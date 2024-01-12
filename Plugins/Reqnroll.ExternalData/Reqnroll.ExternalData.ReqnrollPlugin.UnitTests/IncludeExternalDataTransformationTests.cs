@@ -55,8 +55,8 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
             CreateScenarioOutline(
                 new[]
                 {
-                    new Examples(new Tag[] { new(null, "@extag1") }, null, "Examples", "1", "", new TableRow(null, new[] { new TableCell(null, "product") }), new TableRow[0]),
-                    new Examples(new Tag[] { new(null, "@extag2") }, null, "Examples", "2", "", new TableRow(null, new[] { new TableCell(null, "product") }), new TableRow[0])
+                    new Examples(new Tag[] { new(null, "@extag1") }, null, "Examples", "1", "", new Gherkin.Ast.TableRow(null, new[] { new TableCell(null, "product") }), new Gherkin.Ast.TableRow[0]),
+                    new Examples(new Tag[] { new(null, "@extag2") }, null, "Examples", "2", "", new Gherkin.Ast.TableRow(null, new[] { new TableCell(null, "product") }), new Gherkin.Ast.TableRow[0])
                 });
 
 

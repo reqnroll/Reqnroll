@@ -53,7 +53,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
                 $"SO {++_scenarioCounter}",
                 null,
                 new[] { new Step(null, "Given ", "the customer has <product>", null) },
-                new[] { new Examples(new Tag[0], null, "Examples", "", "", new TableRow(null, new[] { new TableCell(null, "product") }), new TableRow[0]) });
+                new[] { new Examples(new Tag[0], null, "Examples", "", "", new Gherkin.Ast.TableRow(null, new[] { new TableCell(null, "product") }), new Gherkin.Ast.TableRow[0]) });
         }
 
         private Scenario CreateScenario()

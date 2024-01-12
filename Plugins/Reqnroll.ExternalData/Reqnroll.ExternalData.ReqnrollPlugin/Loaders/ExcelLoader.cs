@@ -17,7 +17,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
 
         protected override DataSource LoadDataSourceFromFilePath(string filePath, string sourceFilePath)
         {
-            using var stream = File.Open(filePath, FileMode.Open, FileAccess.Read);
+            using var stream = File.Open(filePath, FileMode.Open, System.IO.FileAccess.Read);
             using IExcelDataReader reader = ExcelReaderFactory.CreateReader(stream);
 
             var result = reader.AsDataSet(new ExcelDataSetConfiguration
