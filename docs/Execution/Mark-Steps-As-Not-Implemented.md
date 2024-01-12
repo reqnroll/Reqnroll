@@ -1,6 +1,6 @@
 # Mark Steps as not implemented
 
-To mark a step as not implemented at runtime, you need to throw a `PendingStepException`. The Runtime of SpecFlow will detect this and will report the appropriate test result back to your test runner.
+To mark a step as not implemented at runtime, you need to throw a `PendingStepException`. The Runtime of Reqnroll will detect this and will report the appropriate test result back to your test runner.
 
 There are multiple ways to throw the exception.
 

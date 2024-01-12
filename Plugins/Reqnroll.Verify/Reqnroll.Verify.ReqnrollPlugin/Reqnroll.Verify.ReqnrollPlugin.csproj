@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(Reqnroll_Generator_TFM)</TargetFrameworks>
+    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Verify.nuspec</NuspecFile>
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="Verify" Version="17.7.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+  </ItemGroup>
+</Project>

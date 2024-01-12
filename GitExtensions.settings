@@ -1,11 +1,11 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <dictionary>
   <item>
     <key>
       <string>BuildServer.AppVeyor.AppVeyorAccountName</string>
     </key>
     <value>
-      <string>SpecFlow</string>
+      <string>Reqnroll</string>
     </value>
   </item>
   <item>
@@ -29,7 +29,7 @@
       <string>BuildServer.AppVeyor.AppVeyorProjectName</string>
     </key>
     <value>
-      <string>SpecFlow</string>
+      <string>Reqnroll</string>
     </value>
   </item>
   <item>
@@ -76,7 +76,7 @@
     &lt;LinkFormats&gt;
       &lt;GitExtLinkFormat&gt;
         &lt;Caption&gt;View on GitHub&lt;/Caption&gt;
-        &lt;Format&gt;https://github.com/SpecFlowOSS/SpecFlow/commit/%COMMIT_HASH%&lt;/Format&gt;
+        &lt;Format&gt;https://github.com/reqnroll/Reqnroll/commit/%COMMIT_HASH%&lt;/Format&gt;
       &lt;/GitExtLinkFormat&gt;
     &lt;/LinkFormats&gt;
     &lt;Name&gt;GitHub - commit&lt;/Name&gt;
@@ -93,7 +93,7 @@
     &lt;LinkFormats&gt;
       &lt;GitExtLinkFormat&gt;
         &lt;Caption&gt;Issue {0}&lt;/Caption&gt;
-        &lt;Format&gt;https://github.com/SpecFlowOSS/SpecFlow/issues/{0}&lt;/Format&gt;
+        &lt;Format&gt;https://github.com/reqnroll/Reqnroll/issues/{0}&lt;/Format&gt;
       &lt;/GitExtLinkFormat&gt;
     &lt;/LinkFormats&gt;
     &lt;Name&gt;GitHub - issues&lt;/Name&gt;
@@ -112,7 +112,7 @@
     &lt;LinkFormats&gt;
       &lt;GitExtLinkFormat&gt;
         &lt;Caption&gt;PR {0}&lt;/Caption&gt;
-        &lt;Format&gt;https://github.com/SpecFlowOSS/SpecFlow/pull/{0}&lt;/Format&gt;
+        &lt;Format&gt;https://github.com/reqnroll/Reqnroll/pull/{0}&lt;/Format&gt;
       &lt;/GitExtLinkFormat&gt;
     &lt;/LinkFormats&gt;
     &lt;Name&gt;GitHub - PR&lt;/Name&gt;

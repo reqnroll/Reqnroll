@@ -70,12 +70,12 @@ jobs:
       archiveFile: ${{ parameters.artifactFileName }} 
       
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: SpecFlow.CI-Sources'
+    displayName: 'Publish Artifact: Reqnroll.CI-Sources'
     condition: and(succeeded(), ${{ parameters.publishArtifacts}})
     inputs:
       PathtoPublish: ${{ parameters.artifactFileName }} 
       artifactType: container
-      ArtifactName: 'SpecFlow.CI-BuildResult-${{ parameters.name }}'
+      ArtifactName: 'Reqnroll.CI-BuildResult-${{ parameters.name }}'
       
   - task: CopyFiles@2
     displayName: 'Copy binlogs'
@@ -85,9 +85,9 @@ jobs:
       targetFolder:  '$(Build.SourcesDirectory)/binlogs'
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: SpecFlow.CI-Binlogs'
+    displayName: 'Publish Artifact: Reqnroll.CI-Binlogs'
     condition: ${{ parameters.publishArtifacts}}
     inputs:
       PathtoPublish: '$(Build.SourcesDirectory)/binlogs'
       artifactType: container
-      ArtifactName: 'SpecFlow.CI-Binlogs-${{ parameters.name }}'
+      ArtifactName: 'Reqnroll.CI-Binlogs-${{ parameters.name }}'

@@ -1,6 +1,6 @@
 # ScenarioContext
 
-You may have at least seen the ScenarioContext from the code that SpecFlow generates when a missing step definition is found: `ScenarioContext.Pending();`
+You may have at least seen the ScenarioContext from the code that Reqnroll generates when a missing step definition is found: `ScenarioContext.Pending();`
 
 `ScenarioContext` provides access to several functions, which are demonstrated using the following scenarios.
 
@@ -122,7 +122,7 @@ See [Mark Steps as not implemented](../Execution/Mark-Steps-As-Not-Implemented.m
 
 ScenarioContext helps you store values in a dictionary between steps. This helps you to organize your step definitions better than using private variables in step definition classes.
 
-There are some type-safe extension methods that help you to manage the contents of the dictionary in a safer way. To do so, you need to include the namespace TechTalk.SpecFlow.Assist, since these methods are extension methods of ScenarioContext.
+There are some type-safe extension methods that help you to manage the contents of the dictionary in a safer way. To do so, you need to include the namespace Reqnroll.Assist, since these methods are extension methods of ScenarioContext.
 
 ## ScenarioContext.ScenarioInfo
 

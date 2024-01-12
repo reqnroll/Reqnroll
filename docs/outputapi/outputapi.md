@@ -1,13 +1,13 @@
 # Output API
 
-The SpecFlow Output API allows you to display texts and attachments in your IDE's test explorer output window and also in SpecFlow+LivingDoc.
+The Reqnroll Output API allows you to display texts and attachments in your IDE's test explorer output window and also in SpecFlow+LivingDoc.
 
-To use the SpecFlow output API interface you must inject the `ISpecFlowOutputHelper` interface via [Context Injection](../Bindings/Context-Injection.md):
+To use the Reqnroll output API interface you must inject the `IReqnrollOutputHelper` interface via [Context Injection](../Bindings/Context-Injection.md):
 
 ```csharp
-    private readonly ISpecFlowOutputHelper _specFlowOutputHelper;
+    private readonly IReqnrollOutputHelper _reqnrollOutputHelper;
 
-    public CalculatorStepDefinitions(ISpecFlowOutputHelper outputHelper)
+    public CalculatorStepDefinitions(IReqnrollOutputHelper outputHelper)
     {
         _outputHelper = outputHelper;
     }
@@ -20,7 +20,7 @@ There are two methods available:
 This method adds text:
 
 ```csharp
-    _specFlowOutputHelper.WriteLine("TEXT");
+    _reqnrollOutputHelper.WriteLine("TEXT");
 ```
 
 ### AddAttachment(string filePath)
@@ -28,7 +28,7 @@ This method adds text:
 This method adds an attachment and requires the file path:
 
 ```csharp
-    _specFlowOutputHelper.AddAttachment("filePath");
+    _reqnrollOutputHelper.AddAttachment("filePath");
 ```
 
 *> Note: The attachment file can be stored anywhere. But it is important to keep mind that if a local file is added, it will only work on your machine and not accessible when shared with others.*
@@ -37,13 +37,13 @@ This method adds an attachment and requires the file path:
 
 ## Example
 
-This example is based on the [Selenium with Page Object Model Pattern](../ui-automation/Selenium-with-Page-Object-Pattern.md) project which tests a simple calculator web application. You can download the repo for this example [here](https://github.com/SpecFlowOSS/SpecFlow-Examples/tree/master/OutputAPI).
+This example is based on the [Selenium with Page Object Model Pattern](../ui-automation/Selenium-with-Page-Object-Pattern.md) project which tests a simple calculator web application. You can download the repo for this example [here](https://github.com/reqnroll/Reqnroll-Examples/tree/master/OutputAPI).
 
-The `_specFlowOutputHelper.WriteLine` is used to indicate when the browser launches and closes:
+The `_reqnrollOutputHelper.WriteLine` is used to indicate when the browser launches and closes:
 
 ![Writeline example](../_static/images/writeline.png)
 
-Since this project tests a web application using a browser, the `_specFlowOutputHelper.AddAttachment` method has been used in the logging [Hooks](../Bindings/Hooks.md) to display the saved screen shots taken during testing:
+Since this project tests a web application using a browser, the `_reqnrollOutputHelper.AddAttachment` method has been used in the logging [Hooks](../Bindings/Hooks.md) to display the saved screen shots taken during testing:
 
 ![Writeattachment example](../_static/images/writeattachment.png)
 
@@ -63,11 +63,11 @@ If an attachment fails, the output explorer will display this message:
 
 ![Output error](../_static/images/outputerror.png)
 
-In SpecFlow+LivingDoc, no additional setup is required, simply [generate LivingDoc](https://docs.specflow.org/projects/specflow-livingdoc/en/latest/LivingDocGenerator/Using-the-command-line-tool.html) as you normally do. You can then view the output texts and attachments by toggling the *Show/Hide Test Output* :
+In SpecFlow+LivingDoc, no additional setup is required, simply [generate LivingDoc](https://docs.reqnroll.net/projects/reqnroll-livingdoc/en/latest/LivingDocGenerator/Using-the-command-line-tool.html) as you normally do. You can then view the output texts and attachments by toggling the *Show/Hide Test Output* :
 
 ![Output API in LivingDoc](../_static/images/livingdoc.png)
 
-*> Note: If the test output toggle is missing, it may be that you are on an older version of SpecFlow+LivingDoc, click [here](https://docs.specflow.org/projects/specflow-livingdoc/en/latest/LivingDocGenerator/Installing-the-command-line-tool.html) to update to the latest version.*
+*> Note: If the test output toggle is missing, it may be that you are on an older version of SpecFlow+LivingDoc, click [here](https://docs.reqnroll.net/projects/reqnroll-livingdoc/en/latest/LivingDocGenerator/Installing-the-command-line-tool.html) to update to the latest version.*
 
 *> Note: The Output API in SpecFlow+LivingDoc supports the following four [Hooks](../Bindings/Hooks.md) :*
 

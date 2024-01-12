@@ -17,7 +17,7 @@ methods in Visual Studio:
          
          * Enter a name for your class in the **Class name** field.
         
-         * Choose your desired `Step Definition Style <https://docs.specflow.org/projects/specflow/en/latest/Bindings/Step-Definitions.html#step-matching-styles-rules>`__, which include formats without regular expressions. Click on **Preview** to preview the output.
+         * Choose your desired `Step Definition Style <https://docs.reqnroll.net/projects/reqnroll/en/latest/Bindings/Step-Definitions.html#step-matching-styles-rules>`__, which include formats without regular expressions. Click on **Preview** to preview the output.
         
          * Click on **Generate** to add a new .cs file with your class to your project. This file will contain the skeleton code for your class and the selected steps.
 
@@ -26,7 +26,7 @@ methods in Visual Studio:
             clipboard** to copy the generated skeleton code to the clipboard. You can then paste it to the file of your choosing.
 
          The most common parameter usage patterns (quotes, apostrophes, numbers) are detected automatically when creating the code and are used by
-         SpecFlow to generate methods and regular expressions.For more information on the available options and custom templates, refer to the `Step Definition Style <https://docs.specflow.org/projects/specflow/en/latest/Bindings/Step-Definitions.html#step-matching-styles-rules>`__ page.
+         Reqnroll to generate methods and regular expressions.For more information on the available options and custom templates, refer to the `Step Definition Style <https://docs.reqnroll.net/projects/reqnroll/en/latest/Bindings/Step-Definitions.html#step-matching-styles-rules>`__ page.
       .. figure:: /_static/images/generatedef2019.gif
          :alt: vs2019
 

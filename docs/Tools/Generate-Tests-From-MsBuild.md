@@ -4,27 +4,27 @@
 
 You need to use the MSBuild code behind file generation for SpecFlow 3.0.  
 
-After version SpecFlow 3.3.30 don't need to add the `SpecFlow.Tools.MSBuild.Generation` package anymore to your project, if you are using one of our [Unit-Test-Provider](../Installation/Unit-Test-Providers.md) NuGet packages.
+After version SpecFlow 3.3.30 don't need to add the `Reqnroll.Tools.MSBuild.Generation` package anymore to your project, if you are using one of our [Unit-Test-Provider](../Installation/Unit-Test-Providers.md) NuGet packages.
 
 **Note:** You will need at least VS2017/MSBuild 15 to use this package.
 
 ### Configuration
 
-1. Add the NuGet package `SpecFlow.Tools.MsBuild.Generation` with the same version as SpecFlow to your project.
-2. Remove all `SpecFlowSingleFileGenerator` custom tool entries from your feature files.<br><img src=http://www.specflow.org/screenshots/CustomTool.png>
-3. Select <b>Tools | Options | SpecFlow</b> from the menu in Visual Studio, and set <b>Enable SpecFlowSingleFileGenerator CustomTool</b> to "false".
+1. Add the NuGet package `Reqnroll.Tools.MsBuild.Generation` with the same version as Reqnroll to your project.
+2. Remove all `ReqnrollSingleFileGenerator` custom tool entries from your feature files.<br><img src=http://www.reqnroll.net/screenshots/CustomTool.png>
+3. Select <b>Tools | Options | Reqnroll</b> from the menu in Visual Studio, and set <b>Enable ReqnrollSingleFileGenerator CustomTool</b> to "false".
 
 ### SDK Style project system
 
 <b>Please use the SpecFlow 2.4.1 NuGet package or higher, as this version fixes an issue with previous versions (see *Known Issues* below)</b>
 <!--
-1. Add the NuGet package `SpecFlow.Tools.MsBuild.Generation` with the same version as SpecFlow to your project.
-2. Remove all `SpecFlowSingleFileGenerator` custom tool entries from your feature files.<br><img src=http://www.specflow.org/screenshots/CustomTool.png>
+1. Add the NuGet package `Reqnroll.Tools.MsBuild.Generation` with the same version as Reqnroll to your project.
+2. Remove all `ReqnrollSingleFileGenerator` custom tool entries from your feature files.<br><img src=http://www.reqnroll.net/screenshots/CustomTool.png>
 -->
 
 ## Additional Legacy Options (Prior to SpecFlow 3)
 
-The `TechTalk.SpecFlow.targets` file defines a number of default options in the following section:
+The `Reqnroll.targets` file defines a number of default options in the following section:
 
 ```xml
 <PropertyGroup>
@@ -52,17 +52,17 @@ To change these options, add the corresponding element to your project file **be
 ...
 </ItemGroup>
 <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-<Import Project="..\packages\SpecFlow.2.2.0\tools\TechTalk.SpecFlow.tasks"  Condition="Exists('..\packages\SpecFlow.2.2.0\tools\TechTalk.SpecFlow.tasks')" />
-<Import Project="..\packages\SpecFlow.2.2.0\tools\TechTalk.SpecFlow.targets" Condition="Exists('..\packages\SpecFlow.2.2.0\tools\TechTalk.SpecFlow.targets')" />
+<Import Project="..\packages\Reqnroll.2.2.0\tools\Reqnroll.tasks"  Condition="Exists('..\packages\Reqnroll.2.2.0\tools\Reqnroll.tasks')" />
+<Import Project="..\packages\Reqnroll.2.2.0\tools\Reqnroll.targets" Condition="Exists('..\packages\Reqnroll.2.2.0\tools\Reqnroll.targets')" />
 ...
 </Project>
 ```
 
 ## Known Issues
 
-### SpecFlow prior to 2.4.1
+### Reqnroll prior to 2.4.1
 
-When using SpecFlow NuGet packages prior to SpecFlow 2.4.1, Visual Studio sometimes does not recognize that a feature file has changed. To generate the code-behind file, you therefore need to rebuild your project. We recommend upgrading your SpecFlow NuGet package to 2.4.1 or higher, where this is no longer an issue.
+When using Reqnroll NuGet packages prior to SpecFlow 2.4.1, Visual Studio sometimes does not recognize that a feature file has changed. To generate the code-behind file, you therefore need to rebuild your project. We recommend upgrading your Reqnroll NuGet package to 2.4.1 or higher, where this is no longer an issue.
 
 ### Code-behind files not generating at compile time
 
@@ -70,4 +70,4 @@ When using the classic project system, the previous MSBuild target may no longer
 
 ### Linked files are not included
 
-If you link feature files into a project, no code-behind file is generated for them (see GitHub Issue [1295](https://github.com/techtalk/SpecFlow/issues/1295)).
+If you link feature files into a project, no code-behind file is generated for them (see GitHub Issue [1295](https://github.com/reqnroll/Reqnroll/issues/1295)).

@@ -1,24 +1,24 @@
 # Castle Windsor
 
 ## Introduction
-SpecFlow plugin for using Castle Windsor as a dependency injection framework for step definitions.
+Reqnroll plugin for using Castle Windsor as a dependency injection framework for step definitions.
 
 ***Currently supports***
 
 **Castle Windsor v5.0.1 or above**
 
-## Step by step walkthrough of using SpecFlow.Windsor
+## Step by step walkthrough of using Reqnroll.Windsor
 
 ### 1. Install plugin
 
-**-** Install plugin from NuGet into your SpecFlow project.
+**-** Install plugin from NuGet into your Reqnroll project.
 
 ```csharp
-PM> Install-Package SpecFlow.Windsor
+PM> Install-Package Reqnroll.Windsor
 ```
 ### 2. Create static method
 
-**-** Create a static method somewhere in the SpecFlow project
+**-** Create a static method somewhere in the Reqnroll project
   
   (Recommended to put it into the `Support` folder) that returns a Windsor `IWindsorContainer` and tag it with the `[ScenarioDependencies]` attribute.
   

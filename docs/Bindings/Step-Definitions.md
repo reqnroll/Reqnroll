@@ -10,7 +10,7 @@ public class StepDefinitions
 }
 ```
 
-*> **Note:** Bindings (step definitions, hooks) are global for the entire SpecFlow project.*
+*> **Note:** Bindings (step definitions, hooks) are global for the entire Reqnroll project.*
 
 For better reusability, the step definitions can include parameters. This means that it is not necessary to define a new step definition for each step that just differs slightly. For example, the steps `When I perform a simple search on 'Domain'` and `When I perform a simple search on 'Communication'` can be automated with a single step definition, with 'Domain' and 'Communication' as parameters.  
 
@@ -40,10 +40,10 @@ public void WhenIPerformASimpleSearchOn(string searchTerm)
 
 ## Supported Step Definition Attributes
 
-* `[Given(expression)]` or `[Given]` - `TechTalk.SpecFlow.GivenAttribute`
-* `[When(expression)]` or `[When]` - `TechTalk.SpecFlow.WhenAttribute`
-* `[Then(expression)]` or `[Then]` - `TechTalk.SpecFlow.ThenAttribute`
-* `[StepDefinition(expression)]` or `[StepDefinition]` - `TechTalk.SpecFlow.StepDefinitionAttribute`, matches for given, when or then attributes
+* `[Given(expression)]` or `[Given]` - `Reqnroll.GivenAttribute`
+* `[When(expression)]` or `[When]` - `Reqnroll.WhenAttribute`
+* `[Then(expression)]` or `[Then]` - `Reqnroll.ThenAttribute`
+* `[StepDefinition(expression)]` or `[StepDefinition]` - `Reqnroll.StepDefinitionAttribute`, matches for given, when or then attributes
 
 The `expression` can be either a Cucumber Expression (from SpecFlow v4) or a Regular Expression. 
 
@@ -60,7 +60,7 @@ public void WhenIPerformASimpleSearchOn(string searchTerm)
 
 ## Other Attributes
 
-The `[Obsolete]` attribute from the system namespace is also supported, check [here](https://docs.specflow.org/projects/specflow/en/latest/Installation/Configuration.html#runtime) for more details.
+The `[Obsolete]` attribute from the system namespace is also supported, check [here](https://docs.reqnroll.net/projects/reqnroll/en/latest/Installation/Configuration.html#runtime) for more details.
 
 ```c#
 [Given("Stuff is done")]
@@ -136,7 +136,7 @@ Matching rules:
 * The step keyword (e.g. `Given`) can be omitted: `[Given] public void I_have_entered_NUMBER_...`.
 * The step keyword can be specified in the local Gherkin language, or English. The default language can be specified in the [app config](../Installation/Configuration.md) as the feature language or binding culture. The following step definition is threfore a valid "Given" step with German language settings: `[When] public void Wenn_ich_addieren_drücke()`
 
-More detailed examples can be found in our specs: [StepDefinitionsWithoutRegex.feature](https://github.com/SpecFlowOSS/SpecFlow/blob/master/Tests/TechTalk.SpecFlow.Specs/Features/Execution/StepDefinitionsWithoutRegex.feature).
+More detailed examples can be found in our specs: [StepDefinitionsWithoutRegex.feature](https://github.com/reqnroll/Reqnroll/blob/master/Tests/Reqnroll.Specs/Features/Execution/StepDefinitionsWithoutRegex.feature).
 
 ### Method name - Pascal-case
 

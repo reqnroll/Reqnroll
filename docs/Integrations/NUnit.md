@@ -1,12 +1,12 @@
 # NUnit
 
-SpecFlow supports NUnit 3.13.1 or later.  
+Reqnroll supports NUnit 3.13.1 or later.  
 
 Documentation for NUnit can be found [here](https://github.com/nunit/docs/wiki/NUnit-Documentation).
 
 ## Needed NuGet Packages
 
-For SpecFlow: [SpecFlow.NUnit](https://www.nuget.org/packages/SpecFlow.NUnit/)  
+For Reqnroll: [Reqnroll.NUnit](https://www.nuget.org/packages/Reqnroll.NUnit/)  
 
 For NUnit: [NUnit](https://www.nuget.org/packages/NUnit/)  
 

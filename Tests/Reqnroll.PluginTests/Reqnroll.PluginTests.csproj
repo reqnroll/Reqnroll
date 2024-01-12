@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(Reqnroll_Test_TFM)</TargetFrameworks>
+    <AssemblyName>Reqnroll.PluginTests</AssemblyName>
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <PackageId>Reqnroll.PluginTests</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Plugins\Reqnroll.Windsor.ReqnrollPlugin\Reqnroll.Windsor.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="FluentAssertions" Version="6.7.0" />
+    <PackageReference Include="Moq" Version="4.17.2" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.console" Version="2.4.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

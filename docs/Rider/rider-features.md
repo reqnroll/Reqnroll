@@ -1,10 +1,10 @@
 # Features
 
-The SpecFlow for Rider plugin is bundled with a handful of features, see below for more details.
+The Reqnroll for Rider plugin is bundled with a handful of features, see below for more details.
 
 ## Navigation
 
-The SpecFlow for Rider plugin allows you to quickly navigate between a Gherkin Step, its relevant bindings, and vice versa.
+The Reqnroll for Rider plugin allows you to quickly navigate between a Gherkin Step, its relevant bindings, and vice versa.
 
 There are multiple ways to achieve this:
 
@@ -36,13 +36,13 @@ You also have the option to create a new binding class straight from the *Create
 
 ## Test Results
 
-The SpecFlow plugin also displays the test results for a specific Gherkin step. You can see whether a test has passed or failed and also execute it by pressing the **⏵** button:
+The Reqnroll plugin also displays the test results for a specific Gherkin step. You can see whether a test has passed or failed and also execute it by pressing the **⏵** button:
 
 ![Rider_results](../_static/images/rider_result.png)
 
 ### Failed Tests Results
 
-If a test fails, the plugin shows you the exact step at which the step failed by highlighting it and also conveniently displays the error message at feature file level. You can view this by hovering over the SpecFlow logo on the failed step:
+If a test fails, the plugin shows you the exact step at which the step failed by highlighting it and also conveniently displays the error message at feature file level. You can view this by hovering over the Reqnroll logo on the failed step:
 
 ![Rider_failed results](../_static/images/rider_failedtest.png)
 

@@ -1,7 +1,7 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0"  >
 
   <PropertyGroup>
-    <SpecFlowBaseVersion Condition="'$(SpecFlowBaseVersion)' == ''">3.5.0</SpecFlowBaseVersion>
+    <ReqnrollBaseVersion Condition="'$(ReqnrollBaseVersion)' == ''">3.5.0</ReqnrollBaseVersion>
   </PropertyGroup>
   
 </Project>

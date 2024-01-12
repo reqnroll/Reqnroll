@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<assembly name="Reqnroll">
+  <member name="T:Reqnroll.BindingAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.GivenAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="M:Reqnroll.GivenAttribute.#ctor(System.String)">
+    <parameter name="regex">
+      <attribute ctor="M:JetBrains.Annotations.RegexPatternAttribute.#ctor"/>
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor"/>
+   </parameter>
+  </member>
+  <member name="M:Reqnroll.GivenAttribute.#ctor(System.String,System.String)">
+    <parameter name="regex">
+      <attribute ctor="M:JetBrains.Annotations.RegexPatternAttribute.#ctor"/>
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor"/>
+   </parameter>
+   <parameter name="culture">
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor"/>
+   </parameter>
+  </member>
+  <member name="T:Reqnroll.WhenAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="M:Reqnroll.WhenAttribute.#ctor(System.String)">
+    <parameter name="regex">
+      <attribute ctor="M:JetBrains.Annotations.RegexPatternAttribute.#ctor"/>
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor"/>
+   </parameter>
+  </member>
+  <member name="T:Reqnroll.ThenAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="M:Reqnroll.ThenAttribute.#ctor(System.String)">
+    <parameter name="regex">
+      <attribute ctor="M:JetBrains.Annotations.RegexPatternAttribute.#ctor"/>
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor"/>
+   </parameter>
+  </member>
+  <member name="T:Reqnroll.BeforeTestRunAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.AfterTestRunAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.BeforeFeatureAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.AfterFeatureAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.BeforeScenarioAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.BeforeAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.AfterScenarioAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.AfterAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.BeforeScenarioBlockAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.AfterScenarioBlockAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.BeforeStepAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.AfterStepAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.Assist.Attributes.TableAliasesAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="M:Reqnroll.Assist.Attributes.TableAliasesAttribute.#ctor(System.String[])">
+  </member>
+  <member name="T:Reqnroll.ScopeAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="T:Reqnroll.StepArgumentTransformationAttribute">
+    <attribute ctor="M:JetBrains.Annotations.MeansImplicitUseAttribute.#ctor" />
+  </member>
+  <member name="M:Reqnroll.StepArgumentTransformationAttribute.#ctor(System.String)">
+    <parameter name="regex">
+      <attribute ctor="M:JetBrains.Annotations.RegexPatternAttribute.#ctor"/>
+      <attribute ctor="M:JetBrains.Annotations.CanBeNullAttribute.#ctor"/>
+   </parameter>
+  </member>
+  <member name="M:Reqnroll.Plugins.RuntimePluginAttribute.#ctor(System.Type)">
+    <parameter name="pluginType">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor"/>
+   </parameter>
+  </member>
+  <member name="M:Reqnroll.Infrastructure.GeneratorPluginAttribute.#ctor(System.Type)">
+    <parameter name="pluginType">
+      <attribute ctor="M:JetBrains.Annotations.NotNullAttribute.#ctor"/>
+   </parameter>
+  </member>
+</assembly>

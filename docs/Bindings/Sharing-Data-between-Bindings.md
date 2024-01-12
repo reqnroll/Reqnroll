@@ -1,10 +1,10 @@
 # Sharing Data between Bindings
 
-In many cases, different bindings need to exchange data during execution. SpecFlow provides several ways of sharing data between bindings.
+In many cases, different bindings need to exchange data during execution. Reqnroll provides several ways of sharing data between bindings.
 
 ## Instance Fields
 
-If the binding is an instance method, SpecFlow creates a new instance of the containing class for every scenario execution. Following the [entity-based step organization rule](https://github.com/cucumber/cucumber/wiki/Step-Organisation), defining instance fields in the binding classes is an efficient way of sharing data between different steps of the same scenario that are related to the same entity. 
+If the binding is an instance method, Reqnroll creates a new instance of the containing class for every scenario execution. Following the [entity-based step organization rule](https://github.com/cucumber/cucumber/wiki/Step-Organisation), defining instance fields in the binding classes is an efficient way of sharing data between different steps of the same scenario that are related to the same entity. 
 
 The following example saves the result of the MVC action to an instance field in order to make assertions for it in a "then" step.
 
@@ -32,7 +32,7 @@ public class SearchSteps
 
 ## Context Injection
 
-SpecFlow supports a very simple dependency framework that is able to instantiate and inject class instances for the scenarios. With this feature you can group the shared state to context-classes, and inject them into every binding class that is interested in that shared state.
+Reqnroll supports a very simple dependency framework that is able to instantiate and inject class instances for the scenarios. With this feature you can group the shared state to context-classes, and inject them into every binding class that is interested in that shared state.
 
 See more about this feature in the [Context Injection](Context-Injection.md) page.
 
@@ -73,7 +73,7 @@ public class BookSteps
 
 ## ScenarioContext and FeatureContext
 
-SpecFlow provides two context instances. 
+Reqnroll provides two context instances. 
 
 The [ScenarioContext](ScenarioContext.md) is created for each individual scenario execution and it is disposed when the scenario execution has been finished.
 
@@ -81,6 +81,6 @@ The [FeatureContext](FeatureContext.md) is created when the first scenario is ex
 
 ## Static Fields
 
-Generally, using static fields can cause synchronization and maintenance issues and makes the unit testability hard. As the SpecFlow tests are executed synchronously and people usually don't write unit tests for the tests itself, these arguments are just partly valid for binding codes. 
+Generally, using static fields can cause synchronization and maintenance issues and makes the unit testability hard. As the Reqnroll tests are executed synchronously and people usually don't write unit tests for the tests itself, these arguments are just partly valid for binding codes. 
 
 In some cases sharing a state through static fields can be an efficient solution.

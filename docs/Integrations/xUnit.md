@@ -1,12 +1,12 @@
 # xUnit
 
-SpecFlow supports xUnit 2.4 or later.  
+Reqnroll supports xUnit 2.4 or later.  
 
 Documentation for xUnit can be found [here](https://xunit.net/#documentation).
 
 ## Needed NuGet Packages
 
-For SpecFlow: [SpecFlow.xUnit](https://www.nuget.org/packages/SpecFlow.xUnit/)
+For Reqnroll: [Reqnroll.xUnit](https://www.nuget.org/packages/Reqnroll.xUnit/)
 
 For xUnit: [xUnit](https://www.nuget.org/packages/xunit/)  
 
@@ -24,7 +24,7 @@ The xUnit ITestOutputHelper is registered in the ScenarioContainer. You can get 
 ``` csharp
 
 using System;
-using TechTalk.SpecFlow;
+using Reqnroll;
 
 [Binding]
 public class BindingClass

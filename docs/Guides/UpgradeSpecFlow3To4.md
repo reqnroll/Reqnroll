@@ -10,13 +10,13 @@ Before upgrading to the latest version, ensure you have a backup of your project
 
 SpecFlow v4 supports [Cucumber Expressions](../Bindings/Cucumber-Expressions.md) natively for [step definitions](../Bindings/Step-Definitions.md). This means that whenever you define a step using the `[Given]`, `[When]` or `[Then]` attribute you can either provide a regular expression for it as a parameter or a cucumber expression.
 
-Based on the expression you have provided, SpecFlow tries to decide whether it is a regular expression or a cucumber expression.
+Based on the expression you have provided, Reqnroll tries to decide whether it is a regular expression or a cucumber expression.
 
 Most of your existing regex step definitions will be compatible, because they are either properly recognized as regex or the expression works the same way with both expression types (e.g. simple text without parameters). 
 
 ### Invalid expressions after upgrade
 
-In some cases you may see an error after upgrading to the new SpecFlow version. For example if you had a step definition with an attribute like:
+In some cases you may see an error after upgrading to the new Reqnroll version. For example if you had a step definition with an attribute like:
 
 ```
 [When(@"I \$ something")]
@@ -26,7 +26,7 @@ In some cases you may see an error after upgrading to the new SpecFlow version. 
 This Cucumber Expression has a problem ...
 ```
 
-In this case the problem is that SpecFlow wrongly identified your expression as a cucumber expression.
+In this case the problem is that Reqnroll wrongly identified your expression as a cucumber expression.
 
 **Solution 1:** Force the expression to be a regular expression by specifying the regex start/end markers (`^`/`$`):
 
@@ -60,13 +60,13 @@ For the latter case, you would need to mask the `/` character:
 
 ### Cucumber Expression step definition skeletons
 
-From v4 SpecFlow will by default generate step definition skeletons (snippets) for the new steps. So in case you write a new step as
+From v4 Reqnroll will by default generate step definition skeletons (snippets) for the new steps. So in case you write a new step as
 
 ```
 When I have 42 cucumbers in my belly
 ```
 
-SpecFlow will suggest the step definition to be:
+Reqnroll will suggest the step definition to be:
 
 ```
 [When("I have {int} cucumbers in my belly")]
@@ -74,11 +74,11 @@ public void WhenIHaveCucumbersInMyBelly(int p0)
 ...
 ```
 
-If you would like to use only regular expressions in your project you either have to manually fix the expression, or you can configure SpecFlow to generate skeletons with regular expressions. This you can achieve with the following setting in the `specflow.json` file:
+If you would like to use only regular expressions in your project you either have to manually fix the expression, or you can configure Reqnroll to generate skeletons with regular expressions. This you can achieve with the following setting in the `reqnroll.json` file:
 
 ```
 {
-  "$schema": "https://specflow.org/specflow-config.json",
+  "$schema": "https://reqnroll.net/reqnroll-config.json",
   "trace": {
     "stepDefinitionSkeletonStyle": "RegexAttribute"
   }

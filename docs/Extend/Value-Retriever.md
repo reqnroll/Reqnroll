@@ -1,6 +1,6 @@
 # Value Retrievers
 
-SpecFlow can turn properties in a table like this:
+Reqnroll can turn properties in a table like this:
 
 ```gherkin
 Given I have the following people
@@ -33,7 +33,7 @@ With commands like these:
 
 ```
 
-But how does SpecFlow match the values in the table with the values in the object?  It does so with Value Retrievers.  There are value retrievers defined for almost every C# base type, so mapping most basic POCOs can be done with SpecFlow without any modification.
+But how does Reqnroll match the values in the table with the values in the object?  It does so with Value Retrievers.  There are value retrievers defined for almost every C# base type, so mapping most basic POCOs can be done with Reqnroll without any modification.
 
 ## Extending with your own value retrievers
 

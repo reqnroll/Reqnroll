@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(Reqnroll_Generator_TFM)</TargetFrameworks>
+    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.MSTest.nuspec</NuspecFile>
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="build\**\*" />
+    <None Include="build\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+
+    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+    <ProjectReference Include="..\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
+  </ItemGroup>
+
+
+  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="$(DesignTimeBuild) != 'true' or '$(BuildingProject)' == 'true'">
+    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.cs" TextToReplace="SPECFLOW_VERSION" TextToReplaceWith="$(NuGetPackageVersion)" WriteOnlyWhenChanged="true" />
+    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.template.vb" OutputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.vb" TextToReplace="SPECFLOW_VERSION" TextToReplaceWith="$(NuGetPackageVersion)" WriteOnlyWhenChanged="true" />
+  </Target>
+  
+</Project>

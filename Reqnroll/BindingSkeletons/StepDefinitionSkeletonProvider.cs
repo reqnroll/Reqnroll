@@ -1,0 +1,222 @@
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+using Reqnroll.Bindings;
+using Reqnroll.Tracing;
+
+namespace Reqnroll.BindingSkeletons
+{
+    public class StepDefinitionSkeletonProvider : IStepDefinitionSkeletonProvider
+    {
+        public const string METHOD_INDENT = "        ";
+
+        private readonly ISkeletonTemplateProvider templateProvider;
+        private readonly IStepTextAnalyzer stepTextAnalyzer;
+
+        public StepDefinitionSkeletonProvider(ISkeletonTemplateProvider templateProvider, IStepTextAnalyzer stepTextAnalyzer)
+        {
+            this.templateProvider = templateProvider;
+            this.stepTextAnalyzer = stepTextAnalyzer;
+        }
+
+        public string GetBindingClassSkeleton(ProgrammingLanguage language, StepInstance[] stepInstances, string namespaceName, string className, StepDefinitionSkeletonStyle style, CultureInfo bindingCulture)
+        {
+            var template = templateProvider.GetStepDefinitionClassTemplate(language);
+
+            var bindings = string.Join(Environment.NewLine, GetOrderedSteps(stepInstances)
+                .Select(si => GetStepDefinitionSkeleton(language, si, style, bindingCulture)).Distinct().ToArray()).TrimEnd();
+            if (bindings.Length > 0)
+                bindings = bindings.Indent(METHOD_INDENT);
+
+            //{namespace}/{className}/{bindings}
+            return ApplyTemplate(template, new { @namespace = namespaceName, className, bindings});
+        }
+
+        private static IEnumerable<StepInstance> GetOrderedSteps(StepInstance[] stepInstances)
+        {
+            return stepInstances
+                .Select((si, index) => new { Step = si, Index = index})
+                .OrderBy(item => item.Step.StepDefinitionType)
+                .ThenBy(item => item.Index)
+                .Select(item => item.Step);
+        }
+
+        public virtual string GetStepDefinitionSkeleton(ProgrammingLanguage language, StepInstance stepInstance, StepDefinitionSkeletonStyle style, CultureInfo bindingCulture)
+        {
+            var withExpression = style == StepDefinitionSkeletonStyle.RegexAttribute || style == StepDefinitionSkeletonStyle.CucumberExpressionAttribute;
+            var template = templateProvider.GetStepDefinitionTemplate(language, withExpression);
+            var analyzedStepText = Analyze(stepInstance, bindingCulture);
+            //{attribute}/{regex}/{methodName}/{parameters}
+            return ApplyTemplate(template, new
+                                               {
+                                                   attribute = stepInstance.StepDefinitionType,
+                                                   expression = withExpression ? GetExpression(analyzedStepText, style, language) : "",
+                                                   methodName = GetMethodName(stepInstance, analyzedStepText, style, language),
+                                                   parameters = string.Join(", ", analyzedStepText.Parameters.Select(p => ToDeclaration(language, p)).ToArray())
+                                               });
+        }
+
+        private string GetExpression(AnalyzedStepText analyzedStepText, StepDefinitionSkeletonStyle style, ProgrammingLanguage programmingLanguage)
+        {
+            switch (style)
+            {
+                case StepDefinitionSkeletonStyle.RegexAttribute:
+                    var regex = GetRegex(analyzedStepText);
+                    var stringPrefix = programmingLanguage == ProgrammingLanguage.VB ? "" : "@";
+                    return $"{stringPrefix}\"{regex}\"";
+                case StepDefinitionSkeletonStyle.CucumberExpressionAttribute:
+                    var cucumberExpression = GetCucumberExpression(analyzedStepText);
+                    return $"\"{cucumberExpression}\"";
+                default: 
+                    return "";
+            }
+        }
+
+        private string GetCucumberExpression(AnalyzedStepText stepText)
+        {
+            StringBuilder result = new StringBuilder();
+
+            result.Append(EscapeRegex(stepText.TextParts[0]));
+            for (int i = 1; i < stepText.TextParts.Count; i++)
+            {
+                var parameter = stepText.Parameters[i - 1];
+                result.AppendFormat("{{{0}}}", parameter.CucumberExpressionTypeName ?? parameter.Type);
+                result.Append(EscapeRegex(stepText.TextParts[i]));
+            }
+
+            return result.ToString();
+        }
+
+        private AnalyzedStepText Analyze(StepInstance stepInstance, CultureInfo bindingCulture)
+        {
+            var result = stepTextAnalyzer.Analyze(stepInstance.Text, bindingCulture);
+            if (stepInstance.MultilineTextArgument != null)
+                result.Parameters.Add(new AnalyzedStepParameter("String", "multilineText"));
+            if (stepInstance.TableArgument != null)
+                result.Parameters.Add(new AnalyzedStepParameter("Table", "table"));
+            return result;
+        }
+
+        private static readonly Regex wordRe = new Regex(@"[\w]+");
+        private IEnumerable<string> GetWords(string text)
+        {
+            return wordRe.Matches(text).Cast<Match>().Select(m => m.Value);
+        }
+
+        private string GetMethodName(StepInstance stepInstance, AnalyzedStepText analyzedStepText, StepDefinitionSkeletonStyle style, ProgrammingLanguage language)
+        {
+            var keyword = LanguageHelper.GetDefaultKeyword(stepInstance.StepContext.Language, stepInstance.StepDefinitionType);
+            switch (style)
+            {
+                case StepDefinitionSkeletonStyle.RegexAttribute:
+                case StepDefinitionSkeletonStyle.CucumberExpressionAttribute:
+                    return keyword.ToIdentifier() + string.Concat(analyzedStepText.TextParts.ToArray()).ToIdentifier();
+                case StepDefinitionSkeletonStyle.MethodNameUnderscores:
+                    return GetMatchingMethodName(keyword, analyzedStepText, stepInstance.StepContext.Language, AppendWordsUnderscored, "_{0}");
+                case StepDefinitionSkeletonStyle.MethodNamePascalCase:
+                    return GetMatchingMethodName(keyword, analyzedStepText, stepInstance.StepContext.Language, AppendWordsPascalCase, "_{0}_");
+                case StepDefinitionSkeletonStyle.MethodNameRegex:
+                    if (language != ProgrammingLanguage.FSharp)
+                        goto case StepDefinitionSkeletonStyle.MethodNameUnderscores;
+                    return "``" + GetRegex(analyzedStepText) + "``";
+                default:
+                    throw new NotSupportedException();
+            }
+        }
+
+        private string GetMatchingMethodName(string keyword, AnalyzedStepText analyzedStepText, CultureInfo language, Action<string, CultureInfo, StringBuilder> appendWords, string paramFormat)
+        {
+            StringBuilder result = new StringBuilder(keyword);
+
+            appendWords(analyzedStepText.TextParts[0], language, result);
+            for (int i = 1; i < analyzedStepText.TextParts.Count; i++)
+            {
+                result.AppendFormat(paramFormat, analyzedStepText.Parameters[i - 1].Name.ToUpper(CultureInfo.InvariantCulture));
+                appendWords(analyzedStepText.TextParts[i], language, result);
+            }
+
+            if (result.Length > 0 && result[result.Length - 1] == '_')
+                result.Remove(result.Length - 1, 1);
+
+            return result.ToString();
+        }
+
+        private void AppendWordsUnderscored(string text, CultureInfo language, StringBuilder result)
+        {
+            foreach (var word in GetWords(text))
+            {
+                result.Append("_");
+                result.Append(word);
+            }
+        }
+
+        private void AppendWordsPascalCase(string text, CultureInfo language, StringBuilder result)
+        {
+            foreach (var word in GetWords(text))
+            {
+                result.Append(word.Substring(0, 1).ToUpper(language));
+                result.Append(word.Substring(1));
+            }
+        }
+
+        private string GetRegex(AnalyzedStepText stepText)
+        {
+            StringBuilder result = new StringBuilder();
+
+            result.Append("^");
+            result.Append(EscapeRegex(stepText.TextParts[0]));
+            for (int i = 1; i < stepText.TextParts.Count; i++)
+            {
+                var parameter = stepText.Parameters[i - 1];
+                result.Append($"{parameter.WrapText}({parameter.RegexPattern}){parameter.WrapText}");
+                result.Append(EscapeRegex(stepText.TextParts[i]));
+            }
+            result.Append("$");
+
+            return result.ToString();
+        }
+
+        protected static string EscapeRegex(string text)
+        {
+            return Regex.Escape(text).Replace("\"", "\"\"").Replace("\\ ", " ");
+        }
+
+        private string ApplyTemplate(string template, object args)
+        {
+            return args.GetType().GetProperties().Aggregate(template, (current, propertyInfo) => current.Replace("{" + propertyInfo.Name + "}", propertyInfo.GetValue(args, null).ToString()));
+        }
+
+        private string ToDeclaration(ProgrammingLanguage language, AnalyzedStepParameter parameter)
+        {
+            return language switch
+            {
+                ProgrammingLanguage.VB => $"ByVal {Keywords.EscapeVBKeyword(parameter.Name)} As {parameter.Type}",
+                ProgrammingLanguage.CSharp => $"{GetCSharpTypeName(parameter.Type)} {Keywords.EscapeCSharpKeyword(parameter.Name)}",
+                ProgrammingLanguage.FSharp => $"{Keywords.EscapeFSharpKeyword(parameter.Name)} : {GetFSharpTypeName(parameter.Type)}",
+                _ => $"{parameter.Type} {parameter.Name}"
+            };
+        }
+
+        private string GetCSharpTypeName(string type)
+        {
+            return type switch
+            {
+                "String" => "string",
+                "Int32" => "int",
+                _ => type
+            };
+        }
+
+        private string GetFSharpTypeName(string type)
+        {
+            return type switch
+            {
+                "String" => "string",
+                _ => type
+            };
+        }
+    }
+}

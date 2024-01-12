@@ -12,11 +12,11 @@ In case your regular expression is wrongly detected as cucumber expression, you 
 [When(@"^this expression is treated as a regex$")]
 ```
 
-For potential migration problems of your existing SpecFlow codebase with regular expressions, please check the [Upgrade from SpecFlow 3.* to 4.*](../Guides/UpgradeSpecFlow3To4.md) guide.
+For potential migration problems of your existing Reqnroll codebase with regular expressions, please check the [Upgrade from SpecFlow 3.* to 4.*](../Guides/UpgradeSpecFlow3To4.md) guide.
 
 ## Removed calling other steps with string
 
-As announced ages ago (https://github.com/SpecFlowOSS/SpecFlow/issues/1733) we have removed the capability to call a step from a step like this:
+As announced ages ago (https://github.com/reqnroll/Reqnroll/issues/1733) we have removed the capability to call a step from a step like this:
 
 ``` csharp
 [Binding]

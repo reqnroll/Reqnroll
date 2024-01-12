@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Manuel Eiwen",
+    "classifications": ["Reqnroll", "Feature"],
+    "identity": "ReqnrollTemplates.DotNET.Item.ReqnrollFeature",
+    "name": "Reqnroll Feature File",
+    "shortName": "reqnroll-feature",
+    "tags": {
+        "language": "C#",
+        "type": "item"
+    }
+}

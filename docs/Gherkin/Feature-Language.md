@@ -10,6 +10,6 @@ Funktionalität: Addition
 ...
 ```
 
-SpecFlow uses the feature file language to determine the set of keywords used to parse the file, but the language setting is also used as the default setting for converting parameters by the SpecFlow runtime. The culture for binding execution and parameter conversion can be specified explicitly, see [bindingCulture element](../Installation/Configuration.md).
+Reqnroll uses the feature file language to determine the set of keywords used to parse the file, but the language setting is also used as the default setting for converting parameters by the Reqnroll runtime. The culture for binding execution and parameter conversion can be specified explicitly, see [bindingCulture element](../Installation/Configuration.md).
 
-As data conversion can only be done using a specific culture in the .NET Framework, we recommend using the specific culture name (e.g. `en-US`) instead of the neutral culture name (e.g. `en`). If a neutral culture is used, SpecFlow uses a specific default culture to convert data (e.g. `en-US` is used to convert data if the `en` language was used).
+As data conversion can only be done using a specific culture in the .NET Framework, we recommend using the specific culture name (e.g. `en-US`) instead of the neutral culture name (e.g. `en`). If a neutral culture is used, Reqnroll uses a specific default culture to convert data (e.g. `en-US` is used to convert data if the `en` language was used).

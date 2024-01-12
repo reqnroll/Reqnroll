@@ -1,0 +1,13 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Manuel Eiwen",
+    "classifications": ["Reqnroll Plus", "Profile"],
+    "identity": "ReqnrollTemplates.DotNET.Item.SpecFlowPlusProfile",
+    "name": "Reqnroll Plus Profile",
+    "shortName": "reqnroll-plus-profile",
+    "tags": {
+        "language": "C#",
+        "type": "item"
+    },
+    "sourceName": "$rootProject$"
+}

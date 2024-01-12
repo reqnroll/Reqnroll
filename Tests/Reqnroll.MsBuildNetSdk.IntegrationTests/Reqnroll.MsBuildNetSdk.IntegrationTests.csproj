@@ -1,0 +1,95 @@
+<Project>
+
+  <!--
+    manual import sdk to be able to simulate nuget based imports
+  -->
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.props" />
+
+  <PropertyGroup>
+    <TargetFramework>$(Reqnroll_Specs_TFM)</TargetFramework>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
+    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>true</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <!--
+    fix test discovery and timeout problem for Reqnroll.MsBuildNetSdk.IntegrationTests
+      https://github.com/dotnet/sdk/issues/7171#issuecomment-261506546
+    -->
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+    <PackageReference Include="Microsoft.TestPlatform.TestHost" Version="17.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.console" Version="2.4.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+
+
+  <ItemGroup>
+    <None Update="App.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <!-- manual import sdk to be able to simulate nuget based imports-->
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <PropertyGroup>
+    <_Reqnroll_PluginTFM Condition=" '$(MSBuildRuntimeType)' == 'Core'">netcoreapp3.1</_Reqnroll_PluginTFM>
+    <_Reqnroll_PluginTFM Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_Reqnroll_PluginTFM>
+  </PropertyGroup>
+
+
+  <Target Name="PreBuild">
+    <MSBuild Projects="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(Reqnroll_Core_Tools_TFM)" />
+    <MSBuild Projects="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=$(Reqnroll_Core_Generator_TFM)" />
+  </Target>
+
+  <ItemGroup>
+    <ReqnrollGeneratorPlugins Include="../../Plugins/Reqnroll.xUnit.Generator.ReqnrollPlugin/bin/$(Configuration)/$(_Reqnroll_PluginTFM)/Reqnroll.xUnit.Generator.ReqnrollPlugin.dll" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_Reqnroll_TaskFolder)' == ''">netcoreapp3.1</_Reqnroll_TaskFolder>
+    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_Reqnroll_TaskFolder)' == ''">net462</_Reqnroll_TaskFolder>
+    <_Reqnroll_TaskAssembly>..\..\Reqnroll.Tools.MsBuild.Generation\bin\$(Configuration)\$(_Reqnroll_TaskFolder)\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
+  </PropertyGroup>
+
+
+  <!-- simulate nuget imports here-->
+  <Import Project="..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
+  <Import Project="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\build\Reqnroll.xUnit.targets" />
+
+  <PropertyGroup>
+    <BuildDependsOn>
+      PreBuild;
+      $(BuildDependsOn)
+    </BuildDependsOn>
+    <RebuildDependsOn>
+      PreBuild;
+      $(RebuildDependsOn)
+    </RebuildDependsOn>
+  </PropertyGroup>
+
+</Project>

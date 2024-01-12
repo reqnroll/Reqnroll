@@ -1,8 +1,8 @@
 # Scoped Step Definitions
 
-Bindings (step definitions, hooks) are global for the entire SpecFlow project. This means that step definitions bound to a very generic step text (e.g. "When I save the changes") become challenging to implement. The general solution for this problem is to phrase the scenario steps in a way that the context is clear (e.g. "When I save the **book details**").
+Bindings (step definitions, hooks) are global for the entire Reqnroll project. This means that step definitions bound to a very generic step text (e.g. "When I save the changes") become challenging to implement. The general solution for this problem is to phrase the scenario steps in a way that the context is clear (e.g. "When I save the **book details**").
 
-In some cases however, it is necessary to restrict when step definitions or hooks are executed based on certain conditions. SpecFlow's scoped bindings can be used for this purpose.
+In some cases however, it is necessary to restrict when step definitions or hooks are executed based on certain conditions. Reqnroll's scoped bindings can be used for this purpose.
 
 You can restrict the execution of scoped bindings by:
 
@@ -97,7 +97,7 @@ The following example defines a different scope for the same step depending on w
 
 ## Scoping Tips & Tricks
 
-The following example shows a way to "ignore" executing the scenarios marked with `@manual`. However SpecFlow's tracing will still display the steps, so you can work through the manual scenarios by following the steps in the report.
+The following example shows a way to "ignore" executing the scenarios marked with `@manual`. However Reqnroll's tracing will still display the steps, so you can work through the manual scenarios by following the steps in the report.
 
 ```c#
     [Binding, Scope(Tag = "manual")]

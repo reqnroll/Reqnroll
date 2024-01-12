@@ -1,0 +1,47 @@
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Verify</id>
+    <version>$version$</version>
+    <title>Reqnroll.Verify</title>
+    <authors>$author$</authors>
+    <owners>$owner$</owners>
+    <description>Package to use Verify with Reqnroll</description>
+    <summary>Package to use Verify with Reqnroll</summary>
+    <language>en-US</language>
+    <projectUrl>https://www.reqnroll.net</projectUrl>
+    <icon>images\reqnroll-icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <tags>reqnroll externaldata json</tags>
+    <copyright>$copyright$</copyright>
+
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Verify" version="17.7.0" />
+      </group>
+      <group targetFramework="netcoreapp3.1">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Verify" version="17.7.0" />
+      </group>
+      <group targetFramework="net6.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Verify" version="17.7.0" />
+      </group>
+    </dependencies>
+
+  </metadata>
+  <files>
+    <file src="build\**\*" target="build"/>
+
+    <file src="bin\$config$\net462\**\*" target="build\net462"/>
+    <file src="bin\$config$\netcoreapp3.1\*" target="build\netcoreapp3.1"/>
+
+    <file src="bin\$config$\net462\Reqnroll.Verify.ReqnrollPlugin.*" target="lib\net462"/>
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.Verify.ReqnrollPlugin.*" target="lib\netcoreapp3.1"/>
+    <file src="bin\$config$\net6.0\Reqnroll.Verify.ReqnrollPlugin.*" target="lib\net6.0"/>
+
+    <file src="$SolutionDir$LICENSE.txt" target="LICENSE.txt" />
+    <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
+  </files>
+</package>

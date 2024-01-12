@@ -1,0 +1,8 @@
+<Project>
+  <UsingTask TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask" AssemblyFile="$(_Reqnroll_TaskAssembly)"  />
+  <UsingTask TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask" AssemblyFile="$(_Reqnroll_TaskAssembly)"  />
+
+  <PropertyGroup>
+    <_ReqnrollTasksImported>true</_ReqnrollTasksImported>
+  </PropertyGroup>
+</Project>

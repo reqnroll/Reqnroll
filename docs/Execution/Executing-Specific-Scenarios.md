@@ -1,11 +1,11 @@
 # Executing specific Scenarios in your Build pipeline
 
-SpecFlow converts the tags in your feature files to test case categories:
+Reqnroll converts the tags in your feature files to test case categories:
 
 - SpecFlow+ Runner: TestCategory
 - NUnit: Category or TestCategory
 - MSTest: TestCategory
-- xUnit: Trait (similar functionality, SpecFlow will insert a Trait attribute with `Category` name)
+- xUnit: Trait (similar functionality, Reqnroll will insert a Trait attribute with `Category` name)
 
 This category can be used to filter the test execution in your build pipeline. Note that the incorrect filter can lead to no test getting executed.
 

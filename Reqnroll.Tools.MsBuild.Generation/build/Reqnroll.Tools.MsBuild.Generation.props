@@ -1,0 +1,77 @@
+<Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+  <PropertyGroup>
+    <Reqnroll_CpsExtensionDesignTimeTargetsPath Condition="'$(Reqnroll_CpsExtensionDesignTimeTargetsPath)' == ''">$(MSBuildThisFileDirectory)CPS\Buildsystem\CpsExtension.DesignTime.targets</Reqnroll_CpsExtensionDesignTimeTargetsPath>
+  </PropertyGroup>
+
+  <Import Project="$(Reqnroll_CpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
+
+
+  <PropertyGroup>
+    <Reqnroll_UseHostCompilerIfAvailable Condition="'$(Reqnroll_UseHostCompilerIfAvailable)'==''">false</Reqnroll_UseHostCompilerIfAvailable>
+    <UseHostCompilerIfAvailable>$(Reqnroll_UseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
+  </PropertyGroup>
+
+
+  <PropertyGroup>
+    <OverwriteReadOnlyFiles Condition="'$(OverwriteReadOnlyFiles)'==''">false</OverwriteReadOnlyFiles>
+    <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
+
+    <ShowTrace Condition="'$(ShowTrace)'==''">false</ShowTrace>
+    <VerboseOutput Condition="'$(VerboseOutput)'==''">true</VerboseOutput>
+    <Reqnroll_DebugMSBuildTask Condition="'$(Reqnroll_DebugMSBuildTask)' == ''">false</Reqnroll_DebugMSBuildTask>
+
+    <_ReqnrollPropsImported Condition="'$(_ReqnrollPropsImported)'==''">true</_ReqnrollPropsImported>
+  </PropertyGroup>
+
+  <!--
+    property group for feature flags
+  -->
+  <PropertyGroup>
+
+    <!--
+      feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
+    -->
+    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)'==''">false</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+
+    <!--
+      net.sdk support: feature flag to enable experimental support for net.sdk project system
+    -->
+    <Reqnroll_EnableDefaultCompileItems Condition="'$(Reqnroll_EnableDefaultCompileItems)'==''">true</Reqnroll_EnableDefaultCompileItems>
+    <Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(Reqnroll_EnableDefaultCompileItems)</Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
+
+    <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ReqnrollFeatureFiles Include="**\*.feature" >
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <Visible>$(UsingMicrosoftNETSdk)</Visible>
+    </ReqnrollFeatureFiles>
+
+    <!-- obsolete codebehind files, scenarios:
+         - after rename operation
+         - after deletion of a feature file
+         - after pulling latest changes from version control with above changes
+     -->
+    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
+
+    <!-- Support for Visual Studio Incremental Build
+        https://github.com/reqnroll/Reqnroll/issues/1319
+     -->
+    <UpToDateCheckInput Include="@(ReqnrollFeatureFiles)" />
+    <UpToDateCheckBuild Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" Original="@(ReqnrollFeatureFiles)" />
+    <CustomAdditionalCompileInputs Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
+
+  </ItemGroup>
+
+
+  <PropertyGroup>
+    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_Reqnroll_TaskFolder)' == ''">netcoreapp3.1</_Reqnroll_TaskFolder>
+    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_Reqnroll_TaskFolder)' == ''">net462</_Reqnroll_TaskFolder>
+    <_Reqnroll_TaskAssembly Condition=" '$(_Reqnroll_TaskAssembly)' == '' ">..\tasks\$(_Reqnroll_TaskFolder)\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
+  </PropertyGroup>
+
+  <Import Project="Reqnroll.Tools.MsBuild.Generation.tasks" Condition="'$(_ReqnrollTasksImported)' =='' " />
+
+</Project>

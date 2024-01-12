@@ -25,12 +25,12 @@ You can thus tell immediately which steps in a feature file have been
 bound.
 
 .. note::    
-   In SpecFlow Visual Studio 2022 plugin a project must be **built** for syntax highlighting to update.
+   In Reqnroll Visual Studio 2022 plugin a project must be **built** for syntax highlighting to update.
 
 IntelliSense (auto-completion) for Keywords and Steps
 -----------------------------------------------------
 
-IntelliSense makes SpecFlow easy to use when integrated with Visual
+IntelliSense makes Reqnroll easy to use when integrated with Visual
 Studio. IntelliSense uses find-as-you-type to restrict the list of
 suggested entries.
 
@@ -75,11 +75,11 @@ IntelliSense settings
 
 As much as having a suggested list of previous entries could speed up
 your work, the list may become too long in a big project and not really
-usable. To fix this problem, SpecFlow gives you the option to limit the
+usable. To fix this problem, Reqnroll gives you the option to limit the
 number of IntelliSense step instances suggestions for each step
 template.
 
-To do this, simply navigate to **Tools \| Options \| SpecFlow \| General
+To do this, simply navigate to **Tools \| Options \| Reqnroll \| General
 \| IntelliSense** and set the desired number of suggestions you wish to
 see against the **Max Step Instances Suggestions** value:
 
@@ -88,7 +88,7 @@ see against the **Max Step Instances Suggestions** value:
 
    .. tab:: VS2019
          
-         Navigate to **Tools \| Options \| SpecFlow \| General\| IntelliSense** and set the desired number of suggestions you wish to
+         Navigate to **Tools \| Options \| Reqnroll \| General\| IntelliSense** and set the desired number of suggestions you wish to
          see against the **Max Step Instances Suggestions** value:
       .. figure:: /_static/images/intellisetting.png
          :alt: vs2019
@@ -99,7 +99,7 @@ see against the **Max Step Instances Suggestions** value:
 
    .. tab:: VS2022
 
-         You must edit the `specflow.json <https://specflow.org/wp-content/uploads/specflowconfigs/specflow-config.json>`__ config file to turn inteli on or off and also access other settings as per below:
+         You must edit the `reqnroll.json <https://reqnroll.net/wp-content/uploads/reqnrollconfigs/reqnroll-config.json>`__ config file to turn inteli on or off and also access other settings as per below:
       .. figure:: ../_static/images/inteli2022.png
          :alt: vs2022
 
@@ -112,7 +112,7 @@ see against the **Max Step Instances Suggestions** value:
 Outlining and Comments in Feature Files
 ---------------------------------------
 
-Most of the items in the **Edit** menu work well with SpecFlow feature
+Most of the items in the **Edit** menu work well with Reqnroll feature
 files, for example:
 
 -  You can comment and uncomment selected lines ('#' character) with the
@@ -125,7 +125,7 @@ files, for example:
 Table Formatting
 ----------------
 
-Tables in SpecFlow are also expanded and formatted automatically as you
+Tables in Reqnroll are also expanded and formatted automatically as you
 enter column names and values:
 
 .. figure:: /_static/images/tablegifvs.gif

@@ -10,13 +10,13 @@ public class MyClass
 }
 ```
 
-Hooks are global, but can be restricted to run only for features or scenarios by defining a [scoped binding](Scoped-Step-Definitions.md), which can be filtered with [tags](https://github.com/techtalk/SpecFlow/wiki/Scoped-bindings#different-steps-for-different-tags). The execution order of hooks for the same type is undefined, unless specified explicitly.
+Hooks are global, but can be restricted to run only for features or scenarios by defining a [scoped binding](Scoped-Step-Definitions.md), which can be filtered with [tags](https://github.com/reqnroll/Reqnroll/wiki/Scoped-bindings#different-steps-for-different-tags). The execution order of hooks for the same type is undefined, unless specified explicitly.
 
 ## SpecFlow+ Runner Restrictions
 
 When running tests in multiple threads with SpecFlow+ Runner, Before and After hooks such as `BeforeTestRun` and `AfterTestRun` are executed once for each thread. This is a limitation of the current architecture.
 
-If you need to execute specific steps once per test run, rather than once per thread, you can do this using [deployment transformations](http://specflow.org/plus/documentation/SpecFlowPlus-Runner-Profiles/#DeploymentTransformation). An example can be found [here](https://github.com/techtalk/SpecFlow.Plus.Examples/tree/master/CustomDeploymentSteps).
+If you need to execute specific steps once per test run, rather than once per thread, you can do this using [deployment transformations](http://specflow.org/plus/documentation/SpecFlowPlus-Runner-Profiles/#DeploymentTransformation). An example can be found [here](https://github.com/reqnroll/Reqnroll.Plus.Examples/tree/master/CustomDeploymentSteps).
 
 ## Supported Hook Attributes
 
@@ -58,7 +58,7 @@ Note: for static hook methods you can use parameter injection.
 
 ## Using Hooks with Parameter Injection
 
-You can add parameters to your hook method that will be automatically injected by SpecFlow.
+You can add parameters to your hook method that will be automatically injected by Reqnroll.
 For example you can get the `ScenarioContext` injected as parameter in the BeforeScenario hook.
 
 ``` csharp

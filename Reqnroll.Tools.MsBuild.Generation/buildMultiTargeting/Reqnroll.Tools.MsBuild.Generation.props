@@ -1,0 +1,5 @@
+<Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+  <Import Project="..\build\Reqnroll.Tools.MsBuild.Generation.props"/>
+  
+</Project>

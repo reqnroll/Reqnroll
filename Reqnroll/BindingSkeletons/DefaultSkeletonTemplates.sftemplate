@@ -1,0 +1,65 @@
+>>>CSharp/StepDefinitionClass
+using System;
+using Reqnroll;
+
+namespace {namespace}
+{
+    [Binding]
+    public class {className}
+    {
+        private readonly ScenarioContext _scenarioContext;
+
+        public {className}(ScenarioContext scenarioContext)
+        {
+            _scenarioContext = scenarioContext;
+        }
+{bindings}
+    }
+}
+>>>CSharp/StepDefinitionExpression
+[{attribute}({expression})]
+public void {methodName}({parameters})
+{
+    _scenarioContext.Pending();
+}
+>>>CSharp/StepDefinition
+[{attribute}]
+public void {methodName}({parameters})
+{
+    _scenarioContext.Pending();
+}
+>>>VB/StepDefinitionClass
+Imports System
+Imports Reqnroll
+
+Namespace {namespace}
+
+    <Binding()> _
+    Public Class {className}
+
+{bindings}
+
+    End Class
+
+End Namespace
+>>>VB/StepDefinitionExpression
+<Reqnroll.{attribute}({expression})> _
+Public Sub {methodName}({parameters})
+    ScenarioContext.Current.Pending()
+End Sub
+>>>VB/StepDefinition
+<Reqnroll.{attribute}()> _
+Public Sub {methodName}({parameters})
+    ScenarioContext.Current.Pending()
+End Sub
+>>>FSharp/StepDefinitionClass
+[<Reqnroll.Binding>]
+module {className}
+
+open Reqnroll
+
+{bindings}
+>>>FSharp/StepDefinitionExpression
+let [<{attribute}({expression}>] {methodName}({parameters}) = ()
+>>>FSharp/StepDefinition
+let [<{attribute}>] {methodName}({parameters}) = ()

@@ -66,7 +66,7 @@ by a `:` and a short text that describes the feature.
 
 You can add free-form text underneath `Feature` to add more description.
 
-These description lines are ignored by SpecFlow at runtime, but are available for reporting (They are included by default in html reports).
+These description lines are ignored by Reqnroll at runtime, but are available for reporting (They are included by default in html reports).
 
 ```gherkin
 Feature: Guess the word
@@ -78,7 +78,7 @@ Feature: Guess the word
   Scenario: Maker starts a game
 ```
 
-The name and the optional description have no special meaning to SpecFlow. Their purpose is to provide
+The name and the optional description have no special meaning to Reqnroll. Their purpose is to provide
 a place for you to document important aspects of the feature, such as a brief explanation
 and a list of business rules (general acceptance criteria).
 
@@ -90,13 +90,13 @@ You can place tags above `Feature` to group related features, independent of you
 
 Tags are markers that can be assigned to features and scenarios. Assigning a tag to a feature is equivalent to assigning the tag to all scenarios in the feature file.  
 
-If supported by the [unit test framework](../Installation/Unit-Test-Providers.md), SpecFlow generates categories from the tags. The generated category name is the same as the tag's name, but without the leading `@`. You can filter and group the tests to be executed using these unit test categories. For example, you can tag crucial tests with `@important`, and then execute these tests more frequently.
+If supported by the [unit test framework](../Installation/Unit-Test-Providers.md), Reqnroll generates categories from the tags. The generated category name is the same as the tag's name, but without the leading `@`. You can filter and group the tests to be executed using these unit test categories. For example, you can tag crucial tests with `@important`, and then execute these tests more frequently.
 
 If your unit test framework does not support categories, you can still use tags to implement special logic for tagged scenarios in [bindings](../Bindings/Bindings.md) by querying the `ScenarioContext.ScenarioInfo.Tags` property.
 
 Scenario, Rule and Feature level tags are available by querying the `ScenarioInfo.CombinedTags` property.
 
-SpecFlow treats the `@ignore` tag as a special tag. SpecFlow generates an [ignored unit test](../Execution/Test-Results.html#ignored-tests) method from scenarios with this tag.
+Reqnroll treats the `@ignore` tag as a special tag. Reqnroll generates an [ignored unit test](../Execution/Test-Results.html#ignored-tests) method from scenarios with this tag.
 
 ### Descriptions
 
@@ -109,7 +109,7 @@ You can write anything you like, as long as no line starts with a keyword.
 
 The (optional) `Rule` keyword has been part of Gherkin since v6. 
 
-**Support in SpecFlow**
+**Support in Reqnroll**
 
 To be able to work with rules in Visual Studio, you have to use Visual Studio 2022 or use the "Deveroom" extension for Visual Studio 2017 and 2019. Otherwise the syntax highlighting will be broken.
 
@@ -168,13 +168,13 @@ Examples follow this same pattern:
 
 Each step starts with `Given`, `When`, `Then`, `And`, or `But`.
 
-SpecFlow executes each step in a scenario one at a time, in the sequence you’ve written them in.
-When SpecFlow tries to execute a step, it looks for a matching step definition to execute.
+Reqnroll executes each step in a scenario one at a time, in the sequence you’ve written them in.
+When Reqnroll tries to execute a step, it looks for a matching step definition to execute.
 
 Keywords are not taken into account when looking for a step definition. This means you cannot have a
 `Given`, `When`, `Then`, `And` or `But` step with the same text as another step.
 
-SpecFlow considers the following steps duplicates:
+Reqnroll considers the following steps duplicates:
 
 ```gherkin
 Given there is money in my account
@@ -194,7 +194,7 @@ Then my account should have a balance of £430
 `Given` steps are used to describe the initial context of the system - the *scene* of the scenario.
 It is typically something that happened in the *past*.
 
-When SpecFlow executes a `Given` step, it will configure the system to be in a well-defined state,
+When Reqnroll executes a `Given` step, it will configure the system to be in a well-defined state,
 such as creating and configuring objects or adding data to a test database.
 
 The purpose of `Given` steps is to **put the system in a known state** before the user (or external system) starts interacting with the system (in the `When` steps).
@@ -425,12 +425,12 @@ which is never directly run. Instead, the `Scenario Outline` is run *once for ea
 the `Examples` section beneath it (not counting the first header row).
 
 The steps can use `<>` delimited *parameters* that reference headers in the examples table.
-SpecFlow will replace these parameters with values from the table *before* it tries
+Reqnroll will replace these parameters with values from the table *before* it tries
 to match the step against a step definition.
 
 **> Note:** Tables used in `Examples` must have **unique headers**. Using duplicate headers will result in errors.
 
-**Hint:** In certain cases, when generating method names using the regular expression method, SpecFlow is unable to generate the correct parameter signatures for unit test logic methods without a little help. Placing single quotation marks (`'`) around placeholders (eg. `'<placeholder>'`)improves SpecFlow's ability to parse the scenario outline and generate more accurate regular expressions and test method signatures.
+**Hint:** In certain cases, when generating method names using the regular expression method, Reqnroll is unable to generate the correct parameter signatures for unit test logic methods without a little help. Placing single quotation marks (`'`) around placeholders (eg. `'<placeholder>'`)improves Reqnroll's ability to parse the scenario outline and generate more accurate regular expressions and test method signatures.
 
 You can also use parameters in [multiline step arguments](#step-arguments).
 
@@ -475,8 +475,8 @@ Given the following users exist:
 
 Just like `Doc Strings`, `Data Tables` will be passed to the step definition as the first argument.
 
-SpecFlow provides a rich API for manipulating tables from within step definitions.
-See the [Assist Namespace](../Bindings/SpecFlow-Assist-Helpers.md) reference for
+Reqnroll provides a rich API for manipulating tables from within step definitions.
+See the [Assist Namespace](../Bindings/Reqnroll-Assist-Helpers.md) reference for
 more details.
 
 ## Markdown
@@ -484,7 +484,7 @@ more details.
 You can include markdown code in your feature files with the standard Markdown features such as bold, italic, lists etc.
 This is useful when generating documentation via the SpecFlow+ LivingDoc generator.
 
-Click [here](https://docs.specflow.org/projects/specflow-livingdoc/en/latest/Generating/Markdown-and-Embedding-Images.html#embedding-images-markdown) to find out more.
+Click [here](https://docs.reqnroll.net/projects/reqnroll-livingdoc/en/latest/Generating/Markdown-and-Embedding-Images.html#embedding-images-markdown) to find out more.
 
 ## Spoken Languages
 
@@ -510,9 +510,9 @@ Funksjonalitet: Gjett et ord
     Så må Gjetter gjette et ord på 5 bokstaver
 ```
 
-A `# language:` header on the first line of a feature file tells SpecFlow what
+A `# language:` header on the first line of a feature file tells Reqnroll what
 spoken language to use - for example `# language: fr` for French.
-If you omit this header, SpecFlow will default to English (`en`).
+If you omit this header, Reqnroll will default to English (`en`).
 
 You can also define the language in the [configuration file](../Installation/Configuration.html#language).
 

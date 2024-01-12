@@ -12,7 +12,7 @@ pr: none
 # Cron expression is a space-delimited expression with five entries: mm HH DD MM DW
 schedules:
 - cron: "00 4 * * Mon-Fri"
-  displayName: SpecFlow Nightly build
+  displayName: Reqnroll Nightly build
   branches:
     include:
     - master
@@ -51,8 +51,8 @@ steps:
 - task: DotNetCoreCLI@2
   displayName: 'dotnet build Release'
   inputs:
-    projects: TechTalk.SpecFlow.sln
+    projects: Reqnroll.sln
     arguments: --configuration Release
 
 - task: WhiteSource Bolt@20
-  displayName: 'WhiteSource Bolt - SpecFlow'
+  displayName: 'WhiteSource Bolt - Reqnroll'

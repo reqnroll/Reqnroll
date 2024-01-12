@@ -23,7 +23,7 @@ The global container captures global services for test execution and the step de
 * IRuntimePluginLoader
 * IBindingAssemblyLoader
 * IBindingInstanceResolver
-* [RuntimePlugins](https://github.com/techtalk/SpecFlow/blob/master/TechTalk.SpecFlow/Plugins/IRuntimePlugin.cs)
+* [RuntimePlugins](https://github.com/reqnroll/Reqnroll/blob/master/Reqnroll/Plugins/IRuntimePlugin.cs)
   * RegisterGlobalDependencies- Event
   * CustomizeGlobalDependencies- Event
 
@@ -40,7 +40,7 @@ The test thread container captures the services and state for executing scenario
 * IStepDefinitionMatchService
 * ITraceListener
 * ITestTracer
-* [RuntimePlugins](https://github.com/techtalk/SpecFlow/blob/master/TechTalk.SpecFlow/Plugins/IRuntimePlugin.cs)
+* [RuntimePlugins](https://github.com/reqnroll/Reqnroll/blob/master/Reqnroll/Plugins/IRuntimePlugin.cs)
   * CustomizeTestThreadDependencies- Event
 
 ## Feature Container

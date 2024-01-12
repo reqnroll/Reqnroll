@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json.schemastore.org/template",
+    "author": "Manuel Eiwen",
+    "classifications": ["Reqnroll", "Configuration", "JSON"],
+    "identity": "ReqnrollTemplates.DotNET.Item.ReqnrollConfiguration",
+    "name": "Reqnroll Configuration JSON File",
+    "shortName": "reqnroll-json",
+    "tags": {
+        "language": "C#",
+        "type": "item"
+    }
+}

@@ -2,12 +2,12 @@
 
 You can easily apply standardized test cases across a wide range of features to significantly reduce
 redundant data for large test suites. By reusing execution flows, you can also speed up exploratory and approval testing
-for ranges of examples. SpecFlow makes all of this possible by introducing support for loading external data into
+for ranges of examples. Reqnroll makes all of this possible by introducing support for loading external data into
 scenarios easily.
 
-The [SpecFlow ExternalData plugin](https://www.nuget.org/packages/SpecFlow.ExternalData/) lets teams separate test data from test scenarios, and reuse examples across a large set of scenarios. This is particularly helpful when a common set of examples needs to be consistently verified in different scenarios.
+The [Reqnroll ExternalData plugin](https://www.nuget.org/packages/Reqnroll.ExternalData/) lets teams separate test data from test scenarios, and reuse examples across a large set of scenarios. This is particularly helpful when a common set of examples needs to be consistently verified in different scenarios.
 
-Simply download the [NuGet package](https://www.nuget.org/packages/SpecFlow.ExternalData/) and add it to your specflow projects to use it.
+Simply download the [NuGet package](https://www.nuget.org/packages/Reqnroll.ExternalData/) and add it to your reqnroll projects to use it.
 
 ## Supported Data Sources
 
@@ -163,9 +163,9 @@ Scenario: The basket price is calculated correctly for other products
 
 ## Language Settings
 
-The decimal and date values read from an Excel file will be exported using the language of the feature file (specified using the `#language` setting in the feature file or in the SpecFlow configuration file). This setting affects for example the decimal operator as in some countries comma (,) is used as decimal separator instead of dot (.). To specify not only the language but also the country use the `#language: language-country` tag, e.g. *#language: de-AT* for *Deutsch-Austria*.
+The decimal and date values read from an Excel file will be exported using the language of the feature file (specified using the `#language` setting in the feature file or in the Reqnroll configuration file). This setting affects for example the decimal operator as in some countries comma (,) is used as decimal separator instead of dot (.). To specify not only the language but also the country use the `#language: language-country` tag, e.g. *#language: de-AT* for *Deutsch-Austria*.
 
-Example: Hungarian uses comma (,) as decimal separator instead of dot (.), so SpecFlow will expect the prices in format 1,23:
+Example: Hungarian uses comma (,) as decimal separator instead of dot (.), so Reqnroll will expect the prices in format 1,23:
 
 This sample shows that the language settings are applied for the data that is being
 read by the external data plugin.

@@ -28,14 +28,14 @@ jobs:
 #- template: build.yml  
 #  parameters:
 #    name: macOS
-#    artifactFileName: '$(Build.ArtifactStagingDirectory)/SpecFlow-macOS.zip'
+#    artifactFileName: '$(Build.ArtifactStagingDirectory)/Reqnroll-macOS.zip'
 #    pool:
 #      name: 'Hosted macOS'
 
 - template: build.yml  
   parameters:
     name: Windows
-    artifactFileName: '$(Build.ArtifactStagingDirectory)/SpecFlow-Windows.zip'
+    artifactFileName: '$(Build.ArtifactStagingDirectory)/Reqnroll-Windows.zip'
     appInsightsInstrumentationKey: $(AppInsightsInstrumentationKey)
     pool:
       vmImage: 'windows-latest'
@@ -43,6 +43,6 @@ jobs:
 - template: build.yml  
   parameters:
     name: Linux
-    artifactFileName: '$(Build.ArtifactStagingDirectory)/SpecFlow-Linux.zip'
+    artifactFileName: '$(Build.ArtifactStagingDirectory)/Reqnroll-Linux.zip'
     pool:
       vmImage: 'ubuntu-latest'

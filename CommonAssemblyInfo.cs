@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Resources;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompany("Tricentis")]
-[assembly: AssemblyProduct("SpecFlow")]
-[assembly: AssemblyCopyright("Copyright © SpecFlow Team")]
+[assembly: AssemblyProduct("Reqnroll")]
+[assembly: AssemblyCopyright("Copyright © Reqnroll")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

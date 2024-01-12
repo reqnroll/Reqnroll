@@ -19,8 +19,8 @@ import sys, os
 # -- Project information -----------------------------------------------------
 
 project = ''
-copyright = '2021, The SpecFlow Team'
-author = 'The SpecFlow Team'
+copyright = '2021, The Reqnroll'
+author = 'The Reqnroll'
 
 
 # -- General configuration ---------------------------------------------------
@@ -66,7 +66,7 @@ html_js_files = [
     'js/serversidetracking.js'
 ]
 
-html_baseurl = 'https://docs.specflow.org/projects/specflow/'
+html_baseurl = 'https://docs.reqnroll.net/projects/reqnroll/'
 html_extra_path = ['robots.txt']
 
 sys.path.append(os.path.abspath('exts'))

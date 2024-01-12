@@ -1,8 +1,8 @@
 # Bindings
 
-The [Gherkin feature files](../Gherkin/Gherkin-Reference.md) are closer to free-text than to code – they cannot be executed as they are. The automation that connects the specification to the application interface has to be developed first. The automation that connects the Gherkin specifications to source code is called a _binding_. The binding classes and methods can be defined in the SpecFlow project or in [external binding assemblies](Use-Bindings-from-External-Assemblies.md).
+The [Gherkin feature files](../Gherkin/Gherkin-Reference.md) are closer to free-text than to code – they cannot be executed as they are. The automation that connects the specification to the application interface has to be developed first. The automation that connects the Gherkin specifications to source code is called a _binding_. The binding classes and methods can be defined in the Reqnroll project or in [external binding assemblies](Use-Bindings-from-External-Assemblies.md).
 
-There are several kinds of bindings in SpecFlow. 
+There are several kinds of bindings in Reqnroll. 
 
 ## Step Definitions
 
@@ -14,4 +14,4 @@ It is required to add the `[Binding]` attribute to the classes where you define 
 
 [Hooks](Hooks.md) can be used to perform additional automation logic on specific events, e.g. before executing a scenario.
 
-*> **Note:** Bindings (step definitions, hooks) are global for the entire SpecFlow project.*
+*> **Note:** Bindings (step definitions, hooks) are global for the entire Reqnroll project.*

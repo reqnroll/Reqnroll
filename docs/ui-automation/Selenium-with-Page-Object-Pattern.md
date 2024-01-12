@@ -1,14 +1,14 @@
 # Selenium with Page Object Model Pattern
 
-Selenium is a free (open-source) automation framework used for web applications across different browsers and platforms, you can read more about them [here](https://www.selenium.dev/). It is often used in connection with SpecFlow to test your web application via their user interface.
+Selenium is a free (open-source) automation framework used for web applications across different browsers and platforms, you can read more about them [here](https://www.selenium.dev/). It is often used in connection with Reqnroll to test your web application via their user interface.
 
 The Page Object Model Pattern is an often used pattern to abstract your page into separate classes. With it you have your element selectors at dedicated locations and not scattered around your automation code.
 
 ## Sample Project Setup
 
-You can download this entire sample project from [Github](https://github.com/SpecFlowOSS/SpecFlow-Examples/tree/master/CalculatorSelenium).
+You can download this entire sample project from [Github](https://github.com/reqnroll/Reqnroll-Examples/tree/master/CalculatorSelenium).
 
-Base of this sample project is the default project that is created from the SpecFlow project template.
+Base of this sample project is the default project that is created from the Reqnroll project template.
 
 Additional used NuGet package to the standard packages:
 
@@ -17,7 +17,7 @@ Additional used NuGet package to the standard packages:
 
 ## Sample Scenario
 
-The web application we are testing in this example is a simple calculator implementation hosted [here](https://specflowoss.github.io/Calculator-Demo/Calculator.html). Feel free to use this for practice if you like to.
+The web application we are testing in this example is a simple calculator implementation hosted [here](https://reqnrolloss.github.io/Calculator-Demo/Calculator.html). Feel free to use this for practice if you like to.
 
 We are testing the web application by simply adding two numbers together and checking the results.
 
@@ -142,7 +142,7 @@ namespace CalculatorSelenium.Specs.PageObjects
     public class CalculatorPageObject
     {
         //The URL of the calculator to be opened in the browser
-        private const string CalculatorUrl = "https://specflowoss.github.io/Calculator-Demo/Calculator.html";
+        private const string CalculatorUrl = "https://reqnrolloss.github.io/Calculator-Demo/Calculator.html";
 
         //The Selenium web driver to automate the browser
         private readonly IWebDriver _webDriver;
@@ -249,7 +249,7 @@ Here is the code of the step definition file. Note the usage of the *calculatorP
 using CalculatorSelenium.Specs.Drivers;
 using CalculatorSelenium.Specs.PageObjects;
 using FluentAssertions;
-using TechTalk.SpecFlow;
+using Reqnroll;
 
 namespace CalculatorSelenium.Specs.Steps
 {
@@ -308,7 +308,7 @@ namespace CalculatorSelenium.Specs.Steps
 ```csharp
 using BoDi;
 using CalculatorSelenium.Specs.Drivers;
-using TechTalk.SpecFlow;
+using Reqnroll;
 
 namespace CalculatorSelenium.Specs.Hooks
 {
@@ -345,7 +345,7 @@ Because we reuse the browser instance, we have to reset the web app for every sc
 ```csharp
 using CalculatorSelenium.Specs.Drivers;
 using CalculatorSelenium.Specs.PageObjects;
-using TechTalk.SpecFlow;
+using Reqnroll;
 
 namespace CalculatorSelenium.Specs.Hooks
 {
@@ -373,7 +373,7 @@ namespace CalculatorSelenium.Specs.Hooks
 If you want to get into more details, have a look at the following documentation pages:
 
 - [Hooks](../Bindings/Hooks.md)  
-  All about Hooks, the lifecycle events in SpecFlow
+  All about Hooks, the lifecycle events in Reqnroll
 - [Driver Pattern](../Guides/DriverPattern.md)  
   More details and examples about the Driver Pattern, which we used for the Browser Lifecycle handling
 - [Page Object Model Pattern](../Guides/PageObjectModel.md)  

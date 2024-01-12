@@ -14,7 +14,7 @@ your Gherkin feature file(s):
 
    .. tab:: VS2019
          
-         Right click the binding and select *`Go to SpecFlow step definition usages`* 
+         Right click the binding and select *`Go to Reqnroll step definition usages`* 
          
       .. figure:: /_static/images/gotogherkin2019.gif
          :alt: vs2019

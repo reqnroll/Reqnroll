@@ -4,17 +4,17 @@ Installation
 The integration packages can also be downloaded and installed separately from the Visual Studio Gallery:
 
 -  `VS2019
-   integration <https://marketplace.visualstudio.com/items?itemName=TechTalkSpecFlowTeam.SpecFlowForVisualStudio>`__
+   integration <https://marketplace.visualstudio.com/items?itemName=TechTalkReqnrollTeam.ReqnrollForVisualStudio>`__
 -  `VS2017
-   integration <https://marketplace.visualstudio.com/items?itemName=TechTalkSpecFlowTeam.SpecFlowforVisualStudio2017>`__
+   integration <https://marketplace.visualstudio.com/items?itemName=TechTalkReqnrollTeam.ReqnrollforVisualStudio2017>`__
 -  `VS2022
-   integration <https://marketplace.visualstudio.com/items?itemName=TechTalkSpecFlowTeam.SpecFlowForVisualStudio2022&ssr=false#overview>`__
+   integration <https://marketplace.visualstudio.com/items?itemName=TechTalkReqnrollTeam.ReqnrollForVisualStudio2022&ssr=false#overview>`__
 
 or through the Visual Studio extensions:
 
 **1-** Open Visual Studio.
 
-**2-** Navigate to ***Extensions ➡ Manage Extensions ➡ Online*** and search for "SpecFlow" in the search bar.
+**2-** Navigate to ***Extensions ➡ Manage Extensions ➡ Online*** and search for "Reqnroll" in the search bar.
 
 **3-** Hit ***Download*** to begin the installation. You will need to restart Visual Studio for the installation to complete
 
@@ -33,7 +33,7 @@ or through the Visual Studio extensions:
 
 Once the extension is successfully installed, you can see it in the list of "Installed extensions" in  ***Extensions ➡ Manage Extensions*** dialog of Visual Studio.
 
-The below video is from our getting started guide which covers the installation of SpecFlow's Visual Studio extension. If you are new to SpecFlow we highly recommend you to go through this `getting started guide <https://docs.specflow.org/projects/getting-started/en/latest/GettingStarted/Step1.html>`__
+The below video is from our getting started guide which covers the installation of Reqnroll's Visual Studio extension. If you are new to Reqnroll we highly recommend you to go through this `getting started guide <https://docs.reqnroll.net/projects/getting-started/en/latest/GettingStarted/Step1.html>`__
 
 
 .. raw:: html

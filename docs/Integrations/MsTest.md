@@ -1,12 +1,12 @@
 # MSTest
 
-SpecFlow supports MsTest V2.
+Reqnroll supports MsTest V2.
 
 Documentation for MSTest can be found [here](https://docs.microsoft.com/en-us/visualstudio/test/unit-test-your-code?view=vs-2019).
 
 ## Needed NuGet Packages
 
-For SpecFlow: [SpecFlow.MSTest](https://www.nuget.org/packages/SpecFlow.MSTest/)  
+For Reqnroll: [Reqnroll.MSTest](https://www.nuget.org/packages/Reqnroll.MSTest/)  
 
 For MSTest: [MSTest.TestFramework](https://www.nuget.org/packages/MSTest.TestFramework/)  
 

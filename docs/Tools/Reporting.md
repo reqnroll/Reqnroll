@@ -5,9 +5,9 @@
 
 Reporting is now easier to generate and share thanks to SpecFlow+ LivingDoc.
 
-You can see your test execution results in a dynamic way now and also check for any [unused step definitions](https://docs.specflow.org/projects/specflow-livingdoc/en/latest/LivingDocGenerator/Unused-step-definition-report.html) along with many other handy features that truly bring your reporting and documentation to life!
+You can see your test execution results in a dynamic way now and also check for any [unused step definitions](https://docs.reqnroll.net/projects/reqnroll-livingdoc/en/latest/LivingDocGenerator/Unused-step-definition-report.html) along with many other handy features that truly bring your reporting and documentation to life!
 
-**Head over to [SpecFlow+ LivingDoc](https://docs.specflow.org/projects/specflow-livingdoc/en/latest/) to read more.**
+**Head over to [SpecFlow+ LivingDoc](https://docs.reqnroll.net/projects/reqnroll-livingdoc/en/latest/) to read more.**
 
 Here is a quick snapshot:
 
@@ -17,11 +17,11 @@ Here is a quick snapshot:
 
 **These reports are only available prior to SpecFlow 3! They have been removed in SpecFlow 3.**
 
-SpecFlow provides various options to generate reports related to the acceptance tests.
+Reqnroll provides various options to generate reports related to the acceptance tests.
 
-**Note:** The `specflow.exe` [command line tool](Tools.md) that is used to generate reports can be found in the `packages\Specflow.{version number}\tools` directory, when you installed SpecFlow through NuGet. Start the tool with no parameters or use the `--help` option to display an overview of the available options.
+**Note:** The `reqnroll.exe` [command line tool](Tools.md) that is used to generate reports can be found in the `packages\Specflow.{version number}\tools` directory, when you installed Reqnroll through NuGet. Start the tool with no parameters or use the `--help` option to display an overview of the available options.
 
-You can find a repository containing the old report code [here](https://github.com/techtalk/SpecFlow.Reports). For information on why the reports were moved to a seperate repo, please read see this [GitHub issue](https://github.com/techtalk/SpecFlow/issues/1036).
+You can find a repository containing the old report code [here](https://github.com/reqnroll/Reqnroll.Reports). For information on why the reports were moved to a seperate repo, please read see this [GitHub issue](https://github.com/reqnroll/Reqnroll/issues/1036).
 
 ### Test Execution Report
 
@@ -48,15 +48,15 @@ In order to generate this report, execute the acceptance tests with the `nunit3-
 nunit3-console.exe --labels=All --out=TestResult.txt "--result=TestResult.xml;format=nunit2" bin\Debug\BookShop.AcceptanceTests.dll
 ```
 
-#### SpecFlow Report Generator 
+#### Reqnroll Report Generator 
 
 **Note:** The examples and parameters are for version 2.4.* and higher. Older versions can be found by viewing past revisions in the GitHub wiki.
 
-The report generation step is the same for both versions of NUnit. The two generated files can be used to invoke the SpecFlow report generation. 
+The report generation step is the same for both versions of NUnit. The two generated files can be used to invoke the Reqnroll report generation. 
 If you use the default output file names shown above, you only need to specify information about the C# test project containing the `*.feature` files. Specflow uses the default `TestResult.xml` and `TestResult.txt` files to produce `TestResult.html`.
 ```
-specflow.exe nunitexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj
-specflow.exe nunitexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj --xmlTestResult CustomNunitTestResult.xml --testOutput CustomNunitTestOutput.txt --OutputFile CustomSpecflowTestReport.html
+reqnroll.exe nunitexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj
+reqnroll.exe nunitexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj --xmlTestResult CustomNunitTestResult.xml --testOutput CustomNunitTestOutput.txt --OutputFile CustomSpecflowTestReport.html
 ```
 
 The following table contains the possible arguments for this command.
@@ -113,7 +113,7 @@ The following table contains the possible arguments for this command.
 ### MsTest Test Execution Report
 <br>
 ```
-specflow.exe mstestexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj /testResult:result.trx /out:MyResult.html
+reqnroll.exe mstestexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj /testResult:result.trx /out:MyResult.html
 ```
 
 The following table contains the possible arguments for this command.
@@ -170,7 +170,7 @@ This report shows the usage and binding status of the steps in your entire proje
 * Steps without a special backgrounds are steps that exist both in feature files and the automation layer.  Ideally, all your steps are like this.
 
 ```
-specflow.exe stepdefinitionreport --ProjectFile BookShop.AcceptanceTests.csproj /BinFolder:bin/debug
+reqnroll.exe stepdefinitionreport --ProjectFile BookShop.AcceptanceTests.csproj /BinFolder:bin/debug
 ```
 
 The following table contains the possible arguments for this command. 
@@ -189,7 +189,7 @@ The following table contains the possible arguments for this command.
     <tr>
         <td>/binFolder</td>
         <td>A folder path (absolute or relative to the project folder)</td>
-        <td>A path for the compiled SpecFlow project. Optional.<br/>
+        <td>A path for the compiled Reqnroll project. Optional.<br/>
             Default: bin\Debug</td>
     </tr>
     <tr>

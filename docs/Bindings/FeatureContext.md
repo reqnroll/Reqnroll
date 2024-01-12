@@ -1,6 +1,6 @@
 # FeatureContext
 
-SpecFlow provides access to the current test context using both `FeatureContext` and the more commonly used [ScenarioContext](ScenarioContext.md). `FeatureContext` persists for the duration of the execution of an entire feature, whereas `ScenarioContext` only persists for the duration of a scenario.
+Reqnroll provides access to the current test context using both `FeatureContext` and the more commonly used [ScenarioContext](ScenarioContext.md). `FeatureContext` persists for the duration of the execution of an entire feature, whereas `ScenarioContext` only persists for the duration of a scenario.
 
 ## Accessing the FeatureContext
 

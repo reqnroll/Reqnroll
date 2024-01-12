@@ -1,6 +1,6 @@
 # Test Results
 
-When SpecFlow tests are executed, the execution engine processes the test steps, executing the necessary test logic and either finishing successfully or failing for various reasons.  
+When Reqnroll tests are executed, the execution engine processes the test steps, executing the necessary test logic and either finishing successfully or failing for various reasons.  
 
 ## Test Passes
 
@@ -14,7 +14,7 @@ A test can fail because it causes an error. The test output contains more detail
 
 ## Test Fails due to Missing, Pending or Improperly Configured Bindings
 
-A test can fail if the test logic (bindings) have not yet been implemented (or are configured improperly). By default, this is reported as an “inconclusive” result, although you can [configure](../Installation/Configuration.md) how SpecFlow behaves in this case.
+A test can fail if the test logic (bindings) have not yet been implemented (or are configured improperly). By default, this is reported as an “inconclusive” result, although you can [configure](../Installation/Configuration.md) how Reqnroll behaves in this case.
 
 **Note:** Some unit test frameworks do not support inconclusive result. In this case the problem is reported as an error instead.
 
@@ -22,4 +22,4 @@ The test output can be very useful if you are missing bindings, as it contain a 
 
 ## Ignored Tests
 
-Just like with normal unit tests, you can also ignore SpecFlow tests. To do so, tag the feature or scenario with the `@ignore` tag. Don't forget that ignoring a test will not solve any problems with your implementation... ;-)
+Just like with normal unit tests, you can also ignore Reqnroll tests. To do so, tag the feature or scenario with the `@ignore` tag. Don't forget that ignoring a test will not solve any problems with your implementation... ;-)

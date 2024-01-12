@@ -1,5 +1,5 @@
 {
-    "github.upstream": "SpecFlowOSS/SpecFlow",
+    "github.upstream": "reqnroll/Reqnroll",
     "restructuredtext.confPath": "${workspaceFolder}\\docs\\source",
     "markdownlint.config": {
         "MD028": false,

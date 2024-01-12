@@ -1,0 +1,66 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>$(Reqnroll_Test_TFM)</TargetFrameworks>
+    <AssemblyName>Reqnroll.RuntimeTests</AssemblyName>
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <PackageId>Reqnroll.RuntimeTests</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <NoWarn>1701;1702;CS1998</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
+    <PackageReference Include="FluentAssertions" Version="6.7.0" />
+    <PackageReference Include="Moq" Version="4.17.2" />
+    <PackageReference Include="xunit" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.console" Version="2.4.2">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Runtime_TFM)'">
+    <Reference Include="System.Configuration" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_Core_Runtime_TFM)' Or '$(TargetFramework)' == '$(Reqnroll_Net6_TFM)'">
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="xunit.runner.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

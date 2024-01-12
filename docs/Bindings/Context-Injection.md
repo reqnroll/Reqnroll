@@ -1,6 +1,6 @@
 # Context Injection
 
-SpecFlow supports a very simple dependency framework that is able to instantiate and inject class instances for scenarios. This feature allows you to group the shared state in context classes, and inject them into every binding class that needs access to that shared state.
+Reqnroll supports a very simple dependency framework that is able to instantiate and inject class instances for scenarios. This feature allows you to group the shared state in context classes, and inject them into every binding class that needs access to that shared state.
 
 To use context injection:
 
@@ -14,9 +14,9 @@ Rules:
 * If the injected objects implement `IDisposable`, they will be disposed after the scenario is executed.
 * The injection is resolved recursively, i.e. the injected class can also have dependencies. 
 * Resolution is done using public constructors only. 
-* If there are multiple public constructors, SpecFlow takes the first one.
+* If there are multiple public constructors, Reqnroll takes the first one.
 
-The container used by SpecFlow can be customized, e.g. you can include object instances that have already been created, or modify the resolution rules. See the _Advanced options_ section below for details.
+The container used by Reqnroll can be customized, e.g. you can include object instances that have already been created, or modify the resolution rules. See the _Advanced options_ section below for details.
 
 ## Examples
 
@@ -104,7 +104,7 @@ public class BookSteps
 
 ## Advanced options
 
-The container used by SpecFlow can be customized, e.g. you can include object instances that have already been created, or modify the resolution rules. 
+The container used by Reqnroll can be customized, e.g. you can include object instances that have already been created, or modify the resolution rules. 
 
 You can customize the container from a [plugin](../Extend/Plugins.md) or a before scenario [hook](Hooks.md). The class customizing the injection rules has to obtain an instance of the scenario execution container (an instance of `BoDi.IObjectContainer`). This can be done through constructor injection (see example below).
 
@@ -132,24 +132,24 @@ public class WebDriverSupport
 
 ## Custom Dependency Injection Frameworks
 
-As mentioned above, the default SpecFlow container is `IObjectContainer` which is recommended for most scenarios. However, you may have situations where you need more control over the configuration of the dependency injection, or make use of an existing dependency injection configuration within the project you are testing, e.g. pulling in service layers for assisting with assertions in `Then` stages.
+As mentioned above, the default Reqnroll container is `IObjectContainer` which is recommended for most scenarios. However, you may have situations where you need more control over the configuration of the dependency injection, or make use of an existing dependency injection configuration within the project you are testing, e.g. pulling in service layers for assisting with assertions in `Then` stages.
 
 ### Consuming existing plugins
 
-You can find the list of available plugins [here](https://docs.specflow.org/projects/specflow/en/latest/Extend/Available-Plugins.html#plugins-for-di-container).
+You can find the list of available plugins [here](https://docs.reqnroll.net/projects/reqnroll/en/latest/Extend/Available-Plugins.html#plugins-for-di-container).
 
-To make use of these plugins, you need to add a reference and add the plugin to your configuration in the `specflow` section:
+To make use of these plugins, you need to add a reference and add the plugin to your configuration in the `reqnroll` section:
 
 ```xml
-<specFlow>
+<reqnroll>
   <plugins>
-    <add name="SpecFlow.Autofac" type="Runtime" />
+    <add name="Reqnroll.Autofac" type="Runtime" />
   </plugins>
   <!-- Anything else -->
-</specFlow>
+</reqnroll>
 ```
 
-This tells SpecFlow to load the runtime plugin and allows you to create an entry point to use this functionality, as [shown in the autofac example](https://github.com/gasparnagy/SpecFlow.Autofac/blob/master/sample/MyCalculator/MyCalculator.Specs/Support/TestDependencies.cs). Once set up, your dependencies are injected into steps and bindings like they are with the `IObjectContainer`, but behind the scenes it will be pulling those dependencies from the DI container you added.
+This tells Reqnroll to load the runtime plugin and allows you to create an entry point to use this functionality, as [shown in the autofac example](https://github.com/gasparnagy/Reqnroll.Autofac/blob/master/sample/MyCalculator/MyCalculator.Specs/Support/TestDependencies.cs). Once set up, your dependencies are injected into steps and bindings like they are with the `IObjectContainer`, but behind the scenes it will be pulling those dependencies from the DI container you added.
 
 > One thing to note here is that each plugin has its own conventions for loading the entry point. This is often a static class with a static method containing an attribute that is marked by the specific plugin. You should check the requirements of the plugins you are using.
 
@@ -197,6 +197,6 @@ This gives you the option of either loading types up front or creating types wit
 
 ### Creating your own
 
-We recommend looking at the autofac example and [plugins documentation](https://specflow.org/documentation/Plugins/) and following these conventions.
+We recommend looking at the autofac example and [plugins documentation](https://reqnroll.net/documentation/Plugins/) and following these conventions.
 
-> Remember to adhere to the plugin documentation and have your assembly end in `.SpecFlowPlugin` e.g. `SpecFlow.AutoFac.SpecFlowPlugin`. Internal namespaces can be anything you want, but the assembly name must follow this naming convention or SpecFlow will be unable to locate it.
+> Remember to adhere to the plugin documentation and have your assembly end in `.ReqnrollPlugin` e.g. `Reqnroll.AutoFac.ReqnrollPlugin`. Internal namespaces can be anything you want, but the assembly name must follow this naming convention or Reqnroll will be unable to locate it.

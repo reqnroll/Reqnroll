@@ -2,21 +2,21 @@
 
 ## Removed in SpecFlow 3
 
-Note that this tool has been removed in SpecFlow 3. This topic only applies to earlier versions of SpecFlow.
+Note that this tool has been removed in SpecFlow 3. This topic only applies to earlier versions of Reqnroll.
 
 ## Tools Overview
 
-Besides executing your tests and verifying that acceptance criteria are met, SpecFlow provides a number of other tools to support the development process. These tools are accessed using the `specflow.exe` command line tool located in the `/packages/SpecFlow.x.y.a/tools` directory of your project.
+Besides executing your tests and verifying that acceptance criteria are met, Reqnroll provides a number of other tools to support the development process. These tools are accessed using the `reqnroll.exe` command line tool located in the `/packages/Reqnroll.x.y.a/tools` directory of your project.
 
-A number of commands are available. If you start `specflow.exe` without any additional options, the available commands are listed.
+A number of commands are available. If you start `reqnroll.exe` without any additional options, the available commands are listed.
 
 ## help
 
-Use the `help` command to display the detailed information on a specific command's syntax. For example, `specflow.exe help generateall` displays the options available for the generateall command.
+Use the `help` command to display the detailed information on a specific command's syntax. For example, `reqnroll.exe help generateall` displays the options available for the generateall command.
 
 ## generateall
 
-Use the `generateall` command to re-generate outdated unit test classes based on your feature files. This can be useful when upgrading to a newer SpecFlow version, or if feature files are modified outside of Visual Studio.
+Use the `generateall` command to re-generate outdated unit test classes based on your feature files. This can be useful when upgrading to a newer Reqnroll version, or if feature files are modified outside of Visual Studio.
 
 The following arguments are available.
 
@@ -34,7 +34,7 @@ The following arguments are available.
     <tr>
         <td>--force</td>
         <td>optional</td>
-        <td>Forces the re-generation of the class files, even if the generated class is up-to-date based on the file modification time and the SpecFlow generator version.<br/>
+        <td>Forces the re-generation of the class files, even if the generated class is up-to-date based on the file modification time and the Reqnroll generator version.<br/>
             Default: disabled (only outdated files are generated)</td>
     </tr>
     <tr>
@@ -48,10 +48,10 @@ The following arguments are available.
 The following command line regenerates unit tests for the BookShop sample application.
 
 ``` bash
-specflow.exe generateall --ProjectFile BookShop.AcceptanceTests.csproj
+reqnroll.exe generateall --ProjectFile BookShop.AcceptanceTests.csproj
 ```
 
-SpecFlow's `generateall` function can also be used with MSBuild, allowing you to update the files before compiling the solution. This can be particularly useful if feature files are regularly modified outside of Visual Studio. See [Generate Tests from MsBuild](Generate-Tests-From-MsBuild.md) for details on configuring MSBuild to use the `generateall` function.
+Reqnroll's `generateall` function can also be used with MSBuild, allowing you to update the files before compiling the solution. This can be particularly useful if feature files are regularly modified outside of Visual Studio. See [Generate Tests from MsBuild](Generate-Tests-From-MsBuild.md) for details on configuring MSBuild to use the `generateall` function.
 
 ## Generating Reports
 

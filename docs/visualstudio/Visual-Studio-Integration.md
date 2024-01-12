@@ -15,10 +15,10 @@ The integration provides the following features:
   * [Document formatting](Visual-Studio-Integration-Editing-Features.html#document-formatting)
 * [Navigation](Visual-Studio-Integration-Navigation-Features)
   * Navigate from [steps in scenarios to binding methods and vice versa](Visual-Studio-Integration-Navigation-Features.html#navigating-between-bindings-and-steps)
-  * Detect bindings from the SpecFlow project, from project references and from assembly references
+  * Detect bindings from the Reqnroll project, from project references and from assembly references
   * Cached step analysis for faster solution startup
 * Generic Test Runner Support
-  * You can execute tests using the following test runners: Visual Studio, ReSharper and SpecRun. You can execute SpecFlow scenarios on all supported unit testing platforms (e.g. NUnit, xUnit, MSTest).
+  * You can execute tests using the following test runners: Visual Studio, ReSharper and SpecRun. You can execute Reqnroll scenarios on all supported unit testing platforms (e.g. NUnit, xUnit, MSTest).
 * [Visual Studio Test Explorer Support](Visual-Studio-Test-Explorer-Support.md)
   * Run/debug (including from feature files)
   * Scenario title displayed in Test Explorer

@@ -51,7 +51,7 @@ public void ThenItIsPossibleToEnterAWithLabel(string inputType, string expectedL
 
 With moving the automation code into a driver class, we could reduce the number of lines in the step definition to one. Also we can now use a method-name (`CheckExistenceOfInputElement`), that is understandable by everybody in your team.
 
-To get an instance of the driver class (`SubmissionSteps`), we are using the [Context- Injection](../Bindings/Context-Injection.md) Feature of SpecFlow.
+To get an instance of the driver class (`SubmissionSteps`), we are using the [Context- Injection](../Bindings/Context-Injection.md) Feature of Reqnroll.
 
 ``` csharp
 [Binding]
@@ -104,4 +104,4 @@ public class SubmissionPageDriver
 
 ## Further Resources
 
-- <http://leitner.io/2015/11/14/driver-pattern-empowers-your-specflow-step-definitions>
+- <http://leitner.io/2015/11/14/driver-pattern-empowers-your-reqnroll-step-definitions>

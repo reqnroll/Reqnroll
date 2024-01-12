@@ -1,6 +1,6 @@
 # Calling Steps from Step Definitions
 
-**Note: This feature was removed in SpecFlow 4.0. Details about it can be found [here](https://github.com/SpecFlowOSS/SpecFlow/issues/1733).**
+**Note: This feature was removed in SpecFlow 4.0. Details about it can be found [here](https://github.com/reqnroll/Reqnroll/issues/1733).**
 
 It is possible to call steps from within [Step Definitions](Step-Definitions.md):
 
@@ -59,7 +59,7 @@ Scenario: View last incidents
 
 ## Calling steps with multiline step arguments  
 
-Sometimes you want to call a step that has been designed to take [Multiline Step Arguments](../Gherkin/Using Gherkin Language in SpecFlow.md), for example:
+Sometimes you want to call a step that has been designed to take [Multiline Step Arguments](../Gherkin/Using Gherkin Language in Reqnroll.md), for example:
 
 ### Tables
 

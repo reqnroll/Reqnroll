@@ -1,11 +1,11 @@
 ---
 name: Bug report
-description: Create a report to help us improve SpecFlow
+description: Create a report to help us improve Reqnroll
 labels: [Bug]
 body:
 - type: input
   attributes:
-    label: SpecFlow Version
+    label: Reqnroll Version
   validations:
     required: true
 - type: dropdown
@@ -40,7 +40,7 @@ body:
     required: true
 - type: dropdown 
   attributes:
-    label: Project Format of the SpecFlow project
+    label: Project Format of the Reqnroll project
     options:
       - Sdk-style project format
       - Classic project format using `packages.config`
@@ -51,8 +51,8 @@ body:
   attributes:
     label: .feature.cs files are generated using
     options:
-      - SpecFlow.Tools.MsBuild.Generation NuGet package
-      - SpecFlowSingleFileGenerator custom tool
+      - Reqnroll.Tools.MsBuild.Generation NuGet package
+      - ReqnrollSingleFileGenerator custom tool
   validations:
     required: true
 - type: dropdown
@@ -66,8 +66,8 @@ body:
     required: true
 - type: textarea
   attributes:
-    label: SpecFlow Section in app.config or content of specflow.json
-    placeholder: PLEASE COPY THE ENTIRE <SpecFlow> SECTION IN YOUR .config FILE or THE ENTIRE specflow.json
+    label: Reqnroll Section in app.config or content of reqnroll.json
+    placeholder: PLEASE COPY THE ENTIRE <Reqnroll> SECTION IN YOUR .config FILE or THE ENTIRE reqnroll.json
 - type: textarea
   attributes:
     label: Issue Description

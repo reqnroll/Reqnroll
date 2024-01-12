@@ -1,0 +1,56 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.xUnit</id>
+    <version>$version$</version>
+    <title>Reqnroll.xUnit</title>
+    <authors>$author$</authors>
+    <owners>$owner$</owners>
+    <description>Package to use Reqnroll with xUnit 2.4 and later</description>
+    <summary>Package to use Reqnroll with xUnit 2.4 and later</summary>
+    <language>en-US</language>
+    <projectUrl>https://www.reqnroll.net</projectUrl>
+    <icon>images\reqnroll-icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <tags>reqnroll xUnit</tags>
+    <copyright>$copyright$</copyright>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
+        <dependency id="xunit.core" version="2.4.2" />
+        <dependency id="Xunit.SkippableFact" version="1.4.13" />
+        <dependency id="System.Runtime.CompilerServices.Unsafe" version="6.0.0" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
+        <dependency id="xunit.core" version="2.4.2" />
+        <dependency id="Xunit.SkippableFact" version="1.4.13" />
+      </group>
+      <group targetFramework="net6.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
+        <dependency id="xunit.core" version="2.4.2" />
+        <dependency id="Xunit.SkippableFact" version="1.4.13" />
+      </group>
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="build\**\*" exclude="build\*.template.*" target="build" />
+    <file src="bin\$config$\net462\Reqnroll.xUnit.ReqnrollPlugin.*" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.xUnit.ReqnrollPlugin.dll" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.xUnit.ReqnrollPlugin.pdb" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="bin\$config$\net6.0\Reqnroll.xUnit.ReqnrollPlugin.*" target="lib\$Reqnroll_Net6_TFM$" />
+
+    <file src="bin\$config$\net462\Reqnroll.xUnit.Generator.ReqnrollPlugin.*" target="build\$Reqnroll_FullFramework_Generator_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll" target="build\$Reqnroll_Core_Generator_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.xUnit.Generator.ReqnrollPlugin.pdb" target="build\$Reqnroll_Core_Generator_TFM$" />
+    <file src="bin\$config$\net6.0\Reqnroll.xUnit.Generator.ReqnrollPlugin.*" target="build\$Reqnroll_Net6_TFM$" />
+
+    <file src="$SolutionDir$LICENSE.txt" target="LICENSE.txt" />
+    <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
+  </files>
+</package>

@@ -8,7 +8,7 @@ assignees: ''
 ---
 
 Product:  
-- [ ] SpecFlow
+- [ ] Reqnroll
 - [ ] SpecFlow+ Runner
 - [ ] SpecFlow+ LivingDoc
 - [ ] SpecMap

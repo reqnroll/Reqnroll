@@ -28,5 +28,5 @@ Ignoring is like skipping the scenario. Be careful, as it behaves a little bit d
 
 ## Limitations
 
-Currently this works only in [step definitions](../Bindings/Step-Definitions.md). It is not possible to use it in [hooks](../Bindings/Hooks.md). See GitHub Issue [#2059](https://github.com/SpecFlowOSS/SpecFlow/issues/2059)
+Currently this works only in [step definitions](../Bindings/Step-Definitions.md). It is not possible to use it in [hooks](../Bindings/Hooks.md). See GitHub Issue [#2059](https://github.com/reqnroll/Reqnroll/issues/2059)
 

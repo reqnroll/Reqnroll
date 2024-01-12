@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.MsTest</id>
+    <version>$version$</version>
+    <title>Reqnroll.MsTest</title>
+    <authors>$author$</authors>
+    <owners>$owner$</owners>
+    <description>Package to setup Reqnroll for use with MsTest v2.</description>
+    <summary>Package to setup Reqnroll for use with MsTest v2.</summary>
+    <language>en-US</language>
+    <projectUrl>https://www.reqnroll.net</projectUrl>
+    <icon>images\reqnroll-icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <tags>reqnroll mstest</tags>
+    <copyright>$copyright$</copyright>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
+        <dependency id="MSTest.TestFramework" version="2.1.2" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
+        <dependency id="MSTest.TestFramework" version="2.1.2" />
+      </group>
+      <group targetFramework="net6.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
+        <dependency id="MSTest.TestFramework" version="2.1.2" />
+      </group>
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="build\**\*" exclude="build\*.template.*" target="build" />
+    <file src="bin\$config$\net462\Reqnroll.MSTest.ReqnrollPlugin.*" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.MSTest.ReqnrollPlugin.dll" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.MSTest.ReqnrollPlugin.pdb" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="bin\$config$\net6.0\Reqnroll.MSTest.ReqnrollPlugin.*" target="lib\$Reqnroll_Net6_TFM$" />
+
+    <file src="bin\$config$\net462\Reqnroll.MSTest.Generator.ReqnrollPlugin.*" target="build\$Reqnroll_FullFramework_Generator_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" target="build\$Reqnroll_Core_Generator_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.MSTest.Generator.ReqnrollPlugin.pdb" target="build\$Reqnroll_Core_Generator_TFM$" />
+    <file src="bin\$config$\net6.0\Reqnroll.MSTest.Generator.ReqnrollPlugin.*" target="build\$Reqnroll_Net6_TFM$" />
+
+    <file src="$SolutionDir$LICENSE.txt" target="LICENSE.txt" />
+    <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
+  </files>
+</package>
