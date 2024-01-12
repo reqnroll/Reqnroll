@@ -8,8 +8,6 @@ namespace Reqnroll.Bindings.Discovery
 {
     public abstract class BindingSourceProcessor : IBindingSourceProcessor
     {
-        public static string BindingAttributeFullName = typeof(BindingAttribute).FullName;
-
         private readonly IBindingFactory _bindingFactory;
 
         private BindingSourceType _currentBindingSourceType = null;
@@ -33,7 +31,7 @@ namespace Reqnroll.Bindings.Discovery
 
         private static bool IsPotentialBindingClass(IEnumerable<string> attributeTypeNames)
         {
-            return attributeTypeNames.Any(attr => attr.Equals(BindingAttributeFullName, StringComparison.InvariantCulture));
+            return attributeTypeNames.Any(attr => attr.EndsWith($".{nameof(BindingAttribute)}", StringComparison.InvariantCulture));
         }
 
         public bool PreFilterType(IEnumerable<string> attributeTypeNames)
@@ -82,7 +80,7 @@ namespace Reqnroll.Bindings.Discovery
 
         private bool IsBindingType(BindingSourceType bindingSourceType)
         {
-            return bindingSourceType.Attributes.Any(attr => attr.AttributeType.TypeEquals(typeof(BindingAttribute)));
+            return bindingSourceType.Attributes.Any(attr => typeof(BindingAttribute).IsAssignableFrom(attr.AttributeType));
         }
 
         private bool IsStepDefinitionAttribute(BindingSourceAttribute attribute)
@@ -102,14 +100,16 @@ namespace Reqnroll.Bindings.Discovery
         private bool IsHookAttribute(BindingSourceAttribute attribute)
         {
 // ReSharper disable AssignNullToNotNullAttribute
-            return attribute.AttributeType.FullName.StartsWith(typeof(BeforeScenarioAttribute).Namespace) &&
+            return (attribute.AttributeType.FullName.StartsWith(typeof(BeforeScenarioAttribute).Namespace) ||
+                    attribute.AttributeType.Name.StartsWith("Before", StringComparison.InvariantCulture) ||
+                    attribute.AttributeType.Name.StartsWith("After", StringComparison.InvariantCulture)) &&
                 TryGetHookType(attribute) != null;
 // ReSharper restore AssignNullToNotNullAttribute
         }
 
         private bool IsStepArgumentTransformationAttribute(BindingSourceAttribute attribute)
         {
-            return attribute.AttributeType.TypeEquals(typeof(StepArgumentTransformationAttribute));
+            return typeof(StepArgumentTransformationAttribute).IsAssignableFrom(attribute.AttributeType);
         }
 
         public void ProcessMethod(BindingSourceMethod bindingSourceMethod)
