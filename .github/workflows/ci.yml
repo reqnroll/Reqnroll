@@ -29,3 +29,5 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj --no-build --verbosity normal -f net6.0
     - name: Generator Tests
       run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj --no-build --verbosity normal -f net6.0
+    - name: ExternalData Plugin Tests
+      run: dotnet test ./Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.csproj --no-build --verbosity normal -f net6.0
