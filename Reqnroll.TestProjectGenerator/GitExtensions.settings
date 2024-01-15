@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<dictionary>
+  <item>
+    <key>
+      <string>RevisionLinkDefs</string>
+    </key>
+    <value>
+      <string>&lt;?xml version="1.0" encoding="utf-16"?&gt;
+&lt;ArrayOfGitExtLinkDef&gt;
+  &lt;GitExtLinkDef&gt;
+    &lt;Enabled&gt;true&lt;/Enabled&gt;
+    &lt;LinkFormats&gt;
+      &lt;GitExtLinkFormat&gt;
+        &lt;Caption&gt;View on GitHub&lt;/Caption&gt;
+        &lt;Format&gt;https://github.com/SpecFlowOSS/SpecFlow.TestProjectGenerator/commit/%COMMIT_HASH%&lt;/Format&gt;
+      &lt;/GitExtLinkFormat&gt;
+    &lt;/LinkFormats&gt;
+    &lt;Name&gt;GitHub - commit&lt;/Name&gt;
+    &lt;RemoteSearchInParts /&gt;
+    &lt;SearchInParts&gt;
+      &lt;RevisionPart&gt;Message&lt;/RevisionPart&gt;
+      &lt;RevisionPart&gt;LocalBranches&lt;/RevisionPart&gt;
+      &lt;RevisionPart&gt;RemoteBranches&lt;/RevisionPart&gt;
+    &lt;/SearchInParts&gt;
+    &lt;SearchPattern&gt;.*&lt;/SearchPattern&gt;
+    &lt;UseRemotesPattern /&gt;
+    &lt;UseOnlyFirstRemote&gt;false&lt;/UseOnlyFirstRemote&gt;
+  &lt;/GitExtLinkDef&gt;
+  &lt;GitExtLinkDef&gt;
+    &lt;Enabled&gt;true&lt;/Enabled&gt;
+    &lt;LinkFormats&gt;
+      &lt;GitExtLinkFormat&gt;
+        &lt;Caption&gt;SF Issue {0}&lt;/Caption&gt;
+        &lt;Format&gt;https://github.com/SpecFlowOSS/SpecFlow/issues/{0}&lt;/Format&gt;
+      &lt;/GitExtLinkFormat&gt;
+      &lt;GitExtLinkFormat&gt;
+        &lt;Caption&gt;TPG Issue {0}&lt;/Caption&gt;
+        &lt;Format&gt;https://github.com/SpecFlowOSS/SpecFlow.TestProjectGenerator/issues/{0}&lt;/Format&gt;
+      &lt;/GitExtLinkFormat&gt;
+    &lt;/LinkFormats&gt;
+    &lt;Name&gt;GitHub - issues&lt;/Name&gt;
+    &lt;NestedSearchPattern&gt;(\d+)+&lt;/NestedSearchPattern&gt;
+    &lt;RemoteSearchInParts /&gt;
+    &lt;SearchInParts&gt;
+      &lt;RevisionPart&gt;Message&lt;/RevisionPart&gt;
+      &lt;RevisionPart&gt;LocalBranches&lt;/RevisionPart&gt;
+      &lt;RevisionPart&gt;RemoteBranches&lt;/RevisionPart&gt;
+    &lt;/SearchInParts&gt;
+    &lt;SearchPattern&gt;(\s*(,|and)?\s*#\d+)+&lt;/SearchPattern&gt;
+    &lt;UseRemotesPattern /&gt;
+    &lt;UseOnlyFirstRemote&gt;false&lt;/UseOnlyFirstRemote&gt;
+  &lt;/GitExtLinkDef&gt;
+&lt;/ArrayOfGitExtLinkDef&gt;</string>
+    </value>
+  </item>
+</dictionary>

@@ -1,0 +1,46 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6</TargetFramework>
+    
+    <PackAsTool>true</PackAsTool>
+    <ToolCommandName>specflow-tpg</ToolCommandName>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Authors>SpecFlow Team</Authors>
+    <Company>Tricentis</Company>
+    <PackageProjectUrl>https://github.com/SpecFlowOSS/SpecFlow.TestProjectGenerator</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SpecFlowOSS/SpecFlow.TestProjectGenerator</RepositoryUrl>
+    <Copyright>Copyright © SpecFlow Team</Copyright>
+    <Description>Command line tool to generate SpecFlow test projects for manual/smoke testing of SpecFlow.</Description>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageIcon>logo.png</PackageIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\SpecFlow.TestProjectGenerator\resources\logo.png">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.4" />
+    <PackageReference Include="Nerdbank.GitVersioning" Version="3.3.37">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Scrutor" Version="3.2.1" />
+    <PackageReference Include="System.CommandLine" Version="2.0.0-beta1.20253.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SpecFlow.TestProjectGenerator\TechTalk.SpecFlow.TestProjectGenerator.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE.txt" Pack="true" Visible="false" PackagePath=""/>
+  </ItemGroup>
+
+</Project>
