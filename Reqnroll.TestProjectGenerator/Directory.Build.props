@@ -3,7 +3,7 @@
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
-    <SpecFlow_EnableStrongNameSigning>true</SpecFlow_EnableStrongNameSigning>
+    <Reqnroll_EnableStrongNameSigning>true</Reqnroll_EnableStrongNameSigning>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,15 +14,15 @@
     </PackageReference>
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(SpecFlow_EnableStrongNameSigning)' == 'true'">
-    <SpecFlow_KeyFile>$(MSBuildThisFileDirectory)\..\..\specflow.snk</SpecFlow_KeyFile>
-    <SpecFlow_SignAssembly>true</SpecFlow_SignAssembly>
+  <PropertyGroup Condition=" '$(Reqnroll_EnableStrongNameSigning)' == 'true'">
+    <Reqnroll_KeyFile>$(MSBuildThisFileDirectory)\..\..\reqnroll.snk</Reqnroll_KeyFile>
+    <Reqnroll_SignAssembly>true</Reqnroll_SignAssembly>
     <DefineConstants>$(DefineConstants);SPECFLOW_ENABLE_STRONG_NAME_SIGNING</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(SpecFlow_EnableStrongNameSigning)' == 'false'">
-    <SpecFlow_KeyFile></SpecFlow_KeyFile>
-    <SpecFlow_SignAssembly>false</SpecFlow_SignAssembly>
+  <PropertyGroup Condition=" '$(Reqnroll_EnableStrongNameSigning)' == 'false'">
+    <Reqnroll_KeyFile></Reqnroll_KeyFile>
+    <Reqnroll_SignAssembly>false</Reqnroll_SignAssembly>
   </PropertyGroup>
 
 </Project>
