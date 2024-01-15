@@ -23,5 +23,9 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-    - name: Runtime Test
+    - name: Runtime Tests
       run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj --no-build --verbosity normal -f net6.0
+    - name: Plugin Tests
+      run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj --no-build --verbosity normal -f net6.0
+    - name: Generator Tests
+      run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj --no-build --verbosity normal -f net6.0
