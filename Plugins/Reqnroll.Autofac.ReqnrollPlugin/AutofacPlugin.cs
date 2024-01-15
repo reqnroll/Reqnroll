@@ -102,7 +102,7 @@ namespace Reqnroll.Autofac
                                 containerBuilder = configureScenarioContainer(containerBuilder);
                             }
 
-                            RegisterSpecflowDependecies(args.ObjectContainer, containerBuilder);
+                            RegisterReqnrollDependecies(args.ObjectContainer, containerBuilder);
                         });
                     }
 
@@ -113,7 +113,7 @@ namespace Reqnroll.Autofac
                     }
 
                     var containerBuilder = createScenarioContainerBuilder(null);
-                    RegisterSpecflowDependecies(args.ObjectContainer, containerBuilder);
+                    RegisterReqnrollDependecies(args.ObjectContainer, containerBuilder);
                     args.ObjectContainer.RegisterFactoryAs(() => containerBuilder.Build());
                     return args.ObjectContainer.Resolve<IContainer>().BeginLifetimeScope(nameof(ScenarioContext));
                 });
@@ -152,7 +152,7 @@ namespace Reqnroll.Autofac
         /// </summary>
         /// <param name="objectContainer">Reqnroll DI container.</param>
         /// <param name="containerBuilder">Autofac ContainerBuilder.</param>
-        private void RegisterSpecflowDependecies(
+        private void RegisterReqnrollDependecies(
             IObjectContainer objectContainer,
             global::Autofac.ContainerBuilder containerBuilder)
         {

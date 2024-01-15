@@ -8,7 +8,7 @@ Imports System.Reflection
 <Assembly: Global.Xunit.TestFramework("Reqnroll.xUnit.ReqnrollPlugin.XunitTestFrameworkWithAssemblyFixture", "Reqnroll.xUnit.ReqnrollPlugin")>
 <Assembly: Global.Reqnroll.xUnit.ReqnrollPlugin.AssemblyFixture(GetType(PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture))>
 
-<GeneratedCode("Reqnroll", "SPECFLOW_VERSION")>
+<GeneratedCode("Reqnroll", "REQNROLL_VERSION")>
 Public Class PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture
     Implements Global.Xunit.IAsyncLifetime
 

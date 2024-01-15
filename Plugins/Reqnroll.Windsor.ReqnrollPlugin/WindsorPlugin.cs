@@ -47,14 +47,14 @@ namespace Reqnroll.Windsor
 
                     var container = containerBuilder();
 
-                    RegisterSpecflowDependecies(args.ObjectContainer, container);
+                    RegisterReqnrollDependecies(args.ObjectContainer, container);
 
                     return container;
                 });
             };
         }
 
-        public void RegisterSpecflowDependecies(IObjectContainer objectContainer, IWindsorContainer container)
+        public void RegisterReqnrollDependecies(IObjectContainer objectContainer, IWindsorContainer container)
         {
             container.Register(Component.For<IObjectContainer>().Instance(objectContainer).LifestyleScoped());
 

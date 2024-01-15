@@ -8,7 +8,7 @@ Imports System.Reflection
 Imports System.CodeDom.Compiler
 Imports System.Runtime.CompilerServices
 
-<GeneratedCode("Reqnroll", "SPECFLOW_VERSION")>
+<GeneratedCode("Reqnroll", "REQNROLL_VERSION")>
 <TestClass>
 Public NotInheritable Class PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks
     <AssemblyInitialize>

@@ -30,7 +30,7 @@ namespace Reqnroll.GeneratorTests
 //  </auto-generated>
 // ------------------------------------------------------------------------------
 #region Designer generated code
-namespace Bowling.Specflow
+namespace Bowling.Reqnroll
 {
 }
 #endregion
@@ -76,7 +76,7 @@ namespace Bowling.Specflow
 //  </auto-generated>
 // ------------------------------------------------------------------------------
 #region Designer generated code
-namespace Bowling.Specflow
+namespace Bowling.Reqnroll
 {
 }
 #endregion

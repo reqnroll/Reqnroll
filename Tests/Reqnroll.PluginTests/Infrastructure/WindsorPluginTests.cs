@@ -102,7 +102,7 @@ namespace Reqnroll.PluginTests.Infrastructure
             objectContainer.Setup(x => x.Resolve<ScenarioContext>()).Returns(context);
 
             var plugin = new WindsorPlugin();
-            plugin.RegisterSpecflowDependecies(objectContainer.Object, container);
+            plugin.RegisterReqnrollDependecies(objectContainer.Object, container);
 
             container.Resolve<ScenarioContext>();
 

@@ -19,7 +19,7 @@ Here is a quick snapshot:
 
 Reqnroll provides various options to generate reports related to the acceptance tests.
 
-**Note:** The `reqnroll.exe` [command line tool](Tools.md) that is used to generate reports can be found in the `packages\Specflow.{version number}\tools` directory, when you installed Reqnroll through NuGet. Start the tool with no parameters or use the `--help` option to display an overview of the available options.
+**Note:** The `reqnroll.exe` [command line tool](Tools.md) that is used to generate reports can be found in the `packages\Reqnroll.{version number}\tools` directory, when you installed Reqnroll through NuGet. Start the tool with no parameters or use the `--help` option to display an overview of the available options.
 
 You can find a repository containing the old report code [here](https://github.com/reqnroll/Reqnroll.Reports). For information on why the reports were moved to a seperate repo, please read see this [GitHub issue](https://github.com/reqnroll/Reqnroll/issues/1036).
 
@@ -53,10 +53,10 @@ nunit3-console.exe --labels=All --out=TestResult.txt "--result=TestResult.xml;fo
 **Note:** The examples and parameters are for version 2.4.* and higher. Older versions can be found by viewing past revisions in the GitHub wiki.
 
 The report generation step is the same for both versions of NUnit. The two generated files can be used to invoke the Reqnroll report generation. 
-If you use the default output file names shown above, you only need to specify information about the C# test project containing the `*.feature` files. Specflow uses the default `TestResult.xml` and `TestResult.txt` files to produce `TestResult.html`.
+If you use the default output file names shown above, you only need to specify information about the C# test project containing the `*.feature` files. Reqnroll uses the default `TestResult.xml` and `TestResult.txt` files to produce `TestResult.html`.
 ```
 reqnroll.exe nunitexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj
-reqnroll.exe nunitexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj --xmlTestResult CustomNunitTestResult.xml --testOutput CustomNunitTestOutput.txt --OutputFile CustomSpecflowTestReport.html
+reqnroll.exe nunitexecutionreport --ProjectFile BookShop.AcceptanceTests.csproj --xmlTestResult CustomNunitTestResult.xml --testOutput CustomNunitTestOutput.txt --OutputFile CustomReqnrollTestReport.html
 ```
 
 The following table contains the possible arguments for this command.

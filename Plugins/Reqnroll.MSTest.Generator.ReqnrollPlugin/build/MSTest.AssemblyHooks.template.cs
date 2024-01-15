@@ -9,7 +9,7 @@ using global::Reqnroll.MSTest.ReqnrollPlugin;
 using global::System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-[GeneratedCode("Reqnroll", "SPECFLOW_VERSION")]
+[GeneratedCode("Reqnroll", "REQNROLL_VERSION")]
 [TestClass]
 public class PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks
 {

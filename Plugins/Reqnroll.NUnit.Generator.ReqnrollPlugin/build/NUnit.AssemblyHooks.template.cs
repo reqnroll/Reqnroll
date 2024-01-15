@@ -6,7 +6,7 @@ using System.Diagnostics;
 using global::System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-[GeneratedCode("Reqnroll", "SPECFLOW_VERSION")]
+[GeneratedCode("Reqnroll", "REQNROLL_VERSION")]
 [global::NUnit.Framework.SetUpFixture]
 public class PROJECT_ROOT_NAMESPACE_NUnitAssemblyHooks
 {

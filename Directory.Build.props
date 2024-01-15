@@ -65,7 +65,7 @@
   <PropertyGroup Condition=" '$(Reqnroll_EnableStrongNameSigning)' == 'true'">
     <Reqnroll_KeyFile>$(MSBuildThisFileDirectory)\reqnroll.snk</Reqnroll_KeyFile>
     <Reqnroll_SignAssembly>true</Reqnroll_SignAssembly>
-    <DefineConstants>$(DefineConstants);SPECFLOW_ENABLE_STRONG_NAME_SIGNING</DefineConstants>
+    <DefineConstants>$(DefineConstants);REQNROLL_ENABLE_STRONG_NAME_SIGNING</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Reqnroll_EnableStrongNameSigning)' == 'false'">

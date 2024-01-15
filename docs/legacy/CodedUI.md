@@ -51,7 +51,7 @@ namespace My.Reqnroll
 using System.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 
-namespace SpecflowCodedUIGenerator
+namespace ReqnrollCodedUIGenerator
 {
     public class MsTest2010CodedUiGeneratorProvider : MsTest2010GeneratorProvider
     {
@@ -79,7 +79,7 @@ namespace SpecflowCodedUIGenerator
 using System.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 
-namespace SpecflowCodedUIGenerator
+namespace ReqnrollCodedUIGenerator
 {
      public class MsTest2010CodedUiGeneratorProvider : MsTest2010GeneratorProvider
     {
@@ -217,4 +217,4 @@ If you want to use any of the Reqnroll Hooks as steps such as [BeforeTestRun],[B
 Solve this by adding a `Playback.Initialize();` call in your [BeforeTestRun] step, and a `Playback.Cleanup();` in your [AfterTestRun] step.
 
 ## Other Information
-[Blog series on using Specflow with Coded UI Test API] (http://rburnham.wordpress.com/2011/03/15/bdd-ui-automation-with-reqnroll-and-coded-ui-tests/)
+[Blog series on using Reqnroll with Coded UI Test API] (http://rburnham.wordpress.com/2011/03/15/bdd-ui-automation-with-reqnroll-and-coded-ui-tests/)

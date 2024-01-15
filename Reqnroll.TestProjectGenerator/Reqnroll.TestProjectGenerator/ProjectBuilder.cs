@@ -461,7 +461,7 @@ namespace Reqnroll.TestProjectGenerator
 
         private string GetReqnrollPublicAssemblyName(string assemblyName)
         {
-#if SPECFLOW_ENABLE_STRONG_NAME_SIGNING
+#if REQNROLL_ENABLE_STRONG_NAME_SIGNING
             return $"{Path.GetFileNameWithoutExtension(assemblyName)}, Version={_currentVersionDriver.ReqnrollVersion}, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL";
 #else
             return Path.GetFileNameWithoutExtension(assemblyName);

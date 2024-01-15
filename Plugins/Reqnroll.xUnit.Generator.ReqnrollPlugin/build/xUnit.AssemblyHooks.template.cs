@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 [assembly: global::Xunit.TestFramework("Reqnroll.xUnit.ReqnrollPlugin.XunitTestFrameworkWithAssemblyFixture", "Reqnroll.xUnit.ReqnrollPlugin")]
 [assembly: global::Reqnroll.xUnit.ReqnrollPlugin.AssemblyFixture(typeof(global::PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture))]
 
-[GeneratedCode("Reqnroll", "SPECFLOW_VERSION")]
+[GeneratedCode("Reqnroll", "REQNROLL_VERSION")]
 public class PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture : global::Xunit.IAsyncLifetime
 {
     [MethodImpl(MethodImplOptions.NoInlining)]

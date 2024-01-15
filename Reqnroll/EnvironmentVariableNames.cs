@@ -3,6 +3,6 @@ namespace Reqnroll
     public class EnvironmentVariableNames
     {
         public const string NCrunch = "NCrunch";
-        public const string SpecflowDisableParallelExecution = "SPECFLOW_DISABLE_PARALLEL";
+        public const string ReqnrollDisableParallelExecution = "REQNROLL_DISABLE_PARALLEL";
     }
 }

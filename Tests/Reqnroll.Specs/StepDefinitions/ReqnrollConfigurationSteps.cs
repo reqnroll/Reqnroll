@@ -25,7 +25,7 @@ namespace Reqnroll.Specs.StepDefinitions
         }
 
         [Given(@"the project has no reqnroll\.json configuration")]
-        public void GivenTheProjectHasNoSpecflow_JsonConfiguration()
+        public void GivenTheProjectHasNoReqnroll_JsonConfiguration()
         {
             _configurationDriver.SetConfigurationFormat(ConfigurationFormat.None);
         }
@@ -81,7 +81,7 @@ namespace Reqnroll.Specs.StepDefinitions
 //          <runtime obsoleteBehavior=""{obsoleteBehaviorValue}"" />
 //          </reqnroll >";
 
-//          GivenTheSpecflowConfigurationIs(configText);
+//          GivenTheReqnrollConfigurationIs(configText);
             _configurationDriver.SetRuntimeObsoleteBehavior(obsoleteBehaviorValue);
         }
 

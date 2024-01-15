@@ -4,7 +4,7 @@ namespace Reqnroll.Analytics
 {
     public class EnvironmentReqnrollTelemetryChecker : IEnvironmentReqnrollTelemetryChecker
     {
-        public const string ReqnrollTelemetryEnvironmentVariable = "SPECFLOW_TELEMETRY_ENABLED";
+        public const string ReqnrollTelemetryEnvironmentVariable = "REQNROLL_TELEMETRY_ENABLED";
 
         public bool IsReqnrollTelemetryEnabled()
         {

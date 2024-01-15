@@ -106,7 +106,7 @@ namespace Reqnroll.Generator.Generation
 
             var codeNamespace = new CodeNamespace(targetNamespace);
 
-            codeNamespace.Imports.Add(new CodeNamespaceImport(GeneratorConstants.SPECFLOW_NAMESPACE));
+            codeNamespace.Imports.Add(new CodeNamespaceImport(GeneratorConstants.REQNROLL_NAMESPACE));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System"));
             codeNamespace.Imports.Add(new CodeNamespaceImport("System.Linq"));
             return codeNamespace;
