@@ -19,7 +19,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\Reqnroll.TestProjectGenerator\resources\logo.png">
+    <None Include="..\..\Resources\logo.png">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
     </None>
