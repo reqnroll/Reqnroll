@@ -232,15 +232,8 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddNuGetPackage("System.Runtime.CompilerServices.Unsafe", "6.0.0", new NuGetPackageAssembly("System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "netstandard2.0\\System.Runtime.CompilerServices.Unsafe.dll"));
                 }
 
-                if (_currentVersionDriver.ReqnrollVersion >= new Version(3, 0))
-                {
-                    // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
-                    _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
-                }
-                else
-                {
-                    _project.AddNuGetPackage("Reqnroll", $"{_currentVersionDriver.ReqnrollNuGetVersion}", new NuGetPackageAssembly($"Reqnroll, Version={_currentVersionDriver.ReqnrollVersion}.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net462\\Reqnroll.dll"));
-                }
+                // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
+                _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
 
                 _project.AddNuGetPackage("BoDi", "1.5.0", new NuGetPackageAssembly("BoDi, Version=1.5.0.0, Culture=neutral, PublicKeyToken=ff7cd5ea2744b496", "net45\\BoDi.dll"));
                 _project.AddNuGetPackage("Gherkin", "19.0.3", new NuGetPackageAssembly("Gherkin, Version=19.0.3.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
@@ -264,36 +257,15 @@ namespace Reqnroll.TestProjectGenerator
 
                 if (IsReqnrollFeatureProject)
                 {
-                    if (_currentVersionDriver.ReqnrollVersion >= new Version(2, 3, 0))
-                    {
-                        _project.AddNuGetPackage("Reqnroll.Tools.MsBuild.Generation", _currentVersionDriver.ReqnrollNuGetVersion);
-                    }
-                    else
-                    {
-                        _project.AddMSBuildImport($"..\\packages\\Reqnroll.{_currentVersionDriver.ReqnrollVersion}\\tools\\Reqnroll.targets");
-                    }
-
-                    if (_project.ProjectFormat == ProjectFormat.Old && _currentVersionDriver.ReqnrollVersion < new Version(3, 0, 0))
-                    {
-                        AddMSBuildTarget("AfterUpdateFeatureFilesInProject", @"<ItemGroup>	
-                                                                          <Compile Include=""@(ReqnrollGeneratedFiles)"" />	
-                                                                       </ItemGroup>");
-                    }
+                    _project.AddNuGetPackage("Reqnroll.Tools.MsBuild.Generation", _currentVersionDriver.ReqnrollNuGetVersion);
                 }
 
                 switch (Configuration.UnitTestProvider)
                 {
                     case UnitTestProvider.SpecRun:
-                        ConfigureRunner();
-                        break;
-                    case UnitTestProvider.SpecRunWithNUnit:
-                        ConfigureRunner();
-                        ConfigureNUnit();
-                        break;
                     case UnitTestProvider.SpecRunWithMsTest:
-                        ConfigureRunner();
-                        ConfigureMSTest();
-                        break;
+                    case UnitTestProvider.SpecRunWithNUnit:
+                        throw new NotSupportedException("Testing with SpecRun is not supported!");
                     case UnitTestProvider.MSTest:
                         ConfigureMSTest();
                         break;
@@ -306,12 +278,6 @@ namespace Reqnroll.TestProjectGenerator
                     default:
                         throw new InvalidOperationException(@"Invalid unit test provider.");
                 }
-
-                if (_currentVersionDriver.ReqnrollVersion < new Version(3, 0))
-                {
-                    _project.AddNuGetPackage("Newtonsoft.Json", "11.0.2");
-                }
-
             }
 
             _project.AddNuGetPackage("FluentAssertions", "5.3.0");
@@ -325,7 +291,7 @@ namespace Reqnroll.TestProjectGenerator
             _project.AddNuGetPackage(NUnit3TestAdapterPackageName, NUnit3TestAdapterPackageVersion);
 
 
-            if (_currentVersionDriver.ReqnrollVersion >= new Version(3, 0) && IsReqnrollFeatureProject)
+            if (IsReqnrollFeatureProject)
             {
                 _project.AddNuGetPackage("Reqnroll.NUnit", _currentVersionDriver.ReqnrollNuGetVersion,
                     new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.NUnit.ReqnrollPlugin.dll"), "net462\\Reqnroll.NUnit.ReqnrollPlugin.dll"));
@@ -360,7 +326,7 @@ namespace Reqnroll.TestProjectGenerator
                 _project.AddNuGetPackage("Validation", "2.4.18", new NuGetPackageAssembly("Validation, Version=2.4.0.0, Culture=neutral, PublicKeyToken=2fc06f0d701809a7", "net45\\Validation.dll"));
             }
 
-            if (_currentVersionDriver.ReqnrollVersion >= new Version(3, 0) && IsReqnrollFeatureProject)
+            if (IsReqnrollFeatureProject)
             {
                 _project.AddNuGetPackage("Reqnroll.xUnit", _currentVersionDriver.ReqnrollNuGetVersion,
                     new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.xUnit.ReqnrollPlugin.dll"), "net462\\Reqnroll.xUnit.ReqnrollPlugin.dll"));
@@ -381,55 +347,12 @@ namespace Reqnroll.TestProjectGenerator
                     "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL",
                     "net45\\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll"));
 
-            if (_currentVersionDriver.ReqnrollVersion >= new Version(3, 0) && IsReqnrollFeatureProject)
+            if (IsReqnrollFeatureProject)
             {
                 _project.AddNuGetPackage("Reqnroll.MSTest", _currentVersionDriver.ReqnrollNuGetVersion,
                     new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.MSTest.ReqnrollPlugin.dll"), "net462\\Reqnroll.MSTest.ReqnrollPlugin.dll"));
                 Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.MSTest", ReqnrollPluginType.Runtime));
             }
-        }
-
-        private void ConfigureRunner()
-        {
-            _project.AddNuGetPackage("SpecRun.Runner", _currentVersionDriver.NuGetVersion);
-
-            if (_currentVersionDriver.ReqnrollVersion >= new Version(3, 0))
-            {
-                if (IsReqnrollFeatureProject)
-                {
-                    ConfigureRunnerForSpecFlow3();
-                }
-            }
-            else
-            {
-                ConfigureRunnerForSpecFlow2(); 
-            }
-                
-        }
-
-        private void ConfigureRunnerForSpecFlow2()
-        {
-            _project.AddNuGetPackage($"SpecRun.Reqnroll.{_currentVersionDriver.ReqnrollVersionDash}", _currentVersionDriver.NuGetVersion,
-                                     new NuGetPackageAssembly($"SpecRun.ReqnrollPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, processorArchitecture=MSIL", "net45\\SpecRun.ReqnrollPlugin.dll"),
-                                     new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                                                              "net45\\TechTalk.SpecRun.dll"),
-                                     new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                                                              "net45\\TechTalk.SpecRun.Common.dll")
-            );
-
-            Configuration.Plugins.Add(new ReqnrollPlugin("SpecRun"));
-        }
-
-        private void ConfigureRunnerForSpecFlow3()
-        {
-            _project.AddNuGetPackage($"SpecRun.Reqnroll.{_currentVersionDriver.ReqnrollVersionDash}", _currentVersionDriver.NuGetVersion,
-                new NuGetPackageAssembly($"SpecRun.Runtime.ReqnrollPlugin, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, processorArchitecture=MSIL",
-                    $"{TargetFrameworkMoniker}\\SpecRun.Runtime.ReqnrollPlugin.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{TargetFrameworkMoniker}\\TechTalk.SpecRun.dll"),
-                new NuGetPackageAssembly($"TechTalk.SpecRun.Common, Version={_currentVersionDriver.MajorMinorPatchVersion}, Culture=neutral, PublicKeyToken=d0fc5cc18b3b389b, processorArchitecture=MSIL",
-                    $"{TargetFrameworkMoniker}\\TechTalk.SpecRun.Common.dll")
-            );
         }
 
         protected virtual void AddAdditionalStuff()
@@ -497,13 +420,7 @@ namespace Reqnroll.TestProjectGenerator
 
         private void AddInternalJson()
         {
-            string internalJsonPublicAssemblyName = InternalJsonPackageName;
-            if (_currentVersionDriver.ReqnrollVersion < new Version(3, 0))
-            {
-                internalJsonPublicAssemblyName = $"{internalJsonPublicAssemblyName}, Version={InternalJsonVersion}, Culture=neutral, PublicKeyToken=0778194805d6db41";
-            }
-
-            _project.AddNuGetPackage($"{InternalJsonPackageName}", $"{InternalJsonVersion}", new NuGetPackageAssembly($"{internalJsonPublicAssemblyName}", "net45\\SpecFlow.Internal.Json.dll"));
+            _project.AddNuGetPackage($"{InternalJsonPackageName}", $"{InternalJsonVersion}", new NuGetPackageAssembly($"{InternalJsonPackageName}", "net45\\SpecFlow.Internal.Json.dll"));
         }
     }
 }

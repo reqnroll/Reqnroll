@@ -64,11 +64,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
         {
             writer.WriteStartElement("reqnroll");
 
-            if (_currentVersionDriver.ReqnrollVersion < new Version(3, 0))
-            {
-                WriteUnitTestProvider(writer, configuration.UnitTestProvider.ToName());
-            }
-            
             if (configuration.BindingCulture != null)
             {
                 WriteBindingCulture(writer, configuration.BindingCulture);
@@ -91,11 +86,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
 
             WriteStepAssemblies(writer, configuration.StepAssemblies);
             
-            if (_currentVersionDriver.ReqnrollVersion < new Version(3, 0))
-            {
-                WritePlugins(writer, configuration.Plugins);
-            }
-
             writer.WriteEndElement();
         }
 

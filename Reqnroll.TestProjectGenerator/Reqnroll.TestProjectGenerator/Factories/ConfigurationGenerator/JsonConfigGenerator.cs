@@ -44,11 +44,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
         {
             configuration.FeatureLanguage = configuration.FeatureLanguage ?? CultureInfo.GetCultureInfo("en-US");
             
-            if (_currentVersionDriver.ReqnrollVersion < new Version(3, 0))
-            {
-                WriteUnitTestProvider(jsonWriter, configuration.UnitTestProvider.ToName());
-            }
-
             if (configuration.FeatureLanguage != null)
             {
                 WriteLanguage(jsonWriter, configuration.FeatureLanguage);
@@ -70,11 +65,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
             }
 
             WriteStepAssemblies(jsonWriter, configuration.StepAssemblies);
-
-            if (_currentVersionDriver.ReqnrollVersion < new Version(3, 0))
-            {
-                WritePlugins(jsonWriter, configuration.Plugins);
-            }
         }
 
         private void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)
