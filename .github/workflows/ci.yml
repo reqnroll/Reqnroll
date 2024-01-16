@@ -45,7 +45,9 @@ jobs:
       with:
         dotnet-version: 6.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: |
+        dotnet new globaljson --sdk-version 6.0.418
+        dotnet restore
     - name: Build
       run: dotnet build --no-restore
     - name: xUnit Specs
