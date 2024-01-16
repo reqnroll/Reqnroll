@@ -7,6 +7,7 @@ Scenario Outline: Two projects with the same unit test provider
 	When I build the solution using '<Build Tool>'
 	Then the build should succeed
 
+	@requiresMsBuild
 	@globalusingdirective #MSBuild for VS2019 and Mono throws error CS8652: The feature 'global using directive' is currently in Preview and unsupported.
 	Examples: 
 	| Build Tool    |
