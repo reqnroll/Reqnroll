@@ -1,6 +1,5 @@
 ﻿Feature: .NET Language Code-Behind Generation Support
 
-
 @quarantaine
 Scenario Outline: A project with a single scenario should compile successfully in all supported languages and build systems
     Given I have a '<Language>' test project
@@ -19,13 +18,6 @@ Scenario Outline: A project with a single scenario should compile successfully i
         | Total | Succeeded |
         | 1     | 1         |
 
-@globalusingdirective #MSBuild for VS2019 and Mono throws error CS8652: The feature 'global using directive' is currently in Preview and unsupported.
-@requiresMsBuild
-Examples:
-    | Description         | Language | Build Command |
-    | C# with MSBuild     | C#       | MSBuild       |
-    | VB.NET with MSBuild | VB.NET   | MSBuild       |
-
 Examples:
     | Description              | Language | Build Command |
     | C# with dotnet build     | C#       | dotnet build  |
@@ -35,3 +27,29 @@ Examples:
     | Description               | Language | Build Command  |
     | C# with dotnet msbuild    | C#       | dotnet msbuild |
     | VB.NET with dotnet msuild | VB.NET   | dotnet msbuild |
+
+# duplicated scenario to be able to filter it out on CI build
+@quarantaine
+@globalusingdirective #MSBuild for VS2019 and Mono throws error CS8652: The feature 'global using directive' is currently in Preview and unsupported.
+@requiresMsBuild
+Scenario Outline: A project with a single scenario should compile successfully in all supported languages and build systems (MsBuild)
+    Given I have a '<Language>' test project
+    And there is a feature file in the project as
+        """
+        Feature: Simple Feature
+        Scenario: Simple Scenario
+            When I do something
+        """
+    And all steps are bound and pass
+
+    When I compile the solution using '<Build Command>'
+    And I execute the tests
+
+    Then the execution summary should contain
+        | Total | Succeeded |
+        | 1     | 1         |
+
+Examples:
+    | Description         | Language | Build Command |
+    | C# with MSBuild     | C#       | MSBuild       |
+    | VB.NET with MSBuild | VB.NET   | MSBuild       |
