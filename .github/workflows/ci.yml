@@ -44,6 +44,10 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
     - name: xUnit Specs
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60&Category=basicExecution"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60&Category=basicExecution"
   
