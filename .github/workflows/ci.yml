@@ -31,3 +31,19 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj --no-build --verbosity normal -f net6.0
     - name: ExternalData Plugin Tests
       run: dotnet test ./Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.csproj --no-build --verbosity normal -f net6.0
+
+  specs:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: 6.0.x
+    - name: xUnit Specs
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60&Category=basicExecution"
+  
