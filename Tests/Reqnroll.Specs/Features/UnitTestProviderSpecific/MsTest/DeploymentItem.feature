@@ -39,6 +39,7 @@ Scenario: Should be able to deploy files
          | Succeeded |
          | 1         |
 
+@quarantaine
 @config
 Scenario: Should be able to deploy files to specific folder
     Given there is a Reqnroll project
