@@ -51,5 +51,13 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: xUnit Specs
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60" --logger "trx;LogFileName=specs-xunit-results.trx" || true
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: always()
+      with:
+        name: DotNET Tests
+        path: "**/specs-*.trx"                            
+        reporter: dotnet-trx
+        fail-on-error: true    
   
