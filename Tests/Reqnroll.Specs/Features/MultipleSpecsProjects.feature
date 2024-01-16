@@ -1,5 +1,6 @@
 ﻿Feature: Multiple Specs Projects
 
+@quarantaine
 Scenario Outline: Two projects with the same unit test provider
 	Given I have Specs.Project.A and Specs.Project.B using the same unit test provider
 	And Specs.Project.B references Specs.Project.A

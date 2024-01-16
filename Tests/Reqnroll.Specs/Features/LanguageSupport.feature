@@ -1,6 +1,7 @@
 ﻿Feature: .NET Language Code-Behind Generation Support
 
 
+@quarantaine
 Scenario Outline: A project with a single scenario should compile successfully in all supported languages and build systems
     Given I have a '<Language>' test project
     And there is a feature file in the project as

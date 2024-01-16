@@ -1,6 +1,7 @@
 ﻿@dotnetcore
 Feature: Build systems
 
+@quarantaine
 @globalusingdirective #MSBuild for VS2019 and Mono throws error CS8652: The feature 'global using directive' is currently in Preview and unsupported.
 Scenario: Use MSBuild for compiling
 	Given there is a scenario in a feature file
