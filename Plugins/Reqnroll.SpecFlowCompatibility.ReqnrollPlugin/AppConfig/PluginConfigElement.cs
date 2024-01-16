@@ -1,7 +1,7 @@
 using System.Configuration;
 using Reqnroll.Plugins;
 
-namespace Reqnroll.Configuration.AppConfig
+namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig
 {
     public class PluginConfigElement : ConfigurationElement
     {

@@ -105,7 +105,10 @@ namespace Reqnroll.Configuration.JsonConfig
                 addNonParallelizableMarkerForTags,
                 obsoleteBehavior,
                 coloredOutput
-            );
+            )
+            {
+                ConfigSourceText = jsonContent
+            };
         }
     }
 }

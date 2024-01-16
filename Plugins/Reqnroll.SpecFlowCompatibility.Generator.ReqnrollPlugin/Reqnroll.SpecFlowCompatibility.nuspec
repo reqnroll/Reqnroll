@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.SpecFlowCompatibility</id>
+    <version>$version$</version>
+    <title>Reqnroll.SpecFlowCompatibility</title>
+    <authors>$author$</authors>
+    <owners>$owner$</owners>
+    <description>Enables SpecFlow compatibility mode for Reqnroll</description>
+    <summary>Enables SpecFlow compatibility mode for Reqnroll</summary>
+    <language>en-US</language>
+    <projectUrl>https://www.reqnroll.net</projectUrl>
+    <icon>images\reqnroll-icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="file">LICENSE.txt</license>
+    <tags>reqnroll specflow</tags>
+    <copyright>$copyright$</copyright>
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Reqnroll" version="[$version$]" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+      </group>
+      <group targetFramework="net6.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+      </group>
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="build\**\*" exclude="build\*.template.*" target="build" />
+    <file src="bin\$config$\net462\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.*" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.pdb" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="bin\$config$\net6.0\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.*" target="lib\$Reqnroll_Net6_TFM$" />
+
+    <file src="bin\$config$\net462\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.*" target="build\$Reqnroll_FullFramework_Generator_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.dll" target="build\$Reqnroll_Core_Generator_TFM$" />
+    <file src="bin\$config$\netcoreapp3.1\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.pdb" target="build\$Reqnroll_Core_Generator_TFM$" />
+    <file src="bin\$config$\net6.0\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.*" target="build\$Reqnroll_Net6_TFM$" />
+
+    <file src="$SolutionDir$LICENSE.txt" target="LICENSE.txt" />
+    <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
+  </files>
+</package>

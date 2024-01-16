@@ -20,11 +20,13 @@ Scenario: Steps can defined in an external .NET (e.g. c# or VB.NET) project
          """
     And the reqnroll configuration is
         """
-        <reqnroll>                             
-            <stepAssemblies>                         
-                <stepAssembly assembly="ExternalSteps" />    
-            </stepAssemblies>
-        </reqnroll>
+        {
+          "stepAssemblies": [
+            {
+              "assembly": "ExternalSteps"
+            }
+          ]
+        }
         """
     When I execute the tests
     Then all tests should pass
@@ -44,11 +46,13 @@ Scenario: Steps can defined in an external F# project
          """
     And the reqnroll configuration is
         """
-        <reqnroll>                             
-            <stepAssemblies>
-                <stepAssembly assembly="ExternalSteps_FSharp" />    
-            </stepAssemblies>
-        </reqnroll>
+        {
+          "stepAssemblies": [
+            {
+              "assembly": "ExternalSteps_FSharp"
+            }
+          ]
+        }
         """
     When I execute the tests
     Then all tests should pass

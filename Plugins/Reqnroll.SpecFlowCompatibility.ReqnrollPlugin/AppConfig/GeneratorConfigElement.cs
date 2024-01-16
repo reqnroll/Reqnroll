@@ -1,8 +1,9 @@
 using System;
 using System.Configuration;
 using BoDi;
+using Reqnroll.Configuration;
 
-namespace Reqnroll.Configuration.AppConfig
+namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig
 {
     public partial class GeneratorConfigElement : ConfigurationElement
     {

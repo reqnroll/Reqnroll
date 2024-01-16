@@ -55,6 +55,7 @@ namespace Reqnroll.Configuration
         }
 
         public ConfigSource ConfigSource { get; set; }
+        public string ConfigSourceText { get; set; }
 
         public ContainerRegistrationCollection CustomDependencies { get; set; }
         public ContainerRegistrationCollection GeneratorCustomDependencies { get; set; }

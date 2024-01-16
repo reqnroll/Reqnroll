@@ -20,7 +20,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
 
         public AppConfigGenerator(CurrentVersionDriver currentVersionDriver)
         {
-            this._currentVersionDriver = currentVersionDriver;
+            _currentVersionDriver = currentVersionDriver;
         }
 
         public ProjectFile Generate(Configuration configuration)
@@ -62,7 +62,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
 
         private void WriteReqnroll(XmlWriter writer, Configuration configuration)
         {
-            writer.WriteStartElement("reqnroll");
+            writer.WriteStartElement("specFlow");
 
             if (configuration.BindingCulture != null)
             {

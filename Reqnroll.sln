@@ -119,6 +119,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Verify.ReqnrollPlu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.TestProjectGenerator.Cli", "Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.Cli\Reqnroll.TestProjectGenerator.Cli.csproj", "{56BECF00-09F0-463A-A720-BED4495E51E8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SpecFlowCompatibility", "SpecFlowCompatibility", "{6070E0CF-FA21-4E82-8A22-3B638CA84525}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.SpecFlowCompatibility.ReqnrollPlugin", "Plugins\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.csproj", "{2FCD6A28-2134-435E-A205-3D55A6F5A389}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin", "Plugins\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.csproj", "{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -489,6 +495,30 @@ Global
 		{56BECF00-09F0-463A-A720-BED4495E51E8}.Release|Any CPU.Build.0 = Release|Any CPU
 		{56BECF00-09F0-463A-A720-BED4495E51E8}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{56BECF00-09F0-463A-A720-BED4495E51E8}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -526,6 +556,9 @@ Global
 		{93476F8A-EBF1-4DB4-929F-77F5B96D08E0} = {229D5199-8A48-4174-AE8F-0B4C91170751}
 		{68E341C2-12C9-4DAC-AB04-A11C7CF94F30} = {229D5199-8A48-4174-AE8F-0B4C91170751}
 		{56BECF00-09F0-463A-A720-BED4495E51E8} = {974420E8-FEEA-4564-B4CE-BE06F7457E3B}
+		{6070E0CF-FA21-4E82-8A22-3B638CA84525} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
+		{2FCD6A28-2134-435E-A205-3D55A6F5A389} = {6070E0CF-FA21-4E82-8A22-3B638CA84525}
+		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE} = {6070E0CF-FA21-4E82-8A22-3B638CA84525}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4D0636F-0160-4FA5-81A3-9784C7E3B3A4}

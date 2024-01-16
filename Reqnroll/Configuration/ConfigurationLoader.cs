@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Globalization;
 using System.IO;
 using BoDi;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Compatibility;
-using Reqnroll.Configuration.AppConfig;
 using Reqnroll.Configuration.JsonConfig;
 using Reqnroll.Tracing;
 
@@ -14,7 +12,6 @@ namespace Reqnroll.Configuration
 {
     public class ConfigurationLoader : IConfigurationLoader
     {
-        private readonly AppConfigConfigurationLoader _appConfigConfigurationLoader;
         //private readonly ObjectContainer _objectContainer;
         private readonly JsonConfigurationLoader _jsonConfigurationLoader;
         private readonly IReqnrollJsonLocator _reqnrollJsonLocator;
@@ -23,7 +20,6 @@ namespace Reqnroll.Configuration
         {
             _reqnrollJsonLocator = reqnrollJsonLocator;
             _jsonConfigurationLoader = new JsonConfigurationLoader();
-            _appConfigConfigurationLoader = new AppConfigConfigurationLoader();
         }
 
         private static CultureInfo DefaultFeatureLanguage => CultureInfo.GetCultureInfo(ConfigDefaults.FeatureLanguage);
@@ -54,8 +50,6 @@ namespace Reqnroll.Configuration
 
         public static bool DefaultColoredOutput => ConfigDefaults.ColoredOutput;
 
-        public bool HasAppConfig => ConfigurationManager.GetSection("reqnroll") != null;
-
         public bool HasJsonConfig
         {
             get
@@ -70,13 +64,25 @@ namespace Reqnroll.Configuration
             if (!reqnrollConfigurationHolder.HasConfiguration)
                 return GetDefault();
 
+            return LoadFromConfigSource(reqnrollConfiguration, reqnrollConfigurationHolder);
+        }
+
+        protected virtual ReqnrollConfiguration LoadFromConfigSource(ReqnrollConfiguration reqnrollConfiguration, IReqnrollConfigurationHolder reqnrollConfigurationHolder)
+        {
             return reqnrollConfigurationHolder.ConfigSource switch
             {
                 ConfigSource.Default => GetDefault(),
-                ConfigSource.AppConfig => LoadAppConfig(reqnrollConfiguration, ConfigurationSectionHandler.CreateFromXml(reqnrollConfigurationHolder.Content)),
                 ConfigSource.Json => LoadJson(reqnrollConfiguration, reqnrollConfigurationHolder.Content),
+                ConfigSource.AppConfig => GetAppConfigStub(reqnrollConfiguration, reqnrollConfigurationHolder.Content),
                 _ => throw new ArgumentOutOfRangeException()
             };
+        }
+
+        private ReqnrollConfiguration GetAppConfigStub(ReqnrollConfiguration reqnrollConfiguration, string content)
+        {
+            var configuration = GetDefault();
+            configuration.ConfigSourceText = content;
+            return configuration;
         }
 
         public ReqnrollConfiguration Load(ReqnrollConfiguration reqnrollConfiguration)
@@ -84,15 +90,7 @@ namespace Reqnroll.Configuration
             if (HasJsonConfig)
                 return LoadJson(reqnrollConfiguration);
 
-            if (HasAppConfig)
-                return LoadAppConfig(reqnrollConfiguration);
-
             return GetDefault();
-        }
-
-        public ReqnrollConfiguration Update(ReqnrollConfiguration reqnrollConfiguration, ConfigurationSectionHandler reqnrollConfigSection)
-        {
-            return LoadAppConfig(reqnrollConfiguration, reqnrollConfigSection);
         }
 
         public void TraceConfigSource(ITraceListener traceListener, ReqnrollConfiguration reqnrollConfiguration)
@@ -135,21 +133,6 @@ namespace Reqnroll.Configuration
                 DefaultColoredOutput
                 );
         }
-
-
-        private ReqnrollConfiguration LoadAppConfig(ReqnrollConfiguration reqnrollConfiguration)
-        {
-            var configSection = ConfigurationManager.GetSection("reqnroll") as ConfigurationSectionHandler;
-
-            return LoadAppConfig(reqnrollConfiguration, configSection);
-        }
-
-        private ReqnrollConfiguration LoadAppConfig(ReqnrollConfiguration reqnrollConfiguration,
-            ConfigurationSectionHandler reqnrollConfigSection)
-        {
-            return _appConfigConfigurationLoader.LoadAppConfig(reqnrollConfiguration, reqnrollConfigSection);
-        }
-
 
         private ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration)
         {

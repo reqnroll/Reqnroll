@@ -1,8 +1,9 @@
 using System;
 using System.Configuration;
 using Reqnroll.BindingSkeletons;
+using Reqnroll.Configuration;
 
-namespace Reqnroll.Configuration.AppConfig
+namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig
 {
     public class TraceConfigElement : ConfigurationElement
     {

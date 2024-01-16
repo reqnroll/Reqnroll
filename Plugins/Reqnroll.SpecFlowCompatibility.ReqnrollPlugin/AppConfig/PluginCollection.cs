@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 
-namespace Reqnroll.Configuration.AppConfig
+namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig
 {
     public class PluginCollection : ConfigurationElementCollection, IEnumerable<PluginConfigElement>
     {

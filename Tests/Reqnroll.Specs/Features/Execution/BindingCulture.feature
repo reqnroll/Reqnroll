@@ -55,11 +55,13 @@ Scenario: The binding culture can be specified to be different than the scenario
          }
          """
     And the reqnroll configuration is
-         """
-        <reqnroll>
-            <bindingCulture name="de-DE" />
-        </reqnroll>
-         """
+        """
+        {
+          "bindingCulture": {
+            "name": "de-DE"
+          }
+        }
+        """
     When I execute the tests
     Then the execution summary should contain
          | Succeeded |

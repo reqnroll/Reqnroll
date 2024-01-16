@@ -8,8 +8,6 @@ namespace Reqnroll.Configuration
 
         ReqnrollConfiguration Load(ReqnrollConfiguration reqnrollConfiguration);
 
-        ReqnrollConfiguration Update(ReqnrollConfiguration reqnrollConfiguration, ConfigurationSectionHandler reqnrollConfigSection);
-
         void TraceConfigSource(ITraceListener traceListener, ReqnrollConfiguration reqnrollConfiguration);
     }
 }

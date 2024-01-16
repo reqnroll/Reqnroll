@@ -56,6 +56,13 @@ namespace Reqnroll.Generator.Project
                 return new ReqnrollConfigurationHolder(ConfigSource.Json, configFileContent);
             }
 
+            string compatibilityJsonConfigPath = Path.Combine(projectFolder, "specflow.json");
+            if (File.Exists(compatibilityJsonConfigPath))
+            {
+                var configFileContent = File.ReadAllText(compatibilityJsonConfigPath);
+                return new ReqnrollConfigurationHolder(ConfigSource.Json, configFileContent);
+            }
+
             string appConfigPath = Path.Combine(projectFolder, "app.config");
             if (File.Exists(appConfigPath))
             {
@@ -74,7 +81,7 @@ namespace Reqnroll.Generator.Project
                 var configDocument = new XmlDocument();
                 configDocument.LoadXml(configFileContent);
 
-                return new ReqnrollConfigurationHolder(configDocument.SelectSingleNode("/configuration/reqnroll"));
+                return new ReqnrollConfigurationHolder(configDocument.SelectSingleNode("/configuration/specFlow"));
             }
             catch (Exception ex)
             {

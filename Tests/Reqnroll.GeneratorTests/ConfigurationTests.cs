@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Xunit;
 using Reqnroll.Configuration;
-using Reqnroll.Configuration.AppConfig;
+using Reqnroll.Configuration.JsonConfig;
 
 namespace Reqnroll.GeneratorTests
 {
@@ -12,19 +12,17 @@ namespace Reqnroll.GeneratorTests
         public void CanLoadConfigWithNonParallelizableTagsProvided()
         {
             var config =
-                @"<reqnroll>
-                    <generator>
-                        <addNonParallelizableMarkerForTags>
-                            <tag value=""tag1""/>
-                            <tag value=""tag2""/>
-                        </addNonParallelizableMarkerForTags>
-                    </generator>
-                </reqnroll>";
+                @"{
+                  ""generator"": {
+                    ""addNonParallelizableMarkerForTags"": [
+                      ""tag1"", ""tag2""
+                    ]
+                  }
+                }";
             var reqnrollConfiguration = ConfigurationLoader.GetDefault();
-            var configurationLoader = new AppConfigConfigurationLoader();
+            var configurationLoader = new JsonConfigurationLoader();
             
-            var configurationSectionHandler = ConfigurationSectionHandler.CreateFromXml(config);
-            reqnrollConfiguration = configurationLoader.LoadAppConfig(reqnrollConfiguration, configurationSectionHandler);
+            reqnrollConfiguration = configurationLoader.LoadJson(reqnrollConfiguration, config);
 
             reqnrollConfiguration.AddNonParallelizableMarkerForTags.Should().BeEquivalentTo("tag1", "tag2");
         }

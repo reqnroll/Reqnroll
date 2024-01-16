@@ -130,11 +130,13 @@ Scenario Outline: F# method name can be used as a regex
          """
 	And the reqnroll configuration is
         """
-		<reqnroll>
-			<stepAssemblies>
-				<stepAssembly assembly="ExternalSteps" />
-			</stepAssemblies>
-		</reqnroll>
+        {
+          "stepAssemblies": [
+            {
+              "assembly": "ExternalSteps"
+            }
+          ]
+        }
         """
 	When I execute the tests
 	Then all tests should pass

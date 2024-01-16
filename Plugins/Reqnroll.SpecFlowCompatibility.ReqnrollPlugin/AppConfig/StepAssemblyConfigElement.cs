@@ -1,6 +1,6 @@
 using System.Configuration;
 
-namespace Reqnroll.Configuration.AppConfig
+namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig
 {
     public class StepAssemblyConfigElement : ConfigurationElement
     {

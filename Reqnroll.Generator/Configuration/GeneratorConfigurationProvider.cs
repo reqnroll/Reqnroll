@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.Interfaces;
-using Reqnroll.Plugins;
 
 namespace Reqnroll.Generator.Configuration
 {
@@ -23,11 +21,5 @@ namespace Reqnroll.Generator.Configuration
         {
             return _configurationLoader.Load(reqnrollConfiguration);
         }
-        
-        internal virtual void UpdateConfiguration(ReqnrollProjectConfiguration configuration, ConfigurationSectionHandler reqnrollConfigSection)
-        {
-            configuration.ReqnrollConfiguration = _configurationLoader.Update(configuration.ReqnrollConfiguration, reqnrollConfigSection);
-        }
-
     }
 }
