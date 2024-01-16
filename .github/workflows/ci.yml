@@ -35,7 +35,7 @@ jobs:
     - name: ExternalData Plugin Tests
       run: dotnet test ./Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.csproj --no-build --verbosity normal -f net6.0
 
-  specs:
+  specs-xunit:
     runs-on: ubuntu-latest
     needs: build
 
@@ -47,7 +47,6 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: | 
-          5.0.x
           6.0.x
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
@@ -61,12 +60,81 @@ jobs:
       if: success() || failure()      
       with:
         name: specs-results
-        path: "**/specs-*.trx"
+        path: "**/specs-xunit-results.trx"
     - name: Test Report
       uses: dorny/test-reporter@v1
       if: success() || failure() 
       with:
-        name: Specs
-        path: "**/specs-*.trx"
+        name: xUnit Specs
+        path: "**/specs-xunit-results.trx"
         reporter: dotnet-trx   
   
+  specs-nunit:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: | 
+          6.0.x
+    - name: Set .NET 6 SDK
+      run: dotnet new globaljson --sdk-version 6.0.418
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: NUnit Specs
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=NUnit&Category=Net60&Category!=requiresMsBuild&Category=quarantaine" --logger "trx;LogFileName=specs-nunit-results.trx"
+    - uses: actions/upload-artifact@v3
+      if: success() || failure()      
+      with:
+        name: specs-results
+        path: "**/specs-nunit-results.trx"
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure() 
+      with:
+        name: NUnit Specs
+        path: "**/specs-nunit-results.trx"
+        reporter: dotnet-trx   
+    
+  
+  specs-mstest:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: | 
+          6.0.x
+    - name: Set .NET 6 SDK
+      run: dotnet new globaljson --sdk-version 6.0.418
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Build
+      run: dotnet build --no-restore
+    - name: MsTest Specs
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild&Category=quarantaine" --logger "trx;LogFileName=specs-mstest-results.trx"
+    - uses: actions/upload-artifact@v3
+      if: success() || failure()      
+      with:
+        name: specs-results
+        path: "**/specs-mstest-results.trx"
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure() 
+      with:
+        name: MsTest Specs
+        path: "**/specs-mstest-results.trx"
+        reporter: dotnet-trx   
+    
