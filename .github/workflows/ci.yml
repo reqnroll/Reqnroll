@@ -10,7 +10,7 @@ permissions:
   checks: write
 
 env:
-  SPECS_FILTER: "&Category=quarantaine"
+  SPECS_FILTER: "" # use for testing CI: "&Category=quarantaine"
 
 jobs:
   build:
