@@ -67,7 +67,8 @@
     <ReplaceTextInFileTask InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs" OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs" TextToReplace="NUGET_VERSION" TextToReplaceWith="$(NuGetPackageVersion)" WriteOnlyWhenChanged="true" />
 
     <ItemGroup>
-      <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs" />
+      <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs"
+               Condition="'%(Compile.Identity)' == '$(ProjectDir)\\NuGetPackageVersion.cs'" />
     </ItemGroup>
   </Target>
 

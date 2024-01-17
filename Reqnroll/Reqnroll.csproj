@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(Reqnroll_Runtime_TFM)</TargetFrameworks>
     <AssemblyName>Reqnroll</AssemblyName>
@@ -59,7 +59,7 @@
 
   <PropertyGroup Condition="'$(AppInsightsInstrumentationKey)' == ''">
     <!-- This is only the testing instance's instrumentation key -->
-    <AppInsightsInstrumentationKey>27cfb992-6c29-4bc8-8093-78d95e275b3a</AppInsightsInstrumentationKey>
+    <AppInsightsInstrumentationKey>3fd018ff-819d-4685-a6e1-6f09bc98d20b</AppInsightsInstrumentationKey>
   </PropertyGroup>
 
   <ItemGroup>
@@ -69,9 +69,13 @@
 
   <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
-    <ItemGroup>
-      <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
+    <ItemGroup >
+      <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" 
+               Condition="'%(Compile.Identity)' == '$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs'" />
     </ItemGroup>
+    <PropertyGroup>
+      <AppInsightsInstrumentationKeyIncluded>true</AppInsightsInstrumentationKeyIncluded>
+    </PropertyGroup>
   </Target>
 
 </Project>
