@@ -53,18 +53,19 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public void Should_be_able_to_customize_dependencies_from_config()
         {
-            var configurationHolder = new StringConfigProvider(string.Format(@"<?xml version=""1.0"" encoding=""utf-8"" ?>
-              <configuration>
-                <reqnroll>
-                  <runtime>  
-                    <dependencies>
-                      <register type=""{0}"" as=""{1}""/>
-                    </dependencies>
-                  </runtime>
-                </reqnroll>
-              </configuration>",
-                typeof(DummyTestRunnerFactory).AssemblyQualifiedName,
-                typeof(ITestRunnerFactory).AssemblyQualifiedName));
+            var configurationHolder = new StringConfigProvider(
+                $$"""
+                {
+                    "runtime": {
+                        "dependencies": [
+                            {
+                                "type": "{{typeof(DummyTestRunnerFactory).AssemblyQualifiedName}}",
+                                "as": "{{typeof(ITestRunnerFactory).AssemblyQualifiedName}}"
+                            }
+                        ]
+                    }
+                }
+                """);
 
             var container = TestObjectFactories.CreateDefaultGlobalContainer(configurationHolder);
             var testRunnerFactory = container.Resolve<ITestRunnerFactory>();

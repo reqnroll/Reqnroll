@@ -149,12 +149,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
         private StringConfigProvider GetConfigWithPlugin()
         {
-            return new StringConfigProvider(string.Format(@"<?xml version=""1.0"" encoding=""utf-8"" ?>
-              <configuration>
-                <reqnroll>
-                  
-                </reqnroll>
-              </configuration>"));
+            return new StringConfigProvider("{}");
         }
 
         //[Fact]
@@ -238,7 +233,6 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public void Test_runner_dependencies_from_a_plugin_are_not_in_the_global_container()
         {
-            StringConfigProvider configurationHolder = GetConfigWithPlugin();
             var pluginWithCustomTestThreadDependencies = new PluginWithCustomTestThreadDependencies(oc => oc.RegisterTypeAs<CustomDependency, ICustomDependency>());
             var runtimePluginEvents = new RuntimePluginEvents();
             pluginWithCustomTestThreadDependencies.Initialize(runtimePluginEvents, new RuntimePluginParameters(), new UnitTestProviderConfiguration());
@@ -268,7 +262,6 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public void Should_be_able_to_register_scenario_dependencies_from_a_plugin()
         {
-            StringConfigProvider configurationHolder = GetConfigWithPlugin();
             var pluginWithCustomScenarioDependencies = new PluginWithCustomScenarioDependencies(oc => oc.RegisterTypeAs<CustomDependency, ICustomDependency>());
             var runtimePluginEvents = new RuntimePluginEvents();
             pluginWithCustomScenarioDependencies.Initialize(runtimePluginEvents, new RuntimePluginParameters(), new UnitTestProviderConfiguration());
