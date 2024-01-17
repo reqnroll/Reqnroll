@@ -57,7 +57,7 @@ Scenario: Should be able to deploy files to specific folder
             [Then(@"the file '(.*)' exists")]
             public void ThenTheFileExists(string fileName)
             {
-                Assert.IsTrue(File.Exists(fileName));
+                Assert.IsTrue(File.Exists(fileName.Replace('\\', Path.DirectorySeparatorChar)));
             }
         }
         """
