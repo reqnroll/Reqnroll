@@ -2,6 +2,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
+using Reqnroll.Utils;
 using Reqnroll.Generator.CodeDom;
 
 namespace Reqnroll.Generator.UnitTestProvider
@@ -112,14 +113,16 @@ namespace Reqnroll.Generator.UnitTestProvider
                 var deploymentItems = generationContext.CustomData[DEPLOYMENTITEM_TAG] as IEnumerable<string>;
                 foreach (string deploymentItem in deploymentItems)
                 {
-                    var outputDirProvided = deploymentItem.Split(':').Any();
-                    if (outputDirProvided)
+                    var deploymentItemParts = deploymentItem.Split(':');
+                    var itemPath = FileSystemHelper.NormalizeDirectorySeparators(deploymentItemParts[0]);
+                    var outputDir = deploymentItemParts.Length > 1 ? deploymentItemParts[1] : null;
+                    if (outputDir != null)
                     {
-                        CodeDomHelper.AddAttribute(testMethod, DEPLOYMENTITEM_ATTR, deploymentItem.Split(':'));
+                        CodeDomHelper.AddAttribute(testMethod, DEPLOYMENTITEM_ATTR, itemPath, outputDir);
                     }
                     else
                     {
-                        CodeDomHelper.AddAttribute(testMethod, DEPLOYMENTITEM_ATTR, deploymentItem);
+                        CodeDomHelper.AddAttribute(testMethod, DEPLOYMENTITEM_ATTR, itemPath);
                     }
                 }
             }
