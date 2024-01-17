@@ -89,7 +89,7 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
     - name: NUnit Specs
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=NUnit&Category=Net60&Category!=requiresMsBuild&Category=quarantaine" --logger "trx;LogFileName=specs-nunit-results.trx"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild&Category=quarantaine" --logger "trx;LogFileName=specs-nunit-results.trx"
     - uses: actions/upload-artifact@v3
       if: success() || failure()      
       with:
