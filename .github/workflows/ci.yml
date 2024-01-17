@@ -51,12 +51,12 @@ jobs:
       with:
         dotnet-version: | 
           6.0.x
-    - name: Set .NET 6 SDK
-      run: dotnet new globaljson --sdk-version 6.0.418
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Set .NET 6 SDK
+      run: dotnet new globaljson --sdk-version 6.0.418
     - name: xUnit Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild$env:SPECS_FILTER" --logger "trx;LogFileName=specs-xunit-results.trx"
@@ -122,12 +122,12 @@ jobs:
       with:
         dotnet-version: | 
           6.0.x
-    - name: Set .NET 6 SDK
-      run: dotnet new globaljson --sdk-version 6.0.418
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
+    - name: Set .NET 6 SDK
+      run: dotnet new globaljson --sdk-version 6.0.418
     - name: MsTest Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild$env:SPECS_FILTER" --logger "trx;LogFileName=specs-mstest-results.trx"
