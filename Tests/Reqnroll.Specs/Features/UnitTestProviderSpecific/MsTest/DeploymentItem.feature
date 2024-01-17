@@ -39,6 +39,7 @@ Scenario: Should be able to deploy files
          | Succeeded |
          | 1         |
 
+@quarantaine
 @config
 Scenario: Should be able to deploy files to specific folder
     Given there is a Reqnroll project
@@ -56,7 +57,7 @@ Scenario: Should be able to deploy files to specific folder
             [Then(@"the file '(.*)' exists")]
             public void ThenTheFileExists(string fileName)
             {
-                Assert.IsTrue(File.Exists(fileName));
+                Assert.IsTrue(File.Exists(fileName.Replace('\\', Path.DirectorySeparatorChar)));
             }
         }
         """

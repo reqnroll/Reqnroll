@@ -1,3 +1,5 @@
+using System.IO;
+using Reqnroll.Utils;
 using Reqnroll.TestProjectGenerator.Driver;
 
 namespace Reqnroll.Specs.StepDefinitions
@@ -15,6 +17,7 @@ namespace Reqnroll.Specs.StepDefinitions
         [Given("there is a content file '(.*)' in the project as")]
         public void GivenThereIsAContentFileInTheProjectAs(string fileName, string fileContent)
         {
+            fileName = FileSystemHelper.NormalizeDirectorySeparators(fileName);
             _projectsDriver.AddFile(fileName, fileContent, "Content");
         }
     }
