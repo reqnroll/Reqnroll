@@ -52,25 +52,5 @@ namespace Reqnroll.GeneratorTests
                 //nop;
             }
         }
-
-        [Fact]
-        public void Should_create_custom_generator_when_configured_so()
-        {
-            var configurationHolder = new ReqnrollConfigurationHolder(ConfigSource.AppConfig, string.Format(@"
-                <reqnroll>
-                  <generator>  
-                  <dependencies>
-                    <register type=""{0}"" as=""{1}""/>
-                  </dependencies>
-                  </generator>
-                </reqnroll>",
-                typeof(DummyGenerator).AssemblyQualifiedName,
-                typeof(ITestGenerator).AssemblyQualifiedName));
-
-            var projectSettings = net35CSProjectSettings;
-            projectSettings.ConfigurationHolder = configurationHolder;
-            var generator = _factory.CreateGenerator(projectSettings, Enumerable.Empty<GeneratorPluginInfo>());
-            generator.Should().BeOfType<DummyGenerator>();
-        }
     }
 }

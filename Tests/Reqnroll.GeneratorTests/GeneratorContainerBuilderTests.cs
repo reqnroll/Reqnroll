@@ -26,10 +26,16 @@ namespace Reqnroll.GeneratorTests
         [Fact]
         public void Should_register_generator_with_custom_settings_when_configured()
         {
-            var container = new GeneratorContainerBuilder().CreateContainer(new ReqnrollConfigurationHolder(ConfigSource.AppConfig, @"
-                <reqnroll>
-                  <generator allowDebugGeneratedFiles=""true"" /><!-- default is false -->
-                </reqnroll>"), new ProjectSettings(), Enumerable.Empty<GeneratorPluginInfo>());
+            var container = new GeneratorContainerBuilder().CreateContainer(
+                new ReqnrollConfigurationHolder(
+                    ConfigSource.Json,
+                    """
+                    {
+                        "generator": {
+                          "allowDebugGeneratedFiles": true
+                        }
+                    }
+                    """), new ProjectSettings(), Enumerable.Empty<GeneratorPluginInfo>());
             container.Resolve<ReqnrollConfiguration>().AllowDebugGeneratedFiles.Should().Be(true);
         }
     }
