@@ -15,6 +15,7 @@
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
     <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>true</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <NoWarn>$(NoWarn);CS2002</NoWarn>
 
   </PropertyGroup>
   <ItemGroup>
@@ -67,8 +68,7 @@
     <ReplaceTextInFileTask InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs" OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs" TextToReplace="NUGET_VERSION" TextToReplaceWith="$(NuGetPackageVersion)" WriteOnlyWhenChanged="true" />
 
     <ItemGroup>
-      <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs"
-               Condition="'%(Compile.Identity)' == '$(ProjectDir)\\NuGetPackageVersion.cs'" />
+      <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs" />
     </ItemGroup>
   </Target>
 
