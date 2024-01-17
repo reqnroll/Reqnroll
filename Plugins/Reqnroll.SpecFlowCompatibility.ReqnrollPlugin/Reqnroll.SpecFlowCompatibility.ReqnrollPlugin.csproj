@@ -23,17 +23,10 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Runtime_TFM)'">
     <Reference Include="System.Configuration" />
-    <!--<Reference Include="System.Net.Http" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="System.Runtime.InteropServices.RuntimeInformation" Version="4.3.0" />
-    <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.5.4" />-->
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_Core_Runtime_TFM)' Or '$(TargetFramework)' == '$(Reqnroll_Net6_TFM)'">
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.1" />
-    <!--<PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />-->
+  <ItemGroup Condition="'$(TargetFramework)' != '$(Reqnroll_FullFramework_Runtime_TFM)'">
+    <Compile Remove="AppConfig\*.cs" />
   </ItemGroup>
 
 </Project>

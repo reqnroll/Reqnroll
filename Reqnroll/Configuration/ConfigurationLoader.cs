@@ -81,6 +81,7 @@ namespace Reqnroll.Configuration
         private ReqnrollConfiguration GetAppConfigStub(ReqnrollConfiguration reqnrollConfiguration, string content)
         {
             var configuration = GetDefault();
+            configuration.ConfigSource = ConfigSource.AppConfig;
             configuration.ConfigSourceText = content;
             return configuration;
         }

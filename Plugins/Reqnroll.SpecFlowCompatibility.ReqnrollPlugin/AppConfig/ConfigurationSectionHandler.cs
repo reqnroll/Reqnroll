@@ -3,6 +3,7 @@ using System.IO;
 using System.Xml;
 using Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig;
 
+// ReSharper disable once CheckNamespace
 namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin;
 
 public class ConfigurationSectionHandler : ConfigurationSection

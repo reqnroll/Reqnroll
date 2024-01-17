@@ -30,10 +30,10 @@
 
   <files>
     <file src="build\**\*" exclude="build\*.template.*" target="build" />
-    <file src="bin\$config$\net462\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.*" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
-    <file src="bin\$config$\netcoreapp3.1\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll" target="lib\$Reqnroll_Core_Runtime_TFM$" />
-    <file src="bin\$config$\netcoreapp3.1\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.pdb" target="lib\$Reqnroll_Core_Runtime_TFM$" />
-    <file src="bin\$config$\net6.0\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.*" target="lib\$Reqnroll_Net6_TFM$" />
+    <file src="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\bin\$config$\net462\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.*" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
+    <file src="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\bin\$config$\netstandard2.0\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\bin\$config$\netstandard2.0\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.pdb" target="lib\$Reqnroll_Core_Runtime_TFM$" />
+    <file src="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\bin\$config$\net6.0\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.*" target="lib\$Reqnroll_Net6_TFM$" />
 
     <file src="bin\$config$\net462\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.*" target="build\$Reqnroll_FullFramework_Generator_TFM$" />
     <file src="bin\$config$\netcoreapp3.1\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.dll" target="build\$Reqnroll_Core_Generator_TFM$" />

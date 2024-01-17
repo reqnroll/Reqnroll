@@ -11,18 +11,20 @@ public class RuntimePlugin : IRuntimePlugin
 {
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
+#if NETFRAMEWORK
         runtimePluginEvents.ConfigurationDefaults += (_, args) =>
         {
             // if it was loaded already from JSON, we skip
             if (args.ReqnrollConfiguration.ConfigSource != ConfigSource.Default)
                 return;
 
-            var loader = new AppConfigConfigurationLoader();
+            var loader = new AppConfig.AppConfigConfigurationLoader();
             if (loader.HasAppConfig)
             {
                 var configSection = ConfigurationManager.GetSection("specFlow") as ConfigurationSectionHandler;
-                loader.LoadAppConfig(args.ReqnrollConfiguration, configSection);
+                loader.UpdateFromAppConfig(args.ReqnrollConfiguration, configSection);
             }
         };
+#endif
     }
 }
