@@ -380,7 +380,7 @@ GitExtensions.settings.backup
 *.AssemblyHooks.cs
 *.AssemblyHooks.vb
 
-# Nerdbank.GitVersioning
+# Version for Specs
 Tests/Reqnroll.Specs/NuGetPackageVersion.cs
 
 #Analytics

@@ -5,17 +5,39 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      configuration:
+        description: 'Build Configuration'
+        required: true
+        default: 'Debug'
+        type: choice
+        options:
+        - Debug
+        - Release
+      version_suffix:
+        description: 'Suffix for the NuGet packages (without leading -). Build ID will be appended.'
+        required: false
+      specs_filter:
+        description: 'Filter for Specs execution (e.g. Category=basicExecution)'
+        required: false
+
 
 permissions:
   checks: write
 
 env:
-  SPECS_FILTER: "" # use for testing CI: "&Category=quarantaine"
+  SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    outputs:
+      product_version_suffix: ${{ steps.versions.outputs.product_version_suffix }}
+      product_configuration: ${{ steps.versions.outputs.product_configuration }}
+      build_params: ${{ steps.versions.outputs.build_params }}
 
     steps:
     - uses: actions/checkout@v3
@@ -25,10 +47,46 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
+    - id: versions
+      name: Calculate versions
+      shell: pwsh
+      run: |
+        $versionSuffix = "${{ inputs.version_suffix }}"
+        if ($versionSuffix -eq "") {
+            $date = [datetime]::Today
+            $dateString = $date.ToString('yyyyMMdd')
+            $versionSuffix = "ci$dateString-${env:GITHUB_RUN_NUMBER}"
+        }
+        else {
+            $versionSuffix = "$versionSuffix-${env:GITHUB_RUN_NUMBER}"
+        }
+        Write-Output "product_version_suffix=$versionSuffix" >> $env:GITHUB_OUTPUT
+        Write-Output "Product Suffix: $versionSuffix"
+        
+        $productConfig = "${{ inputs.configuration }}"
+        if ($productConfig -eq "") {
+            $productConfig = "Debug"
+        }
+        Write-Output "product_configuration=$productConfig" >> $env:GITHUB_OUTPUT
+        Write-Output "Product Configuration: $productConfig"
+
+        $specsFilter = "${{ inputs.specs_filter }}"
+        if ($specsFilter -ne "") {
+            $specsFilter = "&$specsFilter"
+        }
+        else {
+            $specsFilter = $envSPECS_FILTER
+        }
+        Write-Output "specs_filter=$specsFilter" >> $env:GITHUB_OUTPUT
+        Write-Output "Specs Filter: $specsFilter"
+
+        $buildParams = "-p:VersionSuffix=$versionSuffix -c $productConfig"
+        Write-Output "build_params=$buildParams" >> $env:GITHUB_OUTPUT
+        Write-Output "Build Params: $buildParams"
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore ${{ steps.versions.outputs.build_params }}
     - name: Runtime Tests
       run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj --no-build --verbosity normal -f net6.0
     - name: Plugin Tests
@@ -37,6 +95,11 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj --no-build --verbosity normal -f net6.0
     - name: ExternalData Plugin Tests
       run: dotnet test ./Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.csproj --no-build --verbosity normal -f net6.0
+    - name: Upload packages
+      uses: actions/upload-artifact@v3
+      with:
+        name: packages
+        path: "GeneratedNuGetPackages/**/*.nupkg"
 
   specs-xunit:
     runs-on: ubuntu-latest
@@ -54,12 +117,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: xUnit Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild$env:SPECS_FILTER" --logger "trx;LogFileName=specs-xunit-results.trx"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-xunit-results.trx"
     - uses: actions/upload-artifact@v3
       if: success() || failure()      
       with:
@@ -89,12 +152,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: NUnit Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild$env:SPECS_FILTER" --logger "trx;LogFileName=specs-nunit-results.trx"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-nunit-results.trx"
     - uses: actions/upload-artifact@v3
       if: success() || failure()      
       with:
@@ -125,12 +188,12 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: MsTest Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild$env:SPECS_FILTER" --logger "trx;LogFileName=specs-mstest-results.trx"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --no-build --verbosity normal -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-mstest-results.trx"
     - uses: actions/upload-artifact@v3
       if: success() || failure()      
       with:
