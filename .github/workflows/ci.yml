@@ -29,6 +29,7 @@ jobs:
 
     outputs:
       product_version_suffix: ${{ steps.versions.outputs.product_version_suffix }}
+      product_configuration: ${{ steps.versions.outputs.product_configuration }}
 
     steps:
     - uses: actions/checkout@v3
@@ -45,10 +46,14 @@ jobs:
         $date = [datetime]::Today
         $dateString = $date.ToString('yyyyMMdd')
         Write-Output "product_version_suffix=ci$dateString-${env:GITHUB_RUN_NUMBER}" >> $env:GITHUB_OUTPUT
+        $productConfig = "${{ inputs.configuration }}"
+        if ($productConfig -eq "")
+            $productConfig = "Debug"
+        Write-Output "product_configuration=$productConfig" >> $env:GITHUB_OUTPUT
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore -p:VersionSuffix=${{ steps.versions.outputs.product_version_suffix }} -c ${{ inputs.configuration }}
+      run: dotnet build --no-restore -p:VersionSuffix=${{ steps.versions.outputs.product_version_suffix }} -c ${{ steps.versions.outputs.product_configuration }}
     - name: Runtime Tests
       run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj --no-build --verbosity normal -f net6.0
     - name: Plugin Tests
@@ -74,7 +79,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }} -c ${{ inputs.configuration }}
+      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }} -c ${{ needs.build.outputs.product_configuration }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: xUnit Specs
@@ -109,7 +114,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }} -c ${{ inputs.configuration }}
+      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }} -c ${{ needs.build.outputs.product_configuration }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: NUnit Specs
@@ -145,7 +150,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }} -c ${{ inputs.configuration }}
+      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }} -c ${{ needs.build.outputs.product_configuration }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: MsTest Specs
