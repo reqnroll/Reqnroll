@@ -16,7 +16,7 @@ on:
         - Debug
         - Release
       version_suffix:
-        description: 'Suffix for the NuGet packages (without leading -)'
+        description: 'Suffix for the NuGet packages (without leading -). Build ID will be appended.'
         required: false
       specs_filter:
         description: 'Filter for Specs execution (e.g. Category=basicExecution)'
@@ -56,6 +56,9 @@ jobs:
             $date = [datetime]::Today
             $dateString = $date.ToString('yyyyMMdd')
             $versionSuffix = "ci$dateString-${env:GITHUB_RUN_NUMBER}"
+        }
+        else {
+            $versionSuffix = "$versionSuffix-${env:GITHUB_RUN_NUMBER}"
         }
         Write-Output "product_version_suffix=$versionSuffix" >> $env:GITHUB_OUTPUT
         Write-Output "Product Suffix: $versionSuffix"
