@@ -10,12 +10,15 @@ permissions:
   checks: write
 
 env:
-  SPECS_FILTER: "" # use for testing CI: "&Category=quarantaine"
+  SPECS_FILTER: "&Category=basicExecution" # use for testing CI: "&Category=basicExecution"
 
 jobs:
   build:
 
     runs-on: ubuntu-latest
+
+    outputs:
+      product_version_suffix: ${{ steps.versions.outputs.product_version_suffix }}
 
     steps:
     - uses: actions/checkout@v3
@@ -25,10 +28,17 @@ jobs:
       uses: actions/setup-dotnet@v3
       with:
         dotnet-version: 8.0.x
+    - id: versions
+      name: Calculate versions
+      shell: pwsh
+      run: |
+        $date = [datetime]::Today
+        $dateString = $date.ToString('yyyyMMdd')
+        Write-Output "product_version_suffix=ci$dateString-${env:GITHUB_RUN_NUMBER}" >> $env:GITHUB_OUTPUT
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -p:VersionSuffix=${{ steps.versions.outputs.product_version_suffix }}
     - name: Runtime Tests
       run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj --no-build --verbosity normal -f net6.0
     - name: Plugin Tests
@@ -54,7 +64,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: xUnit Specs
@@ -89,7 +99,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: NUnit Specs
@@ -125,7 +135,7 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build --no-restore -p:VersionSuffix=${{ needs.build.outputs.product_version_suffix }}
     - name: Set .NET 6 SDK
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: MsTest Specs
