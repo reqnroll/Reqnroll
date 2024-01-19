@@ -1,10 +1,20 @@
-namespace Reqnroll
+using System.Reflection;
+
+namespace Reqnroll;
+
+internal class VersionInfo
 {
-	internal class VersionInfo
+    internal static string AssemblyVersion { get; }
+    internal static string AssemblyFileVersion { get; }
+    internal static string AssemblyInformationalVersion { get; }
+    internal static string NuGetVersion { get; }
+
+    static VersionInfo()
     {
-        internal static string AssemblyVersion => ThisAssembly.AssemblyVersion;
-        internal static string AssemblyFileVersion => ThisAssembly.AssemblyFileVersion;
-        internal static string AssemblyInformationalVersion => ThisAssembly.AssemblyInformationalVersion;
-        internal static string NuGetVersion => ThisAssembly.AssemblyInformationalVersion.Replace("+", "-");
+        var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+        AssemblyVersion = assembly.GetName().Version.ToString();
+        AssemblyFileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
+        AssemblyInformationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
+        NuGetVersion = AssemblyInformationalVersion?.Split(new[] { '+' }, 2)[0];
     }
 }

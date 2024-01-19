@@ -8,8 +8,13 @@
     <Reqnroll_Owners>Reqnroll</Reqnroll_Owners>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <VersionPrefix>1.0.0</VersionPrefix>
+    <VersionSuffix>local</VersionSuffix>
+    <AssemblyVersion>1.0.0</AssemblyVersion>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="3.5.107" PrivateAssets="all"/>
     <None Include="$(MSBuildThisFileDirectory)/LICENSE.txt" Pack="true" PackagePath=""/>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">
       <PrivateAssets>all</PrivateAssets>
@@ -19,7 +24,7 @@
 
   <PropertyGroup>
     <Authors>$(Reqnroll_Authors)</Authors>
-    <Company>Tricentis</Company>
+    <Company>Reqnroll</Company>
     <Product />
     <PackageProjectUrl>https://reqnroll.net</PackageProjectUrl>
     <PackageIcon>images/reqnroll-icon.png</PackageIcon>

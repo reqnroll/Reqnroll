@@ -142,7 +142,7 @@ namespace Reqnroll.Analytics
 
         private string GetReqnrollVersion()
         {
-            return ThisAssembly.AssemblyInformationalVersion;
+            return VersionInfo.AssemblyInformationalVersion;
         }
 
         private string ToSha256(string inputString)

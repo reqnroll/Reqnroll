@@ -1,8 +1,8 @@
 <Project>
-  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec" DependsOnTargets="GetBuildVersion">
+  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
       <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);version=$(NuGetPackageVersion)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);SolutionDir=$(MSBuildThisFileDirectory)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);copyright=$(Reqnroll_Copyright)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);author=$(Reqnroll_Authors)</NuspecProperties>
