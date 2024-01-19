@@ -47,8 +47,9 @@ jobs:
         $dateString = $date.ToString('yyyyMMdd')
         Write-Output "product_version_suffix=ci$dateString-${env:GITHUB_RUN_NUMBER}" >> $env:GITHUB_OUTPUT
         $productConfig = "${{ inputs.configuration }}"
-        if ($productConfig -eq "")
+        if ($productConfig -eq "") {
             $productConfig = "Debug"
+        }
         Write-Output "product_configuration=$productConfig" >> $env:GITHUB_OUTPUT
     - name: Restore dependencies
       run: dotnet restore
