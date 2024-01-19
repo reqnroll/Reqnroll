@@ -382,11 +382,13 @@ public class BindingInvokerTests
 
     class StepDefClassThatThrowsExceptions
     {
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public async Task AsyncThrow(ExceptionKind kindOfExceptionToThrow, InnerExceptionContentKind innerExceptionKind)
         {
             await Task.Run(() => ConstructAndThrowSync(kindOfExceptionToThrow, innerExceptionKind));
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void SyncThrow(ExceptionKind kindOfExceptionToThrow, InnerExceptionContentKind innerExceptionKind)
         {
             ConstructAndThrowSync(kindOfExceptionToThrow, innerExceptionKind);
