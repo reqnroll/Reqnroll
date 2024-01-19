@@ -81,7 +81,7 @@ jobs:
         Write-Output "build_params=$buildParams" >> $env:GITHUB_OUTPUT
         Write-Output "Build Params: $buildParams"
     - name: Restore dependencies
-      run: dotnet restore ${{ steps.versions.outputs.build_params }}
+      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ steps.versions.outputs.build_params }}
     - name: Runtime Tests
@@ -112,7 +112,7 @@ jobs:
         dotnet-version: | 
           6.0.x
     - name: Restore dependencies
-      run: dotnet restore ${{ needs.build.outputs.build_params }}
+      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Set .NET 6 SDK
@@ -147,7 +147,7 @@ jobs:
         dotnet-version: | 
           6.0.x
     - name: Restore dependencies
-      run: dotnet restore ${{ needs.build.outputs.build_params }}
+      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Set .NET 6 SDK
@@ -183,7 +183,7 @@ jobs:
         dotnet-version: | 
           6.0.x
     - name: Restore dependencies
-      run: dotnet restore ${{ needs.build.outputs.build_params }}
+      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Set .NET 6 SDK
