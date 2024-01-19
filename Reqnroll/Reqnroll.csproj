@@ -69,7 +69,7 @@
 
   <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
-    <ItemGroup >
+    <ItemGroup>
       <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
     </ItemGroup>
   </Target>

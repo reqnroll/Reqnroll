@@ -23,6 +23,8 @@ namespace Reqnroll.Infrastructure
 
         private readonly IDefaultDependencyProvider _defaultDependencyProvider;
 
+        public bool SkipLoadingProvider { get; set; } = false;
+
         public ContainerBuilder(IDefaultDependencyProvider defaultDependencyProvider = null)
         {
             _defaultDependencyProvider = defaultDependencyProvider ?? DefaultDependencyProvider;
@@ -54,9 +56,9 @@ namespace Reqnroll.Infrastructure
                 container.RegisterFromConfiguration(reqnrollConfiguration.CustomDependencies);
             }
 
-            var unitTestProviderConfigration = container.Resolve<UnitTestProviderConfiguration>();
+            var unitTestProviderConfiguration = container.Resolve<UnitTestProviderConfiguration>();
 
-            LoadPlugins(configurationProvider, container, runtimePluginEvents, reqnrollConfiguration, unitTestProviderConfigration, testAssembly);
+            LoadPlugins(configurationProvider, container, runtimePluginEvents, reqnrollConfiguration, unitTestProviderConfiguration, testAssembly);
 
             runtimePluginEvents.RaiseConfigurationDefaults(reqnrollConfiguration);
 
@@ -64,8 +66,8 @@ namespace Reqnroll.Infrastructure
 
             container.RegisterInstanceAs(reqnrollConfiguration);
 
-            if (unitTestProviderConfigration != null)
-                container.RegisterInstanceAs(container.Resolve<IUnitTestRuntimeProvider>(unitTestProviderConfigration.UnitTestProvider ?? ConfigDefaults.UnitTestProviderName));
+            if (!SkipLoadingProvider)
+                container.RegisterInstanceAs(container.Resolve<IUnitTestRuntimeProvider>(unitTestProviderConfiguration.UnitTestProvider ?? ConfigDefaults.UnitTestProviderName));
 
             runtimePluginEvents.RaiseCustomizeGlobalDependencies(container, reqnrollConfiguration);
 

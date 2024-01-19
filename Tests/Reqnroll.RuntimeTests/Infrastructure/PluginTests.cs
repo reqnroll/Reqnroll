@@ -147,9 +147,9 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
         
 
-        private StringConfigProvider GetConfigWithPlugin()
+        private JsonStringRuntimeConfigurationProvider GetConfigWithPlugin()
         {
-            return new StringConfigProvider("{}");
+            return new JsonStringRuntimeConfigurationProvider("{}");
         }
 
         //[Fact]
@@ -277,7 +277,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public void Should_be_able_to_register_feature_dependencies_from_a_plugin()
         {
-            StringConfigProvider configurationHolder = GetConfigWithPlugin();
+            var configurationHolder = GetConfigWithPlugin();
             var testDefaultDependencyProvider = new TestDefaultDependencyProvider(new PluginWithCustomFeatureDependencies(oc => oc.RegisterTypeAs<CustomDependency, ICustomDependency>()));
             var container = TestObjectFactories.CreateDefaultFeatureContainer(configurationHolder, testDefaultDependencyProvider);
             var customDependency = container.Resolve<ICustomDependency>();

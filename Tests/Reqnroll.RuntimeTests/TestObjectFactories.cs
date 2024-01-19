@@ -30,7 +30,7 @@ namespace Reqnroll.RuntimeTests
             return CreateDefaultTestThreadContainer(configurationProvider, registerGlobalMocks, registerTestThreadMocks, new RuntimeTestsContainerBuilder());
         }
 
-        internal static IObjectContainer CreateDefaultFeatureContainer(StringConfigProvider configurationHolder, IDefaultDependencyProvider defaultDependencyProvider = null)
+        internal static IObjectContainer CreateDefaultFeatureContainer(IRuntimeConfigurationProvider configurationHolder, IDefaultDependencyProvider defaultDependencyProvider = null)
         {
             var instance = new RuntimeTestsContainerBuilder(defaultDependencyProvider);
             var testThreadContainer = CreateDefaultTestThreadContainer(configurationHolder, null, null, instance);

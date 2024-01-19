@@ -74,7 +74,7 @@ namespace Reqnroll
 
         protected virtual void InitializeBindingRegistry(ITestRunner testRunner)
         {
-            BindingAssemblies = GetBindingAssemblies();
+            BindingAssemblies = _bindingRegistryBuilder.GetBindingAssemblies(TestAssembly);
             BuildBindingRegistry(BindingAssemblies);
 
             void DomainUnload(object sender, EventArgs e)
@@ -84,16 +84,6 @@ namespace Reqnroll
 
             AppDomain.CurrentDomain.DomainUnload += DomainUnload;
             AppDomain.CurrentDomain.ProcessExit += DomainUnload;
-        }
-
-        protected virtual Assembly[] GetBindingAssemblies()
-        {
-            var bindingAssemblies = new List<Assembly> { TestAssembly };
-
-            var assemblyLoader = _globalContainer.Resolve<IBindingAssemblyLoader>();
-            bindingAssemblies.AddRange(
-                _reqnrollConfiguration.AdditionalStepAssemblies.Select(assemblyLoader.Load));
-            return bindingAssemblies.ToArray();
         }
 
         protected virtual void BuildBindingRegistry(IEnumerable<Assembly> bindingAssemblies)

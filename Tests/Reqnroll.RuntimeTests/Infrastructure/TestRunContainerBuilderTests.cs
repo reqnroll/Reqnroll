@@ -53,7 +53,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public void Should_be_able_to_customize_dependencies_from_config()
         {
-            var configurationHolder = new StringConfigProvider(
+            var configurationHolder = new JsonStringRuntimeConfigurationProvider(
                 $$"""
                 {
                     "runtime": {
@@ -78,7 +78,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var expectedInterface = typeof(ITestRunnerFactory).AssemblyQualifiedName;
             var expectedImplementation = typeof(DummyTestRunnerFactory).AssemblyQualifiedName;
             
-            var configurationHolder = new StringConfigProvider(
+            var configurationHolder = new JsonStringRuntimeConfigurationProvider(
             $@"{{
                 ""runtime"": {{ 
                     ""dependencies"": [

@@ -1,9 +1,12 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Moq;
 using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;
+using Reqnroll.Configuration;
+using Reqnroll.Infrastructure;
 
 namespace Reqnroll.RuntimeTests
 {
@@ -209,10 +212,15 @@ namespace Reqnroll.RuntimeTests
             }
         }
 
+        private RuntimeBindingRegistryBuilder CreateSut()
+        {
+            return new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter(), new Mock<IBindingAssemblyLoader>().Object, ConfigurationLoader.GetDefault());
+        }
+
         [Fact]
         public void ShouldFindBinding_WithDefaultOrder()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromType(builder, typeof (ScopedHookExample));
 
@@ -222,7 +230,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindBinding_WithSpecifiedPriorities()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromType(builder, typeof (PrioritizedHookExample));
 
@@ -292,7 +300,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindExampleConverter()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromAssembly(builder);
             Assert.Equal(1,
@@ -317,7 +325,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindScopedExampleConverter()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromAssembly(builder);
 
@@ -336,7 +344,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindScopedHook_WithCtorArg()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromAssembly(builder);
 
@@ -347,7 +355,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindScopedHook_WithMultipleCtorArg()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromAssembly(builder);
 
@@ -358,7 +366,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindScopedHook_WithScopeAttribute()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromAssembly(builder);
 
@@ -369,7 +377,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindStepDefinitionsWithStepDefinitionAttributes()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromType(builder, typeof(BindingClassWithStepDefinitionAttributes));
 
@@ -382,7 +390,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindStepDefinitionsWithTranslatedAttributes()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromType(builder, typeof(BindingClassWithTranslatedStepDefinitionAttributes));
 
@@ -395,7 +403,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void ShouldFindStepDefinitionsWithCustomAttribute()
         {
-            var builder = new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter());
+            var builder = CreateSut();
 
             BuildCompleteBindingFromType(builder, typeof(BindingClassWithCustomStepDefinitionAttribute));
 

@@ -2,8 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using BoDi;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.Compatibility;
+using Reqnroll.Configuration;
+using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Bindings.Discovery
 {
@@ -11,11 +14,24 @@ namespace Reqnroll.Bindings.Discovery
     {
         private readonly IRuntimeBindingSourceProcessor _bindingSourceProcessor;
         private readonly IReqnrollAttributesFilter _reqnrollAttributesFilter;
+        private readonly IBindingAssemblyLoader _bindingAssemblyLoader;
+        private readonly ReqnrollConfiguration _reqnrollConfiguration;
 
-        public RuntimeBindingRegistryBuilder(IRuntimeBindingSourceProcessor bindingSourceProcessor, IReqnrollAttributesFilter reqnrollAttributesFilter)
+        public RuntimeBindingRegistryBuilder(IRuntimeBindingSourceProcessor bindingSourceProcessor, IReqnrollAttributesFilter reqnrollAttributesFilter, IBindingAssemblyLoader bindingAssemblyLoader, ReqnrollConfiguration reqnrollConfiguration)
         {
             _bindingSourceProcessor = bindingSourceProcessor;
             _reqnrollAttributesFilter = reqnrollAttributesFilter;
+            _bindingAssemblyLoader = bindingAssemblyLoader;
+            _reqnrollConfiguration = reqnrollConfiguration;
+        }
+
+        public Assembly[] GetBindingAssemblies(Assembly testAssembly)
+        {
+            var bindingAssemblies = new List<Assembly> { testAssembly };
+
+            bindingAssemblies.AddRange(
+                _reqnrollConfiguration.AdditionalStepAssemblies.Select(_bindingAssemblyLoader.Load));
+            return bindingAssemblies.ToArray();
         }
 
         public void BuildBindingsFromAssembly(Assembly assembly)
