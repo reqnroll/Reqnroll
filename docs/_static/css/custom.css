@@ -1,8 +1,8 @@
 .wy-side-nav-search {
-    background-color: #F4F7FD;
+    background-color: #F6F9D9;
 }
 a, a:visited, a:hover {
-    color: #8588b6
+    color: #3B4000
 }
 
 .wy-menu-vertical a:hover {
@@ -10,16 +10,16 @@ a, a:visited, a:hover {
 }
 
 .wy-menu-vertical a {
-    color: #8588b6
+    color: #3B4000
 }
 
 .wy-menu {
-    background-color: #F4F7FD;
+    background-color: #F6F9D9;
 }
 
 .wy-nav-side {
-    color:#F4F7FD;
-    background-color: #F4F7FD;
+    color:#F6F9D9;
+    background-color: #F6F9D9;
 }
 
 .wy-menu-vertical li.current {
@@ -57,5 +57,5 @@ p > img {
 
 .wy-body-for-nav 
 .wy-nav-content-wrap {
-    background: #F4F7FD!important;
+    /* main background */
 }

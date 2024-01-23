@@ -19,8 +19,8 @@ import sys, os
 # -- Project information -----------------------------------------------------
 
 project = ''
-copyright = '2021, The Reqnroll'
-author = 'The Reqnroll'
+copyright = '2024, Reqnroll'
+author = 'Reqnroll'
 
 
 # -- General configuration ---------------------------------------------------
@@ -52,8 +52,8 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_theme_options = {
     'logo_only': True,
-    'style_nav_header_background': '#F4F7FD',
-    'analytics_id':'UA-11088967-5'
+    'style_nav_header_background': '#F6F9D9',
+    'analytics_id':'TODO'
 }
 html_logo = '_static/logo.png'
 html_css_files = [

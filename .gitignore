@@ -388,3 +388,6 @@ AppInsightsInstrumentationKey.cs
 
 docs/_build/*
 !Directory.Build.rsp
+/docs/Lib/
+/docs/Scripts/
+/docs/pyvenv.cfg
