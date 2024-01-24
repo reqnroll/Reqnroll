@@ -18,6 +18,6 @@ public static class InstanceComparisonExtensionMethods
     /// </summary>
     public static bool IsEquivalentToInstance<T>(this Table table, T instance)
     {
-        return Reqnroll.InstanceComparisonExtensionMethods.IsEquivalentToInstance(table, instance)
+        return Reqnroll.InstanceComparisonExtensionMethods.IsEquivalentToInstance(table, instance);
     }
 }
