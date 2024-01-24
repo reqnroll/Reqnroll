@@ -38,8 +38,13 @@ namespace Reqnroll.Configuration.JsonConfig
                 {
                     featureLanguage = CultureInfo.GetCultureInfo(jsonConfig.Language.Feature);
                 }
+                if (jsonConfig.Language.Binding.IsNotNullOrWhiteSpace())
+                {
+                    bindingCulture = CultureInfo.GetCultureInfo(jsonConfig.Language.Binding);
+                }
             }
 
+            // legacy config
             if (jsonConfig.BindingCulture != null)
             {
                 if (jsonConfig.BindingCulture.Name.IsNotNullOrWhiteSpace())
@@ -72,16 +77,28 @@ namespace Reqnroll.Configuration.JsonConfig
 
             if (jsonConfig.Trace != null)
             {
+                // legacy config
                 traceSuccessfulSteps = jsonConfig.Trace.TraceSuccessfulSteps;
+                // legacy config
                 traceTimings = jsonConfig.Trace.TraceTimings;
+                // legacy config
                 minTracedDuration = jsonConfig.Trace.MinTracedDuration;
                 stepDefinitionSkeletonStyle = jsonConfig.Trace.StepDefinitionSkeletonStyle;
                 coloredOutput = jsonConfig.Trace.ColoredOutput;
             }
 
+            // legacy config
             if (jsonConfig.StepAssemblies != null)
             {
                 foreach (var stepAssemblyEntry in jsonConfig.StepAssemblies)
+                {
+                    additionalStepAssemblies.Add(stepAssemblyEntry.Assembly);
+                }
+            }
+
+            if (jsonConfig.BindingAssemblies != null)
+            {
+                foreach (var stepAssemblyEntry in jsonConfig.BindingAssemblies)
                 {
                     additionalStepAssemblies.Add(stepAssemblyEntry.Assembly);
                 }

@@ -86,7 +86,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         public void SingleAdditionalStepAssembly()
         {
             var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
-            configuration.StepAssemblies.Add(new StepAssembly("AdditionalStepAssembly"));
+            configuration.BindingAssemblies.Add(new BindingAssembly("AdditionalStepAssembly"));
 
             var projectFile = _appConfigGenerator.Generate(configuration);
 

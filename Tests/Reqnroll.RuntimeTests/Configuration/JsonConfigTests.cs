@@ -324,7 +324,7 @@ namespace Reqnroll.RuntimeTests.Configuration
         public void Check_StepAssemblies_IsEmpty()
         {
             string config = @"{
-                                  ""stepAssemblies"" : [
+                                  ""bindingAssemblies"" : [
                                  ]
                             }";
 
@@ -352,7 +352,7 @@ namespace Reqnroll.RuntimeTests.Configuration
         public void Check_StepAssemblies_OneEntry()
         {
             string config = @"{
-                                ""stepAssemblies"": 
+                                ""bindingAssemblies"": 
                                    [ {""assembly"": ""testEntry""} ]
                             }";
 
@@ -368,7 +368,7 @@ namespace Reqnroll.RuntimeTests.Configuration
         public void Check_StepAssemblies_TwoEntry()
         {
             string config = @"{
-                                ""stepAssemblies"": [
+                                ""bindingAssemblies"": [
                                     { ""assembly"": ""testEntry1"" },
                                     { ""assembly"": ""testEntry2"" }
                                   ]

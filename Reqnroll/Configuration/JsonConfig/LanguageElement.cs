@@ -9,5 +9,8 @@ namespace Reqnroll.Configuration.JsonConfig
         [DefaultValue(ConfigDefaults.FeatureLanguage)]
         [DataMember(Name="feature")]
         public string Feature { get; set; }
+
+        [DataMember(Name = "binding")]
+        public string Binding { get; set; }
     }
 }

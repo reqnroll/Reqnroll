@@ -1,6 +1,7 @@
 using System.Collections.Generic;
+using Reqnroll.Assist;
 
-namespace Reqnroll.Assist
+namespace Reqnroll
 {
     public static class SetComparisonExtensionMethods
     {

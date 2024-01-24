@@ -21,7 +21,7 @@ namespace Reqnroll.Specs.Drivers
 
             foreach (string stepAssemblyName in reqnrollConfiguration.AdditionalStepAssemblies)
             {
-                _configurationDriver.AddStepAssembly(project, new StepAssembly(stepAssemblyName));
+                _configurationDriver.AddStepAssembly(project, new BindingAssembly(stepAssemblyName));
             }
 
             _configurationDriver.SetBindingCulture(project, reqnrollConfiguration.BindingCulture);

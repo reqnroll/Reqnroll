@@ -64,7 +64,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
                 WriteRuntime(jsonWriter, configuration.Runtime.Value);
             }
 
-            WriteStepAssemblies(jsonWriter, configuration.StepAssemblies);
+            WriteStepAssemblies(jsonWriter, configuration.BindingAssemblies);
         }
 
         private void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)
@@ -103,7 +103,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
             jsonWriter.WriteEndObject();
         }
 
-        private void WriteStepAssemblies(JsonWriter jsonWriter, IEnumerable<StepAssembly> stepAssemblies)
+        private void WriteStepAssemblies(JsonWriter jsonWriter, IEnumerable<BindingAssembly> stepAssemblies)
         {
             if (!(stepAssemblies is null))
             {
@@ -121,7 +121,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
             }
         }
 
-        private void WriteStepAssembly(JsonWriter jsonWriter, StepAssembly stepAssembly)
+        private void WriteStepAssembly(JsonWriter jsonWriter, BindingAssembly stepAssembly)
         {
             // open stepAssembly object
             jsonWriter.WriteStartObject();

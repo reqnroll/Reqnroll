@@ -21,7 +21,7 @@ Scenario: Steps can defined in an external .NET (e.g. c# or VB.NET) project
     And the reqnroll configuration is
         """
         {
-          "stepAssemblies": [
+          "bindingAssemblies": [
             {
               "assembly": "ExternalSteps"
             }
@@ -47,7 +47,7 @@ Scenario: Steps can defined in an external F# project
     And the reqnroll configuration is
         """
         {
-          "stepAssemblies": [
+          "bindingAssemblies": [
             {
               "assembly": "ExternalSteps_FSharp"
             }

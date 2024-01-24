@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using Reqnroll.Assist;
 
-namespace Reqnroll.Assist
+// ReSharper disable once CheckNamespace
+namespace Reqnroll
 {
     public static class TableHelperExtensionMethods
     {

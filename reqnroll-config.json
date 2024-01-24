@@ -5,11 +5,8 @@
 
   Changelog:
 
-  1.1
-  - Added "CucumberExpressionAttribute" to trace/stepDefinitionSkeletonStyle and set it is as default.
-
   1.0
-  - Initial Reqnroll configuration schema containing SpecFlow v3.9 settings and IDE settings
+  - Initial Reqnroll configuration schema
   
   */
 
@@ -25,15 +22,8 @@
           "description": "The default language of feature files added to the project. We recommend using specific culture names (e.g.: \"en-US\") rather than generic (neutral) cultures (e.g.: \"en\").",
           "type": "string",
           "default": "en-US"
-        }
-      }
-    },
-    "bindingCulture": {
-      "description": "Use this section to define the culture for executing binding methods and converting step arguments. For more details see https://docs.reqnroll.net/projects/reqnroll/en/latest/Installation/Configuration.html#bindingculture",
-      "type": "object",
-      "additionalProperties": true,
-      "properties": {
-        "name": {
+        },
+        "binding": {
           "description": "Specifies the culture to be used to execute binding methods and convert step arguments. If not specified, the feature language is used. We recommend using specific culture names (e.g.: \"en-US\") rather than generic (neutral) cultures (e.g.: \"en\").",
           "type": "string",
           "default": "not specified"
@@ -94,31 +84,21 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "traceSuccessfulSteps": {
-          "description": "Determines whether Reqnroll should trace successful step binding executions.",
-          "type": "boolean",
-          "default": true
-        },
-        "traceTimings": {
-          "description": "Determines whether Reqnroll should trace execution time of the binding methods (only if the execution time is longer than the minTracedDuration value).",
-          "type": "boolean",
-          "default": false
-        },
-        "minTracedDuration": {
-          "description": "Specifies a threshold for tracing the binding execution times. Example: 0:0:0.1 (100 ms)",
-          "type": "string",
-          "default": "0:0:0.1"
-        },
         "stepDefinitionSkeletonStyle": {
           "description": "Specifies the default step definition style.",
           "type": "string",
           "default": "CucumberExpressionAttribute",
           "enum": [ "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
+        },
+        "coloredOutput": {
+            "description": "Determine whether Reqnroll should color the test result output.",
+            "type": "boolean",
+            "default": false
         }
       }
     },
-    "stepAssemblies": {
-      "description": "This section can be used to configure additional assemblies that contain external binding assemblies. The assembly of the Reqnroll project (the project containing the feature files) is automatically included. The binding assemblies must be placed in the output folder (e.g. bin/Debug) of the Reqnroll project, for example by adding a reference to the assembly from the project. For more details see https://docs.reqnroll.net/projects/reqnroll/en/latest/Installation/Configuration.html#stepassemblies",
+    "bindingAssemblies": {
+      "description": "This section can be used to configure additional assemblies that contain external binding assemblies. The assembly of the Reqnroll project (the project containing the feature files) is automatically included. The binding assemblies must be placed in the output folder (e.g. bin/Debug) of the Reqnroll project, for example by adding a reference to the assembly from the project. For more details see https://go.reqnroll.net/doc-binding-assemblies",
       "type": "array",
       "default": [],
       "items": {
@@ -161,10 +141,6 @@
         "isReqnrollProject": {
           "description": "Enables the project to be handled as Reqnroll project. (Default: [detect automatically])",
           "type": "boolean"
-        },
-        "generatorFolder": {
-          "description": "The path of the Reqnroll generator folder used by the project, that is usually the 'tools' folder of the Reqnroll NuGet package, e.g. '..\\MyDependencies\\Reqnroll.2.3.0\\tools'. (Default: [detect from the installed Reqnroll NuGet package])",
-          "type": "string"
         },
         "configFilePath": {
           "description": "The path of the Reqnroll configuration file (App.config or reqnroll.json) used by the project, e.g. 'reqnroll.json'. (Default: [detect config file automatically])",

@@ -84,7 +84,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
                 WriteRuntime(writer, configuration.Runtime.Value);
             }
 
-            WriteStepAssemblies(writer, configuration.StepAssemblies);
+            WriteStepAssemblies(writer, configuration.BindingAssemblies);
             
             writer.WriteEndElement();
         }
@@ -130,7 +130,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
             writer.WriteEndElement();
         }
 
-        private void WriteStepAssemblies(XmlWriter writer, IEnumerable<StepAssembly> stepAssemblies)
+        private void WriteStepAssemblies(XmlWriter writer, IEnumerable<BindingAssembly> stepAssemblies)
         {
             if (stepAssemblies is null) return;
             writer.WriteStartElement("stepAssemblies");
@@ -142,7 +142,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
             writer.WriteEndElement();
         }
 
-        private void WriteStepAssembly(XmlWriter writer, StepAssembly stepAssembly)
+        private void WriteStepAssembly(XmlWriter writer, BindingAssembly stepAssembly)
         {
             writer.WriteStartElement("stepAssembly");
             writer.WriteAttributeString("assembly", stepAssembly.Assembly);

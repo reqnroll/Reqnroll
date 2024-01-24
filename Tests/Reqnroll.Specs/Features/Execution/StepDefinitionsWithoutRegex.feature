@@ -131,7 +131,7 @@ Scenario Outline: F# method name can be used as a regex
 	And the reqnroll configuration is
         """
         {
-          "stepAssemblies": [
+          "bindingAssemblies": [
             {
               "assembly": "ExternalSteps"
             }

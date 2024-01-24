@@ -4,7 +4,7 @@
     "classifications": ["Reqnroll", "Configuration", "JSON"],
     "identity": "ReqnrollTemplates.DotNET.Item.ReqnrollConfiguration",
     "name": "Reqnroll Configuration JSON File",
-    "shortName": "reqnroll-json",
+    "shortName": "reqnroll-config",
     "tags": {
         "language": "C#",
         "type": "item"

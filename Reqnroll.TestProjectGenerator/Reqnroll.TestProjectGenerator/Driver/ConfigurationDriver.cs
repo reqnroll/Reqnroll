@@ -13,7 +13,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             _solutionDriver = solutionDriver;
         }
 
-        public void AddStepAssembly(StepAssembly stepAssembly)
+        public void AddStepAssembly(BindingAssembly stepAssembly)
         {
             AddStepAssembly(_solutionDriver.DefaultProject, stepAssembly);
         }
@@ -62,9 +62,9 @@ namespace Reqnroll.TestProjectGenerator.Driver
             project.Configuration.UnitTestProvider = GetUnitTestProvider(unitTestProviderName);
         }
 
-        public void AddStepAssembly(ProjectBuilder project, StepAssembly stepAssembly)
+        public void AddStepAssembly(ProjectBuilder project, BindingAssembly stepAssembly)
         {
-            project.Configuration.StepAssemblies.Add(stepAssembly);
+            project.Configuration.BindingAssemblies.Add(stepAssembly);
         }
 
         public void SetConfigurationFormat(ProjectBuilder project, ConfigurationFormat configurationFormat)

@@ -1,9 +1,9 @@
-Feature: Put feature-title here
-	Put feature description here
+Feature: [feature name]
 
-Background:
-    Given Put your Background here
+A short summary of the feature
 
-Scenario: Put your Scenario here
-	When Put your Action here
-    Then Put your Condition here
+@tag1
+Scenario: [scenario name]
+	Given [context]
+	When [action]
+	Then [outcome]

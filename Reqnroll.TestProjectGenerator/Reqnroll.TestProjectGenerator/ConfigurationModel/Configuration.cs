@@ -11,7 +11,7 @@ namespace Reqnroll.TestProjectGenerator.ConfigurationModel
         public UnitTestProvider UnitTestProvider { get; set; } = UnitTestProvider.xUnit;
         public List<ReqnrollPlugin> Plugins { get; } = new List<ReqnrollPlugin>();
         public List<AppConfigSection> AppConfigSection { get;  } = new List<AppConfigSection> { new AppConfigSection(name: "reqnroll", type: "Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.ConfigurationSectionHandler, Reqnroll.SpecFlowCompatibility.ReqnrollPlugin") };
-        public List<StepAssembly> StepAssemblies { get;  } = new List<StepAssembly>();
+        public List<BindingAssembly> BindingAssemblies { get;  } = new List<BindingAssembly>();
         public CultureInfo FeatureLanguage { get; set; } = CultureInfo.GetCultureInfo("en-US");
         public CultureInfo BindingCulture { get; set; }
         public Lazy<Generator> Generator { get; } = new Lazy<Generator>(() => new Generator());

@@ -7,11 +7,13 @@ namespace Reqnroll.Configuration.JsonConfig
 {
     public class TraceElement
     {
+        // legacy config
         //[JsonProperty("traceTimings", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
         [DataMember(Name = "traceTimings")]
         [DefaultValue(ConfigDefaults.TraceTimings)]
         public bool TraceTimings { get; set; }
 
+        // legacy config
         //[JsonProperty("minTracedDuration", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
         [DataMember(Name = "minTracedDuration")]
         [DefaultValue(ConfigDefaults.MinTracedDuration)]
@@ -27,6 +29,7 @@ namespace Reqnroll.Configuration.JsonConfig
         [DefaultValue(ConfigDefaults.ColoredOutput)]
         public bool ColoredOutput { get; set; }
 
+        // legacy config
         //[JsonProperty("traceSuccessfulSteps", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
         [DataMember(Name = "traceSuccessfulSteps")]
         [DefaultValue(ConfigDefaults.TraceSuccessfulSteps)]

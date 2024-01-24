@@ -7,12 +7,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>reqnroll-tpg</ToolCommandName>
     <PackageOutputPath>./nupkg</PackageOutputPath>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Authors>Reqnroll</Authors>
-    <Company>Tricentis</Company>
-    <PackageProjectUrl>https://github.com/Reqnroll/Reqnroll.TestProjectGenerator</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/Reqnroll/Reqnroll.TestProjectGenerator</RepositoryUrl>
-    <Copyright>Copyright © Reqnroll</Copyright>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Command line tool to generate Reqnroll test projects for manual/smoke testing of Reqnroll.</Description>
     <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageIcon>logo.png</PackageIcon>

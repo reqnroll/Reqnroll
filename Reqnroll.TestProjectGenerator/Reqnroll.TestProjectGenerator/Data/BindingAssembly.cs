@@ -1,8 +1,10 @@
 namespace Reqnroll.TestProjectGenerator.Data
 {
-    public class StepAssembly
+    public class BindingAssembly
+
+
     {
-        public StepAssembly(string assembly)
+        public BindingAssembly(string assembly)
         {
             Assembly = assembly;
         }

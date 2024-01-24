@@ -8,6 +8,7 @@ namespace Reqnroll.Configuration.JsonConfig
         [DataMember(Name = "language")]
         public LanguageElement Language { get; set; }
 
+        // legacy config
         [DataMember(Name = "bindingCulture")]
         public BindingCultureElement BindingCulture { get; set; }
 
@@ -20,7 +21,11 @@ namespace Reqnroll.Configuration.JsonConfig
         [DataMember(Name = "trace")]
         public TraceElement Trace { get; set; }
 
+        // legacy config
         [DataMember(Name = "stepAssemblies")]
         public List<StepAssemblyElement> StepAssemblies { get; set; }
+
+        [DataMember(Name = "bindingAssemblies")]
+        public List<StepAssemblyElement> BindingAssemblies { get; set; }
     }
 }

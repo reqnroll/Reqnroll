@@ -4,8 +4,7 @@
     <PackageType>Template</PackageType>
     <PackageId>Reqnroll.Templates.DotNet</PackageId>
     <Title>Reqnroll Templates for dotnet new</Title>
-    <Authors>$author$;Manuel Eiwen</Authors>
-    <Description>Templates for projects using different unit test providers and Templates for Reqnroll files.</Description>
+    <Description>Templates for projects using different test execution frameworks and templates for Reqnroll files.</Description>
     <PackageTags>reqnroll;bdd;gherkin;cucumber;dotnet-new;templates</PackageTags>
 
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -22,51 +21,15 @@
   <ItemGroup>
     <MetaTemplate Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
-    <Content Include="templates\ReqnrollProject\Drivers\Driver.cs" />
-    <Content Include="templates\ReqnrollProject\Hooks\Hook.cs" />
-    <Content Include="templates\ReqnrollProject\Steps\CalculatorStepDefinitions.cs" />
-    <Content Include="templates\reqnroll-feature\.template.config\template.json" />
-    <Content Include="templates\reqnroll-json\.template.config\template.json" />
-    <Content Include="templates\reqnroll-plus-profile\.template.config\template.json" />
-    <Content Include="templates\ReqnrollProject\.template.config\dotnetcli.host.json" />
-    <Content Include="templates\ReqnrollProject\.template.config\template.json" />
     <None Include="$(SolutionDir)reqnroll-icon.png" Pack="true" PackagePath="images" />
     <None Include="templates\ReqnrollProject\Template.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Content Update="templates\reqnroll-feature\Template.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Template.feature</DependentUpon>
-    </Content>
-    <Content Update="templates\ReqnrollProject_MsTest\Features\Template.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Template.feature</DependentUpon>
-    </Content>
-    <Content Update="templates\ReqnrollProject_nUnit\Features\Template.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Template.feature</DependentUpon>
-    </Content>
-    <Content Update="templates\ReqnrollProject_SpecFlowPlusRunner\Features\Template.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Template.feature</DependentUpon>
-    </Content>
-    <Content Update="templates\ReqnrollProject_xUnit\Features\Template.feature.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Template.feature</DependentUpon>
-    </Content>
-  </ItemGroup>
-
   <Target Name="PopulateMetaTemplate" AfterTargets="CoreCompile">
     <WriteLinesToFile File="$(OutDir)\templates\%(MetaTemplate.RecursiveDir)\%(MetaTemplate.FileName)%(MetaTemplate.Extension)" Lines="$([System.IO.File]::ReadAllText(%(MetaTemplate.FullPath)).Replace('$$$NuGetPackageVersion$$$',$(PackageVersion)).Replace('$$$MajorMinorVersion$$$',$(MajorMinorVersion)))" Overwrite="true" />
-      <ItemGroup>
-        <Content Include="$(OutDir)\templates\**\*" PackagePath="content" />
-      </ItemGroup>
+    <ItemGroup>
+      <Content Include="$(OutDir)\templates\**\*" PackagePath="content" />
+    </ItemGroup>
   </Target>
   
 </Project> 

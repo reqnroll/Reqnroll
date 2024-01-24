@@ -4,7 +4,7 @@
     "classifications": ["Reqnroll", "Project"],
     "identity": "ReqnrollTemplates.DotNET.Project",
     "name": "Reqnroll Project Template",
-    "shortName": "reqnrollproject",
+    "shortName": "reqnroll-project",
     "tags": {
         "language": "C#",
         "type": "project"
@@ -15,50 +15,38 @@
             "type": "parameter",
             "description": "Target Framework",
             "datatype": "choice",
-            "defaultValue": "netcoreapp3.1",
+            "defaultValue": "net8.0",
             "replaces": "$target$",
             "choices": [
-                {
-                    "choice": "netcoreapp3.1",
-                    "description": ".NET Core 3.1"
-                },
-                {
-                    "choice": "net5.0",
-                    "description": ".NET 5.0"
-                },
                 {
                     "choice": "net6.0",
                     "description": ".NET 6.0"
                 },
                 {
-                    "choice": "net461",
-                    "description": ".NET Framework 4.6.1"
+                    "choice": "net7.0",
+                    "description": ".NET 7.0"
+                },
+                {
+                    "choice": "net8.0",
+                    "description": ".NET 8.0"
                 },
                 {
                     "choice": "net462",
                     "description": ".NET Framework 4.6.2"
                 },
                 {
-                    "choice": "net47",
-                    "description": ".NET Framework 4.7"
-                },
-                {
-                    "choice": "net471",
-                    "description": ".NET Framework 4.7.1"
-                },
-                {
                     "choice": "net472",
                     "description": ".NET Framework 4.7.2"
                 },
                 {
-                    "choice": "net48",
-                    "description": ".NET Framework 4.8"
+                    "choice": "net481",
+                    "description": ".NET Framework 4.8.1"
                 }
             ]
         },
-        "unitTestProvider": {
+        "testExecutionFramework": {
             "type": "parameter",
-            "description": "Provider for Unit Tests",
+            "description": "Test Execution Framework",
             "datatype": "choice",
             "defaultValue": "nunit",
             "choices": [
@@ -91,15 +79,15 @@
                 "datatype": "string",
                 "cases": [
                     {
-                        "condition": "(unitTestProvider == 'xunit')",
+                        "condition": "(testExecutionFramework == 'xunit')",
                         "value": "<PackageReference Include=\"Reqnroll.xUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
                     },
                     {
-                        "condition": "(unitTestProvider == 'mstest')",
+                        "condition": "(testExecutionFramework == 'mstest')",
                         "value": "<PackageReference Include=\"Reqnroll.MsTest\" Version=\"$$$NuGetPackageVersion$$$\" />"
                     },
                     {
-                        "condition": "(unitTestProvider == 'nunit')",
+                        "condition": "(testExecutionFramework == 'nunit')",
                         "value": "<PackageReference Include=\"Reqnroll.NUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
                     }
                 ]
@@ -114,16 +102,16 @@
                 "datatype": "string",
                 "cases": [
                     {
-                        "condition": "(unitTestProvider == 'xunit')",
-                        "value": "<PackageReference Include=\"xunit\" Version=\"2.4.1\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"2.4.1\">\n    <PrivateAssets>all</PrivateAssets>\n        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>\n    </PackageReference>"
+                        "condition": "(testExecutionFramework == 'xunit')",
+                        "value": "<PackageReference Include=\"xunit\" Version=\"2.6.6\" />\n    <PackageReference Include=\"xunit.runner.visualstudio\" Version=\"2.5.6\">\n    <PrivateAssets>all</PrivateAssets>\n        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>\n    </PackageReference>"
                     },
                     {
-                        "condition": "(unitTestProvider == 'mstest')",
-                        "value": "<PackageReference Include=\"MSTest.TestAdapter\" Version=\"2.1.0\" />"
+                        "condition": "(testExecutionFramework == 'mstest')",
+                        "value": "<PackageReference Include=\"MSTest.TestFramework\" Version=\"3.1.1\" />\n    <PackageReference Include=\"MSTest.TestAdapter\" Version=\"3.1.1\" />"
                     },
                     {
-                        "condition": "(unitTestProvider == 'nunit')",
-                        "value": "<PackageReference Include=\"nunit\" Version=\"3.13.1\" />\n    <PackageReference Include=\"NUnit3TestAdapter\" Version=\"3.17.0\" />"
+                        "condition": "(testExecutionFramework == 'nunit')",
+                        "value": "<PackageReference Include=\"nunit\" Version=\"4.0.1\" />\n    <PackageReference Include=\"NUnit3TestAdapter\" Version=\"4.5.0\" />"
                     }
                 ]
             }
@@ -138,7 +126,7 @@
                 "cases": [
                     {
                         "condition": "(includeFluentAssertions)",
-                        "value": "<PackageReference Include=\"FluentAssertions\" Version=\"5.10.3\" />"
+                        "value": "<PackageReference Include=\"FluentAssertions\" Version=\"6.12.0\" />"
                     }
                 ]
             }
