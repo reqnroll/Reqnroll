@@ -14,7 +14,8 @@ Block comments are currently not supported by Gherkin.
 Either spaces or tabs may be used for indentation. The recommended indentation
 level is two spaces. Here is an example:
 
-``` gherkin
+```{code-block} gherkin
+:caption: GuessTheWord.feature
 Feature: Guess the word
 
   # The first example has two steps
@@ -30,8 +31,9 @@ Feature: Guess the word
 ```
 
 The trailing portion (after the keyword) of each step is matched to
-a code block, called a [step definition](../Bindings/Step-Definitions.md).
+a code block, called a [step definition](../automation/step-definitions).
 
+{#keywords}
 ## Keywords
 
 Each line that isn't a blank line has to start with a Gherkin *keyword*, followed by any text you like. The only exceptions are the feature and scenario descriptions.
@@ -39,7 +41,7 @@ Each line that isn't a blank line has to start with a Gherkin *keyword*, followe
 The primary keywords are:
 
 - `Feature`
-- `Rule` (as of Gherkin 6)
+- `Rule`
 - `Example` (or `Scenario`)
 - `Given`, `When`, `Then`, `And`, `But` for steps (or `*`)
 - `Background`
@@ -53,8 +55,8 @@ There are a few secondary keywords as well:
 - `@` (Tags)
 - `#` (Comments)
 
-**Localisation**
-Gherkin is localised for many [spoken languages](#spoken-languages); each has their own localised equivalent of these keywords.
+**Localization**
+Gherkin is localized for many [spoken languages](#spoken-languages); each has their own localized equivalent of these keywords.
 
 ### Feature
 
@@ -68,7 +70,8 @@ You can add free-form text underneath `Feature` to add more description.
 
 These description lines are ignored by Reqnroll at runtime, but are available for reporting (They are included by default in html reports).
 
-```gherkin
+```{code-block} gherkin
+:caption: GuessTheWord.feature
 Feature: Guess the word
 
   The word guess game is a turn-based game for two players.
@@ -90,13 +93,13 @@ You can place tags above `Feature` to group related features, independent of you
 
 Tags are markers that can be assigned to features and scenarios. Assigning a tag to a feature is equivalent to assigning the tag to all scenarios in the feature file.  
 
-If supported by the [unit test framework](../Installation/Unit-Test-Providers.md), Reqnroll generates categories from the tags. The generated category name is the same as the tag's name, but without the leading `@`. You can filter and group the tests to be executed using these unit test categories. For example, you can tag crucial tests with `@important`, and then execute these tests more frequently.
+If supported by the [test execution framework](../installation/setup-project.md#choosing-your-test-execution-framework), Reqnroll generates categories from the tags. The generated category name is the same as the tag's name, but without the leading `@`. You can filter and group the tests to be executed using these unit test categories. For example, you can tag crucial tests with `@important`, and then execute these tests more frequently.
 
-If your unit test framework does not support categories, you can still use tags to implement special logic for tagged scenarios in [bindings](../Bindings/Bindings.md) by querying the `ScenarioContext.ScenarioInfo.Tags` property.
+If your test execution framework does not support categories, you can still use tags to implement special logic for tagged scenarios in [bindings](../automation/bindings) by querying the `ScenarioContext.ScenarioInfo.Tags` property.
 
 Scenario, Rule and Feature level tags are available by querying the `ScenarioInfo.CombinedTags` property.
 
-Reqnroll treats the `@ignore` tag as a special tag. Reqnroll generates an [ignored unit test](../Execution/Test-Results.html#ignored-tests) method from scenarios with this tag.
+Reqnroll treats the `@ignore` tag as a special tag. Reqnroll generates an [ignored test](../execution/test-results.md#ignored-tests) method from scenarios with this tag.
 
 ### Descriptions
 
@@ -107,23 +110,14 @@ You can write anything you like, as long as no line starts with a keyword.
 
 ### Rule
 
-The (optional) `Rule` keyword has been part of Gherkin since v6. 
+The purpose of the `Rule` keyword is to represent one *business rule* that should be implemented. It provides additional information for a feature. A `Rule` is used to group together several scenarios that belong to this *business rule*. A `Rule` should contain one or more scenarios that illustrate the particular rule.
 
-**Support in Reqnroll**
-
-To be able to work with rules in Visual Studio, you have to use Visual Studio 2022 or use the "Deveroom" extension for Visual Studio 2017 and 2019. Otherwise the syntax highlighting will be broken.
-
-The purpose of the `Rule` keyword is to represent one *business rule* that should be implemented.
-It provides additional information for a feature.
-A `Rule` is used to group together several scenarios
-that belong to this *business rule*. A `Rule` should contain one or more scenarios that illustrate the particular rule.
-
-From SpecFlow v4, you can also add tags on rules that will be inherited to all scenarios within that rule (like feature tags).
+You can also add tags on rules that will be inherited to all scenarios within that rule (like feature tags).
 
 For example:
 
-```gherkin
-# -- FILE: features/gherkin.rule_example.feature
+```{code-block} gherkin
+:caption: Highlander.feature
 Feature: Highlander
 
   Rule: There can be only One
@@ -164,6 +158,7 @@ Examples follow this same pattern:
 - Describe an event (`When` steps)
 - Describe an expected outcome (`Then` steps)
 
+{#steps}
 ### Steps
 
 Each step starts with `Given`, `When`, `Then`, `And`, or `But`.
@@ -176,7 +171,8 @@ Keywords are not taken into account when looking for a step definition. This mea
 
 Reqnroll considers the following steps duplicates:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Given there is money in my account
 Then there is money in my account
 ```
@@ -184,7 +180,8 @@ Then there is money in my account
 This might seem like a limitation, but it forces you to come up with a less ambiguous, more clear
 domain language:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Given my account has a balance of £430
 Then my account should have a balance of £430
 ```
@@ -220,19 +217,18 @@ Examples:
 - Invite a friend
 - Withdraw money
 
-**Imagine it's 1922**
-Most software does something people could do manually (just not as efficiently).
+**Imagine it's 1922.** Most software does something people could do manually (just not as efficiently).
 
 Try hard to come up with examples that don't make any assumptions about
 technology or user interface. Imagine it's 1922, when there were no computers.
 
-Implementation details should be hidden in the [step definitions](../Bindings/Step-Definitions.md).
+Implementation details should be hidden in the [step definitions](../automation/step-definitions).
 
 #### Then
 
 `Then` steps are used to describe an *expected* outcome, or result.
 
-The [step definition](../Bindings/Step-Definitions.md) of a `Then` step should use an *assertion* to
+The [step definition](../automation/step-definitions) of a `Then` step should use an *assertion* to
 compare the *actual* outcome (what the system actually does) to the *expected* outcome
 (what the step says the system is supposed to do).
 
@@ -252,7 +248,8 @@ You should only verify an outcome that is observable for the user (or external s
 
 If you have successive `Given`'s, `When`'s, or `Then`'s, you *could* write:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Scenario: Multiple Givens
   Given one thing
   Given another thing
@@ -264,7 +261,8 @@ Scenario: Multiple Givens
 
 Or, you could make the example more fluidly structured by replacing the successive `Given`'s, `When`'s, or `Then`'s with `And`'s and `But`'s:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Scenario: Multiple Givens
   Given one thing
   And another thing
@@ -280,7 +278,8 @@ Gherkin also supports using an asterisk (`*`) in place of any of the normal step
 
 For example:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Scenario: All done
   Given I am out shopping
   And I have eggs
@@ -292,7 +291,8 @@ Scenario: All done
 
 Could be expressed as:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Scenario: All done
   Given I am out shopping
   * I have eggs
@@ -309,13 +309,14 @@ Occasionally you'll find yourself repeating the same `Given` steps in all of the
 Since it is repeated in every scenario, this is an indication that those steps
 are not *essential* to describe the scenarios; they are *incidental details*. You can literally move such `Given` steps to the background, by grouping them under a `Background` section.
 
-A `Background` allows you to add some context to the scenarios that follow it. It can contain one or more `Given` steps, which are run before *each* scenario, but after any [Before hooks](../Bindings/Hooks.md).
+A `Background` allows you to add some context to the scenarios that follow it. It can contain one or more `Given` steps, which are run before *each* scenario, but after any [Before hooks](../automation/hooks).
 
 A `Background` is placed before the first `Scenario`/`Example`, at the same level of indentation.
 
 For example:
 
-```gherkin
+```{code-block} gherkin
+:caption: MultipleSiteSupport.feature
 Feature: Multiple site support
   Only blog owners can post to a blog, except administrators,
   who can post to all blogs.
@@ -342,9 +343,10 @@ Feature: Multiple site support
     Then I should see "Your article was published."
 ```
 
-<!--- `Background` is also supported at the `Rule` level, for example:
+`Background` is also supported at the `Rule` level, for example:
 
-```gherkin
+```{code-block} gherkin
+:caption: OverdueTasks.feature
 Feature: Overdue tasks
   Let users know when tasks are overdue, even when using other
   features of the app
@@ -365,9 +367,9 @@ Feature: Overdue tasks
   ...
 ```
 
-You can only have one set of `Background` steps per `Feature` or `Rule`. If you need different `Background` steps for different scenarios, consider breaking up your set of scenarios into more `Rule`s or more `Feature`s.--->
+You can only have one set of `Background` steps per `Feature` or `Rule`. If you need different `Background` steps for different scenarios, consider breaking up your set of scenarios into more `Rule`s or more `Feature`s.
 
-For a less explicit alternative to `Background`, check out [scoped step definitions](../Bindings/Scoped-Step-Definitions.md).
+For a less explicit alternative to `Background`, check out [scoped step definitions](../automation/scoped-bindings).
 
 ### Tips for using Background
 
@@ -377,11 +379,12 @@ For a less explicit alternative to `Background`, check out [scoped step definiti
 * Keep your `Background` section **short**.
   * The client needs to actually remember this stuff when reading the scenarios. If the `Background` is more than 4 lines long, consider moving some of the irrelevant details into higher-level steps.
 * Make your `Background` section **vivid**.
-  * Use colourful names, and try to tell a story. The human brain keeps track of stories much better than it keeps track of names like `"User A"`, `"User B"`, `"Site 1"`, and so on.
+  * Use colorful names, and try to tell a story. The human brain keeps track of stories much better than it keeps track of names like `"User A"`, `"User B"`, `"Site 1"`, and so on.
 * Keep your scenarios **short**, and don't have too many.
   * If the `Background` section has scrolled off the screen, the reader no longer has a full overview of whats happening.
 Think about using higher-level steps, or splitting the `*.feature` file.
 
+{#scenario-outline}
 ### Scenario Outline
 
 The `Scenario Outline` keyword can be used to run the same `Scenario` multiple times,
@@ -391,7 +394,8 @@ The keyword `Scenario Template` is a synonym of the keyword `Scenario Outline`.
 
 Copying and pasting scenarios to use different values quickly becomes tedious and repetitive:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Scenario: eat 5 out of 12
   Given there are 12 cucumbers
   When I eat 5 cucumbers
@@ -408,7 +412,8 @@ We can collapse these two similar scenarios into a `Scenario Outline`.
 Scenario outlines allow us to more concisely express these scenarios through the use
 of a template with `< >`-delimited parameters:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Scenario Outline: eating
   Given there are <start> cucumbers
   When I eat <eat> cucumbers
@@ -428,12 +433,16 @@ The steps can use `<>` delimited *parameters* that reference headers in the exam
 Reqnroll will replace these parameters with values from the table *before* it tries
 to match the step against a step definition.
 
-**> Note:** Tables used in `Examples` must have **unique headers**. Using duplicate headers will result in errors.
-
-**Hint:** In certain cases, when generating method names using the regular expression method, Reqnroll is unable to generate the correct parameter signatures for unit test logic methods without a little help. Placing single quotation marks (`'`) around placeholders (eg. `'<placeholder>'`)improves Reqnroll's ability to parse the scenario outline and generate more accurate regular expressions and test method signatures.
+```{note}
+Tables used in `Examples` must have **unique headers**. Using duplicate headers will result in errors.
+```
+```{hint}
+In certain cases, when generating method names using the regular expression method, Reqnroll is unable to generate the correct parameter signatures for unit test logic methods without a little help. Placing single quotation marks (`'`) around placeholders (eg. `'<placeholder>'`)improves Reqnroll's ability to parse the scenario outline and generate more accurate regular expressions and test method signatures.
+```
 
 You can also use parameters in [multiline step arguments](#step-arguments).
 
+{#step-arguments}
 ## Step Arguments
 
 In some cases you might want to pass more data to a step than fits on a single line.
@@ -445,7 +454,8 @@ For this purpose Gherkin has `Doc Strings` and `Data Tables`.
 
 The text should be offset by delimiters consisting of three double-quote marks on lines of their own:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Given a blog post named "Random" with Markdown body
   """
   Some Title, Eh?
@@ -465,7 +475,8 @@ The indentation inside the triple quotes, however, is significant. Each line of 
 
 `Data Tables` are handy for passing a list of values to a step definition:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 Given the following users exist:
   | name   | email              | twitter         |
   | Aslak  | aslak@cucumber.io  | @aslak_hellesoy |
@@ -476,16 +487,10 @@ Given the following users exist:
 Just like `Doc Strings`, `Data Tables` will be passed to the step definition as the first argument.
 
 Reqnroll provides a rich API for manipulating tables from within step definitions.
-See the [Assist Namespace](../Bindings/Reqnroll-Assist-Helpers.md) reference for
+See the [](../automation/datatable-helpers) reference for
 more details.
 
-## Markdown
-
-You can include markdown code in your feature files with the standard Markdown features such as bold, italic, lists etc.
-This is useful when generating documentation via the SpecFlow+ LivingDoc generator.
-
-Click [here](https://docs.reqnroll.net/projects/reqnroll-livingdoc/en/latest/Generating/Markdown-and-Embedding-Images.html#embedding-images-markdown) to find out more.
-
+{#spoken-languages}
 ## Spoken Languages
 
 The language you choose for Gherkin should be the same language your users and
@@ -496,7 +501,8 @@ This is why Gherkin has been translated to over 70 languages.
 
 Here is a Gherkin scenario written in Norwegian:
 
-```gherkin
+```{code-block} gherkin
+:caption: Feature File
 # language: no
 Funksjonalitet: Gjett et ord
 
@@ -514,7 +520,7 @@ A `# language:` header on the first line of a feature file tells Reqnroll what
 spoken language to use - for example `# language: fr` for French.
 If you omit this header, Reqnroll will default to English (`en`).
 
-You can also define the language in the [configuration file](../Installation/Configuration.html#language).
+You can also define the language in the [configuration file](../installation/configuration.md#language).
 
 ### Gherkin Dialects
 
@@ -522,8 +528,9 @@ In order to allow Gherkin to be written in a number of languages, the keywords h
 
 #### Overview
 
-You can find all translation of Gherkin [on GitHub](https://github.com/cucumber/cucumber/blob/master/gherkin/gherkin-languages.json).
+You can find all translation of Gherkin in the [Cucumber documentation](https://cucumber.io/docs/gherkin/languages/).
 This is also the place to add or update translations.
 
-**Note**
-Big parts of this page where taken over from <https://cucumber.io/docs/gherkin/reference/>.
+```{note}
+Big parts of this page where taken over from [Cucumber Gherkin Reference](https://cucumber.io/docs/gherkin/reference/).
+```

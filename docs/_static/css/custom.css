@@ -1,0 +1,5 @@
+.code-block-caption {
+  background-color: var(--color-background-primary);
+  border: 1px solid var(--color-background-border);
+  padding: 0.325rem 0.675rem; /*0.625rem 0.875rem;*/
+}

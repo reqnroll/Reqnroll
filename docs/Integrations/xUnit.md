@@ -17,7 +17,7 @@ For Test Discovery & Execution:
 
 ## Access ITestOutputHelper
 
-The xUnit ITestOutputHelper is registered in the ScenarioContainer. You can get access to simply via getting it via [Context-Injection](../Bindings/Context-Injection.md).
+The xUnit ITestOutputHelper is registered in the ScenarioContainer. You can get access to simply via getting it via [Context-Injection](../automation/context-injection.md).
 
 ### Example
 

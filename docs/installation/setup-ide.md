@@ -1,0 +1,84 @@
+# Setup an IDE for Reqnroll
+
+```{tip}
+Reqnroll can be used without any IDE integration as well, so setting up the IDE is optional.
+```
+
+Setting up the Integrated Development Environment (IDE) integration for Reqnroll can add convenience and productivity features like:
+
+* Adding new project elements, like feature files based on templates
+* Syntax coloring of feature files
+* Showing suggestions (completions) for Gherkin syntax keywords
+* Navigating between steps and step definitions
+* Adding step definition snippets to your codebase for undefined steps
+
+This guide describes the setup steps for the following IDEs:
+
+* [](#setup-vs)
+* [](#setup-vscode)
+* [](#setup-rider)
+
+{#setup-vs}
+## Setup Visual Studio 2022
+
+In order to use Reqnroll with Visual Studio 2022, you need to install the [Reqnroll for Visual Studio](TODO) extension.
+
+1. Open Visual Studio 2022
+2. From the *Extensions* menu, choose the *Manage Extensions...* command.
+3. On the dialog, make sure that the *Online* is selected from the list on the left and type `Reqnroll` to the *Search* text box on the right top corner.
+4. Choose the *Reqnroll for Visual Studio 2022* from the list and click on the *Download* button.
+5. Restart Visual Studio 2022.
+
+For more details about the Reqnroll with Visual Studio extension, please check the [](../ide-integrations/visual-studio/index) page.
+
+```{hint}
+The Reqnroll Visual Studio extension cannot be used for Visual Studio for Mac. On macOS we recommend using [Visual Studio Code](#setup-vscode).
+```
+
+{#setup-vscode}
+## Setup Visual Studio Code
+
+For using Reqnroll with Visual Studio Code, you can choose from multiple available extensions. We recommend using the [Cucumber](https://marketplace.visualstudio.com/items?itemName=CucumberOpen.cucumber-official) extension.
+
+In order to use the navigation features of the extension, you should configure the location of your feature files and step definition classes within your repository.
+
+The following Visual Studio configuration shows a typical configuration.
+
+```{code-block} json
+:caption: .vscode/settings.json
+{
+  "explorer.fileNesting.patterns": {  // shows *.feature.cs files as nested items
+    "*.feature": "${capture}.feature.cs"
+  },
+  "files.exclude": { // excludes compilation result
+    "**/obj/": true,
+    "**/bin/": true,
+  },
+  "cucumber.glue": [ // sets the location of the step definition classes
+    "MyReqnrollProject/**/*.cs",
+  ],
+  "cucumber.features": [ // sets the location of the feature files
+    "MyReqnrollProject/**/*.feature",
+  ]
+}
+```
+
+{#setup-rider}
+## Setup Rider
+
+% TODO
+```{admonition} Rider plugin is not available yet
+:class: error
+
+The Reqnroll Rider plugin has not yet ported and released. Please come back later or help contributing to it in out [open-source GitHub project](https://github.com/reqnroll/Reqnroll.Rider).
+
+We recommend using the Visual Studio 2022 or the Visual Studio Code integration until the plugin will be ready. The SpecFlow Rider plugin can also be used with limited capabilities.
+```
+
+
+% TODO
+```{admonition} Documentation is in progress
+:class: warning
+
+This documentation page is in progress. Please come back later or help contributing to it in out [open-source GitHub project](https://github.com/reqnroll/Reqnroll).
+```

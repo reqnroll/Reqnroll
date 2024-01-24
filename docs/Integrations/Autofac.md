@@ -3,9 +3,9 @@
 ## Introduction
 Reqnroll plugin for using Autofac as a dependency injection framework for step definitions.
 
-***Currently supports***
-
-**Autofac v4.0.0 or above**
+```{note}
+Currently supports Autofac v4.0.0 or above
+```
 
 ## Step by step walkthrough of using Reqnroll.Autofac
 

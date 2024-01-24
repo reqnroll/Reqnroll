@@ -3,9 +3,9 @@
 ## Introduction
 Reqnroll plugin for using Castle Windsor as a dependency injection framework for step definitions.
 
-***Currently supports***
-
-**Castle Windsor v5.0.1 or above**
+```{note}
+Currently supports Castle Windsor v5.0.1 or above
+```
 
 ## Step by step walkthrough of using Reqnroll.Windsor
 

@@ -8,9 +8,8 @@ Determining the ideal level of isolation for your automated tests is a tradeoff.
 
 | Isolation level | Description | Runner support |
 | --------------- | ----------- | -------------- |
-| Thread | Test threads run as threads in the same process and application domain. Only the thread-local state is isolated. | NUnit, MsTest, xUnit, SpecFlow+Runner (SharedAppDomain isolation) |
-| Application domain  (.NET framework only) | Test threads run in the same process but in separate AppDomain instances. The AppDomain provides e.g. an isolated static state. | SpecFlow+Runner (AppDomain isolation) |
-| Process | Test threads run in separate processes. | SpecFlow+Runner (Process isolation), VSTest per test assembly |
+| Thread | Test threads run as threads in the same process and application domain. Only the thread-local state is isolated. | NUnit, MsTest, xUnit |
+| Process | Test threads run in separate processes. | VSTest per test assembly |
 | Agent | Test threads run on multiple agents. | E.g. VSTest task |
 
 ## Parallel Scheduling Unit
@@ -20,7 +19,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 | Scheduling unit  | Description          | Runner support       |
 | ---------------- | -------------------- | -------------------- |
-| Scenario         | Scenarios can run in parallel with each other (also from different features) | SpecFlow+ Runner     |
+| Scenario         | Scenarios can run in parallel with each other (also from different features) | N/A     |
 | Feature          | Features can run in parallel with each other. Scenarios from the same feature are running on the same test thread. | NUnit, MsTest, xUnit |
 | Test assembly    | Different test assemblies can run in parallel with each other | e.g. VSTest |
 
@@ -37,7 +36,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 ### Requirements
 
-* You have to use a test runner that supports in-process parallel execution (currently NUnit v3, xUnit v2, MSTest and SpecFlow+ Runner)
+* You have to use a test runner that supports in-process parallel execution (currently NUnit v3, xUnit v2 and MSTest)
 * You have to ensure that your code does not conflict on static state.
 * You must not use the static context properties of Reqnroll `ScenarioContext.Current`, `FeatureContext.Current` or `ScenarioStepContext.Current` (see further information below).
 * You have to configure the test runner to execute the Reqnroll features in parallel with each other (see configuration details below).
@@ -52,26 +51,34 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 ### NUnit Configuration
 
 By default, [NUnit does not run the tests in parallel](https://docs.nunit.org/articles/nunit/writing-tests/attributes/parallelizable.html).
-Parallelisation must be configured by setting an assembly-level attribute in the Reqnroll project.
+Parallelization must be configured by setting an assembly-level attribute in the Reqnroll project.
 
-```c#
+```{code-block} csharp
+:caption: C# File
+
 using NUnit.Framework;
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 ```
 
-***>Note:** Reqnroll does not support scenario level parallelization with NUnit (when scenarios from the same feature execute in parallel). If you configure a higher level NUnit parallelization than "Fixtures" your tests will fail with runtime errors.*
+```{note}
+Reqnroll does not support scenario level parallelization with NUnit (when scenarios from the same feature execute in parallel). If you configure a higher level NUnit parallelization than "Fixtures" your tests will fail with runtime errors.
+```
 
 ### MSTest Configuration
 
 By default, [MsTest does not run the tests in parallel](https://devblogs.microsoft.com/devops/mstest-v2-in-assembly-parallel-test-execution/).
 Parallelisation must be configured by setting an assembly-level attribute in the Reqnroll project.
 
-```c#
+```{code-block} csharp
+:caption: C# File
+
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 [assembly: Parallelize(Scope = ExecutionScope.ClassLevel)]
 ```
 
-***>Note**: Reqnroll does not support scenario level parallelization with MsTest (when scenarios from the same feature execute in parallel). If you configure a higher level MsTest parallelization than "ClassLevel" your tests will fail with runtime errors.*
+```{note}
+Reqnroll does not support scenario level parallelization with MsTest (when scenarios from the same feature execute in parallel). If you configure a higher level MsTest parallelization than "ClassLevel" your tests will fail with runtime errors.
+```
 
 ### xUnit Configuration
 
@@ -89,28 +96,30 @@ To exclude specific features from running in parallel with any other features, s
 
 Please note that xUnit requires additional configuration to ensure that non parallelizable features do not run in parallel with any other feature. This configuration is automatically provided for users via the xUnit plugin (so no additional effort is required). The following class will be defined within your test assembly for you:
 
-``` C#
+```{code-block} csharp
+:caption: C# File
+
 [CollectionDefinition("ReqnrollNonParallelizableFeatures", DisableParallelization = true)]
 public class ReqnrollNonParallelizableFeaturesCollectionDefinition
 {
 }
 ```
 
-## Running Reqnroll scenarios in parallel with AppDomain or Process isolation
+## Running Reqnroll scenarios in parallel with process isolation
 
-If there are no external dependencies or they can be cloned for parallel execution, but the application architecture depends on static state (e.g. static caches etc.), the best way is to execute tests in parallel isolated by AppDomain or Process. This ensures that every test execution thread is hosted in a separate AppDomain and hence static state is not accessed in parallel. In such scenarios, SpecFlow+Runner can be used to execute tests in parallel without any extra considerations. [SpecFlow+ Runner supports parallel execution](https://reqnroll.net/plus/documentation/Execution/) with AppDomain, SharedAppDomain and Process isolation.
+If there are no external dependencies or they can be cloned for parallel execution, but the application architecture depends on static state (e.g. static caches etc.), the best way is to execute tests in parallel isolated by process. This ensures that every test execution thread is hosted in a separate process and hence static state is not accessed in parallel. 
 
 ### Properties
 
-* Tests threads are separated by an AppDomain or process boundary.
+* Tests threads are separated by a process boundary.
 * Also the static memory state is isolated. Conflicts might be expected on external dependencies only.
 * Bigger initialization footprint and higher memory requirements.
 
 ### Requirements
 
-* You have to use SpecFlow+ Runner with AppDomain or Process isolation.
+* You have to use VSTest task.
 
 ### Execution Behavior
 
-* `[BeforeTestRun]` and `[AfterTestRun]` hooks are executed for each individual test execution thread (AppDomain or process), so you can use them to initialize/reset shared memory.
+* `[BeforeTestRun]` and `[AfterTestRun]` hooks are executed for each individual test execution thread, so you can use them to initialize/reset shared memory.
 * Each test thread manages its own enter/exit feature execution workflow. The `[BeforeFeature]` and `[AfterFeature]` hooks may be executed multiple times in different test threads if they run scenarios from the same feature file. The execution of these hooks do not block one another, but the Before/After feature hooks are called in pairs within a single thread (the `[BeforeFeature]` hook of the next scenario is only executed after the `[AfterFeature]` hook of the previous one). Each test thread has a separate (and isolated) `FeatureContext`.

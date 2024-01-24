@@ -29,7 +29,7 @@ author = 'Reqnroll'
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-  'myst_parser',
+  'myst_parser',  # see https://myst-parser.readthedocs.io/en/v0.16.0/sphinx/intro.html, https://jdsalaro.com/cheatsheet/sphinx-myst-markdown/
   'sphinx_copybutton'
 ]
 
@@ -42,6 +42,14 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 master_doc = 'index'
+
+# -- Options MyST -------------------------------------------------
+
+myst_enable_extensions = [
+    "attrs_block"
+]
+
+myst_heading_anchors = 3
 
 # -- Options for HTML output -------------------------------------------------
 
@@ -90,6 +98,10 @@ html_theme_options = {
         # "color-announcement-text": "#f6f9d9"
     }
 }
+
+html_css_files = [
+    'css/custom.css',
+] 
 
 # see https://pygments.org/styles/
 pygments_style = "solarized-light"
