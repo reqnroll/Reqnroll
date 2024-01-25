@@ -2,7 +2,7 @@
 hide-toc: true
 ---
 
-# Welcome to Reqnroll documentation!
+#Reqnroll Documentation
 
 Reqnroll is an open-source .NET test automation tool to practice [Behavior Driven Development (BDD)](https://cucumber.io/docs/bdd/).
 
