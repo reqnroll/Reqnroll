@@ -15,6 +15,11 @@ on:
         options:
         - Debug
         - Release
+      production_release:
+        description: 'If the build produces a production package'
+        type: boolean
+        default: false
+        required: true
       version_suffix:
         description: 'Suffix for the NuGet packages (without leading -). Build ID will be appended.'
         required: false
@@ -51,7 +56,16 @@ jobs:
     - id: versions
       name: Calculate versions
       shell: pwsh
+      env:
+        APPINSIGHTS_KEY: ${{ secrets.APPINSIGHTS_KEY }}      
       run: |
+        $productionReleaseSetting = "${{ inputs.production_release }}"
+        $productionRelease = $false
+        if ($productionReleaseSetting -eq 'true') {
+            $productionRelease = $true
+        }
+        Write-Output "Production release: $productionRelease"
+
         $versionSuffix = "${{ inputs.version_suffix }}"
         if ($versionSuffix -eq "") {
             $date = [datetime]::Today
@@ -85,13 +99,21 @@ jobs:
         Write-Output "build_params=$buildParams" >> $env:GITHUB_OUTPUT
         Write-Output "Build Params: $buildParams"
 
+        $mainBuildParams = $buildParams
+        if ($productionRelease) {
+          $mainBuildParams = "$mainBuildParams -p:AppInsightsInstrumentationKey=$env:APPINSIGHTS_KEY"
+          Write-Output "Main Build Params Updated for Production"
+        }
+        Write-Output "main_build_params=$mainBuildParams" >> $env:GITHUB_OUTPUT
+        
+
         $testParams = "--no-build --verbosity normal -c $productConfig"
         Write-Output "test_params=$testParams" >> $env:GITHUB_OUTPUT
         Write-Output "Test Params: $testParams"
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore ${{ steps.versions.outputs.build_params }}
+      run: dotnet build --no-restore ${{ steps.versions.outputs.main_build_params }}
     - name: Runtime Tests
       run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj ${{ steps.versions.outputs.test_params }} -f net6.0
     - name: Plugin Tests
