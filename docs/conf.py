@@ -64,6 +64,7 @@ html_theme = "furo"  # see https://pradyunsg.me/furo/
 html_static_path = ['_static']
 
 html_logo = "_static/logo.png"
+html_favicon = 'favicon.ico'
 
 html_title = '%s Documentation' % project
 
