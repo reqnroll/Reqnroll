@@ -12,7 +12,7 @@ In this tutorial we demonstrate the usage of Reqnroll by implementing the *price
 
 When you use Visual Studio 2022 for Reqnroll, please make sure you install the Reqnroll for Visual Studio extension. See [](../installation/setup-ide.md#setup-vs) for details. Please make sure that the SpecFlow extension is disabled or removed for this Quickstart.
 
-We prepared a simple starting point for this tutorial that you can find on GitHub: https://github.com/reqnroll/Quickstart. Clone this project to your machine or download it as zip and extract it to a local folder.
+We prepared a simple starting point for this tutorial that you can find on GitHub: [https://github.com/reqnroll/Quickstart](https://github.com/reqnroll/Quickstart). Clone this project to your machine or [download it as zip](https://github.com/reqnroll/Quickstart/archive/refs/heads/main.zip) and extract it to a local folder.
 
 Open the solution file (`ReqnrollQuickstart.sln`) in Visual Studio 2022 and let's have a look at the content:
 
@@ -71,7 +71,7 @@ Run the tests from the Reqnroll project by opening the *Test Explorer* window (u
 
 The test execution reports a so called "undefined" state for our scenario. That means that Reqnroll has detected the scenario, but we did not *define* how the scenario steps should be automated. We will do this now.
 
-In order to define the steps, we need to create a *step definition class*. This can be done be copying out the code snippet from the test result output, but with Visual Studio we can also use the *Define Steps* dialog. That you can access by invoking the "Define Steps..." command from the feature file editor context menu or with the *Ctrl+B, D" keyboard shortcut from the editor.
+In order to define the steps, we need to create a *step definition class*. This can be done be copying out the code snippet from the test result output, but with Visual Studio we can also use the *Define Steps* dialog. That you can access by invoking the "Define Steps..." command from the feature file editor context menu or with the *Ctrl+B, D* keyboard shortcut from the editor.
 
 ## Generate step definition snippets
 
