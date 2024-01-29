@@ -38,7 +38,7 @@ namespace Reqnroll.RuntimeTests
             var mess = string.Empty;
             try
             {
-                new Table(null);
+                new Table((string[])null);
             }
             catch (ArgumentException ex)
             {

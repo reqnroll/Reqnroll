@@ -57,7 +57,7 @@ namespace Reqnroll.Bindings
             if (stepTransformation.Regex != null && value is string stringValue)
                 arguments = await GetStepTransformationArgumentsFromRegexAsync(stepTransformation, stringValue, cultureInfo);
             else
-                arguments = new[] {value};
+                arguments = new[] { await ConvertAsync(value, stepTransformation.Method.Parameters.ElementAtOrDefault(0)?.Type ?? new RuntimeBindingType(typeof(object)), cultureInfo)};
 
             var result = await bindingInvoker.InvokeBindingAsync(stepTransformation, contextManager, arguments, testTracer, new DurationHolder());
 
@@ -103,12 +103,20 @@ namespace Reqnroll.Bindings
             if (stepTransformationBinding.Regex != null && valueToConvert is string stringValue)
                 return stepTransformationBinding.Regex.IsMatch(stringValue);
 
-            var transformationFirstArgumentTypeName = stepTransformationBinding.Method.Parameters.FirstOrDefault()?.Type.FullName;
+            var transformationFirstArgumentType = stepTransformationBinding.Method.Parameters.FirstOrDefault()?.Type;
 
-            var isTableStepTransformation = transformationFirstArgumentTypeName == typeof(Table).FullName;
+            var isTableStepTransformation = transformationFirstArgumentType != null &&
+                                            IsDataTableType(transformationFirstArgumentType);
             var valueIsTable = valueToConvert is Table;
 
             return isTableStepTransformation == valueIsTable;
+        }
+
+        protected virtual bool IsDataTableType(IBindingType bindingType)
+        {
+            return bindingType.FullName == typeof(Table).FullName || 
+                   (bindingType is RuntimeBindingType runtimeBindingType && 
+                    typeof(Table).IsAssignableFrom(runtimeBindingType));
         }
 
         private static object ConvertSimple(IBindingType typeToConvertTo, object value, CultureInfo cultureInfo)
