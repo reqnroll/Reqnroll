@@ -21,7 +21,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
             return new DataSource(records);
         }
 
-        internal DataTable LoadCsvDataTable(string fileContent, CultureInfo culture)
+        internal DataSources.DataTable LoadCsvDataTable(string fileContent, CultureInfo culture)
         {
             using var reader = new StringReader(fileContent);
             using var csv = new CsvReader(reader, new CsvConfiguration(culture)
@@ -33,7 +33,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
             
             csv.Read();
             csv.ReadHeader();
-            var dataTable = new DataTable(csv.HeaderRecord);
+            var dataTable = new DataSources.DataTable(csv.HeaderRecord);
             while (csv.Read())
             {
                 var dataRecord = new DataRecord();

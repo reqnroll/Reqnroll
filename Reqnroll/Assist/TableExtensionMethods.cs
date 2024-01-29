@@ -86,12 +86,12 @@ namespace Reqnroll
             return list;
         }
 
-        public static IEnumerable<T> CreateSet<T>(this Table table, Func<TableRow, T> methodToCreateEachInstance)
+        public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance)
         {
             return CreateSet(table, methodToCreateEachInstance, null);
         }
 
-        public static IEnumerable<T> CreateSet<T>(this Table table, Func<TableRow, T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
+        public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
         {
             int count = table.Rows.Count;
             var list = new List<T>(count);

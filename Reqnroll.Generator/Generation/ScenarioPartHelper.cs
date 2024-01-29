@@ -2,7 +2,6 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Gherkin.Ast;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
@@ -92,7 +91,7 @@ namespace Reqnroll.Generator.Generation
             {
                 GetSubstitutedString(scenarioStep.Text, paramToIdentifier),
                 GetDocStringArgExpression(scenarioStep.Argument as DocString, paramToIdentifier),
-                GetTableArgExpression(scenarioStep.Argument as DataTable, statements, paramToIdentifier),
+                GetTableArgExpression(scenarioStep.Argument as Gherkin.Ast.DataTable, statements, paramToIdentifier),
                 new CodePrimitiveExpression(scenarioStep.Keyword)
             };
             
@@ -130,7 +129,7 @@ namespace Reqnroll.Generator.Generation
             return reqnrollStep;
         }
 
-        private CodeExpression GetTableArgExpression(DataTable tableArg, List<CodeStatement> statements, ParameterSubstitution paramToIdentifier)
+        private CodeExpression GetTableArgExpression(Gherkin.Ast.DataTable tableArg, List<CodeStatement> statements, ParameterSubstitution paramToIdentifier)
         {
             if (tableArg == null)
             {

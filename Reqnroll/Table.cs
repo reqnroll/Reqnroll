@@ -7,6 +7,9 @@ using System.Text;
 
 namespace Reqnroll
 {
+    /// <summary>
+    /// An alias for the <see cref="DataTable"/> class for backwards compatibility. 
+    /// </summary>
 #if !BODI_LIMITEDRUNTIME
     [Serializable]
 #endif
@@ -18,11 +21,11 @@ namespace Reqnroll
         internal const string ERROR_CELLS_NOT_MATCHING_HEADERS = "The number of cells ({0}) you are trying to add doesn't match the number of columns ({1})";
 
         private readonly string[] _header;
-        private readonly TableRows _rows = new();
+        private readonly DataTableRows _rows = new();
 
         public ICollection<string> Header => _header;
 
-        public TableRows Rows => _rows;
+        public DataTableRows Rows => _rows;
 
         public int RowCount => _rows.Count;
 
@@ -43,7 +46,7 @@ namespace Reqnroll
             {
                 foreach (var dataRow in dataRows)
                 {
-                    _rows.Add(new TableRow(this, dataRow));
+                    _rows.Add(new DataTableRow(this, dataRow));
                 }
             }
         }
@@ -100,7 +103,7 @@ namespace Reqnroll
                         this);
                 throw new ArgumentException(mess);
             }
-            var row = new TableRow(this, cells);
+            var row = new DataTableRow(this, cells);
             _rows.Add(row);
         }
 
@@ -123,7 +126,7 @@ namespace Reqnroll
 
             if (!headersOnly)
             {
-                foreach (TableRow row in _rows)
+                foreach (DataTableRow row in _rows)
                 {
                     for (int colIndex = 0; colIndex < _header.Length; colIndex++)
                         columnWidths[colIndex] = Math.Max(columnWidths[colIndex], row[colIndex].Length);
@@ -135,7 +138,7 @@ namespace Reqnroll
 
             if (!headersOnly)
             {
-                foreach (TableRow row in _rows)
+                foreach (DataTableRow row in _rows)
                     AddTableRow(builder, row.Select(pair => pair.Value), columnWidths);
             }
 
@@ -175,15 +178,15 @@ namespace Reqnroll
 #if !BODI_LIMITEDRUNTIME
     [Serializable]
 #endif
-    public class TableRows : IEnumerable<TableRow>
+    public class DataTableRows : IEnumerable<DataTableRow>
     {
-        private readonly List<TableRow> _innerList = new();
+        private readonly List<DataTableRow> _innerList = new();
 
         public int Count => _innerList.Count;
 
-        public TableRow this[int index] => _innerList[index];
+        public DataTableRow this[int index] => _innerList[index];
 
-        public IEnumerator<TableRow> GetEnumerator()
+        public IEnumerator<DataTableRow> GetEnumerator()
         {
             return _innerList.GetEnumerator();
         }
@@ -193,7 +196,7 @@ namespace Reqnroll
             return GetEnumerator();
         }
 
-        internal void Add(TableRow row)
+        internal void Add(DataTableRow row)
         {
             _innerList.Add(row);
         }
@@ -207,12 +210,12 @@ namespace Reqnroll
 #if !BODI_LIMITEDRUNTIME
     [Serializable]
 #endif
-    public class TableRow : IDictionary<string, string>
+    public class DataTableRow : IDictionary<string, string>
     {
         private readonly Table _table;
         private readonly string[] _items;
 
-        internal TableRow(Table table, string[] items)
+        internal DataTableRow(Table table, string[] items)
         {
             for (int colIndex = 0; colIndex < items.Length; colIndex++)
                 items[colIndex] ??= string.Empty;

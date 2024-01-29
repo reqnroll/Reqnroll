@@ -7,7 +7,6 @@ using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.Transformation;
 using Reqnroll.Parser;
 using Xunit;
-using DataTable = Reqnroll.ExternalData.ReqnrollPlugin.DataSources.DataTable;
 
 namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
 {
@@ -26,7 +25,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
 
         private IncludeExternalDataTransformation CreateSut() => new(_specificationProviderMock.Object);
 
-        private DataTable CreateProductDataTable()
+        private ReqnrollPlugin.DataSources.DataTable CreateProductDataTable()
         {
             return new(new []{"product", "price"})
             {
@@ -55,8 +54,8 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
             CreateScenarioOutline(
                 new[]
                 {
-                    new Examples(new Tag[] { new(null, "@extag1") }, null, "Examples", "1", "", new Gherkin.Ast.TableRow(null, new[] { new TableCell(null, "product") }), new Gherkin.Ast.TableRow[0]),
-                    new Examples(new Tag[] { new(null, "@extag2") }, null, "Examples", "2", "", new Gherkin.Ast.TableRow(null, new[] { new TableCell(null, "product") }), new Gherkin.Ast.TableRow[0])
+                    new Examples(new Tag[] { new(null, "@extag1") }, null, "Examples", "1", "", new TableRow(null, new[] { new TableCell(null, "product") }), Array.Empty<TableRow>()),
+                    new Examples(new Tag[] { new(null, "@extag2") }, null, "Examples", "2", "", new TableRow(null, new[] { new TableCell(null, "product") }), Array.Empty<TableRow>())
                 });
 
 
