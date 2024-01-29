@@ -13,7 +13,7 @@ This gives you following benefits:
 - easier to read step definitions  
   This makes it possible, that also non- technical people can understand what is happening in a step definition. This makes your life in bigger projects easier, because nobody will remember what every single step is doing.  
 
-The Driver pattern is heavily using [Context- Injection](../Bindings/Context-Injection.md) to connect the multiple classes together.
+The Driver pattern is heavily using [Context- Injection](../automation/context-injection) to connect the multiple classes together.
 
 ## Example
 
@@ -21,7 +21,7 @@ In this example you see how the code looks before and after refactoring with the
 
 **Before**:
 
-This is some automation code that uses the [Page Object Model](PageObjectModel.md) and checks if some WebElements are existing.  
+This is some automation code that uses the [Page Object Model](page-object-model.md) and checks if some WebElements are existing.  
 
 ``` csharp
 [Then(@"it is possible to enter a '(.*)' with label '(.*)'")]
@@ -51,7 +51,7 @@ public void ThenItIsPossibleToEnterAWithLabel(string inputType, string expectedL
 
 With moving the automation code into a driver class, we could reduce the number of lines in the step definition to one. Also we can now use a method-name (`CheckExistenceOfInputElement`), that is understandable by everybody in your team.
 
-To get an instance of the driver class (`SubmissionSteps`), we are using the [Context- Injection](../Bindings/Context-Injection.md) Feature of Reqnroll.
+To get an instance of the driver class (`SubmissionSteps`), we are using the [Context- Injection](../automation/context-injection) Feature of Reqnroll.
 
 ``` csharp
 [Binding]

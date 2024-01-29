@@ -9,7 +9,7 @@ For this, we can use a decorator which we need to register in a generator plugin
 
 Steps to follow:
 
-1. Create a Reqnroll project with test framework NUnit using the project template provided by the Reqnroll Visual Studio extension. [Learn more](../Installation/Project-and-Item-Templates.html#visual-studio-templates)
+1. Create a Reqnroll project with test framework NUnit using the project template provided by the Reqnroll Visual Studio extension.
 
 1. Create a GeneratorPlugin. You can follow the steps from the [](plugins) guide.
 

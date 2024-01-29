@@ -17,7 +17,7 @@ public CalculatorStepDefinitions(IReqnrollOutputHelper outputHelper)
 
 There are two methods available:
 
-### `WriteLine(string text)`
+## `WriteLine(string text)`
 
 This method adds text:
 
@@ -25,7 +25,7 @@ This method adds text:
 _reqnrollOutputHelper.WriteLine("TEXT");
 ```
 
-### `AddAttachment(string filePath)`
+## `AddAttachment(string filePath)`
 
 This method adds an attachment and requires the file path:
 

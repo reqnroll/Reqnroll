@@ -93,7 +93,7 @@ As a result a new Reqnroll project is created with a sample [feature file](../gh
 
 You can go ahead and [execute the sample scenarios](../execution/executing-reqnroll-scenarios.md#executing-scenarios-from-console) from console.
 
-To add further feature file or a [Reqnroll configuration file](TODO), you can also use the `reqnroll-feature` and `reqnroll-config` item templates. The following command adds a new feature file to the project named `MyFeature.feature`.
+To add further feature file or a [Reqnroll configuration file](configuration.md), you can also use the `reqnroll-feature` and `reqnroll-config` item templates. The following command adds a new feature file to the project named `MyFeature.feature`.
 
 ```{code-block} pwsh
 :caption: .NET CLI
