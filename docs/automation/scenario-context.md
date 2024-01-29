@@ -1,4 +1,4 @@
-# ScenarioContext
+# Scenario Context
 
 `ScenarioContext` provides access to several functions, which are demonstrated using the following scenarios.
 

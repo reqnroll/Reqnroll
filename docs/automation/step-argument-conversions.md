@@ -53,7 +53,7 @@ public class Transforms
 }
 ```
 
-The following example transforms a table argument into a list of `Book` entities (using the [Reqnroll Assist Helpers](Reqnroll-Assist-Helpers.md)).  
+The following example transforms a table argument into a list of `Book` entities (using the [Reqnroll Assist Helpers](datatable-helpers)).  
 
 ```{code-block} csharp
 :caption: C# File

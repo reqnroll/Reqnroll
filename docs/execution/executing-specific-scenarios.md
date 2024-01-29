@@ -1,4 +1,4 @@
-# Executing specific scenarios
+# Executing Specific Scenarios
 
 Executing a subset or only specific scenarios might be important locally and on the build pipeline.
 

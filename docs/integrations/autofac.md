@@ -19,7 +19,7 @@ PM> Install-Package Reqnroll.Autofac
 
   Plugin supports both registration of dependencies globally and per scenario:
   
-  ##### 2.1 Optionally configure dependencies that need to be shared globally for all scenarios:
+  #### 2.1 Optionally configure dependencies that need to be shared globally for all scenarios:
   
   Create a static method somewhere in the Reqnroll project to register scenario dependencies: 
   (Recommended to put it into the `Support` folder) that returns `void` and has one parameter of Autofac `ContainerBuilder`, tag it with the `[GlobalDependencies]` attribute.
@@ -28,19 +28,19 @@ PM> Install-Package Reqnroll.Autofac
 
   Globally registered dependencies may be resolved in the `[BeforeTestRun]` and `[AfterTestRun]` methods.
     
-  ##### 2.2 Configure dependencies to be resolved each time for a scenario:
+  #### 2.2 Configure dependencies to be resolved each time for a scenario:
   
   Create a static method somewhere in the Reqnroll project to register scenario dependencies: 
   (Recommended to put it into the `Support` folder) that returns `void` and has one parameter of Autofac `ContainerBuilder`, tag it with the `[ScenarioDependencies]` attribute. 
 
-  ##### 2.3 Configure your dependencies for the scenario execution within either the two methods `[GlobalDependencies]` and `[ScenarioDependencies]` or the single `[ScenarioDependencies]` method. 
+  #### 2.3 Configure your dependencies for the scenario execution within either the two methods `[GlobalDependencies]` and `[ScenarioDependencies]` or the single `[ScenarioDependencies]` method. 
 
-  ##### 2.4 You also have to register the step definition classes in the `[ScenarioDependencies]` method, that you can do by either registering all public types from the Reqnroll project:
+  #### 2.4 You also have to register the step definition classes in the `[ScenarioDependencies]` method, that you can do by either registering all public types from the Reqnroll project:
 
 ```csharp
 builder.RegisterAssemblyTypes(typeof(YourClassInTheReqnrollProject).Assembly).SingleInstance();
 ```
-  ##### 2.5 or by registering all classes marked with the `[Binding]` attribute:
+  #### 2.5 or by registering all classes marked with the `[Binding]` attribute:
 
   You may use a provided extension method to do this, but importing:
 ```csharp

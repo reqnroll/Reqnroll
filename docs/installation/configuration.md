@@ -107,7 +107,7 @@ Use this section to define test generation options.
   - Description
 * - allowDebugGeneratedFiles
   - `true`/`false`
-  - By default, the debugger is configured to step through the generated code. This helps you debug your feature files and bindings (see [Debugging Tests](TODO)). Disabled this option by setting this attribute to `true`.<br/> *Default:* `false`
+  - By default, the debugger is configured to step through the generated code. This helps you debug your feature files and bindings (see [Debugging Tests](../execution/debugging)). Disabled this option by setting this attribute to `true`.<br/> *Default:* `false`
 * - allowRowTests
   - `true`/`false`
   - Determines whether "row tests" should be generated for [scenario outlines](../gherkin/gherkin-reference.md#scenario-outline). This setting is ignored if the [test execution framework](setup-project.md#choosing-your-test-execution-framework) does not support row based testing. <br/> *Default:* `true`

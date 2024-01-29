@@ -28,7 +28,7 @@ Parameters can be defined using the `{parameter-type}` syntax. Where `parameter-
 * `string` (`{string}`) that matches to quoted text wrapped with either `"` or `'`. E.g., `[Given("a user {string}")]` matches to `Given a user "Marvin"` or `Given a user 'Zaphod Beeblebrox'`.
 * `word` (`{word}`) that matches to a single word without quotes. E.g., `[Given("a user {word}")]` matches to `Given a user Marvin`.
 * Empty (`{}`) that matches to anything (like `(.*)` with regex).
-* A type name without namespace that is supported by Reqnroll as a parameter type (types with built-in support, enum types and types with [custom argument conversions](Step-Argument-Conversions.md)). E.g. `[When("I have {CustomColor} cucumbers in my belly")]` matches to `When I have green cucumbers in my belly` if `CustomColor` is an enum with `Green` as a value.
+* A type name without namespace that is supported by Reqnroll as a parameter type (types with built-in support, enum types and types with [custom argument conversions](step-argument-conversions)). E.g. `[When("I have {CustomColor} cucumbers in my belly")]` matches to `When I have green cucumbers in my belly` if `CustomColor` is an enum with `Green` as a value.
 * A custom type name you have specified int the `[StepArgumentTransformation]` attribute. E.g., With `[StepArgumentTransformation("v(.*)", Name = "my_version")]`, you can define a step as `[When("I download the release {my_version} of the application")]` that matches to `When I download the release v1.2.3 of the application`.
 
 ### Optionals, alternatives

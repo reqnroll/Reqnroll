@@ -23,6 +23,10 @@ This guide describes the setup steps for the following IDEs:
 
 In order to use Reqnroll with Visual Studio 2022, you need to install the [Reqnroll for Visual Studio](TODO) extension.
 
+```{warning}
+The *Reqnroll with Visual Studio 2022* extension cannot work together with the *SpecFlow for Visual Studio 2022* extension as they both process feature files. As the Reqnroll extension also supports SpecFlow projects, you can remove the SpecFlow extension if you install the Reqnroll extension. Alternatively you can disable the SpecFlow extension for the time you work with Reqnroll. 
+```
+
 1. Open Visual Studio 2022
 2. From the *Extensions* menu, choose the *Manage Extensions...* command.
 3. On the dialog, make sure that the *Online* is selected from the list on the left and type `Reqnroll` to the *Search* text box on the right top corner.

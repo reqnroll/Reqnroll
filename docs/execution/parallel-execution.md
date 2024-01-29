@@ -88,11 +88,11 @@ By default xUnit runs all Reqnroll features [in parallel](https://xunit.net/docs
 
 When using parallel execution accessing the obsolete `ScenarioContext.Current`, `FeatureContext.Current` or `ScenarioStepContext.Current` static properties is not allowed.  Accessing these static properties during parallel execution throws a `ReqnrollException`.
 
-To access the context classes in a thread-safe way you can either use context injection or the instance properties of the `Steps` base class. For further details please see the [FeatureContext](../Bindings/FeatureContext.md) and [ScenarioContext](../Bindings/ScenarioContext.md) documentation.
+To access the context classes in a thread-safe way you can either use context injection or the instance properties of the `Steps` base class. For further details please see the [FeatureContext](../automation/feature-context) and [ScenarioContext](../automation/scenario-context) documentation.
 
 ### Excluding Reqnroll features from parallel execution
 
-To exclude specific features from running in parallel with any other features, see the `addNonParallelizableMarkerForTags` [configuration](../Installation/Configuration.html#generator) option.
+To exclude specific features from running in parallel with any other features, see the `addNonParallelizableMarkerForTags` [configuration](../installation/configuration.md#generator) option.
 
 Please note that xUnit requires additional configuration to ensure that non parallelizable features do not run in parallel with any other feature. This configuration is automatically provided for users via the xUnit plugin (so no additional effort is required). The following class will be defined within your test assembly for you:
 
