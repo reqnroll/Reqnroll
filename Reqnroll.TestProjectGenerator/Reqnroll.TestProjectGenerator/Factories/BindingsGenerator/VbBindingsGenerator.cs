@@ -95,7 +95,7 @@ End Module
                         parameter = $"{argumentName} As Object";
                         break;
                     case ParameterType.Table:
-                        parameter = $"{argumentName} As Table";
+                        parameter = $"{argumentName} As DataTable";
                         break;
                     case ParameterType.DocString:
                         parameter = $"{argumentName} As String";
@@ -124,7 +124,7 @@ End Module
                         parameter = $"{argumentName} As Object";
                         break;
                     case ParameterType.Table:
-                        parameter = $"{argumentName} As Table";
+                        parameter = $"{argumentName} As DataTable";
                         break;
                     case ParameterType.DocString:
                         parameter = $"{argumentName} As String";

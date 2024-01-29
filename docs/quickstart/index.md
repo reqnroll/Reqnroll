@@ -309,7 +309,7 @@ This way of phasing becomes cumbersome with multiple items. The one with the dat
 
 We can use the *Define Steps* dialog as before, but to extend an existing step definition class with a new snippet, you need to click on the *Copy to clipboard* button on the dialog and paste the snippet to our step definition class, for example right after the other "Given" step dealing with basket addition.
 
-The content of the data table is provided as a parameter of type `Table`. We can rename the parameter to `itemsTable`.
+The content of the data table is provided as a parameter of type `DataTable`. We can rename the parameter to `itemsTable`.
 
 ```{code-block} csharp
 :caption: PriceCalculationStepDefinitions.cs
@@ -326,7 +326,7 @@ public class PriceCalculationStepDefinitions
     }
 
     [Given("the client added")]
-    public void GivenTheClientAdded(Table itemsTable)
+    public void GivenTheClientAdded(DataTable itemsTable)
     {
         throw new PendingStepException();
     }
@@ -352,7 +352,7 @@ public class PriceCalculationStepDefinitions
     [...]
 
     [Given("the client added")]
-    public void GivenTheClientAdded(Table itemsTable)
+    public void GivenTheClientAdded(DataTable itemsTable)
     {
         var items = itemsTable.CreateSet<(string Product, int Quantity)>();
         foreach (var item in items)

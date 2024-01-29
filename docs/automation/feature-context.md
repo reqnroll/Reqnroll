@@ -111,7 +111,7 @@ private class FeatureInformation
 public void ExecuteAnyScenario() { }
 
 [Then(@"the FeatureInfo contains the following information")]
-public void FeatureInfoContainsInterestingInformation(Table table)
+public void FeatureInfoContainsInterestingInformation(DataTable table)
 {
     // Create our small DTO for the info from the step
     var fromStep =  table.CreateInstance<FeatureInformation>();

@@ -24,7 +24,7 @@ With commands like these:
 
 ```c#
     [Given(@"I have the following people")]
-    public void x(Table table)
+    public void x(DataTable table)
     {
         var person = table.CreateInstance<Person>();
         // OR

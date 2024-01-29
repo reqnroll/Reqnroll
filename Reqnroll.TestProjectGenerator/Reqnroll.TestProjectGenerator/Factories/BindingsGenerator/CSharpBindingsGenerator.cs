@@ -158,7 +158,7 @@ internal static class Log
                         parameter = $"object {argumentName}";
                         break;
                     case ParameterType.Table:
-                        parameter = $"Table {argumentName}";
+                        parameter = $"DataTable {argumentName}";
                         break;
                     case ParameterType.DocString:
                         parameter = $"string {argumentName}";
@@ -187,7 +187,7 @@ internal static class Log
                         parameter = $"object {argumentName}";
                         break;
                     case ParameterType.Table:
-                        parameter = $"Table {argumentName}";
+                        parameter = $"DataTable {argumentName}";
                         break;
                     case ParameterType.DocString:
                         parameter = $"string {argumentName}";

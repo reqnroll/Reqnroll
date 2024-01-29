@@ -123,7 +123,7 @@ public class ManualSteps
     }
 
     [Given(".*"), When(".*"), Then(".*")]
-    public void EmptyStep(Table tableParam)
+    public void EmptyStep(DataTable tableParam)
     {
     }
 }
