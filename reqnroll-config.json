@@ -14,7 +14,7 @@
   "additionalProperties": true,
   "properties": {
     "language": {
-      "description": "Use this section to define the default language for feature files and other language-related settings. For more details see https://docs.reqnroll.net/projects/reqnroll/en/latest/Installation/Configuration.html#language",
+      "description": "Use this section to define the default language for feature files and other language-related settings. For more details see https://go.reqnroll.net/doc-config#language",
       "type": "object",
       "additionalProperties": true,
       "properties": {
@@ -31,7 +31,7 @@
       }
     },
     "generator": {
-      "description": "Use this section to define unit test generation options. For more details see https://docs.reqnroll.net/projects/reqnroll/en/latest/Installation/Configuration.html#generator",
+      "description": "Use this section to define unit test generation options. For more details see https://go.reqnroll.net/doc-config#generator",
       "type": "object",
       "additionalProperties": true,
       "properties": {
@@ -46,7 +46,7 @@
           "default": false
         },
         "addNonParallelizableMarkerForTags": {
-          "description": "Defines a set of tags, any of which specify that a feature should be excluded from running in parallel with any other feature. For mor details see https://docs.reqnroll.net/projects/reqnroll/en/latest/Execution/Parallel-Execution.html",
+          "description": "Defines a set of tags, any of which specify that a feature should be excluded from running in parallel with any other feature. For mor details see https://go.reqnroll.net/doc-parallel-execution",
           "type": "array",
           "default": [],
           "items": {
@@ -56,7 +56,7 @@
       }
     },
     "runtime": {
-      "description": "Use this section to specify various test execution options. For more details see https://docs.reqnroll.net/projects/reqnroll/en/latest/Installation/Configuration.html#runtime",
+      "description": "Use this section to specify various test execution options. For more details see https://go.reqnroll.net/doc-config#runtime",
       "type": "object",
       "additionalProperties": true,
       "properties": {
@@ -80,7 +80,7 @@
       }
     },
     "trace": {
-      "description": "Use this section to determine the Reqnroll trace output. For more details see https://docs.reqnroll.net/projects/reqnroll/en/latest/Installation/Configuration.html#trace",
+      "description": "Use this section to determine the Reqnroll trace output. For more details see https://go.reqnroll.net/doc-config#trace",
       "type": "object",
       "additionalProperties": true,
       "properties": {

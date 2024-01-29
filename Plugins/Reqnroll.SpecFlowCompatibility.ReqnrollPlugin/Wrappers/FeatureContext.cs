@@ -9,7 +9,7 @@ namespace TechTalk.SpecFlow;
 public class FeatureContext(Reqnroll.FeatureContext originalContext) : IFeatureContext
 {
     #region Singleton
-    [Obsolete("Please get the FeatureContext via Context Injection - https://go.reqnroll.net/Migrate-FeatureContext-Current")]
+    [Obsolete("Please get the FeatureContext via Context Injection - https://go.reqnroll.net/doc-migrate-fc-current")]
     public static Reqnroll.FeatureContext Current => Reqnroll.FeatureContext.Current;
     #endregion
 

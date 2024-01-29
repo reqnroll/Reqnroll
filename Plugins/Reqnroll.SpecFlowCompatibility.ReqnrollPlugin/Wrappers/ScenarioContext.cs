@@ -8,7 +8,7 @@ namespace TechTalk.SpecFlow;
 public class ScenarioContext(Reqnroll.ScenarioContext originalContext) : IScenarioContext
 {
     #region Singleton
-    [Obsolete("Please get the ScenarioContext via Context Injection - https://go.reqnroll.net/Migrate-ScenarioContext-Current")]
+    [Obsolete("Please get the ScenarioContext via Context Injection - https://go.reqnroll.net/doc-migrate-sc-current")]
     public static Reqnroll.ScenarioContext Current => Reqnroll.ScenarioContext.Current;
     #endregion
 

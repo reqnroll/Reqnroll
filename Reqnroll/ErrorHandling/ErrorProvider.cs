@@ -125,7 +125,7 @@ namespace Reqnroll.ErrorHandling
         {
             var upgradeMessage = 
                 stepDefinitionBinding.ExpressionType == StepDefinitionExpressionTypes.CucumberExpression ? 
-                $"{Environment.NewLine}If this error comes after upgrading to SpecFlow v4, check the upgrade guide: https://docs.reqnroll.net/projects/reqnroll/en/latest/Guides/UpgradeSpecFlow3To4.html" :
+                $"{Environment.NewLine}If this error comes after upgrading to Reqnroll, check the upgrade guide: https://go.reqnroll.net/guide-migrating-from-specflow" :
                 "";
             return new BindingException($"Invalid step definition! The step definition method '{GetMethodText(stepDefinitionBinding.Method)}' is invalid: {stepDefinitionBinding.ErrorMessage}.{upgradeMessage}");
         }

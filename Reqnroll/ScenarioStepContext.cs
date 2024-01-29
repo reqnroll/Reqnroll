@@ -20,7 +20,7 @@ namespace Reqnroll
             get
             {
                 if (isCurrentDisabled)
-                    throw new ReqnrollException("The ScenarioStepContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https://go.reqnroll.net/doc-multithreaded for details.");
+                    throw new ReqnrollException("The ScenarioStepContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https:///doc-multithreaded for details.");
                 if (current == null)
                 {
                     Debug.WriteLine("Accessing NULL ScenarioStepContext");

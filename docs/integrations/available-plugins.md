@@ -11,4 +11,4 @@
 
 | Name | Description | Download |
 |---|---|---|
-| [Reqnroll.External Data](https://www.nuget.org/packages/Reqnroll.ExternalData/) | Package to use external data in Gherkin scenarios. [Read more...](https://docs.reqnroll.net/projects/reqnroll/en/latest/Guides/externaldata.html) | <a href="https://www.nuget.org/packages/Reqnroll.ExternalData/">![](https://img.shields.io/nuget/vpre/Reqnroll.ExternalData.svg)</a>|
+| [Reqnroll.External Data](https://www.nuget.org/packages/Reqnroll.ExternalData/) | Package to use external data in Gherkin scenarios. [Read more...](https://go.reqnroll.net/doc-externaldata) | <a href="https://www.nuget.org/packages/Reqnroll.ExternalData/">![](https://img.shields.io/nuget/vpre/Reqnroll.ExternalData.svg)</a>|

@@ -26,13 +26,13 @@ namespace Reqnroll
         private static bool isCurrentDisabled = false;
         private static ScenarioContext current;
 
-        [Obsolete("Please get the ScenarioContext via Context Injection - https://go.reqnroll.net/Migrate-ScenarioContext-Current")]
+        [Obsolete("Please get the ScenarioContext via Context Injection - https://go.reqnroll.net/doc-migrate-sc-current")]
         public static ScenarioContext Current
         {
             get
             {
                 if (isCurrentDisabled)
-                    throw new ReqnrollException("The ScenarioContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https://go.reqnroll.net/doc-multithreaded for details.");
+                    throw new ReqnrollException("The ScenarioContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https://go.reqnroll.net/doc-parallel-execution for details.");
                 if (current == null)
                 {
                     Debug.WriteLine("Accessing NULL ScenarioContext");

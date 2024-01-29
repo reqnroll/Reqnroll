@@ -34,13 +34,13 @@ namespace Reqnroll
         private static bool isCurrentDisabled = false;
         private static FeatureContext current;
 
-        [Obsolete("Please get the FeatureContext via Context Injection - https://go.reqnroll.net/Migrate-FeatureContext-Current")]
+        [Obsolete("Please get the FeatureContext via Context Injection - https://go.reqnroll.net/doc-migrate-fc-current")]
         public static FeatureContext Current
         {
             get
             {
                 if (isCurrentDisabled)
-                    throw new ReqnrollException("The FeatureContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the feature context to the binding class. See https://go.reqnroll.net/doc-multithreaded for details.");
+                    throw new ReqnrollException("The FeatureContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the feature context to the binding class. See https://go.reqnroll.net/doc-parallel-execution for details.");
                 if (current == null)
                 {
                     Debug.WriteLine("Accessing NULL FeatureContext");
