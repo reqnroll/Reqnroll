@@ -87,3 +87,7 @@ public class StepArgumentTransformation : Reqnroll.StepArgumentTransformationAtt
     {
     }
 }
+
+public class ScopeAttribute : Reqnroll.ScopeAttribute
+{
+}
