@@ -34,7 +34,7 @@ namespace Reqnroll
         {
             if (header == null || header.Length == 0)
             {
-                throw new ArgumentNullException(nameof(header));
+                throw new ArgumentException(ERROR_NO_HEADER_TO_ADD, nameof(header));
             }
             for (int colIndex = 0; colIndex < header.Length; colIndex++)
                 header[colIndex] ??= string.Empty;

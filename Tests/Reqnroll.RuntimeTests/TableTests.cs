@@ -2,11 +2,20 @@ using System;
 using System.Collections.Generic;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
+
 namespace Reqnroll.RuntimeTests
 {
     
     public class TableTests
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public TableTests(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
         [Fact]
         public void should_return_nice_error_message_when_column_not_is_found_in_table()
         {
@@ -22,7 +31,7 @@ namespace Reqnroll.RuntimeTests
             catch (IndexOutOfRangeException ex)
             {
                 mess = ex.Message;
-                Console.WriteLine(mess);
+                _testOutputHelper.WriteLine(mess);
             }
 
             // Assert
@@ -43,7 +52,7 @@ namespace Reqnroll.RuntimeTests
             catch (ArgumentException ex)
             {
                 mess = ex.Message;
-                Console.WriteLine(mess);
+                _testOutputHelper.WriteLine(mess);
             }
 
             // Assert
@@ -63,7 +72,7 @@ namespace Reqnroll.RuntimeTests
             catch (ArgumentException ex)
             {
                 mess = ex.Message;
-                Console.WriteLine(mess);
+                _testOutputHelper.WriteLine(mess);
             }
 
             // Assert
