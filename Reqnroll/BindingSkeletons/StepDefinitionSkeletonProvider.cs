@@ -94,7 +94,7 @@ namespace Reqnroll.BindingSkeletons
         {
             var result = stepTextAnalyzer.Analyze(stepInstance.Text, bindingCulture);
             if (stepInstance.MultilineTextArgument != null)
-                result.Parameters.Add(new AnalyzedStepParameter("string", "multilineText"));
+                result.Parameters.Add(new AnalyzedStepParameter("String", "multilineText"));
             if (stepInstance.TableArgument != null)
                 result.Parameters.Add(new AnalyzedStepParameter("DataTable", "dataTable"));
             return result;
