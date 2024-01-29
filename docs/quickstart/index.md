@@ -406,6 +406,6 @@ If you need inspirations how to extend the solution, here are a few ideas:
 * Consider introducing a `Currency` class and create a argument transformation that recognizes currencies like `$195.0` and converts them to a currency value. You can find more about step argument transformations in [](../automation/step-argument-conversions.md).
 * You can replace the hard-coded product prices with "Given" steps that describe the available products and their prices. You can also use the [](../gherkin/gherkin-reference.md#background) section for that.
 * You can consider implementing a new rule that provides 10% discount when the basket value is over $200. Separate their scenarios with the [Rule keyword](../gherkin/gherkin-reference.md#rule).
-* If you are really adventurous, you can turn the app into a backed service that provides the price calculation as a REST HTTP service. In that case that step definitions can make HTTP requests to test the service.
+* If you are really adventurous, you can turn the app into a backed service that provides the price calculation as a REST HTTP service. In that case that step definitions can make HTTP requests to test the service. In that case you can use the `BeforeScenario` and `AfterScenario` [hooks](../automation/hooks) to start and stop the application.
 
 Share your results at our [Reqnroll discussion topic](https://github.com/reqnroll/Reqnroll/discussions/6)!
