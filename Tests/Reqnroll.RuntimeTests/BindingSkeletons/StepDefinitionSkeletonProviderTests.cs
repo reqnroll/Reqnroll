@@ -171,7 +171,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
 
-            result.Should().Be("When/@\"^I do something$\"/WhenIDoSomething/string multilineText, Table table");
+            result.Should().Be("When/@\"^I do something$\"/WhenIDoSomething/string multilineText, DataTable dataTable");
         }
 
         [Fact]
@@ -181,7 +181,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
 
-            result.Should().Be("When/@\"^I do something$\"/WhenIDoSomething/multilineText : string, table : Table");
+            result.Should().Be("When/@\"^I do something$\"/WhenIDoSomething/multilineText : string, dataTable : DataTable");
         }
 
         [Fact]
@@ -191,7 +191,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.VB, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
 
-            result.Should().Be("When/\"^I do something$\"/WhenIDoSomething/ByVal multilineText As String, ByVal table As Table");
+            result.Should().Be("When/\"^I do something$\"/WhenIDoSomething/ByVal multilineText As String, ByVal dataTable As DataTable");
         }
 
         [Fact]

@@ -9,7 +9,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
 {
     public class ExternalDataSpecificationTests
     {
-        private DataTable CreateProductDataTable()
+        private ReqnrollPlugin.DataSources.DataTable CreateProductDataTable()
         {
             return new(new []{ "product", "price", "color"})
             {
@@ -22,7 +22,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
             };
         }
 
-        private DataTable CreateUserDataTable()
+        private ReqnrollPlugin.DataSources.DataTable CreateUserDataTable()
         {
             return new(new []{ "name" })
             {

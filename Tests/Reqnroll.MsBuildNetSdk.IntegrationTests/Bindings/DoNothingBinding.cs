@@ -14,7 +14,7 @@ namespace Reqnroll.MsBuildNetSdk.IntegrationTests.Features
         }
 
         [Given(".*"), When(".*"), Then(".*")]
-        public void EmptyStep(Table tableParam)
+        public void EmptyStep(DataTable tableParam)
         {
         }
     }

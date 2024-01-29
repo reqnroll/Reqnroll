@@ -58,12 +58,12 @@ public static class TableHelperExtensionMethods
         return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance, creationOptions);
     }
 
-    public static IEnumerable<T> CreateSet<T>(this Table table, Func<TableRow, T> methodToCreateEachInstance)
+    public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance)
     {
         return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance);
     }
 
-    public static IEnumerable<T> CreateSet<T>(this Table table, Func<TableRow, T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
+    public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
     {
         return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance, creationOptions);
     }

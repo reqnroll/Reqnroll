@@ -155,7 +155,7 @@ private class ScenarioInformation
 public void ExecuteAnyScenario(){}
 
 [Then(@"the ScenarioInfo contains the following information")]
-public void ScenarioInfoContainsInterestingInformation(Table table)
+public void ScenarioInfoContainsInterestingInformation(DataTable table)
 {
     // Create our small DTO for the info from the step
     var fromStep = table.CreateInstance<ScenarioInformation>();

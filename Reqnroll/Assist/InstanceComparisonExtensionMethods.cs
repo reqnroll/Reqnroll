@@ -71,18 +71,18 @@ namespace Reqnroll
             return differences.Any();
         }
 
-        internal static bool ThePropertyDoesNotExist<T>(T instance, TableRow row)
+        internal static bool ThePropertyDoesNotExist<T>(T instance, DataTableRow row)
         {
             return instance.GetType().GetProperties()
                 .Any(property => TEHelpers.IsMemberMatchingToColumnName(property, row.Id())) == false;
         }
 
-        internal static bool ThereIsADifference<T>(T instance, TableRow row)
+        internal static bool ThereIsADifference<T>(T instance, DataTableRow row)
         {
             return ThePropertyDoesNotExist(instance, row) || TheValuesDoNotMatch(instance, row);
         }
 
-        private static bool TheValuesDoNotMatch<T>(T instance, TableRow row)
+        private static bool TheValuesDoNotMatch<T>(T instance, DataTableRow row)
         {
             var expected = GetTheExpectedValue(row);
             var propertyValue = instance.GetPropertyValue(row.Id());
@@ -92,12 +92,12 @@ namespace Reqnroll
                 .Compare(expected, propertyValue) == false;
         }
 
-        private static string GetTheExpectedValue(TableRow row)
+        private static string GetTheExpectedValue(DataTableRow row)
         {
             return row.Value();
         }
 
-        private static Difference CreateDifferenceForThisRow<T>(T instance, TableRow row)
+        private static Difference CreateDifferenceForThisRow<T>(T instance, DataTableRow row)
         {
             var propertyName = row.Id();
 
@@ -158,12 +158,12 @@ namespace Reqnroll
 
     public static class TableHelpers
     {
-        public static string Id(this TableRow row)
+        public static string Id(this DataTableRow row)
         {
             return row[0];
         }
 
-        public static string Value(this TableRow row)
+        public static string Value(this DataTableRow row)
         {
             return row[1];
         }

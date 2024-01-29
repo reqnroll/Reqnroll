@@ -183,14 +183,14 @@ namespace Reqnroll.Assist
             return aliases.Any(a => a.Aliases.Any(al => Regex.Match(id, al).Success));
         }
 
-        private static bool TheseTypesMatch(Type targetType, Type memberType, TableRow row)
+        private static bool TheseTypesMatch(Type targetType, Type memberType, DataTableRow row)
         {
             return Service.Instance.GetValueRetrieverFor(row, targetType, memberType) != null;
         }
 
         internal class MemberHandler
         {
-            public TableRow Row { get; set; }
+            public DataTableRow Row { get; set; }
             public string MemberName { get; set; }
             public Action<object, object> Setter { get; set; }
             public Type Type { get; set; }

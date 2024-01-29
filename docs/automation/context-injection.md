@@ -103,7 +103,7 @@ public class BookSteps
     }
 
     [Given(@"the following books")]
-    public void GivenTheFollowingBooks(Table table)
+    public void GivenTheFollowingBooks(DataTable table)
     {
         foreach (var book in table.CreateSet<Book>())
         {

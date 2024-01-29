@@ -62,7 +62,7 @@ type internal Log =
                         parameter = $"{argumentName} : Object";
                         break;
                     case ParameterType.Table:
-                        parameter = $"{argumentName} : Table";
+                        parameter = $"{argumentName} : DataTable";
                         break;
                     case ParameterType.DocString:
                         parameter = $"{argumentName} : string";
@@ -91,7 +91,7 @@ type internal Log =
                         parameter = $"{argumentName} : Object";
                         break;
                     case ParameterType.Table:
-                        parameter = $"{argumentName} : Table";
+                        parameter = $"{argumentName} : DataTable";
                         break;
                     case ParameterType.DocString:
                         parameter = $"{argumentName} : string";

@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using ExcelDataReader;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
-using DataTable = Reqnroll.ExternalData.ReqnrollPlugin.DataSources.DataTable;
 
 namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
 {
@@ -32,7 +31,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
 
             foreach (System.Data.DataTable resultTable in result.Tables)
             {
-                var dataTable = new DataTable(resultTable.Columns.OfType<DataColumn>().Select(c => c.ColumnName).ToArray());
+                var dataTable = new DataSources.DataTable(resultTable.Columns.OfType<DataColumn>().Select(c => c.ColumnName).ToArray());
 
                 foreach (DataRow resultTableRow in resultTable.Rows)
                 {

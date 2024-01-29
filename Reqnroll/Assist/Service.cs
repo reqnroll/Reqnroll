@@ -47,7 +47,7 @@ namespace Reqnroll.Assist
             ValueRetrievers.Unregister(valueRetriever);
         }
 
-        public IValueRetriever? GetValueRetrieverFor(TableRow row, Type targetType, Type propertyType)
+        public IValueRetriever? GetValueRetrieverFor(DataTableRow row, Type targetType, Type propertyType)
         {
             var keyValuePair = new KeyValuePair<string, string>(row[0], row[1]);
             foreach (var valueRetriever in ValueRetrievers)

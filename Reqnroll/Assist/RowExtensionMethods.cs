@@ -6,42 +6,42 @@ namespace Reqnroll.Assist
 {
     public static class RowExtensionMethods
     {
-        public static string GetString(this TableRow row, string id)
+        public static string GetString(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id)
                        ? row[id]
                        : null;
         }
 
-        public static int GetInt32(this TableRow row, string id)
+        public static int GetInt32(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
                        ? Convert.ToInt32(row[id])
                        : int.MinValue;
         }
 
-        public static long GetInt64(this TableRow row, string id)
+        public static long GetInt64(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
                        ? Convert.ToInt64(row[id])
                        : long.MinValue;
         }
 
-        public static decimal GetDecimal(this TableRow row, string id)
+        public static decimal GetDecimal(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
                        ? Convert.ToDecimal(row[id])
                        : decimal.MinValue;
         }
 
-        public static DateTime GetDateTime(this TableRow row, string id)
+        public static DateTime GetDateTime(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
                        ? Convert.ToDateTime(row[id])
                        : DateTime.MinValue;
         }
 
-        public static bool GetBoolean(this TableRow row, string id)
+        public static bool GetBoolean(this DataTableRow row, string id)
         {
             if (TheBooleanValueIsEmpty(row, id))
                 return false;
@@ -51,26 +51,26 @@ namespace Reqnroll.Assist
             return string.Equals(row[id], "true", StringComparison.OrdinalIgnoreCase);
         }
 
-        public static double GetDouble(this TableRow row, string id)
+        public static double GetDouble(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
                        ? Convert.ToDouble(row[id])
                        : double.MinValue;
         }
 
-        public static float GetSingle(this TableRow row, string id)
+        public static float GetSingle(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
                 ? Convert.ToSingle(row[id])
                 : float.MinValue;
         }
 
-        public static char GetChar(this TableRow row, string id)
+        public static char GetChar(this DataTableRow row, string id)
         {
             return Convert.ToChar(row[id]);
         }
 
-        public static T GetDiscreteEnum<T>(this TableRow row, string id) where T : struct, IConvertible
+        public static T GetDiscreteEnum<T>(this DataTableRow row, string id) where T : struct, IConvertible
         {
             var value = row[id].Replace(" ", string.Empty);
             if (Enum.TryParse(value, true, out T @enum))
@@ -79,18 +79,18 @@ namespace Reqnroll.Assist
             throw new InvalidOperationException($"No enum with value {value} found in enum {typeof(T).Name}");
         }
 
-        public static T GetDiscreteEnum<T>(this TableRow row, string id, T defaultValue) where T : struct, IConvertible
+        public static T GetDiscreteEnum<T>(this DataTableRow row, string id, T defaultValue) where T : struct, IConvertible
         {
             var value = row[id].Replace(" ", string.Empty);
             return Enum.TryParse(value, true, out T @enum) ? @enum : defaultValue;
         }
 
-        public static TEnum GetEnumValue<TEnum>(this TableRow row, string id)
+        public static TEnum GetEnumValue<TEnum>(this DataTableRow row, string id)
         {
             return (TEnum)Enum.Parse(typeof(TEnum), row[id]);
         }
 
-        public static Enum GetEnum<T>(this TableRow row, string id) where T : class
+        public static Enum GetEnum<T>(this DataTableRow row, string id) where T : class
         {
             return GetTheEnumValue<T>(row[id], id);
         }
@@ -134,37 +134,37 @@ namespace Reqnroll.Assist
         }
 
 
-        public static Guid GetGuid(this TableRow row, string id)
+        public static Guid GetGuid(this DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && TheValueIsNotEmpty(row, id)
                        ? new Guid(row[id])
                        : new Guid();
         }
 
-        private static bool TheBooleanValueIsEmpty(TableRow row, string id)
+        private static bool TheBooleanValueIsEmpty(DataTableRow row, string id)
         {
             return AValueWithThisIdExists(row, id) && string.IsNullOrEmpty(row[id]);
         }
 
-        private static bool TheValueIsNotEmpty(TableRow row, string id)
+        private static bool TheValueIsNotEmpty(DataTableRow row, string id)
         {
             return string.IsNullOrEmpty(row[id]) == false;
         }
 
-        private static void AssertThatTheRequestIsValid(TableRow row, string id)
+        private static void AssertThatTheRequestIsValid(DataTableRow row, string id)
         {
             AssertThatAValueWithThisIdExistsInThisRow(row, id);
             AssertThatThisIsAnAcceptableBoolValue(row, id);
         }
 
-        private static void AssertThatThisIsAnAcceptableBoolValue(TableRow row, string id)
+        private static void AssertThatThisIsAnAcceptableBoolValue(DataTableRow row, string id)
         {
             var acceptedValues = new[] { "true", "false" };
             if (acceptedValues.Contains(row[id], StringComparer.OrdinalIgnoreCase) == false)
                 throw new InvalidCastException($"You must use 'true' or 'false' when setting bools for {id}");
         }
 
-        private static void AssertThatAValueWithThisIdExistsInThisRow(TableRow row, string id)
+        private static void AssertThatAValueWithThisIdExistsInThisRow(DataTableRow row, string id)
         {
             if (AValueWithThisIdExists(row, id) == false)
                 throw new InvalidOperationException($"{id} could not be found in the row.");
@@ -176,31 +176,31 @@ namespace Reqnroll.Assist
         }
 
 		/// <summary>
-		/// Creates a new instance of <typeparamref name="T"/> from the <see cref="TableRow"/>.
+		/// Creates a new instance of <typeparamref name="T"/> from the <see cref="DataTableRow"/>.
 		/// </summary>
 		/// <typeparam name="T">The type of the instance to be created.</typeparam>
 		/// <param name="row">The table row.</param>
-		/// <returns>A new instance of <typeparamref name="T"/> filled with the data from the <see cref="TableRow"/>.</returns>
-		public static T CreateInstance<T>(this TableRow row)
+		/// <returns>A new instance of <typeparamref name="T"/> filled with the data from the <see cref="DataTableRow"/>.</returns>
+		public static T CreateInstance<T>(this DataTableRow row)
 		{
 			var instanceTable = row.ToTable();
 			return instanceTable.CreateInstance<T>();
 		}
 
 		/// <summary>
-		/// Creates a new instance of <typeparamref name="T"/> from the <see cref="TableRow"/>.
+		/// Creates a new instance of <typeparamref name="T"/> from the <see cref="DataTableRow"/>.
 		/// </summary>
 		/// <typeparam name="T">The type of the instance to be created.</typeparam>
 		/// <param name="row">The table row.</param>
 		/// <param name="methodToCreateTheInstance">The method to create a new instance.</param>
-		/// <returns>A new instance of <typeparamref name="T"/> filled with the data from the <see cref="TableRow"/>.</returns>
-		public static T CreateInstance<T>(this TableRow row, Func<T> methodToCreateTheInstance)
+		/// <returns>A new instance of <typeparamref name="T"/> filled with the data from the <see cref="DataTableRow"/>.</returns>
+		public static T CreateInstance<T>(this DataTableRow row, Func<T> methodToCreateTheInstance)
 		{
 			var instanceTable = row.ToTable();
 			return instanceTable.CreateInstance(methodToCreateTheInstance);
 		}
 
-		private static Table ToTable(this TableRow row)
+		private static Table ToTable(this DataTableRow row)
 		{
 			var instanceTable = new Table("Field", "Value");
 			foreach (var kvp in row)

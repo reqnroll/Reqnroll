@@ -15,46 +15,50 @@ public class Table : Reqnroll.Table
     protected internal Table(Reqnroll.Table copyFrom) : base(copyFrom)
     {
     }
-}
 
-internal class SpecFlowTableConverter : TypeConverter
-{
-    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+    private class SpecFlowTableConverter : TypeConverter
     {
-        return typeof(Reqnroll.Table).IsAssignableFrom(sourceType);
-    }
-
-    public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
-    {
-        if (value == null) 
-            return null;
-
-        if (value is Table specFlowTable)
-            return specFlowTable;
-
-        if (value is Reqnroll.Table tableValue)
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
         {
-            return new Table(tableValue);
+            return typeof(Reqnroll.Table).IsAssignableFrom(sourceType);
         }
 
-        return base.ConvertFrom(context, culture, value);
-    }
-
-    public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
-    {
-        return destinationType == typeof(Reqnroll.Table);
-    }
-
-    public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
-    {
-        if (destinationType == typeof(Table) || value == null) 
-            return value;
-
-        if (destinationType == typeof(Reqnroll.Table) && value is Table specFlowTable)
+        public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value)
         {
-            return new Reqnroll.Table(specFlowTable);
+            if (value is Table specFlowTable)
+                return specFlowTable;
+
+            if (value is Reqnroll.Table tableValue)
+            {
+                return new Table(tableValue);
+            }
+
+            return base.ConvertFrom(context, culture, value);
         }
 
-        return base.ConvertTo(context, culture, value, destinationType);
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        {
+            return destinationType == typeof(Reqnroll.Table) || 
+                   destinationType == typeof(Reqnroll.DataTable);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType == typeof(Table) || value == null)
+                return value;
+
+            if (destinationType == typeof(Reqnroll.Table) && value is Table specFlowTable1)
+            {
+                return new Reqnroll.Table(specFlowTable1);
+            }
+
+            if (destinationType == typeof(Reqnroll.DataTable) && value is Table specFlowTable2)
+            {
+                return new Reqnroll.DataTable(specFlowTable2);
+            }
+
+            return base.ConvertTo(context, culture, value, destinationType);
+        }
     }
 }
+

@@ -1,6 +1,6 @@
 # Step Argument Conversions
 
-[Step definitions](step-definitions) can use parameters to make them reusable for similar steps. The parameters are taken from either the step's text or from the values in additional examples. These arguments are provided as either strings or `Reqnroll.Table` instances.
+[Step definitions](step-definitions) can use parameters to make them reusable for similar steps. The parameters are taken from either the step's text or from the values in additional examples. These arguments are provided as either strings or `Reqnroll.DataTable` instances.
 
 To avoid cumbersome conversions in the step binding methods, Reqnroll can perform an automatic conversion from the arguments to the parameter type in the binding method. All conversions are performed using the culture of the feature file, unless the [binding setting of the language section](../installation/configuration) is defined in your `reqnroll.json` configuration file (see [](../gherkin/feature-language)). The following conversions can be performed by Reqnroll (in the following precedence):
 
@@ -10,7 +10,7 @@ To avoid cumbersome conversions in the step binding methods, Reqnroll can perfor
 
 ## Step Argument Transformation
 
-Step argument transformations can be used to apply a custom conversion step to the arguments in step definitions. The step argument transformation is a method that converts from text (specified by a regular expression) or a `Table` instance to an arbitrary .NET type.
+Step argument transformations can be used to apply a custom conversion step to the arguments in step definitions. The step argument transformation is a method that converts from text (specified by a regular expression) or a `DataTable` instance to an arbitrary .NET type.
 
 A step argument transformation is used to convert an argument if:
 
@@ -61,7 +61,7 @@ The following example transforms a table argument into a list of `Book` entities
 public class Transforms
 {
     [StepArgumentTransformation]
-    public IEnumerable<Book> BooksTransform(Table booksTable)
+    public IEnumerable<Book> BooksTransform(DataTable booksTable)
     {
        return booksTable.CreateSet<Books>();
     }

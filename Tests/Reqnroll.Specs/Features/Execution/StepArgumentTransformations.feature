@@ -71,7 +71,7 @@ Scenario: Should be able to convert when multiple converters are returning the s
 		 public System.Collections.Generic.List<DateTime> ConvertInDays(Table table)
 		 {
 			System.Collections.Generic.List<DateTime> dates = new System.Collections.Generic.List<DateTime>();
-            foreach (TableRow row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 dates.Add(DateTime.Today.AddDays(int.Parse(row["in days"])));
             }
@@ -111,7 +111,7 @@ Scenario: Should be able to convert when multiple converters are returning the s
 		 public System.Collections.Generic.List<DateTime> ConvertInDays(Table table)
 		 {
 			System.Collections.Generic.List<DateTime> dates = new System.Collections.Generic.List<DateTime>();
-            foreach (TableRow row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 dates.Add(DateTime.Today.AddDays(int.Parse(row["in days"])));
             }

@@ -113,7 +113,7 @@ There are multiple options for step definition matching:
 
 ## Data Table or DocString Arguments
 
-If the step definition method should match for steps having [Data Table or DocString text arguments](../gherkin/gherkin-reference), additional `Table` or `string` parameters have to be defined in the method signature to be able to receive these arguments. You cannot have both of these arguments in a step definition.
+If the step definition method should match for steps having [Data Table or DocString text arguments](../gherkin/gherkin-reference), additional `DataTable` or `string` parameters have to be defined in the method signature to be able to receive these arguments. You cannot have both of these arguments in a step definition.
 
 ```{code-block} gherkin
 :caption: Feature File
@@ -133,7 +133,7 @@ Given a blog post named "Random" with Markdown body
 ```{code-block} csharp
 :caption: Step Definition File
 [Given("the following books")]
-public void GivenTheFollowingBooks(Table table)
+public void GivenTheFollowingBooks(DataTable table)
 {
   ...
 }
@@ -145,4 +145,6 @@ public void GivenABlogPostWithMarkdownBody(string postName, string bodyText)
 }
 ```
 
-
+```{note}
+For backwards compatibility with SpecFlow, you can also declare data table parameters with the `Reqnroll.Table` class. It is recommended to use the `DataTable` class whenever it is possible.
+```

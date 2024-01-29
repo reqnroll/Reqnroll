@@ -1,6 +1,6 @@
 # DataTable Helpers
 
-A number of helpers implemented as extension methods of the `Table` class make it easier to implement steps that accept a `Table` parameter. 
+A number of helpers implemented as extension methods of the `DataTable` class make it easier to implement steps that accept a `DataTable` parameter. 
 
 When  helper methods expect a generic type (usually denoted as `<T>` in the method signature), you can use:
 
@@ -10,7 +10,7 @@ When  helper methods expect a generic type (usually denoted as `<T>` in the meth
 
 ## `CreateInstance<T>`
 
-The `CreateInstance<T>` extension method of the `Table` class will convert a table in your scenario to a single instance of a class. The class used to convert the table is specified by the generic type `T` in the method signature `CreateInstance<T>`. You can use two different table layouts in your scenarios with the `CreateInstance<T>` method.
+The `CreateInstance<T>` extension method of the `DataTable` class will convert a table in your scenario to a single instance of a class. The class used to convert the table is specified by the generic type `T` in the method signature `CreateInstance<T>`. You can use two different table layouts in your scenarios with the `CreateInstance<T>` method.
 
 - **Vertical Tables**
 
@@ -76,7 +76,7 @@ The name of the class is put in place of the generic type `T` in the call to `Cr
 ```{code-block} csharp
 :caption: Step Definition File
 [Given(@"Given I entered the following data into the new account form:")]
-public void GivenIEnteredTheFollowingDataIntoTheNewAccountForm(Table table)
+public void GivenIEnteredTheFollowingDataIntoTheNewAccountForm(DataTable table)
 {
     var account = table.CreateInstance<Account>();
     //                                 ^^^^^^^
@@ -96,7 +96,7 @@ Alternatively you can use ValueTuples and destructuring:
 ```{code-block} csharp
 :caption: Step Definition File
 [Given(@"Given I entered the following data into the new account form:")]
-public void GivenIEnteredTheFollowingDataIntoTheNewAccountForm(Table table)
+public void GivenIEnteredTheFollowingDataIntoTheNewAccountForm(DataTable table)
 {
     var account = table.CreateInstance<(string name, DateTime birthDate, int heightInInches, decimal bankAccountBalance)>();
 
@@ -106,6 +106,7 @@ public void GivenIEnteredTheFollowingDataIntoTheNewAccountForm(Table table)
 }
 ```
 
+```
 **Important:** In the case of tuples, _**you need to have the same number of parameters and types; parameter names do not matter**_, as ValueTuples do not hold parameter names at runtime using reflection.
 
 **Scenarios with more than 7 properties are not currently supported when converting to ValueTuple, and you will receive an exception if you try to map more than 7 properties.**
@@ -114,7 +115,7 @@ The next section describes how to convert a horizontal table with more than one 
 
 ## `CreateSet<T>`
 
-The `CreateSet<T>` extension method of the `Table` class converts the table into an enumerable set of objects. For example, assume you have the following step:
+The `CreateSet<T>` extension method of the `DataTable` class converts the table into an enumerable set of objects. For example, assume you have the following step:
 
 ```gherkin
 Given these products exist
@@ -140,7 +141,7 @@ You can convert the table to a collection of Product objects in your step defini
 ```{code-block} csharp
 :caption: Step Definition File
 [Given(@"Given these products exist")]
-public void GivenTheseProductsExist(Table table)
+public void GivenTheseProductsExist(DataTable table)
 {
     var products = table.CreateSet<Product>();
     // ...
@@ -151,7 +152,7 @@ The `CreateSet<T>` method returns an `IEnumerable<T>` based on the matching data
 
 ## `CompareToInstance<T>`
 
-The `CompareToInstance<T>` extension method of the `Table` class makes it easy to compare the properties of an object to the table in your scenario. For example, you have a class like this:
+The `CompareToInstance<T>` extension method of the `DataTable` class makes it easy to compare the properties of an object to the table in your scenario. For example, you have a class like this:
 
 ```{code-block} csharp
 :caption: C# File
@@ -189,7 +190,7 @@ public class PersonSteps
     }
 
     [Then("the person should have the following values")]
-    public void ThenThePersonShouldHaveTheFollowingValues(Table table){
+    public void ThenThePersonShouldHaveTheFollowingValues(DataTable table){
         // you don't have to get person this way, this is just for demonstration purposes
         var person = _scenarioContext.Get<Person>();
 
@@ -204,7 +205,7 @@ If the values match, no exception is thrown, and Reqnroll continues to process y
 
 ## `CompareToSet<T>`
 
-The `CompareToSet<T>` extension method of the `Table` class works similarly to `CompareToInstance<T>`, except it compares a collection of objects. For example, you have a class like this:
+The `CompareToSet<T>` extension method of the `DataTable` class works similarly to `CompareToInstance<T>`, except it compares a collection of objects. For example, you have a class like this:
 
 ```{code-block} csharp
 :caption: C# File
@@ -243,7 +244,7 @@ public class AccountSteps
     }
 
     [Then("I get back the following accounts")]
-    public void ThenIGetBackTheFollowingAccounts(Table table)
+    public void ThenIGetBackTheFollowingAccounts(DataTable table)
     {
         // (or get the accounts from the database or web service)
         var accounts = _scenarioContext.Get<IEnumerable<Account>>();
@@ -376,7 +377,7 @@ public static class Hooks1
 ### `NullValueRetriever`
 
 ```{note}
-If you are not looking to transform data from `Table` objects, but rather looking to transform values in your step definitions, you'll likely want to look at [Step Argument Conversions](step-argument-conversions) instead.
+If you are not looking to transform data from `DataTable` objects, but rather looking to transform values in your step definitions, you'll likely want to look at [Step Argument Conversions](step-argument-conversions) instead.
 ```
 
 By default, non-specified (empty string) values are considered:
@@ -466,7 +467,7 @@ public class MusicCollectionSteps
     }
 
     [When(@"I have a music collection")]
-    public void WhenIHaveAMusicCollection(Table table)
+    public void WhenIHaveAMusicCollection(DataTable table)
     {
         var collection = table.CreateSet<Item>();
 
@@ -474,7 +475,7 @@ public class MusicCollectionSteps
     }
 
     [Then(@"it should match")]
-    public void ThenItShouldMatch(Table table)
+    public void ThenItShouldMatch(DataTable table)
     {
         var collection = _scenarioContext["Collection"] as IEnumerable<Item>;
     
@@ -482,7 +483,7 @@ public class MusicCollectionSteps
     }
 
     [Then(@"it should exactly match")]
-    public void ThenItShouldExactlyMatch(Table table)
+    public void ThenItShouldExactlyMatch(DataTable table)
     {
         var collection = _scenarioContext["Collection"] as IEnumerable<Item>;
 
@@ -490,7 +491,7 @@ public class MusicCollectionSteps
     }
 
     [Then(@"it should not match")]
-    public void ThenItShouldNotMatch(Table table)
+    public void ThenItShouldNotMatch(DataTable table)
     {
         var collection = _scenarioContext["Collection"] as IEnumerable<Item>;
     
@@ -498,7 +499,7 @@ public class MusicCollectionSteps
     }
 
     [Then(@"it should not exactly match")]
-    public void ThenItShouldNotExactlyMatch(Table table)
+    public void ThenItShouldNotExactlyMatch(DataTable table)
     {
         var collection = _scenarioContext["Collection"] as IEnumerable<Item>;
     
@@ -546,7 +547,7 @@ public class MusicCollectionSteps
     }
 
     [Then(@"it should contain all items")]
-    public void ThenItShouldContainAllItems(Table table)
+    public void ThenItShouldContainAllItems(DataTable table)
     {
         var collection = _scenarioContext["Collection"] as IEnumerable<Item>;
     
@@ -554,7 +555,7 @@ public class MusicCollectionSteps
     }
 
     [Then(@"it should not contain all items")]
-    public void ThenItShouldNotContainAllItems(Table table)
+    public void ThenItShouldNotContainAllItems(DataTable table)
     {
         var collection = _scenarioContext["Collection"] as IEnumerable<Item>;
     
@@ -562,7 +563,7 @@ public class MusicCollectionSteps
     }
 
     [Then(@"it should not contain any of items")]
-    public void ThenItShouldNotContainAnyOfItems(Table table)
+    public void ThenItShouldNotContainAnyOfItems(DataTable table)
     {
         var collection = _scenarioContext["Collection"] as IEnumerable<Item>;
     
@@ -602,26 +603,26 @@ table.ToProjectionOfSet(collection);
 table.ToProjectionOfInstance(instance);
 ```
 
-Here are the definitions of Reqnroll Table extensions methods that convert tables and collections of IEnumerables to EnumerableProjection:
+Here are the definitions of Reqnroll DataTable extensions methods that convert tables and collections of IEnumerables to EnumerableProjection:
 
 ```{code-block} csharp
 :caption: C# File
-public static IEnumerable<Projection<T>> ToProjection<T>(this IEnumerable<T> collection, Table table = null)
+public static IEnumerable<Projection<T>> ToProjection<T>(this IEnumerable<T> collection, DataTable table = null)
 {
     return new EnumerableProjection<T>(table, collection);
 }
 
-public static IEnumerable<Projection<T>> ToProjection<T>(this Table table)
+public static IEnumerable<Projection<T>> ToProjection<T>(this DataTable table)
 {
     return new EnumerableProjection<T>(table);
 }
 
-public static IEnumerable<Projection<T>> ToProjectionOfSet<T>(this Table table, IEnumerable<T> collection)
+public static IEnumerable<Projection<T>> ToProjectionOfSet<T>(this DataTable table, IEnumerable<T> collection)
 {
     return new EnumerableProjection<T>(table);
 }
 
-public static IEnumerable<Projection<T>> ToProjectionOfInstance<T>(this Table table, T instance)
+public static IEnumerable<Projection<T>> ToProjectionOfInstance<T>(this DataTable table, T instance)
 {
     return new EnumerableProjection<T>(table);
 }
