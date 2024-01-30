@@ -1,0 +1,23 @@
+---
+name: Documentation request
+description: Suggest an improvement to the documentation
+labels: [documentation]
+body:
+- type: input
+  attributes:
+    label: Related Documentation Page
+- type: dropdown
+  attributes:
+    label: Type of the problem
+    options: 
+      - Incorrect information 
+      - Missing information
+      - Typo, language or grammar error
+      - Broken link or display
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: Problem Description
+  validations:
+    required: true

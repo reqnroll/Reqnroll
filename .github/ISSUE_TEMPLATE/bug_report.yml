@@ -1,7 +1,7 @@
 ---
 name: Bug report
 description: Create a report to help us improve Reqnroll
-labels: [Bug]
+labels: [bug]
 body:
 - type: input
   attributes:
@@ -12,7 +12,6 @@ body:
   attributes:
     label: Which test runner are you using?
     options: 
-      - SpecFlow+ Runner
       - MSTest 
       - NUnit
       - xUnit
@@ -27,32 +26,12 @@ body:
   attributes:
     label: .NET Implementation
     options:
+      - .NET 8.0
+      - .NET 7.0
       - .NET 6.0
       - .NET 5.0
       - .NET Core 3.1
-      - .NET Core 3.0
-      - .NET Core 2.2
-      - .NET Core 2.1
-      - .NET Core 2.0
-      - equal or greater .NET Framework 4.6.1
-      - before .NET Framework 4.6.1
-  validations:
-    required: true
-- type: dropdown 
-  attributes:
-    label: Project Format of the Reqnroll project
-    options:
-      - Sdk-style project format
-      - Classic project format using `packages.config`
-      - Classic project format using `<PackageReference>` tags
-  validations:
-    required: true
-- type: dropdown 
-  attributes:
-    label: .feature.cs files are generated using
-    options:
-      - Reqnroll.Tools.MsBuild.Generation NuGet package
-      - ReqnrollSingleFileGenerator custom tool
+      - .NET Framework 4.6.2 or later
   validations:
     required: true
 - type: dropdown
@@ -60,17 +39,21 @@ body:
     label: Test Execution Method
     options:
       - Visual Studio Test Explorer
-      - TFS/VSTS/Azure DevOps – Task – PLEASE SPECIFY THE NAME OF THE TASK
+      - ReSharper Test Runner
+      - Azure DevOps Pipeline Task – PLEASE SPECIFY THE NAME OF THE TASK
+      - Other build server task – PLEASE SPECIFY THE NAME OF THE BUILD SERVER AND TASK
       - Command line – PLEASE SPECIFY THE FULL COMMAND LINE
+      - Other – PLEASE SPECIFY
   validations:
     required: true
 - type: textarea
   attributes:
-    label: Reqnroll Section in app.config or content of reqnroll.json
-    placeholder: PLEASE COPY THE ENTIRE <Reqnroll> SECTION IN YOUR .config FILE or THE ENTIRE reqnroll.json
+    label: Content of reqnroll.json configuration file
+    placeholder: PLEASE COPY THE ENTIRE reqnroll.json
 - type: textarea
   attributes:
     label: Issue Description
+    placeholder: For ideas, feature requests and questions, please use our discussion board at https://github.com/reqnroll/Reqnroll/discussions/
   validations:
     required: true
 - type: textarea
