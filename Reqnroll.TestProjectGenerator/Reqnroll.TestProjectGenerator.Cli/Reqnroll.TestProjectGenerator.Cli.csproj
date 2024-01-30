@@ -9,7 +9,7 @@
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <Description>Command line tool to generate Reqnroll test projects for manual/smoke testing of Reqnroll.</Description>
-    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageIcon>logo.png</PackageIcon>
   </PropertyGroup>
 

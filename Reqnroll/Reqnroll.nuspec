@@ -12,7 +12,7 @@
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <icon>images\reqnroll-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="file">LICENSE.txt</license>
+    <license type="file">LICENSE</license>
     <tags>reqnroll bdd gherkin cucumber</tags>
     <copyright>$copyright$</copyright>
     <dependencies>
@@ -51,7 +51,7 @@
     <file src="$SolutionDir$\Licenses\*" target="Licenses" />
     <file src="$SolutionDir$\*.txt" target="" />
 
-    <file src="$SolutionDir$LICENSE.txt" target="LICENSE.txt" />
+    <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
 
   </files>

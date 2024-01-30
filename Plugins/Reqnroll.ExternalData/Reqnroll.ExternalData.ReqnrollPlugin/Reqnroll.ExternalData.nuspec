@@ -11,7 +11,7 @@
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <icon>images\reqnroll-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="file">LICENSE.txt</license>
+    <license type="file">LICENSE</license>
     <tags>reqnroll externaldata json</tags>
     <copyright>$copyright$</copyright>
     <dependencies>
@@ -25,7 +25,7 @@
 
     <file src="bin\$config$\netcoreapp3.1\*" target="build\netcoreapp3.1"/>
 
-    <file src="$SolutionDir$LICENSE.txt" target="LICENSE.txt" />
+    <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
   </files>
 </package>
