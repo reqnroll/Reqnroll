@@ -1,4 +1,4 @@
-# Quickstart
+ # Quickstart
 
 This guide gives a quick introduction to Reqnroll.
 
@@ -17,12 +17,12 @@ We prepared a simple starting point for this tutorial that you can find on GitHu
 Open the solution file (`ReqnrollQuickstart.sln`) in Visual Studio 2022 and let's have a look at the content:
 
 * The solution contains two projects: `ReqnrollQuickstart.App` is our application that we build, `ReqnrollQuickstart.Specs` contains the automated specification for it, so basically the Reqnroll acceptance tests. We will refer to this as Reqnroll project in this guide.
-* The application contains one important class for now, the `PriceCalculator`, that is a very simple class, with an unfinished method for calculating the price.
+* The application contains one important class for now, the `PriceCalculator`, this is a very simple class, with an unfinished method for calculating the price.
 * The Reqnroll project has a single specification file (called [feature file](../gherkin/feature-files)), the `PriceCalculation.feature` in the `Features` folder, with our first scenario for the pricing module.
 
 The Reqnroll project has been configured for using Reqnroll with MsTest. You can check the [](../installation/setup-project.md) guide for more details about the installation and setup options.
 
-Make sure you build your solution otherwise the feature file editor might behave incorrectly in Visual Studio.
+Make sure you build your solution, otherwise the feature file editor might behave incorrectly in Visual Studio.
 
 Once you have done this, you should see these files. 
 
@@ -50,7 +50,7 @@ public class PriceCalculator
 :caption: PriceCalculation.feature
 Feature: Price calculation
 
-This feature is about calculating the basket price
+This feature is about calculating the basket price.
 
 We work with fixed item prices for now:
 * Electric guitar: $180
@@ -71,7 +71,7 @@ Run the tests from the Reqnroll project by opening the *Test Explorer* window (u
 
 The test execution reports a so called "undefined" state for our scenario. That means that Reqnroll has detected the scenario, but we did not *define* how the scenario steps should be automated. We will do this now.
 
-In order to define the steps, we need to create a *step definition class*. This can be done be copying out the code snippet from the test result output, but with Visual Studio we can also use the *Define Steps* dialog. That you can access by invoking the "Define Steps..." command from the feature file editor context menu or with the *Ctrl+B, D* keyboard shortcut from the editor.
+In order to define the steps, we need to create a *step definition class*. This can be done be copying the code snippet from the test result output, but with Visual Studio we can also use the *Define Steps* dialog. You can access it by invoking the "Define Steps..." command from the feature file editor context menu or with the *Ctrl+B, D* keyboard shortcut from the editor.
 
 ## Generate step definition snippets
 
@@ -122,7 +122,7 @@ public class PriceCalculationStepDefinitions
 As you can see, each step in our scenario has a corresponding method, called a *step definition method*. These are currently unfinished, but guide us to provide the necessary automation code to verify our application. You can find more information about step definitions in the [](../automation/step-definitions.md) guide.
 
 ```{note}
-After adding step definitions or changing their expressions you have to build the project in Visual Studio so that the changes are shown in the feature file editor.
+After adding step definitions or changing their expressions, you have to build the project in Visual Studio, so that the changes are shown in the feature file editor.
 ```
 
 ## Prepare fields for the step definitions
@@ -148,7 +148,7 @@ public class PriceCalculationStepDefinitions
 These fields will be used for different purposes:
 
 * The field `_priceCalculator` contains the module class that we would like to test.
-* The `_basket` field will be used to collect the items the client puts to the basket is a pair of product and quantity.
+* The `_basket` field will be used to collect the item/s the client puts in the basket, an item is a pair of product and quantity.
 * The `_calculatedPrice` field will contain the price calculated by the application, so that we can make assertions for it.
 
 These fields will provide data (or with other word *state*) for the step definitions. For now, all our step definition methods were in the same class, therefore declaring them as simple class-level fields was enough. For learning more about sharing data between step definition methods please check the [](../automation/sharing-data-between-bindings.md) guide.
@@ -291,7 +291,7 @@ Scenario: Client has multiple items in their basket
     Then the basket price should be $195.0
 ```
 
-Visual Studio shows most of the steps of the new scenario with default font color, except the "And the client added" step. This is because all other steps have been already used in our other scenario as well so we can automatically reuse the automation we provided for them. Great! But the "And the client added" step is still *undefined*. This is a special step as it contains an attached tabular parameter with the products and the quantities to be added to the basket. This parameter is called *Data Table* in Gherkin and you can read more about it in the [](../gherkin/gherkin-reference.md#data-tables) section of our Gherkin page.
+Visual Studio shows most of the steps of the new scenario with default font color, except the "And the client added" step. This is because all other steps have been already used in our other scenario as well, so we can automatically reuse the automation we provided for them. Great! But the "And the client added" step is still *undefined*. This is a special step as it contains an attached tabular parameter with the products and the quantities to be added to the basket. This parameter is called *Data Table* in Gherkin and you can read more about it in the [](../gherkin/gherkin-reference.md#data-tables) section of our Gherkin page.
 
 ```{tip}
 You can easily find the step definition method of a *defined* step by invoking the *Go To Definition* command from the context menu of the step. And once you are at the step definition, the *Find Step Definition Usages* command shows where it was used.
@@ -365,7 +365,7 @@ public class PriceCalculationStepDefinitions
 }
 ```
 
-Let's run the tests now. As we expected, the first scenario still passes but the new one fails, because our basic implementation of the calculator does not support this case yet.
+Let's run the tests now. As we expected, the first scenario still passes, but the new one fails, because our basic implementation of the calculator does not support this case yet.
 
 ```{code-block} text
 :caption: Test Output
@@ -393,7 +393,7 @@ public class PriceCalculator
 }
 ```
 
-Now both of our test pass!
+Now both of our tests pass!
 
 ## Next Steps
 
@@ -406,6 +406,6 @@ If you need inspirations how to extend the solution, here are a few ideas:
 * Consider introducing a `Currency` class and create a argument transformation that recognizes currencies like `$195.0` and converts them to a currency value. You can find more about step argument transformations in [](../automation/step-argument-conversions.md).
 * You can replace the hard-coded product prices with "Given" steps that describe the available products and their prices. You can also use the [](../gherkin/gherkin-reference.md#background) section for that.
 * You can consider implementing a new rule that provides 10% discount when the basket value is over $200. Separate their scenarios with the [Rule keyword](../gherkin/gherkin-reference.md#rule).
-* If you are really adventurous, you can turn the app into a backed service that provides the price calculation as a REST HTTP service. In that case that step definitions can make HTTP requests to test the service. In that case you can use the `BeforeScenario` and `AfterScenario` [hooks](../automation/hooks) to start and stop the application.
+* If you are really adventureous, you can turn the app into a backed service that provides the price calculation as a REST HTTP service. In this case that step definitions can make HTTP requests to test the service. In that case you can use the `BeforeScenario` and `AfterScenario` [hooks](../automation/hooks) to start and stop the application.
 
 Share your results at our [Reqnroll discussion topic](https://github.com/reqnroll/Reqnroll/discussions/6)!

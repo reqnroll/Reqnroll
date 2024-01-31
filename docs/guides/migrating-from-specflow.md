@@ -1,33 +1,33 @@
 # Migrating from SpecFlow
 
-Reqnroll has been created based on the open-source codebase of SpecFlow therefore it provides a high level of compatibility with SpecFlow. We can generally say that everything that worked with SpecFlow also works with Reqnroll, but some names and the namespaces have been modified. 
+Reqnroll has been created based on the open-source codebase of SpecFlow, therefore it provides a high level of compatibility with SpecFlow. We can generally say that everything that has worked with SpecFlow also works with Reqnroll, but some names and the namespaces have been modified. 
 
 The key differences between SpecFlow and Reqnroll are the following:
 
 * All packages have been renamed from `SpecFlow.*` to `Reqnroll.*`. E.g. `Reqnroll.MsTest`.
 * The namespace of the classes has been changed from `TechTalk.SpecFlow` to `Reqnroll` and some classes that had SpecFlow in their name (e.g. `ISpecFlowOutputHelper`) have been renamed accordingly. An optional *SpecFlow Compatibility Package* has been created to migrate without changing all namespaces, see below.
 * There is a new `DataTable` alias for the `Table` class to better match Gherkin terminology. The `Table` class can still be used.
-* The main extension methods of the *Assist helpers* have been moved to the `Reqnroll` namespace so that they can be used without an additional namespace using statement. The helpers are now referred as [](../automation/datatable-helpers.md).
+* The main extension methods of the *Assist helpers* have been moved to the `Reqnroll` namespace, so that they can be used without an additional namespace using statement. The helpers are now referred to as [](../automation/datatable-helpers.md).
 * The [Reqnroll Visual Studio extension](../installation/setup-ide.md#setup-vs) has been reworked in a way that it can handle both SpecFlow and Reqnroll projects (also for .NET 8.0).
 * The integration plugins that have been managed by SpecFlow have been also ported to work with Reqnroll (e.g. `Reqnroll.Autofac`). See [](../integrations/available-plugins.md).
 
-This article provides you step-by-step guidance to migrate SpecFlow projects to Reqnroll. There are two migration paths that you can choose from:
+This article provides you a step-by-step guidance to migrate SpecFlow projects to Reqnroll. There are two migration paths you can choose from:
 
 1. [](#specflow-compatibility-package): requires minimal change in the codebase.
 2. [](#with-namespace-changes): requires simple changes, mostly doable with search-and-replace.
 
-It is also worth mentioning that Reqnroll is based on the SpecFlow v4 codebase, so if you migrate from SpecFlow v3 you should also consider the [](#breaking-changes-specflow-v3) section as well.
+It is also worth mentioning that Reqnroll is based on the SpecFlow v4 codebase, so if you migrate from SpecFlow v3, you should consider the [](#breaking-changes-specflow-v3) section as well.
 
 {#specflow-compatibility-package}
 ## Migrate with the Reqnroll SpecFlow Compatibility Package
 
-Reqnroll contains a *SpecFlow Compatibility Package* ([`Reqnroll.SpecFlowCompatibility`](https://www.nuget.org/packages/Reqnroll.SpecFlowCompatibility)) that allows using the Reqnroll classes using the SpecFlow namespace (`TechTalk.SpecFlow`). This allows a quick migration of SpecFlow project that requires minimal code changes. The migrated project can later incrementally transformed to use the Reqnroll namespaces.
+Reqnroll contains a *SpecFlow Compatibility Package* ([`Reqnroll.SpecFlowCompatibility`](https://www.nuget.org/packages/Reqnroll.SpecFlowCompatibility)) that allows to use the Reqnroll classes using the SpecFlow namespace (`TechTalk.SpecFlow`). This allows a quick migration of SpecFlow project that requires minimal code changes. Later the migrated project can be incrementally transformed to use the Reqnroll namespaces.
 
 In order to migrate a SpecFlow project using the SpecFlow compatibility package, you need to perform the following steps.
 
 ### Step 1 - Change NuGet packages
 
-You need to remove the SpecFlow NuGet package references from the project and replace them with the Reqnroll ones. This can be done using the Visual Studio NuGet package manager or by modifying the project file in an editor.
+You need to remove the SpecFlow NuGet package references from the project and replace them with the Reqnroll ones. This can be done with the Visual Studio NuGet package manager or by modifying the project file in an editor.
 
 * Packages to be removed: 
   * any package where the name starts with SpecFlow, e.g. `SpecFlow` or `SpecFlow.MsTest`
@@ -68,9 +68,9 @@ For most of the SpecFlow projects this is the only change you need to do and you
 
 Build the project with the changed package references. If the project builds successfully, you can move on to the next step.
 
-If you see build errors, they might be belong to one of the following categories.
+If you see build errors, they might belong to one of the following categories.
 
-1. If the C# compiler complains of a missing `TechTalk.SpecFlow.<component>` namespace or a missing class, that means that the code used some infrastructural elements of SpecFlow. For these files, simply add a namespace using for the related Reqnroll namespace: `using Reqnroll.<component>`. This might happen for special hook classes or step argument transformations.
+1. If the C# compiler complains of a missing `TechTalk.SpecFlow.<component>` namespace or a missing class, it means that the code has used some infrastructural elements of SpecFlow. For these files, simply add a namespace using for the related Reqnroll namespace: `using Reqnroll.<component>`. This might happen for special hook classes or step argument transformations.
 2. Any other compilation error might be caused by the breaking changes between SpecFlow v3 and v4. Please check the section [](#breaking-changes-specflow-v3) below for the fixes.
 
 After fixing these issues, your project should compile successfully. 
@@ -102,14 +102,14 @@ If you have used the legacy `App.config` file to configure SpecFlow, your config
 
 Now it is time to run your tests. If the tests were passing before, they should be still passing, there is no reported compatibility issue.
 
-If you run into any problems that might be caused by the breaking changes between SpecFlow v3 and v4. Please check the section [](#breaking-changes-specflow-v3) below for the fixes.
+If you run into any problems, it might be caused by the breaking changes between SpecFlow v3 and v4. Please check the section [](#breaking-changes-specflow-v3) below for the fixes.
 
 **Congratulations you are done!**
 
 {#with-namespace-changes}
 ## Migrate with namespace changes
 
-Thanks to the high level of compatibility, it is also easy to perform a full migration from SpecFlow projects that requires simple changes, mostly doable with search-and-replace.
+Thanks to the high level of compatibility, it is also easy to perform a full migration from SpecFlow projects that requires simple changes, it is mostly doable with search-and-replace.
 
 In order to migrate a SpecFlow project, you need to perform the following steps.
 
@@ -159,7 +159,7 @@ This will replace the namespace in namespace usings (e.g. `using TechTalk.SpecFl
 
 Build the project with the changed package references. If the project builds successfully, you can move on to the next step.
 
-If you see build errors, they might be belong to one of the following categories.
+If you see build errors, they might belong to one of the following categories.
 
 1. You might have used a SpecFlow class that had SpecFlow in the name. The most common example is `ISpecFlowOutputHelper`. Replace these accordingly (e.g. `IReqnrollOutputHelper`). If you use them extensively, you can also use a "replace in all files" function.
 2. Any other compilation error might be caused by the breaking changes between SpecFlow v3 and v4. Please check the section [](#breaking-changes-specflow-v3) below for the fixes.
@@ -170,7 +170,7 @@ After fixing these issues, your project should compile successfully.
 
 If you have not used custom SpecFlow configuration, you can move on to the next step.
 
-Reqnroll uses a JSON configuration file named `reqnroll.json`. The format is compatible with the `specflow.json` configuration file format, so the migration is simple, you just need to rename the file to `reqnroll.json`. It is recommended to set the JSON schema reference, so that your editor offers completion for the settings. The official schema reference is `https://schemas.reqnroll.net/reqnroll-config-latest.json`, that you can use like the example shows below.
+Reqnroll uses a JSON configuration file named `reqnroll.json`. The format is compatible with the `specflow.json` configuration file format, so the migration is simple, you just need to rename the file to `reqnroll.json`. It is recommended to set the JSON schema reference, so that your editor offers completion for the settings. The official schema reference is `https://schemas.reqnroll.net/reqnroll-config-latest.json`, which you can use like the example shows below.
 
 ```{code-block} json
 :caption: reqnroll.json
@@ -207,11 +207,11 @@ If you run into any problems that might be caused by the breaking changes betwee
 {#breaking-changes-specflow-v3}
 ## Breaking changes since SpecFlow v3
 
-As Reqnroll is based on SpecFlow v4, if you migrate from SpecFlow v3 you might encounter problems that are caused by the breaking changes between SpecFlow v3 and v4. The following list contains the most important breaking changes and the suggestions to resolve them.
+As Reqnroll is based on SpecFlow v4, if you migrate from SpecFlow v3, you might encounter problems that are caused by the breaking changes between SpecFlow v3 and v4. The following list contains the most important breaking changes and the suggestions to resolve them.
 
 ### Cucumber Expressions support, compatibility of existing expressions
 
-Reqnroll supports [Cucumber Expressions](../automation/cucumber-expressions) natively for [step definitions](../automation/step-definitions). This means that whenever you define a step using the `[Given]`, `[When]` or `[Then]` attribute you can either provide a regular expression for it as a parameter or a cucumber expression.
+Reqnroll supports [Cucumber Expressions](../automation/cucumber-expressions) natively for [step definitions](../automation/step-definitions). This means that whenever you define a step using the `[Given]`, `[When]` or `[Then]` attribute, you can either provide a regular expression for it as a parameter or a cucumber expression.
 
 Most of your existing regex step definitions will be compatible, because they are either properly recognized as regex or the expression works the same way with both expression types (e.g. simple text without parameters). 
 
@@ -221,7 +221,7 @@ In case your regular expression is wrongly detected as cucumber expression, you 
 [When(@"^this expression is treated as a regex$")]
 ```
 
-There are a few special cases listed below
+There are a few special cases listed below.
 
 #### Invalid expressions after upgrade
 
@@ -251,9 +251,9 @@ In this case the problem is that Reqnroll wrongly identified your expression as 
 
 #### Expression matching problems during test execution
 
-In some very special cases it can happen that the expression is wrongly identified as cucumber expression but you only get the step binding error during test execution (usually `No matching step definition found` error), because the expression is valid as regex and as cucumber expression as well, but with different meaning. 
+In some very special cases it can happen that the expression is wrongly identified as cucumber expression, but you only get the step binding error during test execution (usually `No matching step definition found` error), because the expression is valid as regex and as cucumber expression as well, but with different meaning. 
 
-For example if you had a step definition that matches the step `When I a/b something`, that will be considered as a cucumber expression, but in cucumber expressions, the `/` is used for alternation (so it matches to either `When I a something` or `When I b something`).
+For example if you had a step definition that matches the step `When I a/b something`, it will be considered as a cucumber expression, but in cucumber expressions, the `/` is used for alternation (so it matches either `When I a something` or `When I b something`).
 
 ```
 [When(@"I a/b something")]
@@ -283,7 +283,7 @@ public void WhenIHaveCucumbersInMyBelly(int p0)
 ...
 ```
 
-If you would like to use only regular expressions in your project you either have to manually fix the expression, or you can configure Reqnroll to generate skeletons with regular expressions. This you can achieve with the following setting in the `reqnroll.json` file:
+If you would like to use only regular expressions in your project, you either have to fix the expression manually, or you can configure Reqnroll to generate skeletons with regular expressions. You can achieve this with the following setting in the `reqnroll.json` file:
 
 ```{code-block} json
 :caption: reqnroll.json
@@ -318,11 +318,10 @@ public class CallingStepsFromStepDefinitionSteps : Steps
     Given(string.Format("the user {0} exists", name));
     Given(string.Format("I log in as {0}", name));
   }
-}
 ```
 
-This is not anymore possible as the methods are now removed.
+This is not possible anymore, as the methods are now removed.
 
-If you are using this feature, you have two options:
+If you use this feature, you have two options:
 - refactor to the [Driver Pattern](../guides/driver-pattern.md)
 - call the methods directly

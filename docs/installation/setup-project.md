@@ -1,11 +1,11 @@
 # Setup Reqnroll Project
 
-This page guides you through setting up your Reqnroll project. It is also recommended to configure your Integrated Development Environment (IDE, e.g. Visual Studio 2022) to work conveniently with Reqnroll. For setting up your IDE please follow the [](setup-ide) guide first.
+This page guides you through setting up your Reqnroll project. It is also recommended to configure your Integrated Development Environment (IDE, e.g. Visual Studio 2022) to work conveniently with Reqnroll. To set up your IDE, please follow the [](setup-ide) guide first.
 
 {#choosing-your-test-execution-framework}
 ## Choosing your test execution framework
 
-Reqnroll uses *test execution frameworks* (MsTest, NUnit or xUnit) to run the tests. So first of all, you need to decide on which one you would like to use. Reqnroll does not have a favorite one, so you should better chose the one you have the most experience with. If you don't have any preference, choose NUnit. The following table gives you a quick comparison of the different supported execution frameworks.
+Reqnroll uses *test execution frameworks* (MsTest, NUnit or xUnit) to run the tests. So first of all, you need to decide, which one you would like to use. Reqnroll does not have a favorite one, so you should better choose the one you have the most experience with. If you don't have any preference, choose NUnit. The following table gives you a quick comparison of the different supported execution frameworks.
 
 ```{list-table}
 :header-rows: 1
@@ -26,7 +26,7 @@ Reqnroll uses *test execution frameworks* (MsTest, NUnit or xUnit) to run the te
 
 ```{note}
 
-If you change your mind and would like to switch to another test execution framework, check out the [](../guides/how-to-change-test-execution-framework) guide. Using independent assertion frameworks, like [Fluent Assertions](https://fluentassertions.com/) makes the change much easier.
+If you changed your mind and you would like to switch to another test execution framework, check out the [](../guides/how-to-change-test-execution-framework) guide. Using independent assertion frameworks, like [Fluent Assertions](https://fluentassertions.com/) makes the change much easier.
 ```
 
 ## Setting up a Reqnroll project
@@ -49,7 +49,7 @@ If you have installed the [](../ide-integrations/visual-studio/index), you can e
 3. Choose *Reqnroll Project" from the list and click on *Next* button.
 4. Follow the wizard by choosing the name, the target framework and the test framework for the project.
 
-As a result a new Reqnroll project is created with a sample [feature file](../gherkin/feature-files) and [step definition class](../automation/step-definitions).
+As a result, a new Reqnroll project is created with a sample [feature file](../gherkin/feature-files) and [step definition class](../automation/step-definitions).
 
 Build your project and [execute the sample scenarios](../execution/executing-reqnroll-scenarios.md#executing-scenarios-from-visual-studio).
 
@@ -58,21 +58,21 @@ Build your project and [execute the sample scenarios](../execution/executing-req
 
 Reqnroll projects can also be installed using the .NET template infrastructure and the `dotnet new` command.
 
-First you need to make sure that the Reqnroll templates are installed to your computer by running the `dotnet new install Reqnroll.Templates.DotNet`:
+First, you need to make sure that the Reqnroll templates are installed on your computer by running the `dotnet new install Reqnroll.Templates.DotNet`:
 
 ```{code-block} pwsh
 :caption: .NET CLI
 dotnet new install Reqnroll.Templates.DotNet
 ```
 
-Once the templates are installed, you can create a new project using the `dotnet new reqnroll-project` command in a new directory.
+Once the templates have been installed, you can create a new project using the `dotnet new reqnroll-project` command in a new directory.
 
 ```{code-block} pwsh
 :caption: Terminal
 > mkdir MyReqnrollProject
 > cd MyReqnrollProject
 > dotnet new reqnroll-project
-The template "Reqnroll Project Template" was created successfully.
+The template "Reqnroll Project Template" has been created successfully.
 ```
 
 This command creates a Reqnroll project with NUnit for the latest .NET framework. In order to use other test execution framework or .NET version, you can use the `-t` and the `-f` option. For the possible values and all options, you can invoke `dotnet new reqnroll-project --help`.
@@ -89,7 +89,7 @@ The following command creates a Reqnroll project with MsTest using .NET 6.0
 dotnet new reqnroll-project -t mstest -f net6.0
 ```
 
-As a result a new Reqnroll project is created with a sample [feature file](../gherkin/feature-files) and [step definition class](../automation/step-definitions).
+As a result, a new Reqnroll project is created with a sample [feature file](../gherkin/feature-files) and [step definition class](../automation/step-definitions).
 
 You can go ahead and [execute the sample scenarios](../execution/executing-reqnroll-scenarios.md#executing-scenarios-from-console) from console.
 
@@ -103,7 +103,7 @@ dotnet new reqnroll-feature -n MyFeature
 {#setup-existing-project}
 ### Setup an existing test project
 
-Reqnroll can also be configured for an existing [test project](https://learn.microsoft.com/en-us/visualstudio/test/create-a-unit-test-project?view=vs-2022). For that you need to add the NuGet package of your chosen test execution framework to your project. (Check the NuGet package names [above](#choosing-your-test-execution-framework)). The chosen test execution framework has to match of the framework used in your existing test project.
+Reqnroll can also be configured for an existing [test project](https://learn.microsoft.com/en-us/visualstudio/test/create-a-unit-test-project?view=vs-2022). For that you need to add the NuGet package of your chosen test execution framework to your project. (Check the NuGet package names [above](#choosing-your-test-execution-framework)). The chosen test execution framework has to match the framework used in your existing test project.
 
 The following example adds the Reqnroll NuGet package for an MsTest project.
 
@@ -112,4 +112,4 @@ The following example adds the Reqnroll NuGet package for an MsTest project.
 dotnet add package Reqnroll.MsTest
 ```
 
-Although the Reqnroll tests can be mixed with normal unit tests in the same .NET project, for clarity it is recommended to create a separate project for your Reqnroll BDD scenarios.
+Although the Reqnroll tests can be mixed with normal unit tests in the same .NET project, for the sake of clarity it is recommended to create a separate project for your Reqnroll BDD scenarios.

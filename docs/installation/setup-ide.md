@@ -24,12 +24,12 @@ This guide describes the setup steps for the following IDEs:
 In order to use Reqnroll with Visual Studio 2022, you need to install the [Reqnroll for Visual Studio 2022](https://go.reqnroll.net/vs2022-extension) extension.
 
 ```{warning}
-The *Reqnroll with Visual Studio 2022* extension cannot work together with the *SpecFlow for Visual Studio 2022* extension as they both process feature files. As the Reqnroll extension also supports SpecFlow projects, you can remove the SpecFlow extension if you install the Reqnroll extension. Alternatively you can disable the SpecFlow extension for the time you work with Reqnroll. 
+The *Reqnroll with Visual Studio 2022* extension cannot work together with the *SpecFlow for Visual Studio 2022* extension, as they both process feature files. As the Reqnroll extension also supports SpecFlow projects, you can remove the SpecFlow extension if you install the Reqnroll extension. Alternatively, you can disable the SpecFlow extension for the time you work with Reqnroll. 
 ```
 
 1. Open Visual Studio 2022
 2. From the *Extensions* menu, choose the *Manage Extensions...* command.
-3. On the dialog, make sure that the *Online* is selected from the list on the left and type `Reqnroll` to the *Search* text box on the right top corner.
+3. On the dialog, make sure that *Online* is selected from the list on the left and type `Reqnroll` to the *Search* text box on the right top corner.
 4. Choose the *Reqnroll for Visual Studio 2022* from the list and click on the *Download* button.
 5. Restart Visual Studio 2022.
 
@@ -74,7 +74,7 @@ The following Visual Studio configuration shows a typical configuration.
 ```{admonition} Rider plugin is not available yet
 :class: error
 
-The Reqnroll Rider plugin has not yet ported and released. Please come back later or help contributing to it in out [open-source GitHub project](https://github.com/reqnroll/Reqnroll.Rider).
+The Reqnroll Rider plugin has not yet been ported and released. Please, come back later or help contribute to it in our [open-source GitHub project](https://github.com/reqnroll/Reqnroll.Rider).
 
 We recommend using the Visual Studio 2022 or the Visual Studio Code integration until the plugin will be ready. The SpecFlow Rider plugin can also be used with limited capabilities.
 ```
@@ -84,5 +84,5 @@ We recommend using the Visual Studio 2022 or the Visual Studio Code integration 
 ```{admonition} Documentation is in progress
 :class: warning
 
-This documentation page is in progress. Please come back later or help contributing to it in out [open-source GitHub project](https://github.com/reqnroll/Reqnroll).
+This documentation page is in progress. Please, come back later or help contribute to it in our [open-source GitHub project](https://github.com/reqnroll/Reqnroll).
 ```
