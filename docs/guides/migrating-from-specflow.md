@@ -325,3 +325,29 @@ This is not possible anymore, as the methods are now removed.
 If you use this feature, you have two options:
 - refactor to the [Driver Pattern](../guides/driver-pattern.md)
 - call the methods directly
+
+### Complete changelog of SpecFlow v4
+
+Breaking Changes:
+
+* Removed the ability to call steps from steps via string
+* Removed .NET Core 2.1 support (min .NET Core version: 3.1)
+* Removed .NET Framework 4.6.1 support (min .NET Framework version: 4.6.2)
+* Bindings declared as `async void` are not allowed. Use `async Task` instead.
+
+Features:
+
+* Add an option to colorize test result output
+* Support for using Cucumber Expressions for step definitions.
+* Support Rule tags (can be used for hook filters, scoping and access through `ScenarioInfo.CombinedTags`)
+* Support for async step argument transformations.
+* Support for ValueTask and ValueTask<T> binding methods (step definitions, hooks, step argument transformations)
+* Rules now support Background blocks
+* Collect binding errors (type load, binding, step definition) and report them as exception when any of the tests are executed.
+
+Changes:
+
+* Existing step definition expressions detected to be either regular or cucumber expression. 
+* Default step definition skeletons are generating cucumber expressions.
+* `ScenarioInfo.ScenarioAndFeatureTags` has been deprecated in favor of `ScenarioInfo.CombinedTags`. Now both contain rule tags as well.
+* AggregateExceptions thrown by async StepDefinition methods are no longer consumed; but passed along to the test host.

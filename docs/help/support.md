@@ -1,8 +1,5 @@
 # Support
 
-% TODO
-```{admonition} Documentation is in progress
-:class: warning
+For support options, please check the [Support page](https://reqnroll.net/support/) of our website.
 
-This documentation page is in progress. Please come back later or help contributing to it in out [open-source GitHub project](https://github.com/reqnroll/Reqnroll).
-```
+% TODO
