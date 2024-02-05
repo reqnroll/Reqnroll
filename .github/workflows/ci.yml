@@ -26,7 +26,7 @@ on:
         default: false
         required: true
       version_suffix:
-        description: 'Suffix for the NuGet packages (without leading -). Build ID will be appended.'
+        description: 'Suffix for the NuGet packages (without leading -). Build ID will be appended. Use "-" to force empty.'
         required: false
       specs_filter:
         description: 'Filter for Specs execution (e.g. Category=basicExecution)'
@@ -76,6 +76,9 @@ jobs:
             $date = [datetime]::Today
             $dateString = $date.ToString('yyyyMMdd')
             $versionSuffix = "ci$dateString-${env:GITHUB_RUN_NUMBER}"
+        }
+        elseif ($versionSuffix -eq "-") {
+            $versionSuffix = ""
         }
         else {
             $versionSuffix = "$versionSuffix-${env:GITHUB_RUN_NUMBER}"
