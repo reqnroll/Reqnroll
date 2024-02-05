@@ -80,8 +80,8 @@
     </ItemGroup>
 
     <ReplaceTextInFileTask 
-      InputFile="$(MSBuildThisFileDirectory)..\Changelog.md" 
-      OutputFile="$(MSBuildThisFileDirectory)..\Changelog.md" 
+      InputFile="$(MSBuildThisFileDirectory)..\CHANGELOG.md" 
+      OutputFile="$(MSBuildThisFileDirectory)..\CHANGELOG.md" 
       TextToReplace="[vNext]" 
       TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" 
       WriteOnlyWhenChanged="true" />

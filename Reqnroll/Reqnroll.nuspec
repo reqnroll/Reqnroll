@@ -50,7 +50,7 @@
 
     <file src="$SolutionDir$\Licenses\*" target="Licenses" />
 
-    <file src="$SolutionDir$Changelog.md" target="Changelog.md" />
+    <file src="$SolutionDir$CHANGELOG.md" target="CHANGELOG.md" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
 
