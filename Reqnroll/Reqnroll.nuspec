@@ -49,8 +49,8 @@
     <file src="Reqnroll.ExternalAnnotations.xml" target="lib\$Reqnroll_Core_Runtime_TFM$" />
 
     <file src="$SolutionDir$\Licenses\*" target="Licenses" />
-    <file src="$SolutionDir$\*.txt" target="" />
 
+    <file src="$SolutionDir$Changelog.md" target="Changelog.md" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
 

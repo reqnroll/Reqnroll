@@ -67,11 +67,24 @@
     <None Include="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
   </ItemGroup>
 
-  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
+  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" 
+          Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
+    <ReplaceTextInFileTask 
+      InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" 
+      OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" 
+      TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" 
+      TextToReplaceWith="$(AppInsightsInstrumentationKey)" 
+      WriteOnlyWhenChanged="true" />
     <ItemGroup>
       <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
     </ItemGroup>
+
+    <ReplaceTextInFileTask 
+      InputFile="$(MSBuildThisFileDirectory)..\Changelog.md" 
+      OutputFile="$(MSBuildThisFileDirectory)..\Changelog.md" 
+      TextToReplace="[vNext]" 
+      TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" 
+      WriteOnlyWhenChanged="true" />
   </Target>
 
 </Project>
