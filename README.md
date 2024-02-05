@@ -22,7 +22,7 @@ Reqnroll works on all major operating systems (Windows, Linux, macOS), on all co
 
 ## Installation
 
-The extension can be installed via NuGet packages from nuget.org. The main package you need to install depends on the test execution framework: [![NuGet Version](https://img.shields.io/nuget/v/Reqnroll.NUnit)](https://www.nuget.org/packages/Reqnroll.NUnit), [![NuGet Version](https://img.shields.io/nuget/v/Reqnroll.MsTest)](https://www.nuget.org/packages/Reqnroll.MsTest) or [![NuGet Version](https://img.shields.io/nuget/v/Reqnroll.xUnit)](https://www.nuget.org/packages/Reqnroll.xUnit). See detailed instructions on the [project setup documentation page](https://go.reqnroll.net/doc-setup-project).
+The extension can be installed via NuGet packages from nuget.org. The main package you need to install depends on the test execution framework: [`Reqnroll.NUnit`](https://www.nuget.org/packages/Reqnroll.NUnit), [`Reqnroll.MsTest`](https://www.nuget.org/packages/Reqnroll.MsTest) or [`Reqnroll.xUnit`](https://www.nuget.org/packages/Reqnroll.xUnit). See detailed instructions on the [project setup documentation page](https://go.reqnroll.net/doc-setup-project).
 
 ## Contributing
 
