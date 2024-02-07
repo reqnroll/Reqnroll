@@ -1,5 +1,5 @@
 blank_issues_enabled: false
 contact_links:
   - name: Feature request
-    url: https://github.com/reqnroll/Reqnroll/discussions/new?category=ideas
+    url: https://github.com/orgs/reqnroll/discussions/new?category=ideas
     about: Please create a new discussion to the "Ideas" category of our discussion board
