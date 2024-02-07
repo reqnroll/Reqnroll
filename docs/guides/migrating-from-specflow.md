@@ -106,6 +106,8 @@ If you run into any problems, it might be caused by the breaking changes between
 
 **Congratulations you are done!**
 
+Our more complex sample application, [ReqOverflow](https://github.com/reqnroll/Sample-ReqOverflow) has been also migrated from SpecFlow. You can check what changes we had to do in order to get it working with Reqnroll using the SpecFlow compatibility package. See the changes on [GitHub](https://github.com/reqnroll/Sample-ReqOverflow/compare/before-migration...migration-with-compatiblity-package).
+
 {#with-namespace-changes}
 ## Migrate with namespace changes
 
@@ -203,6 +205,8 @@ Now it is time to run your tests. If the tests were passing before, they should 
 If you run into any problems that might be caused by the breaking changes between SpecFlow v3 and v4. Please check the section [](#breaking-changes-specflow-v3) below for the fixes.
 
 **Congratulations you are done!**
+
+Our more complex sample application, [ReqOverflow](https://github.com/reqnroll/Sample-ReqOverflow) has been also migrated from SpecFlow. You can check what changes we had to do in order to get it working with Reqnroll with a complete migration. See the changes on [GitHub](https://github.com/reqnroll/Sample-ReqOverflow/compare/before-migration...full-migration).
 
 {#breaking-changes-specflow-v3}
 ## Breaking changes since SpecFlow v3
