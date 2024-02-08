@@ -26,7 +26,7 @@ The extension can be installed via NuGet packages from nuget.org. The main packa
 
 ## Contributing
 
-All contributors are welcome! For more information see the [Contribution guidelines](CONTRIBUTION.md)
+All contributors are welcome! For more information see the [Contribution guidelines](CONTRIBUTING.md)
 
 ## License
 
