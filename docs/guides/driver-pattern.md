@@ -104,4 +104,4 @@ public class SubmissionPageDriver
 
 ## Further Resources
 
-- <http://leitner.io/2015/11/14/driver-pattern-empowers-your-reqnroll-step-definitions>
+- <http://leitner.io/2015/11/14/driver-pattern-empowers-your-specflow-step-definitions>
