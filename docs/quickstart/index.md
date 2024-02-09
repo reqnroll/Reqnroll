@@ -3,7 +3,7 @@
 This guide gives a quick introduction to Reqnroll.
 
 ```{note}
-The guide uses Visual Studio 2023 as an IDE, but you can also follow it with other tools.
+The guide uses Visual Studio 2022 as an IDE, but you can also follow it with other tools.
 ```
 
 In this tutorial we demonstrate the usage of Reqnroll by implementing the *price calculation* module of an *online instrument & accessories shop*.
