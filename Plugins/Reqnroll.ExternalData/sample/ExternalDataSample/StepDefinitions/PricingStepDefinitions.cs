@@ -48,7 +48,7 @@ namespace Specs.StepDefinitions
             _scenarioContext = scenarioContext;
         }
 
-        [Given(@"the price of (.*) is �(.*)")]
+        [Given(@"the price of (.*) is €(.*)")]
         public void GivenThePriceOfProductIs(string productName, decimal itemPrice)
         {
             _priceCalculator.SetPrice(productName, itemPrice);
@@ -79,7 +79,7 @@ namespace Specs.StepDefinitions
             Assert.Greater(_calculatedPrice, 0);
         }
 
-        [Then(@"the basket price should be �(.*)")]
+        [Then(@"the basket price should be €(.*)")]
         public void ThenTheBasketPriceShouldBe(decimal expectedPrice)
         {
             Assert.AreEqual(expectedPrice, _calculatedPrice);
