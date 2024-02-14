@@ -165,7 +165,7 @@ jobs:
         path: "**/specs-xunit-results.trx"
     - name: Test Report
       uses: dorny/test-reporter@v1
-      if: success() || failure() 
+      if: github.event_name != 'pull_request' && (success() || failure())
       with:
         name: xUnit Specs
         path: "**/specs-xunit-results.trx"
@@ -200,7 +200,7 @@ jobs:
         path: "**/specs-nunit-results.trx"
     - name: Test Report
       uses: dorny/test-reporter@v1
-      if: success() || failure() 
+      if: github.event_name != 'pull_request' && (success() || failure())
       with:
         name: NUnit Specs
         path: "**/specs-nunit-results.trx"
@@ -236,7 +236,7 @@ jobs:
         path: "**/specs-mstest-results.trx"
     - name: Test Report
       uses: dorny/test-reporter@v1
-      if: success() || failure() 
+      if: github.event_name != 'pull_request' && (success() || failure())
       with:
         name: MsTest Specs
         path: "**/specs-mstest-results.trx"
