@@ -19,6 +19,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
+  </ItemGroup>
+
+  <ItemGroup>
     <MetaTemplate Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
     <None Include="$(SolutionDir)reqnroll-icon.png" Pack="true" PackagePath="images" />
@@ -29,7 +33,12 @@
   </ItemGroup>
 
   <Target Name="PopulateMetaTemplate" AfterTargets="CoreCompile">
-    <WriteLinesToFile File="$(OutDir)\templates\%(MetaTemplate.RecursiveDir)\%(MetaTemplate.FileName)%(MetaTemplate.Extension)" Lines="$([System.IO.File]::ReadAllText(%(MetaTemplate.FullPath)).Replace('$$$NuGetPackageVersion$$$',$(PackageVersion)).Replace('$$$MajorMinorVersion$$$',$(MajorMinorVersion)))" Overwrite="true" />
+    <ReplaceTextInFileTask
+      InputFile="%(MetaTemplate.FullPath)"
+      OutputFile="$(OutDir)\templates\%(MetaTemplate.RecursiveDir)\%(MetaTemplate.FileName)%(MetaTemplate.Extension)"
+      TextToReplace="$$$NuGetPackageVersion$$$"
+      TextToReplaceWith="$(PackageVersion)"
+      WriteOnlyWhenChanged="true" />
     <ItemGroup>
       <Content Include="$(OutDir)\templates\**\*" PackagePath="content" />
     </ItemGroup>
