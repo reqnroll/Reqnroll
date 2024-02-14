@@ -32,10 +32,6 @@ on:
         description: 'Filter for Specs execution (e.g. Category=basicExecution)'
         required: false
 
-
-permissions:
-  checks: write
-
 env:
   SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
 
@@ -163,14 +159,7 @@ jobs:
       with:
         name: specs-xunit-results
         path: "**/specs-xunit-results.trx"
-    - name: Test Report
-      uses: dorny/test-reporter@v1
-      if: github.event_name != 'pull_request' && (success() || failure())
-      with:
-        name: xUnit Specs
-        path: "**/specs-xunit-results.trx"
-        reporter: dotnet-trx   
-  
+
   specs-nunit:
     runs-on: ubuntu-latest
     needs: build
@@ -198,15 +187,7 @@ jobs:
       with:
         name: specs-nunit-results
         path: "**/specs-nunit-results.trx"
-    - name: Test Report
-      uses: dorny/test-reporter@v1
-      if: github.event_name != 'pull_request' && (success() || failure())
-      with:
-        name: NUnit Specs
-        path: "**/specs-nunit-results.trx"
-        reporter: dotnet-trx   
-    
-  
+
   specs-mstest:
     runs-on: ubuntu-latest
     needs: build
@@ -234,11 +215,3 @@ jobs:
       with:
         name: specs-mstest-results
         path: "**/specs-mstest-results.trx"
-    - name: Test Report
-      uses: dorny/test-reporter@v1
-      if: github.event_name != 'pull_request' && (success() || failure())
-      with:
-        name: MsTest Specs
-        path: "**/specs-mstest-results.trx"
-        reporter: dotnet-trx   
-    
