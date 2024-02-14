@@ -22,7 +22,10 @@
     <MetaTemplate Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
     <None Include="$(SolutionDir)reqnroll-icon.png" Pack="true" PackagePath="images" />
-    <None Include="templates\ReqnrollProject\Template.csproj" />
+    <None Include="templates\reqnroll-project\Template.csproj" />
+    <None Include="templates\reqnroll-project\.template.config\**" />
+    <None Include="templates\reqnroll-config\.template.config\**" />
+    <None Include="templates\reqnroll-feature\.template.config\**" />
   </ItemGroup>
 
   <Target Name="PopulateMetaTemplate" AfterTargets="CoreCompile">
