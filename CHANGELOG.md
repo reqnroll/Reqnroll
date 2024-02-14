@@ -1,5 +1,7 @@
 # [vNext]
 
+* Fix: Error when installing the Reqnroll template via command line (#22)
+
 # v1.0.0 - 2024-02-05
 
 * Support for .NET 8 projects
