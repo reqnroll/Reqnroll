@@ -154,7 +154,7 @@ jobs:
     - name: xUnit Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-xunit-results.trx"
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v3
       if: success() || failure()      
       with:
         name: specs-xunit-results
@@ -182,7 +182,7 @@ jobs:
     - name: NUnit Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-nunit-results.trx"
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v3
       if: success() || failure()      
       with:
         name: specs-nunit-results
@@ -210,7 +210,7 @@ jobs:
     - name: MsTest Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-mstest-results.trx"
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v3
       if: success() || failure()      
       with:
         name: specs-mstest-results
