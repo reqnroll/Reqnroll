@@ -32,6 +32,9 @@ on:
         description: 'Filter for Specs execution (e.g. Category=basicExecution)'
         required: false
 
+permissions:
+  checks: write
+
 env:
   SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
 
@@ -154,11 +157,13 @@ jobs:
     - name: xUnit Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-xunit-results.trx"
-    - uses: actions/upload-artifact@v3
-      if: success() || failure()      
+    - name: Publish xUnit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
       with:
-        name: specs-xunit-results
-        path: "**/specs-xunit-results.trx"
+        check_name: xUnit Specs
+        files: "**/specs-xunit-results.trx"
+        comment_mode: off
 
   specs-nunit:
     runs-on: ubuntu-latest
@@ -182,11 +187,13 @@ jobs:
     - name: NUnit Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-nunit-results.trx"
-    - uses: actions/upload-artifact@v3
-      if: success() || failure()      
+    - name: Publish NUnit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
       with:
-        name: specs-nunit-results
-        path: "**/specs-nunit-results.trx"
+        check_name: NUnit Specs
+        files: "**/specs-nunit-results.trx"
+        comment_mode: off
 
   specs-mstest:
     runs-on: ubuntu-latest
@@ -210,8 +217,10 @@ jobs:
     - name: MsTest Specs
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-mstest-results.trx"
-    - uses: actions/upload-artifact@v3
-      if: success() || failure()      
+    - name: Publish MSTest Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
       with:
-        name: specs-mstest-results
-        path: "**/specs-mstest-results.trx"
+        check_name: MSTest Specs
+        files: "**/specs-mstest-results.trx"
+        comment_mode: off
