@@ -1,5 +1,7 @@
 # [vNext]
 
+# v1.0.1 - 2024-02-16
+
 * Fix: Error when installing the Reqnroll template via command line (#22)
 
 # v1.0.0 - 2024-02-05
