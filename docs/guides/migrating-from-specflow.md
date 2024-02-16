@@ -10,6 +10,7 @@ The key differences between SpecFlow and Reqnroll are the following:
 * The main extension methods of the *Assist helpers* have been moved to the `Reqnroll` namespace, so that they can be used without an additional namespace using statement. The helpers are now referred to as [](../automation/datatable-helpers.md).
 * The [Reqnroll Visual Studio extension](../installation/setup-ide.md#setup-vs) has been reworked in a way that it can handle both SpecFlow and Reqnroll projects (also for .NET 8.0).
 * The integration plugins that have been managed by SpecFlow have been also ported to work with Reqnroll (e.g. `Reqnroll.Autofac`). See [](../integrations/available-plugins.md).
+* The "SpecFlow.Actions" plugins that provide a read-to-use support for different automation technologies (e.g. Selenium) are ported as `Reqnroll.SpecFlowCompatibility.Actions.*` packages (e.g. `Reqnroll.SpecFlowCompatibility.Actions.Selenium`). 
 
 This article provides you a step-by-step guidance to migrate SpecFlow projects to Reqnroll. There are two migration paths you can choose from:
 
@@ -35,6 +36,7 @@ You need to remove the SpecFlow NuGet package references from the project and re
 * Packages to add:
   * The Reqnroll package according to the test execution framework you use: [`Reqnroll.NUnit`](https://www.nuget.org/packages/Reqnroll.NUnit), [`Reqnroll.MsTest`](https://www.nuget.org/packages/Reqnroll.MsTest) or [`Reqnroll.xUnit`](https://www.nuget.org/packages/Reqnroll.xUnit)
   * The SpecFlow Compatibility package: [`Reqnroll.SpecFlowCompatibility`](https://www.nuget.org/packages/Reqnroll.SpecFlowCompatibility)
+  * If you have used any of the `SpecFlow.Actions.*` package (e.g. `SpecFlow.Actions.Selenium`), you need to add the matching `Reqnroll.SpecFlowCompatibility.Actions.*` package (`Reqnroll.SpecFlowCompatibility.Actions.Selenium`).
 
 After the change, your project file might look like this:
 
@@ -124,6 +126,7 @@ You need to remove the SpecFlow NuGet package references from the project and re
   * the `CucumberExpressions.SpecFlow.*` packages (Reqnroll has built-in [Cucumber Expression](../automation/cucumber-expressions) support)
 * Packages to add:
   * The Reqnroll package according to the test execution framework you use: [`Reqnroll.NUnit`](https://www.nuget.org/packages/Reqnroll.NUnit), [`Reqnroll.MsTest`](https://www.nuget.org/packages/Reqnroll.MsTest) or [`Reqnroll.xUnit`](https://www.nuget.org/packages/Reqnroll.xUnit)
+  * If you have used any of the `SpecFlow.Actions.*` package (e.g. `SpecFlow.Actions.Selenium`), you need to add the matching `Reqnroll.SpecFlowCompatibility.Actions.*` package (`Reqnroll.SpecFlowCompatibility.Actions.Selenium`).
 
 After the change, your project file might look like this:
 
