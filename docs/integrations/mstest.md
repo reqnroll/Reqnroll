@@ -104,6 +104,10 @@ Output:
 [Microsoft.VisualStudio.TestTools.UnitTesting.PriorityAttribute(1)]
 ```
 
+Remarks:
+
+The attribute is generated only when the value is a valid integer (valid means supported by [` int.TryParse `](https://learn.microsoft.com/it-it/dotnet/api/system.int32.tryparse?#system-int32-tryparse(system-string-system-int32@)))
+
 ### WorkItem
 
 Tag:
