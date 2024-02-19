@@ -13,9 +13,11 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string DONOTPARALLELIZE_TAG = "MsTest:donotparallelize";
         protected internal const string CATEGORY_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.TestCategoryAttribute";
         protected internal const string OWNER_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.OwnerAttribute";
+        protected internal const string PRIORITY_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.PriorityAttribute";
         protected internal const string WORKITEM_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.WorkItemAttribute";
         protected internal const string DEPLOYMENTITEM_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.DeploymentItemAttribute";
         protected internal const string OWNER_TAG = "owner:";
+        protected internal const string PRIORITY_TAG = "priority:";
         protected internal const string WORKITEM_TAG = "workitem:";
         protected internal const string DEPLOYMENTITEM_TAG = "MsTest:deploymentitem:";
 
@@ -52,6 +54,16 @@ namespace Reqnroll.Generator.UnitTestProvider
             if (ownerTags.Any())
             {
                 generationContext.CustomData[OWNER_TAG] = ownerTags.Select(t => t.Substring(OWNER_TAG.Length).Trim('\"')).FirstOrDefault();
+            }
+
+            var priorityTags = featureCategories.Where(t => t.StartsWith(PRIORITY_TAG, StringComparison.InvariantCultureIgnoreCase)).Select(t => t);
+            if (priorityTags.Any())
+            {
+                var priorityTextValue = priorityTags.Select(t => t.Substring(PRIORITY_TAG.Length).Trim('\"')).FirstOrDefault();
+                if (int.TryParse(priorityTextValue, out var priority))
+                {
+                    generationContext.CustomData[PRIORITY_TAG] =  priority;
+                }
             }
 
             var workItemTags = featureCategories.Where(t => t.StartsWith(WORKITEM_TAG, StringComparison.InvariantCultureIgnoreCase)).Select(t => t);
@@ -97,6 +109,12 @@ namespace Reqnroll.Generator.UnitTestProvider
                 {
                     CodeDomHelper.AddAttribute(testMethod, OWNER_ATTR, ownerName);
                 }
+            }
+
+            if (generationContext.CustomData.ContainsKey(PRIORITY_TAG))
+            {
+                var priority = (int)generationContext.CustomData[PRIORITY_TAG];
+                CodeDomHelper.AddAttribute(testMethod, PRIORITY_ATTR, priority);
             }
 
             if (generationContext.CustomData.ContainsKey(WORKITEM_TAG))
@@ -153,6 +171,16 @@ namespace Reqnroll.Generator.UnitTestProvider
                 }
             }
 
+            var priorityTags = scenarioCategoriesArray.Where(t => t.StartsWith(PRIORITY_TAG, StringComparison.InvariantCultureIgnoreCase)).Select(t => t);
+            if (priorityTags.Any())
+            {
+                var priorityTextValue = priorityTags.Select(t => t.Substring(PRIORITY_TAG.Length).Trim('\"')).FirstOrDefault();
+                if (int.TryParse(priorityTextValue, out var priority))
+                {
+                    CodeDomHelper.AddAttribute(testMethod, PRIORITY_ATTR, priority);
+                }
+            }
+
             var workItemTags = scenarioCategoriesArray.Where(t => t.StartsWith(WORKITEM_TAG, StringComparison.InvariantCultureIgnoreCase)).Select(t => t);
             if (workItemTags.Any())
             {
@@ -175,6 +203,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         private IEnumerable<string> GetNonMSTestSpecificTags(IEnumerable<string> tags)
         {
             return tags == null ? new string[0] : tags.Where(t => !t.StartsWith(OWNER_TAG, StringComparison.InvariantCultureIgnoreCase))
+                                                      .Where(t => !t.StartsWith(PRIORITY_TAG, StringComparison.InvariantCultureIgnoreCase))
                                                       .Where(t => !t.StartsWith(WORKITEM_TAG, StringComparison.InvariantCultureIgnoreCase))
                                                       .Where(t => !t.StartsWith(DEPLOYMENTITEM_TAG, StringComparison.InvariantCultureIgnoreCase))
                                                       .Select(t => t);

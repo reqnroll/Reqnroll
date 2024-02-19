@@ -90,6 +90,20 @@ Output:
 [Microsoft.VisualStudio.TestTools.UnitTesting.OwnerAttribute("John")]
 ```
 
+### Priority
+
+Tag:
+
+``` gherkin
+@Priority:1
+```
+
+Output:
+
+``` csharp
+[Microsoft.VisualStudio.TestTools.UnitTesting.PriorityAttribute(1)]
+```
+
 ### WorkItem
 
 Tag:
