@@ -1,10 +1,10 @@
-using System.Globalization;
-using System.IO;
-using System.Linq;
 using FluentAssertions;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using Xunit;
 
 namespace Reqnroll.GeneratorTests.UnitTestProvider
@@ -113,6 +113,55 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
             attributes.Should().NotContain(a => a.Name == "Microsoft.VisualStudio.TestTools.UnitTesting.DoNotParallelizeAttribute");
+        }
+
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MsTestV2GeneratorProvider_WithPriorityTag_ShouldAddPriorityAttribute(bool testFeatureTag)
+        {
+            // ARRANGE
+            var featureTag = testFeatureTag ? "@priority:1" : string.Empty;
+            var scenarioTag = testFeatureTag ? string.Empty : "@priority:1";
+
+            var document = ParseDocumentFromString($@"
+            {featureTag}
+            Feature: Sample feature file
+
+            {scenarioTag}
+            Scenario: Simple scenario
+                Given there is something");
+
+            var provider = new MsTestV2GeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator();
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+
+            // ASSERT
+            var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenario");
+            testMethod.CustomAttributes().Should().ContainSingle(a => a.Name == MsTestV2GeneratorProvider.PRIORITY_ATTR && (int)a.ArgumentValues().First() == 1);
+        }
+
+        [Fact]
+        public void MsTestV2GeneratorProvider_WithoutPriorityTag_ShouldntAddPriorityAttribute()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            Scenario: Simple scenario
+                Given there is something");
+
+            var provider = new MsTestV2GeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator();
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+
+            // ASSERT
+            var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenario");
+            testMethod.CustomAttributes().Should().NotContain(a => a.Name == MsTestV2GeneratorProvider.PRIORITY_ATTR);
         }
 
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)
