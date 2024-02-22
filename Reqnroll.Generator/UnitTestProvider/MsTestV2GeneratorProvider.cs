@@ -16,6 +16,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string PRIORITY_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.PriorityAttribute";
         protected internal const string WORKITEM_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.WorkItemAttribute";
         protected internal const string DEPLOYMENTITEM_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.DeploymentItemAttribute";
+        protected internal const string ROW_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.DataRowAttribute";
         protected internal const string OWNER_TAG = "owner:";
         protected internal const string PRIORITY_TAG = "priority:";
         protected internal const string WORKITEM_TAG = "workitem:";
@@ -27,7 +28,27 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public override UnitTestGeneratorTraits GetTraits()
         {
-            return UnitTestGeneratorTraits.ParallelExecution;
+            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
+        }
+
+        public override void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
+        {
+            SetTestMethod(generationContext, testMethod, scenarioTitle);
+        }
+
+        public override void SetRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> arguments, IEnumerable<string> tags, bool isIgnored)
+        {
+            // msTest doens't support to ignore a specific test case / DataRow
+            if (isIgnored)
+            {
+                return;
+            }
+
+            // msTest doesn't support categories for a specific test case / DataRow
+            var args = arguments.Select(arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg)))
+                .ToArray();
+
+            CodeDomHelper.AddAttribute(testMethod, ROW_ATTR, args);
         }
 
         public override void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)

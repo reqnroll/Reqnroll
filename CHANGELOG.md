@@ -1,6 +1,7 @@
 # [vNext]
 
 * Support for PriorityAttribute in MsTest adapter
+* Support for Scenario Outline / DataRowAttribute in MsTest adapter
 
 # v1.0.1 - 2024-02-16
 

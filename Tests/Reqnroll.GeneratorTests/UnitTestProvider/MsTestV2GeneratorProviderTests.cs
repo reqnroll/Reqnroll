@@ -2,6 +2,7 @@ using FluentAssertions;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -11,7 +12,10 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
 {
     public class MsTestV2GeneratorProviderTests
     {
-        private const string TestDeploymentItemAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.DeploymentItemAttribute";
+        private const string 
+            TestCaseAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.DataRowAttribute",
+            TestDeploymentItemAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.DeploymentItemAttribute",
+            TestMethodAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute";
 
         [Fact]
         public void MsTestV2GeneratorProvider_WithFeatureWithoutDeploymentItem_GeneratedClassShouldNotIncludeDeploymentItemForPlugin()
@@ -162,6 +166,71 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenario");
             testMethod.CustomAttributes().Should().NotContain(a => a.Name == MsTestV2GeneratorProvider.PRIORITY_ATTR);
+        }
+
+        [Fact]
+        public void MsTestV2GeneratorProvider_WithScenarioOutline_ShouldGenerateASingleParametrizedTest()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            Scenario Outline: Simple scenario
+                Given there is <count> <color> items
+
+                Examples:
+                    | count | color |
+                    |     0 | blue  |
+                    |     2 | black |");
+
+            var provider = new MsTestV2GeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator();
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+
+            // ASSERT
+            var testMethods = code.Class().Members().Where(x => x.CustomAttributes().Any(a => a.Name == TestMethodAttributeName)).ToList();
+            testMethods.Should().HaveCount(1);
+            var testCaseAttributes = testMethods[0].CustomAttributes().Where(x => x.Name == TestCaseAttributeName).ToList();
+            testCaseAttributes.Should().HaveCount(2);
+            testCaseAttributes.Should().ContainSingle(x => x.ArgumentValues().OfType<string>().ElementAt(0) == "0" &&
+                                                           x.ArgumentValues().OfType<string>().ElementAt(1) == "blue");
+            testCaseAttributes.Should().ContainSingle(x => x.ArgumentValues().OfType<string>().ElementAt(0) == "2" &&
+                                                           x.ArgumentValues().OfType<string>().ElementAt(1) == "black");
+        }
+
+        [Fact]
+        public void MsTestV2GeneratorProvider_WithScenarioOutline_ShouldSkipIgnoredExamples()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            Scenario Outline: Simple scenario
+                Given there is <count> items
+
+                @ignore
+                Examples:
+                    | count |
+                    |     0 |
+
+                Examples:
+                    | count |
+                    |     2 |");
+
+            var provider = new MsTestV2GeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator();
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+
+            // ASSERT
+            var testMethods = code.Class().Members().Where(x => x.CustomAttributes().Any(a => a.Name == TestMethodAttributeName)).ToList();
+            testMethods.Should().HaveCount(1);
+            var testCaseAttributes = testMethods[0].CustomAttributes().Where(x => x.Name == TestCaseAttributeName).ToList();
+            testCaseAttributes.Should().HaveCount(1);
+            testCaseAttributes.Should().ContainSingle(x => x.ArgumentValues().OfType<string>().ElementAt(0) == "2");
         }
 
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)
