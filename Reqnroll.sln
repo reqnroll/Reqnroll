@@ -129,6 +129,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubWorkflows", "GitHubWo
 		.github\workflows\lock.yml = .github\workflows\lock.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.FeatureSourceGenerator.NUnit", "Reqnroll.FeatureSourceGenerator.NUnit\Reqnroll.FeatureSourceGenerator.NUnit.csproj", "{4E6760C3-CFC4-418B-8954-92DADD653B54}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -511,6 +513,18 @@ Global
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{4E6760C3-CFC4-418B-8954-92DADD653B54}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
