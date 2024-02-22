@@ -34,4 +34,4 @@ Reqnroll for VisualStudio is licensed under the [BSD 3-Clause License](LICENSE).
 
 Copyright (c) 2024 Reqnroll
 
-This project is based on the [SpecFlow](SpecFlowOSS/SpecFlow) framework.
+This project is based on the [SpecFlow](https://github.com/SpecFlowOSS/SpecFlow) framework.

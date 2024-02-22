@@ -2,16 +2,13 @@
 
 Contributing can be a rewarding way to teach, improve existing skills, refine the software you work with and build experience. Contributing to open source can also help you grow and learn more in your career or even change careers!
 
-By contributing to Reqnroll, you also have the chance to become a Reqnroll Community Hero! Please check the [Reqnroll Community Hero Program](https://reqnroll.net/community/community-hero-program/) for more details.
-
 ## What do I need to know to help?
 
 We do all of our development [on GitHub](https://github.com/reqnroll/Reqnroll). If you are not familiar with GitHub or pull requests please check out [this guide](https://guides.github.com/activities/hello-world/) to get started.
 
-Other prerequisites to develop are : 
+Other prerequisites to develop are:
 
 - .NET 5 SDK
-
 - .NET Core 3.1 SDK
 - .NET Core 2.1 SDK
 - .NET 4.6.1 SDK
@@ -21,30 +18,27 @@ and of course **C# knowledge** if you are looking to contribute by coding.
 
 ## Types of contributions 
 
-You can contribute by working on an  [existing bug/issue](https://github.com/reqnroll/Reqnroll/search?type=Issues) or report a new one, build a new functionality based on [feature requests](https://support.reqnroll.net/hc/en-us/community/topics/360000519178-Feature-Requests) reported by Reqnroll community or if do not wish to code you can always contribute to [writing documentation](##Building-documentation). 
+You can contribute by working on an  [existing bug/issue](https://github.com/reqnroll/Reqnroll/issues) or report a new one, build a new functionality based on [ideas](https://github.com/orgs/reqnroll/discussions/categories/ideas) reported by Reqnroll community or if do not wish to code you can always contribute to [writing documentation](#building-documentation).
 
 ### Ground rules & expectations
 
 #### Bug reports
 
-If you like to contribute by fixing a bug/issue, please start by [checking if the issue has already been reported](https://github.com/reqnroll/Reqnroll/search?type=Issues). 
+If you like to contribute by fixing a bug/issue, please start by [checking if the issue has already been reported](https://github.com/reqnroll/Reqnroll/search?type=Issues).
 
 Guidelines for bug reports:
 
 1. **Use the GitHub issue search** — look for [existing issues](https://github.com/reqnroll/Reqnroll/search?type=Issues).
 
-2. **Check if the issue has been fixed** &mdash; try to reproduce it using the
-   `master` branch in the repository.
+2. **Check if the issue has been fixed** &mdash; try to reproduce it using the `main` branch in the repository.
 
-3. **Isolate and report the problem** &mdash; ideally create a reduced test
-   case. Fill out the provided template.
+3. **Isolate and report the problem** &mdash; ideally create a reduced test case. Fill out the provided template.
 
 We label issues that need help, but may not be of a critical nature or require intensive Reqnroll knowledge, to [Up For Grabs](https://github.com/reqnroll/Reqnroll/labels/up-for-grabs). This is a list of easier tasks that anybody who wants to get into Reqnroll development can try.
 
 #### Feature requests
 
-Feature requests are welcome. But please take a moment to find out whether your idea fits with the scope and aims of the project. It's up to *you*
-to make a strong case to convince the community of the merits of this feature. Please visit our [feature request page](https://support.reqnroll.net/hc/en-us/community/topics/360000519178-Feature-Requests) to check out the existing requests and vote on the ones already proposed by the community. Since much of the work is done by volunteers, someone who believes in the idea will have to write the code.  Please provide as much detail and context as possible.
+Feature requests are welcome. But please take a moment to find out whether your idea fits with the scope and aims of the project. It's up to *you* to make a strong case to convince the community of the merits of this feature. Please visit the [community discussions](https://github.com/orgs/reqnroll/discussions) to check out the existing requests and vote on the ones already proposed by the community. Since much of the work is done by volunteers, someone who believes in the idea will have to write the code.  Please provide as much detail and context as possible.
 
 #### New Features
 
@@ -54,7 +48,7 @@ If you decide to implement one of the existing feature requests or have one of y
 
 Microsoft has introduced [package identity verification](https://github.com/NuGet/Home/wiki/NuGet-Package-Identity-Verification#nuget-package-id-prefix-reservation) for packages on nuget.org. This will allow developers to reserve particular ID prefixes used for identification. This in turn should help users identify which packages have been submitted by the owner of the ID prefix.
 
-We have reserved the **“Reqnroll”** NuGet package prefix, which is used to identify official Reqnroll and SpecFlow+ packages. This will mean that new packages with the Reqnroll prefix can only be submitted by Reqnroll, and will indicate that these packages are official.
+We have reserved the **“Reqnroll”** NuGet package prefix, which is used to identify official Reqnroll packages. This will mean that new packages with the Reqnroll prefix can only be submitted by Reqnroll, and will indicate that these packages are official.
 
 We have also requested the **"Reqnroll.Contrib"** prefix be made publicly accessible for developers who want to release their own packages for Reqnroll. If you want to submit your own package for Reqnroll whose name begins with “Reqnroll”, you can use this prefix. This will indicate to users that the package is intended for use with Reqnroll, but is a third-party contribution.
 
@@ -62,15 +56,13 @@ These changes will not affect existing packages using the Reqnroll prefix that h
 
 In summary, here are the prefixes we have:
 
-Reqnroll.*
-
-SpecRun.*
+- Reqnroll.*
 
 You can find out more about package IDs on [nuget.org blog](https://blog.nuget.org/20170417/Package-identity-and-trust.html).
 
 ## How to contribute
 
-As mentioned before, we do all of our development [on GitHub](https://github.com/reqnroll/Reqnroll). If you are not familiar with GitHub or pull requests please check out [this guide](https://guides.github.com/activities/hello-world/) to get started. All required information about developing Reqnroll can be found in [our documentation](https://docs.reqnroll.net/projects/reqnroll/en/latest/Contribute/Prerequisite.html).
+As mentioned before, we do all of our development [on GitHub](https://github.com/reqnroll/Reqnroll). If you are not familiar with GitHub or pull requests please check out [this guide](https://guides.github.com/activities/hello-world/) to get started. All required information about building and testing Reqnroll can be found below.
 
 Please adhere to the coding conventions in the project (indentation, accurate comments, etc.) and don't forget to add your own tests and documentation. When working with Git, we recommend the following process.
 
@@ -78,55 +70,52 @@ Please adhere to the coding conventions in the project (indentation, accurate co
 
 in order to craft an excellent pull request:
 
-1. [Fork](https://help.github.com/fork-a-repo/) the project, clone your fork, and configure the remotes.
+1. [Fork](https://docs.github.com/articles/fork-a-repo) the project, clone your fork, and configure the remotes.
 
-2. Configure your local setup. Information to do this can be found [here](https://docs.reqnroll.net/projects/reqnroll/en/latest/Contribute/LocalSetup.html).
+2. Configure your local setup. Information to do this can be found below.
 
 3. If you cloned a while ago, get the latest changes from upstream.
 
-4. Create a new topic branch (off of `master`) to contain your feature, change,
-   or fix.  
+4. Create a new topic branch (off of `main`) to contain your feature, change, or fix.
 
-   **IMPORTANT**: Making changes in `master` is discouraged. You should always  keep your local `master` in sync with upstream `master` and make your
-   changes in topic branches.
+   **IMPORTANT**: Making changes in `main` is discouraged. You should always  keep your local `main` in sync with upstream `main` and make your changes in topic branches.
 
-5. Commit your changes in logical chunks. Keep your commit messages organized, with a short description in the first line and more detailed information on the following lines. Feel free to use Git's [interactive rebase](https://help.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
+5. Commit your changes in logical chunks. Keep your commit messages organized, with a short description in the first line and more detailed information on the following lines. Feel free to use Git's [interactive rebase](https://docs.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
 
 6. Newly added tests should pass and be green, same applies to unit tests:
 
-   ![unittests](https://raw.githubusercontent.com/reqnroll/Reqnroll/master/docs/_static/images/unittests.png)
+   ![unittests](https://raw.githubusercontent.com/reqnroll/Reqnroll/main/docs/_static/images/unittests.png)
 
 7. Push your topic branch up to your fork.
 
-8. [Open a Pull Request ](https://help.github.com/articles/using-pull-requests/) with a clear title and description.
+8. [Open a Pull Request ](https://docs.github.com/articles/using-pull-requests/) with a clear title and description.
 
-9. If you haven't updated your pull request for a while, you should consider rebasing on master and resolving any conflicts.
+9. If you haven't updated your pull request for a while, you should consider rebasing on `main` and resolving any conflicts.
 
 Some important notes to keep in mind:
 
-- _Never ever_ merge upstream `master` into your branches. You  should always `git rebase` on `master` to bring your changes up to date when  necessary.
+- _Never ever_ merge upstream `main` into your branches. You  should always `git rebase` on `main` to bring your changes up to date when  necessary.
 - Do not send code style changes as pull requests like changing the indentation of some particular code snippet or how a function is called.
   Those will not be accepted as they pollute the repository history with non functional changes and are often based on personal preferences.
 - By submitting a patch, you agree that your work will be licensed under the license used by the project.
-- If you have any large pull request in mind (e.g. Implementing features, refactoring code, etc), **please ask first** otherwise you risk spending
-  a lot of time working on something that the project's developers might not want to merge into the project. 										
+- If you have any large pull request in mind (e.g. Implementing features, refactoring code, etc), **please ask first** otherwise you risk spending a lot of time working on something that the project's developers might not want to merge into the project. 
 
- ## Building sources
+## Building sources
 
-Visual Studio:  
+Visual Studio:
 
 - Open <Reqnroll.sln> with Visual Studio
 - Build\Build Solution
 
-CLI: 
+CLI:
 
 - Execute build.ps1 in [PowerShell](https://github.com/powershell/powershell)
 
-![buildps1](https://raw.githubusercontent.com/reqnroll/Reqnroll/master/docs/_static/images/buildps1.png)
+![buildps1](https://raw.githubusercontent.com/reqnroll/Reqnroll/main/docs/_static/images/buildps1.png)
 
 ## Running tests
 
-The Reqnroll tests are usually multi-platform tests, that means that the same test can be executed multiple times with the different platforms (e.g. .NET Framework 4.7.1, .NET 5, .NET 6). This also means that normally it is not a good idea to just "run all tests", but select a platform for development (.NET 6 is recommended) and run the tests for that one only locally. 
+The Reqnroll tests are usually multi-platform tests, that means that the same test can be executed multiple times with the different platforms (e.g. .NET Framework 4.7.1, .NET 5, .NET 6). This also means that normally it is not a good idea to just "run all tests", but select a platform for development (.NET 6 is recommended) and run the tests for that one only locally.
 
 There are unit and integration tests. The unit tests run fast, but the integration tests take more time to run.
 
@@ -172,26 +161,30 @@ To build local documentation:
 
     > Note: Make sure to add python to your PATH env variable
     >
-    > ![python](https://raw.githubusercontent.com/reqnroll/Reqnroll/master/docs/_static/images/python.png)
+    > ![python](https://raw.githubusercontent.com/reqnroll/Reqnroll/main/docs/_static/images/python.png)
 
   
 
 - Install sphinx:
 
-  - pip install sphinx
-
-    
+  ```bash
+  pip install sphinx
+  ```
 
 - Install dependencies in the working directory
 
-  - pip install -r docs/requirements.txt (Path to requirements can vary)
-
-
+  ```bash
+  pip install -r docs/requirements.txt (Path to requirements can vary)
+  ```
 
 - Run (PS or CMD) from the working directory
-     - ./make html
-   - Result: html pages are generated in the working directory
-        - _build/html/index.html
+
+  ```bash
+  ./make html
+  ```
+
+  - Result: html pages are generated in the working directory
+    - _build/html/index.html
 
 ## Where can I go for help?
 

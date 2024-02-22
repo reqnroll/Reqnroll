@@ -1,4 +1,4 @@
-<!-- If this is your first PR, please have a look at the Contribution Guidelines (https://github.com/reqnroll/Reqnroll/blob/master/CONTRIBUTING.md) -->
+<!-- If this is your first PR, please have a look at the Contribution Guidelines (https://github.com/reqnroll/Reqnroll/blob/main/CONTRIBUTING.md) -->
 
 
 <!--- Describe your changes in detail -->
