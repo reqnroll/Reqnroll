@@ -19,5 +19,5 @@ You can also use asynchronous [step argument transformations](step-argument-conv
 ```
 
 ```{hint}
-It is also possible to use use [`ValueTask`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.valuetask?view=net-6.0) and [`ValueTask<T>`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.valuetask-1?view=net-6.0) return types.
+It is also possible to use [`ValueTask`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.valuetask?view=net-6.0) and [`ValueTask<T>`](https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.valuetask-1?view=net-6.0) return types.
 ```
