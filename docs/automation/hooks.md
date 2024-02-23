@@ -1,6 +1,6 @@
 # Hooks
 
-Hooks (event bindings) can be used to perform additional automation logic at specific times, such as any setup required prior to executing a scenario. In order to use hooks, you need to add the `Binding` attribute to your class:
+Hooks (event bindings) can be used to perform additional automation logic at specific times, such as any setup required prior to executing a scenario. In order to use hooks, you need to add the `Binding` attribute to your class. Hooks can be synchronous or asynchronous, allowing them to perform operations that can benefit from async programming patterns:
 
 ```{code-block} csharp
 :caption: Hook File
@@ -11,6 +11,21 @@ public class MyHooks
     public void SetupTestUsers()
     {
         //...
+    }
+}
+```
+
+```{code-block} csharp
+:caption: Hook File with async method
+[Binding]
+public class MyHooks
+{
+    [BeforeScenario]
+    public async Task SetupTestUsersAsync()
+    {
+        // Asynchronous setup logic
+        // Example async operation
+        await Task.Delay(1000);
     }
 }
 ```
@@ -32,6 +47,22 @@ public class MyHooks
 }
 ```
 
+```{code-block} csharp
+:caption: Hook File with async method
+[Binding]
+public class MyHooks
+{
+    [BeforeScenario("@requiresUsers")]
+    public async Task SetupTestUsersAsync()
+    {
+        //...
+        // Asynchronous setup logic
+        // Example async operation
+        await Task.Delay(1000);
+    }
+}
+```
+
 
 ## Supported Hook Attributes
 
@@ -47,9 +78,10 @@ public class MyHooks
 As most of the unit test runners do not provide a hook for executing logic once the tests have been executed, the `[AfterTestRun]` event is triggered by the test assembly unload event. 
 
 The exact timing and  thread of this execution may therefore differ for each test runner.
+
 ```
 
-You can annotate a single method with multiple attributes.
+You can annotate a single method with multiple attributes, and both synchronous and asynchronous methods can be used as hooks, depending on the needs of your test setup and teardown logic.
 
 ## Using Hooks with Constructor Injection
 
@@ -76,8 +108,30 @@ public class MyHooks
 }
 ```
 
+```{code-block} csharp
+:caption: Hook File with async method
+[Binding]
+public class MyHooks
+{
+    private ScenarioContext _scenarioContext;
+
+    public MyHooks(ScenarioContext scenarioContext)
+    {
+        _scenarioContext = scenarioContext;
+    }
+
+    [BeforeScenario]
+    public async Task SetupTestUsersAsync()
+    {
+        //_scenarioContext...
+        // Example async operation
+        await Task.Delay(1000);
+    }
+}
+```
+
 ```{note}
-For static hook methods you can use parameter injection.
+For static hook methods you can use parameter injection which can be combined with asynchronous execution to resolve dependencies and perform setup or teardown tasks asynchronously.
 ```
 
 ## Using Hooks with Parameter Injection
@@ -98,6 +152,22 @@ public class MyHooks
 }
 ```
 
+
+```{code-block} csharp
+:caption: Hook File with async method
+[Binding]
+public class MyHooks
+{
+    [BeforeScenario]
+    public async Task SetupTestUsersAsync(ScenarioContext scenarioContext)
+    {
+        //scenarioContext...
+        // Example async operation
+        await Task.Delay(1000);
+    }
+}
+```
+
 Parameter injection is especially useful for hooks that must be implemented as static methods.
 
 ```{code-block} csharp
@@ -108,6 +178,21 @@ public class Hooks
     [BeforeFeature]
     public static void SetupStuffForFeatures(FeatureContext featureContext)
     {
+        Console.WriteLine("Starting " + featureContext.FeatureInfo.Title);
+    }
+}
+```
+
+```{code-block} csharp
+:caption: Hook File with async method
+[Binding]
+public class Hooks
+{
+    [BeforeFeature]
+    public static async Task SetupStuffForFeaturesAsync(FeatureContext featureContext)
+    {
+        // Example async operation
+        await Task.Delay(1000);
         Console.WriteLine("Starting " + featureContext.FeatureInfo.Title);
     }
 }
@@ -128,6 +213,25 @@ public static void BeforeTestRunInjection(ITestRunnerManager testRunnerManager, 
     
     //ITestRunner from test thread container
     var threadId = testRunner.ThreadId;
+}
+```
+
+```{code-block} csharp
+:caption: Hook File with async method
+[BeforeTestRun]
+public static async Task BeforeTestRunInjectionAsync(ITestRunnerManager testRunnerManager, ITestRunner testRunner)
+{
+    //All parameters are resolved from the test thread container automatically.
+    //Since the global container is the base container of the test thread container, globally registered services can be also injected.
+
+    //ITestRunManager from global container
+    var location = testRunnerManager.TestAssembly.Location;
+    
+    //ITestRunner from test thread container
+    var threadId = testRunner.ThreadId;
+
+    // Example async operation
+    await Task.Delay(1000);
 }
 ```
 
@@ -156,6 +260,25 @@ public void CleanDatabase()
 public void LoginUser()
 {
     // ...so we can log in to a clean database
+}
+```
+
+```{code-block} csharp
+:caption: Hook File with async method
+[BeforeScenario(Order = 0)]
+public async Task CleanDatabaseAsync()
+{
+    // we need to run this first...
+    // Example async operation
+    await Task.Delay(1000);
+}
+
+[BeforeScenario(Order = 100)]
+public async Task LoginUserAsync()
+{
+    // ...so we can log in to a clean database
+    // Example async operation
+    await Task.Delay(1000);
 }
 ```
 
