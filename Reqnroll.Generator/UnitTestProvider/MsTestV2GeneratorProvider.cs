@@ -38,17 +38,21 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public override void SetRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> arguments, IEnumerable<string> tags, bool isIgnored)
         {
-            // msTest doens't support to ignore a specific test case / DataRow
+            // MsTest doesn't support to ignore a specific test case / DataRow
             if (isIgnored)
             {
                 return;
             }
 
-            // msTest doesn't support categories for a specific test case / DataRow
-            var args = arguments.Select(arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg)))
-                .ToArray();
+            // MsTest doesn't support categories for a specific test case / DataRow
+            var args = arguments.Select(arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
 
-            CodeDomHelper.AddAttribute(testMethod, ROW_ATTR, args);
+            var tagExpressions = tags.Select(t => (CodeExpression)new CodePrimitiveExpression(t)).ToArray();
+            args.Add(new CodeAttributeArgument(tagExpressions.Any()
+               ? new CodeArrayCreateExpression(typeof(string[]), tagExpressions)
+               : new CodePrimitiveExpression(null)));
+
+            CodeDomHelper.AddAttribute(testMethod, ROW_ATTR, args.ToArray());
         }
 
         public override void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
