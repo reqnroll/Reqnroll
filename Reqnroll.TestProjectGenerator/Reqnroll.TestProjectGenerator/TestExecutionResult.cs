@@ -37,6 +37,7 @@ namespace Reqnroll.TestProjectGenerator
         public List<TestStepResult> Steps { get; set; }
         public int ExecutionCount { get; set; }
         public string ErrorMessage { get; set; }
+        public List<TestResult> InnerResults { get; set; }
     }
 
     public class TestStepResult
