@@ -29,6 +29,7 @@ namespace Reqnroll.Infrastructure
         private readonly IStepDefinitionMatchService _stepDefinitionMatchService;
         private readonly IStepFormatter _stepFormatter;
         private readonly ITestObjectResolver _testObjectResolver;
+        private readonly ITestRunContext _testRunContext;
         private readonly ITestTracer _testTracer;
         private readonly IUnitTestRuntimeProvider _unitTestRuntimeProvider;
         private readonly IAnalyticsEventProvider _analyticsEventProvider;
@@ -62,8 +63,8 @@ namespace Reqnroll.Infrastructure
             ITestThreadExecutionEventPublisher testThreadExecutionEventPublisher,
             ITestPendingMessageFactory testPendingMessageFactory,
             ITestUndefinedMessageFactory testUndefinedMessageFactory,
-            ITestObjectResolver testObjectResolver = null,
-            IObjectContainer testThreadContainer = null) //TODO: find a better way to access the container
+            ITestObjectResolver testObjectResolver,
+            ITestRunContext testRunContext)
         {
             _errorProvider = errorProvider;
             _bindingInvoker = bindingInvoker;
@@ -76,7 +77,7 @@ namespace Reqnroll.Infrastructure
             _stepArgumentTypeConverter = stepArgumentTypeConverter;
             _stepDefinitionMatchService = stepDefinitionMatchService;
             _testObjectResolver = testObjectResolver;
-            TestThreadContainer = testThreadContainer;
+            _testRunContext = testRunContext;
             _obsoleteStepHandler = obsoleteStepHandler;
             _analyticsEventProvider = analyticsEventProvider;
             _analyticsTransmitter = analyticsTransmitter;
@@ -90,6 +91,8 @@ namespace Reqnroll.Infrastructure
         public FeatureContext FeatureContext => _contextManager.FeatureContext;
 
         public ScenarioContext ScenarioContext => _contextManager.ScenarioContext;
+        public ITestThreadContext TestThreadContext => _contextManager.TestThreadContext;
+        public ITestRunContext TestRunContext => _testRunContext;
 
         public virtual async Task OnTestRunStartAsync()
         {
@@ -361,8 +364,6 @@ namespace Reqnroll.Infrastructure
             _runtimePluginTestExecutionLifecycleEventEmitter.RaiseExecutionLifecycleEvent(hookType, container);
         }
 
-        protected IObjectContainer TestThreadContainer { get; }
-
         public virtual async Task InvokeHookAsync(IAsyncBindingInvoker invoker, IHookBinding hookBinding, HookType hookType)
         {
             var currentContainer = GetHookContainer(hookType);
@@ -388,7 +389,7 @@ namespace Reqnroll.Infrastructure
             {
                 case HookType.BeforeTestRun:
                 case HookType.AfterTestRun:
-                    currentContainer = TestThreadContainer;
+                    currentContainer = _testRunContext.TestRunContainer;
                     break;
                 case HookType.BeforeFeature:
                 case HookType.AfterFeature:
@@ -402,13 +403,13 @@ namespace Reqnroll.Infrastructure
             return currentContainer;
         }
 
-        private ReqnrollContext GetHookContext(HookType hookType)
+        private IReqnrollContext GetHookContext(HookType hookType)
         {
             switch (hookType)
             {
                 case HookType.BeforeTestRun:
                 case HookType.AfterTestRun:
-                    return _contextManager.TestThreadContext;
+                    return TestRunContext;
                 case HookType.BeforeFeature:
                 case HookType.AfterFeature:
                     return _contextManager.FeatureContext;
@@ -420,8 +421,8 @@ namespace Reqnroll.Infrastructure
         private void SetHookError(HookType hookType, Exception hookException)
         {
             var context = GetHookContext(hookType);
-            if (context != null && context.TestError == null)
-                context.TestError = hookException;
+            if (context is { TestError: null } and ReqnrollContext reqnrollContext)
+                reqnrollContext.TestError = hookException;
 
             if (context is ScenarioContext scenarioContext)
             {

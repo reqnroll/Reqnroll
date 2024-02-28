@@ -2,11 +2,11 @@ using Reqnroll.EnvironmentAccess;
 
 namespace Reqnroll.TestFramework
 {
-    public class DefaultTestRunContext : ITestRunContext
+    public class DefaultTestRunSettingsProvider : ITestRunSettingsProvider
     {
         private readonly IEnvironmentWrapper _environmentWrapper;
 
-        public DefaultTestRunContext(IEnvironmentWrapper environmentWrapper)
+        public DefaultTestRunSettingsProvider(IEnvironmentWrapper environmentWrapper)
         {
             _environmentWrapper = environmentWrapper;
         }
