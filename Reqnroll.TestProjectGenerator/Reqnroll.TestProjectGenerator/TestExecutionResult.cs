@@ -15,6 +15,7 @@ namespace Reqnroll.TestProjectGenerator
         public int Executed { get; set; }
 
         public List<TestResult> TestResults { get; set; }
+        public TestResult[] LeafTestResults { get; set; }
         public List<string> ReportFiles { get; set; }
         public int Warning { get; set; }
         public string LogFileContent { get; set; }

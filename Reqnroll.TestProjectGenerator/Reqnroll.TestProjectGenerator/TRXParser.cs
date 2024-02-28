@@ -63,12 +63,18 @@ namespace Reqnroll.TestProjectGenerator
             int.TryParse(inconclusiveAttribute?.Value, out int inconclusive);
 
             var testResults = GetTestResults(testRunElement, _xmlns);
-            string trxOutput = Enumerable.Select<TestResult, string>(testResults, r => r.StdOut).Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c)).ToString();
+            var leafTestResults =
+                testResults.Where(tr => tr.InnerResults.Count == 0)
+                           .Concat(testResults.Where(tr => tr.InnerResults.Count > 0).SelectMany(tr => tr.InnerResults))
+                           .ToArray();
+
+            string trxOutput = leafTestResults.Select(r => r.StdOut).Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c)).ToString();
 
             return new TestExecutionResult
             {
                 ValidLicense = false,
                 TestResults = testResults,
+                LeafTestResults = leafTestResults,
                 Output = output,
                 ReportFiles = reportFiles.ToList(),
                 TrxOutput = trxOutput,
@@ -120,17 +126,12 @@ namespace Reqnroll.TestProjectGenerator
         {
             bool HasPendingError(TestResult r) => r.ErrorMessage != null && r.ErrorMessage.Contains("Assert.Inconclusive failed. One or more step definitions are not implemented yet.");
 
-            var leafResults = 
-                testExecutionResult.TestResults.Where(tr => tr.InnerResults.Count == 0)
-                .Concat(testExecutionResult.TestResults.Where(tr => tr.InnerResults.Count > 0).SelectMany(tr => tr.InnerResults))
-                .ToArray();
-
-            testExecutionResult.Total = leafResults.Length;
-            testExecutionResult.Succeeded = leafResults.Count(tr => tr.Outcome == "Passed");
-            testExecutionResult.Failed = leafResults.Count(tr => tr.Outcome == "Failed");
+            testExecutionResult.Total = testExecutionResult.LeafTestResults.Length;
+            testExecutionResult.Succeeded = testExecutionResult.LeafTestResults.Count(tr => tr.Outcome == "Passed");
+            testExecutionResult.Failed = testExecutionResult.LeafTestResults.Count(tr => tr.Outcome == "Failed");
             testExecutionResult.Executed = testExecutionResult.Succeeded + testExecutionResult.Failed;
-            testExecutionResult.Ignored = leafResults.Count(r => r.Outcome == "NotExecuted" && !HasPendingError(r));
-            testExecutionResult.Pending = leafResults.Count(HasPendingError);
+            testExecutionResult.Ignored = testExecutionResult.LeafTestResults.Count(r => r.Outcome == "NotExecuted" && !HasPendingError(r));
+            testExecutionResult.Pending = testExecutionResult.LeafTestResults.Count(HasPendingError);
     
             return testExecutionResult;
         }
