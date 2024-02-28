@@ -43,7 +43,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         private ObjectContainer testThreadContainer;
         private ObjectContainer featureContainer;
         private ObjectContainer scenarioContainer;
-        private TestRunContext testRunContext;
+        private DefaultTestRunContext testRunContext;
         private TestObjectResolver defaultTestObjectResolver = new TestObjectResolver();
         private ITestPendingMessageFactory _testPendingMessageFactory;
         private ITestUndefinedMessageFactory _testUndefinedMessageFactory;
@@ -87,7 +87,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             testThreadContainer = new ObjectContainer(globalContainer);
             featureContainer = new ObjectContainer(testThreadContainer);
             scenarioContainer = new ObjectContainer(scenarioContainer);
-            testRunContext = new TestRunContext(globalContainer, new Mock<ITestRunSettingsProvider>().Object);
+            testRunContext = new DefaultTestRunContext(globalContainer, new Mock<ITestRunSettingsProvider>().Object);
 
             beforeScenarioEvents = new List<IHookBinding>();
             afterScenarioEvents = new List<IHookBinding>();

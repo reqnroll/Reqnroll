@@ -24,7 +24,7 @@ namespace Reqnroll.Infrastructure
     {
         public virtual void RegisterGlobalContainerDefaults(ObjectContainer container)
         {
-            container.RegisterTypeAs<TestRunContext, ITestRunContext>();
+            container.RegisterTypeAs<DefaultTestRunContext, ITestRunContext>();
             container.RegisterTypeAs<DefaultRuntimeConfigurationProvider, IRuntimeConfigurationProvider>();
 
             container.RegisterTypeAs<TestRunnerManager, ITestRunnerManager>();

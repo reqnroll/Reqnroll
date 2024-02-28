@@ -9,7 +9,7 @@ public interface ITestRunContext : IReqnrollContext
     string TestDirectory { get; }
 }
 
-public class TestRunContext : ReqnrollContext, ITestRunContext
+public class DefaultTestRunContext : ReqnrollContext, ITestRunContext
 {
     private readonly ITestRunSettingsProvider _testRunSettingsProvider;
 
@@ -17,7 +17,7 @@ public class TestRunContext : ReqnrollContext, ITestRunContext
 
     public string TestDirectory => _testRunSettingsProvider.GetTestDirectory();
 
-    public TestRunContext(IObjectContainer testRunContainer, ITestRunSettingsProvider testRunSettingsProvider)
+    public DefaultTestRunContext(IObjectContainer testRunContainer, ITestRunSettingsProvider testRunSettingsProvider)
     {
         _testRunSettingsProvider = testRunSettingsProvider;
         TestRunContainer = testRunContainer;
