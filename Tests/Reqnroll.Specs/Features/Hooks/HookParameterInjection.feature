@@ -52,33 +52,26 @@ Note: the parameters of the BeforeFeature/AfterFeature hook are resolved from th
         | 1         |
     
 Scenario: Should be able to access thread level and global services in BeforeTestRun/AfterTestRun hooks as parameter
-Note: the parameters of the BeforeFeature/AfterFeature hook are resolved from the test thread container
+Note: the parameters of the BeforeFeature/AfterFeature hook are resolved from the test run (global) container
     Given there is a Reqnroll project
     And there is a scenario	
     And all steps are bound and pass
     And the following hooks
         """
         [BeforeTestRun]
-        public static void BeforeTestRun(ITestRunnerManager testRunnerManager, ITestRunner testRunner)
+        public static void BeforeTestRun(ITestRunnerManager testRunnerManager)
         {
-            //All parameters are resolved from the test thread container automatically. ITestRunnerManager and ITestRunner are just some examples here.
-            //Since the global container is the base container of the test thread container, globally registered services can be also injected.
+            //All parameters are resolved from the test run container automatically. ITestRunnerManager is just an example here.
         
             //ITestRunManager from global container
             if (testRunnerManager == null) throw new Exception("ITestRunManager wasn't passed correctly as parameter to BeforeTestRun");
-            
-            //ITestRunner from test thread container
-            if (testRunner == null) throw new Exception("ITestRunner wasn't passed correctly as parameter to BeforeTestRun");
         }
             
         [AfterTestRun]
-        public static void AfterTestRun(ITestRunnerManager testRunnerManager, ITestRunner testRunner)
+        public static void AfterTestRun(ITestRunnerManager testRunnerManager)
         {
             //ITestRunManager from global container
             if (testRunnerManager == null) throw new Exception("ITestRunManager wasn't passed correctly as parameter to AfterTestRun");
-            
-            //ITestRunner from test thread container
-            if (testRunner == null) throw new Exception("ITestRunner wasn't passed correctly as parameter to AfterTestRun");
         }
         """
     When I execute the tests
