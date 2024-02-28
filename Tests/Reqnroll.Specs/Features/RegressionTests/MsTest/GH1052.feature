@@ -1,7 +1,7 @@
 @MSTest
 Feature: GH1052
 
-Wrong scenario context injected when running tests in parallel using NUnit (also specrun) - https://github.com/reqnroll/Reqnroll/issues/1052
+Wrong scenario context injected when running tests in parallel using NUnit (also specrun) - https://github.com/SpecFlowOSS/SpecFlow/issues/1052
 
 
 Scenario: GH1052
@@ -133,7 +133,7 @@ Scenario: GH1052
                 {
                     _reqnrollOutputHelper.WriteLine($"Context ID {_scenarioContext["ID"].ToString()}");
                     _reqnrollOutputHelper.WriteLine($"ManagedThreadId {Thread.CurrentThread.ManagedThreadId}");
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
                 catch (Exception e)
                 {

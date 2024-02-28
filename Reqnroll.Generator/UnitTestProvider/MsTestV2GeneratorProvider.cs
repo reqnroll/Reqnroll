@@ -16,6 +16,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string PRIORITY_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.PriorityAttribute";
         protected internal const string WORKITEM_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.WorkItemAttribute";
         protected internal const string DEPLOYMENTITEM_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.DeploymentItemAttribute";
+        protected internal const string ROW_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.DataRowAttribute";
         protected internal const string OWNER_TAG = "owner:";
         protected internal const string PRIORITY_TAG = "priority:";
         protected internal const string WORKITEM_TAG = "workitem:";
@@ -27,7 +28,42 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public override UnitTestGeneratorTraits GetTraits()
         {
-            return UnitTestGeneratorTraits.ParallelExecution;
+            return UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
+        }
+
+        public override void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
+        {
+            SetTestMethod(generationContext, testMethod, scenarioTitle);
+        }
+
+        public override void SetRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> arguments, IEnumerable<string> tags, bool isIgnored)
+        {
+            // MsTest doesn't support to ignore a specific test case / DataRow
+            if (isIgnored)
+            {
+                return;
+            }
+
+            // MsTest doesn't support categories for a specific test case / DataRow
+            var args = arguments.Select(arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
+
+            var tagExpressions = tags.Select(t => (CodeExpression)new CodePrimitiveExpression(t)).ToArray();
+
+            // MsTest v2.* cannot handle string[] as the second argument of the [DataRow] attribute.
+            // To compensate this, we include a dummy parameter and argument in this case.
+            if (tagExpressions.Any() && args.Count <= 1)
+            {
+                args.Add(new CodeAttributeArgument(new CodePrimitiveExpression("")));
+                var dummyParameterName = "notUsed6248";
+                if (testMethod.Parameters.OfType<CodeParameterDeclarationExpression>().All(p => p.Name != dummyParameterName))
+                    testMethod.Parameters.Insert(testMethod.Parameters.Count - 1, new CodeParameterDeclarationExpression(typeof(string), dummyParameterName));
+            }
+
+            args.Add(new CodeAttributeArgument(tagExpressions.Any()
+               ? new CodeArrayCreateExpression(typeof(string[]), tagExpressions)
+               : new CodePrimitiveExpression(null)));
+
+            CodeDomHelper.AddAttribute(testMethod, ROW_ATTR, args.ToArray());
         }
 
         public override void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)

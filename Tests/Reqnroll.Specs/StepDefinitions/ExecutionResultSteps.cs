@@ -108,7 +108,7 @@ namespace Reqnroll.Specs.StepDefinitions
         {
             var lastTestExecutionResult = _vsTestExecutionDriver.LastTestExecutionResult;
 
-            foreach (var testResult in lastTestExecutionResult.TestResults)
+            foreach (var testResult in lastTestExecutionResult.LeafTestResults)
             {
                 var contextIdLines = testResult.StdOut.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries).Where(s => s.StartsWith("-> Context ID"));
 

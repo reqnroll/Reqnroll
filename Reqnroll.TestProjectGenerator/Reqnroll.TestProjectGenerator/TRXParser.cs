@@ -15,6 +15,7 @@ namespace Reqnroll.TestProjectGenerator
         private readonly XName _unitTestResultElementName;
         private readonly XName _unitTestResultOutputElementName;
         private readonly XName _unitTestResultStdOutElementName;
+        private readonly XName _unitTestResultInnerResultsElementName;
         private readonly XName _testRunElementName;
         private readonly XName _resultsElementName;
 
@@ -24,6 +25,7 @@ namespace Reqnroll.TestProjectGenerator
             _unitTestResultElementName = _xmlns + "UnitTestResult";
             _unitTestResultOutputElementName = _xmlns + "Output";
             _unitTestResultStdOutElementName = _xmlns + "StdOut";
+            _unitTestResultInnerResultsElementName = _xmlns + "InnerResults";
             _testRunElementName = _xmlns + "TestRun";
             _resultsElementName = _xmlns + "Results";
         }
@@ -61,12 +63,18 @@ namespace Reqnroll.TestProjectGenerator
             int.TryParse(inconclusiveAttribute?.Value, out int inconclusive);
 
             var testResults = GetTestResults(testRunElement, _xmlns);
-            string trxOutput = Enumerable.Select<TestResult, string>(testResults, r => r.StdOut).Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c)).ToString();
+            var leafTestResults =
+                testResults.Where(tr => tr.InnerResults.Count == 0)
+                           .Concat(testResults.Where(tr => tr.InnerResults.Count > 0).SelectMany(tr => tr.InnerResults))
+                           .ToArray();
+
+            string trxOutput = leafTestResults.Select(r => r.StdOut).Aggregate(new StringBuilder(), (acc, c) => acc.AppendLine(c)).ToString();
 
             return new TestExecutionResult
             {
                 ValidLicense = false,
                 TestResults = testResults,
+                LeafTestResults = leafTestResults,
                 Output = output,
                 ReportFiles = reportFiles.ToList(),
                 TrxOutput = trxOutput,
@@ -118,8 +126,12 @@ namespace Reqnroll.TestProjectGenerator
         {
             bool HasPendingError(TestResult r) => r.ErrorMessage != null && r.ErrorMessage.Contains("Assert.Inconclusive failed. One or more step definitions are not implemented yet.");
 
-            testExecutionResult.Ignored = testExecutionResult.TestResults.Count(r => r.Outcome == "NotExecuted" && !HasPendingError(r));
-            testExecutionResult.Pending = testExecutionResult.TestResults.Count(r => HasPendingError(r));
+            testExecutionResult.Total = testExecutionResult.LeafTestResults.Length;
+            testExecutionResult.Succeeded = testExecutionResult.LeafTestResults.Count(tr => tr.Outcome == "Passed");
+            testExecutionResult.Failed = testExecutionResult.LeafTestResults.Count(tr => tr.Outcome == "Failed");
+            testExecutionResult.Executed = testExecutionResult.Succeeded + testExecutionResult.Failed;
+            testExecutionResult.Ignored = testExecutionResult.LeafTestResults.Count(r => r.Outcome == "NotExecuted" && !HasPendingError(r));
+            testExecutionResult.Pending = testExecutionResult.LeafTestResults.Count(HasPendingError);
     
             return testExecutionResult;
         }
@@ -135,13 +147,19 @@ namespace Reqnroll.TestProjectGenerator
 
         private List<TestResult> GetTestResults(XElement testRunElement, XNamespace xmlns)
         {
-            var testResults = from unitTestResultElement in testRunElement.Element(xmlns + "Results")?.Elements(_unitTestResultElementName) ?? Enumerable.Empty<XElement>()
+            return GetTestResultsInternal(testRunElement.Element(xmlns + "Results"), xmlns);
+        }
+
+        private List<TestResult> GetTestResultsInternal(XElement testRunResultsElement, XNamespace xmlns)
+        {
+            var testResults = from unitTestResultElement in testRunResultsElement?.Elements(_unitTestResultElementName) ?? Enumerable.Empty<XElement>()
                 let outputElement = unitTestResultElement.Element(_unitTestResultOutputElementName)
                 let idAttribute = unitTestResultElement.Attribute("executionId")
                 let outcomeAttribute = unitTestResultElement.Attribute("outcome")
                 let stdOutElement = outputElement?.Element(_unitTestResultStdOutElementName)
                 let errorInfoElement = outputElement?.Element(xmlns + "ErrorInfo")
                 let errorMessage = errorInfoElement?.Element(xmlns + "Message")
+                let innerResultsElement = unitTestResultElement.Element(_unitTestResultInnerResultsElementName)
                 where idAttribute != null
                 where outcomeAttribute != null
                 select new TestResult
@@ -149,7 +167,8 @@ namespace Reqnroll.TestProjectGenerator
                     Id = idAttribute.Value,
                     Outcome = outcomeAttribute.Value,
                     StdOut = stdOutElement?.Value,
-                    ErrorMessage = errorMessage?.Value
+                    ErrorMessage = errorMessage?.Value,
+                    InnerResults = GetTestResultsInternal(innerResultsElement, xmlns)
                 };
 
             return testResults.ToList();

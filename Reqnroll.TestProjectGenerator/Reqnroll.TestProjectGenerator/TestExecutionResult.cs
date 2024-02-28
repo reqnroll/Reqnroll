@@ -15,6 +15,7 @@ namespace Reqnroll.TestProjectGenerator
         public int Executed { get; set; }
 
         public List<TestResult> TestResults { get; set; }
+        public TestResult[] LeafTestResults { get; set; }
         public List<string> ReportFiles { get; set; }
         public int Warning { get; set; }
         public string LogFileContent { get; set; }
@@ -37,6 +38,7 @@ namespace Reqnroll.TestProjectGenerator
         public List<TestStepResult> Steps { get; set; }
         public int ExecutionCount { get; set; }
         public string ErrorMessage { get; set; }
+        public List<TestResult> InnerResults { get; set; }
     }
 
     public class TestStepResult
