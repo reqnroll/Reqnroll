@@ -1,5 +1,7 @@
 # [vNext]
 
+* Resolve dependencies of [BeforeTestRun] / [AfterTestRun] hooks from the 
+  test run (global) context instead of the test thread context.
 * Support for PriorityAttribute in MsTest adapter
 * Support for Scenario Outline / DataRowAttribute in MsTest adapter
 
