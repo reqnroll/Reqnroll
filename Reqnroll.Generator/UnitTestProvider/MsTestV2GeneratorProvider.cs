@@ -48,6 +48,17 @@ namespace Reqnroll.Generator.UnitTestProvider
             var args = arguments.Select(arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
 
             var tagExpressions = tags.Select(t => (CodeExpression)new CodePrimitiveExpression(t)).ToArray();
+
+            // MsTest v2.* cannot handle string[] as the second argument of the [DataRow] attribute.
+            // To compensate this, we include a dummy parameter and argument in this case.
+            if (tagExpressions.Any() && args.Count <= 1)
+            {
+                args.Add(new CodeAttributeArgument(new CodePrimitiveExpression("")));
+                var dummyParameterName = "notUsed6248";
+                if (testMethod.Parameters.OfType<CodeParameterDeclarationExpression>().All(p => p.Name != dummyParameterName))
+                    testMethod.Parameters.Insert(testMethod.Parameters.Count - 1, new CodeParameterDeclarationExpression(typeof(string), dummyParameterName));
+            }
+
             args.Add(new CodeAttributeArgument(tagExpressions.Any()
                ? new CodeArrayCreateExpression(typeof(string[]), tagExpressions)
                : new CodePrimitiveExpression(null)));
