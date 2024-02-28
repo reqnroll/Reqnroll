@@ -4,11 +4,11 @@ using Reqnroll.TestFramework;
 
 namespace Reqnroll.NUnit.ReqnrollPlugin
 {
-    public class NUnitNetFrameworkTestRunContext : ITestRunContext
+    public class NUnitNetFrameworkTestRunSettingsProvider : ITestRunSettingsProvider
     {
         private readonly IReqnrollPath _reqnrollPath;
 
-        public NUnitNetFrameworkTestRunContext(IReqnrollPath reqnrollPath)
+        public NUnitNetFrameworkTestRunSettingsProvider(IReqnrollPath reqnrollPath)
         {
             _reqnrollPath = reqnrollPath;
         }

@@ -19,6 +19,7 @@ using FluentAssertions;
 using Reqnroll.Analytics;
 using Reqnroll.Events;
 using Reqnroll.Plugins;
+using Reqnroll.TestFramework;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
 {
@@ -38,9 +39,11 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         private Mock<IObsoleteStepHandler> obsoleteTestHandlerMock;
         private FeatureInfo featureInfo;
         private ScenarioInfo scenarioInfo;
+        private ObjectContainer globalContainer;
         private ObjectContainer testThreadContainer;
         private ObjectContainer featureContainer;
         private ObjectContainer scenarioContainer;
+        private DefaultTestRunContext testRunContext;
         private TestObjectResolver defaultTestObjectResolver = new TestObjectResolver();
         private ITestPendingMessageFactory _testPendingMessageFactory;
         private ITestUndefinedMessageFactory _testUndefinedMessageFactory;
@@ -80,9 +83,11 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             reqnrollConfiguration = ConfigurationLoader.GetDefault();
 
-            testThreadContainer = new ObjectContainer();
-            featureContainer = new ObjectContainer();
-            scenarioContainer = new ObjectContainer();
+            globalContainer = new ObjectContainer();
+            testThreadContainer = new ObjectContainer(globalContainer);
+            featureContainer = new ObjectContainer(testThreadContainer);
+            scenarioContainer = new ObjectContainer(scenarioContainer);
+            testRunContext = new DefaultTestRunContext(globalContainer, new Mock<ITestRunSettingsProvider>().Object);
 
             beforeScenarioEvents = new List<IHookBinding>();
             afterScenarioEvents = new List<IHookBinding>();
@@ -176,7 +181,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                 _testPendingMessageFactory,
                 _testUndefinedMessageFactory,
                 testObjectResolverMock.Object,
-                testThreadContainer);
+                testRunContext);
         }
 
 
@@ -464,7 +469,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.OnTestRunStartAsync();
 
-            AssertHooksWasCalledWithParam(hookMock, testThreadContainer);
+            AssertHooksWasCalledWithParam(hookMock, globalContainer);
         }
 
         [Fact]
@@ -494,7 +499,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             AssertHooksWasCalledWithParam(beforeHook, DummyClass.LastInstance);
             AssertHooksWasCalledWithParam(afterHook, DummyClass.LastInstance);
-            testObjectResolverMock.Verify(bir => bir.ResolveBindingInstance(typeof(DummyClass), testThreadContainer),
+            testObjectResolverMock.Verify(bir => bir.ResolveBindingInstance(typeof(DummyClass), globalContainer),
                 Times.Exactly(2));
         }
 

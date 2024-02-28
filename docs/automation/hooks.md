@@ -203,32 +203,19 @@ In the BeforeTestRun hook you can resolve test thread specific or global service
 ```{code-block} csharp
 :caption: Hook File
 [BeforeTestRun]
-public static void BeforeTestRunInjection(ITestRunnerManager testRunnerManager, ITestRunner testRunner)
+public static void BeforeTestRunInjection(ITestRunnerManager testRunnerManager)
 {
-    //All parameters are resolved from the test thread container automatically.
-    //Since the global container is the base container of the test thread container, globally registered services can be also injected.
-
-    //ITestRunManager from global container
+    //All parameters are resolved from the test run (global) container automatically.
     var location = testRunnerManager.TestAssembly.Location;
-    
-    //ITestRunner from test thread container
-    var threadId = testRunner.ThreadId;
 }
 ```
 
 ```{code-block} csharp
 :caption: Hook File with async method
 [BeforeTestRun]
-public static async Task BeforeTestRunInjectionAsync(ITestRunnerManager testRunnerManager, ITestRunner testRunner)
+public static async Task BeforeTestRunInjectionAsync(ITestRunnerManager testRunnerManager)
 {
-    //All parameters are resolved from the test thread container automatically.
-    //Since the global container is the base container of the test thread container, globally registered services can be also injected.
-
-    //ITestRunManager from global container
     var location = testRunnerManager.TestAssembly.Location;
-    
-    //ITestRunner from test thread container
-    var threadId = testRunner.ThreadId;
 
     // Example async operation
     await Task.Delay(1000);
@@ -239,7 +226,7 @@ Depending on the type of the hook the parameters are resolved from a container w
 
 | Attribute | Container |
 |-----------|-----------|
-| `[BeforeTestRun]`<br/>`[AfterTestRun]` | TestThreadContainer |
+| `[BeforeTestRun]`<br/>`[AfterTestRun]` | TestRunContainer ("global" container) |
 | `[BeforeFeature]`<br/>`[AfterFeature]` | FeatureContainer    |
 | `[BeforeScenario]`<br/>`[AfterScenario]`<br/>`[BeforeScenarioBlock]`<br/>`[AfterScenarioBlock]`<br/>`[BeforeStep]`<br/>`[AfterStep]`| ScenarioContainer |
 

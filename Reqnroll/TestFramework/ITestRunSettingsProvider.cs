@@ -1,6 +1,6 @@
 namespace Reqnroll.TestFramework
 {
-    public interface ITestRunContext
+    public interface ITestRunSettingsProvider
     {
         string GetTestDirectory();
     }

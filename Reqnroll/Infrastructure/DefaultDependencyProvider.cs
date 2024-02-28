@@ -24,6 +24,7 @@ namespace Reqnroll.Infrastructure
     {
         public virtual void RegisterGlobalContainerDefaults(ObjectContainer container)
         {
+            container.RegisterTypeAs<DefaultTestRunContext, ITestRunContext>();
             container.RegisterTypeAs<DefaultRuntimeConfigurationProvider, IRuntimeConfigurationProvider>();
 
             container.RegisterTypeAs<TestRunnerManager, ITestRunnerManager>();
@@ -69,7 +70,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<BinaryFileAccessor, IBinaryFileAccessor>();
             container.RegisterTypeAs<TestPendingMessageFactory, ITestPendingMessageFactory>();
             container.RegisterTypeAs<TestUndefinedMessageFactory, ITestUndefinedMessageFactory>();
-            container.RegisterTypeAs<DefaultTestRunContext, ITestRunContext>();
+            container.RegisterTypeAs<DefaultTestRunSettingsProvider, ITestRunSettingsProvider>();
 
             container.RegisterTypeAs<ReqnrollPath, IReqnrollPath>();
 

@@ -27,7 +27,7 @@ namespace Reqnroll.NUnit.ReqnrollPlugin
         private void RuntimePluginEvents_CustomizeGlobalDependencies(object sender, CustomizeGlobalDependenciesEventArgs e)
         {
 #if NETFRAMEWORK
-            e.ObjectContainer.RegisterTypeAs<NUnitNetFrameworkTestRunContext, ITestRunContext>();
+            e.ObjectContainer.RegisterTypeAs<NUnitNetFrameworkTestRunSettingsProvider, ITestRunSettingsProvider>();
 #endif
         }
 
