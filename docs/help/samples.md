@@ -7,7 +7,7 @@ You can get a deeper understanding of Reqnroll by looking at sample and demo app
 
 * - Sample
   - Reqnroll version
-  - Contributor
+  - Contributors
   - Description
 * - [ReqOverflow](https://github.com/reqnroll/Sample-ReqOverflow)
   - 1.0.0
