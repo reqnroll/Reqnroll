@@ -142,7 +142,6 @@ Hints to speed up tests:
 * Always select a unit test framework and a platform category to run tests.
 * Add the `%TEMP%\SF` folder to the Microsoft Defender Antivirus exclusion list.
 * Add the following processes to the Microsoft Defender Antivirus exclusion list: dotnet.exe, MSBuild.exe, vstest.console.exe, VBCSCompiler.exe, testhost.exe, testhost.x86.exe
-* Set the `MSBUILDDISABLENODEREUSE` environment variable to `1`
 
 Other notes:
 * The Specs tests use an interim version of Reqnroll that you have just built locally. The version number of this package is calculated automatically by the git commits, so after every commit there will be a new version. You might need to do a rebuild to pick it up if you see failures related to not found Reqnroll package versions.
