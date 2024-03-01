@@ -68,6 +68,7 @@ ide-integrations/index
 
 help/troubleshooting
 help/faq
+help/samples
 help/support
 ```
 
