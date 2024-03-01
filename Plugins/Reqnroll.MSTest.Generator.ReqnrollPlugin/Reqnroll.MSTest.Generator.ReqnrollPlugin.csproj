@@ -31,7 +31,7 @@
   </ItemGroup>
 
 
-  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="$(DesignTimeBuild) != 'true' or '$(BuildingProject)' == 'true'">
+  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.cs" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
     <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.template.vb" OutputFile="$(MSBuildThisFileDirectory)\build\MSTest.AssemblyHooks.vb" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
   </Target>

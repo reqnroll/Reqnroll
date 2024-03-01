@@ -68,7 +68,7 @@
   </ItemGroup>
 
   <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" 
-          Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
+          Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask 
       InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" 
       OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" 
@@ -80,6 +80,7 @@
     </ItemGroup>
 
     <ReplaceTextInFileTask 
+      Condition="'$(BuildingInsideVisualStudio)' != 'true'"
       InputFile="$(MSBuildThisFileDirectory)..\CHANGELOG.md" 
       OutputFile="$(MSBuildThisFileDirectory)..\CHANGELOG.md" 
       TextToReplace="[vNext]" 
