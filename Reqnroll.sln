@@ -131,6 +131,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubWorkflows", "GitHubWo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.FeatureSourceGenerator.NUnit", "Reqnroll.FeatureSourceGenerator.NUnit\Reqnroll.FeatureSourceGenerator.NUnit.csproj", "{4E6760C3-CFC4-418B-8954-92DADD653B54}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.FeatureSourceGenerator.NUnit.Example", "Tests\Reqnroll.FeatureSourceGenerator.NUnit.Example\Reqnroll.FeatureSourceGenerator.NUnit.Example.csproj", "{F9321D18-EEA5-4B21-B988-1632FC081CD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -525,6 +527,18 @@ Global
 		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4E6760C3-CFC4-418B-8954-92DADD653B54}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{4E6760C3-CFC4-418B-8954-92DADD653B54}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -565,6 +579,7 @@ Global
 		{2FCD6A28-2134-435E-A205-3D55A6F5A389} = {6070E0CF-FA21-4E82-8A22-3B638CA84525}
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE} = {6070E0CF-FA21-4E82-8A22-3B638CA84525}
 		{B6B374C2-ABD8-4F3B-BBF4-505992309168} = {577A0375-1436-446C-802B-3C75C8CEF94F}
+		{F9321D18-EEA5-4B21-B988-1632FC081CD4} = {A10B5CD6-38EC-4D7E-9D1C-2EBA8017E437}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4D0636F-0160-4FA5-81A3-9784C7E3B3A4}

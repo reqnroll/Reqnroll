@@ -1,4 +1,4 @@
-# [vNext]
+# v1.0.2-local - 2024-02-22
 
 * Support for PriorityAttribute in MsTest adapter
 
