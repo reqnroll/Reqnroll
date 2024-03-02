@@ -25,8 +25,12 @@
     <file src="bin\$config$\net462\*.dll" target="tasks\$Reqnroll_FullFramework_Generator_TFM$" />
     <file src="bin\$config$\netcoreapp3.1\*.dll" target="tasks\$Reqnroll_Core_Tools_TFM$" />
     <file src="bin\$config$\netcoreapp3.1\*.deps.json" target="tasks\$Reqnroll_Core_Tools_TFM$" />
-    
-    <file src="bin\$config$\net6.0\*.dll" target="tasks\$Reqnroll_Net6_TFM$" />
+
+    <file src="bin\$config$\net6.0\BoDi.dll" target="tasks\$Reqnroll_Net6_TFM$" />
+    <file src="bin\$config$\net6.0\CucumberExpressions.dll" target="tasks\$Reqnroll_Net6_TFM$" />
+    <file src="bin\$config$\net6.0\Gherkin.dll" target="tasks\$Reqnroll_Net6_TFM$" />
+    <file src="bin\$config$\net6.0\SpecFlow.Internal.Json.dll" target="tasks\$Reqnroll_Net6_TFM$" />
+    <file src="bin\$config$\net6.0\Reqnroll*.dll" target="tasks\$Reqnroll_Net6_TFM$" />
     <file src="bin\$config$\net6.0\*.deps.json" target="tasks\$Reqnroll_Net6_TFM$" />
     
     <file src="$SolutionDir$\Licenses\**\*" target="licenses" />

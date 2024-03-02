@@ -153,16 +153,16 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: | 
-          8.0.x
+          6.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
-    - name: Set .NET 8 SDK
-      run: dotnet new globaljson --sdk-version 8.0.201
+    - name: Set .NET 6 SDK
+      run: dotnet new globaljson --sdk-version 6.0.418
     - name: xUnit Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net8.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-xunit-results.trx"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-xunit-results.trx"
     - name: Publish xUnit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -189,16 +189,16 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: | 
-          8.0.x
+          6.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
-    - name: Set .NET 8 SDK
-      run: dotnet new globaljson --sdk-version 8.0.201
+    - name: Set .NET 6 SDK
+      run: dotnet new globaljson --sdk-version 6.0.418
     - name: NUnit Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net8.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-nunit-results.trx"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-nunit-results.trx"
     - name: Publish NUnit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
@@ -225,16 +225,16 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: | 
-          8.0.x
+          6.0.x
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
-    - name: Set .NET 8 SDK
-      run: dotnet new globaljson --sdk-version 8.0.201
+    - name: Set .NET 6 SDK
+      run: dotnet new globaljson --sdk-version 6.0.418
     - name: MsTest Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net8.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-mstest-results.trx"
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-mstest-results.trx"
     - name: Publish MSTest Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
