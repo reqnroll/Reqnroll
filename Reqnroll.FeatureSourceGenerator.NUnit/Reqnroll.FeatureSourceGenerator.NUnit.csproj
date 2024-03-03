@@ -9,9 +9,39 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <!-- NuGet packaging properties -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <Version>0.1.0-prototype.5</Version>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludePackagesAsPrivateAssets</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Reqnroll.FeatureSourceGenerator.NUnit.Tests"/>
+  </ItemGroup>
+
+  <!-- This target only runs when creating the NuGet package. -->
+  <Target Name="IncludePackagesAsPrivateAssets">
+    <ItemGroup>
+      <PackageReference Update="*">
+        <PrivateAssets>all</PrivateAssets>
+        <GeneratePathProperty>true</GeneratePathProperty>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Include code generator assembly -->
+      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+      <!-- Include dependencies -->
+      <None Include="$(PkgGherkin)\lib\netstandard2.0\Gherkin.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+  </Target>
+
   <ItemGroup>
     <PackageReference Include="Gherkin" Version="26.0.3">
-      <PrivateAssets>all</PrivateAssets>
       <GeneratePathProperty>true</GeneratePathProperty>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" />
@@ -20,25 +50,9 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
-  <!-- NuGet packaging properties -->
-  <PropertyGroup>
-    <IsPackable>true</IsPackable>
-    <IncludeBuildOutput>false</IncludeBuildOutput>
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <Version>0.1.0-prototype.4</Version>
-  </PropertyGroup>
   
   <ItemGroup>
-    <!-- Include icon for packing -->
     <Content Include="..\reqnroll-icon.png" Link="reqnroll-icon.png" PackagePath="\images" PackageCopyToOutput="true" />
-    
-    <!-- Include code generator assembly -->
-    <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
-    
-    <!-- Include dependencies -->
-    <None Include="$(PkgGherkin)\lib\netstandard2.0\Gherkin.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
   </ItemGroup>
-
 
 </Project>
