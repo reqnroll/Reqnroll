@@ -27,7 +27,7 @@ internal class NUnitFeatureSourceGenerator : IIncrementalGenerator
 
                 if (!fileOptions.TryGetValue("build_property.RootNamespace", out var ns))
                 {
-                    ns = "Checklight.Specification";
+                    ns = "ReqnrollGenerated";
                 }
 
                 return (file, ns);
