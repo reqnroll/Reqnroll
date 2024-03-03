@@ -26,6 +26,7 @@ internal static partial class CSharpSyntax
             if (sb.Length == 0 && !IsValidAsFirstCharacterInIdentifier(c))
             {
                 sb.Append('_');
+                sb.Append(c);
                 continue;
             }
 
