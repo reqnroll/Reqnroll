@@ -5,26 +5,30 @@ using Reqnroll.Assist;
 // ReSharper disable once CheckNamespace
 namespace Reqnroll
 {
-    public static class TableHelperExtensionMethods
+    public static class TableExtensionMethods
     {
+        [Obsolete("Use TableHelpers instead")]
         public static T CreateInstance<T>(this Table table)
         {
             return CreateInstance<T>(table, (InstanceCreationOptions)null);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static T CreateInstance<T>(this Table table, InstanceCreationOptions creationOptions)
         {
             var instanceTable = TEHelpers.GetTheProperInstanceTable(table, typeof(T));
             return TEHelpers.ThisTypeHasADefaultConstructor<T>()
-                       ? TEHelpers.CreateTheInstanceWithTheDefaultConstructor<T>(instanceTable, creationOptions)
-                       : TEHelpers.CreateTheInstanceWithTheValuesFromTheTable<T>(instanceTable, creationOptions);
+                       ? TEHelpers.CreateTheInstanceWithTheDefaultConstructor<T>(Service.Instance, instanceTable, creationOptions)
+                       : TEHelpers.CreateTheInstanceWithTheValuesFromTheTable<T>(Service.Instance, instanceTable, creationOptions);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance)
         {
             return CreateInstance(table, methodToCreateTheInstance, null);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance, InstanceCreationOptions creationOptions)
         {
             var instance = methodToCreateTheInstance();
@@ -32,22 +36,26 @@ namespace Reqnroll
             return instance;
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static void FillInstance(this Table table, object instance)
         {
             FillInstance(table, instance, null);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static void FillInstance(this Table table, object instance, InstanceCreationOptions creationOptions)
         {
             var instanceTable = TEHelpers.GetTheProperInstanceTable(table, instance.GetType());
-            TEHelpers.LoadInstanceWithKeyValuePairs(instanceTable, instance, creationOptions);
+            TEHelpers.LoadInstanceWithKeyValuePairs(Service.Instance, instanceTable, instance, creationOptions);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<T> CreateSet<T>(this Table table)
         {
             return CreateSet<T>(table, (InstanceCreationOptions)null);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<T> CreateSet<T>(this Table table, InstanceCreationOptions creationOptions)
         {
             int count = table.Rows.Count;
@@ -65,11 +73,13 @@ namespace Reqnroll
             return list;
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<T> methodToCreateEachInstance)
         {
             return CreateSet(table, methodToCreateEachInstance, null);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
         {
             int count = table.Rows.Count;
@@ -86,11 +96,13 @@ namespace Reqnroll
             return list;
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance)
         {
             return CreateSet(table, methodToCreateEachInstance, null);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
         {
             int count = table.Rows.Count;

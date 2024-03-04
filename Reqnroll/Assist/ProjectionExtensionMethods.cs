@@ -1,27 +1,36 @@
+using System;
 using System.Collections.Generic;
 
 namespace Reqnroll.Assist
 {
     public static class ProjectionExtensionMethods
     {
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<Projection<T>> ToProjection<T>(this IEnumerable<T> collection, Table table = null)
         {
-            return new EnumerableProjection<T>(table, collection);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table, collection);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<Projection<T>> ToProjection<T>(this Table table)
         {
-            return new EnumerableProjection<T>(table);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<Projection<T>> ToProjectionOfSet<T>(this Table table, IEnumerable<T> collection)
         {
-            return new EnumerableProjection<T>(table);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table);
         }
 
+        [Obsolete("Use TableHelpers instead")]
         public static IEnumerable<Projection<T>> ToProjectionOfInstance<T>(this Table table, T instance)
         {
-            return new EnumerableProjection<T>(table);
+            var tableHelpers = new TableHelpers(Service.Instance);
+            return new EnumerableProjection<T>(tableHelpers, table);
         }
     }
 }

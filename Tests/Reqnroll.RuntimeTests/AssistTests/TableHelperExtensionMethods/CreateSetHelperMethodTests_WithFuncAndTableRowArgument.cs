@@ -11,6 +11,7 @@ using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
 {
     
+    [Obsolete]
     public class CreateSetHelperMethodTests_WithFuncAndTableRowArgument
     {
         public CreateSetHelperMethodTests_WithFuncAndTableRowArgument()

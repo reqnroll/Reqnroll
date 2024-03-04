@@ -10,10 +10,12 @@ namespace Reqnroll.Specs.StepDefinitions
     public class GherkinParserSteps
     {
         private readonly ParserDriver _parserDriver;
-        
-        public GherkinParserSteps(ParserDriver parserDriver)
+        private readonly TableHelpers _tableHelpers;
+
+        public GherkinParserSteps(ParserDriver parserDriver, TableHelpers tableHelpers)
         {
             _parserDriver = parserDriver;
+            _tableHelpers = tableHelpers;
         }
 
         [Given(@"there is a Gherkin file as")]
@@ -37,7 +39,7 @@ namespace Reqnroll.Specs.StepDefinitions
         [StepArgumentTransformation]
         public List<ExpectedError> ConvertExpectedErrors(Table table)
         {
-            return table.CreateSet<ExpectedError>().ToList();
+            return _tableHelpers.CreateSet<ExpectedError>(table).ToList();
         }
 
         [Then(@"the following errors are provided")]

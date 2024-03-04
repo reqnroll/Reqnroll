@@ -9,6 +9,7 @@ using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 namespace Reqnroll.RuntimeTests.AssistTests
 {
     
+    [Obsolete]
     public class InstanceEquivalenceExtensionMethodTests
     {
         public InstanceEquivalenceExtensionMethodTests()

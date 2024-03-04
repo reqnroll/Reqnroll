@@ -8,63 +8,75 @@ namespace TechTalk.SpecFlow.Assist;
 
 public static class TableHelperExtensionMethods
 {
+    [Obsolete("Use TableHelpers instead")]
     public static T CreateInstance<T>(this Table table)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateInstance<T>(table);
+        return Reqnroll.TableExtensionMethods.CreateInstance<T>(table);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static T CreateInstance<T>(this Table table, InstanceCreationOptions creationOptions)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateInstance<T>(table, creationOptions);
+        return Reqnroll.TableExtensionMethods.CreateInstance<T>(table, creationOptions);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateInstance(table, methodToCreateTheInstance);
+        return Reqnroll.TableExtensionMethods.CreateInstance(table, methodToCreateTheInstance);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance, InstanceCreationOptions creationOptions)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateInstance(table, methodToCreateTheInstance, creationOptions);
+        return Reqnroll.TableExtensionMethods.CreateInstance(table, methodToCreateTheInstance, creationOptions);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static void FillInstance(this Table table, object instance)
     {
-        Reqnroll.TableHelperExtensionMethods.FillInstance(table, instance);
+        Reqnroll.TableExtensionMethods.FillInstance(table, instance);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static void FillInstance(this Table table, object instance, InstanceCreationOptions creationOptions)
     {
-        Reqnroll.TableHelperExtensionMethods.FillInstance(table, instance, creationOptions);
+        Reqnroll.TableExtensionMethods.FillInstance(table, instance, creationOptions);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static IEnumerable<T> CreateSet<T>(this Table table)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table);
+        return Reqnroll.TableExtensionMethods.CreateSet<T>(table);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static IEnumerable<T> CreateSet<T>(this Table table, InstanceCreationOptions creationOptions)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, creationOptions);
+        return Reqnroll.TableExtensionMethods.CreateSet<T>(table, creationOptions);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static IEnumerable<T> CreateSet<T>(this Table table, Func<T> methodToCreateEachInstance)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance);
+        return Reqnroll.TableExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static IEnumerable<T> CreateSet<T>(this Table table, Func<T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance, creationOptions);
+        return Reqnroll.TableExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance, creationOptions);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance);
+        return Reqnroll.TableExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance);
     }
 
+    [Obsolete("Use TableHelpers instead")]
     public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance, InstanceCreationOptions creationOptions)
     {
-        return Reqnroll.TableHelperExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance, creationOptions);
+        return Reqnroll.TableExtensionMethods.CreateSet<T>(table, methodToCreateEachInstance, creationOptions);
     }
 }

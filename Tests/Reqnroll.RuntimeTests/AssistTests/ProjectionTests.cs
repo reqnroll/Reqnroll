@@ -10,7 +10,7 @@ using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 
 namespace Reqnroll.RuntimeTests.AssistTests
 {
-    
+    [Obsolete]
     public class ProjectionTests
     {
         private SetComparisonTestObject testInstance;

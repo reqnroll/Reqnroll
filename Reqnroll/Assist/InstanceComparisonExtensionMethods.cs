@@ -8,36 +8,35 @@ namespace Reqnroll
 {
     public static class InstanceComparisonExtensionMethods
     {
-
+        [Obsolete("Use TableHelpers instead")]
         public static void CompareToInstance<T>(this Table table, T instance)
         {
             AssertThatTheInstanceExists(instance);
 
             var instanceTable = TEHelpers.GetTheProperInstanceTable(table, typeof(T));
 
-            var differences = FindAnyDifferences(instanceTable, instance);
+            var differences = FindAnyDifferences(Service.Instance, instanceTable, instance);
 
-            if (ThereAreAnyDifferences(differences))
-                ThrowAnExceptionThatDescribesThoseDifferences(differences);
+            if (ThereAreAnyDifferences(differences)) ThrowAnExceptionThatDescribesThoseDifferences(differences);
         }
 
         /// <summary>
         /// Indicates whether the table is equivalent to the specified instance by comparing the values of all
         /// columns against the properties of the instance.  Will return false after finding the first difference.
         /// </summary>
+        [Obsolete("Use TableHelpers instead")]
         public static bool IsEquivalentToInstance<T>(this Table table, T instance)
         {
             AssertThatTheInstanceExists(instance);
 
             var instanceTable = TEHelpers.GetTheProperInstanceTable(table, typeof(T));
 
-            return HasDifference(instanceTable, instance) == false;
+            return HasDifference(Service.Instance, instanceTable, instance) == false;
         }
 
         private static void AssertThatTheInstanceExists<T>(T instance)
         {
-            if (instance == null)
-                throw new ComparisonException("The item to compare was null.");
+            if (instance == null) throw new ComparisonException("The item to compare was null.");
         }
 
         private static void ThrowAnExceptionThatDescribesThoseDifferences(IEnumerable<Difference> differences)
@@ -47,23 +46,25 @@ namespace Reqnroll
 
         private static string CreateDescriptiveErrorMessage(IEnumerable<Difference> differences)
         {
-            return differences.Aggregate(@"The following fields did not match:",
-                                         (sum, next) => sum + (Environment.NewLine + next.Description));
+            return differences.Aggregate(
+                @"The following fields did not match:",
+                (sum, next) => sum + (Environment.NewLine + next.Description));
         }
 
-        private static Difference[] FindAnyDifferences<T>(Table table, T instance)
+        private static Difference[] FindAnyDifferences<T>(Service service, Table table, T instance)
         {
             return (from row in table.Rows
-                    where ThePropertyDoesNotExist(instance, row) || TheValuesDoNotMatch(instance, row)
-                    select CreateDifferenceForThisRow(instance, row)).ToArray();
+                    where ThePropertyDoesNotExist(instance, row) || TheValuesDoNotMatch(service, instance, row)
+                    select CreateDifferenceForThisRow(service, instance, row)).ToArray();
         }
 
-        private static bool HasDifference<T>(Table table, T instance)
+        private static bool HasDifference<T>(Service service, Table table, T instance)
         {
             // This method exists so it will stop evaluating the instance (hence stop using Reflection)
             // after the first difference is found.
-            return (from row in table.Rows select row)
-                   .Any(row => ThePropertyDoesNotExist(instance, row) || TheValuesDoNotMatch(instance, row));
+            return (from row in table.Rows
+                    select row)
+                .Any(row => ThePropertyDoesNotExist(instance, row) || TheValuesDoNotMatch(service, instance, row));
         }
 
         private static bool ThereAreAnyDifferences(IEnumerable<Difference> differences)
@@ -73,23 +74,26 @@ namespace Reqnroll
 
         internal static bool ThePropertyDoesNotExist<T>(T instance, DataTableRow row)
         {
-            return instance.GetType().GetProperties()
-                .Any(property => TEHelpers.IsMemberMatchingToColumnName(property, row.Id())) == false;
+            return instance.GetType()
+                           .GetProperties()
+                           .Any(property => TEHelpers.IsMemberMatchingToColumnName(property, row.Id()))
+                   == false;
         }
 
-        internal static bool ThereIsADifference<T>(T instance, DataTableRow row)
+        internal static bool ThereIsADifference<T>(Service service, T instance, DataTableRow row)
         {
-            return ThePropertyDoesNotExist(instance, row) || TheValuesDoNotMatch(instance, row);
+            return ThePropertyDoesNotExist(instance, row) || TheValuesDoNotMatch(service, instance, row);
         }
 
-        private static bool TheValuesDoNotMatch<T>(T instance, DataTableRow row)
+        private static bool TheValuesDoNotMatch<T>(Service service, T instance, DataTableRow row)
         {
             var expected = GetTheExpectedValue(row);
             var propertyValue = instance.GetPropertyValue(row.Id());
-            var comparer = FindValueComparerForValue(propertyValue);
+            var comparer = FindValueComparerForValue(service, propertyValue);
 
             return comparer
-                .Compare(expected, propertyValue) == false;
+                       .Compare(expected, propertyValue)
+                   == false;
         }
 
         private static string GetTheExpectedValue(DataTableRow row)
@@ -97,26 +101,23 @@ namespace Reqnroll
             return row.Value();
         }
 
-        private static Difference CreateDifferenceForThisRow<T>(T instance, DataTableRow row)
+        private static Difference CreateDifferenceForThisRow<T>(Service service, T instance, DataTableRow row)
         {
             var propertyName = row.Id();
 
-            if (ThePropertyDoesNotExist(instance, row))
-                return new PropertyDoesNotExist(propertyName);
+            if (ThePropertyDoesNotExist(instance, row)) return new PropertyDoesNotExist(propertyName);
 
             var expected = row.Value();
             var actual = instance.GetPropertyValue(propertyName);
-            var comparer = FindValueComparerForProperty(instance, propertyName);
+            var comparer = FindValueComparerForProperty(service, instance, propertyName);
             return new PropertyDiffers(propertyName, expected, actual, comparer);
         }
 
-        private static IValueComparer FindValueComparerForProperty<T>(T instance, string propertyName) =>
-            FindValueComparerForValue(
-                instance.GetPropertyValue(propertyName));
+        private static IValueComparer FindValueComparerForProperty<T>(Service service, T instance, string propertyName) =>
+            FindValueComparerForValue(service, instance.GetPropertyValue(propertyName));
 
-        private static IValueComparer FindValueComparerForValue(object propertyValue) =>
-            Service.Instance.ValueComparers
-                .FirstOrDefault(x => x.CanCompare(propertyValue));
+        private static IValueComparer FindValueComparerForValue(Service service, object propertyValue) =>
+            service.ValueComparers.FirstOrDefault(x => x.CanCompare(propertyValue));
 
         private abstract class Difference
         {
@@ -156,7 +157,7 @@ namespace Reqnroll
         }
     }
 
-    public static class TableHelpers
+    public static class SetComparerTableHelpers
     {
         public static string Id(this DataTableRow row)
         {

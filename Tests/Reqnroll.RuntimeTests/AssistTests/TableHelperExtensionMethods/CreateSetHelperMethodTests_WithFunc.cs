@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -10,6 +11,7 @@ using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
 {
     
+    [Obsolete]
     public class CreateSetHelperMethodTests_WithFunc
     {
         public CreateSetHelperMethodTests_WithFunc()

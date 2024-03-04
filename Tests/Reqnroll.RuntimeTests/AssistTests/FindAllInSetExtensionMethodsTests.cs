@@ -11,6 +11,7 @@ using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 namespace Reqnroll.RuntimeTests.AssistTests
 {
     
+    [Obsolete]
     public class FindAllInSetExtensionMethodsTests
     {
         private IList<InstanceComparisonTestObject> testSet;

@@ -27,9 +27,10 @@ namespace Reqnroll.RuntimeTests.AssistTests.SituationalTests.EnumberableValueRet
         [Fact]
         public void CanRetrieveAListThatContainsValuesThatShouldBeRetrievedByACustomValueRetriever()
         {
-            Service.Instance.ValueRetrievers.Register(new NullValueRetriever("<null>"));
+            var service = new Service();
+            service.ValueRetrievers.Register(new NullValueRetriever("<null>"));
 
-            var retriever_under_test = Service.Instance.GetValueRetrieverFor(testRow, typeof(object), typeof(IList<Nullable<int>>));
+            var retriever_under_test = service.GetValueRetrieverFor(testRow, typeof(object), typeof(IList<Nullable<int>>));
             retriever_under_test.Should().NotBeNull();
 
             var can = retriever_under_test.CanRetrieve(Val, typeof(IList<Nullable<int>>));
@@ -63,13 +64,17 @@ namespace Reqnroll.RuntimeTests.AssistTests.SituationalTests.EnumberableValueRet
         [MemberData(nameof(EnumerableRetrieverWithNullableValueRetriever_TestCases))]
         public void IntegrationOfEnumerableRetrieverWithNullableValueRetriever(string input, IEnumerable<int?> expectedValues)
         {
-            Service.Instance.ValueRetrievers.Register(new NullValueRetriever("<null>"));
+            var service = new Service();
+            service.ValueRetrievers.Register(new NullValueRetriever("<null>"));
+                
+            var tableHelpers = new TableHelpers(service);
+            
             var table = new Table("Field", "Value");
             table.AddRow("MyExampleValues", input);
 
             var expected = expectedValues.ToList();
 
-            var test = table.CreateInstance<Example>();
+            var test = tableHelpers.CreateInstance<Example>(table);
             test.MyExampleValues.Should().BeEquivalentTo(expected);
 
 
