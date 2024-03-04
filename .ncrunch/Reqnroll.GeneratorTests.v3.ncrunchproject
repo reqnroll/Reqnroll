@@ -1,0 +1,6 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <ConsiderInconclusiveTestsAsPassing>True</ConsiderInconclusiveTestsAsPassing>
+    <IgnoreThisComponentCompletely>False</IgnoreThisComponentCompletely>
+  </Settings>
+</ProjectConfiguration>

@@ -81,8 +81,8 @@
 
     <ReplaceTextInFileTask 
       Condition="'$(BuildingInsideVisualStudio)' != 'true'"
-      InputFile="$(MSBuildThisFileDirectory)..\CHANGELOG.md" 
-      OutputFile="$(MSBuildThisFileDirectory)..\CHANGELOG.md" 
+      InputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" 
+      OutputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" 
       TextToReplace="[vNext]" 
       TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" 
       WriteOnlyWhenChanged="true" />
