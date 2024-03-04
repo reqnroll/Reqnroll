@@ -10,6 +10,7 @@ using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 namespace Reqnroll.RuntimeTests.AssistTests
 {
     
+    [Obsolete]
     public class RowExtensionMethodTests
     {
         public RowExtensionMethodTests()

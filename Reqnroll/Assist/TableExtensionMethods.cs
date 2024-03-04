@@ -5,7 +5,7 @@ using Reqnroll.Assist;
 // ReSharper disable once CheckNamespace
 namespace Reqnroll
 {
-    public static class TableHelperExtensionMethods
+    public static class TableExtensionMethods
     {
         public static T CreateInstance<T>(this Table table)
         {
@@ -16,8 +16,8 @@ namespace Reqnroll
         {
             var instanceTable = TEHelpers.GetTheProperInstanceTable(table, typeof(T));
             return TEHelpers.ThisTypeHasADefaultConstructor<T>()
-                       ? TEHelpers.CreateTheInstanceWithTheDefaultConstructor<T>(instanceTable, creationOptions)
-                       : TEHelpers.CreateTheInstanceWithTheValuesFromTheTable<T>(instanceTable, creationOptions);
+                       ? TEHelpers.CreateTheInstanceWithTheDefaultConstructor<T>(Service.Instance, instanceTable, creationOptions)
+                       : TEHelpers.CreateTheInstanceWithTheValuesFromTheTable<T>(Service.Instance, instanceTable, creationOptions);
         }
 
         public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance)
@@ -40,7 +40,7 @@ namespace Reqnroll
         public static void FillInstance(this Table table, object instance, InstanceCreationOptions creationOptions)
         {
             var instanceTable = TEHelpers.GetTheProperInstanceTable(table, instance.GetType());
-            TEHelpers.LoadInstanceWithKeyValuePairs(instanceTable, instance, creationOptions);
+            TEHelpers.LoadInstanceWithKeyValuePairs(Service.Instance, instanceTable, instance, creationOptions);
         }
 
         public static IEnumerable<T> CreateSet<T>(this Table table)
@@ -85,6 +85,7 @@ namespace Reqnroll
 
             return list;
         }
+
 
         public static IEnumerable<T> CreateSet<T>(this Table table, Func<DataTableRow, T> methodToCreateEachInstance)
         {

@@ -1,3 +1,4 @@
+using System;
 using FluentAssertions;
 using Xunit;
 using Reqnroll.Assist;
@@ -6,6 +7,7 @@ using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
 {
     
+    [Obsolete]
     public class FillInstanceHelperMethodTests : CreateInstanceHelperMethodTestBase
     {
         public FillInstanceHelperMethodTests()

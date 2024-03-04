@@ -10,6 +10,7 @@ using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 namespace Reqnroll.RuntimeTests.AssistTests
 {
     
+    [Obsolete]
     public class FindInSetExtensionMethodsTests
     {
         private IList<InstanceComparisonTestObject> testSet;

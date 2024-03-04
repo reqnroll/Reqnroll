@@ -3,25 +3,29 @@ using System.Globalization;
 using System.Threading;
 using Xunit;
 using FluentAssertions;
+using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 
-namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
+namespace Reqnroll.RuntimeTests.AssistTests.TableHelpersTests
 {
-    public abstract class CreateInstanceHelperMethodTestBase
+    public abstract class TableHelpersTestBase
     {
-        private readonly Func<Table, Person> func;
+        private readonly Func<TableHelpers, Table, Person> func;
 
-        public CreateInstanceHelperMethodTestBase(Func<Table, Person> func)
+        protected TableHelpers Sut { get; }
+
+        public TableHelpersTestBase(Func<TableHelpers, Table, Person> func)
         {
             this.func = func;
+            Sut = new TableHelpers(new Service());
         }
 
         public Person GetThePerson(Table table)
         {
-            return func(table);
+            return func(Sut, table);
         }
 
-        public CreateInstanceHelperMethodTestBase()
+        public TableHelpersTestBase()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
         }

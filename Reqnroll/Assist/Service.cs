@@ -14,13 +14,13 @@ namespace Reqnroll.Assist
         public Service()
         {
             ValueComparers = new ReqnrollDefaultValueComparerList();
-            ValueRetrievers = new ReqnrollDefaultValueRetrieverList();
+            ValueRetrievers = new ReqnrollDefaultValueRetrieverList(this);
         }
 
         public void RestoreDefaults()
         {
             ValueComparers = new ReqnrollDefaultValueComparerList();
-            ValueRetrievers = new ReqnrollDefaultValueRetrieverList();
+            ValueRetrievers = new ReqnrollDefaultValueRetrieverList(this);
         }
 
         [Obsolete("Use ValueComparers.Register")]

@@ -1,12 +1,10 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using FluentAssertions;
 using Reqnroll.Assist;
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
-using Reqnroll.TestProjectGenerator.Helpers;
 
 namespace Reqnroll.Specs.StepDefinitions
 {
@@ -17,13 +15,15 @@ namespace Reqnroll.Specs.StepDefinitions
         private readonly VSTestExecutionDriver _vsTestExecutionDriver;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly TestRunLogDriver _testRunLogDriver;
+        private readonly TableHelpers _tableHelpers;
 
-        public ExecutionResultSteps(BindingsDriver bindingsDriver, VSTestExecutionDriver vsTestExecutionDriver, TestProjectFolders testProjectFolders, TestRunLogDriver testRunLogDriver)
+        public ExecutionResultSteps(BindingsDriver bindingsDriver, VSTestExecutionDriver vsTestExecutionDriver, TestProjectFolders testProjectFolders, TestRunLogDriver testRunLogDriver, TableHelpers tableHelpers)
         {
             _bindingsDriver = bindingsDriver;
             _vsTestExecutionDriver = vsTestExecutionDriver;
             _testProjectFolders = testProjectFolders;
             _testRunLogDriver = testRunLogDriver;
+            _tableHelpers = tableHelpers;
         }
 
         [Then(@"the tests were executed successfully")]
@@ -39,14 +39,14 @@ namespace Reqnroll.Specs.StepDefinitions
         public void ThenTheExecutionSummaryShouldContain(Table expectedTestExecutionResult)
         {
             _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
-            expectedTestExecutionResult.CompareToInstance(_vsTestExecutionDriver.LastTestExecutionResult);
+            _tableHelpers.CompareToInstance(expectedTestExecutionResult,_vsTestExecutionDriver.LastTestExecutionResult);
 
             // if we only assert for total number of tests, we will make an additional assertion for the 
             // successful tests with the same count, to highlight hidden runtime errors
             if (expectedTestExecutionResult.Header.Count == 1 && expectedTestExecutionResult.ContainsColumn("Total"))
             {
                 expectedTestExecutionResult.RenameColumn("Total", "Succeeded");
-                expectedTestExecutionResult.CompareToInstance(_vsTestExecutionDriver.LastTestExecutionResult);
+                _tableHelpers.CompareToInstance(expectedTestExecutionResult,_vsTestExecutionDriver.LastTestExecutionResult);
             }
         }
 

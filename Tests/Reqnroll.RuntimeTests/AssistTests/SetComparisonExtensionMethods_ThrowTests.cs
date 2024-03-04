@@ -8,6 +8,7 @@ using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 
 namespace Reqnroll.RuntimeTests.AssistTests
 {
+    [Obsolete]
     public abstract class SetComparisonExtensionMethods_ThrowTests
     {
         public SetComparisonExtensionMethods_ThrowTests()
@@ -376,6 +377,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
     }
 
     
+    [Obsolete]
     public class SetComparisonExtensionMethods_OrderInsensitive_ThrowTests : SetComparisonExtensionMethods_ThrowTests
     {
         [Fact]
@@ -405,6 +407,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
     }
 
     
+    [Obsolete]
     public class SetComparisonExtensionMethods_OrderSensitive_ThrowTests : SetComparisonExtensionMethods_ThrowTests
     {
         [Fact]
