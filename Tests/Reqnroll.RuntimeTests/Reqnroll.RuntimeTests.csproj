@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_Test_TFM)</TargetFrameworks>
+    <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>Reqnroll.RuntimeTests</AssemblyName>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
