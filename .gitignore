@@ -139,9 +139,7 @@ _TeamCity*
 *.coveragexml
 
 # NCrunch
-_NCrunch_*
-.*crunch*.local.xml
-nCrunchTemp_*
+/.ncrunch/cache/
 
 # MightyMoose
 *.mm.*
@@ -343,12 +341,9 @@ obj/
 [Dd]ebug*/
 [Rr]elease*/
 _ReSharper*/
-_NCrunch*/
 *.pidb
 *.userprefs
 *.resharper
-*.ncrunchproject
-*.ncrunchsolution
 *.cache
 *.gpState
 *.dotCover
@@ -365,7 +360,6 @@ UpgradeLog*
 .vs/*
 
 #Reqnroll Stuff
-/_NCrunch_Reqnroll_VS2013/StoredText
 !lib/**
 Reqnroll.Tools/app.config
 Reqnroll.Tools/plugincompability.config

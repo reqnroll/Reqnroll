@@ -1,0 +1,12 @@
+﻿<SolutionConfiguration>
+  <Settings>
+    <AdditionalFilesToIncludeForSolution>
+      <Value>CHANGELOG.md</Value>
+      <Value>GeneratedNuGetPackages\Debug\**.*</Value>
+    </AdditionalFilesToIncludeForSolution>
+    <AllowParallelTestExecution>True</AllowParallelTestExecution>
+    <NCrunchCacheStoragePath>.ncrunch\cache</NCrunchCacheStoragePath>
+    <ProjectConfigStoragePathRelativeToSolutionDir>.ncrunch</ProjectConfigStoragePathRelativeToSolutionDir>
+    <SolutionConfigured>True</SolutionConfigured>
+  </Settings>
+</SolutionConfiguration>
