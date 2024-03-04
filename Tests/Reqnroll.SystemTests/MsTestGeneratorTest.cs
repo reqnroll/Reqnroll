@@ -69,6 +69,13 @@ public class MsTestGeneratorTest
     }
 
     // This is an example of a test that verifies a special case
+
+
+    /// <summary>
+    /// MsTest v2.* defines the [DataRow] attribute with a ctor that cannot handle if the second
+    /// parameter of the attribute is a string[]. This causes problems with single-column examples,
+    /// because in this case the second parameter is a list of example block tags passed in as string[].
+    /// </summary>
     [Fact]
     public void Generator_handles_tagged_examples_block_with_single_column()
     {
@@ -81,8 +88,11 @@ public class MsTestGeneratorTest
                 | what |
                 | foo  |
                 | bar  |
+            Examples: Second example without tags - in this case the tag list is null.
+                | what |
+                | baz  |
             """);
         _projectsDriver.AddPassingStepBinding();
-        ShouldAllScenariosPass(2);
+        ShouldAllScenariosPass(3);
     }
 }
