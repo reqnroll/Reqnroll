@@ -51,7 +51,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
             // MsTest v2.* cannot handle string[] as the second argument of the [DataRow] attribute.
             // To compensate this, we include a dummy parameter and argument in this case.
-            if (tagExpressions.Any() && args.Count <= 1)
+            if (args.Count <= 1)
             {
                 args.Add(new CodeAttributeArgument(new CodePrimitiveExpression("")));
                 var dummyParameterName = "notUsed6248";
