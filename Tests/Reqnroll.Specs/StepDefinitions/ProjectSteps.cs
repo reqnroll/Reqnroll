@@ -44,7 +44,7 @@ namespace Reqnroll.Specs.StepDefinitions
         [When(@"I compile the solution")]
         public void WhenTheProjectIsCompiled()
         {
-            _compilationDriver.CompileSolution();
+            _compilationDriver.CompileSolution(failOnError: false);
         }
 
         [Then(@"no compilation errors are reported")]

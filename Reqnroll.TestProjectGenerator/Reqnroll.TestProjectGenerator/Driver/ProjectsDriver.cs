@@ -84,6 +84,16 @@ namespace Reqnroll.TestProjectGenerator.Driver
             _solutionDriver.DefaultProject.AddFeatureFile(featureFileContent);
         }
 
+        public void AddScenario(string scenarioContent)
+        {
+            AddFeatureFile(
+                $$"""
+                  Feature: Sample Feature
+                  
+                  {{scenarioContent}}
+                  """);
+        }
+
         public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode)
         {
             _solutionDriver.DefaultProject.AddStepBinding(attributeName, regex, csharpcode, vbnetcode);
@@ -150,6 +160,11 @@ namespace Reqnroll.TestProjectGenerator.Driver
         public void AddFailingStepBinding(string scenarioBlock, string stepRegex)
         {
             AddStepBinding(scenarioBlock, stepRegex, @"throw new System.Exception(""simulated failure"");", @"Throw New System.Exception(""simulated failure"")");
+        }
+
+        public void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
+        {
+            AddStepBinding(scenarioBlock, stepRegex, "//pass", "'pass");
         }
     }
 }

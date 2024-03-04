@@ -74,11 +74,7 @@ namespace Reqnroll.TestProjectGenerator
 
             if (!processResult)
             {
-#if NETCOREAPP3_1_OR_GREATER
-                process.Kill(true);
-#else
                 process.Kill();
-#endif
             }
 
             var waitForOutputs = Timeout-sw.Elapsed;
@@ -121,11 +117,7 @@ namespace Reqnroll.TestProjectGenerator
 
             cancellationTokenSource.Token.Register(() =>
             {
-#if NETCOREAPP3_1_OR_GREATER
-                process.Kill(true);
-#else
                 process.Kill();
-#endif
                 var waitForOutputs = Timeout - sw.Elapsed;
                 if (waitForOutputs <= TimeSpan.Zero || waitForOutputs > TimeSpan.FromMinutes(1)) waitForOutputs = TimeSpan.FromMinutes(1);
                 outputWaiter.Wait(waitForOutputs);

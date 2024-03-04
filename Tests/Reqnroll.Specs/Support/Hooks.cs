@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Reqnroll.Specs.Drivers;
 using Reqnroll.TestProjectGenerator;
+using Reqnroll.TestProjectGenerator.Conventions;
 using Reqnroll.TestProjectGenerator.Helpers;
 using Reqnroll.UnitTestProvider;
 
@@ -53,7 +54,7 @@ namespace Reqnroll.Specs.Support
         public static void BeforeTestRun()
         {
             var appConfigDriver = new AppConfigDriver();
-            var folders = new Folders(appConfigDriver);
+            var folders = new Folders(appConfigDriver, new ArtifactNamingConvention());
 
             DeletePackageVersionFolders();
             DeleteOldTestRunData(folders);

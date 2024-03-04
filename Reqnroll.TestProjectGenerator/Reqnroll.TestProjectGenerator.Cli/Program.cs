@@ -135,7 +135,7 @@ namespace Reqnroll.TestProjectGenerator.Cli
 
             services.AddSingleton<IOutputWriter, OutputWriter>();
             services.AddSingleton<Folders, FoldersOverride>();
-            services.AddSingleton<SolutionNamingConvention, SolutionNamingConventionOverride>();
+            services.AddSingleton<ArtifactNamingConvention, ArtifactNamingConventionOverride>();
 
             services.AddSingleton<IProjectContentGenerator, ComplexProjectContentGenerator>();
 

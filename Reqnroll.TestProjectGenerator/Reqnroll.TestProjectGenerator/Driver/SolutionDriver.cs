@@ -16,7 +16,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
         private readonly TestRunConfiguration _testRunConfiguration;
         private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly Folders _folders;
-        private readonly SolutionNamingConvention _solutionNamingConvention;
+        private readonly ArtifactNamingConvention _artifactNamingConvention;
         private readonly Solution _solution;
         private readonly Dictionary<string, ProjectBuilder> _projects = new Dictionary<string, ProjectBuilder>();
         private ProjectBuilder _defaultProject;
@@ -27,13 +27,13 @@ namespace Reqnroll.TestProjectGenerator.Driver
             ProjectBuilderFactory projectBuilderFactory,
             Folders folders,
             TestProjectFolders testProjectFolders,
-            SolutionNamingConvention solutionNamingConvention)
+            ArtifactNamingConvention artifactNamingConvention)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _testRunConfiguration = testRunConfiguration;
             _projectBuilderFactory = projectBuilderFactory;
             _folders = folders;
-            _solutionNamingConvention = solutionNamingConvention;
+            _artifactNamingConvention = artifactNamingConvention;
             NuGetSources = new List<NuGetSource>
             {
                 new NuGetSource("LocalReqnrollDevPackages", _folders.NuGetFolder),
@@ -53,14 +53,14 @@ namespace Reqnroll.TestProjectGenerator.Driver
             }
 
             _solution = new Solution(SolutionName);
-            testProjectFolders.PathToSolutionFile = Path.Combine(_folders.FolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
+            testProjectFolders.PathToSolutionFile = Path.Combine(_folders.RunUniqueFolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
 
         public Guid SolutionGuid { get; } = Guid.NewGuid();
 
         public IList<NuGetSource> NuGetSources { get; }
 
-        public string SolutionName => _solutionNamingConvention.GetSolutionName(SolutionGuid);
+        public string SolutionName => _artifactNamingConvention.GetSolutionName(SolutionGuid);
 
         public IReadOnlyDictionary<string, ProjectBuilder> Projects => _projects;
 
@@ -86,7 +86,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 _solution.AddProject(project);
             }
 
-            _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray());
+            _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray(), _folders.RunUniqueGlobalPackages);
             return _solution;
         }
 
