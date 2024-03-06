@@ -250,6 +250,15 @@ In this case the problem is that Reqnroll wrongly identified your expression as 
 [When(@"^I \$ something$")]
 ```
 
+If you have many of such step definitions, you can force all of them to be treated as regex by including the start/end markers using Visual Studio "Find and Replace in Files" (Ctrl+Alt+H) option:
+
+* Set search text to `\[(Given|When|Then)\((@?)"(.*?)"\)\]`
+* Set replacement text to `[$1($2"^$3$$")]`
+* Check "Use regular expressions" setting
+* Click on "Replace All"
+
+This will add the markers to all step definition attributes.
+
 **Solution 2:** Change the expression to be a valid cucumber expression. For the example above, you need to remove the masking character (`\`), because the `$` sign does not have to be masked in cucumber expressions:
 
 ```
