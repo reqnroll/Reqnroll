@@ -6,13 +6,13 @@ namespace Reqnroll.TestProjectGenerator
 {
     public class Compiler
     {
-        private readonly VisualStudioFinder _visualStudioFinder;
+        private readonly MSBuildFinder _msBuildFinder;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly IOutputWriter _outputWriter;
 
-        public Compiler(VisualStudioFinder visualStudioFinder, TestProjectFolders testProjectFolders, IOutputWriter outputWriter)
+        public Compiler(MSBuildFinder msBuildFinder, TestProjectFolders testProjectFolders, IOutputWriter outputWriter)
         {
-            _visualStudioFinder = visualStudioFinder;
+            _msBuildFinder = msBuildFinder;
             _testProjectFolders = testProjectFolders;
             _outputWriter = outputWriter;
         }
@@ -37,7 +37,7 @@ namespace Reqnroll.TestProjectGenerator
             string msBuildPath="";
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                msBuildPath = _visualStudioFinder.FindMSBuild();
+                msBuildPath = _msBuildFinder.FindMSBuild();
             }
             else
             {
