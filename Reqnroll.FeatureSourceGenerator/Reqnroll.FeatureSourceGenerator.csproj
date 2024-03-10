@@ -14,7 +14,7 @@
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <Version>0.1.0-prototype.2</Version>
+    <Version>0.1.0-prototype.3</Version>
   </PropertyGroup>
 
   <ItemGroup>

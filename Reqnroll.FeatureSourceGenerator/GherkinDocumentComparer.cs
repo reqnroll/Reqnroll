@@ -1,6 +1,6 @@
 ﻿using Gherkin.Ast;
 
-namespace Reqnroll.FeatureSourceGenerator.NUnit;
+namespace Reqnroll.FeatureSourceGenerator;
 
 internal class GherkinDocumentComparer : IEqualityComparer<GherkinDocument>
 {

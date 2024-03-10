@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis.Text;
 using System.Text;
 
-namespace Reqnroll.FeatureSourceGenerator.NUnit;
+namespace Reqnroll.FeatureSourceGenerator;
 
 internal class CSharpSourceBuilder
 {

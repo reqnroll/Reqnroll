@@ -1,4 +1,4 @@
-﻿namespace Reqnroll.FeatureSourceGenerator.NUnit;
+﻿namespace Reqnroll.FeatureSourceGenerator;
 
 internal static class DiagnosticIds
 {

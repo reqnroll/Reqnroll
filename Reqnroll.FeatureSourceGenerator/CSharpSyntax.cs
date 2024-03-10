@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Text;
 
-namespace Reqnroll.FeatureSourceGenerator.NUnit;
+namespace Reqnroll.FeatureSourceGenerator;
 
 internal static partial class CSharpSyntax
 {

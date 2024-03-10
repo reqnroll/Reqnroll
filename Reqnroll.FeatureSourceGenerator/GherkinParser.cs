@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 
-namespace Reqnroll.FeatureSourceGenerator.NUnit;
+namespace Reqnroll.FeatureSourceGenerator;
 
 using Location = Gherkin.Ast.Location;
 

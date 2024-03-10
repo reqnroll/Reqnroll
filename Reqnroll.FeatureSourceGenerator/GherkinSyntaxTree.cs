@@ -2,7 +2,7 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 
-namespace Reqnroll.FeatureSourceGenerator.NUnit;
+namespace Reqnroll.FeatureSourceGenerator;
 
 public class GherkinSyntaxTree : IEquatable<GherkinSyntaxTree>
 {

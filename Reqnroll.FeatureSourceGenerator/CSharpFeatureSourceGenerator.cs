@@ -3,10 +3,10 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections.Immutable;
 
-namespace Reqnroll.FeatureSourceGenerator.NUnit;
+namespace Reqnroll.FeatureSourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
-internal class NUnitFeatureSourceGenerator : IIncrementalGenerator
+internal class CSharpFeatureSourceGenerator : IIncrementalGenerator
 {
     private readonly GherkinParser _gherkinParser = new();
 

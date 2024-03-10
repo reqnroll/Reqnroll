@@ -12,7 +12,7 @@ public class NUnitFeatureSourceGeneratorTests
         var features = ImmutableArray.Create<AdditionalText>(
             new FeatureFile("Test.feature", "Feature: Test"));
             
-        var generator = new NUnitFeatureSourceGenerator();
+        var generator = new CSharpFeatureSourceGenerator();
 
         var assemblies = AppDomain.CurrentDomain.GetAssemblies();
 
