@@ -14,11 +14,11 @@
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <Version>0.1.0-prototype.8</Version>
+    <Version>0.1.0-prototype.2</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Reqnroll.FeatureSourceGenerator.NUnit.Tests" />
+    <InternalsVisibleTo Include="Reqnroll.FeatureSourceGenerator.Tests" />
   </ItemGroup>
 
   <!-- This target only runs when creating the NuGet package. -->
@@ -53,6 +53,8 @@
   
   <ItemGroup>
     <Content Include="..\reqnroll-icon.png" Link="reqnroll-icon.png" PackagePath="\images" PackageCopyToOutput="true" />
+
+    <None Include="build\**" Pack="True" PackagePath="\build" />
   </ItemGroup>
 
 </Project>

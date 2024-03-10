@@ -129,11 +129,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubWorkflows", "GitHubWo
 		.github\workflows\lock.yml = .github\workflows\lock.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.FeatureSourceGenerator.NUnit", "Reqnroll.FeatureSourceGenerator.NUnit\Reqnroll.FeatureSourceGenerator.NUnit.csproj", "{4E6760C3-CFC4-418B-8954-92DADD653B54}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.FeatureSourceGenerator.NUnit.Example", "Tests\Reqnroll.FeatureSourceGenerator.NUnit.Example\Reqnroll.FeatureSourceGenerator.NUnit.Example.csproj", "{F9321D18-EEA5-4B21-B988-1632FC081CD4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.FeatureSourceGenerator.NUnit.Example", "Tests\Reqnroll.FeatureSourceGenerator.NUnit.Example\Reqnroll.FeatureSourceGenerator.NUnit.Example.csproj", "{F9321D18-EEA5-4B21-B988-1632FC081CD4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.FeatureSourceGenerator", "Reqnroll.FeatureSourceGenerator\Reqnroll.FeatureSourceGenerator.csproj", "{BAE6E6AD-F68D-4543-A607-A80088256622}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.FeatureSourceGenerator.NUnit.Tests", "Tests\Reqnroll.FeatureSourceGenerator.NUnit.Tests\Reqnroll.FeatureSourceGenerator.NUnit.Tests.csproj", "{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.FeatureSourceGenerator.Tests", "Tests\Reqnroll.FeatureSourceGenerator.Tests\Reqnroll.FeatureSourceGenerator.Tests.csproj", "{12E276C7-EAC3-40E3-85AD-23372E79ECD3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -517,18 +517,6 @@ Global
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{4E6760C3-CFC4-418B-8954-92DADD653B54}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
@@ -541,18 +529,30 @@ Global
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{BAE6E6AD-F68D-4543-A607-A80088256622}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -594,7 +594,7 @@ Global
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE} = {6070E0CF-FA21-4E82-8A22-3B638CA84525}
 		{B6B374C2-ABD8-4F3B-BBF4-505992309168} = {577A0375-1436-446C-802B-3C75C8CEF94F}
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4} = {A10B5CD6-38EC-4D7E-9D1C-2EBA8017E437}
-		{7B21BD18-5AD1-45DD-A6DB-1646C878D8C2} = {0359B7D7-7E29-48E9-8DF9-7D1FACFA5CFA}
+		{12E276C7-EAC3-40E3-85AD-23372E79ECD3} = {0359B7D7-7E29-48E9-8DF9-7D1FACFA5CFA}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4D0636F-0160-4FA5-81A3-9784C7E3B3A4}

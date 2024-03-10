@@ -1,0 +1,5 @@
+<Project>
+  <ItemGroup>
+    <AdditionalFiles Include="**\*.feature" />
+  </ItemGroup>
+</Project>

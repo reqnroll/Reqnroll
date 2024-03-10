@@ -7,7 +7,7 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <RootNamespace>Reqnroll.FeatureSourceGenerator.NUnit</RootNamespace>
+    <RootNamespace>Reqnroll.FeatureSourceGenerator</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.FeatureSourceGenerator.NUnit\Reqnroll.FeatureSourceGenerator.NUnit.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.FeatureSourceGenerator\Reqnroll.FeatureSourceGenerator.csproj" />
   </ItemGroup>
 
 </Project>

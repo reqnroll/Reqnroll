@@ -17,14 +17,10 @@
     <PackageReference Include="NUnit3TestAdapter" Version="4.2.1" />
     <PackageReference Include="NUnit.Analyzers" Version="3.6.1" />
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
-    <PackageReference Include="Reqnroll.FeatureSourceGenerator.NUnit" Version="0.1.0-prototype.8">
+    <PackageReference Include="Reqnroll.FeatureSourceGenerator" Version="0.1.0-prototype.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <AdditionalFiles Include="**\*.feature" />
   </ItemGroup>
 
 </Project>
