@@ -14,16 +14,15 @@
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
-    <Version>0.1.0-prototype.5</Version>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludePackagesAsPrivateAssets</TargetsForTfmSpecificBuildOutput>
+    <Version>0.1.0-prototype.8</Version>
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="Reqnroll.FeatureSourceGenerator.NUnit.Tests"/>
+    <InternalsVisibleTo Include="Reqnroll.FeatureSourceGenerator.NUnit.Tests" />
   </ItemGroup>
 
   <!-- This target only runs when creating the NuGet package. -->
-  <Target Name="IncludePackagesAsPrivateAssets">
+  <Target Name="IncludePackagesAsPrivateAssets" BeforeTargets="_GetPackageFiles" DependsOnTargets="Build">
     <ItemGroup>
       <PackageReference Update="*">
         <PrivateAssets>all</PrivateAssets>
@@ -33,10 +32,10 @@
 
     <ItemGroup>
       <!-- Include code generator assembly -->
-      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
 
-      <!-- Include dependencies -->
-      <None Include="$(PkgGherkin)\lib\netstandard2.0\Gherkin.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+      <!-- Include direct dependencies needed by code-generator -->
+      <None Include="$(PkgGherkin)\lib\netstandard2.0\Gherkin.dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
 
@@ -45,6 +44,7 @@
       <GeneratePathProperty>true</GeneratePathProperty>
     </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.5.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.24072.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
