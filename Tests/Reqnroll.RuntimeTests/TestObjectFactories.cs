@@ -1,5 +1,5 @@
 using System;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using System.Globalization;
 using Reqnroll.Infrastructure;

@@ -32,7 +32,6 @@
 
   <ItemGroup>
     <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
-    <PackageReference Include="BoDi" Version="1.5.0" />
     <PackageReference Include="Gherkin" Version="19.0.3" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="16.0.0" />
     <PackageReference Include="SpecFlow.Internal.Json" Version="1.0.8" />
@@ -67,25 +66,17 @@
     <None Include="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
   </ItemGroup>
 
-  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" 
-          Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask 
-      InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" 
-      OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" 
-      TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" 
-      TextToReplaceWith="$(AppInsightsInstrumentationKey)" 
-      WriteOnlyWhenChanged="true" />
+  <ItemGroup>
+    <ProjectReference Include="..\Reqnroll.BoDi\Reqnroll.BoDi.csproj" />
+  </ItemGroup>
+
+  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+    <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
     <ItemGroup>
       <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
     </ItemGroup>
 
-    <ReplaceTextInFileTask 
-      Condition="'$(BuildingInsideVisualStudio)' != 'true'"
-      InputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" 
-      OutputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" 
-      TextToReplace="[vNext]" 
-      TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" 
-      WriteOnlyWhenChanged="true" />
+    <ReplaceTextInFileTask Condition="'$(BuildingInsideVisualStudio)' != 'true'" InputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" OutputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" TextToReplace="[vNext]" TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" WriteOnlyWhenChanged="true" />
   </Target>
 
 </Project>

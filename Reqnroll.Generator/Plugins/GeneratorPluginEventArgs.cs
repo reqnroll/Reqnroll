@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Infrastructure;
 using Reqnroll.Plugins;

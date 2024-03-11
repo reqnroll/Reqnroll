@@ -1,5 +1,5 @@
 using System;
-using BoDi;
+using Reqnroll.BoDi;
 using Castle.Windsor;
 using Reqnroll.Infrastructure;
 

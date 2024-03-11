@@ -2,7 +2,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using BoDi;
+using Reqnroll.BoDi;
 using Gherkin.Ast;
 using Reqnroll.Parser;
 

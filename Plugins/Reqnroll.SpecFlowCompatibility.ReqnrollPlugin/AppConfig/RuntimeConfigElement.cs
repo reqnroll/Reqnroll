@@ -1,5 +1,5 @@
 using System.Configuration;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 
 namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig

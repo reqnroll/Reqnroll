@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Generation;

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using BoDi;
+using Reqnroll.BoDi;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Reqnroll.Generator;

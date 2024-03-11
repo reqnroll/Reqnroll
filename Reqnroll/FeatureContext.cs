@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 
 namespace Reqnroll

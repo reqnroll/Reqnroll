@@ -1,5 +1,5 @@
 using System;
-using BoDi;
+using Reqnroll.BoDi;
 using NUnit.Framework;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;

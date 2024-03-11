@@ -4,7 +4,7 @@ using System.Threading;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BoDi;
+using Reqnroll.BoDi;
 using FluentAssertions;
 using Moq;
 using Reqnroll.Bindings;

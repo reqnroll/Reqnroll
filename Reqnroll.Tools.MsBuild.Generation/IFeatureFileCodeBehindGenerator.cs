@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BoDi;
+using Reqnroll.BoDi;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {

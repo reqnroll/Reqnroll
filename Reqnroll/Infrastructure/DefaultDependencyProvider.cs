@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
 using Reqnroll.Analytics.UserId;

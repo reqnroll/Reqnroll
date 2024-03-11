@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using BoDi;
+using Reqnroll.BoDi;
 using Moq;
 using Xunit;
 using FluentAssertions;

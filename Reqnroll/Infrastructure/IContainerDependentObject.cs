@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 
 namespace Reqnroll.Infrastructure
 {

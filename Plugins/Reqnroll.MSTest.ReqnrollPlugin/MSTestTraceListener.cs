@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Tracing;
 
 namespace Reqnroll.MSTest.ReqnrollPlugin

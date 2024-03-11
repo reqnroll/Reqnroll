@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Analytics;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;

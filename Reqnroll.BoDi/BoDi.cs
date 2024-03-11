@@ -745,7 +745,7 @@ namespace Reqnroll.BoDi
 
         public bool IsRegistered<T>()
         {
-            return this.IsRegistered<T>(null);
+            return IsRegistered<T>(null);
         }
 
         public bool IsRegistered<T>(string name)

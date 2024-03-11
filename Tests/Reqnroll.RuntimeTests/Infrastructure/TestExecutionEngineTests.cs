@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using BoDi;
+using Reqnroll.BoDi;
 using Moq;
 using Xunit;
 using Reqnroll.BindingSkeletons;

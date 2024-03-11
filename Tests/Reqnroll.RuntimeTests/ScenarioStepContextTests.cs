@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using BoDi;
+using Reqnroll.BoDi;
 using FluentAssertions;
 using Moq;
 using Xunit;

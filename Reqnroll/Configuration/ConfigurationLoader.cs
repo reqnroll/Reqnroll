@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Compatibility;
 using Reqnroll.Configuration.JsonConfig;

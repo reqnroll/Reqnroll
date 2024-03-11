@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Bindings;
 using Reqnroll.Infrastructure;
 

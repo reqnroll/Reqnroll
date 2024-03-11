@@ -2,7 +2,7 @@ using System;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Reflection;
-using BoDi;
+using Reqnroll.BoDi;
 using Castle.Windsor;
 using FluentAssertions;
 using Moq;

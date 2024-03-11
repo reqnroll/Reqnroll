@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Parser;
 
 namespace Reqnroll.Generator.UnitTestConverter

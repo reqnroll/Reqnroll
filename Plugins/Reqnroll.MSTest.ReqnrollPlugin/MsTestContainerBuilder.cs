@@ -1,5 +1,5 @@
 using System.Reflection;
-using BoDi;
+using Reqnroll.BoDi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
