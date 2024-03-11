@@ -6,7 +6,6 @@ using Newtonsoft.Json;
 using Reqnroll.TestProjectGenerator.ConfigurationModel;
 using Reqnroll.TestProjectGenerator.ConfigurationModel.Dependencies;
 using Reqnroll.TestProjectGenerator.Data;
-using Reqnroll.TestProjectGenerator.Extensions;
 using Reqnroll.TestProjectGenerator.Helpers;
 
 namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
@@ -67,19 +66,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
             WriteStepAssemblies(jsonWriter, configuration.BindingAssemblies);
         }
 
-        private void WriteUnitTestProvider(JsonWriter jsonWriter, string unitTestProvider)
-        {
-            // open unitTestProvider object
-            jsonWriter.WritePropertyName("unitTestProvider");
-
-            jsonWriter.WriteStartObject();
-            jsonWriter.WritePropertyName("name");
-            jsonWriter.WriteValue(unitTestProvider);
-
-            // close unitTestProvider
-            jsonWriter.WriteEndObject();
-        }
-
         private void WriteLanguage(JsonWriter jsonWriter, CultureInfo featureLanguage)
         {
             // open language object
@@ -130,46 +116,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
             jsonWriter.WriteValue(stepAssembly.Assembly);
 
             // clase stepAssembly object
-            jsonWriter.WriteEndObject();
-        }
-
-        private void WritePlugins(JsonWriter jsonWriter, IEnumerable<ReqnrollPlugin> plugins)
-        {
-            if (plugins is null) return;
-
-            // open plugins array
-            jsonWriter.WritePropertyName("plugins");
-            jsonWriter.WriteStartArray();
-
-            foreach (var plugin in plugins)
-            {
-                WritePlugin(jsonWriter, plugin);
-            }
-
-            // close plugins array
-            jsonWriter.WriteEndArray();
-        }
-
-        private void WritePlugin(JsonWriter jsonWriter, ReqnrollPlugin plugin)
-        {
-            // open add object
-            jsonWriter.WriteStartObject();
-            jsonWriter.WritePropertyName("name");
-            jsonWriter.WriteValue(plugin.Name);
-
-            if (!string.IsNullOrEmpty(plugin.Path))
-            {
-                jsonWriter.WritePropertyName("path");
-                jsonWriter.WriteValue(plugin.Path);
-            }
-
-            if (plugin.Type != (ReqnrollPluginType.Generator | ReqnrollPluginType.Runtime))
-            {
-                jsonWriter.WritePropertyName("type");
-                jsonWriter.WriteValue(plugin.Type.ToPluginTypeString());
-            }
-
-            // close add object
             jsonWriter.WriteEndObject();
         }
 

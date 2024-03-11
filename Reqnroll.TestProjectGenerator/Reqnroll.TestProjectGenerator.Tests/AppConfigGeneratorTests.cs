@@ -33,54 +33,6 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
 
-        [Fact]
-        public void UnitTestProvider()
-        {
-            var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
-            var projectFile = _appConfigGenerator.Generate(configuration);
-
-
-            projectFile.Content.Should().Contain("<unitTestProvider name=\"SpecRun\" />");
-        }
-
-        [Fact]
-        public void SinglePlugin()
-        {
-            var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
-            configuration.Plugins.Add(new ReqnrollPlugin("SpecRun") );
-            var projectFile = _appConfigGenerator.Generate(configuration);
-
-            projectFile.Content.Should().Contain("<plugins>");
-            projectFile.Content.Should().Contain("<add name=\"SpecRun\" />");
-            projectFile.Content.Should().Contain("</plugins>");
-        }
-
-        [Fact]
-        public void MultiplePlugins()
-        {
-            var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
-            configuration.Plugins.Add(new ReqnrollPlugin("SpecRun"));
-            configuration.Plugins.Add(new ReqnrollPlugin("SpecFlow+Excel"));
-            var projectFile = _appConfigGenerator.Generate(configuration);
-
-            projectFile.Content.Should().Contain("<plugins>");
-            projectFile.Content.Should().Contain("<add name=\"SpecRun\" />");
-            projectFile.Content.Should().Contain("<add name=\"SpecFlow+Excel\" />");
-            projectFile.Content.Should().Contain("</plugins>");
-        }
-
-        [Fact]
-        public void PluginWithPath()
-        {
-            var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
-            configuration.Plugins.Add(new ReqnrollPlugin("SpecRun", "pathToPluginFolder"));
-            var projectFile = _appConfigGenerator.Generate(configuration);
-            
-
-            projectFile.Content.Should().Contain("<plugins>");
-            projectFile.Content.Should().Contain("<add name=\"SpecRun\" path=\"pathToPluginFolder\" />");
-            projectFile.Content.Should().Contain("</plugins>");
-        }
 
         [Fact]
         public void SingleAdditionalStepAssembly()
