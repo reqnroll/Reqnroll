@@ -214,7 +214,11 @@ namespace Reqnroll.TestProjectGenerator
 
             _project = new Project(ProjectName, ProjectGuid, Language, TargetFramework, Format, ProjectType);
 
-            _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.GlobalPackages;
+            _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.RunUniqueGlobalPackages;
+            if (!Directory.Exists(_testProjectFolders.PathToNuGetPackages))
+            {
+                Directory.CreateDirectory(_testProjectFolders.PathToNuGetPackages);
+            }
 
             if (ProjectType == ProjectType.Library)
             {

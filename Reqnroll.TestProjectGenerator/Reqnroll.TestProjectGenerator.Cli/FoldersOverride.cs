@@ -1,12 +1,13 @@
 using System.IO;
 using Reqnroll.TestProjectGenerator;
+using Reqnroll.TestProjectGenerator.Conventions;
 
 namespace Reqnroll.TestProjectGenerator.Cli
 {
     public class FoldersOverride : Folders
     {
         private readonly SolutionConfiguration _solutionConfiguration;
-        public FoldersOverride(SolutionConfiguration solutionConfiguration) : base(null)
+        public FoldersOverride(SolutionConfiguration solutionConfiguration, ArtifactNamingConvention artifactNamingConvention) : base(null, artifactNamingConvention)
         {
             _solutionConfiguration = solutionConfiguration;
         }

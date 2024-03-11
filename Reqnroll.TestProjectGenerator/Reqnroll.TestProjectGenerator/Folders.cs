@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using Reqnroll.TestProjectGenerator.Conventions;
 using Reqnroll.TestProjectGenerator.Helpers;
 
 namespace Reqnroll.TestProjectGenerator
@@ -8,6 +9,8 @@ namespace Reqnroll.TestProjectGenerator
     public class Folders
     {
         private readonly AppConfigDriver _appConfigDriver;
+        private readonly ArtifactNamingConvention _artifactNamingConvention;
+        private static readonly Guid UniqueRunId = Guid.NewGuid();
         protected string _nugetFolder;
         protected string _packageFolder;
         protected string _sourceRoot;
@@ -19,9 +22,10 @@ namespace Reqnroll.TestProjectGenerator
 
         public string TestFolder => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
 
-        public Folders(AppConfigDriver appConfigDriver)
+        public Folders(AppConfigDriver appConfigDriver, ArtifactNamingConvention artifactNamingConvention)
         {
             _appConfigDriver = appConfigDriver;
+            _artifactNamingConvention = artifactNamingConvention;
         }
 
         public virtual string SourceRoot
@@ -32,10 +36,7 @@ namespace Reqnroll.TestProjectGenerator
 
         public string VSAdapterFolder
         {
-            get
-            {
-                return !string.IsNullOrWhiteSpace(_vsAdapterFolder) ? _vsAdapterFolder : VsAdapterFolderProjectBinaries;
-            }
+            get => !string.IsNullOrWhiteSpace(_vsAdapterFolder) ? _vsAdapterFolder : VsAdapterFolderProjectBinaries;
             set
             {
                 _vsAdapterFolder = value;
@@ -60,7 +61,7 @@ namespace Reqnroll.TestProjectGenerator
         }
 
         public virtual string ExternalNuGetFolder
-            => _externalNuGetFolder = _externalNuGetFolder ?? Path.GetFullPath(Path.Combine(SourceRoot, "NuGet", "feed"));
+            => _externalNuGetFolder ??= Path.GetFullPath(Path.Combine(SourceRoot, "NuGet", "feed"));
 
         public string PackageFolder
         {
@@ -77,5 +78,8 @@ namespace Reqnroll.TestProjectGenerator
         }
 
         public virtual string FolderToSaveGeneratedSolutions => Path.Combine(Path.GetTempPath(), _appConfigDriver.TestProjectFolderName);
+
+        public virtual string RunUniqueFolderToSaveGeneratedSolutions => Path.Combine(FolderToSaveGeneratedSolutions, _artifactNamingConvention.GetRunName(UniqueRunId));
+        public virtual string RunUniqueGlobalPackages => Path.Combine(RunUniqueFolderToSaveGeneratedSolutions, ".nuget");
     }
 }

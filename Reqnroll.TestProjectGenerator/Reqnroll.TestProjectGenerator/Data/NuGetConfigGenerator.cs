@@ -8,9 +8,9 @@ namespace Reqnroll.TestProjectGenerator.Data
 {
     public class NuGetConfigGenerator : XmlFileGeneratorBase
     {
-        private readonly ProjectFileFactory _projectFileFactory = new ProjectFileFactory();
+        private readonly ProjectFileFactory _projectFileFactory = new();
 
-        public ProjectFile Generate(NuGetSource[] nuGetSources = null)
+        public ProjectFile Generate(NuGetSource[] nuGetSources = null, string globalPackagesFolder = null)
         {
             using (var ms = new MemoryStream())
             {
@@ -18,7 +18,7 @@ namespace Reqnroll.TestProjectGenerator.Data
                 {
                     writer.WriteStartElement("configuration");
 
-                    WriteConfig(writer);
+                    WriteConfig(writer, globalPackagesFolder);
 
                     WritePackageSources(nuGetSources, writer);
                     WriteAPIKeys(writer, nuGetSources);
@@ -31,7 +31,7 @@ namespace Reqnroll.TestProjectGenerator.Data
             }
         }
 
-        private void WriteConfig(XmlWriter writer)
+        private void WriteConfig(XmlWriter writer, string globalPackagesFolder)
         {
             writer.WriteStartElement("config");
 
@@ -39,6 +39,14 @@ namespace Reqnroll.TestProjectGenerator.Data
             writer.WriteAttributeString("key", "dependencyversion");
             writer.WriteAttributeString("value", "Highest");
             writer.WriteEndElement();
+
+            if (globalPackagesFolder != null)
+            {
+                writer.WriteStartElement("add");
+                writer.WriteAttributeString("key", "globalPackagesFolder");
+                writer.WriteAttributeString("value", globalPackagesFolder);
+                writer.WriteEndElement();
+            }
 
             writer.WriteEndElement();
         }
