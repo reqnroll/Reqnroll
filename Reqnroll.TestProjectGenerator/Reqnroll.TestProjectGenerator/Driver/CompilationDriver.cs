@@ -1,3 +1,6 @@
+using System;
+using FluentAssertions;
+
 namespace Reqnroll.TestProjectGenerator.Driver
 {
     public class CompilationDriver
@@ -18,12 +21,12 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public bool HasTriedToCompile { get; private set; }
 
-        public void CompileSolution(BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null)
+        public void CompileSolution(BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null, bool failOnError = true)
         {
-            CompileSolutionTimes(1, buildTool, treatWarningsAsErrors);
+            CompileSolutionTimes(1, buildTool, treatWarningsAsErrors, failOnError);
         }
 
-        public void CompileSolutionTimes(uint times, BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null)
+        public void CompileSolutionTimes(uint times, BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null, bool failOnError = true)
         {
             HasTriedToCompile = true;
             _solutionWriteToDiskDriver.WriteSolutionToDisk(treatWarningsAsErrors);
@@ -33,6 +36,8 @@ namespace Reqnroll.TestProjectGenerator.Driver
             for (uint time = 0; time < times; time++)
             {
                 _compilationResultDriver.CompileResult = _compiler.Run(usedBuildTool, treatWarningsAsErrors);
+                if (failOnError)
+                    _compilationResultDriver.CompileResult.IsSuccessful.Should().BeTrue($"Compilation should succeed. Build errors: {Environment.NewLine}{_compilationResultDriver.CompileResult.ErrorLines}");
             }
         }
 
