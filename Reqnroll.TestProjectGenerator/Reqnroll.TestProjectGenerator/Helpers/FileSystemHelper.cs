@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Reqnroll.TestProjectGenerator.Helpers
@@ -163,31 +164,31 @@ namespace Reqnroll.TestProjectGenerator.Helpers
             }
         }
 
-        public static void DeleteFolderContent(string folderName)
+        public static int DeleteFolderContent(string folderName, Func<FileSystemInfo, bool> condition = null, bool ignoreErrors = false)
         {
-            foreach (string file in Directory.GetFiles(folderName))
+            var directoryInfo = new DirectoryInfo(folderName);
+            var fileSystemInfos = directoryInfo.GetFileSystemInfos()
+                .OrderByDescending(f => f.LastWriteTimeUtc)
+                .Where(f => condition == null || condition(f));
+            int deletedCount = 0;
+            foreach (var fileSystemInfo in fileSystemInfos)
             {
                 try
                 {
-                    Retry(5, () => File.Delete(file));
+                    if (fileSystemInfo is DirectoryInfo folder)
+                        Retry(5, () => folder.Delete(true));
+                    else 
+                        Retry(5, fileSystemInfo.Delete);
+                    deletedCount++;
                 }
                 catch (Exception ex)
                 {
-                    throw new Exception("Unable to delete file: " + file, ex);
+                    if (!ignoreErrors)
+                        throw new Exception("Unable to delete file or directory: " + fileSystemInfo.FullName, ex);
                 }
             }
 
-            foreach (string folder in Directory.GetDirectories(folderName))
-            {
-                try
-                {
-                    Retry(5, () => Directory.Delete(folder, true));
-                }
-                catch (Exception ex)
-                {
-                    throw new Exception("Unable to delete folder: " + folder, ex);
-                }
-            }
+            return deletedCount;
         }
 
         public static void DeleteFolder(string path)

@@ -3,6 +3,5 @@
     <CustomBuildProperties>
       <Value>TargetFrameworks = net6.0</Value>
     </CustomBuildProperties>
-    <IgnoreThisComponentCompletely>True</IgnoreThisComponentCompletely>
   </Settings>
 </ProjectConfiguration>

@@ -1,16 +1,20 @@
-namespace Reqnroll.TestProjectGenerator
-{
-    public class CompileResult
-    {
-        public CompileResult(int exitCode, string output)
-        {
-            ExitCode = exitCode;
-            IsSuccessful = exitCode == 0;
-            Output = output;
-        }
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 
-        public int ExitCode { get; }
-        public bool IsSuccessful { get; }
-        public string Output { get; }
-    }
+namespace Reqnroll.TestProjectGenerator;
+
+public class CompileResult(int exitCode, string output)
+{
+    public int ExitCode { get; } = exitCode;
+
+    public bool IsSuccessful { get; } = exitCode == 0;
+
+    public string Output { get; } = output;
+
+    public string ErrorLines =>
+        string.Join(
+            Environment.NewLine,
+            Regex.Split(Output, @"\r?\n").Where(l => l.Contains("error")));
 }

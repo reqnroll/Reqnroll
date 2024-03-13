@@ -65,7 +65,7 @@ namespace Reqnroll.TestProjectGenerator
 
             var processHelper = new ProcessHelper();
 
-            string argumentsFormat = $"build {GetWarningAsErrorParameter(treatWarningsAsErrors)} --no-cache -binaryLogger:;ProjectImports=None -nodeReuse:false -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
+            string argumentsFormat = $"build {GetWarningAsErrorParameter(treatWarningsAsErrors)} -nologo -v:m \"{_testProjectFolders.PathToSolutionFile}\"";
             var dotnetBuildProcessResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, "dotnet", argumentsFormat);
 
             return new CompileResult(dotnetBuildProcessResult.ExitCode, dotnetBuildProcessResult.CombinedOutput);

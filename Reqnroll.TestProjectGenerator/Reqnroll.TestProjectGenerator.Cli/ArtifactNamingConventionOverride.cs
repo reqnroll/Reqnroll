@@ -3,11 +3,11 @@ using Reqnroll.TestProjectGenerator.Conventions;
 
 namespace Reqnroll.TestProjectGenerator.Cli
 {
-    public class SolutionNamingConventionOverride : SolutionNamingConvention
+    public class ArtifactNamingConventionOverride : ArtifactNamingConvention
     {
         private readonly SolutionConfiguration _solutionConfiguration;
 
-        public SolutionNamingConventionOverride(SolutionConfiguration solutionConfiguration)
+        public ArtifactNamingConventionOverride(SolutionConfiguration solutionConfiguration)
         {
             _solutionConfiguration = solutionConfiguration;
         }

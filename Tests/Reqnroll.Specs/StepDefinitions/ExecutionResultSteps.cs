@@ -40,6 +40,14 @@ namespace Reqnroll.Specs.StepDefinitions
         {
             _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
             expectedTestExecutionResult.CompareToInstance(_vsTestExecutionDriver.LastTestExecutionResult);
+
+            // if we only assert for total number of tests, we will make an additional assertion for the 
+            // successful tests with the same count, to highlight hidden runtime errors
+            if (expectedTestExecutionResult.Header.Count == 1 && expectedTestExecutionResult.ContainsColumn("Total"))
+            {
+                expectedTestExecutionResult.RenameColumn("Total", "Succeeded");
+                expectedTestExecutionResult.CompareToInstance(_vsTestExecutionDriver.LastTestExecutionResult);
+            }
         }
 
         [Then(@"the binding method '(.*)' is executed")]

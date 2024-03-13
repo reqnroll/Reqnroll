@@ -204,7 +204,7 @@ namespace Reqnroll.TestProjectGenerator
             {
                 if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
                 {
-                    return $" -a \"{_testProjectFolders.PathToNuGetPackages}\"";
+                    return $" --test-adapter-path \"{_testProjectFolders.PathToNuGetPackages}\"";
                 }
             }
 
