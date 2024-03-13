@@ -1,3 +1,7 @@
 ﻿<ProjectConfiguration>
-  <Settings />
+  <Settings>
+    <CustomBuildProperties>
+      <Value>TargetFrameworks = net60</Value>
+    </CustomBuildProperties>
+  </Settings>
 </ProjectConfiguration>
