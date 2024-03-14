@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <LangVersion>10.0</LangVersion>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <!-- NuGet packaging properties -->
+  <PropertyGroup>
+    <IsPackable>true</IsPackable>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <Version>0.1.0-prototype.5</Version>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);IncludePackagesAsPrivateAssets</TargetsForTfmSpecificBuildOutput>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="Reqnroll.FeatureSourceGenerator.NUnit.Tests"/>
+  </ItemGroup>
+
+  <!-- This target only runs when creating the NuGet package. -->
+  <Target Name="IncludePackagesAsPrivateAssets">
+    <ItemGroup>
+      <PackageReference Update="*">
+        <PrivateAssets>all</PrivateAssets>
+        <GeneratePathProperty>true</GeneratePathProperty>
+      </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Include code generator assembly -->
+      <None Include="$(OutputPath)\$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+
+      <!-- Include dependencies -->
+      <None Include="$(PkgGherkin)\lib\netstandard2.0\Gherkin.dll" Pack="true" PackagePath="analyzers/dotnet/cs" Visible="false" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <PackageReference Include="Gherkin" Version="26.0.3">
+      <GeneratePathProperty>true</GeneratePathProperty>
+    </PackageReference>
+    <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.24072.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Content Include="..\reqnroll-icon.png" Link="reqnroll-icon.png" PackagePath="\images" PackageCopyToOutput="true" />
+  </ItemGroup>
+
+</Project>

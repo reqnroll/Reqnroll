@@ -1,4 +1,4 @@
-# [vNext]
+# v1.0.2-local - 2024-02-22
 
 * Resolve dependencies of [BeforeTestRun] / [AfterTestRun] hooks from the 
   test run (global) context instead of the test thread context.
