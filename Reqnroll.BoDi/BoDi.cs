@@ -1,68 +1,10 @@
-﻿/**************************************************************************************
- * 
- * BoDi: A very simple IoC container, easily embeddable also as a source code. 
- * 
- * BoDi was created to support SpecFlow (http://www.specflow.org) by Gaspar Nagy (http://gasparnagy.com/)
- * 
- * Project source & unit tests: http://github.com/gasparnagy/BoDi
- * License: Apache License 2.0
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED 
- * TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
- * THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
- * CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
- * 
- * Change history
- * V1.5
- *   - Thread-safe object resolution
- *   - New 'instance per dependency' strategy added for type and factory registrations (by MKMZ)
- * 
- * v1.4
- *   - Provide .NET Standard 2.0 and .NET 4.5 library package (#14 by SabotageAndi)
- *   - Fix: Collection was modified issue (#7)
- *   - Exposing BaseContainer to the public interface (#17 by jessicabuttigieg)
- *
- * v1.3
- *   - Fix: When an object resolved without registration using the concrete type it cannot be resolved from sub context
- *   - Added IsRegistered methods to check if an interface or type is already registered (#6)
- *   - Expose the ObjectContainer.RegisterFactoryAs in the IObjectContainer interface (by slawomir-brzezinski-at-interxion)
- *   - eliminate internal TypeHelper class
- *
- * v1.2
- *   - support for mapping of generic type definitions (by ibrahimbensalah)
- *   - object should be created in the parent container, if the registration was applied there
- *   - should be able to customize object creation with a container event (ObjectCreated)
- *   - should be able to register factory delegates
- *   - should be able to retrieve all named instance as a list with container.ResolveAll<T>()
- *   - should not allow resolving value types (structs)
- *   - should list registrations in container ToString()
- *   - should not dispose registered instances by default, disposal can be requested by the 'dispose: true' parameter
- *   - should be able to disable configuration file support (and the dependency on System.Configuration) with BODI_DISABLECONFIGFILESUPPORT compilation symbol
- *   - smaller code refactoring
- *   - improve resolution path handling
- * 
- * v1.1 - released with SpecFlow v1.9.0
- * 
- * 
- * --------------
- * Note about thread safety
- * 
- * BoDi container is not reentrant and can't be used from different threads without further considerations.
- * Typical user (Specflow) ensures it by allocating container per test thread and all feature- and scenario- containers as child containers.
- * The manual synchronization is not necessary for usual cases 
- * (using test-thread, feature or scenario containers and not creating multiple threads from the binding code).
- * Thread-safe object resolution has been introduced to handle the rare cases when dependencies might be resolved from the shared global context concurrently.
- *
- * More information here https://github.com/gasparnagy/BoDi/issues/27
- */
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Configuration;
-using System.Linq;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
@@ -591,8 +533,8 @@ namespace Reqnroll.BoDi
         public event Action<object> ObjectCreated;
         public IObjectContainer BaseContainer => baseContainer;
 
-        public static TimeSpan ConcurrentObjectResolutionTimeout { get; set; } = TimeSpan.FromSeconds(1); 
-            
+        public static TimeSpan ConcurrentObjectResolutionTimeout { get; set; } = TimeSpan.FromSeconds(1);
+
         public ObjectContainer(IObjectContainer baseContainer = null)
         {
             if (baseContainer != null && !(baseContainer is ObjectContainer))
@@ -663,11 +605,11 @@ namespace Reqnroll.BoDi
 
         private IRegistration EnsureImplicitRegistration(RegistrationKey key)
         {
-           var registration =  registrations.GetOrAdd(key, (registrationKey =>  new TypeRegistration(registrationKey.Type)));
+            var registration = registrations.GetOrAdd(key, (registrationKey => new TypeRegistration(registrationKey.Type)));
 
-           AddNamedDictionaryRegistration(key);
+            AddNamedDictionaryRegistration(key);
 
-           return registration;
+            return registration;
         }
 
         private void AddNamedDictionaryRegistration(RegistrationKey key)
@@ -920,7 +862,7 @@ namespace Reqnroll.BoDi
             var resolutionPathForResolve = registrationToUse.Key == this ?
                 resolutionPath : new ResolutionList();
             var result = registrationToUse.Value.Resolve(registrationToUse.Key, keyToResolve, resolutionPathForResolve);
-           
+
             return result;
         }
 

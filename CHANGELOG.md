@@ -1,5 +1,6 @@
 # [vNext]
 
+* Add [BoDi](https://github.com/SpecFlowOSS/BoDi/)
 * Resolve dependencies of [BeforeTestRun] / [AfterTestRun] hooks from the 
   test run (global) context instead of the test thread context.
 * Support for PriorityAttribute in MsTest adapter
