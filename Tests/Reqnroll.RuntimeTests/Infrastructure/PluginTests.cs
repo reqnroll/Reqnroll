@@ -296,7 +296,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             _pluginToReturn = pluginToReturn;
         }
 
-        public override void RegisterGlobalContainerDefaults(BoDi.ObjectContainer container)
+        public override void RegisterGlobalContainerDefaults(ObjectContainer container)
         {
             base.RegisterGlobalContainerDefaults(container);
 
