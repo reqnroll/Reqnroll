@@ -15,7 +15,7 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.Should().BeAssignableTo<IDisposable>();
         }
 
-        [Fact/*ExpectedException(typeof(ObjectContainerException), ExpectedMessage = "disposed", MatchType = MessageMatch.Contains)*/]
+        [Fact]
         public void ContainerShouldThrowExceptionWhenDisposed()
         {
             var container = new ObjectContainer();

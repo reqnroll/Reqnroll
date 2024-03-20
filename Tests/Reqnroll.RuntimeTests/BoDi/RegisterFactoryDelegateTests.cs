@@ -15,7 +15,6 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterFactoryAs<IInterface1>(() => new VerySimpleClass());
 
             // when
-
             var obj = container.Resolve<IInterface1>();
 
             // then
@@ -31,7 +30,6 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterFactoryAs<IInterface1>(() => new VerySimpleClass());
 
             // when
-
             var obj1 = container.Resolve<IInterface1>();
             var obj2 = container.Resolve<IInterface1>();
 
@@ -49,7 +47,6 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterFactoryAs<IInterface3>(new Func<IInterface1, IInterface3>(if1 => new ClassWithSimpleDependency(if1)));
 
             // when
-
             var obj = container.Resolve<IInterface3>();
 
             // then
@@ -68,7 +65,6 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterFactoryAs<IInterface3>(c => new ClassWithSimpleDependency(c.Resolve<IInterface1>()));
 
             // when
-
             var obj = container.Resolve<IInterface3>();
 
             // then
@@ -81,16 +77,15 @@ namespace Reqnroll.RuntimeTests.BoDi
         public void ShouldThrowExceptionForDynamicCircularDependencies()
         {
             // given
-
             var container = new ObjectContainer();
             container.RegisterFactoryAs<ClassWithCircularDependency1>(c => new ClassWithCircularDependency1(c.Resolve<ClassWithCircularDependency2>()));
 
             // when 
             Action act = () => container.Resolve<ClassWithCircularDependency1>();
-            act.Should().Throw<ObjectContainerException>("Circular dependency");
+            act.Should().ThrowExactly<ObjectContainerException>("Circular dependency");
         }
 
-        [Fact/*, ExpectedException(typeof(ObjectContainerException), ExpectedMessage = "Circular dependency", MatchType = MessageMatch.Contains)*/]
+        [Fact]
         public void ShouldThrowExceptionForStaticCircularDependencies()
         {
             // given
@@ -99,10 +94,10 @@ namespace Reqnroll.RuntimeTests.BoDi
 
             // when 
             Action act = () => container.Resolve<ClassWithCircularDependency1>();
-            act.Should().Throw<ObjectContainerException>("Circular dependency");
+            act.Should().ThrowExactly<ObjectContainerException>("Circular dependency");
         }
 
-        [Fact/*, ExpectedException(typeof(ObjectContainerException), ExpectedMessage = "Circular dependency", MatchType = MessageMatch.Contains)*/]
+        [Fact]
         public void ShouldThrowExceptionForStaticCircularDependenciesWithMultipleFactoriesInPath()
         {
             // given
@@ -112,7 +107,7 @@ namespace Reqnroll.RuntimeTests.BoDi
 
             // when 
             Action act = () => container.Resolve<ClassWithCircularDependency1>();
-            act.Should().Throw<ObjectContainerException>("Circular dependency");
+            act.Should().ThrowExactly<ObjectContainerException>("Circular dependency");
         }
 
         [Fact]

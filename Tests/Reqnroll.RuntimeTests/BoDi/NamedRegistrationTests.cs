@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
 using FluentAssertions;
 using Reqnroll.BoDi;
 using Xunit;
@@ -28,8 +30,8 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterTypeAs<VerySimpleClass, IInterface1>("a_name");
 
             // when
-            Assert.Throws<ObjectContainerException>(() => container.Resolve<IInterface1>());
-
+            Action act = () => container.Resolve<IInterface1>();
+            act.Should().ThrowExactly<ObjectContainerException>();
         }
 
         [Fact]
@@ -39,11 +41,9 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterTypeAs<VerySimpleClass, IInterface1>("a_name");
 
             // when
-
             var obj = container.Resolve<IInterface1>("a_name");
 
             // then
-
             obj.Should().BeOfType<VerySimpleClass>();
         }
 
@@ -55,12 +55,10 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterTypeAs<VerySimpleClass, IInterface1>("another_name");
 
             // when
-
             var obj = container.Resolve<IInterface1>("a_name");
             var otherObj = container.Resolve<IInterface1>("another_name");
 
             // then
-
             obj.Should().NotBeSameAs(otherObj);
         }
 
@@ -72,12 +70,10 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterTypeAs<SimpleClassWithDefaultCtor, IInterface1>("two");
 
             // when
-
             var oneObj = container.Resolve<IInterface1>("one");
             var twoObj = container.Resolve<IInterface1>("two");
 
             // then
-
             oneObj.Should().NotBeSameAs(twoObj);
             oneObj.Should().BeOfType<VerySimpleClass>();
             twoObj.Should().BeOfType<SimpleClassWithDefaultCtor>();
@@ -91,11 +87,9 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterTypeAs<SimpleClassWithDefaultCtor, IInterface1>("two");
 
             // when
-
             var instanceDict = container.Resolve<IDictionary<string, IInterface1>>();
 
             // then
-
             instanceDict.Keys.Should().Contain("one");
             instanceDict.Keys.Should().Contain("two");
             instanceDict["one"].Should().BeOfType<VerySimpleClass>();
@@ -108,11 +102,9 @@ namespace Reqnroll.RuntimeTests.BoDi
             var container = new ObjectContainer();
 
             // when
-
             var instanceDict = container.Resolve<IDictionary<string, IInterface1>>();
 
             // then
-
             instanceDict.Count.Should().Be(0);
         }
 
@@ -124,11 +116,9 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterTypeAs<SimpleClassWithDefaultCtor, IInterface1>("two");
 
             // when
-
             var instanceDict = container.Resolve<IDictionary<MyEnumKey, IInterface1>>();
 
             // then
-
             instanceDict.Keys.Should().Contain(MyEnumKey.One);
             instanceDict.Keys.Should().Contain(MyEnumKey.Two);
             instanceDict[MyEnumKey.One].Should().BeOfType<VerySimpleClass>();
@@ -141,8 +131,8 @@ namespace Reqnroll.RuntimeTests.BoDi
             var container = new ObjectContainer();
 
             // when
-
-            Assert.Throws<ObjectContainerException>(() => container.Resolve<IDictionary<int, IInterface1>>());
+            Action act = () => container.Resolve<IDictionary<int, IInterface1>>();
+            act.Should().ThrowExactly<ObjectContainerException>();
         }
 
         [Fact]
@@ -152,11 +142,9 @@ namespace Reqnroll.RuntimeTests.BoDi
             container.RegisterTypeAs<SimpleClassWithRegisteredNameDependency, IInterface1>("a_name");
 
             // when
-
             var obj = container.Resolve<IInterface1>("a_name");
 
             // then
-
             obj.Should().BeOfType<SimpleClassWithRegisteredNameDependency>();
             ((SimpleClassWithRegisteredNameDependency)obj).RegisteredName.Should().Be("a_name");
         }

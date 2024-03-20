@@ -23,11 +23,11 @@ namespace Reqnroll.RuntimeTests.BoDi
             Console.WriteLine(result);
 
             // then 
-            result.Should().Contain("BoDi.IObjectContainer -> <self>");
-            result.Should().Contain("BoDi.Tests.IInterface1 -> Instance: SimpleClassWithDefaultCtor: instance1");
-            result.Should().Contain("BoDi.Tests.IInterface1('one') -> Type: BoDi.Tests.VerySimpleClass");
-            result.Should().Contain("BoDi.Tests.IInterface1('two') -> Instance: SimpleClassWithDefaultCtor: instance2");
-            result.Should().Contain("BoDi.Tests.IInterface1('three') -> Instance: simulated error");
+            result.Should().Contain("Reqnroll.BoDi.IObjectContainer -> <self>");
+            result.Should().Contain("Reqnroll.RuntimeTests.BoDi.IInterface1 -> Instance: SimpleClassWithDefaultCtor: instance1");
+            result.Should().Contain("Reqnroll.RuntimeTests.BoDi.IInterface1('one') -> Type: Reqnroll.RuntimeTests.BoDi.VerySimpleClass");
+            result.Should().Contain("Reqnroll.RuntimeTests.BoDi.IInterface1('two') -> Instance: SimpleClassWithDefaultCtor: instance2");
+            result.Should().Contain("Reqnroll.RuntimeTests.BoDi.IInterface1('three') -> Instance: simulated error");
         }
     }
 }

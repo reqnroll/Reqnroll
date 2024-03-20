@@ -8,7 +8,7 @@ namespace Reqnroll.RuntimeTests.BoDi
 {
     public class RegisterFromConfigTests
     {
-#if !NETCOREAPP2_0 
+#if !NETCOREAPP
         //Disable this tests, because of problem with dotnet test and app.configs - https://github.com/dotnet/corefx/issues/22101#partial-timeline-marker
 
         [Fact]

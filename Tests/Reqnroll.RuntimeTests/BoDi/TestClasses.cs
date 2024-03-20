@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace Reqnroll.RuntimeTests.BoDi
 {
@@ -51,13 +48,13 @@ namespace Reqnroll.RuntimeTests.BoDi
     {
         public MyStructWithDependencies(VerySimpleClass dep)
         {
-            
+
         }
     }
 
     public struct MyStructWithoutCtor
     {
-        
+
     }
 
     /// <summary>
@@ -180,7 +177,7 @@ namespace Reqnroll.RuntimeTests.BoDi
     /// </summary>
     public class ClassWithTwoInterface : IInterface1, IInterface2
     {
-        
+
     }
 
     public interface IDisposableClass
@@ -188,7 +185,7 @@ namespace Reqnroll.RuntimeTests.BoDi
         bool WasDisposed { get; }
     }
 
-    public class DisposableClass1: IDisposableClass, IDisposable
+    public class DisposableClass1 : IDisposableClass, IDisposable
     {
         public bool WasDisposed { get; private set; }
 
@@ -204,19 +201,19 @@ namespace Reqnroll.RuntimeTests.BoDi
         Two
     }
 
-    public class ClassWithCircularDependency1 
+    public class ClassWithCircularDependency1
     {
         public ClassWithCircularDependency1(ClassWithCircularDependency2 dep2)
         {
-            
+
         }
     }
 
-    public class ClassWithCircularDependency2 
+    public class ClassWithCircularDependency2
     {
         public ClassWithCircularDependency2(ClassWithCircularDependency1 dep1)
         {
-            
+
         }
     }
 
@@ -224,7 +221,7 @@ namespace Reqnroll.RuntimeTests.BoDi
     {
         public ClassWithCircularDependencyThroughInterfaces1(IInterface2 dep2)
         {
-            
+
         }
     }
 
@@ -232,7 +229,7 @@ namespace Reqnroll.RuntimeTests.BoDi
     {
         public ClassWithCircularDependencyThroughInterfaces2(IInterface1 dep1)
         {
-            
+
         }
     }
 
@@ -240,12 +237,12 @@ namespace Reqnroll.RuntimeTests.BoDi
     {
         public ClassWithTwoConstructorSameParamCount(string a, int b)
         {
-            
+
         }
 
         public ClassWithTwoConstructorSameParamCount(int a, string b)
         {
-            
+
         }
     }
 

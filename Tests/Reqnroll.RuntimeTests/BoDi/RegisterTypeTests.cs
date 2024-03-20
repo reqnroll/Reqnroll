@@ -65,7 +65,7 @@ namespace Reqnroll.RuntimeTests.BoDi
 
             // when 
             Action act = () => container.RegisterTypeAs<SimpleClassWithDefaultCtor, IInterface1>();
-            act.Should().Throw<ObjectContainerException>();
+            act.Should().ThrowExactly<ObjectContainerException>();
         }
 
         [Fact]
@@ -135,7 +135,7 @@ namespace Reqnroll.RuntimeTests.BoDi
             // then
             var obj1 = (SimpleClassWithDefaultCtor)container.Resolve<IInterface1>();
             var obj2 = (SimpleClassWithDefaultCtor)container.Resolve<IInterface1>();
-            obj1.Should().NotBeSameAs(obj2);
+            obj1.Should().BeSameAs(obj2);
         }
     }
 }

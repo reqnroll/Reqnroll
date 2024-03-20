@@ -11,7 +11,6 @@ namespace Reqnroll.RuntimeTests.BoDi
 
     public class ResolveAllTests
     {
-
         [Fact]
         public void ShouldResolveTheRightNumberOfRegisteredTypes()
         {

@@ -10,11 +10,9 @@ namespace Reqnroll.RuntimeTests.BoDi
         public void ShouldReturnFalseIfInterfaceNotRegistered()
         {
             // given
-
             var container = new ObjectContainer();
 
             // then
-
             bool isRegistered = container.IsRegistered<IInterface1>();
 
             isRegistered.Should().BeFalse();
@@ -24,11 +22,9 @@ namespace Reqnroll.RuntimeTests.BoDi
         public void ShouldReturnFalseIfTypeNotRegistered()
         {
             // given
-
             var container = new ObjectContainer();
 
             // then
-
             bool isRegistered = container.IsRegistered<VerySimpleClass>();
 
             isRegistered.Should().BeFalse();
@@ -38,15 +34,12 @@ namespace Reqnroll.RuntimeTests.BoDi
         public void ShouldReturnTrueIfInterfaceRegistered()
         {
             // given
-
             var container = new ObjectContainer();
 
             // when 
-
             container.RegisterTypeAs<VerySimpleClass, IInterface1>();
 
             // then
-
             bool isRegistered = container.IsRegistered<IInterface1>();
 
             isRegistered.Should().BeTrue();
@@ -56,15 +49,12 @@ namespace Reqnroll.RuntimeTests.BoDi
         public void ShouldReturnTrueIfTypeRegistered()
         {
             // given
-
             var container = new ObjectContainer();
 
             // when 
-
             container.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
 
             // then
-
             bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
 
             isRegistered.Should().BeTrue();

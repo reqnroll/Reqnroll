@@ -121,7 +121,6 @@ namespace Reqnroll.RuntimeTests.BoDi
         }
 
         [Fact]
-        //[ExpectedException(typeof(ObjectContainerException))]
         public void ShouldThrowErrorIfInterfaceCannotBeResolved()
         {
             // given

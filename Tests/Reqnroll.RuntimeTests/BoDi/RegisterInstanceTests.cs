@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Xml.Linq;
 using FluentAssertions;
 using Reqnroll.BoDi;
 using Xunit;
@@ -7,7 +8,7 @@ namespace Reqnroll.RuntimeTests.BoDi
 {
     public class RegisterInstanceTests
     {
-        [Fact/*, ExpectedException(typeof(ArgumentNullException))*/]
+        [Fact]
         public void ShouldThrowArgumentExceptionWhenCalledWithNull()
         {
             // given
@@ -15,7 +16,7 @@ namespace Reqnroll.RuntimeTests.BoDi
 
             // when
             Action act = () => container.RegisterInstanceAs((IInterface1)null);
-            act.Should().Throw<ArgumentNullException>();
+            act.Should().ThrowExactly<ArgumentNullException>();
         }
 
         [Fact]
@@ -63,7 +64,7 @@ namespace Reqnroll.RuntimeTests.BoDi
 
             // when 
             Action act = () => container.RegisterInstanceAs<IInterface1>(instance);
-            act.Should().Throw<ObjectContainerException>();
+            act.Should().ThrowExactly<ObjectContainerException>();
         }
 
         [Fact]
@@ -76,7 +77,8 @@ namespace Reqnroll.RuntimeTests.BoDi
             var instance = new SimpleClassWithDefaultCtor();
 
             // when 
-            Assert.Throws<ObjectContainerException>(() => container.RegisterInstanceAs<IInterface1>(instance));
+            Action act = () => container.RegisterInstanceAs<IInterface1>(instance);
+            act.Should().ThrowExactly<ObjectContainerException>();
         }
     }
 }
