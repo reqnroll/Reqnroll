@@ -516,8 +516,8 @@ namespace Reqnroll.RuntimeTests.BoDi
         {
             try
             {
-                ObjectContainer.ConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
-                IObjectContainer container = new ObjectContainer();
+                var container = new ObjectContainer();
+                container.ConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
                 container.RegisterTypeAs<BlockingObject, BlockingObject>();
 
                 var thread1 = new Thread(_ =>

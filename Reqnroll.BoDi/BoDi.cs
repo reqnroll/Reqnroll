@@ -170,7 +170,6 @@ namespace Reqnroll.BoDi
     public class ObjectContainer : IObjectContainer
     {
         private const string REGISTERED_NAME_PARAMETER_NAME = "registeredName";
-        private const string DISABLE_THREAD_SAFE_RESOLUTION = "DISABLE_THREAD_SAFE_RESOLUTION";
 
         /// <summary>
         /// A very simple immutable linked list of <see cref="Type"/>.
@@ -325,7 +324,7 @@ namespace Reqnroll.BoDi
                     var obj = container.CreateObject(typeToConstruct, resolutionPath, keyToResolve);
                     container.objectPool.Add(pooledObjectKey, obj);
                     return obj;
-                }, resolutionPath);
+                }, resolutionPath, container.ConcurrentObjectResolutionTimeout);
 
                 return result;
             }
@@ -414,17 +413,17 @@ namespace Reqnroll.BoDi
                 return this;
             }
 
-            protected static object ExecuteWithLock(object lockObject, Func<object> getter, Func<object> factory, ResolutionList resolutionPath)
+            protected static object ExecuteWithLock(object lockObject, Func<object> getter, Func<object> factory, ResolutionList resolutionPath, TimeSpan timeout)
             {
                 var obj = getter();
 
                 if (obj != null)
                     return obj;
 
-                if (ObjectContainer.DisableThreadSafeResolution)
+                if (timeout == TimeSpan.Zero)
                     return factory();
 
-                if (Monitor.TryEnter(lockObject, ConcurrentObjectResolutionTimeout))
+                if (Monitor.TryEnter(lockObject, timeout))
                 {
                     try
                     {
@@ -462,7 +461,7 @@ namespace Reqnroll.BoDi
                     var obj = container.InvokeFactoryDelegate(factoryDelegate, resolutionPath, keyToResolve);
                     container.objectPool.Add(keyToResolve, obj);
                     return obj;
-                }, resolutionPath);
+                }, resolutionPath, container.ConcurrentObjectResolutionTimeout);
 
                 return result;
             }
@@ -516,24 +515,20 @@ namespace Reqnroll.BoDi
 
         #endregion
 
+        public static TimeSpan DefaultConcurrentObjectResolutionTimeout { get; set; } = TimeSpan.FromSeconds(1);
         private bool isDisposed = false;
         private readonly ObjectContainer baseContainer;
         private readonly ConcurrentDictionary<RegistrationKey, IRegistration> registrations = new ConcurrentDictionary<RegistrationKey, IRegistration>();
         private readonly List<RegistrationKey> resolvedKeys = new List<RegistrationKey>();
         private readonly Dictionary<RegistrationKey, object> objectPool = new Dictionary<RegistrationKey, object>();
 
-        public static bool DisableThreadSafeResolution { get; set; }
-
-        static ObjectContainer()
-        {
-            DisableThreadSafeResolution =
-                !string.IsNullOrEmpty(Environment.GetEnvironmentVariable(DISABLE_THREAD_SAFE_RESOLUTION));
-        }
-
         public event Action<object> ObjectCreated;
         public IObjectContainer BaseContainer => baseContainer;
 
-        public static TimeSpan ConcurrentObjectResolutionTimeout { get; set; } = TimeSpan.FromSeconds(1);
+        /// <summary>
+        /// Sets the timeout for thread-safe object resolution. By default, it uses the value of <see cref="DefaultConcurrentObjectResolutionTimeout"/> that is initialized to 1 second. Setting it to <see cref="TimeSpan.Zero"/> disables thread-safe resolution.
+        /// </summary>
+        public TimeSpan ConcurrentObjectResolutionTimeout { get; set; } = DefaultConcurrentObjectResolutionTimeout;
 
         public ObjectContainer(IObjectContainer baseContainer = null)
         {
