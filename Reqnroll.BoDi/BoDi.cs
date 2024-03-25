@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -172,10 +171,10 @@ namespace Reqnroll.BoDi
         /// </summary>
         private class ResolutionList
         {
-            private readonly RegistrationKey currentRegistrationKey;
-            private readonly Type currentResolvedType;
-            private readonly ResolutionList nextNode;
-            private bool IsLast { get { return nextNode == null; } }
+            private readonly RegistrationKey _currentRegistrationKey;
+            private readonly Type _currentResolvedType;
+            private readonly ResolutionList _nextNode;
+            private bool IsLast => _nextNode == null;
 
             public ResolutionList()
             {
@@ -186,9 +185,9 @@ namespace Reqnroll.BoDi
             {
                 if (nextNode == null) throw new ArgumentNullException("nextNode");
 
-                this.currentRegistrationKey = currentRegistrationKey;
-                this.currentResolvedType = currentResolvedType;
-                this.nextNode = nextNode;
+                _currentRegistrationKey = currentRegistrationKey;
+                _currentResolvedType = currentResolvedType;
+                _nextNode = nextNode;
             }
 
             public ResolutionList AddToEnd(RegistrationKey registrationKey, Type resolvedType)
@@ -196,6 +195,7 @@ namespace Reqnroll.BoDi
                 return new ResolutionList(registrationKey, resolvedType, this);
             }
 
+            // ReSharper disable once UnusedMember.Local
             public bool Contains(Type resolvedType)
             {
                 if (resolvedType == null) throw new ArgumentNullException("resolvedType");
@@ -212,8 +212,8 @@ namespace Reqnroll.BoDi
                 var node = this;
                 while (!node.IsLast)
                 {
-                    yield return new KeyValuePair<RegistrationKey, Type>(node.currentRegistrationKey, node.currentResolvedType);
-                    node = node.nextNode;
+                    yield return new KeyValuePair<RegistrationKey, Type>(node._currentRegistrationKey, node._currentResolvedType);
+                    node = node._nextNode;
                 }
             }
 
@@ -275,10 +275,7 @@ namespace Reqnroll.BoDi
 
             public override int GetHashCode()
             {
-                unchecked
-                {
-                    return TypeGroup.GetHashCode();
-                }
+                return TypeGroup.GetHashCode();
             }
         }
 
@@ -297,12 +294,12 @@ namespace Reqnroll.BoDi
 
         private class TypeRegistration : RegistrationWithStrategy, IRegistration
         {
-            private readonly Type implementationType;
-            private readonly object syncRoot = new object();
+            private readonly Type _implementationType;
+            private readonly object _syncRoot = new object();
 
             public TypeRegistration(Type implementationType)
             {
-                this.implementationType = implementationType;
+                _implementationType = implementationType;
             }
 
             protected override object ResolvePerContext(ObjectContainer container, RegistrationKey keyToResolve, ResolutionList resolutionPath)
@@ -311,14 +308,14 @@ namespace Reqnroll.BoDi
 
                 var pooledObjectKey = new RegistrationKey(typeToConstruct, keyToResolve.Name);
 
-                var result = ExecuteWithLock(syncRoot, () => container.GetPooledObject(pooledObjectKey), () =>
+                var result = ExecuteWithLock(_syncRoot, () => container.GetPooledObject(pooledObjectKey), () =>
                 {
                     if (typeToConstruct.IsInterface)
                         throw new ObjectContainerException("Interface cannot be resolved: " + keyToResolve,
                             resolutionPath.ToTypeList());
 
                     var obj = container.CreateObject(typeToConstruct, resolutionPath, keyToResolve);
-                    container.objectPool.Add(pooledObjectKey, obj);
+                    container._objectPool.Add(pooledObjectKey, obj);
                     return obj;
                 }, resolutionPath, container.ConcurrentObjectResolutionTimeout);
 
@@ -337,7 +334,7 @@ namespace Reqnroll.BoDi
 
             private Type GetTypeToConstruct(RegistrationKey keyToResolve)
             {
-                var targetType = implementationType;
+                var targetType = _implementationType;
                 if (targetType.IsGenericTypeDefinition)
                 {
                     var typeArgs = keyToResolve.Type.GetGenericArguments();
@@ -348,22 +345,22 @@ namespace Reqnroll.BoDi
 
             public override string ToString()
             {
-                return "Type: " + implementationType.FullName;
+                return "Type: " + _implementationType.FullName;
             }
         }
 
         private class InstanceRegistration : IRegistration
         {
-            private readonly object instance;
+            private readonly object _instance;
 
             public InstanceRegistration(object instance)
             {
-                this.instance = instance;
+                _instance = instance;
             }
 
             public object Resolve(ObjectContainer container, RegistrationKey keyToResolve, ResolutionList resolutionPath)
             {
-                return instance;
+                return _instance;
             }
 
             public override string ToString()
@@ -371,7 +368,7 @@ namespace Reqnroll.BoDi
                 string instanceText;
                 try
                 {
-                    instanceText = instance.ToString();
+                    instanceText = _instance.ToString();
                 }
                 catch (Exception ex)
                 {
@@ -384,10 +381,10 @@ namespace Reqnroll.BoDi
 
         private abstract class RegistrationWithStrategy : IStrategyRegistration
         {
-            protected SolvingStrategy solvingStrategy = SolvingStrategy.PerContext;
+            protected SolvingStrategy SolvingStrategy = SolvingStrategy.PerContext;
             public virtual object Resolve(ObjectContainer container, RegistrationKey keyToResolve, ResolutionList resolutionPath)
             {
-                if (solvingStrategy == SolvingStrategy.PerDependency)
+                if (SolvingStrategy == SolvingStrategy.PerDependency)
                 {
                     return ResolvePerDependency(container, keyToResolve, resolutionPath);
                 }
@@ -399,13 +396,13 @@ namespace Reqnroll.BoDi
 
             public IStrategyRegistration InstancePerDependency()
             {
-                solvingStrategy = SolvingStrategy.PerDependency;
+                SolvingStrategy = SolvingStrategy.PerDependency;
                 return this;
             }
 
             public IStrategyRegistration InstancePerContext()
             {
-                solvingStrategy = SolvingStrategy.PerContext;
+                SolvingStrategy = SolvingStrategy.PerContext;
                 return this;
             }
 
@@ -443,19 +440,19 @@ namespace Reqnroll.BoDi
 
         private class FactoryRegistration : RegistrationWithStrategy, IRegistration
         {
-            private readonly Delegate factoryDelegate;
-            private readonly object syncRoot = new object();
+            private readonly Delegate _factoryDelegate;
+            private readonly object _syncRoot = new object();
             public FactoryRegistration(Delegate factoryDelegate)
             {
-                this.factoryDelegate = factoryDelegate;
+                _factoryDelegate = factoryDelegate;
             }
 
             protected override object ResolvePerContext(ObjectContainer container, RegistrationKey keyToResolve, ResolutionList resolutionPath)
             {
-                var result = ExecuteWithLock(syncRoot, () => container.GetPooledObject(keyToResolve), () =>
+                var result = ExecuteWithLock(_syncRoot, () => container.GetPooledObject(keyToResolve), () =>
                 {
-                    var obj = container.InvokeFactoryDelegate(factoryDelegate, resolutionPath, keyToResolve);
-                    container.objectPool.Add(keyToResolve, obj);
+                    var obj = container.InvokeFactoryDelegate(_factoryDelegate, resolutionPath, keyToResolve);
+                    container._objectPool.Add(keyToResolve, obj);
                     return obj;
                 }, resolutionPath, container.ConcurrentObjectResolutionTimeout);
 
@@ -463,7 +460,7 @@ namespace Reqnroll.BoDi
             }
             protected override object ResolvePerDependency(ObjectContainer container, RegistrationKey keyToResolve, ResolutionList resolutionPath)
             {
-                return container.InvokeFactoryDelegate(factoryDelegate, resolutionPath, keyToResolve);
+                return container.InvokeFactoryDelegate(_factoryDelegate, resolutionPath, keyToResolve);
             }
         }
 
@@ -489,7 +486,7 @@ namespace Reqnroll.BoDi
                 var targetType = genericArguments[1];
                 var result = (IDictionary)Activator.CreateInstance(typeof(Dictionary<,>).MakeGenericType(genericArguments));
 
-                foreach (var namedRegistration in container.registrations.Where(r => r.Key.Name != null && r.Key.Type == targetType).Select(r => r.Key).ToList())
+                foreach (var namedRegistration in container._registrations.Where(r => r.Key.Name != null && r.Key.Type == targetType).Select(r => r.Key).ToList())
                 {
                     var convertedKey = ChangeType(namedRegistration.Name, keyType);
                     Debug.Assert(convertedKey != null);
@@ -512,14 +509,14 @@ namespace Reqnroll.BoDi
         #endregion
 
         public static TimeSpan DefaultConcurrentObjectResolutionTimeout { get; set; } = TimeSpan.FromSeconds(1);
-        private bool isDisposed = false;
-        private readonly ObjectContainer baseContainer;
-        private readonly ConcurrentDictionary<RegistrationKey, IRegistration> registrations = new ConcurrentDictionary<RegistrationKey, IRegistration>();
-        private readonly List<RegistrationKey> resolvedKeys = new List<RegistrationKey>();
-        private readonly Dictionary<RegistrationKey, object> objectPool = new Dictionary<RegistrationKey, object>();
+        private bool _isDisposed = false;
+        private readonly ObjectContainer _baseContainer;
+        private readonly ConcurrentDictionary<RegistrationKey, IRegistration> _registrations = new();
+        private readonly List<RegistrationKey> _resolvedKeys = new();
+        private readonly Dictionary<RegistrationKey, object> _objectPool = new();
 
         public event Action<object> ObjectCreated;
-        public IObjectContainer BaseContainer => baseContainer;
+        public IObjectContainer BaseContainer => _baseContainer;
 
         /// <summary>
         /// Sets the timeout for thread-safe object resolution. By default, it uses the value of <see cref="DefaultConcurrentObjectResolutionTimeout"/> that is initialized to 1 second. Setting it to <see cref="TimeSpan.Zero"/> disables thread-safe resolution.
@@ -531,7 +528,7 @@ namespace Reqnroll.BoDi
             if (baseContainer != null && !(baseContainer is ObjectContainer))
                 throw new ArgumentException("Base container must be an ObjectContainer", "baseContainer");
 
-            this.baseContainer = (ObjectContainer)baseContainer;
+            _baseContainer = (ObjectContainer)baseContainer;
             RegisterInstanceAs<IObjectContainer>(this);
         }
 
@@ -589,14 +586,14 @@ namespace Reqnroll.BoDi
 
         private void AddRegistration(RegistrationKey key, IRegistration registration)
         {
-            registrations[key] = registration;
+            _registrations[key] = registration;
 
             AddNamedDictionaryRegistration(key);
         }
 
         private IRegistration EnsureImplicitRegistration(RegistrationKey key)
         {
-            var registration = registrations.GetOrAdd(key, (registrationKey => new TypeRegistration(registrationKey.Type)));
+            var registration = _registrations.GetOrAdd(key, (registrationKey => new TypeRegistration(registrationKey.Type)));
 
             AddNamedDictionaryRegistration(key);
 
@@ -608,7 +605,7 @@ namespace Reqnroll.BoDi
             if (key.Name != null)
             {
                 var dictKey = CreateNamedInstanceDictionaryKey(key.Type);
-                registrations.TryAdd(dictKey, new NamedInstanceDictionaryRegistration());
+                _registrations.TryAdd(dictKey, new NamedInstanceDictionaryRegistration());
             }
         }
 
@@ -633,7 +630,7 @@ namespace Reqnroll.BoDi
 
             ClearRegistrations(registrationKey);
             AddRegistration(registrationKey, new InstanceRegistration(instance));
-            objectPool[new RegistrationKey(instance.GetType(), name)] = GetPoolableInstance(instance, dispose);
+            _objectPool[new RegistrationKey(instance.GetType(), name)] = GetPoolableInstance(instance, dispose);
         }
 
         private static object GetPoolableInstance(object instance, bool dispose)
@@ -687,19 +684,19 @@ namespace Reqnroll.BoDi
 
             var keyToResolve = new RegistrationKey(typeToResolve, name);
 
-            return registrations.ContainsKey(keyToResolve);
+            return _registrations.ContainsKey(keyToResolve);
         }
 
         // ReSharper disable once UnusedParameter.Local
         private void AssertNotResolved(RegistrationKey interfaceType)
         {
-            if (resolvedKeys.Contains(interfaceType))
+            if (_resolvedKeys.Contains(interfaceType))
                 throw new ObjectContainerException("An object has been resolved for this interface already.", null);
         }
 
         private void ClearRegistrations(RegistrationKey registrationKey)
         {
-            registrations.TryRemove(registrationKey, out IRegistration result);
+            _registrations.TryRemove(registrationKey, out _);
         }
 
 
@@ -728,7 +725,7 @@ namespace Reqnroll.BoDi
 
         public IEnumerable<T> ResolveAll<T>() where T : class
         {
-            return registrations
+            return _registrations
                 .Where(x => x.Key.Type == typeof(T))
                 .Select(x => Resolve(x.Key.Type, x.Key.Name) as T);
         }
@@ -739,9 +736,9 @@ namespace Reqnroll.BoDi
 
             var keyToResolve = new RegistrationKey(typeToResolve, name);
             object resolvedObject = ResolveObject(keyToResolve, resolutionPath);
-            if (!resolvedKeys.Contains(keyToResolve))
+            if (!_resolvedKeys.Contains(keyToResolve))
             {
-                resolvedKeys.Add(keyToResolve);
+                _resolvedKeys.Add(keyToResolve);
             }
             Debug.Assert(typeToResolve.IsInstanceOfType(resolvedObject));
             return resolvedObject;
@@ -750,13 +747,13 @@ namespace Reqnroll.BoDi
         private KeyValuePair<ObjectContainer, IRegistration>? GetRegistrationResult(RegistrationKey keyToResolve)
         {
             IRegistration registration;
-            if (registrations.TryGetValue(keyToResolve, out registration))
+            if (_registrations.TryGetValue(keyToResolve, out registration))
             {
                 return new KeyValuePair<ObjectContainer, IRegistration>(this, registration);
             }
 
-            if (baseContainer != null)
-                return baseContainer.GetRegistrationResult(keyToResolve);
+            if (_baseContainer != null)
+                return _baseContainer.GetRegistrationResult(keyToResolve);
 
             if (IsSpecialNamedInstanceDictionaryKey(keyToResolve))
             {
@@ -801,7 +798,7 @@ namespace Reqnroll.BoDi
 
         private bool GetObjectFromPool(RegistrationKey pooledObjectKey, out object obj)
         {
-            if (!objectPool.TryGetValue(pooledObjectKey, out obj))
+            if (!_objectPool.TryGetValue(pooledObjectKey, out obj))
                 return false;
 
             var nonDisposableWrapper = obj as NonDisposableWrapper;
@@ -870,7 +867,7 @@ namespace Reqnroll.BoDi
         private object InvokeFactoryDelegate(Delegate factoryDelegate, ResolutionList resolutionPath, RegistrationKey keyToResolve)
         {
             if (resolutionPath.Contains(keyToResolve))
-                throw new ObjectContainerException("Circular dependency found! " + factoryDelegate.ToString(), resolutionPath.ToTypeList());
+                throw new ObjectContainerException("Circular dependency found! " + factoryDelegate, resolutionPath.ToTypeList());
 
             var args = ResolveArguments(factoryDelegate.Method.GetParameters(), keyToResolve, resolutionPath.AddToEnd(keyToResolve, null));
             return factoryDelegate.DynamicInvoke(args);
@@ -897,27 +894,27 @@ namespace Reqnroll.BoDi
         public override string ToString()
         {
             return string.Join(Environment.NewLine,
-                registrations
+                _registrations
                     .Where(r => !(r.Value is NamedInstanceDictionaryRegistration))
                     .Select(r => string.Format("{0} -> {1}", r.Key, (r.Key.Type == typeof(IObjectContainer) && r.Key.Name == null) ? "<self>" : r.Value.ToString())));
         }
 
         private void AssertNotDisposed()
         {
-            if (isDisposed)
+            if (_isDisposed)
                 throw new ObjectContainerException("Object container disposed", null);
         }
 
         public void Dispose()
         {
-            isDisposed = true;
+            _isDisposed = true;
 
-            foreach (var obj in objectPool.Values.OfType<IDisposable>().Where(o => !ReferenceEquals(o, this)))
+            foreach (var obj in _objectPool.Values.OfType<IDisposable>().Where(o => !ReferenceEquals(o, this)))
                 obj.Dispose();
 
-            objectPool.Clear();
-            registrations.Clear();
-            resolvedKeys.Clear();
+            _objectPool.Clear();
+            _registrations.Clear();
+            _resolvedKeys.Clear();
         }
     }
 }
