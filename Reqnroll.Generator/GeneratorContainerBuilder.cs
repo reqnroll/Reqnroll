@@ -38,10 +38,7 @@ namespace Reqnroll.Generator
             generatorPluginEvents.RaiseRegisterDependencies(container);
             generatorPluginEvents.RaiseConfigurationDefaults(reqnrollConfiguration);
 
-            if (reqnrollConfiguration.ReqnrollConfiguration.GeneratorCustomDependencies != null)
-            {
-                container.RegisterFromConfiguration(reqnrollConfiguration.ReqnrollConfiguration.GeneratorCustomDependencies);
-            }
+            reqnrollConfiguration.ReqnrollConfiguration.GeneratorCustomDependencies?.RegisterTo(container);
 
             container.RegisterInstanceAs(reqnrollConfiguration);
             container.RegisterInstanceAs(reqnrollConfiguration.ReqnrollConfiguration);

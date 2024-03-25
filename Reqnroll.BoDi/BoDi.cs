@@ -544,21 +544,21 @@ namespace Reqnroll.BoDi
         public IStrategyRegistration RegisterTypeAs<TInterface>(Type implementationType, string name = null) where TInterface : class
         {
             Type interfaceType = typeof(TInterface);
-            return RegisterTypeAs(implementationType, interfaceType, name);
+            return RegisterTypeAsInternal(implementationType, interfaceType, name);
         }
 
         public IStrategyRegistration RegisterTypeAs<TType, TInterface>(string name = null) where TType : class, TInterface
         {
             Type interfaceType = typeof(TInterface);
             Type implementationType = typeof(TType);
-            return RegisterTypeAs(implementationType, interfaceType, name);
+            return RegisterTypeAsInternal(implementationType, interfaceType, name);
         }
 
-        public IStrategyRegistration RegisterTypeAs(Type implementationType, Type interfaceType)
+        public IStrategyRegistration RegisterTypeAs(Type implementationType, Type interfaceType, string name = null)
         {
             if (!IsValidTypeMapping(implementationType, interfaceType))
                 throw new InvalidOperationException("type mapping is not valid");
-            return RegisterTypeAs(implementationType, interfaceType, null);
+            return RegisterTypeAsInternal(implementationType, interfaceType, name);
         }
 
         private bool IsValidTypeMapping(Type implementationType, Type interfaceType)
@@ -616,7 +616,7 @@ namespace Reqnroll.BoDi
             }
         }
 
-        private IStrategyRegistration RegisterTypeAs(Type implementationType, Type interfaceType, string name)
+        private IStrategyRegistration RegisterTypeAsInternal(Type implementationType, Type interfaceType, string name)
         {
             var registrationKey = new RegistrationKey(interfaceType, name);
             AssertNotResolved(registrationKey);
@@ -706,35 +706,6 @@ namespace Reqnroll.BoDi
             registrations.TryRemove(registrationKey, out IRegistration result);
         }
 
-#if !BODI_LIMITEDRUNTIME && !BODI_DISABLECONFIGFILESUPPORT
-        public void RegisterFromConfiguration()
-        {
-            var section = (BoDiConfigurationSection)ConfigurationManager.GetSection("boDi");
-            if (section == null)
-                return;
-
-            RegisterFromConfiguration(section.Registrations);
-        }
-
-        public void RegisterFromConfiguration(ContainerRegistrationCollection containerRegistrationCollection)
-        {
-            if (containerRegistrationCollection == null)
-                return;
-
-            foreach (ContainerRegistrationConfigElement registrationConfigElement in containerRegistrationCollection)
-            {
-                RegisterFromConfiguration(registrationConfigElement);
-            }
-        }
-
-        private void RegisterFromConfiguration(ContainerRegistrationConfigElement registrationConfigElement)
-        {
-            Type interfaceType = Type.GetType(registrationConfigElement.Interface, true);
-            Type implementationType = Type.GetType(registrationConfigElement.Implementation, true);
-
-            RegisterTypeAs(implementationType, interfaceType, string.IsNullOrEmpty(registrationConfigElement.Name) ? null : registrationConfigElement.Name);
-        }
-#endif
 
         #endregion
 
@@ -953,72 +924,4 @@ namespace Reqnroll.BoDi
             resolvedKeys.Clear();
         }
     }
-
-    #region Configuration handling
-#if !BODI_LIMITEDRUNTIME && !BODI_DISABLECONFIGFILESUPPORT
-
-    public class BoDiConfigurationSection : ConfigurationSection
-    {
-        [ConfigurationProperty("", Options = ConfigurationPropertyOptions.IsDefaultCollection)]
-        [ConfigurationCollection(typeof(ContainerRegistrationCollection), AddItemName = "register")]
-        public ContainerRegistrationCollection Registrations
-        {
-            get { return (ContainerRegistrationCollection)this[""]; }
-            set { this[""] = value; }
-        }
-    }
-
-    public class ContainerRegistrationCollection : ConfigurationElementCollection
-    {
-        protected override ConfigurationElement CreateNewElement()
-        {
-            return new ContainerRegistrationConfigElement();
-        }
-
-        protected override object GetElementKey(ConfigurationElement element)
-        {
-            var registrationConfigElement = ((ContainerRegistrationConfigElement)element);
-            string elementKey = registrationConfigElement.Interface;
-            if (registrationConfigElement.Name != null)
-                elementKey = elementKey + "/" + registrationConfigElement.Name;
-            return elementKey;
-        }
-
-        public void Add(string implementationType, string interfaceType, string name = null)
-        {
-            BaseAdd(new ContainerRegistrationConfigElement
-            {
-                Implementation = implementationType,
-                Interface = interfaceType,
-                Name = name
-            });
-        }
-    }
-
-    public class ContainerRegistrationConfigElement : ConfigurationElement
-    {
-        [ConfigurationProperty("as", IsRequired = true)]
-        public string Interface
-        {
-            get { return (string)this["as"]; }
-            set { this["as"] = value; }
-        }
-
-        [ConfigurationProperty("type", IsRequired = true)]
-        public string Implementation
-        {
-            get { return (string)this["type"]; }
-            set { this["type"] = value; }
-        }
-
-        [ConfigurationProperty("name", IsRequired = false, DefaultValue = null)]
-        public string Name
-        {
-            get { return (string)this["name"]; }
-            set { this["name"] = value; }
-        }
-    }
-
-#endif
-    #endregion
 }

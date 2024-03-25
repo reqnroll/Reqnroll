@@ -33,7 +33,7 @@ public class AppConfigConfigurationLoader
 
             if (IsSpecified(configSection.Runtime.Dependencies))
             {
-                reqnrollConfiguration.CustomDependencies = configSection.Runtime.Dependencies;
+                reqnrollConfiguration.CustomDependencies = configSection.Runtime.Dependencies.ToDependencyConfigurationCollection();
             }
         }
 
@@ -49,7 +49,7 @@ public class AppConfigConfigurationLoader
 
             if (IsSpecified(configSection.Generator.Dependencies))
             {
-                reqnrollConfiguration.GeneratorCustomDependencies = configSection.Generator.Dependencies;
+                reqnrollConfiguration.GeneratorCustomDependencies = configSection.Generator.Dependencies.ToDependencyConfigurationCollection();
             }
         }
 

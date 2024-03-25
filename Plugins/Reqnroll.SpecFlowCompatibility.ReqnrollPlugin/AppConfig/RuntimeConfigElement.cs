@@ -1,5 +1,4 @@
 using System.Configuration;
-using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 
 namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig
@@ -7,10 +6,10 @@ namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig
     public class RuntimeConfigElement : ConfigurationElement
     {
         [ConfigurationProperty("dependencies", Options = ConfigurationPropertyOptions.IsDefaultCollection)]
-        [ConfigurationCollection(typeof(ContainerRegistrationCollection), AddItemName = "register")]
-        public ContainerRegistrationCollection Dependencies
+        [ConfigurationCollection(typeof(ContainerRegistrationElementCollection), AddItemName = "register")]
+        public ContainerRegistrationElementCollection Dependencies
         {
-            get { return (ContainerRegistrationCollection)this["dependencies"]; }
+            get { return (ContainerRegistrationElementCollection)this["dependencies"]; }
             set { this["dependencies"] = value; }
         }
 

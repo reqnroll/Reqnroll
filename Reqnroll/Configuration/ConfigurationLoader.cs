@@ -116,8 +116,8 @@ namespace Reqnroll.Configuration
         public static ReqnrollConfiguration GetDefault()
         {
             return new ReqnrollConfiguration(ConfigSource.Default,
-                new ContainerRegistrationCollection(),
-                new ContainerRegistrationCollection(),
+                new DependencyConfigurationCollection(),
+                new DependencyConfigurationCollection(),
                 DefaultFeatureLanguage,
                 DefaultBindingCulture,
                 DefaultStopAtFirstError,
