@@ -1,5 +1,5 @@
 using System;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.Loaders;
 using Xunit;

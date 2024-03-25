@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Moq;
 using Reqnroll.Infrastructure;
 using Reqnroll.UnitTestProvider;

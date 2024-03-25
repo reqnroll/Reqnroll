@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Bindings.Discovery;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;

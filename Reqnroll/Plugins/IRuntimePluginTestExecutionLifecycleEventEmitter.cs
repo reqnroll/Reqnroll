@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Bindings;
 
 namespace Reqnroll.Plugins

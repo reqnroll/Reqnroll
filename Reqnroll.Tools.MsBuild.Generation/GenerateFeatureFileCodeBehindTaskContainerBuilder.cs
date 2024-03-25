@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Microsoft.Build.Utilities;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;

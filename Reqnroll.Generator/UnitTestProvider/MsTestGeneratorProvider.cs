@@ -2,7 +2,7 @@ using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using Reqnroll.Generator.CodeDom;
-using BoDi;
+using Reqnroll.BoDi;
 
 namespace Reqnroll.Generator.UnitTestProvider
 {

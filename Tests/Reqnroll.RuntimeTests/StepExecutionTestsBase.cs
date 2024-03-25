@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using BoDi;
+using Reqnroll.BoDi;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;

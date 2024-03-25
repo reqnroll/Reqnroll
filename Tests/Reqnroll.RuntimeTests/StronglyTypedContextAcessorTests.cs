@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Xunit;
 using Reqnroll.Infrastructure;
 

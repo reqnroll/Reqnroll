@@ -1,7 +1,7 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using BoDi;
+using Reqnroll.BoDi;
 using FluentAssertions;
 using Xunit;
 using Reqnroll.BindingSkeletons;

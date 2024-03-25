@@ -2,7 +2,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Generator.CodeDom;
 
 namespace Reqnroll.Generator.UnitTestProvider

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Bindings;
 using Reqnroll.Tracing;
 

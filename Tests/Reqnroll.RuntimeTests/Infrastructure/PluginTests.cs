@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using BoDi;
+using Reqnroll.BoDi;
 using Moq;
 using Xunit;
 using FluentAssertions;
@@ -296,7 +296,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             _pluginToReturn = pluginToReturn;
         }
 
-        public override void RegisterGlobalContainerDefaults(BoDi.ObjectContainer container)
+        public override void RegisterGlobalContainerDefaults(ObjectContainer container)
         {
             base.RegisterGlobalContainerDefaults(container);
 

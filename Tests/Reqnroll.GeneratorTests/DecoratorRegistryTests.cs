@@ -1,6 +1,6 @@
 using System.CodeDom;
 using System.Collections.Generic;
-using BoDi;
+using Reqnroll.BoDi;
 using Moq;
 using Xunit;
 using Reqnroll.Generator;

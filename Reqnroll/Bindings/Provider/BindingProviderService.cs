@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;

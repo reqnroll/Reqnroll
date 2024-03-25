@@ -10,7 +10,7 @@ using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Autofac
 {
-    using BoDi;
+    using Reqnroll.BoDi;
 
     using Reqnroll;
 

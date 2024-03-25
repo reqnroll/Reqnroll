@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.BindingSkeletons;
 
 namespace Reqnroll.Configuration
@@ -17,8 +17,8 @@ namespace Reqnroll.Configuration
     public class ReqnrollConfiguration
     {
         public ReqnrollConfiguration(ConfigSource configSource,
-            ContainerRegistrationCollection customDependencies,
-            ContainerRegistrationCollection generatorCustomDependencies,
+            DependencyConfigurationCollection customDependencies,
+            DependencyConfigurationCollection generatorCustomDependencies,
             CultureInfo featureLanguage,
             CultureInfo bindingCulture,
             bool stopAtFirstError,
@@ -57,8 +57,8 @@ namespace Reqnroll.Configuration
         public ConfigSource ConfigSource { get; set; }
         public string ConfigSourceText { get; set; }
 
-        public ContainerRegistrationCollection CustomDependencies { get; set; }
-        public ContainerRegistrationCollection GeneratorCustomDependencies { get; set; }
+        public DependencyConfigurationCollection CustomDependencies { get; set; }
+        public DependencyConfigurationCollection GeneratorCustomDependencies { get; set; }
 
         //language settings
         public CultureInfo FeatureLanguage { get; set; }

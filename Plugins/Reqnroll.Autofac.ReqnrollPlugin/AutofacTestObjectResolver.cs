@@ -1,6 +1,6 @@
 using System;
 using Autofac;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Autofac

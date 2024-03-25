@@ -1,5 +1,5 @@
 using System;
-using BoDi;
+using Reqnroll.BoDi;
 
 namespace Reqnroll
 {

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.Compatibility;
 using Reqnroll.Configuration;

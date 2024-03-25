@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Analytics;
 using Reqnroll.Configuration;
 using Reqnroll.Generator;

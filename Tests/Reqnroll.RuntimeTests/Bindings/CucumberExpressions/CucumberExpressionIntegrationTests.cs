@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
-using BoDi;
+using Reqnroll.BoDi;
 using FluentAssertions;
 using Moq;
 using Reqnroll.Bindings;

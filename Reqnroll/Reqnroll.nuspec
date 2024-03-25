@@ -17,7 +17,7 @@
     <copyright>$copyright$</copyright>
     <dependencies>
       <group targetFramework="net462">
-        <dependency id="BoDi" version="1.5.0" />
+        <dependency id="Reqnroll.BoDi" version="[$version$]" />
         <dependency id="Gherkin" version="19.0.3"/>
         <dependency id="Cucumber.CucumberExpressions" version="16.0.0"/>
         <dependency id="System.ValueTuple" version="4.5.0" />
@@ -25,10 +25,9 @@
       </group>
 
       <group targetFramework="netstandard2.0">
-        <dependency id="System.Configuration.ConfigurationManager" version="4.4.1" />
         <dependency id="Microsoft.Extensions.DependencyModel" version="6.0.0" />
         <dependency id="System.Runtime.Loader" version="4.3.0" />
-        <dependency id="BoDi" version="1.5.0" />
+        <dependency id="Reqnroll.BoDi" version="[$version$]" />
         <dependency id="Gherkin" version="19.0.3"/>
         <dependency id="Cucumber.CucumberExpressions" version="16.0.0"/>
         <dependency id="System.Net.Http" version="4.3.4" />
@@ -40,7 +39,7 @@
   <files>
     <file src="build\**\*" target="build" />
 
-    <file src="bin\$config$\net462\Reqnroll.*" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
+    <file src="bin\$config$\net462\Reqnroll.*" exclude="bin\$config$\net462\Reqnroll.BoDi.*" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
     <file src="Reqnroll.ExternalAnnotations.xml" target="lib\$Reqnroll_FullFramework_Runtime_TFM$" />
 
     <file src="bin\$config$\netstandard2.0\Reqnroll.dll" target="lib\$Reqnroll_Core_Runtime_TFM$" />

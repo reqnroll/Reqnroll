@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -51,10 +51,7 @@ namespace Reqnroll.Infrastructure
             ReqnrollConfiguration reqnrollConfiguration = ConfigurationLoader.GetDefault();
             reqnrollConfiguration = configurationProvider.LoadConfiguration(reqnrollConfiguration);
 
-            if (reqnrollConfiguration.CustomDependencies != null)
-            {
-                container.RegisterFromConfiguration(reqnrollConfiguration.CustomDependencies);
-            }
+            reqnrollConfiguration.CustomDependencies?.RegisterTo(container);
 
             var unitTestProviderConfiguration = container.Resolve<UnitTestProviderConfiguration>();
 

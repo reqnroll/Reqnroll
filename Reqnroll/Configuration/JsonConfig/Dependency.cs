@@ -8,5 +8,7 @@ namespace Reqnroll.Configuration.JsonConfig
         public string ImplementationType { get; set; }
         [DataMember(Name = "as")]
         public string InterfaceType { get; set; }
+        [DataMember(Name = "name")]
+        public string Name { get; set; }
     }
 }

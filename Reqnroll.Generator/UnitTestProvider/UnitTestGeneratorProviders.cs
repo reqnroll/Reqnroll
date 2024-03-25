@@ -1,4 +1,4 @@
-using BoDi;
+using Reqnroll.BoDi;
 using Reqnroll.Generator.UnitTestProvider;
 
 namespace Reqnroll.Generator

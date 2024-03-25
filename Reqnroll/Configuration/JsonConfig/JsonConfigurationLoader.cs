@@ -63,7 +63,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 {
                     foreach (var runtimeDependency in jsonConfig.Runtime.Dependencies)
                     {
-                        containerRegistrationCollection.Add(runtimeDependency.ImplementationType, runtimeDependency.InterfaceType);
+                        containerRegistrationCollection.Add(runtimeDependency.ImplementationType, runtimeDependency.InterfaceType, runtimeDependency.Name);
                     }
                 }
             }
