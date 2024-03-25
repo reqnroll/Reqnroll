@@ -70,13 +70,25 @@
     <ProjectReference Include="..\Reqnroll.BoDi\Reqnroll.BoDi.csproj" />
   </ItemGroup>
 
-  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
+  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" 
+          Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+    <ReplaceTextInFileTask 
+      InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" 
+      OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" 
+      TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" 
+      TextToReplaceWith="$(AppInsightsInstrumentationKey)" 
+      WriteOnlyWhenChanged="true" />
     <ItemGroup>
       <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
     </ItemGroup>
 
-    <ReplaceTextInFileTask Condition="'$(BuildingInsideVisualStudio)' != 'true'" InputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" OutputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" TextToReplace="[vNext]" TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" WriteOnlyWhenChanged="true" />
+    <ReplaceTextInFileTask 
+      Condition="'$(BuildingInsideVisualStudio)' != 'true'"
+      InputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" 
+      OutputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" 
+      TextToReplace="[vNext]" 
+      TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" 
+      WriteOnlyWhenChanged="true" />
   </Target>
 
 </Project>
