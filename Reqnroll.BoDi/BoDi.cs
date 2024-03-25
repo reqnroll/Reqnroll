@@ -11,22 +11,18 @@ using System.Threading;
 
 namespace Reqnroll.BoDi
 {
-#if !BODI_LIMITEDRUNTIME
     [Serializable]
-#endif
     public class ObjectContainerException : Exception
     {
         public ObjectContainerException(string message, Type[] resolutionPath) : base(GetMessage(message, resolutionPath))
         {
         }
 
-#if !BODI_LIMITEDRUNTIME
         protected ObjectContainerException(
             SerializationInfo info,
             StreamingContext context) : base(info, context)
         {
         }
-#endif
 
         static private string GetMessage(string message, Type[] resolutionPath)
         {
