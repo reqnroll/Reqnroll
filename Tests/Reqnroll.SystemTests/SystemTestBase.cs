@@ -21,6 +21,7 @@ public abstract class SystemTestBase
     protected readonly ObjectContainer _testContainer;
     protected readonly TestRunConfiguration _testRunConfiguration;
     protected readonly CurrentVersionDriver _currentVersionDriver;
+    protected readonly CompilationDriver _compilationDriver;
 
     protected int _preparedTests = 0;
 
@@ -49,6 +50,7 @@ public abstract class SystemTestBase
         _projectsDriver = _testContainer.Resolve<ProjectsDriver>();
         _executionDriver = _testContainer.Resolve<ExecutionDriver>();
         _vsTestExecutionDriver = _testContainer.Resolve<VSTestExecutionDriver>();
+        _compilationDriver = _testContainer.Resolve<CompilationDriver>();
     }
 
     protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null)

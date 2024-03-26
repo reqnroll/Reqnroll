@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using Reqnroll.TestProjectGenerator.Driver;
+using Xunit;
 using Xunit.Abstractions;
 
 namespace Reqnroll.SystemTests.Portability;
@@ -20,5 +21,16 @@ public abstract class PortabilityTestBase : SystemTestBase
         ExecuteTests();
 
         ShouldAllScenariosPass();
+    }
+
+    [Theory]
+    [InlineData(BuildTool.MSBuild)]
+    [InlineData(BuildTool.DotnetMSBuild)]
+    public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild(BuildTool buildTool)
+    {
+        PrepareGeneratorAllInSamples();
+        _compilationDriver.SetBuildTool(buildTool);
+
+        _compilationDriver.CompileSolution();
     }
 }
