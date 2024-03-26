@@ -238,7 +238,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
         [Fact]
-        public void CreateEmtpyCSharpProjectInNewFormat()
+        public void CreateEmptyCSharpProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
@@ -246,12 +246,11 @@ namespace Reqnroll.TestProjectGenerator.Tests
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+            projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
         }
 
         [Fact]
-        public void CreateEmtpyCSharpCore3_1ProjectInNewFormat()
+        public void CreateEmptyCSharpCore3_1ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
 
@@ -264,20 +263,20 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
         [Fact]
-        public void CreateEmtpyCSharpNet50ProjectInNewFormat()
+        public void CreateEmptyCSharpNet50ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net50);
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net50);
 
             new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net5.0</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net5.0</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]
-        public void CreateEmtpyCSharpNet60ProjectInNewFormat()
+        public void CreateEmptyCSharpNet60ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net60);
 
@@ -290,7 +289,72 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
         [Fact]
-        public void CreateEmtpyFSharpProjectInNewFormat()
+        public void CreateEmptyCSharpNet70ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net70);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net7.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmptyCSharpNet80ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net80);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net8.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmptyCSharpNet481ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net481);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net481</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmptyCSharpNet462ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net462);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmptyCSharpNet472ProjectInNewFormat()
+        {
+            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net472);
+
+            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+
+            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+            projectFileContent.Should()
+                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net472</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+        }
+
+        [Fact]
+        public void CreateEmptyFSharpProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp);
 
@@ -303,7 +367,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
         [Fact]
-        public void CreateEmtpyVbProjectInNewFormat()
+        public void CreateEmptyVbProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB);
 

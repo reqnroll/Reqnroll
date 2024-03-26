@@ -8,8 +8,8 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
         {
             switch (targetLanguage)
             {
-                case ProgrammingLanguage.CSharp: return new CSharpBindingsGenerator();
-                case ProgrammingLanguage.CSharp10: return new CSharp10BindingsGenerator();
+                case ProgrammingLanguage.CSharp73: return new CSharpBindingsGenerator();
+                case ProgrammingLanguage.CSharp: return new CSharp10BindingsGenerator();
                 case ProgrammingLanguage.FSharp: return new FSharpBindingsGenerator();
                 case ProgrammingLanguage.VB: return new VbBindingsGenerator();
                 default: throw new ArgumentException(

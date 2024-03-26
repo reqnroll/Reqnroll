@@ -64,7 +64,6 @@ public class {0}
         public override ProjectFile GenerateLoggerClass(string pathToLogFile)
         {
             string fileContent = $$"""
-                                   #nullable disable
                                    using System;
                                    using System.IO;
                                    using System.Runtime.CompilerServices;

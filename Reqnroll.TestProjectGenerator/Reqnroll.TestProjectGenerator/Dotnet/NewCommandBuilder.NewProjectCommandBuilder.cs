@@ -51,10 +51,15 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
                 arguments = AddArgument(
                     arguments,
                     "-lang",
+                    _language == ProgrammingLanguage.CSharp73 ? "\"C#\"" :
                     _language == ProgrammingLanguage.CSharp ? "\"C#\"" :
-                    _language == ProgrammingLanguage.CSharp10 ? "\"C#\"" :
                     _language == ProgrammingLanguage.VB ? "VB" :
                     _language == ProgrammingLanguage.FSharp ? "\"F#\"" : string.Empty);
+
+                if (_language == ProgrammingLanguage.CSharp73)
+                {
+                    arguments = AddArgument(arguments, "--langVersion", "7.3");
+                }
 
                 return arguments;
             }

@@ -13,7 +13,13 @@ namespace Reqnroll.TestProjectGenerator.Data
         Netcoreapp31,
         Net461,
         Net462,
+        Net471,
+        Net472,
+        Net48,
+        Net481,
         Net50,
-        Net60
+        Net60,
+        Net70,
+        Net80
     }
 }

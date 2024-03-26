@@ -173,8 +173,8 @@ namespace Reqnroll.TestProjectGenerator
         {
             switch (language)
             {
+                case ProgrammingLanguage.CSharp73:
                 case ProgrammingLanguage.CSharp:
-                case ProgrammingLanguage.CSharp10:
                     return csharpcode;
                 case ProgrammingLanguage.VB:
                     return vbnetcode;
@@ -252,8 +252,8 @@ namespace Reqnroll.TestProjectGenerator
                     case ProgrammingLanguage.FSharp:
                         AddInitialFSharpReferences();
                         break;
+                    case ProgrammingLanguage.CSharp73:
                     case ProgrammingLanguage.CSharp:
-                    case ProgrammingLanguage.CSharp10:
                         AddUnitTestProviderSpecificConfig();
                         break;
                 }

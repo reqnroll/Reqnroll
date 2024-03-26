@@ -72,20 +72,22 @@ namespace Reqnroll.TestProjectGenerator.Factories
         {
             switch (_testRunConfiguration.TargetFramework)
             {
-                case TargetFramework.Net45:
-                case TargetFramework.NetStandard20:
-                case TargetFramework.Netcoreapp20:
-                case TargetFramework.Net452:
                 case TargetFramework.Net35:
+                case TargetFramework.Net45:
+                case TargetFramework.Net452:
+                case TargetFramework.Net461:
+                case TargetFramework.Net462:
+                case TargetFramework.Net471:
+                case TargetFramework.Net472:
+                case TargetFramework.Netcoreapp20:
                 case TargetFramework.Netcoreapp21:
                 case TargetFramework.Netcoreapp22:
                 case TargetFramework.Netcoreapp30:
                 case TargetFramework.Netcoreapp31:
-                case TargetFramework.Net461:
-                case TargetFramework.Net462:
                 case TargetFramework.Net50:
-                    return ProgrammingLanguage.CSharp;
-                default: return ProgrammingLanguage.CSharp10;
+                case TargetFramework.NetStandard20:
+                    return ProgrammingLanguage.CSharp73;
+                default: return ProgrammingLanguage.CSharp;
             }
         }
 
