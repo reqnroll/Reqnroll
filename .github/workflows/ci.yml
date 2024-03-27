@@ -262,6 +262,10 @@ jobs:
     #   with:
     #     dotnet-version: | 
     #       6.0.x
+    - name: .NET Information
+      run: |
+        dotnet --list-sdks
+        dotnet --list-runtimes
     - name: Restore dependencies
       run: dotnet restore
     - name: Install Test Report Dependencies
