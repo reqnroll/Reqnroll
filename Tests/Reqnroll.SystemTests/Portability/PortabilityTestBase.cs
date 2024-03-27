@@ -33,4 +33,8 @@ public abstract class PortabilityTestBase : SystemTestBase
 
         _compilationDriver.CompileSolution();
     }
+
+    //TODO: test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
+    //TODO: test async steps (async steps are executed in order)
+    //TODO: test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
 }
