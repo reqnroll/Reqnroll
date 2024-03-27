@@ -1,12 +1,14 @@
-﻿using Reqnroll.TestProjectGenerator.Data;
-using Xunit.Abstractions;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Reqnroll.TestProjectGenerator.Data;
 
 namespace Reqnroll.SystemTests.Portability;
 
+[TestClass]
 public class Net70PortabilityTest : PortabilityTestBase
 {
-    public Net70PortabilityTest(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
+    protected override void TestInitialize()
     {
+        base.TestInitialize();
         _testRunConfiguration.TargetFramework = TargetFramework.Net70;
     }
 }

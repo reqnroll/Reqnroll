@@ -1,37 +1,41 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.BoDi;
 using Reqnroll.SystemTests.Drivers;
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Driver;
 using Reqnroll.TestProjectGenerator.Helpers;
-using Xunit.Abstractions;
 
 namespace Reqnroll.SystemTests;
 public abstract class SystemTestBase
 {
-    protected readonly ITestOutputHelper _testOutputHelper;
-    protected readonly ProjectsDriver _projectsDriver;
-    protected readonly ExecutionDriver _executionDriver;
-    protected readonly VSTestExecutionDriver _vsTestExecutionDriver;
-    protected readonly TestFileManager _testFileManager = new();
-    protected readonly FolderCleaner _folderCleaner;
-    protected readonly ObjectContainer _testContainer;
-    protected readonly TestRunConfiguration _testRunConfiguration;
-    protected readonly CurrentVersionDriver _currentVersionDriver;
-    protected readonly CompilationDriver _compilationDriver;
+    protected ProjectsDriver _projectsDriver = null!;
+    protected ExecutionDriver _executionDriver = null!;
+    protected VSTestExecutionDriver _vsTestExecutionDriver = null!;
+    protected TestFileManager _testFileManager = new();
+    protected FolderCleaner _folderCleaner = null!;
+    protected ObjectContainer _testContainer = null!;
+    protected TestRunConfiguration _testRunConfiguration = null!;
+    protected CurrentVersionDriver _currentVersionDriver = null!;
+    protected CompilationDriver _compilationDriver = null!;
 
     protected int _preparedTests = 0;
 
-    protected SystemTestBase(ITestOutputHelper testOutputHelper)
-    {
-        _testOutputHelper = testOutputHelper;
+    public TestContext TestContext { get; set; } = null!;
 
+    [TestInitialize]
+    public void TestInitializeMethod()
+    {
+        TestInitialize();
+    }
+
+    protected virtual void TestInitialize()
+    {
         _testContainer = new ObjectContainer();
-        _testContainer.RegisterInstanceAs(_testOutputHelper);
-        _testContainer.RegisterTypeAs<XUnitOutputConnector, IOutputWriter>();
+        _testContainer.RegisterTypeAs<ConsoleOutputConnector, IOutputWriter>();
 
         _testRunConfiguration = _testContainer.Resolve<TestRunConfiguration>();
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.CSharp;
@@ -86,11 +90,11 @@ public abstract class SystemTestBase
 
         if (count == 0)
         {
-            _testOutputHelper.WriteLine("No tests detected");
+            Console.WriteLine("No tests detected");
             return null;
         }
 
-        _testOutputHelper.WriteLine($"Detected {count} tests");
+        Console.WriteLine($"Detected {count} tests");
         return count;
     }
 

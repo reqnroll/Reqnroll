@@ -1,19 +1,16 @@
 using System;
 using System.Diagnostics;
 using Reqnroll.TestProjectGenerator;
-using Xunit.Abstractions;
 
 namespace Reqnroll.SystemTests.Drivers;
 
-class XUnitOutputConnector : IOutputWriter
+class ConsoleOutputConnector : IOutputWriter
 {
     private readonly Stopwatch _stopwatch = new();
-    private readonly ITestOutputHelper _testOutputHelper;
     private TimeSpan _previousElapsed = TimeSpan.Zero;
 
-    public XUnitOutputConnector(ITestOutputHelper testOutputHelper)
+    public ConsoleOutputConnector()
     {
-        _testOutputHelper = testOutputHelper;
         _stopwatch.Start();
         WriteLine("Start");
     }
@@ -24,7 +21,7 @@ class XUnitOutputConnector : IOutputWriter
         message = $"{elapsed:c}(+{(elapsed - _previousElapsed).TotalMilliseconds:0}ms):{message}";
         _previousElapsed = elapsed;
 
-        _testOutputHelper.WriteLine(message);
+        Console.WriteLine(message);
     }
 
     public void WriteLine(string format, params object[] args)

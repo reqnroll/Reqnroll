@@ -1,19 +1,15 @@
-﻿using Reqnroll.TestProjectGenerator.Driver;
-using Xunit;
-using Xunit.Abstractions;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Reqnroll.TestProjectGenerator.Driver;
 
 namespace Reqnroll.SystemTests.Portability;
 
 /// <summary>
 /// Supported .NET versions: https://docs.reqnroll.net/latest/installation/compatibility.html#net-versions
 /// </summary>
+[TestCategory("Portability")]
 public abstract class PortabilityTestBase : SystemTestBase
 {
-    protected PortabilityTestBase(ITestOutputHelper testOutputHelper) : base(testOutputHelper)
-    {
-    }
-
-    [Fact]
+    [TestMethod]
     public void GeneratorAllIn_sample_can_be_handled()
     {
         PrepareGeneratorAllInSamples();
@@ -23,9 +19,9 @@ public abstract class PortabilityTestBase : SystemTestBase
         ShouldAllScenariosPass();
     }
 
-    [Theory]
-    [InlineData(BuildTool.MSBuild)]
-    [InlineData(BuildTool.DotnetMSBuild)]
+    [TestMethod]
+    [DataRow(BuildTool.MSBuild)]
+    [DataRow(BuildTool.DotnetMSBuild)]
     public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild(BuildTool buildTool)
     {
         PrepareGeneratorAllInSamples();
