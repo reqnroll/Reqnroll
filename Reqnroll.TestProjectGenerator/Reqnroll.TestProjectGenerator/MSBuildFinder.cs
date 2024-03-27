@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace Reqnroll.TestProjectGenerator
 {
-    public class MSBuildFinder(IOutputWriter _outputWriter, AppConfigDriver _configDriver)
+    public class MSBuildFinder(IOutputWriter _outputWriter, ConfigurationDriver _configDriver)
     {
         private string FindUsingVS2022()
         {

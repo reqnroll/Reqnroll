@@ -89,7 +89,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 _solution.AddProject(project);
             }
 
-            var customGlobalPackagesFolder = _folders.RunUniqueGlobalPackages == _folders.GlobalPackages ? null : _folders.RunUniqueGlobalPackages;
+            var customGlobalPackagesFolder = _folders.IsGlobalPackagesCustomized ? _folders.GlobalNuGetPackages : null;
             if (customGlobalPackagesFolder != null)
                 _outputWriter.WriteLine($"Using custom global packages folder: {customGlobalPackagesFolder}");
             _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray(), customGlobalPackagesFolder);
