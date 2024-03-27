@@ -10,7 +10,7 @@ The key differences between SpecFlow and Reqnroll are the following:
 * The main extension methods of the *Assist helpers* have been moved to the `Reqnroll` namespace, so that they can be used without an additional namespace using statement. The helpers are now referred to as [](../automation/datatable-helpers.md).
 * The [Reqnroll Visual Studio extension](../installation/setup-ide.md#setup-vs) has been reworked in a way that it can handle both SpecFlow and Reqnroll projects (also for .NET 8.0).
 * The integration plugins that have been managed by SpecFlow have been also ported to work with Reqnroll (e.g. `Reqnroll.Autofac`). See [](../integrations/available-plugins.md).
-* The "SpecFlow.Actions" plugins that provide a read-to-use support for different automation technologies (e.g. Selenium) are ported as `Reqnroll.SpecFlowCompatibility.Actions.*` packages (e.g. `Reqnroll.SpecFlowCompatibility.Actions.Selenium`). 
+* The "SpecFlow.Actions" plugins that provide a ready-to-use support for different automation technologies (e.g. Selenium) are ported as `Reqnroll.SpecFlowCompatibility.Actions.*` packages (e.g. `Reqnroll.SpecFlowCompatibility.Actions.Selenium`). 
 
 This article provides you a step-by-step guidance to migrate SpecFlow projects to Reqnroll. There are two migration paths you can choose from:
 
