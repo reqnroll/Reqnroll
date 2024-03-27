@@ -162,7 +162,10 @@ jobs:
       run: dotnet new globaljson --sdk-version 6.0.418
     - name: xUnit Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-xunit-results.trx"
+      run: |
+        $specsFilter = "${{ needs.build.outputs.specs_filter }}"
+        Write-Output "Specs Filter: $specsFilter"
+        dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild$specsFilter" --logger "trx;LogFileName=specs-xunit-results.trx"
     - name: Publish xUnit Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
