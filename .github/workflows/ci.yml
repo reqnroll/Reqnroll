@@ -306,7 +306,7 @@ jobs:
       shell: pwsh
       run: |
         $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
-        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --logger "trx;LogFileName=systemtests-linux-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
+        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --filter "TestCategory!=MsBuild&TestCategory!=Net481" --logger "trx;LogFileName=systemtests-linux-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
