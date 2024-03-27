@@ -97,7 +97,7 @@ jobs:
             $specsFilter = "&$specsFilter"
         }
         else {
-            $specsFilter = $envSPECS_FILTER
+            $specsFilter = $env:SPECS_FILTER
         }
         Write-Output "specs_filter=$specsFilter" >> $env:GITHUB_OUTPUT
         Write-Output "Specs Filter: $specsFilter"
@@ -262,11 +262,11 @@ jobs:
     #   with:
     #     dotnet-version: | 
     #       6.0.x
+    - name: Restore dependencies
+      run: dotnet restore
     - name: Install Test Report Dependencies
       run: | 
         dotnet add ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj package GitHubActionsTestLogger
-    - name: Restore dependencies
-      run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     # - name: Set .NET 6 SDK
@@ -275,7 +275,7 @@ jobs:
       shell: pwsh
       run: |
         $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
-        dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} --logger "trx;LogFileName=systemtests-windows-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
+        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --logger "trx;LogFileName=systemtests-windows-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
