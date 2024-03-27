@@ -8,7 +8,7 @@ namespace Reqnroll.TestProjectGenerator
 {
     public class Folders
     {
-        private readonly AppConfigDriver _appConfigDriver;
+        private readonly ConfigurationDriver _configurationDriver;
         private readonly ArtifactNamingConvention _artifactNamingConvention;
         private static readonly Guid UniqueRunId = Guid.NewGuid();
         protected string _nugetFolder;
@@ -22,9 +22,9 @@ namespace Reqnroll.TestProjectGenerator
 
         public string TestFolder => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
 
-        public Folders(AppConfigDriver appConfigDriver, ArtifactNamingConvention artifactNamingConvention)
+        public Folders(ConfigurationDriver configurationDriver, ArtifactNamingConvention artifactNamingConvention)
         {
-            _appConfigDriver = appConfigDriver;
+            _configurationDriver = configurationDriver;
             _artifactNamingConvention = artifactNamingConvention;
         }
 
@@ -69,7 +69,7 @@ namespace Reqnroll.TestProjectGenerator
             set => _packageFolder = value;
         }
 
-        public string GlobalPackages => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+        public string SystemGlobalNuGetPackages => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
 
         public string Reqnroll
         {
@@ -77,9 +77,10 @@ namespace Reqnroll.TestProjectGenerator
             set => _reqnroll = value;
         }
 
-        public virtual string FolderToSaveGeneratedSolutions => Path.Combine(Path.GetTempPath(), _appConfigDriver.TestProjectFolderName);
+        public virtual string FolderToSaveGeneratedSolutions => Path.Combine(Path.GetTempPath(), _configurationDriver.TestProjectFolderName);
 
         public virtual string RunUniqueFolderToSaveGeneratedSolutions => Path.Combine(FolderToSaveGeneratedSolutions, _artifactNamingConvention.GetRunName(UniqueRunId));
-        public virtual string RunUniqueGlobalPackages => Path.Combine(RunUniqueFolderToSaveGeneratedSolutions, ".nuget");
+        public virtual string GlobalNuGetPackages => _configurationDriver.PipelineMode ? SystemGlobalNuGetPackages : _configurationDriver.GlobalNuGetPackages ?? Path.Combine(RunUniqueFolderToSaveGeneratedSolutions, ".nuget");
+        public bool IsGlobalPackagesCustomized => GlobalNuGetPackages != SystemGlobalNuGetPackages;
     }
 }

@@ -3,9 +3,9 @@ namespace Reqnroll.TestProjectGenerator
     public enum ProgrammingLanguage
     {
         Other,
-        CSharp,
+        CSharp73,
         VB,
         FSharp,
-        CSharp10
+        CSharp
     }
 }

@@ -26,7 +26,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
         {
             if (!Directory.Exists(outputPath))
             {
-                Directory.CreateDirectory(outputPath);
+                Directory.CreateDirectory(outputPath!);
             }
 
             if (solution is null)
@@ -51,7 +51,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 _fileWriter.Write(globalJsonFile, outputPath);
             }
 
-            AllowNet6ToTestOlderFrameworks(targetFramework);
+            DisableUsingSdkFromEnvironmentVariable();
 
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
             createSolutionCommand.ExecuteWithRetry(1, TimeSpan.FromSeconds(1),
@@ -74,15 +74,15 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
         }
 
         /// <summary>
-        /// (santa) 2021.10.28 In .Net6 prerelease there is an issue when using 'dotnet' commands from tests
-        /// The environment variable is set to MSBuildSDKsPath=C:\Program Files\dotnet\sdk\6.0.100-rc.1.21463.6\Sdks
-        /// As a result the dotnet restore command fails
-        /// The workaround is to remove this environment variable
+        /// During test execution, the MSBuildSDKsPath environment variable is set to the SDK of the test execution,
+        /// e.g. C:\Program Files\dotnet\sdk\8.0.101\Sdks.
+        /// This causes issues with dotnet restore if working with a project of a different target framework.
+        /// The error might be for example 'error MSB4062: The "CheckIfPackageReferenceShouldBeFrameworkReference" task could not be loaded from the assembly[...]'.
+        /// The workaround is to remove this environment variable.
         /// </summary>
-        /// <param name="targetFramework"></param>
-        private static void AllowNet6ToTestOlderFrameworks(TargetFramework targetFramework)
+        private static void DisableUsingSdkFromEnvironmentVariable()
         {
-            if (targetFramework is TargetFramework.Net461 or TargetFramework.Netcoreapp31 or TargetFramework.Netcoreapp21 or TargetFramework.Net50 or TargetFramework.Net462) 
+            if (Environment.GetEnvironmentVariable("MSBuildSDKsPath") != null)
                 Environment.SetEnvironmentVariable("MSBuildSDKsPath", null);
         }
 

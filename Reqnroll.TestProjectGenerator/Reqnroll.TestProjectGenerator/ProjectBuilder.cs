@@ -173,8 +173,8 @@ namespace Reqnroll.TestProjectGenerator
         {
             switch (language)
             {
+                case ProgrammingLanguage.CSharp73:
                 case ProgrammingLanguage.CSharp:
-                case ProgrammingLanguage.CSharp10:
                     return csharpcode;
                 case ProgrammingLanguage.VB:
                     return vbnetcode;
@@ -214,7 +214,7 @@ namespace Reqnroll.TestProjectGenerator
 
             _project = new Project(ProjectName, ProjectGuid, Language, TargetFramework, Format, ProjectType);
 
-            _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.RunUniqueGlobalPackages;
+            _testProjectFolders.PathToNuGetPackages = _project.ProjectFormat == ProjectFormat.Old ? Path.Combine(_testProjectFolders.PathToSolutionDirectory, "packages") : _folders.GlobalNuGetPackages;
             if (!Directory.Exists(_testProjectFolders.PathToNuGetPackages))
             {
                 Directory.CreateDirectory(_testProjectFolders.PathToNuGetPackages);
@@ -252,8 +252,8 @@ namespace Reqnroll.TestProjectGenerator
                     case ProgrammingLanguage.FSharp:
                         AddInitialFSharpReferences();
                         break;
+                    case ProgrammingLanguage.CSharp73:
                     case ProgrammingLanguage.CSharp:
-                    case ProgrammingLanguage.CSharp10:
                         AddUnitTestProviderSpecificConfig();
                         break;
                 }

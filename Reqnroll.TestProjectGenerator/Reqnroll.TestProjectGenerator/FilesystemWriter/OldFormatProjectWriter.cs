@@ -96,8 +96,8 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
         {
             switch (project.ProgrammingLanguage)
             {
+                case ProgrammingLanguage.CSharp73:
                 case ProgrammingLanguage.CSharp:
-                case ProgrammingLanguage.CSharp10:
                     WriteMSBuildImport(xw, "$(MSBuildToolsPath)\\Microsoft.CSharp.targets");
                     break;
                 case ProgrammingLanguage.FSharp:

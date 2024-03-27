@@ -1,6 +1,7 @@
 using Reqnroll.Specs.Drivers;
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
+using ConfigurationDriver = Reqnroll.TestProjectGenerator.Driver.ConfigurationDriver;
 
 namespace Reqnroll.Specs.StepDefinitions
 {

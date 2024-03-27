@@ -34,15 +34,7 @@ namespace Reqnroll.TestProjectGenerator
 
         private CompileResult CompileWithMSBuild(bool? treatWarningsAsErrors)
         {
-            string msBuildPath="";
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                msBuildPath = _msBuildFinder.FindMSBuild();
-            }
-            else
-            {
-                msBuildPath = "msbuild";
-            }
+            var msBuildPath = _msBuildFinder.FindMSBuild();
 
             _outputWriter.WriteLine($"Invoke MsBuild from {msBuildPath}");
 

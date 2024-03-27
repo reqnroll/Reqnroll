@@ -37,6 +37,7 @@ permissions:
 
 env:
   SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
+  REQNROLL_TEST_PIPELINEMODE: true
 
 jobs:
   build:
@@ -48,6 +49,7 @@ jobs:
       product_configuration: ${{ steps.versions.outputs.product_configuration }}
       build_params: ${{ steps.versions.outputs.build_params }}
       test_params: ${{ steps.versions.outputs.test_params }}
+      specs_filter: ${{ steps.versions.outputs.specs_filter }}
 
     steps:
     - uses: actions/checkout@v4
@@ -97,7 +99,7 @@ jobs:
             $specsFilter = "&$specsFilter"
         }
         else {
-            $specsFilter = $envSPECS_FILTER
+            $specsFilter = $env:SPECS_FILTER
         }
         Write-Output "specs_filter=$specsFilter" >> $env:GITHUB_OUTPUT
         Write-Output "Specs Filter: $specsFilter"
@@ -248,3 +250,67 @@ jobs:
       with:
         name: specs-mstest-trx
         path: "**/specs-mstest-results.trx"
+
+  system-tests-windows:
+    runs-on: windows-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: .NET Information
+      run: |
+        dotnet --list-sdks
+        dotnet --list-runtimes
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Install Test Report Dependencies
+      run: | 
+        dotnet add ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj package GitHubActionsTestLogger
+    - name: Build
+      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
+    - name: System Tests
+      shell: pwsh
+      run: |
+        $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
+        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --logger "trx;LogFileName=systemtests-windows-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
+    - name: Upload Test Result TRX Files
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: systemtests-windows-trx
+        path: "**/*.trx"
+
+
+  system-tests-linux:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: .NET Information
+      run: |
+        dotnet --list-sdks
+        dotnet --list-runtimes
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Install Test Report Dependencies
+      run: | 
+        dotnet add ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj package GitHubActionsTestLogger
+    - name: Build
+      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
+    - name: System Tests
+      shell: pwsh
+      run: |
+        $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
+        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --filter "TestCategory!=MsBuild&TestCategory!=Net481" --logger "trx;LogFileName=systemtests-linux-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
+    - name: Upload Test Result TRX Files
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: systemtests-linux-trx
+        path: "**/*.trx"
+    
