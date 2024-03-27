@@ -41,7 +41,7 @@ public abstract class SystemTestBase
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.CSharp;
         _testRunConfiguration.ProjectFormat = ProjectFormat.New;
         _testRunConfiguration.ConfigurationFormat = ConfigurationFormat.Json;
-        _testRunConfiguration.TargetFramework = TargetFramework.Net60;
+        _testRunConfiguration.TargetFramework = TargetFramework.Net80;
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.MSTest;
 
         _currentVersionDriver = _testContainer.Resolve<CurrentVersionDriver>();
