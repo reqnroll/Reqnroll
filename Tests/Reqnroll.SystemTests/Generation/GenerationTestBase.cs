@@ -14,4 +14,11 @@ public class GenerationTestBase : SystemTestBase
 
         ShouldAllScenariosPass();
     }
+
+    //TODO: test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
+    //TODO: test async steps (async steps are executed in order)
+    //TODO: test hooks: before/after test run (require special handling by test frameworks)
+    //TODO: test hooks: before/after test feature & scenario (require special handling by test frameworks)
+    //TODO: test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)
+    //TODO: test parallel execution (details TBD) - maybe this should be in a separate test class
 }
