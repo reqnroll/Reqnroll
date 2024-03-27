@@ -5,6 +5,8 @@ using Reqnroll.TestProjectGenerator.Data;
 namespace Reqnroll.SystemTests.Portability;
 
 [TestClass]
+[TestCategory("NetFramework")]
+[TestCategory("Net462")]
 public class Net462PortabilityTest : PortabilityTestBase
 {
     protected override void TestInitialize()

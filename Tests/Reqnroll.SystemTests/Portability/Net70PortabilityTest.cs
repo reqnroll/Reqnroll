@@ -4,6 +4,8 @@ using Reqnroll.TestProjectGenerator.Data;
 namespace Reqnroll.SystemTests.Portability;
 
 [TestClass]
+[TestCategory("DotNet")]
+[TestCategory("Net70")]
 public class Net70PortabilityTest : PortabilityTestBase
 {
     protected override void TestInitialize()

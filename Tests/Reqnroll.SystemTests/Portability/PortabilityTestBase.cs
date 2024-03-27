@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.TestProjectGenerator.Driver;
+using System.Runtime.InteropServices;
 
 namespace Reqnroll.SystemTests.Portability;
 
@@ -20,12 +21,21 @@ public abstract class PortabilityTestBase : SystemTestBase
     }
 
     [TestMethod]
-    [DataRow(BuildTool.MSBuild)]
-    [DataRow(BuildTool.DotnetMSBuild)]
-    public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild(BuildTool buildTool)
+    [TestCategory("MsBuild")]
+    public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild()
     {
         PrepareGeneratorAllInSamples();
-        _compilationDriver.SetBuildTool(buildTool);
+        _compilationDriver.SetBuildTool(BuildTool.MSBuild);
+
+        _compilationDriver.CompileSolution();
+    }
+
+    [TestMethod]
+    [TestCategory("DotnetMSBuild")]
+    public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild()
+    {
+        PrepareGeneratorAllInSamples();
+        _compilationDriver.SetBuildTool(BuildTool.DotnetMSBuild);
 
         _compilationDriver.CompileSolution();
     }
