@@ -36,7 +36,7 @@ permissions:
   checks: write
 
 env:
-  SPECS_FILTER: "&Category=basicExecution" # use for testing CI: "&Category=basicExecution"
+  SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
   REQNROLL_TEST_PIPELINEMODE: true
 
 jobs:
