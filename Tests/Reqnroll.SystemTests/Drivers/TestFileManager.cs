@@ -7,17 +7,12 @@ using FluentAssertions;
 
 namespace Reqnroll.SystemTests.Drivers;
 
-//TODO: ported from Specs
+//ported from Specs
 public class TestFileManager
 {
     private const string RootNamespace = "Reqnroll.SystemTests";
     private const string TestFileFolder = "Resources";
-    private readonly string _prefix;
-
-    public TestFileManager()
-    {
-        _prefix = $"{RootNamespace}.{TestFileFolder}";
-    }
+    private readonly string _prefix = $"{RootNamespace}.{TestFileFolder}";
 
     public string GetTestFileContent(string testFileName)
     {

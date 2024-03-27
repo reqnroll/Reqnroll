@@ -3,30 +3,17 @@ using Reqnroll.TestProjectGenerator.Driver;
 
 namespace Reqnroll.SystemTests.Drivers;
 
-//TODO: ported from Specs
-public class ExecutionDriver
+//ported from Specs
+public class ExecutionDriver(
+    VSTestExecutionDriver _vsTestExecutionDriver, 
+    CompilationDriver _compilationDriver, 
+    TestRunConfiguration _testRunConfiguration)
 {
-    private readonly VSTestExecutionDriver _vsTestExecutionDriver;
-    private readonly CompilationDriver _compilationDriver;
-    private readonly TestRunConfiguration _testRunConfiguration;
-
-    public ExecutionDriver(VSTestExecutionDriver vsTestExecutionDriver, CompilationDriver compilationDriver, TestRunConfiguration testRunConfiguration)
-    {
-        _vsTestExecutionDriver = vsTestExecutionDriver;
-        _compilationDriver = compilationDriver;
-        _testRunConfiguration = testRunConfiguration;
-    }
-
     public void ExecuteTestsWithTag(string tag)
     {
-        if (_testRunConfiguration.UnitTestProvider == TestProjectGenerator.UnitTestProvider.xUnit)
-        {
-            _vsTestExecutionDriver.Filter = $"Category={tag}";
-        }
-        else
-        {
-            _vsTestExecutionDriver.Filter = $"TestCategory={tag}";
-        }
+        _vsTestExecutionDriver.Filter = _testRunConfiguration.UnitTestProvider == UnitTestProvider.xUnit ? 
+            $"Category={tag}" : 
+            $"TestCategory={tag}";
 
         ExecuteTests();
     }
