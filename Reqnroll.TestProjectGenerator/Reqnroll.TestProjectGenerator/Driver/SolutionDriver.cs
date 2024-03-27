@@ -17,6 +17,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
         private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly Folders _folders;
         private readonly ArtifactNamingConvention _artifactNamingConvention;
+        private readonly IOutputWriter _outputWriter;
         private readonly Solution _solution;
         private readonly Dictionary<string, ProjectBuilder> _projects = new Dictionary<string, ProjectBuilder>();
         private ProjectBuilder _defaultProject;
@@ -27,18 +28,20 @@ namespace Reqnroll.TestProjectGenerator.Driver
             ProjectBuilderFactory projectBuilderFactory,
             Folders folders,
             TestProjectFolders testProjectFolders,
-            ArtifactNamingConvention artifactNamingConvention)
+            ArtifactNamingConvention artifactNamingConvention,
+            IOutputWriter outputWriter)
         {
             _nuGetConfigGenerator = nuGetConfigGenerator;
             _testRunConfiguration = testRunConfiguration;
             _projectBuilderFactory = projectBuilderFactory;
             _folders = folders;
             _artifactNamingConvention = artifactNamingConvention;
+            _outputWriter = outputWriter;
             NuGetSources = new List<NuGetSource>
             {
-                new NuGetSource("LocalReqnrollDevPackages", _folders.NuGetFolder),
-                new NuGetSource("Reqnroll CI", "https://www.myget.org/F/reqnroll/api/v3/index.json"),
-                new NuGetSource("Reqnroll Unstable", "https://www.myget.org/F/reqnroll-unstable/api/v3/index.json")
+                new("LocalReqnrollDevPackages", _folders.NuGetFolder),
+                new("Reqnroll CI", "https://www.myget.org/F/reqnroll/api/v3/index.json"),
+                new("Reqnroll Unstable", "https://www.myget.org/F/reqnroll-unstable/api/v3/index.json")
             };
 
             if (testRunConfiguration.UnitTestProvider == UnitTestProvider.SpecRun)
@@ -86,7 +89,10 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 _solution.AddProject(project);
             }
 
-            _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray(), _folders.RunUniqueGlobalPackages);
+            var customGlobalPackagesFolder = _folders.RunUniqueGlobalPackages == _folders.GlobalPackages ? null : _folders.RunUniqueGlobalPackages;
+            if (customGlobalPackagesFolder != null)
+                _outputWriter.WriteLine($"Using custom global packages folder: {customGlobalPackagesFolder}");
+            _solution.NugetConfig = _nuGetConfigGenerator?.Generate(NuGetSources.ToArray(), customGlobalPackagesFolder);
             return _solution;
         }
 

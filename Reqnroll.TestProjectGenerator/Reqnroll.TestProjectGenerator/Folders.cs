@@ -80,6 +80,6 @@ namespace Reqnroll.TestProjectGenerator
         public virtual string FolderToSaveGeneratedSolutions => Path.Combine(Path.GetTempPath(), _appConfigDriver.TestProjectFolderName);
 
         public virtual string RunUniqueFolderToSaveGeneratedSolutions => Path.Combine(FolderToSaveGeneratedSolutions, _artifactNamingConvention.GetRunName(UniqueRunId));
-        public virtual string RunUniqueGlobalPackages => Path.Combine(RunUniqueFolderToSaveGeneratedSolutions, ".nuget");
+        public virtual string RunUniqueGlobalPackages => _appConfigDriver.PipelineMode ? GlobalPackages : Path.Combine(RunUniqueFolderToSaveGeneratedSolutions, ".nuget");
     }
 }

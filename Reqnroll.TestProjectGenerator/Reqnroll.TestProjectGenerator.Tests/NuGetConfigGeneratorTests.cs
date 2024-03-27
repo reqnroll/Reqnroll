@@ -1,6 +1,5 @@
 using FluentAssertions;
 using Reqnroll.TestProjectGenerator.Data;
-using Reqnroll.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
 namespace Reqnroll.TestProjectGenerator.Tests

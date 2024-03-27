@@ -6,10 +6,8 @@ using System.Text.RegularExpressions;
 
 namespace Reqnroll.TestProjectGenerator
 {
-    public class MSBuildFinder(IOutputWriter _outputWriter)
+    public class MSBuildFinder(IOutputWriter _outputWriter, AppConfigDriver _configDriver)
     {
-        private const string MSBUILD_ENV_VAR = "REQNROLL_TEST_MSBUILD_PATH";
-
         private string FindUsingVS2022()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return null;
@@ -60,16 +58,14 @@ namespace Reqnroll.TestProjectGenerator
             return msBuildPath;
         }
 
-        private string FindUsingEnvironmentVariable()
+        private string FindUsingEnvironmentVariableAndConfig()
         {
-            var fromEnv = Environment.GetEnvironmentVariable(MSBUILD_ENV_VAR);
-            if (!string.IsNullOrWhiteSpace(fromEnv)) return fromEnv.Trim();
-            return null;
+            return _configDriver.MsBuildPath;
         }
 
         public string FindMSBuild()
         {
-            return FindUsingEnvironmentVariable() ??
+            return FindUsingEnvironmentVariableAndConfig() ??
                    FindUsingVS2022() ??
                    FindUsingVsWhere() ?? 
                    "msbuild";

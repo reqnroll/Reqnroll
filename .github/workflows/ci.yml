@@ -37,6 +37,7 @@ permissions:
 
 env:
   SPECS_FILTER: "&Category=basicExecution" # use for testing CI: "&Category=basicExecution"
+  REQNROLL_TEST_PIPELINEMODE: true
 
 jobs:
   build:
