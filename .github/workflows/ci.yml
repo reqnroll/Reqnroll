@@ -281,4 +281,36 @@ jobs:
       with:
         name: systemtests-windows-trx
         path: "**/*.trx"
+
+
+  system-tests-linux:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: .NET Information
+      run: |
+        dotnet --list-sdks
+        dotnet --list-runtimes
+    - name: Restore dependencies
+      run: dotnet restore
+    - name: Install Test Report Dependencies
+      run: | 
+        dotnet add ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj package GitHubActionsTestLogger
+    - name: Build
+      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
+    - name: System Tests
+      shell: pwsh
+      run: |
+        $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
+        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --logger "trx;LogFileName=systemtests-ubuntu-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
+    - name: Upload Test Result TRX Files
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: systemtests-ubuntu-trx
+        path: "**/*.trx"
     
