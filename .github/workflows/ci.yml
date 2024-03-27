@@ -48,6 +48,7 @@ jobs:
       product_configuration: ${{ steps.versions.outputs.product_configuration }}
       build_params: ${{ steps.versions.outputs.build_params }}
       test_params: ${{ steps.versions.outputs.test_params }}
+      specs_filter: ${{ steps.versions.outputs.specs_filter }}
 
     steps:
     - uses: actions/checkout@v4
