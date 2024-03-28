@@ -191,8 +191,8 @@ namespace Reqnroll.Generator.Generation
             AddVariableForArguments(testMethod, paramToIdentifier);
 
             testMethod.Statements.Add(
-                new CodeVariableDeclarationStatement(typeof(ScenarioInfo), "scenarioInfo",
-                    new CodeObjectCreateExpression(typeof(ScenarioInfo),
+                new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)), "scenarioInfo",
+                    new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)),
                         new CodePrimitiveExpression(scenarioDefinition.Name),
                         new CodePrimitiveExpression(scenarioDefinition.Description),
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME),
@@ -277,7 +277,7 @@ namespace Reqnroll.Generator.Generation
             var tagsOfScenarioVariableReferenceExpression = new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME);
             var featureFileTagFieldReferenceExpression = new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME);
 
-            var tagHelperReference = new CodeTypeReferenceExpression(nameof(TagHelper));
+            var tagHelperReference = new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TagHelper)));
             var scenarioTagIgnoredCheckStatement = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.ContainsIgnoreTag), tagsOfScenarioVariableReferenceExpression);
             var featureTagIgnoredCheckStatement = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.ContainsIgnoreTag), featureFileTagFieldReferenceExpression);
 

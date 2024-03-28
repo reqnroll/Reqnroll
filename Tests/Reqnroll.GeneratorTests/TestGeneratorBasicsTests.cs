@@ -227,7 +227,7 @@ namespace Reqnroll.GeneratorTests
 
         private static string AssertFolderPathArgument(string outputFile)
         {
-            var match = Regex.Match(outputFile, @"new Reqnroll.FeatureInfo\([^;]*");
+            var match = Regex.Match(outputFile, @"new global::Reqnroll\.FeatureInfo\([^;]*");
             match.Success.Should().BeTrue("FeatureInfo ctor should be found in output");
             var folderPathArgument = match.Value.Split(',')[1].Trim();
             folderPathArgument.Should().StartWith("\"").And.EndWith("\"", "the folderPath argument should be a string");

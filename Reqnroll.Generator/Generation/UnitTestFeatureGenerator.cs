@@ -159,7 +159,7 @@ namespace Reqnroll.Generator.Generation
 
         private CodeMemberField DeclareTestRunnerMember(CodeTypeDeclaration type)
         {
-            var testRunnerField = new CodeMemberField(typeof(ITestRunner), GeneratorConstants.TESTRUNNER_FIELD);
+            var testRunnerField = new CodeMemberField(_codeDomHelper.GetGlobalizedTypeName(typeof(ITestRunner)), GeneratorConstants.TESTRUNNER_FIELD);
             type.Members.Add(testRunnerField);
             return testRunnerField;
         }
@@ -185,7 +185,7 @@ namespace Reqnroll.Generator.Generation
             };
 
             var getTestRunnerExpression = new CodeMethodInvokeExpression(
-                new CodeTypeReferenceExpression(typeof(TestRunnerManager)),
+                new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
                 nameof(TestRunnerManager.GetTestRunnerForAssembly), testRunnerParameters);
 
             testClassInitializeMethod.Statements.Add(
@@ -195,15 +195,15 @@ namespace Reqnroll.Generator.Generation
 
             //FeatureInfo featureInfo = new FeatureInfo("xxxx");
             testClassInitializeMethod.Statements.Add(
-                new CodeVariableDeclarationStatement(typeof(FeatureInfo), "featureInfo",
-                    new CodeObjectCreateExpression(typeof(FeatureInfo),
+                new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), "featureInfo",
+                    new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)),
                         new CodeObjectCreateExpression(typeof(CultureInfo),
                             new CodePrimitiveExpression(generationContext.Feature.Language)),
                         new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
                         new CodePrimitiveExpression(generationContext.Feature.Name),
                         new CodePrimitiveExpression(generationContext.Feature.Description),
                         new CodeFieldReferenceExpression(
-                            new CodeTypeReferenceExpression("ProgrammingLanguage"),
+                            new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Reqnroll.ProgrammingLanguage))),
                             _codeDomHelper.TargetLanguage.ToString()),
                         new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME))));
 
@@ -289,7 +289,7 @@ namespace Reqnroll.Generator.Generation
             scenarioInitializeMethod.Attributes = MemberAttributes.Public | MemberAttributes.Final;
             scenarioInitializeMethod.Name = GeneratorConstants.SCENARIO_INITIALIZE_NAME;
             scenarioInitializeMethod.Parameters.Add(
-                new CodeParameterDeclarationExpression(typeof(ScenarioInfo), "scenarioInfo"));
+                new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)), "scenarioInfo"));
 
             //testRunner.OnScenarioInitialize(scenarioInfo);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
