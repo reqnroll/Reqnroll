@@ -15,6 +15,29 @@ public class GenerationTestBase : SystemTestBase
         ShouldAllScenariosPass();
     }
 
+    [TestMethod]
+    public void Handles_simple_scenarios_without_namespace_collisions()
+    {
+        _projectsDriver.CreateProject("CollidingNamespace.Reqnroll", "C#");
+
+        AddScenario(
+            """
+            Scenario: Sample Scenario
+                When something happens
+
+            Scenario: Scenario with DataTable
+            When something happens with
+            	| who          | when     |
+            	| me           | today    |
+            	| someone else | tomorrow |
+            """);
+        _projectsDriver.AddPassingStepBinding();
+
+        ExecuteTests();
+
+        ShouldAllScenariosPass();
+    }
+
     //TODO: test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
     //TODO: test async steps (async steps are executed in order)
     //TODO: test hooks: before/after test run (require special handling by test frameworks)

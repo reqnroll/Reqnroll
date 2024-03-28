@@ -33,7 +33,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string IGNORE_TEST_CLASS = "IgnoreTestClass";
         protected internal const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
         protected internal const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
-        protected internal const string XUNITPARALLELWORKERTRACKER_INSTANCE = "Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance";
+        protected internal const string XUNITPARALLELWORKERTRACKER_INSTANCE = "global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance";
 
         public XUnit2TestGeneratorProvider(CodeDomHelper codeDomHelper)
         {
