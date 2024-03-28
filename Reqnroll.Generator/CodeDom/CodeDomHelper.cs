@@ -294,8 +294,7 @@ namespace Reqnroll.Generator.CodeDom
             {
                 return "global::" + type.FullName!;
             }
-
-            //TODO: VB.NET
+            // Global namespaces not yet supported in VB
             return type.FullName!;
         }
     }
