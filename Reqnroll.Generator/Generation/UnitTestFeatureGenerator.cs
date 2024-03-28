@@ -203,7 +203,7 @@ namespace Reqnroll.Generator.Generation
                         new CodePrimitiveExpression(generationContext.Feature.Name),
                         new CodePrimitiveExpression(generationContext.Feature.Description),
                         new CodeFieldReferenceExpression(
-                            new CodeTypeReferenceExpression("global::Reqnroll.ProgrammingLanguage"),
+                            new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Reqnroll.ProgrammingLanguage))),
                             _codeDomHelper.TargetLanguage.ToString()),
                         new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME))));
 

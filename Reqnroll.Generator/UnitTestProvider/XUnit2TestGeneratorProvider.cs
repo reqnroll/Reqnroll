@@ -33,7 +33,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string IGNORE_TEST_CLASS = "IgnoreTestClass";
         protected internal const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
         protected internal const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
-        protected internal const string XUNITPARALLELWORKERTRACKER_INSTANCE = "global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance";
+        protected internal const string XUNITPARALLELWORKERTRACKER_INSTANCE = "Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance";
 
         public XUnit2TestGeneratorProvider(CodeDomHelper codeDomHelper)
         {
@@ -188,7 +188,7 @@ namespace Reqnroll.Generator.UnitTestProvider
                     new CodePropertyReferenceExpression(new CodeVariableReferenceExpression(generationContext.TestRunnerField.Name), "TestWorkerId")));
             generationContext.TestClassCleanupMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
-                    new CodeVariableReferenceExpression(XUNITPARALLELWORKERTRACKER_INSTANCE),
+                    new CodeVariableReferenceExpression(GlobalNamespaceIfCSharp(XUNITPARALLELWORKERTRACKER_INSTANCE)),
                     "ReleaseWorker",
                     new CodeVariableReferenceExpression("testWorkerId")));
         }
@@ -418,8 +418,13 @@ namespace Reqnroll.Generator.UnitTestProvider
         {
             // XUnitParallelWorkerTracker.Instance.GetWorkerId()
             return new CodeMethodInvokeExpression(
-                new CodeVariableReferenceExpression(XUNITPARALLELWORKERTRACKER_INSTANCE),
+                new CodeVariableReferenceExpression(GlobalNamespaceIfCSharp(XUNITPARALLELWORKERTRACKER_INSTANCE)),
                 "GetWorkerId");
+        }
+
+        private string GlobalNamespaceIfCSharp(string typeName)
+        {
+            return CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.CSharp ? "global::" + typeName : typeName;
         }
     }
 }
