@@ -1,5 +1,6 @@
 # [vNext]
 
+* Fix for #44 in which user code namespaces that included "Reqnroll" within them caused the code generation to fail
 * Include built-in dependency injection framework (BoDi) to the main repository as "Reqnroll.BoDi" based on v1.5 of [BoDi](https://github.com/SpecFlowOSS/BoDi/)
 * Resolve dependencies of [BeforeTestRun] / [AfterTestRun] hooks from the 
   test run (global) context instead of the test thread context.

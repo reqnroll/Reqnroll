@@ -287,6 +287,17 @@ namespace Reqnroll.Generator.CodeDom
                 _ => thisExpression
             };
         }
+
+        public string GetGlobalizedTypeName(Type type)
+        {
+            if (TargetLanguage == CodeDomProviderLanguage.CSharp)
+            {
+                return "global::" + type.FullName!;
+            }
+
+            //TODO: VB.NET
+            return type.FullName!;
+        }
     }
 }
 
