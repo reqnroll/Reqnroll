@@ -30,8 +30,16 @@ public class GenerationTestBase : SystemTestBase
             	| who          | when     |
             	| me           | today    |
             	| someone else | tomorrow |
+
+            Scenario Outline: Scenario outline with examples
+            When something happens to <person>
+            Examples:
+            	| person |
+            	| me     |
+            	| you    |
             """);
-        _projectsDriver.AddPassingStepBinding();
+
+        AddPassingStepBinding();
 
         ExecuteTests();
 
@@ -39,6 +47,101 @@ public class GenerationTestBase : SystemTestBase
     }
 
     //TODO: test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
+    [TestMethod]
+    public void FailingScenariosAreCountedAsFailures()
+    {
+        AddScenario(
+            """
+            Scenario: Sample Scenario
+                When something happens
+
+            Scenario Outline: Scenario outline with examples
+            When something happens to <person>
+            Examples:
+            	| person |
+            	| me     |
+            	| you    |
+            """);
+
+        AddFailingStepBinding();
+
+        ExecuteTests();
+
+        ShouldAllScenariosFail();
+    }
+
+    [TestMethod]
+    public void PendingScenariosAreCountedAsPending()
+    {
+        AddScenario(
+            """
+            Scenario: Sample Scenario
+                When something happens
+
+            Scenario Outline: Scenario outline with examples
+            When something happens to <person>
+            Examples:
+            	| person |
+            	| me     |
+            	| you    |
+            """);
+
+        AddPendingStepBinding();
+
+        ExecuteTests();
+
+        ShouldAllScenariosPend();
+    }
+
+    [TestMethod]
+    public void IgnoredScenariosAreCountedAsIgnored()
+    {
+        AddScenario(
+            """
+            @ignore
+            Scenario: Sample Scenario
+                When something happens
+
+            @ignore
+            Scenario Outline: Scenario outline with examples
+            When something happens to <person>
+            Examples:
+            	| person |
+            	| me     |
+            	| you    |
+            """);
+
+        AddPassingStepBinding();
+
+        ExecuteTests();
+
+        ShouldAllScenariosBeIgnored(2); 
+    }
+
+    [TestMethod]
+    public void UndefinedScenariosAreNotExecuted()
+    {
+        AddScenario(
+            """
+            Scenario: Sample Scenario
+                When something happens
+
+            Scenario Outline: Scenario outline with examples
+            When something happens to <person>
+            Examples:
+            	| person |
+            	| me     |
+            	| you    |
+            """);
+
+        //AddPassingStepBinding();
+
+        ExecuteTests();
+
+        ShouldAllUndefinedScenariosNotBeExecuted();
+    }
+
+
     //TODO: test async steps (async steps are executed in order)
     //TODO: test hooks: before/after test run (require special handling by test frameworks)
     //TODO: test hooks: before/after test feature & scenario (require special handling by test frameworks)
