@@ -137,13 +137,77 @@ public abstract class SystemTestBase
 
     protected void ShouldAllScenariosPass(int? expectedNrOfTestsSpec = null)
     {
-        if (expectedNrOfTestsSpec == null && _preparedTests == 0) 
+        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
+        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
+        _folderCleaner.CleanSolutionFolder();
+    }
+
+    protected void ShouldAllScenariosFail(int? expectedNrOfTestsSpec = null)
+    {
+        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
+        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(expectedNrOfTests, "all tests should fail");
+        _folderCleaner.CleanSolutionFolder();
+
+    }
+
+    protected void ShouldAllScenariosPend(int? expectedNrOfTestsSpec = null)
+    {
+        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
+        _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(expectedNrOfTests, "all tests should Pend");
+        _folderCleaner.CleanSolutionFolder();
+    }
+
+    protected void ShouldAllScenariosBeIgnored(int? expectedNrOfTestsSpec = null)
+    {
+        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
+        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(expectedNrOfTests, "all tests should be Ignored");
+        _folderCleaner.CleanSolutionFolder();
+    }
+
+    protected void ShouldAllUndefinedScenariosNotBeExecuted(int? expectedNrOfTestsSpec = null)
+    {
+        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
+        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(0, "none of the tests should pass");
+        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(0, "none of the tests should fail");
+        _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(expectedNrOfTests, "All of the tests should Pend");
+        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(0, "None of the tests should be Ignored");
+        _folderCleaner.CleanSolutionFolder();
+    }
+
+
+    protected void ShouldXScenariosPassAndYFail(int expectedPass, int expectedFail, int? expectedNrOfTestsSpec = null)
+    {
+        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
+        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedPass, "unexpected number of tests passed");
+        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(expectedFail, "unexpected number of tests failed");
+        _folderCleaner.CleanSolutionFolder();
+    }
+
+    protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)
+    {
+        if (expectedNrOfTestsSpec == null && _preparedTests == 0)
             throw new ArgumentException($"If {nameof(_preparedTests)} is not set, the {nameof(expectedNrOfTestsSpec)} is mandatory.", nameof(expectedNrOfTestsSpec));
         var expectedNrOfTests = expectedNrOfTestsSpec ?? _preparedTests;
 
         _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
         _vsTestExecutionDriver.LastTestExecutionResult.Total.Should().Be(expectedNrOfTests, $"the run should contain {expectedNrOfTests} tests");
-        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
-        _folderCleaner.CleanSolutionFolder();
+        return expectedNrOfTests;
     }
+
+    protected void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
+    {
+        _projectsDriver.AddPassingStepBinding(scenarioBlock, stepRegex);
+    }
+
+    protected void AddFailingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
+    {
+        _projectsDriver.AddFailingStepBinding(scenarioBlock, stepRegex);
+    }
+
+    protected void AddPendingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
+    {
+        _projectsDriver.AddStepBinding(scenarioBlock, stepRegex, "throw new PendingStepException();", "ScenarioContext.Current.Pending()");
+    }
+
+
 }
