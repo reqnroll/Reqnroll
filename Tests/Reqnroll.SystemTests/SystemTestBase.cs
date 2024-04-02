@@ -233,5 +233,8 @@ public abstract class SystemTestBase
         _projectsDriver.AddStepBinding(scenarioBlock, stepRegex, "throw new PendingStepException();", "ScenarioContext.Current.Pending()");
     }
 
-
+    protected void AddBindingClass(string content)
+    {
+        _projectsDriver.AddBindingClass(content);
+    }
 }
