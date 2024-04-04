@@ -1,10 +1,27 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
+using FluentAssertions;
+using Reqnroll.TestProjectGenerator.Driver;
+using Reqnroll.TestProjectGenerator;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace Reqnroll.SystemTests.Generation;
 
 [TestCategory("Generation")]
 public class GenerationTestBase : SystemTestBase
 {
+    private HooksDriver? _hookDriver;
+    private TestProjectFolders? _testProjectFolders;
+
+    protected override void TestInitialize()
+    {
+        base.TestInitialize();
+        _hookDriver = _testContainer.Resolve<HooksDriver>();
+        _testProjectFolders = _testContainer.Resolve<TestProjectFolders>();
+    }
+
     [TestMethod]
     public void GeneratorAllIn_sample_can_be_handled()
     {
@@ -170,13 +187,13 @@ public class GenerationTestBase : SystemTestBase
         [Given(""a list to hold step numbers"")]
         public async Task GivenAPlaceholder()
         {
-            await Task.Run(() => _scenarioContext[nameof(AsyncsequenceStepDefinitions)] = new List<string>() );
+            await Task.Run(() => global::Log.LogStep() );
         }
 
         [When(""Async Step {string} is called"")]
         public async Task WhenStepIsTaken(string p0)
         {
-            await Task.Run(() => ((IList<string>)_scenarioContext[nameof(AsyncsequenceStepDefinitions)]).Add(p0) );
+            await Task.Run(() => global::Log.LogStep() );
         }
 
         [Then(""async step order should be {string}"")]
@@ -184,10 +201,7 @@ public class GenerationTestBase : SystemTestBase
         {
             await Task.Run( () => 
             {   
-                if (p0 != String.Join("","", (IList<string>)_scenarioContext[nameof(AsyncsequenceStepDefinitions)]))
-                {
-                    throw new Exception(""Step sequence is not correct"");
-                }
+                global::Log.LogStep();
             }
             );
         }
@@ -197,10 +211,87 @@ public class GenerationTestBase : SystemTestBase
         AddBindingClass(_asyncBindingClassContent);
 
         ExecuteTests();
+        CheckAreStepsExecutedInOrder(new string[] { "GivenAPlaceholder", "WhenStepIsTaken", "ThenStepSequenceIs" });
+
         ShouldAllScenariosPass();
     }
-    //TODO: test hooks: before/after test run (require special handling by test frameworks)
+    //test hooks: before/after test run (require special handling by test frameworks)
+    //TODO: Consider adding a AddHook method to SystemTestBase 
+    [TestMethod]
+    public void BeforeAndAfterTestHooksRun()
+    {
+        AddScenario(
+    """
+            Scenario: Sample Scenario
+                When something happens
+
+            Scenario Outline: Scenario outline with examples
+            When something happens to <person>
+            Examples:
+            	| person |
+            	| me     |
+            	| you    |
+            """);
+
+
+        AddPassingStepBinding();
+
+        _projectsDriver.AddHookBinding("BeforeTestRun", "BeforeTestRun", null, null, null, "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("AfterTestRun", "AfterTestRun", null, null, null, "global::Log.LogHook();");
+
+        ExecuteTests();
+
+        _hookDriver?.CheckIsHookExecutedInOrder(new string[] { "BeforeTestRun", "AfterTestRun" });
+        ShouldAllScenariosPass();
+
+    }
+
     //TODO: test hooks: before/after test feature & scenario (require special handling by test frameworks)
+
+    [TestMethod]
+    public void BeforeAndAfterFeatureAndScenarioHooksRun()
+    {
+        AddScenario(
+    """
+            Scenario: Sample Scenario
+                When something happens
+
+            Scenario Outline: Scenario outline with examples
+            When something happens to <person>
+            Examples:
+            	| person |
+            	| me     |
+            	| you    |
+            """);
+
+
+        AddPassingStepBinding();
+
+        _projectsDriver.AddHookBinding("BeforeFeature", "BeforeFeatureRun", null, null, null, "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("AfterFeature", "AfterFeatureRun", null, null, null, "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("BeforeScenario", "BeforeSenarioRun", null, null, null, "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("AfterScenario", "AfterScenarioRun", null, null, null, "global::Log.LogHook();");
+
+        ExecuteTests();
+
+        _hookDriver?.CheckIsHookExecutedInOrder(new string[] { "BeforeFeatureRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "AfterFeatureRun" });
+        ShouldAllScenariosPass();
+
+    }
+
     //TODO: test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)
     //TODO: test parallel execution (details TBD) - maybe this should be in a separate test class
+
+    //TODO: Consider moving this to the TestProjectGenerator as a driver method
+    public void CheckAreStepsExecutedInOrder(IEnumerable<string> methodNames)
+    {
+        Assert.IsNotNull(_testProjectFolders);
+        _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+
+        var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
+        var lines = File.ReadAllLines(pathToHookLogFile);
+        var methodNameLines = methodNames.Select(m => $"-> step: {m}");
+        lines.Should().ContainInOrder(methodNameLines);
+    }
+
 }
