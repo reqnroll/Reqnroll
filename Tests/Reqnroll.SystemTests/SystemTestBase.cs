@@ -199,17 +199,15 @@ public abstract class SystemTestBase
         int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
         _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(0, "none of the tests should pass");
         _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(0, "none of the tests should fail");
-        _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(expectedNrOfTests, "All of the tests should Pend");
-        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(0, "None of the tests should be Ignored");
-        _folderCleaner.CleanSolutionFolder();
-    }
+
+        // MSTest treats tests with undefined steps as Ignored, the other two frameworks treat them as Pending
+        int pendingExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? 0 : expectedNrOfTests;
+        _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(pendingExpected, "All of the tests should Pend");
+
+        int IgnoredExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? expectedNrOfTests : 0;
+        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(IgnoredExpected, "None of the tests should be Ignored");
 
 
-    protected void ShouldXScenariosPassAndYFail(int expectedPass, int expectedFail, int? expectedNrOfTestsSpec = null)
-    {
-        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
-        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedPass, "unexpected number of tests passed");
-        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(expectedFail, "unexpected number of tests failed");
         _folderCleaner.CleanSolutionFolder();
     }
 

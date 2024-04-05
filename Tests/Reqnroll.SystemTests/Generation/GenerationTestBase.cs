@@ -12,12 +12,14 @@ namespace Reqnroll.SystemTests.Generation;
 [TestCategory("Generation")]
 public class GenerationTestBase : SystemTestBase
 {
-    private HooksDriver? _hookDriver;
+    private HooksDriver _hookDriver = null!;
+    private TestProjectGenerator.Driver.ConfigurationDriver _configDriver = null!;
 
     protected override void TestInitialize()
     {
         base.TestInitialize();
         _hookDriver = _testContainer.Resolve<HooksDriver>();
+        _configDriver = _testContainer.Resolve<TestProjectGenerator.Driver.ConfigurationDriver>();
     }
 
     [TestMethod]
@@ -127,10 +129,10 @@ public class GenerationTestBase : SystemTestBase
             """);
 
         AddPassingStepBinding();
-
+        _configDriver.SetIsRowTestsAllowed( false); //This is necessary as MSTest and Xunit count the number of physical Test methods.
         ExecuteTests();
 
-        ShouldAllScenariosBeIgnored(2); 
+        ShouldAllScenariosBeIgnored(3); 
     }
 
     [TestMethod]
@@ -271,7 +273,7 @@ public class GenerationTestBase : SystemTestBase
 
         ExecuteTests();
 
-        _hookDriver?.CheckIsHookExecutedInOrder(new string[] { "BeforeFeatureRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "AfterFeatureRun" });
+        _hookDriver.CheckIsHookExecutedInOrder(new string[] { "BeforeFeatureRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "AfterFeatureRun" });
         ShouldAllScenariosPass();
 
     }
