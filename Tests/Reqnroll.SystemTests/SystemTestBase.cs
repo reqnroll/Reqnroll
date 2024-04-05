@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +27,7 @@ public abstract class SystemTestBase
     protected CompilationDriver _compilationDriver = null!;
 
     protected int _preparedTests = 0;
+    private TestProjectFolders _testProjectFolders = null!;
 
     public TestContext TestContext { get; set; } = null!;
 
@@ -79,6 +83,8 @@ public abstract class SystemTestBase
         _executionDriver = _testContainer.GetService<ExecutionDriver>();
         _vsTestExecutionDriver = _testContainer.GetService<VSTestExecutionDriver>();
         _compilationDriver = _testContainer.GetService<CompilationDriver>();
+        _testProjectFolders = _testContainer.Resolve<TestProjectFolders>();
+
     }
 
     protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null)
@@ -236,5 +242,16 @@ public abstract class SystemTestBase
     protected void AddBindingClass(string content)
     {
         _projectsDriver.AddBindingClass(content);
+    }
+
+    //TODO: Consider moving this to the TestProjectGenerator as a driver method
+    public void CheckAreStepsExecutedInOrder(IEnumerable<string> methodNames)
+    {
+        _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+
+        var pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
+        var lines = File.ReadAllLines(pathToLogFile);
+        var methodNameLines = methodNames.Select(m => $"-> step: {m}");
+        lines.Should().ContainInOrder(methodNameLines);
     }
 }

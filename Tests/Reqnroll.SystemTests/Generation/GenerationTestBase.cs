@@ -13,13 +13,11 @@ namespace Reqnroll.SystemTests.Generation;
 public class GenerationTestBase : SystemTestBase
 {
     private HooksDriver? _hookDriver;
-    private TestProjectFolders? _testProjectFolders;
 
     protected override void TestInitialize()
     {
         base.TestInitialize();
         _hookDriver = _testContainer.Resolve<HooksDriver>();
-        _testProjectFolders = _testContainer.Resolve<TestProjectFolders>();
     }
 
     [TestMethod]
@@ -216,7 +214,7 @@ public class GenerationTestBase : SystemTestBase
         ShouldAllScenariosPass();
     }
     //test hooks: before/after test run (require special handling by test frameworks)
-    //TODO: Consider adding a AddHook method to SystemTestBase 
+    //TODO: Consider adding a AddHookBinding method to SystemTestBase 
     [TestMethod]
     public void BeforeAndAfterTestHooksRun()
     {
@@ -246,8 +244,7 @@ public class GenerationTestBase : SystemTestBase
 
     }
 
-    //TODO: test hooks: before/after test feature & scenario (require special handling by test frameworks)
-
+    //test hooks: before/after test feature & scenario (require special handling by test frameworks)
     [TestMethod]
     public void BeforeAndAfterFeatureAndScenarioHooksRun()
     {
@@ -282,16 +279,5 @@ public class GenerationTestBase : SystemTestBase
     //TODO: test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)
     //TODO: test parallel execution (details TBD) - maybe this should be in a separate test class
 
-    //TODO: Consider moving this to the TestProjectGenerator as a driver method
-    public void CheckAreStepsExecutedInOrder(IEnumerable<string> methodNames)
-    {
-        Assert.IsNotNull(_testProjectFolders);
-        _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
-
-        var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-        var lines = File.ReadAllLines(pathToHookLogFile);
-        var methodNameLines = methodNames.Select(m => $"-> step: {m}");
-        lines.Should().ContainInOrder(methodNameLines);
-    }
 
 }
