@@ -117,16 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="CSharpSourceBuilderAlreadyInCodeSection" xml:space="preserve">
-    <value>The CSharpSourceBuilder is already in a code section.</value>
+  <data name="NoTestFrameworkFoundMessage" xml:space="preserve">
+    <value>No compatible test framework is referenced by the project. Add a reference to one of the supported test frameworks: {0}</value>
   </data>
-  <data name="CSharpSourceBuilderCannotAppendDirectiveUnlessAtStartOfLine" xml:space="preserve">
-    <value>Cannot append a directive unless at the start of a line.</value>
-  </data>
-  <data name="CSharpSourceBuilderNotInCodeBlock" xml:space="preserve">
-    <value>The CSharpSourceBuilder is not in a code block.</value>
-  </data>
-  <data name="CSharpSourceBuilderNotInCodeSection" xml:space="preserve">
-    <value>The CSharpSourceBuilder is not in a code section.</value>
+  <data name="NoTestFrameworkFoundTitle" xml:space="preserve">
+    <value>No test framework detected</value>
   </data>
 </root>

@@ -8,7 +8,7 @@ namespace Reqnroll.FeatureSourceGenerator;
 
 using Location = Gherkin.Ast.Location;
 
-public class GherkinParser
+public class GherkinSyntaxParser
 {
     public static readonly DiagnosticDescriptor SyntaxError = new(
         id: DiagnosticIds.SyntaxError,
@@ -23,22 +23,23 @@ public class GherkinParser
         var parser = new Parser { StopAtFirstError = false };
 
         GherkinDocument? document = null;
-        ImmutableList<Diagnostic>? diagnostics = null;
+        ImmutableArray<Diagnostic>? diagnostics = null;
 
         cancellationToken.ThrowIfCancellationRequested();
 
         try
         {
+            // CONSIDER: Using a parser that doesn't throw exceptions for syntax errors.
             document = parser.Parse(new SourceTokenScanner(text));
         }
         catch (CompositeParserException ex)
         {
-            diagnostics = ex.Errors.Select(error => CreateGherkinDiagnostic(error, text, path)).ToImmutableList();
+            diagnostics = ex.Errors.Select(error => CreateGherkinDiagnostic(error, text, path)).ToImmutableArray();
         }
 
         return new GherkinSyntaxTree(
             document ?? new GherkinDocument(null, Array.Empty<Comment>()),
-            diagnostics ?? ImmutableList<Diagnostic>.Empty,
+            diagnostics ?? ImmutableArray<Diagnostic>.Empty,
             path);
     }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Reqnroll.FeatureSourceGenerator.NUnit;
+namespace Reqnroll.FeatureSourceGenerator;
 
 internal class FeatureFile(string path, string content) : AdditionalText
 {

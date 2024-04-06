@@ -3,7 +3,7 @@ using System.Text;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
-internal class CSharpSourceBuilder
+public class CSharpSourceBuilder
 {
     private static readonly UTF8Encoding Encoding = new(false);
 
@@ -20,11 +20,61 @@ internal class CSharpSourceBuilder
     /// </summary>
     public int Depth => _context.Depth;
 
+    public CSharpSourceBuilder Append(char c)
+    {
+        AppendIndentIfIsFreshLine();
+
+        _buffer.Append(c);
+        return this;
+    }
+
     public CSharpSourceBuilder Append(string text)
     {
         AppendIndentIfIsFreshLine();
 
         _buffer.Append(text);
+        return this;
+    }
+
+    public CSharpSourceBuilder AppendConstantList(IEnumerable<object?> values)
+    {
+        var first = true;
+
+        foreach (var value in values)
+        {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                Append(", ");
+            }
+
+            AppendConstant(value);
+        }
+
+        return this;
+    }
+
+    public CSharpSourceBuilder AppendConstant(object? value)
+    {
+        return value switch
+        {
+            null => Append("null"),
+            string s => AppendConstant(s),
+            _ => throw new NotSupportedException($"Values of type {value.GetType().FullName} cannot be encoded as a constant in C#.")
+        };
+    }
+
+    private CSharpSourceBuilder AppendConstant(string? s)
+    {
+        if (s == null)
+        {
+            return Append("null");
+        }
+
+        _buffer.Append('"').Append(s).Append('"');
         return this;
     }
 
@@ -44,6 +94,23 @@ internal class CSharpSourceBuilder
         {
             _buffer.Append(Indent);
         }
+    }
+
+    internal void Reset() => _buffer.Clear();
+
+    public CSharpSourceBuilder AppendDirective(string directive)
+    {
+        if (!_isFreshLine)
+        {
+            throw new InvalidOperationException(ExceptionMessages.CSharpSourceBuilderCannotAppendDirectiveUnlessAtStartOfLine);
+        }
+
+        _buffer.Append(directive);
+
+        _buffer.AppendLine();
+
+        _isFreshLine = true;
+        return this;
     }
 
     public CSharpSourceBuilder AppendLine()
@@ -69,17 +136,18 @@ internal class CSharpSourceBuilder
     /// <summary>
     /// Starts a new code block.
     /// </summary>
-    public void BeginBlock()
+    public CSharpSourceBuilder BeginBlock()
     {
         AppendLine();
         _context = new CodeBlock(_context);
+        return this;
     }
 
     /// <summary>
     /// Appends the specified text and starts a new block.
     /// </summary>
     /// <param name="text">The text to append.</param>
-    public void BeginBlock(string text) => Append(text).BeginBlock();
+    public CSharpSourceBuilder BeginBlock(string text) => Append(text).BeginBlock();
 
     /// <summary>
     /// Ends the current block and begins a new line.
@@ -87,7 +155,7 @@ internal class CSharpSourceBuilder
     /// <exception cref="InvalidOperationException">
     /// <para>The builder is not currently in a block (the <see cref="Depth"/> is zero.)</para>
     /// </exception>
-    public void EndBlock()
+    public CSharpSourceBuilder EndBlock()
     {
         if (_context.Parent == null)
         {
@@ -95,7 +163,7 @@ internal class CSharpSourceBuilder
         }
 
         _context = _context.Parent;
-        AppendLine();
+        return AppendLine();
     }
 
     /// <summary>
@@ -105,7 +173,7 @@ internal class CSharpSourceBuilder
     /// <exception cref="InvalidOperationException">
     /// <para>The builder is not currently in a block (the <see cref="Depth"/> is zero.)</para>
     /// </exception>
-    public void EndBlock(string text)
+    public CSharpSourceBuilder EndBlock(string text)
     {
         if (_context.Parent == null)
         {
@@ -113,7 +181,7 @@ internal class CSharpSourceBuilder
         }
 
         _context = _context.Parent;
-        AppendLine(text);
+        return AppendLine(text);
     }
 
     /// <summary>
@@ -121,41 +189,6 @@ internal class CSharpSourceBuilder
     /// </summary>
     /// <returns>A string containing all text appended to the builder.</returns>
     public override string ToString() => _buffer.ToString();
-
-    /// <summary>
-    /// Marks the start of a section of code that should be separated from surrounding sections.
-    /// </summary>
-    public void BeginSection()
-    {
-        if (_context.InSection)
-        {
-            throw new InvalidOperationException(ExceptionMessages.CSharpSourceBuilderAlreadyInCodeSection);
-        }
-
-        _context.InSection = true;
-
-        if (_context.HasSection)
-        {
-            AppendLine();
-        }
-        else
-        {
-            _context.HasSection = true;
-        }
-    }
-
-    /// <summary>
-    /// Marks the end of a section of code that should be separated from surrounding sections.
-    /// </summary>
-    public void EndSection()
-    {
-        if (!_context.InSection)
-        {
-            throw new InvalidOperationException(ExceptionMessages.CSharpSourceBuilderNotInCodeSection);
-        }
-
-        _context.InSection = false;
-    }
 
     private class CodeBlock
     {

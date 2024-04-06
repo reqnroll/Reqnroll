@@ -7,9 +7,9 @@ namespace Reqnroll.FeatureSourceGenerator;
 public class GherkinSyntaxTree : IEquatable<GherkinSyntaxTree>
 {
     private readonly GherkinDocument _root;
-    private readonly ImmutableList<Diagnostic> _diagnostics;
+    private readonly ImmutableArray<Diagnostic> _diagnostics;
 
-    internal GherkinSyntaxTree(GherkinDocument root, ImmutableList<Diagnostic> diagnostics, string? path )
+    internal GherkinSyntaxTree(GherkinDocument root, ImmutableArray<Diagnostic> diagnostics, string? path )
     {
         _root = root;
         _diagnostics = diagnostics;
@@ -53,7 +53,7 @@ public class GherkinSyntaxTree : IEquatable<GherkinSyntaxTree>
         return hash;
     }
 
-    public IEnumerable<Diagnostic> GetDiagnostics() => _diagnostics;
+    public ImmutableArray<Diagnostic> GetDiagnostics() => _diagnostics;
 
     public GherkinDocument GetRoot() => _root;
 }
