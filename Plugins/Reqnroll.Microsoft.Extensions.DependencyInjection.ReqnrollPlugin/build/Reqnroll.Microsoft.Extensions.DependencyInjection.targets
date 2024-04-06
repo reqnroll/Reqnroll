@@ -1,0 +1,7 @@
+﻿<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">netstandard2.0</_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework>
+    <_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework>
+    <_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework)\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll</_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginPath>
+  </PropertyGroup>
+</Project>
