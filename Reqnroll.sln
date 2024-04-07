@@ -135,6 +135,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.FeatureSourceGener
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.FeatureSourceGenerator.Tests", "Tests\Reqnroll.FeatureSourceGenerator.Tests\Reqnroll.FeatureSourceGenerator.Tests.csproj", "{12E276C7-EAC3-40E3-85AD-23372E79ECD3}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.FeatureSourceGenerator.MSTest.Example", "Tests\Reqnroll.FeatureSourceGenerator.MSTest.Example\Reqnroll.FeatureSourceGenerator.MSTest.Example.csproj", "{95192968-2F6C-4C23-9EFF-2C33152B46FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -553,6 +555,18 @@ Global
 		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.Release|Any CPU.Build.0 = Release|Any CPU
 		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{12E276C7-EAC3-40E3-85AD-23372E79ECD3}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -595,6 +609,7 @@ Global
 		{B6B374C2-ABD8-4F3B-BBF4-505992309168} = {577A0375-1436-446C-802B-3C75C8CEF94F}
 		{F9321D18-EEA5-4B21-B988-1632FC081CD4} = {A10B5CD6-38EC-4D7E-9D1C-2EBA8017E437}
 		{12E276C7-EAC3-40E3-85AD-23372E79ECD3} = {0359B7D7-7E29-48E9-8DF9-7D1FACFA5CFA}
+		{95192968-2F6C-4C23-9EFF-2C33152B46FE} = {A10B5CD6-38EC-4D7E-9D1C-2EBA8017E437}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4D0636F-0160-4FA5-81A3-9784C7E3B3A4}

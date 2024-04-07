@@ -64,7 +64,7 @@ public abstract class TestFixtureSourceGenerator : IIncrementalGenerator
                     .Where(handler => handler.IsTestFrameworkReferenced(compilationInfo));
 
                 // CONSIDER: Should we produce a warning/error when multiple handlers match?
-                var testFramework = compatibleHandlers.FirstOrDefault();
+                var testFramework = availableHandlers.FirstOrDefault();
 
                 if (testFramework == null)
                 {

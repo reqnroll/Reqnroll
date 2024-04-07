@@ -20,6 +20,6 @@ public class NUnitHandler : ITestFrameworkHandler
 
     public bool IsTestFrameworkReferenced(CompilationInformation compilationInformation)
     {
-        throw new NotImplementedException();
+        return compilationInformation.ReferencedAssemblies.Any(assembly => assembly.Name == "nunit.framework");
     }
 }

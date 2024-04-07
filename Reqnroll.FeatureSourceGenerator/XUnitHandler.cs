@@ -16,6 +16,6 @@ public class XUnitHandler : ITestFrameworkHandler
 
     public bool IsTestFrameworkReferenced(CompilationInformation compilationInformation)
     {
-        throw new NotImplementedException();
+        return false;
     }
 }

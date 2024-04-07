@@ -1,5 +1,4 @@
-﻿
-using Gherkin.Ast;
+﻿using Gherkin.Ast;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator;

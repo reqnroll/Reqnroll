@@ -135,7 +135,7 @@ public class CSharpTestFixtureSourceTextGenerator
         SourceBuilder
             .Append("private static readonly global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(")
             .Append("new global::System.Globalization.CultureInfo(\"").Append(feature.Language).Append("\"), ")
-            .AppendConstant(Path.GetDirectoryName(FeatureInformation.FeatureSyntax.FilePath)).Append(", ")
+            .AppendConstant(Path.GetDirectoryName(FeatureInformation.FeatureSyntax.FilePath).Replace("\\", "\\\\")).Append(", ")
             .AppendConstant(feature.Name).Append(", ")
             .AppendLine("null, global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);")
             .AppendLine();

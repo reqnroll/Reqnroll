@@ -1,23 +1,26 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
 public class MSTestHandler : ITestFrameworkHandler
 {
-    public string FrameworkName => throw new NotImplementedException();
+    public string FrameworkName => "MSTest";
 
-    public bool CanGenerateLanguage(string language)
-    {
-        throw new NotImplementedException();
-    }
+    public bool CanGenerateLanguage(string language) => string.Equals(language, LanguageNames.CSharp, StringComparison.Ordinal);
 
     public SourceText GenerateTestFixture(FeatureInformation feature)
     {
-        throw new NotImplementedException();
+        return feature.CompilationInformation.Language switch
+        {
+            LanguageNames.CSharp => new MSTestCSharpTestFixtureSourceTextGenerator(feature).GenerateTestFixtureSourceText(),
+            _ => throw new NotSupportedException(),
+        };
     }
 
     public bool IsTestFrameworkReferenced(CompilationInformation compilationInformation)
     {
-        throw new NotImplementedException();
+        return compilationInformation.ReferencedAssemblies
+            .Any(assembly => assembly.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework");
     }
 }

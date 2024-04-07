@@ -1,8 +1,6 @@
 ﻿using Gherkin;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using System.ComponentModel.DataAnnotations;
-using System.Configuration;
 
 namespace Reqnroll.FeatureSourceGenerator.MSTest;
 
@@ -13,16 +11,19 @@ public class MSTestCSharpTestFixtureSourceTextGeneratorTests
     {
         var handler = BuiltInTestFrameworkHandlers.MSTest;
 
-        const string featureText = @"#language: en
-@featureTag1
-Feature: Calculator
+        const string featureText = 
+            """
+            #language: en
+            @featureTag1
+            Feature: Calculator
 
-@mytag
-Scenario: Add two numbers
-	Given the first number is 50
-	And the second number is 70
-	When the two numbers are added
-	Then the result should be 120";
+            @mytag
+            Scenario: Add two numbers
+                Given the first number is 50
+                And the second number is 70
+                When the two numbers are added
+                Then the result should be 120
+            """;
 
         var featureInfo = new FeatureInformation(
             new GherkinSyntaxTree(
@@ -69,7 +70,7 @@ Scenario: Add two numbers
         
         private static readonly string[] featureTags = new string[] { ""featureTag1"" };
         
-        private static readonly global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo(""en""), ""C:\Users\ReqnrollUser\Source\Repos\TestProject\Features"", ""Calculator"", null, global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
+        private static readonly global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(new global::System.Globalization.CultureInfo(""en""), ""C:\\Users\\ReqnrollUser\\Source\\Repos\\TestProject\\Features"", ""Calculator"", null, global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);
         
         public async global::System.Threading.Tasks.Task ScenarioInitialize(global::Reqnroll.ITestRunner testRunner, global::Reqnroll.ScenarioInfo scenarioInfo)
         {
