@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Plugins\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.Windsor.ReqnrollPlugin\Reqnroll.Windsor.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
