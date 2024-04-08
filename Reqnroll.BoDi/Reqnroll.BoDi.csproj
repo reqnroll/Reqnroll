@@ -7,7 +7,7 @@
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <NoWarn>$(NoWarn);1591</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
             
