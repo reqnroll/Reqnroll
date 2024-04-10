@@ -31,23 +31,14 @@ public class GenerationTestBase : SystemTestBase
     public void Handles_simple_scenarios_without_namespace_collisions()
     {
         _projectsDriver.CreateProject("CollidingNamespace.Reqnroll", "C#");
-        AddScenarios(
+        AddSimpleScenarioAndOutline();
+        AddScenario(
             """
-            Scenario: Sample Scenario
-                When something happens
-
             Scenario: Scenario with DataTable
             When something happens with
             	| who          | when     |
             	| me           | today    |
             	| someone else | tomorrow |
-
-            Scenario Outline: Scenario outline with examples
-            When something happens to <person>
-            Examples:
-            	| person |
-            	| me     |
-            	| you    |
             """);
         AddPassingStepBinding();
 
@@ -60,19 +51,7 @@ public class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Failing_scenarios_are_counted_as_failures()
     {
-        AddScenarios(
-            """
-            Scenario: Sample Scenario
-                When something happens
-
-            Scenario Outline: Scenario outline with examples
-            When something happens to <person>
-            Examples:
-            	| person |
-            	| me     |
-            	| you    |
-            """);
-
+        AddSimpleScenarioAndOutline();
         AddFailingStepBinding();
 
         ExecuteTests();
@@ -83,19 +62,7 @@ public class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Pending_scenarios_are_counted_as_pending()
     {
-        AddScenarios(
-            """
-            Scenario: Sample Scenario
-                When something happens
-
-            Scenario Outline: Scenario outline with examples
-            When something happens to <person>
-            Examples:
-            	| person |
-            	| me     |
-            	| you    |
-            """);
-
+        AddSimpleScenarioAndOutline();
         AddPendingStepBinding();
 
         ExecuteTests();
@@ -106,15 +73,17 @@ public class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Ignored_scenarios_are_counted_as_ignored()
     {
-        AddScenarios(
+        AddScenario(
             """
             @ignore
             Scenario: Sample Scenario
                 When something happens
-
+            """);
+        AddScenario(
+            """
             @ignore
             Scenario Outline: Scenario outline with examples
-            When something happens to <person>
+                When something happens to <person>
             Examples:
             	| person |
             	| me     |
@@ -122,27 +91,16 @@ public class GenerationTestBase : SystemTestBase
             """);
 
         AddPassingStepBinding();
-        _configFileDriver.SetIsRowTestsAllowed( false); //This is necessary as MSTest and Xunit count the number of physical Test methods.
+        _configFileDriver.SetIsRowTestsAllowed(false); //This is necessary as MSTest and Xunit count the number of physical Test methods.
         ExecuteTests();
 
-        ShouldAllScenariosBeIgnored(3); 
+        ShouldAllScenariosBeIgnored();
     }
 
     [TestMethod]
     public void Undefined_scenarios_are_not_executed()
     {
-        AddScenarios(
-            """
-            Scenario: Sample Scenario
-                When something happens
-
-            Scenario Outline: Scenario outline with examples
-            When something happens to <person>
-            Examples:
-            	| person |
-            	| me     |
-            	| you    |
-            """);
+        AddSimpleScenarioAndOutline();
 
         ExecuteTests();
 
@@ -154,7 +112,7 @@ public class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Async_steps_are_executed_in_order()
     {
-        AddScenarios(
+        AddScenario(
             """
             Scenario: Async Scenario Steps
                 Given a list to hold step numbers
@@ -209,29 +167,19 @@ public class GenerationTestBase : SystemTestBase
     }
 
     //test hooks: before/after run, feature & scenario hook (require special handling by test frameworks)
-    //TODO: Consider adding a AddHookBinding method to SystemTestBase 
     [TestMethod]
     public void TestRun_Feature_and_Scenario_hooks_are_executed_in_right_order()
     {
-        AddScenarios(
-            """
-            Scenario: Sample Scenario
-                When something happens
-
-            Scenario Outline: Scenario outline with examples
-            When something happens to <person>
-            Examples:
-            	| person |
-            	| me     |
-            	| you    |
-            """);
+        var testsInFeatureFile1 = 3;
+        AddSimpleScenario();
+        AddSimpleScenarioOutline(testsInFeatureFile1 - 1);
         AddPassingStepBinding();
-        _projectsDriver.AddHookBinding("BeforeTestRun", code: "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("AfterTestRun", code: "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("BeforeFeature", code: "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("AfterFeature", code: "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("BeforeScenario", code: "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("AfterScenario", code: "global::Log.LogHook();");
+        AddHookBinding("BeforeTestRun");
+        AddHookBinding("AfterTestRun");
+        AddHookBinding("BeforeFeature");
+        AddHookBinding("AfterFeature");
+        AddHookBinding("BeforeScenario");
+        AddHookBinding("AfterScenario");
 
         ExecuteTests();
 

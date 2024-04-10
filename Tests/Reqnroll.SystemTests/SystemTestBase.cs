@@ -145,10 +145,45 @@ public abstract class SystemTestBase
         UpdatePreparedTests(featureFileContent, preparedTests);
     }
 
-    protected void AddScenarios(string scenarioContent, int? preparedTests = null)
+    protected void AddScenario(string scenarioContent, int? preparedTests = null)
     {
         _projectsDriver.AddScenario(scenarioContent);
         UpdatePreparedTests(scenarioContent, preparedTests);
+    }
+
+    protected void AddSimpleScenario()
+    {
+        AddScenario(
+            """
+            Scenario: Sample Scenario
+                When something happens
+            """);
+    }
+
+    protected void AddSimpleScenarioOutline(int numberOfExamples = 2)
+    {
+        var examples = numberOfExamples == 2
+            ? """
+                  | me     |
+                  | you    |
+              """
+            : string.Join(
+                Environment.NewLine,
+                Enumerable.Range(1, numberOfExamples).Select(i => $"    | example {i} |"));
+        AddScenario(
+            $"""
+            Scenario Outline: Scenario outline with examples
+                When something happens to <person>
+            Examples:
+               	| person |
+            {examples}
+            """);
+    }
+
+    protected void AddSimpleScenarioAndOutline()
+    {
+        AddSimpleScenario();
+        AddSimpleScenarioOutline();
     }
 
     private void UpdatePreparedTests(string gherkinContent, int? preparedTests)
@@ -223,6 +258,11 @@ public abstract class SystemTestBase
         _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
         _vsTestExecutionDriver.LastTestExecutionResult.Total.Should().Be(expectedNrOfTests, $"the run should contain {expectedNrOfTests} tests");
         return expectedNrOfTests;
+    }
+
+    protected void AddHookBinding(string eventType, string? name = null, string? code = null)
+    {
+        _projectsDriver.AddHookBinding(eventType, name, code: code ?? "global::Log.LogHook();");
     }
 
     protected void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")

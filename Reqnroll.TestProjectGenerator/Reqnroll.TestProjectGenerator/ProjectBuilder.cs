@@ -79,13 +79,14 @@ namespace Reqnroll.TestProjectGenerator
             _project.AddFile(projectFile ?? throw new ArgumentNullException(nameof(projectFile)));
         }
 
-        public void AddFeatureFile(string featureFileContent)
+        public ProjectFile AddFeatureFile(string featureFileContent)
         {
             EnsureProjectExists();
 
             var featureFile = _featureFileGenerator.Generate(featureFileContent);
 
             _project.AddFile(featureFile);
+            return featureFile;
         }
 
         public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode)

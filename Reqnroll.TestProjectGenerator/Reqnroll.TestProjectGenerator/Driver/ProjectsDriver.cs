@@ -12,6 +12,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
         private readonly SolutionDriver _solutionDriver;
         private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly TestProjectFolders _testProjectFolders;
+        public ProjectFile LastFeatureFile { get; private set; }
 
         public ProjectsDriver(SolutionDriver solutionDriver, ProjectBuilderFactory projectBuilderFactory, TestProjectFolders testProjectFolders)
         {
@@ -61,8 +62,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public void AddHookBinding(string eventType, string name = null, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
         {
-            name ??= eventType;
-            AddHookBinding(_solutionDriver.DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
+            AddHookBinding(_solutionDriver.DefaultProject, eventType, name ?? eventType, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
         private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,  IList<string> classScopeAttributeTags = null)
@@ -82,17 +82,24 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public void AddFeatureFile(string featureFileContent)
         {
-            _solutionDriver.DefaultProject.AddFeatureFile(featureFileContent);
+            LastFeatureFile = _solutionDriver.DefaultProject.AddFeatureFile(featureFileContent);
         }
 
         public void AddScenario(string scenarioContent)
         {
-            AddFeatureFile(
-                $$"""
-                  Feature: Sample Feature
-                  
-                  {{scenarioContent}}
-                  """);
+            if (LastFeatureFile != null)
+            {
+                LastFeatureFile.Append(scenarioContent);
+            }
+            else
+            {
+                AddFeatureFile(
+                    $$"""
+                      Feature: Sample Feature
+
+                      {{scenarioContent}}
+                      """);
+            }
         }
 
         public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode)
