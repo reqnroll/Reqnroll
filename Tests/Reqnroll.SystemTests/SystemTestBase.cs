@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using FluentAssertions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Reqnroll.BoDi;
 using Reqnroll.SystemTests.Drivers;
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Driver;
 using Reqnroll.TestProjectGenerator.Helpers;
+using Scrutor;
 
 namespace Reqnroll.SystemTests;
 public abstract class SystemTestBase
@@ -17,7 +18,7 @@ public abstract class SystemTestBase
     protected VSTestExecutionDriver _vsTestExecutionDriver = null!;
     protected TestFileManager _testFileManager = new();
     protected FolderCleaner _folderCleaner = null!;
-    protected ObjectContainer _testContainer = null!;
+    protected IServiceProvider _testContainer = null!;
     protected TestRunConfiguration _testRunConfiguration = null!;
     protected CurrentVersionDriver _currentVersionDriver = null!;
     protected CompilationDriver _compilationDriver = null!;
@@ -32,29 +33,52 @@ public abstract class SystemTestBase
         TestInitialize();
     }
 
+    protected virtual IServiceCollection ConfigureServices()
+    {
+        var services = new ServiceCollection();
+
+        services.AddSingleton<IOutputWriter, ConsoleOutputConnector>();
+
+        services.Scan(scan => scan
+                              .FromAssemblyOf<TestRunConfiguration>()
+                              .AddClasses()
+                              .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+                              .AsSelf()
+                              .WithScopedLifetime());
+
+        services.Scan(scan => scan
+                              .FromAssemblyOf<ExecutionDriver>()
+                              .AddClasses(c => c.InNamespaceOf<ExecutionDriver>())
+                              .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+                              .AsSelf()
+                              .WithScopedLifetime());
+
+        return services;
+    }
+
     protected virtual void TestInitialize()
     {
-        _testContainer = new ObjectContainer();
-        _testContainer.RegisterTypeAs<ConsoleOutputConnector, IOutputWriter>();
+        var services = ConfigureServices();
+        _testContainer = services.BuildServiceProvider();
 
-        _testRunConfiguration = _testContainer.Resolve<TestRunConfiguration>();
+        _testRunConfiguration = _testContainer.GetService<TestRunConfiguration>();
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.CSharp;
         _testRunConfiguration.ProjectFormat = ProjectFormat.New;
         _testRunConfiguration.ConfigurationFormat = ConfigurationFormat.Json;
         _testRunConfiguration.TargetFramework = TargetFramework.Net80;
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.MSTest;
 
-        _currentVersionDriver = _testContainer.Resolve<CurrentVersionDriver>();
+        _currentVersionDriver = _testContainer.GetService<CurrentVersionDriver>();
         _currentVersionDriver.NuGetVersion = NuGetPackageVersion.Version;
         _currentVersionDriver.ReqnrollNuGetVersion = NuGetPackageVersion.Version;
 
-        _folderCleaner = _testContainer.Resolve<FolderCleaner>();
+        _folderCleaner = _testContainer.GetService<FolderCleaner>();
         _folderCleaner.EnsureOldRunFoldersCleaned();
 
-        _projectsDriver = _testContainer.Resolve<ProjectsDriver>();
-        _executionDriver = _testContainer.Resolve<ExecutionDriver>();
-        _vsTestExecutionDriver = _testContainer.Resolve<VSTestExecutionDriver>();
-        _compilationDriver = _testContainer.Resolve<CompilationDriver>();
+        _projectsDriver = _testContainer.GetService<ProjectsDriver>();
+        _executionDriver = _testContainer.GetService<ExecutionDriver>();
+        _vsTestExecutionDriver = _testContainer.GetService<VSTestExecutionDriver>();
+        _compilationDriver = _testContainer.GetService<CompilationDriver>();
     }
 
     protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null)
