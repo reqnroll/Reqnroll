@@ -129,9 +129,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "GitHubWorkflows", "GitHubWo
 		.github\workflows\lock.yml = .github\workflows\lock.yml
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.BoDi", "Reqnroll.BoDi\Reqnroll.BoDi.csproj", "{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.SystemTests", "Tests\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj", "{C658B37D-FD36-4868-9070-4EB452FAE526}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.SystemTests", "Tests\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj", "{C658B37D-FD36-4868-9070-4EB452FAE526}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -515,18 +513,6 @@ Global
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{C073A609-8A6A-4707-86B0-7BB32EF8ACEE}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{8E1AB4D0-98E8-46C5-97EC-7EF47B5DFD27}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 		{C658B37D-FD36-4868-9070-4EB452FAE526}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C658B37D-FD36-4868-9070-4EB452FAE526}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C658B37D-FD36-4868-9070-4EB452FAE526}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
