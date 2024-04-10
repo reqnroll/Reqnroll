@@ -6,6 +6,7 @@ using Reqnroll.TestProjectGenerator;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Reqnroll.SystemTests.Generation;
 
@@ -18,8 +19,8 @@ public class GenerationTestBase : SystemTestBase
     protected override void TestInitialize()
     {
         base.TestInitialize();
-        _hookDriver = _testContainer.Resolve<HooksDriver>();
-        _configDriver = _testContainer.Resolve<TestProjectGenerator.Driver.ConfigurationDriver>();
+        _hookDriver = _testContainer.GetService<HooksDriver>();
+        _configDriver = _testContainer.GetService<TestProjectGenerator.Driver.ConfigurationDriver>();
     }
 
     [TestMethod]

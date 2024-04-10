@@ -83,7 +83,7 @@ public abstract class SystemTestBase
         _executionDriver = _testContainer.GetService<ExecutionDriver>();
         _vsTestExecutionDriver = _testContainer.GetService<VSTestExecutionDriver>();
         _compilationDriver = _testContainer.GetService<CompilationDriver>();
-        _testProjectFolders = _testContainer.Resolve<TestProjectFolders>();
+        _testProjectFolders = _testContainer.GetService<TestProjectFolders>();
 
     }
 
@@ -204,8 +204,8 @@ public abstract class SystemTestBase
         int pendingExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? 0 : expectedNrOfTests;
         _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(pendingExpected, "All of the tests should Pend");
 
-        int IgnoredExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? expectedNrOfTests : 0;
-        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(IgnoredExpected, "None of the tests should be Ignored");
+        int ignoredExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? expectedNrOfTests : 0;
+        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(ignoredExpected, "None of the tests should be Ignored");
 
 
         _folderCleaner.CleanSolutionFolder();
