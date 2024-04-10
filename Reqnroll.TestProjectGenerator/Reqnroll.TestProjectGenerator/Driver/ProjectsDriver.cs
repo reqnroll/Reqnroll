@@ -59,8 +59,9 @@ namespace Reqnroll.TestProjectGenerator.Driver
             AddHookBinding(_solutionDriver.DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
-        public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
+        public void AddHookBinding(string eventType, string name = null, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
         {
+            name ??= eventType;
             AddHookBinding(_solutionDriver.DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 

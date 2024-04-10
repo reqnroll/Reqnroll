@@ -1,11 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System;
-using FluentAssertions;
 using Reqnroll.TestProjectGenerator.Driver;
-using Reqnroll.TestProjectGenerator;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Reqnroll.SystemTests.Generation;
@@ -14,13 +8,13 @@ namespace Reqnroll.SystemTests.Generation;
 public class GenerationTestBase : SystemTestBase
 {
     private HooksDriver _hookDriver = null!;
-    private TestProjectGenerator.Driver.ConfigurationDriver _configDriver = null!;
+    private ConfigurationFileDriver _configFileDriver = null!;
 
     protected override void TestInitialize()
     {
         base.TestInitialize();
         _hookDriver = _testContainer.GetService<HooksDriver>();
-        _configDriver = _testContainer.GetService<TestProjectGenerator.Driver.ConfigurationDriver>();
+        _configFileDriver = _testContainer.GetService<ConfigurationFileDriver>();
     }
 
     [TestMethod]
@@ -37,8 +31,7 @@ public class GenerationTestBase : SystemTestBase
     public void Handles_simple_scenarios_without_namespace_collisions()
     {
         _projectsDriver.CreateProject("CollidingNamespace.Reqnroll", "C#");
-
-        AddScenario(
+        AddScenarios(
             """
             Scenario: Sample Scenario
                 When something happens
@@ -56,7 +49,6 @@ public class GenerationTestBase : SystemTestBase
             	| me     |
             	| you    |
             """);
-
         AddPassingStepBinding();
 
         ExecuteTests();
@@ -66,9 +58,9 @@ public class GenerationTestBase : SystemTestBase
 
     //test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
     [TestMethod]
-    public void FailingScenariosAreCountedAsFailures()
+    public void Failing_scenarios_are_counted_as_failures()
     {
-        AddScenario(
+        AddScenarios(
             """
             Scenario: Sample Scenario
                 When something happens
@@ -89,9 +81,9 @@ public class GenerationTestBase : SystemTestBase
     }
 
     [TestMethod]
-    public void PendingScenariosAreCountedAsPending()
+    public void Pending_scenarios_are_counted_as_pending()
     {
-        AddScenario(
+        AddScenarios(
             """
             Scenario: Sample Scenario
                 When something happens
@@ -112,9 +104,9 @@ public class GenerationTestBase : SystemTestBase
     }
 
     [TestMethod]
-    public void IgnoredScenariosAreCountedAsIgnored()
+    public void Ignored_scenarios_are_counted_as_ignored()
     {
-        AddScenario(
+        AddScenarios(
             """
             @ignore
             Scenario: Sample Scenario
@@ -130,16 +122,16 @@ public class GenerationTestBase : SystemTestBase
             """);
 
         AddPassingStepBinding();
-        _configDriver.SetIsRowTestsAllowed( false); //This is necessary as MSTest and Xunit count the number of physical Test methods.
+        _configFileDriver.SetIsRowTestsAllowed( false); //This is necessary as MSTest and Xunit count the number of physical Test methods.
         ExecuteTests();
 
         ShouldAllScenariosBeIgnored(3); 
     }
 
     [TestMethod]
-    public void UndefinedScenariosAreNotExecuted()
+    public void Undefined_scenarios_are_not_executed()
     {
-        AddScenario(
+        AddScenarios(
             """
             Scenario: Sample Scenario
                 When something happens
@@ -151,8 +143,6 @@ public class GenerationTestBase : SystemTestBase
             	| me     |
             	| you    |
             """);
-
-        //AddPassingStepBinding();
 
         ExecuteTests();
 
@@ -162,9 +152,9 @@ public class GenerationTestBase : SystemTestBase
 
     //test async steps (async steps are executed in order)
     [TestMethod]
-    public void AsyncStepsAreExecutedInOrder()
+    public void Async_steps_are_executed_in_order()
     {
-        AddScenario(
+        AddScenarios(
             """
             Scenario: Async Scenario Steps
                 Given a list to hold step numbers
@@ -174,55 +164,57 @@ public class GenerationTestBase : SystemTestBase
                 Then async step order should be '1,2,3'
             """);
 
-        var _asyncBindingClassContent =
-            @"namespace AsyncSequence.StepDefinitions
-{
-    [Binding]
-    public class AsyncsequenceStepDefinitions
-    {
-        private ScenarioContext _scenarioContext;
-
-        public AsyncsequenceStepDefinitions(ScenarioContext scenarioContext) {
-            _scenarioContext = scenarioContext;
-        }
-        [Given(""a list to hold step numbers"")]
-        public async Task GivenAPlaceholder()
-        {
-            await Task.Run(() => global::Log.LogStep() );
-        }
-
-        [When(""Async Step {string} is called"")]
-        public async Task WhenStepIsTaken(string p0)
-        {
-            await Task.Run(() => global::Log.LogStep() );
-        }
-
-        [Then(""async step order should be {string}"")]
-        public async Task ThenStepSequenceIs( string p0)
-        {
-            await Task.Run( () => 
-            {   
-                global::Log.LogStep();
+        AddBindingClass(
+            """
+            namespace AsyncSequence.StepDefinitions
+            {
+                [Binding]
+                public class AsyncSequenceStepDefinitions
+                {
+                    private ScenarioContext _scenarioContext;
+            
+                    public AsyncSequenceStepDefinitions(ScenarioContext scenarioContext)
+                    {
+                        _scenarioContext = scenarioContext;
+                    }
+                    
+                    [Given("a list to hold step numbers")]
+                    public async Task GivenAPlaceholder()
+                    {
+                        await Task.Run(() => global::Log.LogStep() );
+                    }
+            
+                    [When("Async Step {string} is called")]
+                    public async Task WhenStepIsTaken(string p0)
+                    {
+                        await Task.Run(() => global::Log.LogStep() );
+                    }
+            
+                    [Then("async step order should be {string}")]
+                    public async Task ThenStepSequenceIs(string p0)
+                    {
+                        await Task.Run(() =>
+                        {
+                            global::Log.LogStep();
+                        });
+                    }
+                }
             }
-            );
-        }
-    }
-}
-";
-        AddBindingClass(_asyncBindingClassContent);
+            """);
 
         ExecuteTests();
-        CheckAreStepsExecutedInOrder(new string[] { "GivenAPlaceholder", "WhenStepIsTaken", "ThenStepSequenceIs" });
+        CheckAreStepsExecutedInOrder(new[] { "GivenAPlaceholder", "WhenStepIsTaken", "ThenStepSequenceIs" });
 
         ShouldAllScenariosPass();
     }
-    //test hooks: before/after test run (require special handling by test frameworks)
+
+    //test hooks: before/after run, feature & scenario hook (require special handling by test frameworks)
     //TODO: Consider adding a AddHookBinding method to SystemTestBase 
     [TestMethod]
-    public void BeforeAndAfterTestHooksRun()
+    public void TestRun_Feature_and_Scenario_hooks_are_executed_in_right_order()
     {
-        AddScenario(
-    """
+        AddScenarios(
+            """
             Scenario: Sample Scenario
                 When something happens
 
@@ -233,50 +225,30 @@ public class GenerationTestBase : SystemTestBase
             	| me     |
             	| you    |
             """);
-
-
         AddPassingStepBinding();
-
-        _projectsDriver.AddHookBinding("BeforeTestRun", "BeforeTestRun", null, null, null, "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("AfterTestRun", "AfterTestRun", null, null, null, "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("BeforeTestRun", code: "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("AfterTestRun", code: "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("BeforeFeature", code: "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("AfterFeature", code: "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("BeforeScenario", code: "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding("AfterScenario", code: "global::Log.LogHook();");
 
         ExecuteTests();
 
-        _hookDriver?.CheckIsHookExecutedInOrder(new string[] { "BeforeTestRun", "AfterTestRun" });
+        _hookDriver.CheckIsHookExecutedInOrder(new[]
+        {
+            "BeforeTestRun", 
+            "BeforeFeature", 
+            "BeforeScenario", 
+            "AfterScenario", 
+            "BeforeScenario", 
+            "AfterScenario", 
+            "BeforeScenario", 
+            "AfterScenario", 
+            "AfterFeature", 
+            "AfterTestRun"
+        });
         ShouldAllScenariosPass();
-
-    }
-
-    //test hooks: before/after test feature & scenario (require special handling by test frameworks)
-    [TestMethod]
-    public void BeforeAndAfterFeatureAndScenarioHooksRun()
-    {
-        AddScenario(
-    """
-            Scenario: Sample Scenario
-                When something happens
-
-            Scenario Outline: Scenario outline with examples
-            When something happens to <person>
-            Examples:
-            	| person |
-            	| me     |
-            	| you    |
-            """);
-
-
-        AddPassingStepBinding();
-
-        _projectsDriver.AddHookBinding("BeforeFeature", "BeforeFeatureRun", null, null, null, "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("AfterFeature", "AfterFeatureRun", null, null, null, "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("BeforeScenario", "BeforeSenarioRun", null, null, null, "global::Log.LogHook();");
-        _projectsDriver.AddHookBinding("AfterScenario", "AfterScenarioRun", null, null, null, "global::Log.LogHook();");
-
-        ExecuteTests();
-
-        _hookDriver.CheckIsHookExecutedInOrder(new string[] { "BeforeFeatureRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "BeforeSenarioRun", "AfterScenarioRun", "AfterFeatureRun" });
-        ShouldAllScenariosPass();
-
     }
 
     //TODO: test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)

@@ -9,7 +9,7 @@ public class SmokeTest : SystemTestBase
     [TestMethod]
     public void Handles_the_simplest_scenario()
     {
-        AddScenario(
+        AddScenarios(
             """
             Scenario: Sample Scenario
                 When something happens

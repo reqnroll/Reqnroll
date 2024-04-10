@@ -25,7 +25,7 @@ public class MsTestGenerationTest : GenerationTestBase
     [TestMethod]
     public void Generator_handles_tagged_examples_block_with_single_column()
     {
-        AddScenario(
+        AddScenarios(
             """
             Scenario Outline: Sample Scenario Outline
                 When <what> happens

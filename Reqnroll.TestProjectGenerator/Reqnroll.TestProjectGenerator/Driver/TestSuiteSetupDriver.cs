@@ -9,16 +9,16 @@ namespace Reqnroll.TestProjectGenerator.Driver
         private readonly ProjectsDriver _projectsDriver;
         private readonly TestSuiteInitializationDriver _testSuiteInitializationDriver;
         private readonly JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver;
-        private readonly ConfigurationDriver _configurationDriver;
+        private readonly ConfigurationFileDriver _configurationFileDriver;
         private bool _isProjectCreated;
 
         public TestSuiteSetupDriver(ProjectsDriver projectsDriver, TestSuiteInitializationDriver testSuiteInitializationDriver, JsonConfigurationLoaderDriver jsonConfigurationLoaderDriver,
-            ConfigurationDriver configurationDriver)
+            ConfigurationFileDriver configurationFileDriver)
         {
             _projectsDriver = projectsDriver;
             _testSuiteInitializationDriver = testSuiteInitializationDriver;
             _jsonConfigurationLoaderDriver = jsonConfigurationLoaderDriver;
-            _configurationDriver = configurationDriver;
+            _configurationFileDriver = configurationFileDriver;
         }
 
         public void AddGenericWhenStepBinding()
@@ -136,7 +136,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public void AddAppConfigFromString(string appConfigContent)
         {
-            _configurationDriver.SetConfigurationFormat(ConfigurationFormat.None);
+            _configurationFileDriver.SetConfigurationFormat(ConfigurationFormat.None);
             _projectsDriver.AddFile("app.config", appConfigContent);
         }
     }

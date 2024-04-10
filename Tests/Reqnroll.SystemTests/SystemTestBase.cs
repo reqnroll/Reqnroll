@@ -84,7 +84,18 @@ public abstract class SystemTestBase
         _vsTestExecutionDriver = _testContainer.GetService<VSTestExecutionDriver>();
         _compilationDriver = _testContainer.GetService<CompilationDriver>();
         _testProjectFolders = _testContainer.GetService<TestProjectFolders>();
+    }
 
+
+    [TestCleanup]
+    public void TestCleanupMethod()
+    {
+        TestCleanup();
+    }
+
+    protected virtual void TestCleanup()
+    {
+        _folderCleaner.CleanSolutionFolder();
     }
 
     protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null)
@@ -134,7 +145,7 @@ public abstract class SystemTestBase
         UpdatePreparedTests(featureFileContent, preparedTests);
     }
 
-    protected void AddScenario(string scenarioContent, int? preparedTests = null)
+    protected void AddScenarios(string scenarioContent, int? preparedTests = null)
     {
         _projectsDriver.AddScenario(scenarioContent);
         UpdatePreparedTests(scenarioContent, preparedTests);
@@ -169,29 +180,24 @@ public abstract class SystemTestBase
     {
         int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
         _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
-        _folderCleaner.CleanSolutionFolder();
     }
 
     protected void ShouldAllScenariosFail(int? expectedNrOfTestsSpec = null)
     {
         int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
         _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(expectedNrOfTests, "all tests should fail");
-        _folderCleaner.CleanSolutionFolder();
-
     }
 
     protected void ShouldAllScenariosPend(int? expectedNrOfTestsSpec = null)
     {
         int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
         _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(expectedNrOfTests, "all tests should Pend");
-        _folderCleaner.CleanSolutionFolder();
     }
 
     protected void ShouldAllScenariosBeIgnored(int? expectedNrOfTestsSpec = null)
     {
         int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
         _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(expectedNrOfTests, "all tests should be Ignored");
-        _folderCleaner.CleanSolutionFolder();
     }
 
     protected void ShouldAllUndefinedScenariosNotBeExecuted(int? expectedNrOfTestsSpec = null)
@@ -206,9 +212,6 @@ public abstract class SystemTestBase
 
         int ignoredExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? expectedNrOfTests : 0;
         _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(ignoredExpected, "None of the tests should be Ignored");
-
-
-        _folderCleaner.CleanSolutionFolder();
     }
 
     protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)
