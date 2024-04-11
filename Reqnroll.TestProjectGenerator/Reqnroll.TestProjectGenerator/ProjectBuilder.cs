@@ -6,7 +6,6 @@ using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Driver;
 using Reqnroll.TestProjectGenerator.Factories.BindingsGenerator;
 using Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator;
-using Reqnroll.TestProjectGenerator.NewApi._1_Memory;
 
 namespace Reqnroll.TestProjectGenerator
 {
@@ -101,15 +100,15 @@ namespace Reqnroll.TestProjectGenerator
             _project.AddFile(bindingsGenerator.GenerateStepDefinition("StepBinding", methodImplementation, attributeName, regex, ParameterType.DocString, "docStringArg"));
         }
 
-        public void AddLoggingStepBinding(string attributeName, string methodName, string pathToLogFile, string regex)
+        public void AddLoggingStepBinding(string attributeName, string methodName, string regex)
         {
             EnsureProjectExists();
 
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
 
-            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, pathToLogFile, attributeName, regex));
-            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, pathToLogFile, attributeName, regex, ParameterType.Table, "tableArg"));
-            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, pathToLogFile, attributeName, regex, ParameterType.DocString, "docStringArg"));
+            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, attributeName, regex));
+            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, attributeName, regex, ParameterType.Table, "tableArg"));
+            _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, attributeName, regex, ParameterType.DocString, "docStringArg"));
         }
 
         public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,
@@ -246,7 +245,7 @@ namespace Reqnroll.TestProjectGenerator
                 _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "6.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "netstandard2.0\\Microsoft.Bcl.AsyncInterfaces.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
-                _project.AddFile(generator.GenerateLoggerClass(Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log")));
+                _project.AddFile(generator.GenerateLoggerClass(_testProjectFolders.LogFilePath));
 
                 switch (_project.ProgrammingLanguage)
                 {

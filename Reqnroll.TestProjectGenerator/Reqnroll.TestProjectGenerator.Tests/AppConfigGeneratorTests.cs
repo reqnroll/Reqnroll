@@ -2,7 +2,6 @@ using FluentAssertions;
 using Reqnroll.TestProjectGenerator.ConfigurationModel;
 using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator;
-using Reqnroll.TestProjectGenerator.NewApi._1_Memory;
 using Xunit;
 
 namespace Reqnroll.TestProjectGenerator.Tests

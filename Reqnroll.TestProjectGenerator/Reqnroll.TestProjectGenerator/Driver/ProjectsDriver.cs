@@ -109,7 +109,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public void AddLoggingStepBinding(string attributeName, string methodName, string regex)
         {
-            _solutionDriver.DefaultProject.AddLoggingStepBinding(attributeName, methodName, Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log"), regex);
+            _solutionDriver.DefaultProject.AddLoggingStepBinding(attributeName, methodName, regex);
         }
 
         public void AddStepBinding(string projectName, string bindingCode) => AddStepBinding(_solutionDriver.Projects[projectName], bindingCode);

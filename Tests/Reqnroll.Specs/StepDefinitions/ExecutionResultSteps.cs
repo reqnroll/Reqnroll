@@ -13,14 +13,14 @@ namespace Reqnroll.Specs.StepDefinitions
     [Binding]
     public class ExecutionResultSteps
     {
-        private readonly HooksDriver _hooksDriver;
+        private readonly BindingsDriver _bindingsDriver;
         private readonly VSTestExecutionDriver _vsTestExecutionDriver;
         private readonly TestProjectFolders _testProjectFolders;
         private readonly TestRunLogDriver _testRunLogDriver;
 
-        public ExecutionResultSteps(HooksDriver hooksDriver, VSTestExecutionDriver vsTestExecutionDriver, TestProjectFolders testProjectFolders, TestRunLogDriver testRunLogDriver)
+        public ExecutionResultSteps(BindingsDriver bindingsDriver, VSTestExecutionDriver vsTestExecutionDriver, TestProjectFolders testProjectFolders, TestRunLogDriver testRunLogDriver)
         {
-            _hooksDriver = hooksDriver;
+            _bindingsDriver = bindingsDriver;
             _vsTestExecutionDriver = vsTestExecutionDriver;
             _testProjectFolders = testProjectFolders;
             _testRunLogDriver = testRunLogDriver;
@@ -66,13 +66,13 @@ namespace Reqnroll.Specs.StepDefinitions
         [Then(@"the hook '(.*)' is executed (\d+) times")]
         public void ThenTheHookIsExecuted(string methodName, int times)
         {
-            _hooksDriver.CheckIsHookExecuted(methodName, times);
+            _bindingsDriver.CheckIsHookExecuted(methodName, times);
         }
 
         [Then(@"the hooks are executed in the order")]
         public void ThenTheHooksAreExecutedInTheOrder(Table table)
         {
-            _hooksDriver.CheckIsHookExecutedInOrder(table.Rows.Select(r => r[0]));
+            _bindingsDriver.AssertHooksExecutedInOrder(table.Rows.Select(r => r[0]));
         }
 
         [Then(@"the execution log should contain text '(.*)'")]

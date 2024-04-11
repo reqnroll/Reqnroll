@@ -53,10 +53,9 @@ namespace Reqnroll.TestProjectGenerator
 
         public void CheckIsBindingMethodExecuted(string methodName, int timesExecuted)
         {
-            string pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            string logFileContent = File.ReadAllText(pathToLogFile, Encoding.UTF8);
+            string logFileContent = File.ReadAllText(_testProjectFolders.LogFilePath, Encoding.UTF8);
 
-            var regex = new Regex($@"-> step: {methodName}");
+            var regex = new Regex($"-> step: {methodName}");
 
             regex.Match(logFileContent).Success.Should().BeTrue($"method {methodName} was not executed.");
             regex.Matches(logFileContent).Count.Should().Be(timesExecuted);

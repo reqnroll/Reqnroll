@@ -1,4 +1,4 @@
-namespace Reqnroll.TestProjectGenerator.NewApi._1_Memory
+namespace Reqnroll.TestProjectGenerator.Data
 {
     public class AppConfigSection
     {

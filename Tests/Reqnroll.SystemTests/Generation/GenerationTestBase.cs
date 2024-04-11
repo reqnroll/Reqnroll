@@ -7,13 +7,13 @@ namespace Reqnroll.SystemTests.Generation;
 [TestCategory("Generation")]
 public class GenerationTestBase : SystemTestBase
 {
-    private HooksDriver _hookDriver = null!;
+    private BindingsDriver _bindingDriver = null!;
     private ConfigurationFileDriver _configFileDriver = null!;
 
     protected override void TestInitialize()
     {
         base.TestInitialize();
-        _hookDriver = _testContainer.GetService<HooksDriver>();
+        _bindingDriver = _testContainer.GetService<BindingsDriver>();
         _configFileDriver = _testContainer.GetService<ConfigurationFileDriver>();
     }
 
@@ -161,7 +161,7 @@ public class GenerationTestBase : SystemTestBase
             """);
 
         ExecuteTests();
-        CheckAreStepsExecutedInOrder(new[] { "GivenAPlaceholder", "WhenStepIsTaken", "ThenStepSequenceIs" });
+        _bindingDriver.AssertStepsExecutedInOrder(new[] { "GivenAPlaceholder", "WhenStepIsTaken", "ThenStepSequenceIs" });
 
         ShouldAllScenariosPass();
     }
@@ -170,9 +170,9 @@ public class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void TestRun_Feature_and_Scenario_hooks_are_executed_in_right_order()
     {
-        var testsInFeatureFile1 = 3;
+        var testsInFeatureFile = 3;
         AddSimpleScenario();
-        AddSimpleScenarioOutline(testsInFeatureFile1 - 1);
+        AddSimpleScenarioOutline(testsInFeatureFile - 1);
         AddPassingStepBinding();
         AddHookBinding("BeforeTestRun");
         AddHookBinding("AfterTestRun");
@@ -183,7 +183,7 @@ public class GenerationTestBase : SystemTestBase
 
         ExecuteTests();
 
-        _hookDriver.CheckIsHookExecutedInOrder(new[]
+        _bindingDriver.AssertExecutedHooksEqual(new[]
         {
             "BeforeTestRun", 
             "BeforeFeature", 

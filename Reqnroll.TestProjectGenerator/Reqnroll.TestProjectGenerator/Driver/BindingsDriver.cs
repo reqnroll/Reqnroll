@@ -8,15 +8,8 @@ using FluentAssertions;
 
 namespace Reqnroll.TestProjectGenerator.Driver
 {
-    public class HooksDriver
+    public class BindingsDriver(TestProjectFolders _testProjectFolders)
     {
-        private readonly TestProjectFolders _testProjectFolders;
-
-        public HooksDriver(TestProjectFolders testProjectFolders)
-        {
-            _testProjectFolders = testProjectFolders;
-        }
-
         public void CheckIsHookExecuted(string methodName, int expectedTimesExecuted)
         {
             int hookExecutionCount = GetHookExecutionCount(methodName);
@@ -27,13 +20,12 @@ namespace Reqnroll.TestProjectGenerator.Driver
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            string pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            if (!File.Exists(pathToHookLogFile))
+            if (!File.Exists(_testProjectFolders.LogFilePath))
             {
                 return 0;
             }
 
-            string content = File.ReadAllText(pathToHookLogFile);
+            string content = File.ReadAllText(_testProjectFolders.LogFilePath);
             content.Should().NotBeNull();
 
             var regex = new Regex($@"-> hook: {methodName}");
@@ -41,13 +33,15 @@ namespace Reqnroll.TestProjectGenerator.Driver
             return regex.Matches(content).Count;
         }
 
+        private string GetLogFileLockPath() => _testProjectFolders.LogFilePath + ".lock";
+
         public void AcquireHookLock()
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log.lock");
+            var pathToHookLogFile = GetLogFileLockPath();
 
-            Directory.CreateDirectory(Path.GetDirectoryName(pathToHookLogFile));
+            Directory.CreateDirectory(Path.GetDirectoryName(pathToHookLogFile)!);
             using (File.Open(pathToHookLogFile, FileMode.CreateNew))
             {
             }
@@ -56,10 +50,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
         public void ReleaseHookLock()
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
-
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log.lock");
-
-            File.Delete(pathToHookLogFile);
+            File.Delete(GetLogFileLockPath());
         }
 
         public async Task WaitForIsWaitingForHookLockAsync(string methodName)
@@ -81,14 +72,12 @@ namespace Reqnroll.TestProjectGenerator.Driver
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-
-            if (!File.Exists(pathToHookLogFile))
+            if (!File.Exists(_testProjectFolders.LogFilePath))
             {
                 return false;
             }
 
-            var content = File.ReadAllText(pathToHookLogFile);
+            var content = File.ReadAllText(_testProjectFolders.LogFilePath);
             content.Should().NotBeNull();
 
             var regex = new Regex($@"-> waiting for hook lock: {methodName}");
@@ -100,8 +89,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            var content = File.ReadAllText(pathToHookLogFile);
+            var content = File.ReadAllText(_testProjectFolders.LogFilePath);
             content.Should().NotBeNull();
 
             var regex = new Regex($@"-> hook: {methodName}");
@@ -109,14 +97,52 @@ namespace Reqnroll.TestProjectGenerator.Driver
             regex.Matches(content).Count.Should().NotBe(timesExecuted);
         }
 
-        public void CheckIsHookExecutedInOrder(IEnumerable<string> methodNames)
+        private IEnumerable<string> GetActualHookLines()
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            var lines = File.ReadAllLines(pathToHookLogFile);
+            var lines = File.ReadAllLines(_testProjectFolders.LogFilePath);
+            return lines.Where(l => l.StartsWith("-> hook:"));
+        }
+
+        public void AssertHooksExecutedInOrder(IEnumerable<string> methodNames)
+        {
+            var hookLines = GetActualHookLines();
+
             var methodNameLines = methodNames.Select(m => $"-> hook: {m}");
-            lines.Should().ContainInOrder(methodNameLines);
+            hookLines.Should().ContainInOrder(methodNameLines);
+        }
+
+        public void AssertExecutedHooksEqual(IEnumerable<string> methodNames)
+        {
+            var hookLines = GetActualHookLines();
+
+            var methodNameLines = methodNames.Select(m => $"-> hook: {m}");
+            hookLines.Should().Equal(methodNameLines);
+        }
+
+        private IEnumerable<string> GetActualStepLines()
+        {
+            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+
+            var lines = File.ReadAllLines(_testProjectFolders.LogFilePath);
+            return lines.Where(l => l.StartsWith("-> step:"));
+        }
+
+        public void AssertStepsExecutedInOrder(IEnumerable<string> methodNames)
+        {
+            var stepLines = GetActualStepLines();
+
+            var methodNameLines = methodNames.Select(m => $"-> step: {m}");
+            stepLines.Should().ContainInOrder(methodNameLines);
+        }
+
+        public void AssertExecutedStepsEqual(IEnumerable<string> methodNames)
+        {
+            var stepLines = GetActualStepLines();
+
+            var methodNameLines = methodNames.Select(m => $"-> step: {m}");
+            stepLines.Should().Equal(methodNameLines);
         }
     }
 }

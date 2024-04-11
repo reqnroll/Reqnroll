@@ -95,7 +95,8 @@ public abstract class SystemTestBase
 
     protected virtual void TestCleanup()
     {
-        _folderCleaner.CleanSolutionFolder();
+        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+            _folderCleaner.CleanSolutionFolder();
     }
 
     protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null)
@@ -260,9 +261,9 @@ public abstract class SystemTestBase
         return expectedNrOfTests;
     }
 
-    protected void AddHookBinding(string eventType, string? name = null, string? code = null)
+    protected void AddHookBinding(string eventType, string? name = null, string code = "")
     {
-        _projectsDriver.AddHookBinding(eventType, name, code: code ?? "global::Log.LogHook();");
+        _projectsDriver.AddHookBinding(eventType, name, code: code);
     }
 
     protected void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
@@ -283,16 +284,5 @@ public abstract class SystemTestBase
     protected void AddBindingClass(string content)
     {
         _projectsDriver.AddBindingClass(content);
-    }
-
-    //TODO: Consider moving this to the TestProjectGenerator as a driver method
-    public void CheckAreStepsExecutedInOrder(IEnumerable<string> methodNames)
-    {
-        _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
-
-        var pathToLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-        var lines = File.ReadAllLines(pathToLogFile);
-        var methodNameLines = methodNames.Select(m => $"-> step: {m}");
-        lines.Should().ContainInOrder(methodNameLines);
     }
 }

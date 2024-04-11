@@ -12,6 +12,7 @@ namespace Reqnroll.TestProjectGenerator
         public string CompiledAssemblyPath { get; set; }
         public string PathToSolutionDirectory => Path.GetDirectoryName(PathToSolutionFile);
         public string TestAssemblyFileName { get; set; }
+        public string LogFilePath => Path.Combine(PathToSolutionDirectory, "steps.log");
 
         public string PathToSolutionFile
         {
