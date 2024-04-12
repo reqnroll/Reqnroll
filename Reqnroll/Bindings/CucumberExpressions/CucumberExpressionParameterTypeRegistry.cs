@@ -120,7 +120,8 @@ public class CucumberExpressionParameterTypeRegistry : IParameterTypeRegistry
         {
             yield return new BuiltInCucumberExpressionParameterTypeTransformation(
                 CucumberExpressionParameterType.MatchAllRegex,
-                enumParameterType);
+                enumParameterType,
+                enumParameterType.Type.FullName);
         }
     }
 
