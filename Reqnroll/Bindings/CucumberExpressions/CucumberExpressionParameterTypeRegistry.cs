@@ -129,6 +129,14 @@ public class CucumberExpressionParameterTypeRegistry : IParameterTypeRegistry
     {
         if (_parameterTypesByName.Value.TryGetValue(name, out var parameterType))
             return parameterType;
+        //enum keys contain the Fullname of the type, try matching on the short name:
+        var matchingEnums = _parameterTypesByName.Value.Where(kvp => kvp.Key.EndsWith(name) && kvp.Value.ParameterType.IsEnum).ToArray();
+        if (matchingEnums.Length == 0) { return null; }
+        if (matchingEnums.Length == 1) { return matchingEnums[0].Value; }
+        if (matchingEnums.Length > 1)
+        {
+            throw new ApplicationException($"Ambigous Enum Parameters share the same short name '{name}'. Use the Enum's FullName in the Cucumber Expression.");
+        }
         return null;
     }
 
