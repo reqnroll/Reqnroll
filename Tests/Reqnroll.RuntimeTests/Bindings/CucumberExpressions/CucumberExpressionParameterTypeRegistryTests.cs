@@ -42,9 +42,9 @@ namespace Reqnroll.RuntimeTests.Bindings.CucumberExpressions {
         public void Should_not_error_on_multiple_enums_of_the_same_name()
         {
             var sut = CreateSut();
-            Reqnroll.Bindings.Reflection.IBindingMethod enumUsingBindingMethod1 = new RuntimeBindingMethod(typeof(SampleEnumUsingClass).GetMethod("MethodUsingSampleColorEnum1"));
+            Reqnroll.Bindings.Reflection.IBindingMethod enumUsingBindingMethod1 = new RuntimeBindingMethod(typeof(SampleEnumUsingClass).GetMethod(nameof(SampleEnumUsingClass.MethodUsingSampleColorEnum1)));
             sut.OnBindingMethodProcessed(enumUsingBindingMethod1);
-            Reqnroll.Bindings.Reflection.IBindingMethod enumUsingBindingMethod2 = new RuntimeBindingMethod(typeof(CucumberAddtionalExpressions.EnumCucumberExpressions).GetMethod("MethodUsingSampleColorEnum2"));
+            Reqnroll.Bindings.Reflection.IBindingMethod enumUsingBindingMethod2 = new RuntimeBindingMethod(typeof(CucumberAddtionalExpressions.EnumCucumberExpressions).GetMethod(nameof(CucumberAddtionalExpressions.EnumCucumberExpressions.MethodUsingSampleColorEnum2)));
             sut.OnBindingMethodProcessed(enumUsingBindingMethod2);
             var paramTypes = sut.GetParameterTypes().Where(pt => pt.ParameterType.IsEnum).ToList();
                 
