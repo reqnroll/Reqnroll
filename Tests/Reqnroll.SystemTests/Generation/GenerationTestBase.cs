@@ -234,8 +234,62 @@ public abstract class GenerationTestBase : SystemTestBase
     }
     #endregion
 
-    //TODO: test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)
+    #region Test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)
+
+    [TestMethod]
+    public void Scenario_outline_examples_gather_tags_and_parameters()
+    {
+        AddFeatureFile(
+            """
+            @feature_tag
+            Feature: Sample Feature
+
+            @rule_tag
+            Rule: Sample Rule
+            
+            @so1_tag
+            Scenario Outline: SO1
+            When <what1> happens to <person>
+            Examples:
+                | what1     | person |
+                | something | me     |
+                | nothing   | you    |
+            
+            @so2_tag
+            Scenario Outline: SO2
+            When <what2> happens to <person>
+            Examples:
+                | what2     | person |
+                | something | me     |
+            @e3_tag
+            Examples: E3
+                | what2   | person |
+                | nothing | you    |
+            """);
+        _projectsDriver.AddStepBinding("StepDefinition", regex: ".*",
+            """
+            global::Log.LogCustom("tags", string.Join(",", _scenarioContext.ScenarioInfo.CombinedTags));
+            global::Log.LogCustom("parameters", string.Join(",", _scenarioContext.ScenarioInfo.Arguments.OfType<System.Collections.DictionaryEntry>().Select(kv => $"{kv.Key}={kv.Value}")));
+            """);
+
+        ExecuteTests();
+
+        ShouldAllScenariosPass(4);
+
+        _bindingDriver.GetActualLogLines("tags").Should().BeEquivalentTo(
+            "-> tags: so1_tag,feature_tag,rule_tag:StepBinding",
+            "-> tags: so1_tag,feature_tag,rule_tag:StepBinding",
+            "-> tags: so2_tag,feature_tag,rule_tag:StepBinding",
+            "-> tags: so2_tag,e3_tag,feature_tag,rule_tag:StepBinding");
+
+        _bindingDriver.GetActualLogLines("parameters").Should().BeEquivalentTo(
+            "-> parameters: what1=something,person=me:StepBinding",
+            "-> parameters: what1=nothing,person=you:StepBinding",
+            "-> parameters: what2=something,person=me:StepBinding",
+            "-> parameters: what2=nothing,person=you:StepBinding");
+    }
+
+    #endregion
+
     //TODO: test parallel execution (details TBD) - maybe this should be in a separate test class
-
-
 }

@@ -85,6 +85,14 @@ namespace Reqnroll.TestProjectGenerator.Driver
             return regex.Matches(content).Count == 1;
         }
 
+        public IEnumerable<string> GetActualLogLines(string category)
+        {
+            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+
+            var lines = File.ReadAllLines(_testProjectFolders.LogFilePath);
+            return lines.Where(l => l.StartsWith($"-> {category}:"));
+        }
+
         public void CheckIsNotHookExecuted(string methodName, int timesExecuted)
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
@@ -97,13 +105,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             regex.Matches(content).Count.Should().NotBe(timesExecuted);
         }
 
-        private IEnumerable<string> GetActualHookLines()
-        {
-            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
-
-            var lines = File.ReadAllLines(_testProjectFolders.LogFilePath);
-            return lines.Where(l => l.StartsWith("-> hook:"));
-        }
+        private IEnumerable<string> GetActualHookLines() => GetActualLogLines("hook");
 
         public void AssertHooksExecutedInOrder(params string[] methodNames)
         {
@@ -121,13 +123,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             hookLines.Should().Equal(methodNameLines);
         }
 
-        private IEnumerable<string> GetActualStepLines()
-        {
-            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
-
-            var lines = File.ReadAllLines(_testProjectFolders.LogFilePath);
-            return lines.Where(l => l.StartsWith("-> step:"));
-        }
+        private IEnumerable<string> GetActualStepLines() => GetActualLogLines("step");
 
         public void AssertStepsExecutedInOrder(params string[] methodNames)
         {
