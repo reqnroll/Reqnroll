@@ -23,9 +23,10 @@ public abstract class SystemTestBase
     protected TestRunConfiguration _testRunConfiguration = null!;
     protected CurrentVersionDriver _currentVersionDriver = null!;
     protected CompilationDriver _compilationDriver = null!;
+    protected BindingsDriver _bindingDriver = null!;
+    protected TestProjectFolders _testProjectFolders = null!;
 
     protected int _preparedTests = 0;
-    protected TestProjectFolders _testProjectFolders = null!;
 
     public TestContext TestContext { get; set; } = null!;
 
@@ -82,6 +83,7 @@ public abstract class SystemTestBase
         _vsTestExecutionDriver = _testContainer.GetService<VSTestExecutionDriver>();
         _compilationDriver = _testContainer.GetService<CompilationDriver>();
         _testProjectFolders = _testContainer.GetService<TestProjectFolders>();
+        _bindingDriver = _testContainer.GetService<BindingsDriver>();
     }
 
 

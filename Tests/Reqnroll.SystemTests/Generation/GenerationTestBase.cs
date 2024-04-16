@@ -1,7 +1,5 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Reqnroll.TestProjectGenerator.Driver;
-using Microsoft.Extensions.DependencyInjection;
 using FluentAssertions;
 
 namespace Reqnroll.SystemTests.Generation;
@@ -9,14 +7,6 @@ namespace Reqnroll.SystemTests.Generation;
 [TestCategory("Generation")]
 public abstract class GenerationTestBase : SystemTestBase
 {
-    private BindingsDriver _bindingDriver = null!;
-
-    protected override void TestInitialize()
-    {
-        base.TestInitialize();
-        _bindingDriver = _testContainer.GetService<BindingsDriver>();
-    }
-
     [TestMethod]
     public void GeneratorAllIn_sample_can_be_handled()
     {

@@ -1,6 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.TestProjectGenerator.Driver;
-using System.Runtime.InteropServices;
 
 namespace Reqnroll.SystemTests.Portability;
 
@@ -40,7 +39,21 @@ public abstract class PortabilityTestBase : SystemTestBase
         _compilationDriver.CompileSolution();
     }
 
-    //TODO: test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
-    //TODO: test async steps (async steps are executed in order)
-    //TODO: test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
+    #region Test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
+    [TestMethod]
+    public void TestRun_hooks_are_executed()
+    {
+        AddSimpleScenario();
+        AddPassingStepBinding();
+        AddHookBinding("BeforeTestRun");
+        AddHookBinding("AfterTestRun");
+
+        ExecuteTests();
+
+        _bindingDriver.AssertExecutedHooksEqual(
+            "BeforeTestRun",
+            "AfterTestRun");
+        ShouldAllScenariosPass();
+    }
+    #endregion
 }
