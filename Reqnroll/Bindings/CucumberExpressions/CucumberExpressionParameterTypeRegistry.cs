@@ -130,12 +130,12 @@ public class CucumberExpressionParameterTypeRegistry : IParameterTypeRegistry
         if (_parameterTypesByName.Value.TryGetValue(name, out var parameterType))
             return parameterType;
         //enum keys contain the Fullname of the type, try matching on the short name:
-        var matchingEnums = _parameterTypesByName.Value.Where(kvp => kvp.Key.EndsWith("." + name) && kvp.Value.ParameterType.IsEnum).ToArray();
+        var matchingEnums = _parameterTypesByName.Value.Where(kvp => kvp.Value.ParameterType.IsEnum && (kvp.Key.EndsWith("." + name) || kvp.Key.EndsWith("+" + name))).ToArray();
         if (matchingEnums.Length == 0) { return null; }
         if (matchingEnums.Length == 1) { return matchingEnums[0].Value; }
         if (matchingEnums.Length > 1)
         {
-            throw new ReqnrollException($"Ambiguous Enum Parameters share the same short name '{name}'. Use the Enum's FullName in the Cucumber Expression or define a [StepArgumentTransformation] with the chosen type and the short name.");
+            throw new ReqnrollException($"Ambiguous enum in cucumber expression. Multiple enums share the same short name '{name}'. Use the enum's full name in the cucumber expression or define a [StepArgumentTransformation] with the chosen type and the short name.");
         }
         return null;
     }
