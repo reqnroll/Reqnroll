@@ -32,7 +32,7 @@ namespace Reqnroll.TestProjectGenerator
         public string Id { get; set; }
         public string Outcome { get; set; }
         public string StdOut { get; set; }
-        public string Title { get; set; }
+        public string TestName { get; set; }
         public string Feature { get; set; }
         public int ScheduleOrder { get; set; }
         public List<TestStepResult> Steps { get; set; }

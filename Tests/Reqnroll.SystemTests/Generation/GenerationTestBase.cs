@@ -1,20 +1,20 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.TestProjectGenerator.Driver;
 using Microsoft.Extensions.DependencyInjection;
+using FluentAssertions;
 
 namespace Reqnroll.SystemTests.Generation;
 
 [TestCategory("Generation")]
-public class GenerationTestBase : SystemTestBase
+public abstract class GenerationTestBase : SystemTestBase
 {
     private BindingsDriver _bindingDriver = null!;
-    private ConfigurationFileDriver _configFileDriver = null!;
 
     protected override void TestInitialize()
     {
         base.TestInitialize();
         _bindingDriver = _testContainer.GetService<BindingsDriver>();
-        _configFileDriver = _testContainer.GetService<ConfigurationFileDriver>();
     }
 
     [TestMethod]
@@ -48,65 +48,114 @@ public class GenerationTestBase : SystemTestBase
     }
 
     //test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
-    [TestMethod]
-    public void Failing_scenarios_are_counted_as_failures()
-    {
-        AddSimpleScenarioAndOutline();
-        AddFailingStepBinding();
+    protected virtual string GetExpectedPendingOutcome() => "NotExecuted";
+    protected virtual string GetExpectedUndefinedOutcome() => "NotExecuted";
+    protected virtual string GetExpectedIgnoredOutcome() => "NotExecuted";
 
-        ExecuteTests();
-
-        ShouldAllScenariosFail();
-    }
 
     [TestMethod]
-    public void Pending_scenarios_are_counted_as_pending()
+    public void Handles_different_scenario_and_scenario_outline_outcomes()
     {
-        AddSimpleScenarioAndOutline();
-        AddPendingStepBinding();
-
-        ExecuteTests();
-
-        ShouldAllScenariosPend();
-    }
-
-    [TestMethod]
-    public void Ignored_scenarios_are_counted_as_ignored()
-    {
-        AddScenario(
+        AddFeatureFile(
             """
+            Feature: Sample Feature
+            
+            Scenario: Passing scenario
+            When the step passes        
+
+            Scenario: Failing scenario
+            When the step fails        
+
+            Scenario: Pending scenario
+            When the step is pending        
+
+            Scenario: Undefined scenario
+            When the step is undefined        
+
             @ignore
-            Scenario: Sample Scenario
-                When something happens
-            """);
-        AddScenario(
-            """
-            @ignore
-            Scenario Outline: Scenario outline with examples
-                When something happens to <person>
+            Scenario: Ignored scenario
+            When the step fails        
+
+            Scenario Outline: SO
+            When the step <result>
             Examples:
-            	| person |
-            	| me     |
-            	| you    |
+                | result       |
+                | passes       |
+                | fails        |
+                | is pending   |
+                | is undefined |
+            @ignore
+            Examples:
+                | result       |
+                | ignored      |
+                
+            @ignore
+            Scenario Outline: ExampleIgnored
+            When the step <result>
+            Examples:
+                | result |
+                | fails  |
             """);
-
-        AddPassingStepBinding();
-        _configFileDriver.SetIsRowTestsAllowed(false); //This is necessary as MSTest and Xunit count the number of physical Test methods.
+        _projectsDriver.AddPassingStepBinding(stepRegex: "the step passes");
+        _projectsDriver.AddFailingStepBinding(stepRegex: "the step fails");
+        _projectsDriver.AddStepBinding("StepDefinition", regex: "the step is pending", "throw new PendingStepException();");
         ExecuteTests();
 
-        ShouldAllScenariosBeIgnored();
+        // handles PASSED
+        var expectedPassedOutcome = "Passed";
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("Passing"))
+                              .Which.Outcome.Should().Be(expectedPassedOutcome);
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+            .Should().ContainSingle(tr => tr.TestName.StartsWith("SO") && tr.TestName.Contains("passes"))
+            .Which.Outcome.Should().Be(expectedPassedOutcome);
+
+        // handles FAILED
+        var expectedFailedOutcome = "Failed";
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("Failing"))
+                              .Which.Outcome.Should().Be(expectedFailedOutcome);
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+            .Should().ContainSingle(tr => tr.TestName.StartsWith("SO") && tr.TestName.Contains("fails"))
+            .Which.Outcome.Should().Be(expectedFailedOutcome);
+
+        // handles PENDING
+        var expectedPendingOutcome = GetExpectedPendingOutcome();
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("Pending"))
+                              .Which.Outcome.Should().Be(expectedPendingOutcome);
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+            .Should().ContainSingle(tr => tr.TestName.StartsWith("SO") && tr.TestName.Contains("pending"))
+            .Which.Outcome.Should().Be(expectedPendingOutcome);
+
+        // handles UNDEFINED
+        var expectedUndefinedOutcome = GetExpectedUndefinedOutcome();
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("Undefined"))
+                              .Which.Outcome.Should().Be(expectedUndefinedOutcome);
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+            .Should().ContainSingle(tr => tr.TestName.StartsWith("SO") && tr.TestName.Contains("undefined"))
+            .Which.Outcome.Should().Be(expectedUndefinedOutcome);
+
+        // handles IGNORED
+        var expectedIgnoredOutcome = GetExpectedIgnoredOutcome();
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("Ignored"))
+                              .Which.Outcome.Should().Be(expectedIgnoredOutcome);
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("ExampleIgnored"))
+                              .Which.Outcome.Should().Be(expectedIgnoredOutcome);
+        AssertIgnoredScenarioOutlineExampleHandled();
     }
 
-    [TestMethod]
-    public void Undefined_scenarios_are_not_executed()
+    protected virtual void AssertIgnoredScenarioOutlineExampleHandled()
     {
-        AddSimpleScenarioAndOutline();
+        // the scenario outline examples ignored by a tag on the examples block are not generated
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().NotContain(tr => tr.TestName.StartsWith("SO") && tr.TestName.Contains("ignored"))
+                              .And.Subject.Where(tr => tr.TestName.StartsWith("SO")).Should().HaveCount(4);
 
-        ExecuteTests();
-
-        ShouldAllUndefinedScenariosNotBeExecuted();
     }
-
 
     //test async steps (async steps are executed in order)
     [TestMethod]

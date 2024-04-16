@@ -16,4 +16,7 @@ public class XUnitGenerationTest : GenerationTestBase
         base.TestInitialize();
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.xUnit;
     }
+
+    protected override string GetExpectedPendingOutcome() => "Failed";
+    protected override string GetExpectedUndefinedOutcome() => "Failed";
 }

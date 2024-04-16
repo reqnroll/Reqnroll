@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentAssertions;
@@ -27,7 +25,7 @@ public abstract class SystemTestBase
     protected CompilationDriver _compilationDriver = null!;
 
     protected int _preparedTests = 0;
-    private TestProjectFolders _testProjectFolders = null!;
+    protected TestProjectFolders _testProjectFolders = null!;
 
     public TestContext TestContext { get; set; } = null!;
 
@@ -218,38 +216,6 @@ public abstract class SystemTestBase
         _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
     }
 
-    protected void ShouldAllScenariosFail(int? expectedNrOfTestsSpec = null)
-    {
-        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
-        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(expectedNrOfTests, "all tests should fail");
-    }
-
-    protected void ShouldAllScenariosPend(int? expectedNrOfTestsSpec = null)
-    {
-        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
-        _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(expectedNrOfTests, "all tests should Pend");
-    }
-
-    protected void ShouldAllScenariosBeIgnored(int? expectedNrOfTestsSpec = null)
-    {
-        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
-        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(expectedNrOfTests, "all tests should be Ignored");
-    }
-
-    protected void ShouldAllUndefinedScenariosNotBeExecuted(int? expectedNrOfTestsSpec = null)
-    {
-        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
-        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(0, "none of the tests should pass");
-        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(0, "none of the tests should fail");
-
-        // MSTest treats tests with undefined steps as Ignored, the other two frameworks treat them as Pending
-        int pendingExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? 0 : expectedNrOfTests;
-        _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(pendingExpected, "All of the tests should Pend");
-
-        int ignoredExpected = _testRunConfiguration.UnitTestProvider == UnitTestProvider.MSTest ? expectedNrOfTests : 0;
-        _vsTestExecutionDriver.LastTestExecutionResult.Ignored.Should().Be(ignoredExpected, "None of the tests should be Ignored");
-    }
-
     protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)
     {
         if (expectedNrOfTestsSpec == null && _preparedTests == 0)
@@ -269,16 +235,6 @@ public abstract class SystemTestBase
     protected void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
     {
         _projectsDriver.AddPassingStepBinding(scenarioBlock, stepRegex);
-    }
-
-    protected void AddFailingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
-    {
-        _projectsDriver.AddFailingStepBinding(scenarioBlock, stepRegex);
-    }
-
-    protected void AddPendingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
-    {
-        _projectsDriver.AddStepBinding(scenarioBlock, stepRegex, "throw new PendingStepException();", "ScenarioContext.Current.Pending()");
     }
 
     protected void AddBindingClass(string content)

@@ -102,7 +102,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             }
         }
 
-        public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode)
+        public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode = null)
         {
             _solutionDriver.DefaultProject.AddStepBinding(attributeName, regex, csharpcode, vbnetcode);
         }

@@ -1,3 +1,4 @@
+using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.TestProjectGenerator;
 
@@ -15,5 +16,12 @@ public class NUnitGenerationTest : GenerationTestBase
     {
         base.TestInitialize();
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.NUnit3;
+    }
+
+    protected override void AssertIgnoredScenarioOutlineExampleHandled()
+    {
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("SO") && tr.TestName.Contains("ignored"))
+                              .Which.Outcome.Should().Be(GetExpectedIgnoredOutcome());
     }
 }
