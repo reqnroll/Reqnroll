@@ -47,11 +47,10 @@ public abstract class GenerationTestBase : SystemTestBase
         ShouldAllScenariosPass();
     }
 
-    //test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
+    #region Test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
     protected virtual string GetExpectedPendingOutcome() => "NotExecuted";
     protected virtual string GetExpectedUndefinedOutcome() => "NotExecuted";
     protected virtual string GetExpectedIgnoredOutcome() => "NotExecuted";
-
 
     [TestMethod]
     public void Handles_different_scenario_and_scenario_outline_outcomes()
@@ -98,7 +97,7 @@ public abstract class GenerationTestBase : SystemTestBase
             """);
         _projectsDriver.AddPassingStepBinding(stepRegex: "the step passes");
         _projectsDriver.AddFailingStepBinding(stepRegex: "the step fails");
-        _projectsDriver.AddStepBinding("StepDefinition", regex: "the step is pending", "throw new PendingStepException();");
+        _projectsDriver.AddStepBinding("StepDefinition", regex: "the step is pending", "throw new PendingStepException();", "Throw New PendingStepException()");
         ExecuteTests();
 
         // handles PASSED
@@ -156,19 +155,18 @@ public abstract class GenerationTestBase : SystemTestBase
                               .And.Subject.Where(tr => tr.TestName.StartsWith("SO")).Should().HaveCount(4);
 
     }
+    #endregion
 
-    //test async steps (async steps are executed in order)
+    #region Test async steps (async steps are executed in order)
     [TestMethod]
     public void Async_steps_are_executed_in_order()
     {
         AddScenario(
             """
             Scenario: Async Scenario Steps
-                Given a list to hold step numbers
-                When Async Step '1' is called
-                When Async Step '2' is called
-                When Async Step '3' is called
-                Then async step order should be '1,2,3'
+                When Async step 1 is called
+                When Async step 2 is called
+                When Async step 3 is called
             """);
 
         AddBindingClass(
@@ -178,44 +176,33 @@ public abstract class GenerationTestBase : SystemTestBase
                 [Binding]
                 public class AsyncSequenceStepDefinitions
                 {
-                    private ScenarioContext _scenarioContext;
-            
-                    public AsyncSequenceStepDefinitions(ScenarioContext scenarioContext)
-                    {
-                        _scenarioContext = scenarioContext;
-                    }
-                    
-                    [Given("a list to hold step numbers")]
-                    public async Task GivenAPlaceholder()
+                    [When("Async step 1 is called")]
+                    public async Task WhenStep1IsTaken()
                     {
                         await Task.Run(() => global::Log.LogStep() );
                     }
-            
-                    [When("Async Step {string} is called")]
-                    public async Task WhenStepIsTaken(string p0)
+                    [When("Async step 2 is called")]
+                    public async Task WhenStep2IsTaken()
                     {
                         await Task.Run(() => global::Log.LogStep() );
                     }
-            
-                    [Then("async step order should be {string}")]
-                    public async Task ThenStepSequenceIs(string p0)
+                    [When("Async step 3 is called")]
+                    public async Task WhenStep3IsTaken()
                     {
-                        await Task.Run(() =>
-                        {
-                            global::Log.LogStep();
-                        });
+                        await Task.Run(() => global::Log.LogStep() );
                     }
                 }
             }
             """);
 
         ExecuteTests();
-        _bindingDriver.AssertStepsExecutedInOrder(new[] { "GivenAPlaceholder", "WhenStepIsTaken", "ThenStepSequenceIs" });
+        _bindingDriver.AssertExecutedStepsEqual("WhenStep1IsTaken", "WhenStep2IsTaken", "WhenStep3IsTaken");
 
         ShouldAllScenariosPass();
     }
+    #endregion
 
-    //test hooks: before/after run, feature & scenario hook (require special handling by test frameworks)
+    #region Test hooks: before/after run, feature & scenario hook (require special handling by test frameworks)
     [TestMethod]
     public void TestRun_Feature_and_Scenario_hooks_are_executed_in_right_order()
     {
@@ -232,21 +219,20 @@ public abstract class GenerationTestBase : SystemTestBase
 
         ExecuteTests();
 
-        _bindingDriver.AssertExecutedHooksEqual(new[]
-        {
-            "BeforeTestRun", 
-            "BeforeFeature", 
-            "BeforeScenario", 
-            "AfterScenario", 
-            "BeforeScenario", 
-            "AfterScenario", 
-            "BeforeScenario", 
-            "AfterScenario", 
-            "AfterFeature", 
-            "AfterTestRun"
-        });
+        _bindingDriver.AssertExecutedHooksEqual(
+            "BeforeTestRun",
+            "BeforeFeature",
+            "BeforeScenario",
+            "AfterScenario",
+            "BeforeScenario",
+            "AfterScenario",
+            "BeforeScenario",
+            "AfterScenario",
+            "AfterFeature",
+            "AfterTestRun");
         ShouldAllScenariosPass();
     }
+    #endregion
 
     //TODO: test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)
     //TODO: test parallel execution (details TBD) - maybe this should be in a separate test class

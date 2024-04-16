@@ -72,7 +72,7 @@ namespace Reqnroll.Specs.StepDefinitions
         [Then(@"the hooks are executed in the order")]
         public void ThenTheHooksAreExecutedInTheOrder(Table table)
         {
-            _bindingsDriver.AssertHooksExecutedInOrder(table.Rows.Select(r => r[0]));
+            _bindingsDriver.AssertHooksExecutedInOrder(table.Rows.Select(r => r[0]).ToArray());
         }
 
         [Then(@"the execution log should contain text '(.*)'")]

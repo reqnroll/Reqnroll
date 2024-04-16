@@ -105,7 +105,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             return lines.Where(l => l.StartsWith("-> hook:"));
         }
 
-        public void AssertHooksExecutedInOrder(IEnumerable<string> methodNames)
+        public void AssertHooksExecutedInOrder(params string[] methodNames)
         {
             var hookLines = GetActualHookLines();
 
@@ -113,7 +113,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             hookLines.Should().ContainInOrder(methodNameLines);
         }
 
-        public void AssertExecutedHooksEqual(IEnumerable<string> methodNames)
+        public void AssertExecutedHooksEqual(params string[] methodNames)
         {
             var hookLines = GetActualHookLines();
 
@@ -129,7 +129,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             return lines.Where(l => l.StartsWith("-> step:"));
         }
 
-        public void AssertStepsExecutedInOrder(IEnumerable<string> methodNames)
+        public void AssertStepsExecutedInOrder(params string[] methodNames)
         {
             var stepLines = GetActualStepLines();
 
@@ -137,7 +137,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             stepLines.Should().ContainInOrder(methodNameLines);
         }
 
-        public void AssertExecutedStepsEqual(IEnumerable<string> methodNames)
+        public void AssertExecutedStepsEqual(params string[] methodNames)
         {
             var stepLines = GetActualStepLines();
 
