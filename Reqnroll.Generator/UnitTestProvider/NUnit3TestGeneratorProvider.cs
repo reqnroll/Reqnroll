@@ -140,7 +140,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             }
 
             if (isIgnored)
-                args.Add(new CodeAttributeArgument("Ignored", new CodePrimitiveExpression(true)));
+                args.Add(new CodeAttributeArgument("IgnoreReason", new CodePrimitiveExpression("Ignored by @ignore tag")));
 
             CodeDomHelper.AddAttribute(testMethod, ROW_ATTR, args.ToArray());
         }
