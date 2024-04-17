@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Reqnroll;
 
-namespace Specs.StepDefinitions
+namespace Reqnroll.ExternalData.ReqnrollPlugin.IntegrationTest.StepDefinitions
 {
     [Binding]
     public class PricingStepDefinitions

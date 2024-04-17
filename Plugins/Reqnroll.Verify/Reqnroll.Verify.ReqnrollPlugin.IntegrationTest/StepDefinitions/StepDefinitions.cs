@@ -1,9 +1,7 @@
-using Reqnroll;
-
-namespace Reqnroll.Verify.ReqnrollPlugin.IntegrationTest.Steps;
+namespace Reqnroll.Verify.ReqnrollPlugin.IntegrationTest.StepDefinitions;
 
 [Binding]
-internal class Steps
+internal class StepDefinitions
 {
     [When("I try Verify with Reqnroll")]
     public async Task ITryVerifyWithReqnroll()

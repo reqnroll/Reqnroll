@@ -1,10 +1,12 @@
-<Project>
+﻿<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="..\..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.props" />
+  <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
+    <!-- we have to set the root namespace to avoid generation error -->
+    <RootNamespace>XReqnroll.ExternalData.ReqnrollPlugin.IntegrationTest</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
-    <ProjectReference Include="..\..\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
@@ -27,19 +29,19 @@
   </PropertyGroup>
 
   <Target Name="PreBuild">
-    <MSBuild Projects="..\..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
-    <MSBuild Projects="..\..\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
+    <MSBuild Projects="..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
+    <MSBuild Projects="..\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
   </Target>
 
   <ItemGroup>
-    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Reqnroll.ExternalData.ReqnrollPlugin\bin\$(Configuration)\$(_Reqnroll_Needed_MSBuildGenerator)\Reqnroll.ExternalData.ReqnrollPlugin.dll" />
+    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\Reqnroll.ExternalData.ReqnrollPlugin\bin\$(Configuration)\$(_Reqnroll_Needed_MSBuildGenerator)\Reqnroll.ExternalData.ReqnrollPlugin.dll" />
   </ItemGroup>
 
   <PropertyGroup>
     <_Reqnroll_TaskAssembly>..\..\Reqnroll.Tools.MsBuild.Generation\bin\$(Configuration)\$(_Reqnroll_Needed_MSBuildGenerator)\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
   </PropertyGroup>
 
-  <Import Project="..\..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
+  <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
   <!-- has to be before the PropertyGroup change-->
   <PropertyGroup>
     <BuildDependsOn>

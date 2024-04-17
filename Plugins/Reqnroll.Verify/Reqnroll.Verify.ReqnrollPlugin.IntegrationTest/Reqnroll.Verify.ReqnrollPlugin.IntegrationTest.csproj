@@ -4,7 +4,7 @@
   <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.props" />
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>true</ImplicitUsings>
   </PropertyGroup>
 
@@ -47,7 +47,6 @@
 
   <ItemGroup>
     <Folder Include="Features\" />
-    <Folder Include="StepDefinitions\" />
   </ItemGroup>
 
   <PropertyGroup>
