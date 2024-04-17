@@ -69,7 +69,9 @@ namespace Reqnroll.TestProjectGenerator
             set => _packageFolder = value;
         }
 
-        public string SystemGlobalNuGetPackages => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
+        public string SystemGlobalNuGetPackages => 
+            Environment.GetEnvironmentVariable("NUGET_PACKAGES") ?? 
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".nuget", "packages");
 
         public string Reqnroll
         {
@@ -77,7 +79,7 @@ namespace Reqnroll.TestProjectGenerator
             set => _reqnroll = value;
         }
 
-        public virtual string FolderToSaveGeneratedSolutions => Path.Combine(Path.GetTempPath(), _configurationDriver.TestProjectFolderName);
+        public virtual string FolderToSaveGeneratedSolutions => Path.Combine(_configurationDriver.TempFolderPath, _configurationDriver.TestProjectFolderName);
 
         public virtual string RunUniqueFolderToSaveGeneratedSolutions => Path.Combine(FolderToSaveGeneratedSolutions, _artifactNamingConvention.GetRunName(UniqueRunId));
         public virtual string GlobalNuGetPackages => _configurationDriver.PipelineMode ? SystemGlobalNuGetPackages : _configurationDriver.GlobalNuGetPackages ?? Path.Combine(RunUniqueFolderToSaveGeneratedSolutions, ".nuget");

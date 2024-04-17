@@ -1,10 +1,12 @@
 using System;
 using System.Configuration;
+using System.IO;
 
 namespace Reqnroll.TestProjectGenerator;
 
 public class ConfigurationDriver
 {
+    public string TempFolderPath => GetConfigSetting("tempFolder", Path.GetTempPath());
     public string TestProjectFolderName => GetConfigSetting("testProjectFolder", "RR");
     public string VSTestPath => GetConfigSetting("vstestPath", "Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow");
     public string MsBuildPath => GetConfigSetting(nameof(MsBuildPath));
