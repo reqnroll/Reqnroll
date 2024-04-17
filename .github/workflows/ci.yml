@@ -160,96 +160,22 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
-    - name: Set .NET 6 SDK
-      run: dotnet new globaljson --sdk-version 6.0.418
-    - name: xUnit Specs
+    - name: Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=xUnit&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-xunit-results.trx"
-    - name: Publish xUnit Test Results
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} --filter "Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-results.trx"
+    - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
       with:
-        check_name: xUnit Specs
-        files: "**/specs-xunit-results.trx"
+        check_name: Specs
+        files: "**/specs-results.trx"
         comment_mode: off
     - name: Upload TRX files
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: specs-xunit-trx
-        path: "**/specs-xunit-results.trx"
-  
-  specs-nunit:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: | 
-          6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
-    - name: Set .NET 6 SDK
-      run: dotnet new globaljson --sdk-version 6.0.418
-    - name: NUnit Specs
-      shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=NUnit3&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-nunit-results.trx"
-    - name: Publish NUnit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        check_name: NUnit Specs
-        files: "**/specs-nunit-results.trx"
-        comment_mode: off
-    - name: Upload TRX files
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: specs-nunit-trx
-        path: "**/specs-nunit-results.trx"
-  
-  specs-mstest:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: | 
-          6.0.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
-    - name: Set .NET 6 SDK
-      run: dotnet new globaljson --sdk-version 6.0.418
-    - name: MsTest Specs
-      shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} -f net6.0 --filter "Category=MsTest&Category=Net60&Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-mstest-results.trx"
-    - name: Publish MSTest Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        check_name: MSTest Specs
-        files: "**/specs-mstest-results.trx"
-        comment_mode: off
-    - name: Upload TRX files
-      uses: actions/upload-artifact@v4
-      if: always()
-      with:
-        name: specs-mstest-trx
-        path: "**/specs-mstest-results.trx"
+        name: specs-trx
+        path: "**/specs-results.trx"
 
   system-tests-windows:
     runs-on: windows-latest
