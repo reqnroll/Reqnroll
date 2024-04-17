@@ -6,7 +6,7 @@ using Reqnroll.ExternalData.ReqnrollPlugin.Transformation;
 using Reqnroll.Parser;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
+namespace Reqnroll.PluginTests.ExternalData
 {
     public class ScenarioTransformationTests
     {

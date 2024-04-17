@@ -1,10 +1,11 @@
 using System;
 using Reqnroll.BoDi;
+using Reqnroll.ExternalData.ReqnrollPlugin;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.Loaders;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
+namespace Reqnroll.PluginTests.ExternalData
 {
     public class DataSourceLoaderFactoryTests
     {

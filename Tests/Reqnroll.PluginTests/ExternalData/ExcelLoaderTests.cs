@@ -5,11 +5,11 @@ using System.Reflection;
 using Reqnroll.ExternalData.ReqnrollPlugin.Loaders;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
+namespace Reqnroll.PluginTests.ExternalData
 {
     public class ExcelLoaderTests
     {
-        private static readonly string SampleFilesFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "SampleFiles");
+        private static readonly string SampleFilesFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ExternalData", "SampleFiles");
         private readonly string _productsSampleFilePath = Path.Combine(SampleFilesFolder, "products.xlsx");
 
         private ExcelLoader CreateSut() => new();

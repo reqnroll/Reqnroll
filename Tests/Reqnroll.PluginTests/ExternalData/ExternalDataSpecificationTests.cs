@@ -5,11 +5,11 @@ using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources.Selectors;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
+namespace Reqnroll.PluginTests.ExternalData
 {
     public class ExternalDataSpecificationTests
     {
-        private ReqnrollPlugin.DataSources.DataTable CreateProductDataTable()
+        private Reqnroll.ExternalData.ReqnrollPlugin.DataSources.DataTable CreateProductDataTable()
         {
             return new(new []{ "product", "price", "color"})
             {
@@ -22,7 +22,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
             };
         }
 
-        private ReqnrollPlugin.DataSources.DataTable CreateUserDataTable()
+        private Reqnroll.ExternalData.ReqnrollPlugin.DataSources.DataTable CreateUserDataTable()
         {
             return new(new []{ "name" })
             {

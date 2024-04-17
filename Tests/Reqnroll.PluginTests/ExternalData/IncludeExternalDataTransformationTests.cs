@@ -8,7 +8,7 @@ using Reqnroll.ExternalData.ReqnrollPlugin.Transformation;
 using Reqnroll.Parser;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
+namespace Reqnroll.PluginTests.ExternalData
 {
     public class IncludeExternalDataTransformationTests
     {
@@ -25,7 +25,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
 
         private IncludeExternalDataTransformation CreateSut() => new(_specificationProviderMock.Object);
 
-        private ReqnrollPlugin.DataSources.DataTable CreateProductDataTable()
+        private Reqnroll.ExternalData.ReqnrollPlugin.DataSources.DataTable CreateProductDataTable()
         {
             return new(new []{"product", "price"})
             {

@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Reqnroll.ExternalData.ReqnrollPlugin;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources.Selectors;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.DataSources.Selectors
+namespace Reqnroll.PluginTests.ExternalData.DataSources.Selectors
 {
     public class DataSourceSelectorTests
     {

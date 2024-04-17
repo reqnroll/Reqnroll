@@ -1,12 +1,13 @@
 using System;
 using Gherkin.Ast;
 using Moq;
+using Reqnroll.ExternalData.ReqnrollPlugin;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources.Selectors;
 using Reqnroll.ExternalData.ReqnrollPlugin.Loaders;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
+namespace Reqnroll.PluginTests.ExternalData
 {
     public class SpecificationProviderTests
     {

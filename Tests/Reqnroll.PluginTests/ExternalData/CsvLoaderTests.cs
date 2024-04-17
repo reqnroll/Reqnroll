@@ -1,15 +1,15 @@
 using System;
-using System.Globalization;
 using System.IO;
 using System.Reflection;
+using Reqnroll.ExternalData.ReqnrollPlugin;
 using Reqnroll.ExternalData.ReqnrollPlugin.Loaders;
 using Xunit;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
+namespace Reqnroll.PluginTests.ExternalData
 {
     public class CsvLoaderTests
     {
-        private static readonly string SampleFilesFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "SampleFiles");
+        private static readonly string SampleFilesFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ExternalData", "SampleFiles");
         private string _productsSampleFilePath = Path.Combine(SampleFilesFolder, "products.csv");
 
         private string SampleFeatureFilePathInSampleFileFolder =>
