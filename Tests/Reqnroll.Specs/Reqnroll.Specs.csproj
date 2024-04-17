@@ -4,14 +4,13 @@
   <Import Project="../../Reqnroll.Tools.MsBuild.Generation/build/Reqnroll.Tools.MsBuild.Generation.props" />
 
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_Specs_TFM)</TargetFrameworks>
+    <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Reqnroll.Specs</AssemblyName>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>false</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <PackageId>Reqnroll.Specs</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <Configurations>Debug;Release;Debug-XUnit;Debug-MSTest;Debug-NUnit</Configurations>
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
     <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>true</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
@@ -34,8 +33,8 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj" />
-    <ProjectReference Include="..\Reqnroll.Specs.Generator.ReqnrollPlugin\Reqnroll.Specs.Generator.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,7 +57,7 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Generator_TFM)</_Reqnroll_Needed_MSBuildGenerator>
+    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">net6.0</_Reqnroll_Needed_MSBuildGenerator>
     <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Generator_TFM)</_Reqnroll_Needed_MSBuildGenerator>
   </PropertyGroup>
 
@@ -74,11 +73,11 @@
 
   <Target Name="PreBuild">
     <MSBuild Projects="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
-    <MSBuild Projects="..\Reqnroll.Specs.Generator.ReqnrollPlugin\Reqnroll.Specs.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
+    <MSBuild Projects="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
   </Target>
 
   <ItemGroup>
-    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\Reqnroll.Specs.Generator.ReqnrollPlugin\bin\$(Configuration)\$(_Reqnroll_Needed_MSBuildGenerator)\Reqnroll.Specs.Generator.ReqnrollPlugin.dll" />
+    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\$(_Reqnroll_Needed_MSBuildGenerator)\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
   <PropertyGroup>

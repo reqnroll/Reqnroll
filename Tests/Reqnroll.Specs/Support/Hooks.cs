@@ -1,5 +1,6 @@
 using System;
 using Reqnroll.TestProjectGenerator;
+using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Helpers;
 
 namespace Reqnroll.Specs.Support;
@@ -22,6 +23,16 @@ public class Hooks
     [BeforeScenario]
     public void BeforeScenario()
     {
+        _scenarioContext.ScenarioContainer.RegisterInstanceAs(
+            new TestRunConfiguration
+            {
+                ProgrammingLanguage = TestProjectGenerator.ProgrammingLanguage.CSharp, 
+                ProjectFormat = ProjectFormat.New, 
+                TargetFramework = TargetFramework.Net80, 
+                UnitTestProvider = TestProjectGenerator.UnitTestProvider.MSTest, 
+                ConfigurationFormat = ConfigurationFormat.Json
+            });
+
         _currentVersionDriver.NuGetVersion = NuGetPackageVersion.Version;
         _currentVersionDriver.ReqnrollNuGetVersion = NuGetPackageVersion.Version;
         _scenarioContext.ScenarioContainer.RegisterTypeAs<OutputConnector, IOutputWriter>();
