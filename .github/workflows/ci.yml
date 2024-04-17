@@ -50,6 +50,7 @@ jobs:
       build_params: ${{ steps.versions.outputs.build_params }}
       test_params: ${{ steps.versions.outputs.test_params }}
       specs_filter: ${{ steps.versions.outputs.specs_filter }}
+      gh_logger_settings: ${{ steps.versions.outputs.gh_logger_settings }}
 
     steps:
     - uses: actions/checkout@v4
@@ -115,12 +116,19 @@ jobs:
         }
         Write-Output "main_build_params=$mainBuildParams" >> $env:GITHUB_OUTPUT
         
-
-        $testParams = "--no-build --verbosity normal -c $productConfig"
+        $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
+        $testParams = "--no-build --verbosity normal -c $productConfig --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true"
         Write-Output "test_params=$testParams" >> $env:GITHUB_OUTPUT
         Write-Output "Test Params: $testParams"
+
     - name: Restore dependencies
       run: dotnet restore
+    - name: Install Test Report Dependencies
+      run: | 
+        dotnet add ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj package GitHubActionsTestLogger
+        dotnet add ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj package GitHubActionsTestLogger
+        dotnet add ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj package GitHubActionsTestLogger
+        dotnet add ./Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.csproj package GitHubActionsTestLogger
     - name: Build
       run: dotnet build --no-restore ${{ steps.versions.outputs.main_build_params }}
     - name: Runtime Tests
@@ -158,18 +166,14 @@ jobs:
           6.0.x
     - name: Restore dependencies
       run: dotnet restore
+    - name: Install Test Report Dependencies
+      run: | 
+        dotnet add ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj package GitHubActionsTestLogger
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj ${{ needs.build.outputs.test_params }} --filter "Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-results.trx"
-    - name: Publish Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v2
-      if: always()
-      with:
-        check_name: Specs
-        files: "**/specs-results.trx"
-        comment_mode: off
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --filter "Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-results.trx" ${{ needs.build.outputs.test_params }}
     - name: Upload TRX files
       uses: actions/upload-artifact@v4
       if: always()
@@ -198,9 +202,7 @@ jobs:
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: System Tests
       shell: pwsh
-      run: |
-        $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
-        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --logger "trx;LogFileName=systemtests-windows-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
+      run: dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj --logger "trx;LogFileName=systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
@@ -230,9 +232,7 @@ jobs:
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: System Tests
       shell: pwsh
-      run: |
-        $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
-        dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj ${{ needs.build.outputs.test_params }} --filter "TestCategory!=MsBuild&TestCategory!=Net481" --logger "trx;LogFileName=systemtests-linux-results.trx" --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true
+      run: dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj --filter "TestCategory!=MsBuild&TestCategory!=Net481" --logger "trx;LogFileName=systemtests-linux-results.trx"  ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
