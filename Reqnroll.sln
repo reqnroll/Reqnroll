@@ -78,14 +78,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.PluginTests", "Tes
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.CustomPlugin", "Installer\Reqnroll.CustomPlugin\Reqnroll.CustomPlugin.csproj", "{FA9DFEFA-4F35-4A57-91AE-64C7B5D41EAA}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.MsBuildNetSdk.IntegrationTests", "Tests\Reqnroll.MsBuildNetSdk.IntegrationTests\Reqnroll.MsBuildNetSdk.IntegrationTests.csproj", "{02A08F81-B90F-4EB3-9C30-CE7447DE2012}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AzurePipelines", "AzurePipelines", "{48E162BC-9431-450D-8353-66D396DCB5FE}"
-	ProjectSection(SolutionItems) = preProject
-		azure-pipelines.yml = azure-pipelines.yml
-		build.yml = build.yml
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Autofac.ReqnrollPlugin", "Plugins\Reqnroll.Autofac.ReqnrollPlugin\Reqnroll.Autofac.ReqnrollPlugin.csproj", "{EA16606D-6F1C-4A4D-B7A1-8A08B448CD86}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Templates.DotNet", "Templates\Reqnroll.Templates.DotNet\Reqnroll.Templates.DotNet.csproj", "{B7F589EB-524F-4BAD-9419-6576F6527670}"
@@ -364,18 +356,6 @@ Global
 		{FA9DFEFA-4F35-4A57-91AE-64C7B5D41EAA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FA9DFEFA-4F35-4A57-91AE-64C7B5D41EAA}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
 		{FA9DFEFA-4F35-4A57-91AE-64C7B5D41EAA}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug-MSTest|Any CPU.Build.0 = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug-NUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug-NUnit|Any CPU.Build.0 = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug-XUnit|Any CPU.ActiveCfg = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Debug-XUnit|Any CPU.Build.0 = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.Release|Any CPU.Build.0 = Release|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.VS2010IntegrationTest|Any CPU.ActiveCfg = Debug|Any CPU
-		{02A08F81-B90F-4EB3-9C30-CE7447DE2012}.VS2010IntegrationTest|Any CPU.Build.0 = Debug|Any CPU
 		{EA16606D-6F1C-4A4D-B7A1-8A08B448CD86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EA16606D-6F1C-4A4D-B7A1-8A08B448CD86}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EA16606D-6F1C-4A4D-B7A1-8A08B448CD86}.Debug-MSTest|Any CPU.ActiveCfg = Debug|Any CPU
