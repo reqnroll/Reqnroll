@@ -44,9 +44,10 @@ namespace Reqnroll.Specs.Drivers.Parser
         {
             const string ns1 = "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"";
             const string ns2 = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
-
-            string expected = parsedFeatureXml.Replace("\r", "").Replace(ns1, "").Replace(ns2, "");
-            string got = SerializeDocument(ParsedDocument).Replace("\r", "").Replace(ns1, "").Replace(ns2, "");
+            string Normalize(string value)
+                => value.Replace("\r", "").Replace(@"\r", "").Replace(ns1, "").Replace(ns2, "");
+            string expected = Normalize(parsedFeatureXml);
+            string got = Normalize(SerializeDocument(ParsedDocument));
 
             got.Should().Be(expected);
         }
