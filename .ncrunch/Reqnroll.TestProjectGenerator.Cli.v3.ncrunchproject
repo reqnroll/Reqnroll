@@ -1,7 +1,4 @@
 ﻿<ProjectConfiguration>
   <Settings>
-    <CustomBuildProperties>
-      <Value>TargetFrameworks = net6.0</Value>
-    </CustomBuildProperties>
   </Settings>
 </ProjectConfiguration>
