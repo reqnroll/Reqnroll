@@ -170,7 +170,7 @@ jobs:
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: Specs
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --filter "Category!=requiresMsBuild${{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-results.trx" ${{ needs.build.outputs.test_params }}
+      run: dotnet test ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=specs-results.trx" ${{ needs.build.outputs.test_params }}
     - name: Upload TRX files
       uses: actions/upload-artifact@v4
       if: always()
