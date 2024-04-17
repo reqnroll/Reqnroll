@@ -132,13 +132,13 @@ jobs:
     - name: Build
       run: dotnet build --no-restore ${{ steps.versions.outputs.main_build_params }}
     - name: Runtime Tests
-      run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj ${{ steps.versions.outputs.test_params }}
+      run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj --logger "trx;LogFileName=runtimetests-results.trx" ${{ steps.versions.outputs.test_params }}
     - name: Plugin Tests
-      run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj ${{ steps.versions.outputs.test_params }}
+      run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj --logger "trx;LogFileName=plugintests-results.trx" ${{ steps.versions.outputs.test_params }}
     - name: Generator Tests
-      run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj ${{ steps.versions.outputs.test_params }}
+      run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj --logger "trx;LogFileName=generatortests-results.trx" ${{ steps.versions.outputs.test_params }}
     - name: ExternalData Plugin Tests
-      run: dotnet test ./Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.csproj ${{ steps.versions.outputs.test_params }}
+      run: dotnet test ./Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests/Reqnroll.ExternalData.ReqnrollPlugin.UnitTests.csproj --logger "trx;LogFileName=externaldata-unittests-results.trx" ${{ steps.versions.outputs.test_params }}
     - name: Upload packages
       uses: actions/upload-artifact@v4
       with:
