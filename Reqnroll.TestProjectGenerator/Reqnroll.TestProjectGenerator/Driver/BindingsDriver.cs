@@ -8,15 +8,8 @@ using FluentAssertions;
 
 namespace Reqnroll.TestProjectGenerator.Driver
 {
-    public class HooksDriver
+    public class BindingsDriver(TestProjectFolders _testProjectFolders)
     {
-        private readonly TestProjectFolders _testProjectFolders;
-
-        public HooksDriver(TestProjectFolders testProjectFolders)
-        {
-            _testProjectFolders = testProjectFolders;
-        }
-
         public void CheckIsHookExecuted(string methodName, int expectedTimesExecuted)
         {
             int hookExecutionCount = GetHookExecutionCount(methodName);
@@ -27,13 +20,12 @@ namespace Reqnroll.TestProjectGenerator.Driver
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            string pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            if (!File.Exists(pathToHookLogFile))
+            if (!File.Exists(_testProjectFolders.LogFilePath))
             {
                 return 0;
             }
 
-            string content = File.ReadAllText(pathToHookLogFile);
+            string content = File.ReadAllText(_testProjectFolders.LogFilePath);
             content.Should().NotBeNull();
 
             var regex = new Regex($@"-> hook: {methodName}");
@@ -41,13 +33,15 @@ namespace Reqnroll.TestProjectGenerator.Driver
             return regex.Matches(content).Count;
         }
 
+        private string GetLogFileLockPath() => _testProjectFolders.LogFilePath + ".lock";
+
         public void AcquireHookLock()
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log.lock");
+            var pathToHookLogFile = GetLogFileLockPath();
 
-            Directory.CreateDirectory(Path.GetDirectoryName(pathToHookLogFile));
+            Directory.CreateDirectory(Path.GetDirectoryName(pathToHookLogFile)!);
             using (File.Open(pathToHookLogFile, FileMode.CreateNew))
             {
             }
@@ -56,10 +50,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
         public void ReleaseHookLock()
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
-
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log.lock");
-
-            File.Delete(pathToHookLogFile);
+            File.Delete(GetLogFileLockPath());
         }
 
         public async Task WaitForIsWaitingForHookLockAsync(string methodName)
@@ -81,14 +72,12 @@ namespace Reqnroll.TestProjectGenerator.Driver
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-
-            if (!File.Exists(pathToHookLogFile))
+            if (!File.Exists(_testProjectFolders.LogFilePath))
             {
                 return false;
             }
 
-            var content = File.ReadAllText(pathToHookLogFile);
+            var content = File.ReadAllText(_testProjectFolders.LogFilePath);
             content.Should().NotBeNull();
 
             var regex = new Regex($@"-> waiting for hook lock: {methodName}");
@@ -96,12 +85,19 @@ namespace Reqnroll.TestProjectGenerator.Driver
             return regex.Matches(content).Count == 1;
         }
 
+        public IEnumerable<string> GetActualLogLines(string category)
+        {
+            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+
+            var lines = File.ReadAllLines(_testProjectFolders.LogFilePath);
+            return lines.Where(l => l.StartsWith($"-> {category}:"));
+        }
+
         public void CheckIsNotHookExecuted(string methodName, int timesExecuted)
         {
             _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            var content = File.ReadAllText(pathToHookLogFile);
+            var content = File.ReadAllText(_testProjectFolders.LogFilePath);
             content.Should().NotBeNull();
 
             var regex = new Regex($@"-> hook: {methodName}");
@@ -109,14 +105,40 @@ namespace Reqnroll.TestProjectGenerator.Driver
             regex.Matches(content).Count.Should().NotBe(timesExecuted);
         }
 
-        public void CheckIsHookExecutedInOrder(IEnumerable<string> methodNames)
-        {
-            _testProjectFolders.PathToSolutionDirectory.Should().NotBeNullOrWhiteSpace();
+        private IEnumerable<string> GetActualHookLines() => GetActualLogLines("hook");
 
-            var pathToHookLogFile = Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log");
-            var lines = File.ReadAllLines(pathToHookLogFile);
+        public void AssertHooksExecutedInOrder(params string[] methodNames)
+        {
+            var hookLines = GetActualHookLines();
+
             var methodNameLines = methodNames.Select(m => $"-> hook: {m}");
-            lines.Should().ContainInOrder(methodNameLines);
+            hookLines.Should().ContainInOrder(methodNameLines);
+        }
+
+        public void AssertExecutedHooksEqual(params string[] methodNames)
+        {
+            var hookLines = GetActualHookLines();
+
+            var methodNameLines = methodNames.Select(m => $"-> hook: {m}");
+            hookLines.Should().Equal(methodNameLines);
+        }
+
+        private IEnumerable<string> GetActualStepLines() => GetActualLogLines("step");
+
+        public void AssertStepsExecutedInOrder(params string[] methodNames)
+        {
+            var stepLines = GetActualStepLines();
+
+            var methodNameLines = methodNames.Select(m => $"-> step: {m}");
+            stepLines.Should().ContainInOrder(methodNameLines);
+        }
+
+        public void AssertExecutedStepsEqual(params string[] methodNames)
+        {
+            var stepLines = GetActualStepLines();
+
+            var methodNameLines = methodNames.Select(m => $"-> step: {m}");
+            stepLines.Should().Equal(methodNameLines);
         }
     }
 }

@@ -16,7 +16,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
             return GenerateStepDefinition(method);
         }
 
-        public ProjectFile GenerateLoggingStepDefinition(string methodName, string pathToLogFile, string attributeName, string regex, ParameterType parameterType = ParameterType.Normal, string argumentName = null)
+        public ProjectFile GenerateLoggingStepDefinition(string methodName, string attributeName, string regex, ParameterType parameterType = ParameterType.Normal, string argumentName = null)
         {
             string method = GetLoggingStepDefinitionCode(methodName, attributeName, regex, parameterType, argumentName);
             return GenerateStepDefinition(method);

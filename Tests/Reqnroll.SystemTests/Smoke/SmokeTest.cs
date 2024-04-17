@@ -9,11 +9,7 @@ public class SmokeTest : SystemTestBase
     [TestMethod]
     public void Handles_the_simplest_scenario()
     {
-        AddScenario(
-            """
-            Scenario: Sample Scenario
-                When something happens
-            """);
+        AddSimpleScenario();
         _projectsDriver.AddPassingStepBinding();
 
         ExecuteTests();

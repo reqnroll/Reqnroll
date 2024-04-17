@@ -5,17 +5,17 @@ namespace Reqnroll.TestProjectGenerator.Driver
     public class JsonConfigurationLoaderDriver
     {
         private readonly ProjectsDriver _projectsDriver;
-        private readonly ConfigurationDriver _configurationDriver;
+        private readonly ConfigurationFileDriver _configurationFileDriver;
 
-        public JsonConfigurationLoaderDriver(ProjectsDriver projectsDriver, ConfigurationDriver configurationDriver)
+        public JsonConfigurationLoaderDriver(ProjectsDriver projectsDriver, ConfigurationFileDriver configurationFileDriver)
         {
             _projectsDriver = projectsDriver;
-            _configurationDriver = configurationDriver;
+            _configurationFileDriver = configurationFileDriver;
         }
 
         public void AddReqnrollJson(string reqnrollJson)
         {
-            _configurationDriver.SetConfigurationFormat(ConfigurationFormat.None);
+            _configurationFileDriver.SetConfigurationFormat(ConfigurationFormat.None);
             _projectsDriver.AddFile("reqnroll.json", reqnrollJson);
         }
     }

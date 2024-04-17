@@ -4,11 +4,11 @@ using Reqnroll.TestProjectGenerator.Data;
 
 namespace Reqnroll.TestProjectGenerator.Driver
 {
-    public class ConfigurationDriver
+    public class ConfigurationFileDriver
     {
         private readonly SolutionDriver _solutionDriver;
 
-        public ConfigurationDriver(SolutionDriver solutionDriver)
+        public ConfigurationFileDriver(SolutionDriver solutionDriver)
         {
             _solutionDriver = solutionDriver;
         }

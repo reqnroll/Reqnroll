@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,6 +23,8 @@ public abstract class SystemTestBase
     protected TestRunConfiguration _testRunConfiguration = null!;
     protected CurrentVersionDriver _currentVersionDriver = null!;
     protected CompilationDriver _compilationDriver = null!;
+    protected BindingsDriver _bindingDriver = null!;
+    protected TestProjectFolders _testProjectFolders = null!;
 
     protected int _preparedTests = 0;
 
@@ -79,6 +82,21 @@ public abstract class SystemTestBase
         _executionDriver = _testContainer.GetService<ExecutionDriver>();
         _vsTestExecutionDriver = _testContainer.GetService<VSTestExecutionDriver>();
         _compilationDriver = _testContainer.GetService<CompilationDriver>();
+        _testProjectFolders = _testContainer.GetService<TestProjectFolders>();
+        _bindingDriver = _testContainer.GetService<BindingsDriver>();
+    }
+
+
+    [TestCleanup]
+    public void TestCleanupMethod()
+    {
+        TestCleanup();
+    }
+
+    protected virtual void TestCleanup()
+    {
+        if (TestContext.CurrentTestOutcome == UnitTestOutcome.Passed)
+            _folderCleaner.CleanSolutionFolder();
     }
 
     protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null)
@@ -134,6 +152,41 @@ public abstract class SystemTestBase
         UpdatePreparedTests(scenarioContent, preparedTests);
     }
 
+    protected void AddSimpleScenario()
+    {
+        AddScenario(
+            """
+            Scenario: Sample Scenario
+                When something happens
+            """);
+    }
+
+    protected void AddSimpleScenarioOutline(int numberOfExamples = 2)
+    {
+        var examples = numberOfExamples == 2
+            ? """
+                  | me     |
+                  | you    |
+              """
+            : string.Join(
+                Environment.NewLine,
+                Enumerable.Range(1, numberOfExamples).Select(i => $"    | example {i} |"));
+        AddScenario(
+            $"""
+            Scenario Outline: Scenario outline with examples
+                When something happens to <person>
+            Examples:
+               	| person |
+            {examples}
+            """);
+    }
+
+    protected void AddSimpleScenarioAndOutline()
+    {
+        AddSimpleScenario();
+        AddSimpleScenarioOutline();
+    }
+
     private void UpdatePreparedTests(string gherkinContent, int? preparedTests)
     {
         if (preparedTests == null)
@@ -161,13 +214,33 @@ public abstract class SystemTestBase
 
     protected void ShouldAllScenariosPass(int? expectedNrOfTestsSpec = null)
     {
-        if (expectedNrOfTestsSpec == null && _preparedTests == 0) 
+        int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
+        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
+    }
+
+    protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)
+    {
+        if (expectedNrOfTestsSpec == null && _preparedTests == 0)
             throw new ArgumentException($"If {nameof(_preparedTests)} is not set, the {nameof(expectedNrOfTestsSpec)} is mandatory.", nameof(expectedNrOfTestsSpec));
         var expectedNrOfTests = expectedNrOfTestsSpec ?? _preparedTests;
 
         _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
         _vsTestExecutionDriver.LastTestExecutionResult.Total.Should().Be(expectedNrOfTests, $"the run should contain {expectedNrOfTests} tests");
-        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
-        _folderCleaner.CleanSolutionFolder();
+        return expectedNrOfTests;
+    }
+
+    protected void AddHookBinding(string eventType, string? name = null, string code = "")
+    {
+        _projectsDriver.AddHookBinding(eventType, name, code: code);
+    }
+
+    protected void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
+    {
+        _projectsDriver.AddPassingStepBinding(scenarioBlock, stepRegex);
+    }
+
+    protected void AddBindingClass(string content)
+    {
+        _projectsDriver.AddBindingClass(content);
     }
 }

@@ -3,7 +3,6 @@ using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Factories.BindingsGenerator;
 using Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator;
 using Reqnroll.TestProjectGenerator.Helpers;
-using Reqnroll.TestProjectGenerator.NewApi._1_Memory;
 
 namespace Reqnroll.TestProjectGenerator.Factories
 {

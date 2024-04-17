@@ -109,6 +109,11 @@ public class {0}
                                            WriteToFile($@"-> hook: {stepName}{Environment.NewLine}");
                                        }
                                    
+                                       internal static void LogCustom(string category, string value, [CallerMemberName] string memberName = null)
+                                       {
+                                           Retry(5, () => WriteToFile($@"-> {category}: {value}:{memberName}{Environment.NewLine}"));
+                                       }
+                                       
                                        static void WriteToFile(string line)
                                        {
                                            using (FileStream fs = File.Open(LogFileLocation, FileMode.Append, FileAccess.Write, FileShare.None))
