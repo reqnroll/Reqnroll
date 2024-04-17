@@ -57,7 +57,7 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Generator_TFM)</_Reqnroll_Needed_MSBuildGenerator>
+    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">net6.0</_Reqnroll_Needed_MSBuildGenerator>
     <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Generator_TFM)</_Reqnroll_Needed_MSBuildGenerator>
   </PropertyGroup>
 
