@@ -33,13 +33,13 @@ namespace ReqnrollQuickstart.App;
 public class PriceCalculator
 {
     // the item prices are hard coded for now
-    private readonly Dictionary<string, double> _priceTable = new()
+    private readonly Dictionary<string, decimal> _priceTable = new()
     {
         { "Electric guitar", 180.0 },
         { "Guitar pick", 1.5 }
     };
 
-    public double CalculatePrice(Dictionary<string, int> basket)
+    public decimal CalculatePrice(Dictionary<string, int> basket)
     {
         throw new NotImplementedException();
     }
