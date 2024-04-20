@@ -35,7 +35,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             return (solution, project, folder);
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddNuGetPackageToProjectInNewFormat()
         {
             
@@ -53,7 +53,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             projectFileContent.Should().Contain("<PackageReference Include=\"Reqnroll\" Version=\"2.3.1\" />");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddNuGetPackageToProjectInOldFormat()
         {
 
@@ -73,7 +73,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddNuGetPackageWithMSBuildFilesToProjectInOldFormat()
         {
 
@@ -95,7 +95,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddReferenceToProjectInNewFormat()
         {
 
@@ -113,7 +113,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             projectFileContent.Should().Contain("<Reference Include=\"System.Configuration\" />");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddReferenceToProjectInOldFormat()
         {
 
@@ -132,7 +132,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddFileToProjectInOldFormat()
         {
 
@@ -155,7 +155,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
 
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddFileToProjectInNewFormat()
         {
 
@@ -178,7 +178,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
 
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddFileInFolderToProjectInOldFormat()
         {
 
@@ -201,7 +201,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
 
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddFileInFolderToProjectInNewFormat()
         {
 
@@ -237,7 +237,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             return Path.Combine(solutionFolder, project.Name);
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
@@ -249,7 +249,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpCore3_1ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
@@ -262,7 +262,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpNet50ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net50);
@@ -275,7 +275,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net5.0</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpNet60ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net60);
@@ -288,7 +288,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                               .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net6.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpNet70ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net70);
@@ -301,7 +301,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                               .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net7.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpNet80ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net80);
@@ -314,7 +314,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                               .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net8.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpNet481ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net481);
@@ -327,7 +327,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                               .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net481</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpNet462ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net462);
@@ -340,7 +340,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                               .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyCSharpNet472ProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net472);
@@ -353,7 +353,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                               .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net472</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyFSharpProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp);
@@ -366,7 +366,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             projectFileContent.Should().Contain("<ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>");
         }
 
-        [Fact]
+        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void CreateEmptyVbProjectInNewFormat()
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB);
