@@ -87,7 +87,7 @@ public class CucumberExpressionParameterTypeRegistry : IParameterTypeRegistry
 
         // get custom user transformations (both for built-in types and for custom types)
         var userTransformations = _bindingRegistry.GetStepTransformations()
-                                                  .SelectMany(t => GetUserTransformations(t, aliases));
+                                                  .SelectMany(t => GetUserTransformations(t, builtInTransformations, aliases));
 
         var parameterTypes = builtInTransformations
                                                    .Concat(enumTypes)
@@ -100,9 +100,11 @@ public class CucumberExpressionParameterTypeRegistry : IParameterTypeRegistry
         return parameterTypes;
     }
 
-    private IEnumerable<UserDefinedCucumberExpressionParameterTypeTransformation> GetUserTransformations(IStepArgumentTransformationBinding t, Dictionary<IBindingType, string> aliases)
+    private IEnumerable<UserDefinedCucumberExpressionParameterTypeTransformation> GetUserTransformations(IStepArgumentTransformationBinding t, BuiltInCucumberExpressionParameterTypeTransformation[] builtInTransformations, Dictionary<IBindingType, string> aliases)
     {
-        yield return new UserDefinedCucumberExpressionParameterTypeTransformation(t);
+        bool IsUserDefinedType(IBindingType type) => !builtInTransformations.Any(b => b.TargetType.Name == type.Name);
+        var name = IsUserDefinedType(t.Method.ReturnType) && (t.Name == t.Method.ReturnType.Name || t.Name == null) ? t.Method.ReturnType.FullName : t.Name;
+        yield return new UserDefinedCucumberExpressionParameterTypeTransformation(t, name);
 
         // If the custom user transformations is for a built-in type, we also expose it with the
         // short name (e.g {int}) and not only with the type name (e.g. {Int32}).
@@ -130,12 +132,17 @@ public class CucumberExpressionParameterTypeRegistry : IParameterTypeRegistry
         if (_parameterTypesByName.Value.TryGetValue(name, out var parameterType))
             return parameterType;
         //enum keys contain the Fullname of the type, try matching on the short name:
-        var matchingEnums = _parameterTypesByName.Value.Where(kvp => kvp.Value.ParameterType.IsEnum && (kvp.Key.EndsWith("." + name) || kvp.Key.EndsWith("+" + name))).ToArray();
-        if (matchingEnums.Length == 0) { return null; }
-        if (matchingEnums.Length == 1) { return matchingEnums[0].Value; }
-        if (matchingEnums.Length > 1)
+        var matchingEntries = _parameterTypesByName.Value.Where(kvp => kvp.Key.EndsWith("." + name) || kvp.Key.EndsWith("+" + name)).ToArray();
+        if (matchingEntries.Length == 0) { return null; }
+        if (matchingEntries.Length == 1) { return matchingEntries[0].Value; }
+        if (matchingEntries.Length > 1)
         {
-            throw new ReqnrollException($"Ambiguous enum in cucumber expression. Multiple enums share the same short name '{name}'. Use the enum's full name in the cucumber expression or define a [StepArgumentTransformation] with the chosen type and the short name.");
+            if (matchingEntries[0].Value.ParameterType.IsEnum)
+            {
+                throw new ReqnrollException($"Ambiguous enum in cucumber expression. Multiple enums share the same short name '{name}'. Use the enum's full name in the cucumber expression or define a [StepArgumentTransformation] with the chosen type and the short name.");
+            }
+            else
+                throw new ReqnrollException($"Ambiguous type used in cucumber expressions. Multiple step method parameter types share the same short name '{name}'. Use a uniquely named StepArgumentTransformation for each. ");
         }
         return null;
     }
