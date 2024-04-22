@@ -17,6 +17,7 @@ Reqnroll works on all major operating systems (Windows, Linux, macOS), on all co
 * [Quickstart guide](https://go.reqnroll.net/quickstart)
 * [Reqnroll website](https://reqnroll.net/)
 * [Reqnroll documentation](https://docs.reqnroll.net/)
+* [Migrating from SpecFlow](https://docs.reqnroll.net/latest/guides/migrating-from-specflow.html)
 * [Release notes](https://go.reqnroll.net/release-notes)
 * [IDE setup instructions for Reqnroll](https://go.reqnroll.net/doc-setup-ide)
 
