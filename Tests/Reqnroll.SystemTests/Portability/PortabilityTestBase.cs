@@ -10,78 +10,50 @@ namespace Reqnroll.SystemTests.Portability;
 [TestCategory("Portability")]
 public abstract class PortabilityTestBase : SystemTestBase
 {
-    [TestMethod]
+    [SkippableTestMethod(typeof(DotNetSdkNotInstalledException))]
     public void GeneratorAllIn_sample_can_be_handled()
     {
-        try
-        {
-            PrepareGeneratorAllInSamples();
+        PrepareGeneratorAllInSamples();
 
-            ExecuteTests();
+        ExecuteTests();
 
-            ShouldAllScenariosPass();
-        }
-        catch (DotNetSdkNotInstalledException exception)
-        {
-            Assert.Inconclusive(exception.Message);
-        }
+        ShouldAllScenariosPass();
     }
 
-    [TestMethod]
+    [SkippableTestMethod(typeof(DotNetSdkNotInstalledException))]
     [TestCategory("MsBuild")]
     public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild()
     {
-        try
-        {
-            PrepareGeneratorAllInSamples();
-            _compilationDriver.SetBuildTool(BuildTool.MSBuild);
-            _compilationDriver.CompileSolution();
-        }
-        catch (DotNetSdkNotInstalledException exception)
-        {
-            Assert.Inconclusive(exception.Message);
-        }
+        PrepareGeneratorAllInSamples();
+        _compilationDriver.SetBuildTool(BuildTool.MSBuild);
+        _compilationDriver.CompileSolution();
     }
 
-    [TestMethod]
+    [SkippableTestMethod(typeof(DotNetSdkNotInstalledException))]
     [TestCategory("DotnetMSBuild")]
     public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild()
     {
-        try
-        {
-            PrepareGeneratorAllInSamples();
-            _compilationDriver.SetBuildTool(BuildTool.DotnetMSBuild);
+        PrepareGeneratorAllInSamples();
+        _compilationDriver.SetBuildTool(BuildTool.DotnetMSBuild);
 
-            _compilationDriver.CompileSolution();
-        }
-        catch (DotNetSdkNotInstalledException exception)
-        {
-            Assert.Inconclusive(exception.Message);
-        }
+        _compilationDriver.CompileSolution();
     }
 
     #region Test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
-    [TestMethod]
+    [SkippableTestMethod(typeof(DotNetSdkNotInstalledException))]
     public void TestRun_hooks_are_executed()
     {
-        try
-        {
-            AddSimpleScenario();
-            AddPassingStepBinding();
-            AddHookBinding("BeforeTestRun");
-            AddHookBinding("AfterTestRun");
+        AddSimpleScenario();
+        AddPassingStepBinding();
+        AddHookBinding("BeforeTestRun");
+        AddHookBinding("AfterTestRun");
 
-            ExecuteTests();
+        ExecuteTests();
 
-            _bindingDriver.AssertExecutedHooksEqual(
-                "BeforeTestRun",
-                "AfterTestRun");
-            ShouldAllScenariosPass();
-        }
-        catch (DotNetSdkNotInstalledException exception)
-        {
-            Assert.Inconclusive(exception.Message);
-        }
+        _bindingDriver.AssertExecutedHooksEqual(
+            "BeforeTestRun",
+            "AfterTestRun");
+        ShouldAllScenariosPass();
     }
     #endregion
 }
