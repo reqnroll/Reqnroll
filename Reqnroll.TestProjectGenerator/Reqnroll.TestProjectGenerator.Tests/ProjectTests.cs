@@ -35,6 +35,8 @@ namespace Reqnroll.TestProjectGenerator.Tests
             return (solution, project, folder);
         }
 
+        private SolutionWriter CreateSolutionWriter() => new SolutionWriter(new Mock<IOutputWriter>().Object, new ConfigurationDriver());
+
         [SkippableFact(typeof(DotNetSdkNotInstalledException))]
         public void AddNuGetPackageToProjectInNewFormat()
         {
@@ -45,7 +47,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddNuGetPackage("Reqnroll", "2.3.1", new NuGetPackageAssembly("Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\Reqnroll.dll"));
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -63,7 +65,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddNuGetPackage("Reqnroll", "2.3.1", new NuGetPackageAssembly("Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\Reqnroll.dll"));
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -85,7 +87,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 "2.3.2-preview20180328");
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -105,7 +107,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddReference("System.Configuration");
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -123,7 +125,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddReference("System.Configuration");
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -143,7 +145,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
@@ -166,7 +168,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
@@ -189,7 +191,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
@@ -212,7 +214,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             project.AddFile(projectFile);
 
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             var projectFileContent = GetProjectFileContent(solutionFolder, project);
             var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
@@ -242,7 +244,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -254,7 +256,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -267,7 +269,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net50);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -280,7 +282,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net60);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -293,7 +295,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net70);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -306,7 +308,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net80);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -319,7 +321,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net481);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -332,7 +334,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net462);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -345,7 +347,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net472);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
@@ -358,7 +360,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
             projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
@@ -371,7 +373,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         {
             var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB);
 
-            new SolutionWriter(new Mock<IOutputWriter>().Object).WriteToFileSystem(solution, solutionFolder);
+            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
