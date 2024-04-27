@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Reqnroll.FeatureSourceGenerator\Reqnroll.FeatureSourceGenerator.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.FeatureSourceGenerator\Reqnroll.FeatureSourceGenerator.csproj" />
   </ItemGroup>
 
   <ItemGroup>

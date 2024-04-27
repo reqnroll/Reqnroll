@@ -2,16 +2,16 @@
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace Reqnroll.FeatureSourceGenerator;
-public class CSharpClassDeclarationAssertions(ClassDeclarationSyntax? subject) :
-    CSharpClassDeclarationAssertions<CSharpClassDeclarationAssertions>(subject)
+public class CSharpMethodDeclarationAssertions(MethodDeclarationSyntax? subject) :
+    CSharpMethodDeclarationAssertions<CSharpMethodDeclarationAssertions>(subject)
 {
 }
 
-public class CSharpClassDeclarationAssertions<TAssertions>(ClassDeclarationSyntax? subject) : 
-    CSharpSyntaxAssertions<ClassDeclarationSyntax, TAssertions>(subject)
-    where TAssertions : CSharpClassDeclarationAssertions<TAssertions>
+public class CSharpMethodDeclarationAssertions<TAssertions>(MethodDeclarationSyntax? subject) :
+    CSharpSyntaxAssertions<MethodDeclarationSyntax, TAssertions>(subject)
+    where TAssertions : CSharpMethodDeclarationAssertions<TAssertions>
 {
-    protected override string Identifier => "class";
+    protected override string Identifier => "method";
 
     /// <summary>
     /// Expects the class declaration have only a single attribute with a specific identifier.
@@ -31,7 +31,7 @@ public class CSharpClassDeclarationAssertions<TAssertions>(ClassDeclarationSynta
         string because = "",
         params object[] becauseArgs)
     {
-        var expectation = "Expected {context:class} to have a single attribute " +
+        var expectation = "Expected {context:method} to have a single attribute " +
             $"which is of type \"{type}\" {{reason}}";
 
         bool notNull = Execute.Assertion
@@ -80,44 +80,44 @@ public class CSharpClassDeclarationAssertions<TAssertions>(ClassDeclarationSynta
         return new AndWhichConstraint<TAssertions, AttributeSyntax>((TAssertions)this, match!);
     }
 
-    public AndWhichConstraint<TAssertions, MethodDeclarationSyntax> ContainMethod(
-        string identifier,
+    public AndWhichConstraint<TAssertions, AttributeSyntax> HaveAttribute(
+        string type,
         string because = "",
         params object[] becauseArgs)
     {
-        var expectation = "Expected {context:class} to have a method " +
-            $"named \"{identifier}\" {{reason}}";
+        var expectation = "Expected {context:method} to have an attribute " +
+            $"of type \"{type}\" {{reason}}";
 
         bool notNull = Execute.Assertion
             .BecauseOf(because, becauseArgs)
             .ForCondition(Subject is not null)
             .FailWith(expectation + ", but found <null>.");
 
-        MethodDeclarationSyntax? match = default;
+        AttributeSyntax? match = default;
 
         if (notNull)
         {
-            var methods = Subject!.Members.OfType<MethodDeclarationSyntax>().ToList();
+            var attributes = Subject!.AttributeLists.SelectMany(list => list.Attributes).ToList();
 
-            if (methods.Count == 0)
+            if (attributes.Count == 0)
             {
                 Execute.Assertion
                     .BecauseOf(because, becauseArgs)
-                    .FailWith(expectation + ", but the class has no methods.");
+                    .FailWith(expectation + ", but the method has no attributes.");
             }
             else
             {
-                match = methods.FirstOrDefault(method => method.Identifier.Text == identifier);
+                match = attributes.FirstOrDefault(attribute => attribute.Name.ToString() == type);
 
                 if (match == null)
                 {
                     Execute.Assertion
                         .BecauseOf(because, becauseArgs)
-                        .FailWith(expectation + ", but found {0}.", methods);
+                        .FailWith(expectation + ", but found {0}.", attributes);
                 }
             }
         }
 
-        return new AndWhichConstraint<TAssertions, MethodDeclarationSyntax>((TAssertions)this, match!);
+        return new AndWhichConstraint<TAssertions, AttributeSyntax>((TAssertions)this, match!);
     }
 }

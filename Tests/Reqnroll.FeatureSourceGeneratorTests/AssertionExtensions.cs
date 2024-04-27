@@ -28,4 +28,12 @@ public static class AssertionExtensions
     [Pure]
     public static CSharpNamespaceDeclarationAssertions Should(this NamespaceDeclarationSyntax? actualValue) =>
         new(actualValue);
+
+    /// <summary>
+    /// Returns an <see cref="CSharpMethodDeclarationAssertions"/> object that can be used to assert the
+    /// current <see cref="MethodDeclarationSyntax"/>.
+    /// </summary>
+    [Pure]
+    public static CSharpMethodDeclarationAssertions Should(this MethodDeclarationSyntax? actualValue) =>
+        new(actualValue);
 }

@@ -1,8 +1,9 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Reqnroll.FeatureSourceGenerator;
 using Reqnroll.FeatureSourceGenerator.CSharp;
 
-namespace Reqnroll.FeatureSourceGenerator.MSTest;
+namespace Reqnroll.FeatureSourceGenerator;
 
 public class MSTestFeatureSourceGeneratorTests
 {
