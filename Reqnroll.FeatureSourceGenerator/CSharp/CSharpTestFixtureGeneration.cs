@@ -37,6 +37,12 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         return SourceBuilder.ToSourceText();
     }
 
+    protected virtual string GetClassName() => CSharpSyntax.CreateIdentifier(Document.Feature.Name + Document.Feature.Keyword);
+
+    protected virtual string? GetBaseType() => null;
+
+    protected virtual IEnumerable<string> GetInterfaces() => [];
+
     protected virtual void AppendTestFixtureClass()
     {
         var attributes = GetTestFixtureAttributes();
@@ -47,9 +53,41 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         }
 
         var feature = Document.Feature;
-        var className = CSharpSyntax.CreateIdentifier(feature.Name + feature.Keyword);
+        var className = GetClassName();
+        var baseType = GetBaseType();
+        var interfaces = GetInterfaces().ToList();
 
-        SourceBuilder.Append("public class ").Append(className).AppendLine();
+        SourceBuilder.Append("public class ").Append(className);
+        
+        if (baseType != null || interfaces.Count > 0)
+        {
+            var baseTypes = new List<string>();
+
+            if (baseType != null)
+            {
+                baseTypes.Add(baseType);
+            }
+
+            baseTypes.AddRange(interfaces);
+
+            SourceBuilder.Append(" : ");
+
+            var first = true;
+
+            foreach (var value in baseTypes)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    SourceBuilder.Append(", ");
+                }
+
+                SourceBuilder.Append(value);
+            }
+        }
 
         SourceBuilder.BeginBlock("{");
 
@@ -132,7 +170,7 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
             .AppendLine();
 
         SourceBuilder
-            .Append("private static readonly global::Reqnroll.FeatureInfo featureInfo = new global::Reqnroll.FeatureInfo(")
+            .Append("private static readonly global::Reqnroll.FeatureInfo FeatureInfo = new global::Reqnroll.FeatureInfo(")
             .Append("new global::System.Globalization.CultureInfo(\"").Append(feature.Language).Append("\"), ")
             .AppendConstant(Path.GetDirectoryName(FeatureInformation.FeatureSyntax.FilePath).Replace("\\", "\\\\")).Append(", ")
             .AppendConstant(feature.Name).Append(", ")
@@ -163,8 +201,8 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
     {
         SourceBuilder.AppendLine("// handle feature initialization");
         SourceBuilder.AppendLine(
-            "if (testRunner.FeatureContext == null || !object.ReferenceEquals(testRunner.FeatureContext.FeatureInfo, featureInfo))");
-        SourceBuilder.AppendLine("await testRunner.OnFeatureStartAsync(featureInfo);");
+            "if (testRunner.FeatureContext == null || !object.ReferenceEquals(testRunner.FeatureContext.FeatureInfo, FeatureInfo))");
+        SourceBuilder.AppendLine("await testRunner.OnFeatureStartAsync(FeatureInfo);");
         SourceBuilder.AppendLine();
 
         SourceBuilder.AppendLine("// handle scenario initialization");
@@ -190,7 +228,7 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
 
     protected virtual void AppendTestMethodBodyForScenario(Scenario scenario)
     {
-        AppendTestRunnerLookupForScenario();
+        AppendTestRunnerLookupForScenario(scenario);
         SourceBuilder.AppendLine();
 
         AppendScenarioInfo(scenario);
@@ -291,11 +329,21 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         SourceBuilder.AppendLine("// end: calculate ScenarioInfo");
     }
 
-    protected virtual void AppendTestRunnerLookupForScenario()
+    /// <summary>
+    /// Appends the code to provide the test runner instance for the scenario execution.
+    /// </summary>
+    /// <param name="scenario">The scenario to append code for.</param>
+    /// <remarks>
+    /// <para>Implementations of this method <b>must</b> append code to achieve the following:</para>
+    /// <list type="bullet">
+    ///     <item>Declare a local variable named <c>testRunner</c> of a type which can be assigned to type <c>Reqnroll.TestRunner</c>.</item>
+    ///     <item>Assign to the <c>testRunner</c> variable the instance to use as the test runner for the scenario.</item>
+    /// </list>
+    /// </remarks>
+    protected virtual void AppendTestRunnerLookupForScenario(Scenario scenario)
     {
         SourceBuilder.AppendLine("// getting test runner");
-        SourceBuilder.AppendLine("string testWorkerId = global::System.Threading.Thread.CurrentThread.ManagedThreadId.ToString(); " +
-            "// this might be different with other test runners");
+        SourceBuilder.AppendLine("var testWorkerId = global::System.Threading.Thread.CurrentThread.ManagedThreadId.ToString();");
         SourceBuilder.AppendLine("var testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, testWorkerId);");
     }
 

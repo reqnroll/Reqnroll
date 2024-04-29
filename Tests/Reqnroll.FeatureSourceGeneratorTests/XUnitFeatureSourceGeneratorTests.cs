@@ -15,7 +15,7 @@ public class XUnitFeatureSourceGeneratorTests
 
         var compilation = CSharpCompilation.Create("test", references: references);
 
-        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.MSTest]);
+        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.XUnit]);
 
         const string featureText =
             """
@@ -53,11 +53,11 @@ public class XUnitFeatureSourceGeneratorTests
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
             .Which.Should().ContainMethod("AddTwoNumbers")
-            .Which.Should().HaveAttribute("global:XUnit.Fact");
+            .Which.Should().HaveAttribute("global::XUnit.Fact");
     }
 
     [Fact]
-    public void GeneratorProducesMSTestOutputWhenWhenEditorConfigConfiguredForMSTest()
+    public void GeneratorProducesXUnitOutputWhenWhenEditorConfigConfiguredForXUnit()
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
             .Where(asm => !asm.IsDynamic)
@@ -65,7 +65,7 @@ public class XUnitFeatureSourceGeneratorTests
 
         var compilation = CSharpCompilation.Create("test", references: references);
 
-        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.MSTest]);
+        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.XUnit]);
 
         const string featureText =
             """
@@ -103,6 +103,6 @@ public class XUnitFeatureSourceGeneratorTests
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
             .Which.Should().ContainMethod("AddTwoNumbers")
-            .Which.Should().HaveAttribute("global:XUnit.Fact");
+            .Which.Should().HaveAttribute("global::XUnit.Fact");
     }
 }

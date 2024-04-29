@@ -32,7 +32,7 @@ public class CSharpMethodDeclarationAssertions<TAssertions>(MethodDeclarationSyn
         params object[] becauseArgs)
     {
         var expectation = "Expected {context:method} to have a single attribute " +
-            $"which is of type \"{type}\" {{reason}}";
+            $"which is of type \"{type}\"{{reason}}";
 
         bool notNull = Execute.Assertion
             .BecauseOf(because, becauseArgs)
@@ -86,7 +86,7 @@ public class CSharpMethodDeclarationAssertions<TAssertions>(MethodDeclarationSyn
         params object[] becauseArgs)
     {
         var expectation = "Expected {context:method} to have an attribute " +
-            $"of type \"{type}\" {{reason}}";
+            $"of type \"{type}\"{{reason}}";
 
         bool notNull = Execute.Assertion
             .BecauseOf(because, becauseArgs)

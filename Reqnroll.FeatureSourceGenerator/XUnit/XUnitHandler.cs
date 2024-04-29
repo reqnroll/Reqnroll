@@ -11,11 +11,16 @@ public class XUnitHandler : ITestFrameworkHandler
 
     public SourceText GenerateTestFixture(FeatureInformation feature)
     {
-        throw new NotImplementedException();
+        return feature.CompilationInformation.Language switch
+        {
+            LanguageNames.CSharp => new XUnitCSharpSyntaxGeneration(feature).GetSourceText(),
+            _ => throw new NotSupportedException(),
+        };
     }
 
     public bool IsTestFrameworkReferenced(CompilationInformation compilationInformation)
     {
-        return false;
+        return compilationInformation.ReferencedAssemblies
+            .Any(assembly => assembly.Name == "xunit.core");
     }
 }
