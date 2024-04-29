@@ -84,6 +84,11 @@ public abstract class GenerationTestBase : SystemTestBase
             Examples:
                 | result |
                 | fails  |
+
+            @ignore
+            Rule: Scenario in this Rule should be Ignored
+             Scenario: Ruleignored scenario
+             When the step passes
             """);
         _projectsDriver.AddPassingStepBinding(stepRegex: "the step passes");
         _projectsDriver.AddFailingStepBinding(stepRegex: "the step fails");
@@ -133,6 +138,9 @@ public abstract class GenerationTestBase : SystemTestBase
                               .Which.Outcome.Should().Be(expectedIgnoredOutcome);
         _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
                               .Should().ContainSingle(tr => tr.TestName.StartsWith("ExampleIgnored"))
+                              .Which.Outcome.Should().Be(expectedIgnoredOutcome);
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("Ruleignored")) 
                               .Which.Outcome.Should().Be(expectedIgnoredOutcome);
         AssertIgnoredScenarioOutlineExampleHandled();
     }

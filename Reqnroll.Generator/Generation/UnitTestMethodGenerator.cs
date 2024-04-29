@@ -277,8 +277,10 @@ namespace Reqnroll.Generator.Generation
             var tagsOfScenarioVariableReferenceExpression = new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME);
             var featureFileTagFieldReferenceExpression = new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME);
 
+            var scenarioCombinedTagsPropertyExpression = new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("scenarioInfo"), "CombinedTags");
+
             var tagHelperReference = new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TagHelper)));
-            var scenarioTagIgnoredCheckStatement = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.ContainsIgnoreTag), tagsOfScenarioVariableReferenceExpression);
+            var scenarioTagIgnoredCheckStatement = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.ContainsIgnoreTag), scenarioCombinedTagsPropertyExpression);
             var featureTagIgnoredCheckStatement = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.ContainsIgnoreTag), featureFileTagFieldReferenceExpression);
 
             var ifIsIgnoredStatement = new CodeConditionStatement(

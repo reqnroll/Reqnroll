@@ -8,6 +8,7 @@
 * Support for Scenario Outline / DataRowAttribute in MsTest adapter
 * Fix for #81 in which Cucumber Expressions fail when two enums or two custom types with the same short name (differing namespaces) are used as parameters
 * Fix: Adding @ignore to an Examples block generates invalid code for NUnit v3+ (#103)
+* Fix: #111 @ignore attribute is not inherited to the scenarios from Rule
 
 # v1.0.1 - 2024-02-16
 
