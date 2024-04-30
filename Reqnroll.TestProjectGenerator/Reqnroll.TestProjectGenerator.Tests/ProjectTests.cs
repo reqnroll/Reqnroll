@@ -259,7 +259,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
             string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
             projectFileContent.Should()
-                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net6.0</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
         }
 
         [Fact]

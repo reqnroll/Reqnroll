@@ -9,6 +9,7 @@ using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
 {
     
+    [Obsolete]
     public class CreateInstanceHelperStandardTypesTests
     {
         public CreateInstanceHelperStandardTypesTests()

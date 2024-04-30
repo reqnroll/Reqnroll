@@ -9,6 +9,7 @@ using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 
 namespace Reqnroll.RuntimeTests.AssistTests
 {
+    [Obsolete]
     public abstract class SetComparisonExtensionMethods_MessageTests
     {
         [Fact]
@@ -16,12 +17,14 @@ namespace Reqnroll.RuntimeTests.AssistTests
         {
             var table = new Table("StringProperty", "AFieldThatDoesNotExist", "AnotherFieldThatDoesNotExist");
 
-            var items = new[] {new SetComparisonTestObject()};
+            var items = new[] { new SetComparisonTestObject() };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(
-                @"The following fields do not exist:
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"The following fields do not exist:
 AFieldThatDoesNotExist
 AnotherFieldThatDoesNotExist".AgnosticLineBreak());
         }
@@ -31,12 +34,14 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
         {
             var table = new Table("StringProperty");
 
-            var items = new[] {new SetComparisonTestObject()};
+            var items = new[] { new SetComparisonTestObject() };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(
-                @"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
 + |                |
 ".AgnosticLineBreak());
@@ -47,12 +52,14 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
         {
             var table = new Table("StringProperty");
 
-            var items = new[] {new SetComparisonTestObject(), new SetComparisonTestObject()};
+            var items = new[] { new SetComparisonTestObject(), new SetComparisonTestObject() };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(
-                @"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
 + |                |
 + |                |
@@ -65,12 +72,14 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
             var table = new Table("StringProperty");
             table.AddRow("orange");
 
-            var items = new[] {new SetComparisonTestObject {StringProperty = "apple"}};
+            var items = new[] { new SetComparisonTestObject { StringProperty = "apple" } };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(
-@"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
 - | orange         |
 + | apple          |
@@ -85,15 +94,17 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
             table.AddRow("apple");
 
             var items = new[]
-                            {
-                                new SetComparisonTestObject {StringProperty = "orange"},
-                                new SetComparisonTestObject {StringProperty = "rotten apple"}
-                            };
+            {
+                new SetComparisonTestObject { StringProperty = "orange" },
+                new SetComparisonTestObject { StringProperty = "rotten apple" }
+            };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(
-                @"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
   | orange         |
 - | apple          |
@@ -109,15 +120,18 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
             table.AddRow("apple");
 
             var items = new[]
-                            {
-                                new SetComparisonTestObject {StringProperty = "orange"},
-                                new SetComparisonTestObject {StringProperty = "apple"},
-                                new SetComparisonTestObject {StringProperty = "extra row"}
-                            };
+            {
+                new SetComparisonTestObject { StringProperty = "orange" },
+                new SetComparisonTestObject { StringProperty = "apple" },
+                new SetComparisonTestObject { StringProperty = "extra row" }
+            };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(@"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
   | orange         |
   | apple          |
@@ -132,15 +146,18 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
             table.AddRow("orange");
 
             var items = new[]
-                            {
-                                new SetComparisonTestObject {StringProperty = "orange"},
-                                new SetComparisonTestObject {StringProperty = "apple"},
-                                new SetComparisonTestObject {StringProperty = "banana"}
-                            };
+            {
+                new SetComparisonTestObject { StringProperty = "orange" },
+                new SetComparisonTestObject { StringProperty = "apple" },
+                new SetComparisonTestObject { StringProperty = "banana" }
+            };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(@"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
   | orange         |
 + | apple          |
@@ -158,7 +175,10 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(@"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
 - | orange         |
 ".AgnosticLineBreak());
@@ -185,7 +205,10 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(@"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | DateTimeProperty              |
 - | 3/28/2018 12:34:56 AM         |
 + | 3/28/2018 12:34:56.0780009 AM |
@@ -202,13 +225,14 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
             {
                 return ex;
             }
+
             return null;
         }
 
         protected abstract void CallComparison(Table table, SetComparisonTestObject[] items);
     }
 
-    
+    [Obsolete]
     public class SetComparisonExtensionMethods_OrderInsensitive_MessageTests : SetComparisonExtensionMethods_MessageTests
     {
         [Fact]
@@ -219,15 +243,17 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
             table.AddRow("apple");
 
             var items = new[]
-                            {
-                                new SetComparisonTestObject {StringProperty = "rotten orange"},
-                                new SetComparisonTestObject {StringProperty = "rotten apple"}
-                            };
+            {
+                new SetComparisonTestObject { StringProperty = "rotten orange" },
+                new SetComparisonTestObject { StringProperty = "rotten apple" }
+            };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(
-                @"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
 - | orange         |
 - | apple          |
@@ -242,7 +268,7 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
         }
     }
 
-    
+    [Obsolete]
     public class SetComparisonExtensionMethods_OrderSensitive_MessageTests : SetComparisonExtensionMethods_MessageTests
     {
         [Fact]
@@ -253,15 +279,17 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
             table.AddRow("apple");
 
             var items = new[]
-                            {
-                                new SetComparisonTestObject {StringProperty = "rotten orange"},
-                                new SetComparisonTestObject {StringProperty = "rotten apple"}
-                            };
+            {
+                new SetComparisonTestObject { StringProperty = "rotten orange" },
+                new SetComparisonTestObject { StringProperty = "rotten apple" }
+            };
 
             var exception = GetTheExceptionThrowByComparingThese(table, items);
 
-            exception.Message.AgnosticLineBreak().Should().Be(
-                @"
+            exception.Message.AgnosticLineBreak()
+                     .Should()
+                     .Be(
+                         @"
   | StringProperty |
 - | orange         |
 + | rotten orange  |

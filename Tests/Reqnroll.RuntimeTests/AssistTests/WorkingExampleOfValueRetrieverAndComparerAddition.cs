@@ -9,15 +9,15 @@ using FluentAssertions;
 
 namespace Reqnroll.RuntimeTests.AssistTests
 {
-
     public class FancyName
     {
         public string FirstName { get; set; }
+
         public string LastName;
 
         public override string ToString()
         {
-            return String.Join(" ", new string[]{ FirstName, LastName });
+            return String.Join(" ", new string[] { FirstName, LastName });
         }
     }
 
@@ -28,17 +28,16 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
     public class FancyNameValueRetriever : IValueRetriever
     {
-
         public static FancyName Parse(string fullName)
         {
             var firstName = fullName.ToString().Split(' ').First();
-            var lastName  = fullName.ToString().Split(' ').Last();
+            var lastName = fullName.ToString().Split(' ').Last();
             return new FancyName() { FirstName = firstName, LastName = lastName };
         }
 
         public IEnumerable<Type> TypesForWhichIRetrieveValues()
         {
-            return new Type[]{ typeof(FancyName) };
+            return new Type[] { typeof(FancyName) };
         }
 
         public object Retrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType)
@@ -50,7 +49,6 @@ namespace Reqnroll.RuntimeTests.AssistTests
         {
             return TypesForWhichIRetrieveValues().Contains(type);
         }
-
     }
 
     public class FancyNameValueComparer : IValueComparer
@@ -63,19 +61,17 @@ namespace Reqnroll.RuntimeTests.AssistTests
         public bool Compare(string expectedValue, object actualValue)
         {
             var expected = FancyNameValueRetriever.Parse(expectedValue);
-            var actual = (FancyName)actualValue; 
+            var actual = (FancyName)actualValue;
             return expected.FirstName == actual.FirstName && expected.LastName == actual.LastName;
         }
     }
 
-    
+    [Obsolete]
     public class WorkingExampleOfValueRetrieverAndComparerAddition : IDisposable
     {
-
         [Fact]
         public void Should_be_able_to_retrieve_the_fancy_name()
         {
-
             Service.Instance.ValueRetrievers.Register(new FancyNameValueRetriever());
 
             var table = new Table("Field", "Value");
@@ -97,7 +93,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("Name", "John Galt");
 
             var expectedName = new FancyName() { FirstName = "John", LastName = "Galt" };
-            var expectedLad  = new FancyLad() { Name = expectedName };
+            var expectedLad = new FancyLad() { Name = expectedName };
 
             table.CompareToInstance<FancyLad>(expectedLad);
         }
@@ -108,12 +104,12 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
     }
 
-
     /***************************************************/
 
     public class Product
     {
         public string Name { get; set; }
+
         public ProductCategory Category { get; set; }
     }
 
@@ -129,7 +125,6 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
     public class ProductCategoryValueRetriever : IValueRetriever
     {
-
         public static ProductCategory Parse(string name)
         {
             return new ProductCategory() { Name = name };
@@ -137,7 +132,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
         public IEnumerable<Type> TypesForWhichIRetrieveValues()
         {
-            return new Type[]{ typeof(ProductCategory) };
+            return new Type[] { typeof(ProductCategory) };
         }
 
         public object Retrieve(KeyValuePair<string, string> keyValuePair, Type targetType, Type propertyType)
@@ -149,7 +144,6 @@ namespace Reqnroll.RuntimeTests.AssistTests
         {
             return TypesForWhichIRetrieveValues().Contains(type);
         }
-
     }
 
     public class ProductCategoryValueComparer : IValueComparer
@@ -162,18 +156,17 @@ namespace Reqnroll.RuntimeTests.AssistTests
         public bool Compare(string expectedValue, object actualValue)
         {
             var expected = ProductCategoryValueRetriever.Parse(expectedValue);
-            var actual = (ProductCategory)actualValue; 
+            var actual = (ProductCategory)actualValue;
             return expected.Name == actual.Name;
         }
     }
 
-    
+    [Obsolete]
     public class AnotherWorkingExampleOfValueRetrieverAndComparerAddition : IDisposable
     {
         [Fact]
         public void Should_be_able_to_retrieve_the_category()
         {
-
             Service.Instance.ValueRetrievers.Register(new ProductCategoryValueRetriever());
 
             var table = new Table("Field", "Value");
@@ -205,7 +198,6 @@ namespace Reqnroll.RuntimeTests.AssistTests
         public void Dispose()
         {
             Service.Instance.RestoreDefaults();
-
         }
     }
 }

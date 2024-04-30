@@ -181,6 +181,7 @@ namespace Reqnroll.Assist
 		/// <typeparam name="T">The type of the instance to be created.</typeparam>
 		/// <param name="row">The table row.</param>
 		/// <returns>A new instance of <typeparamref name="T"/> filled with the data from the <see cref="DataTableRow"/>.</returns>
+        [Obsolete("Use TableHelpers instead")]
 		public static T CreateInstance<T>(this DataTableRow row)
 		{
 			var instanceTable = row.ToTable();
@@ -194,6 +195,7 @@ namespace Reqnroll.Assist
 		/// <param name="row">The table row.</param>
 		/// <param name="methodToCreateTheInstance">The method to create a new instance.</param>
 		/// <returns>A new instance of <typeparamref name="T"/> filled with the data from the <see cref="DataTableRow"/>.</returns>
+        [Obsolete("Use TableHelpers instead")]
 		public static T CreateInstance<T>(this DataTableRow row, Func<T> methodToCreateTheInstance)
 		{
 			var instanceTable = row.ToTable();

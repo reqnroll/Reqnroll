@@ -9,18 +9,19 @@ namespace Reqnroll.Assist
         public ServiceComponentList<IValueComparer> ValueComparers { get; private set; }
         public ServiceComponentList<IValueRetriever> ValueRetrievers { get; private set; }
 
+        [Obsolete("Use TableHelpers retrieved from the DI container instead.")]
         public static Service Instance { get; } = new Service();
 
         public Service()
         {
             ValueComparers = new ReqnrollDefaultValueComparerList();
-            ValueRetrievers = new ReqnrollDefaultValueRetrieverList();
+            ValueRetrievers = new ReqnrollDefaultValueRetrieverList(this);
         }
 
         public void RestoreDefaults()
         {
             ValueComparers = new ReqnrollDefaultValueComparerList();
-            ValueRetrievers = new ReqnrollDefaultValueRetrieverList();
+            ValueRetrievers = new ReqnrollDefaultValueRetrieverList(this);
         }
 
         [Obsolete("Use ValueComparers.Register")]

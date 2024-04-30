@@ -1,17 +1,13 @@
-using System;
 using FluentAssertions;
 using Xunit;
-using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 
-namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
+namespace Reqnroll.RuntimeTests.AssistTests.TableHelpersTests
 {
-    
-    [Obsolete]
-    public class CreateInstanceHelperMethodTests : CreateInstanceHelperMethodTestBase
+    public class TableHelpersTests : TableHelpersTestBase
     {
-        public CreateInstanceHelperMethodTests()
-            : base(t => t.CreateInstance<Person>())
+        public TableHelpersTests()
+            : base((sut, t) => sut.CreateInstance<Person>(t))
         {
         }
 
@@ -32,7 +28,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             table.AddRow("SecondColor", "Red");
             table.AddRow("FirstColor", "Red");
 
-            var @class = table.CreateInstance<AClassWithMultipleEnums>();
+            var @class = Sut.CreateInstance<AClassWithMultipleEnums>(table);
 
             @class.FirstColor.Should().Be(AClassWithMultipleEnums.Color.Red);
             @class.SecondColor.Should().Be(AClassWithMultipleEnums.ColorAgain.Red);
@@ -47,7 +43,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             table.AddRow("Field2", "Entry2");
             table.AddRow("Field1", "Entry1");
 
-            var @class = table.CreateInstance<AClassWithAConstructor>();
+            var @class = Sut.CreateInstance<AClassWithAConstructor>(table);
 
             @class.Field1.Should().Be("Entry1");
             @class.Field2.Should().Be("Entry2");
@@ -59,7 +55,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Field", "Value");
             table.AddRow("Field1", "Entry1");
 
-            var @class = table.CreateInstance<AClassWithAConstructorWithDefaultParameters>();
+            var @class = Sut.CreateInstance<AClassWithAConstructorWithDefaultParameters>(table);
 
             @class.Field1.Should().Be("Entry1");
             @class.Field2.Should().BeNull();
@@ -69,12 +65,26 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         public class AClassWithMultipleEnums
         {
             public Color FirstColor { get; set; }
+
             public ColorAgain SecondColor { get; set; }
+
             public Color ThirdColor { get; set; }
+
             public ColorAgain FourthColor { get; set; }
 
-            public enum Color { Red, Green, Blue }
-            public enum ColorAgain { Red, Green, Blue}
+            public enum Color
+            {
+                Red,
+                Green,
+                Blue
+            }
+
+            public enum ColorAgain
+            {
+                Red,
+                Green,
+                Blue
+            }
         }
 
         public class AClassWithAConstructor
@@ -86,6 +96,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             }
 
             public string Field1 { get; }
+
             public string Field2 { get; }
         }
 
@@ -99,7 +110,9 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             }
 
             public string Field1 { get; }
+
             public string Field2 { get; }
+
             public string Field3 { get; }
         }
     }

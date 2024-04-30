@@ -7,15 +7,16 @@ using FluentAssertions;
 using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 
-namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
+namespace Reqnroll.RuntimeTests.AssistTests.TableHelpersTests
 {
-
-    [Obsolete]
     public class CreateSetHelperMethodTests
     {
+        private readonly TableHelpers _sut;
+
         public CreateSetHelperMethodTests()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
+            _sut = new TableHelpers(new Service());
         }
 
         private static Table CreatePersonTableHeaders()
@@ -27,7 +28,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         public void Returns_empty_set_of_type_when_there_are_no_rows()
         {
             var table = new Table("FirstName");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.Count().Should().Be(0);
         }
 
@@ -36,7 +37,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         {
             var table = new Table("FirstName");
             table.AddRow("John");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.Count().Should().Be(1);
         }
 
@@ -45,7 +46,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         {
             var table = new Table("firstname");
             table.AddRow("John");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.First().FirstName.Should().Be("John");
         }
 
@@ -54,7 +55,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         {
             var table = new Table("first name");
             table.AddRow("John");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.First().FirstName.Should().Be("John");
         }
 
@@ -63,7 +64,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         {
             var table = new Table("With_Underscore");
             table.AddRow("John");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.First().With_Underscore.Should().Be("John");
         }
 
@@ -72,17 +73,16 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         {
             var table = new Table("WithUmlauteäöü");
             table.AddRow("John");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.First().WithUmlauteäöü.Should().Be("John");
         }
-
 
         [Fact]
         public void Sets_properties_from_column_names_to_properties_with_dash()
         {
             var table = new Table("first-name");
             table.AddRow("John");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.First().FirstName.Should().Be("John");
         }
 
@@ -92,7 +92,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("FirstName");
             table.AddRow("John");
             table.AddRow("Howard");
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
             people.Count().Should().Be(2);
         }
 
@@ -102,8 +102,8 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("SurName");
             table.AddRow("John");
             table.AddRow("Howard");
-            Action act = () => table.CreateSet<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
-            
+            Action act = () => _sut.CreateSet<Person>(table, new InstanceCreationOptions { VerifyAllColumnsBound = true });
+
             act.Should().Throw<ColumnCouldNotBeBoundException>();
         }
 
@@ -113,7 +113,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = CreatePersonTableHeaders();
             table.AddRow("John", "Galt", "", "", "", "");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().FirstName.Should().Be("John");
             people.First().LastName.Should().Be("Galt");
@@ -125,12 +125,10 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = CreatePersonTableHeaders();
             table.AddRow("", "", "", "3,124", "", "");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().NumberOfIdeas.Should().Be(3124);
         }
-
-
 
         [Fact]
         public void Sets_Enum_values_on_the_instance_when_type_is_int()
@@ -138,7 +136,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("FirstName", "LastName", "BirthDate", "NumberOfIdeas", "Salary", "IsRational", "Sex");
             table.AddRow("", "", "", "", "", "", "Male");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Sex.Should().Be(Sex.Male);
         }
@@ -149,11 +147,10 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = CreatePersonTableHeaders();
             table.AddRow("", "", "4/28/2009", "3", "", "");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().BirthDate.Should().Be(new DateTime(2009, 4, 28));
         }
-
 
         [Fact]
         public void Sets_datetime_on_the_instance_when_type_is_datetime_and_culture_is_fr_FR()
@@ -163,11 +160,10 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = CreatePersonTableHeaders();
             table.AddRow("", "", "28/4/2009", "3", "", "");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().BirthDate.Should().Be(new DateTime(2009, 4, 28));
         }
-
 
         [Fact]
         public void Sets_decimal_on_the_instance_when_type_is_decimal()
@@ -175,7 +171,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = CreatePersonTableHeaders();
             table.AddRow("", "", "4/28/2009", "3", 9997.43M.ToString(), "");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Salary.Should().Be(9997.43M);
         }
@@ -186,7 +182,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = CreatePersonTableHeaders();
             table.AddRow("", "", "4/28/2009", "3", "", "true");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().IsRational.Should().BeTrue();
         }
@@ -197,7 +193,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Salary", "NullableDecimal");
             table.AddRow("4.193", "7.28");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Salary.Should().Be(4.193M);
             people.First().NullableDecimal.Should().Be(7.28M);
@@ -211,7 +207,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Salary", "NullableDecimal");
             table.AddRow("4,193", "7,28");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Salary.Should().Be(4.193M);
             people.First().NullableDecimal.Should().Be(7.28M);
@@ -223,7 +219,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Short", "NullableShort");
             table.AddRow("1234", "1,234");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Short.Should().Be(1234);
             people.First().NullableShort.Should().Be(1234);
@@ -235,7 +231,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("UShort", "NullableUShort");
             table.AddRow("1234", "1,234");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().UShort.Should().Be(1234);
             people.First().NullableUShort.Value.Should().Be(1234);
@@ -247,7 +243,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Long", "NullableLong");
             table.AddRow("1234567890123456789", "1,234,567,890,123,456,789");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Long.Should().Be(1234567890123456789L);
             people.First().NullableLong.Should().Be(1234567890123456789L);
@@ -259,7 +255,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("ULong", "NullableULong");
             table.AddRow("1234567890123456789", "1,234,567,890,123,456,789");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().ULong.Should().Be(1234567890123456789UL);
             people.First().NullableULong.Should().Be(1234567890123456789UL);
@@ -271,7 +267,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Double", "NullableDouble");
             table.AddRow("4.193", "7.28");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Double.Should().Be(4.193);
             people.First().NullableDouble.Should().Be(7.28);
@@ -285,7 +281,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Double", "NullableDouble");
             table.AddRow("4,193", "7,28");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Double.Should().Be(4.193);
             people.First().NullableDouble.Should().Be(7.28);
@@ -297,7 +293,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Byte", "NullableByte");
             table.AddRow("4.0", "7.0");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Byte.Should().Be(4);
             people.First().NullableByte.Should().Be(7);
@@ -311,7 +307,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Byte", "NullableByte");
             table.AddRow("4,000", "7,000");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Byte.Should().Be(4);
             people.First().NullableByte.Should().Be(7);
@@ -323,7 +319,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("SByte", "NullableSByte");
             table.AddRow("4.0", "5.0");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().SByte.Should().Be(4);
             people.First().NullableSByte.Value.Should().Be(5);
@@ -337,7 +333,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("SByte", "NullableSByte");
             table.AddRow("4,0", "5,0");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().SByte.Should().Be(4);
             people.First().NullableSByte.Value.Should().Be(5);
@@ -349,7 +345,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Float", "NullableFloat");
             table.AddRow("2.698", "8.954");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Float.Should().Be(2.698F);
             people.First().NullableFloat.Should().Be(8.954F);
@@ -363,7 +359,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("Float", "NullableFloat");
             table.AddRow("2,698", "8,954");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().Float.Should().Be(2.698F);
             people.First().NullableFloat.Should().Be(8.954F);
@@ -375,7 +371,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("GuidId", "NullableGuidId");
             table.AddRow("8A6F6A2F-4EF8-4D6A-BCCE-749E8513BA82", "11116FB0-3E49-473A-B79F-A77D0A5A1526");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().GuidId.Should().Be(new Guid("8A6F6A2F-4EF8-4D6A-BCCE-749E8513BA82"));
             people.First().NullableGuidId.Should().Be(new Guid("11116FB0-3E49-473A-B79F-A77D0A5A1526"));
@@ -387,7 +383,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("UnsignedInt", "NullableUnsignedInt");
             table.AddRow("1,234", "2452");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().UnsignedInt.Should().Be(1234);
             people.First().NullableUnsignedInt.Should().Be((uint?)2452);
@@ -399,7 +395,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("MiddleInitial", "NullableChar");
             table.AddRow("O", "K");
 
-            var people = table.CreateSet<Person>();
+            var people = _sut.CreateSet<Person>(table);
 
             people.First().MiddleInitial.Should().Be('O');
             people.First().NullableChar.Should().Be('K');
@@ -412,16 +408,15 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             table.AddRow("Rich", "48", "345467", "9.5");
             table.AddRow("Sarah", "45", "12654", "4.0");
 
-            var people = table.CreateSet<(string Name, int Age, int HiScore, decimal ShoeSize)>();
+            var people = _sut.CreateSet<(string Name, int Age, int HiScore, decimal ShoeSize)>(table);
 
-            people.First().Name.Should().Be("Rich");
-            people.First().Age.Should().Be(48);
-            people.First().HiScore.Should().Be(345467);
-            people.First().ShoeSize.Should().Be(9.5m);
-            people.Last().Name.Should().Be("Sarah");
-            people.Last().Age.Should().Be(45);
-            people.Last().HiScore.Should().Be(12654);
-            people.Last().ShoeSize.Should().Be(4.0m);
+            people.Should()
+                  .BeEquivalentTo(
+                      new (string Name, int Age, int HiScore, decimal ShoeSize)[]
+                      {
+                          ("Rich", 48, 345467, 9.5m),
+                          ("Sarah", 45, 12654, 4.0m)
+                      });
         }
     }
 }
