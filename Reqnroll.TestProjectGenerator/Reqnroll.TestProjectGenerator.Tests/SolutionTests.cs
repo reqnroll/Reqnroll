@@ -10,7 +10,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
 {
     public class SolutionTests
     {
-        private SolutionWriter CreateSolutionWriter() => new SolutionWriter(new Mock<IOutputWriter>().Object, new ConfigurationDriver());
+        private SolutionWriter CreateSolutionWriter() => new SolutionWriter(new Mock<IOutputWriter>().Object);
 
         [Fact]
         public void CreateEmptySolution()

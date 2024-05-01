@@ -32,8 +32,6 @@ namespace Reqnroll.TestProjectGenerator
             }
         }
 
-        internal bool PipelineMode => _msBuildFinder.PipelineMode;
-
         private CompileResult CompileWithMSBuild(bool? treatWarningsAsErrors)
         {
             var msBuildPath = _msBuildFinder.FindMSBuild();

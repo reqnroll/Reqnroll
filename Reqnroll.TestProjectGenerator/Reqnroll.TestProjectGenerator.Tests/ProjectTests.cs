@@ -35,195 +35,220 @@ namespace Reqnroll.TestProjectGenerator.Tests
             return (solution, project, folder);
         }
 
-        private SolutionWriter CreateSolutionWriter() => new SolutionWriter(new Mock<IOutputWriter>().Object, new ConfigurationDriver());
+        private SolutionWriter CreateSolutionWriter() => new SolutionWriter(new Mock<IOutputWriter>().Object);
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        private void RunSkippableTest(Action test)
+        {
+            try
+            {
+                test();
+            }
+            catch (DotNetSdkNotInstalledException ex)
+            {
+                Skip.IfNot(new ConfigurationDriver().PipelineMode, ex.ToString());
+            }
+        }
+
+        [SkippableFact]
         public void AddNuGetPackageToProjectInNewFormat()
         {
-            
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
 
-            project.AddNuGetPackage("Reqnroll", "2.3.1", new NuGetPackageAssembly("Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\Reqnroll.dll"));
+                project.AddNuGetPackage("Reqnroll", "2.3.1", new NuGetPackageAssembly("Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\Reqnroll.dll"));
 
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
 
-            projectFileContent.Should().Contain("<PackageReference Include=\"Reqnroll\" Version=\"2.3.1\" />");
+                projectFileContent.Should().Contain("<PackageReference Include=\"Reqnroll\" Version=\"2.3.1\" />");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddNuGetPackageToProjectInOldFormat()
         {
-
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
-
-
-            project.AddNuGetPackage("Reqnroll", "2.3.1", new NuGetPackageAssembly("Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\Reqnroll.dll"));
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                project.AddNuGetPackage("Reqnroll", "2.3.1", new NuGetPackageAssembly("Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL", "net45\\Reqnroll.dll"));
 
 
-            projectFileContent.Should().Contain("<Import Project=\"..\\packages\\Reqnroll.2.3.1\\build\\Reqnroll.targets\" Condition=\"Exists(\'..\\packages\\Reqnroll.2.3.1\\build\\Reqnroll.targets\')\" />");
-            projectFileContent.Should().Match("*<Reference Include=\"Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL\">*<HintPath>..\\packages\\Reqnroll.2.3.1\\lib\\net45\\Reqnroll.dll</HintPath>*</Reference>*");
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+
+                projectFileContent.Should().Contain("<Import Project=\"..\\packages\\Reqnroll.2.3.1\\build\\Reqnroll.targets\" Condition=\"Exists(\'..\\packages\\Reqnroll.2.3.1\\build\\Reqnroll.targets\')\" />");
+                projectFileContent.Should().Match("*<Reference Include=\"Reqnroll, Version=2.3.1.0, Culture=neutral, PublicKeyToken=0778194805d6db41, processorArchitecture=MSIL\">*<HintPath>..\\packages\\Reqnroll.2.3.1\\lib\\net45\\Reqnroll.dll</HintPath>*</Reference>*");
+            });
         }
 
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddNuGetPackageWithMSBuildFilesToProjectInOldFormat()
         {
-
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
-
-
-            project.AddNuGetPackage(
-                "Reqnroll.Tools.MsBuild.Generation",
-                "2.3.2-preview20180328");
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                project.AddNuGetPackage(
+                    "Reqnroll.Tools.MsBuild.Generation",
+                    "2.3.2-preview20180328");
 
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
 
 
-            projectFileContent.Should().Contain("<Import Project=\"..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.props\" Condition=\"Exists(\'..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.props\')\" />");
-            projectFileContent.Should().Contain("<Import Project=\"..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.targets\" Condition=\"Exists(\'..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.targets\')\" />");
-            
+                projectFileContent.Should().Contain("<Import Project=\"..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.props\" Condition=\"Exists(\'..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.props\')\" />");
+                projectFileContent.Should().Contain("<Import Project=\"..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.targets\" Condition=\"Exists(\'..\\packages\\Reqnroll.Tools.MsBuild.Generation.2.3.2-preview20180328\\build\\Reqnroll.Tools.MsBuild.Generation.targets\')\" />");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddReferenceToProjectInNewFormat()
         {
-
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
-
-
-            project.AddReference("System.Configuration");
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                project.AddReference("System.Configuration");
 
 
-            projectFileContent.Should().Contain("<Reference Include=\"System.Configuration\" />");
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+
+                projectFileContent.Should().Contain("<Reference Include=\"System.Configuration\" />");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddReferenceToProjectInOldFormat()
         {
-
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
-
-
-            project.AddReference("System.Configuration");
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                project.AddReference("System.Configuration");
 
 
-            projectFileContent.Should().Contain("<Reference Include=\"System.Configuration\" />");
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
+
+
+                projectFileContent.Should().Contain("<Reference Include=\"System.Configuration\" />");
+            });
         }
 
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddFileToProjectInOldFormat()
         {
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
+                var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
 
-            var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
-
-            project.AddFile(projectFile);
-
-
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
-            var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
+                project.AddFile(projectFile);
 
 
-            projectFileContent.Should().Contain("<Compile Include=\"File.cs\" />");
-            File.Exists(filePath).Should().BeTrue();
-            File.ReadAllText(filePath).Should().Contain("//no code");
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
+
+
+                projectFileContent.Should().Contain("<Compile Include=\"File.cs\" />");
+                File.Exists(filePath).Should().BeTrue();
+                File.ReadAllText(filePath).Should().Contain("//no code");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddFileToProjectInNewFormat()
         {
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
+                var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
 
-            var projectFile = new ProjectFile("File.cs", "Compile", "//no code");
-
-            project.AddFile(projectFile);
-
-
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
-            var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
+                project.AddFile(projectFile);
 
 
-            projectFileContent.Should().NotContain("<Compile");
-            File.Exists(filePath).Should().BeTrue();
-            File.ReadAllText(filePath).Should().Contain("//no code");
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "File.cs");
+
+
+                projectFileContent.Should().NotContain("<Compile");
+                File.Exists(filePath).Should().BeTrue();
+                File.ReadAllText(filePath).Should().Contain("//no code");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddFileInFolderToProjectInOldFormat()
         {
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.Old, ProgrammingLanguage.CSharp);
+                var projectFile = new ProjectFile(Path.Combine("Folder", "File.cs"), "Compile", "//no code");
 
-            var projectFile = new ProjectFile(Path.Combine("Folder","File.cs"), "Compile", "//no code");
-
-            project.AddFile(projectFile);
-
-
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
-            var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
+                project.AddFile(projectFile);
 
 
-            projectFileContent.Should().Contain("<Compile Include=\"Folder\\File.cs\" />");
-            File.Exists(filePath).Should().BeTrue();
-            File.ReadAllText(filePath).Should().Contain("//no code");
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
+
+
+                projectFileContent.Should().Contain("<Compile Include=\"Folder\\File.cs\" />");
+                File.Exists(filePath).Should().BeTrue();
+                File.ReadAllText(filePath).Should().Contain("//no code");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void AddFileInFolderToProjectInNewFormat()
         {
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
+                var projectFile = new ProjectFile(Path.Combine("Folder", "File.cs"), "Compile", "//no code");
 
-            var projectFile = new ProjectFile(Path.Combine("Folder", "File.cs"), "Compile", "//no code");
-
-            project.AddFile(projectFile);
-
-
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-            var projectFileContent = GetProjectFileContent(solutionFolder, project);
-            var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
+                project.AddFile(projectFile);
 
 
-            projectFileContent.Should().NotContain("<Compile");
-            File.Exists(filePath).Should().BeTrue();
-            File.ReadAllText(filePath).Should().Contain("//no code");
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
+                var projectFileContent = GetProjectFileContent(solutionFolder, project);
+                var filePath = Path.Combine(GetProjectFolderPath(solutionFolder, project), "Folder", "File.cs");
+
+
+                projectFileContent.Should().NotContain("<Compile");
+                File.Exists(filePath).Should().BeTrue();
+                File.ReadAllText(filePath).Should().Contain("//no code");
+            });
         }
 
         private string GetProjectFileContent(string solutionFolder, Project project)
@@ -239,148 +264,179 @@ namespace Reqnroll.TestProjectGenerator.Tests
             return Path.Combine(solutionFolder, project.Name);
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
+                projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpCore3_1ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                    .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpNet50ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net50);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net50);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net5.0</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                    .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net5.0</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpNet60ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net60);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net60);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net6.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net6.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpNet70ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net70);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net70);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net7.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net7.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpNet80ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net80);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Net80);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net8.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net8.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpNet481ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net481);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net481);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net481</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net481</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpNet462ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net462);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net462);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyCSharpNet472ProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net472);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net472);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net472</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net472</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyFSharpProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.FSharp);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
-            projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
-            projectFileContent.Should().Contain("<TargetFramework>net462</TargetFramework>");
-            projectFileContent.Should().Contain("<ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>");
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                projectFileContent.Should().Contain("<Project Sdk=\"Microsoft.NET.Sdk\">");
+                projectFileContent.Should().Contain("<TargetFramework>net462</TargetFramework>");
+                projectFileContent.Should().Contain("<ItemGroup>\r\n    <Compile Include=\"Library.fs\" />\r\n  </ItemGroup>");
+            });
         }
 
-        [SkippableFact(typeof(DotNetSdkNotInstalledException))]
+        [SkippableFact]
         public void CreateEmptyVbProjectInNewFormat()
         {
-            var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB);
+            RunSkippableTest(() =>
+            {
+                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.VB);
 
-            CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
+                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
 
-            string projectFileContent = GetProjectFileContent(solutionFolder, project);
+                string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
-            projectFileContent.Should()
-                              .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net462</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                projectFileContent.Should()
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net462</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+            });
         }
     }
-
-    
 }

@@ -10,15 +10,13 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
     public class SolutionWriter
     {
         private readonly IOutputWriter _outputWriter;
-        private readonly ConfigurationDriver _configurationDriver;
         private readonly ProjectWriterFactory _projectWriterFactory;
         private readonly FileWriter _fileWriter;
         private readonly NetCoreSdkInfoProvider _netCoreSdkInfoProvider;
 
-        public SolutionWriter(IOutputWriter outputWriter, ConfigurationDriver configurationDriver)
+        public SolutionWriter(IOutputWriter outputWriter)
         {
             _outputWriter = outputWriter;
-            _configurationDriver = configurationDriver;
             _projectWriterFactory = new ProjectWriterFactory(outputWriter, new TargetFrameworkMonikerStringBuilder(), new TargetFrameworkVersionStringBuilder());
             _fileWriter = new FileWriter();
             _netCoreSdkInfoProvider = new NetCoreSdkInfoProvider();
@@ -58,7 +56,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
             createSolutionCommand.ExecuteWithRetry(1, TimeSpan.FromSeconds(1), (innerException) =>
             {
-                if (innerException is AggregateException aggregateException && aggregateException.InnerExceptions.Any(x => x.InnerException.Message.Contains("Install the [" + sdk.Version)) && !_configurationDriver.PipelineMode)
+                if (innerException is AggregateException aggregateException && aggregateException.InnerExceptions.Any(x => x.InnerException.Message.Contains("Install the [" + sdk.Version)))
                     return new DotNetSdkNotInstalledException($"Sdk Version \"{sdk.Version}\" is not installed", innerException);
                 return new ProjectCreationNotPossibleException("Could not create solution.", innerException);
             });

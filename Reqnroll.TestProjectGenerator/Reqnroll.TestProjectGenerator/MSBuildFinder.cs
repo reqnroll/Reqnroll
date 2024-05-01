@@ -30,8 +30,6 @@ namespace Reqnroll.TestProjectGenerator
             return null;
         }
 
-        internal bool PipelineMode => _configDriver.PipelineMode;
-
         private string FindUsingVsWhere()
         {
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return null;
