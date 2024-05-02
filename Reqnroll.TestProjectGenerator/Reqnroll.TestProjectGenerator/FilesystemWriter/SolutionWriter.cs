@@ -54,8 +54,12 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             DisableUsingSdkFromEnvironmentVariable();
 
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
-            createSolutionCommand.ExecuteWithRetry(1, TimeSpan.FromSeconds(1),
-                (innerException) => new ProjectCreationNotPossibleException("Could not create solution.", innerException) );
+            createSolutionCommand.ExecuteWithRetry(1, TimeSpan.FromSeconds(1), (innerException) =>
+            {
+                if (innerException is AggregateException aggregateException && aggregateException.InnerExceptions.Any(x => x.InnerException.Message.Contains("Install the [" + sdk.Version)))
+                    return new DotNetSdkNotInstalledException($"Sdk Version \"{sdk.Version}\" is not installed", innerException);
+                return new ProjectCreationNotPossibleException("Could not create solution.", innerException);
+            });
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
             WriteProjects(solution, outputPath, solutionFilePath);

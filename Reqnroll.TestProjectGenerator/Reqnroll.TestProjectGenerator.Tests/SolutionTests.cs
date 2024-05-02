@@ -10,6 +10,8 @@ namespace Reqnroll.TestProjectGenerator.Tests
 {
     public class SolutionTests
     {
+        private SolutionWriter CreateSolutionWriter() => new SolutionWriter(new Mock<IOutputWriter>().Object);
+
         [Fact]
         public void CreateEmptySolution()
         {
@@ -17,7 +19,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
 
             var solution = new Solution("SolutionName");
 
-            var solutionWriter = new SolutionWriter(new Mock<IOutputWriter>().Object);
+            var solutionWriter = CreateSolutionWriter();
 
             solutionWriter.WriteToFileSystem(solution, folder);
 
@@ -39,7 +41,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
 
             solution.AddProject(project);
 
-            var solutionWriter = new SolutionWriter(new Mock<IOutputWriter>().Object);
+            var solutionWriter = CreateSolutionWriter();
 
             solutionWriter.WriteToFileSystem(solution, folder);
 
