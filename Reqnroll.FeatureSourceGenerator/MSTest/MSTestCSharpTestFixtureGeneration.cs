@@ -25,31 +25,40 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
         SourceBuilder.AppendLine("// start: MSTest Specific part");
         SourceBuilder.AppendLine();
 
-        SourceBuilder.AppendLine("private global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext? _testContext;");
+        SourceBuilder.AppendLine("public global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext { get; set; }");
         SourceBuilder.AppendLine();
 
-        SourceBuilder.AppendLine("public virtual global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext? TestContext");
-        SourceBuilder.BeginBlock("{");
-
-        SourceBuilder
-            .AppendLine("get")
-            .BeginBlock("{")
-            .AppendLine("return this._testContext;")
-            .EndBlock("}");
-
-        SourceBuilder
-            .AppendLine("set")
-            .BeginBlock("{")
-            .AppendLine("this._testContext = value;")
-            .EndBlock("}");
-
-        SourceBuilder.EndBlock("}");
-
+        AppendClassInitializeMethod();
         SourceBuilder.AppendLine();
+
+        AppendClassCleanupMethod();
+        SourceBuilder.AppendLine();
+
         SourceBuilder.AppendLine("// end: MSTest Specific part");
-        SourceBuilder.AppendLine();
 
         base.AppendTestFixturePreamble();
+    }
+
+    protected virtual void AppendClassInitializeMethod()
+    {
+        SourceBuilder.AppendLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitialize]");
+        SourceBuilder.AppendLine("public static Task IntializeFeatureAsync(TestContext testContext)");
+        SourceBuilder.BeginBlock("{");
+        SourceBuilder.AppendLine("var testWorkerId = global::System.Threading.Thread.CurrentThread.ManagedThreadId.ToString();");
+        SourceBuilder.AppendLine("var testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, testWorkerId);");
+        SourceBuilder.AppendLine("return testRunner.OnFeatureStartAsync(featureInfo);");
+        SourceBuilder.EndBlock("}");
+    }
+
+    protected virtual void AppendClassCleanupMethod()
+    {
+        SourceBuilder.AppendLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanup]");
+        SourceBuilder.AppendLine("public static Task TeardownFeatureAsync()");
+        SourceBuilder.BeginBlock("{");
+        SourceBuilder.AppendLine("var testWorkerId = global::System.Threading.Thread.CurrentThread.ManagedThreadId.ToString();");
+        SourceBuilder.AppendLine("var testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, testWorkerId);");
+        SourceBuilder.AppendLine("return testRunner.OnFeatureEndAsync();");
+        SourceBuilder.EndBlock("}");
     }
 
     protected override IEnumerable<AttributeDescriptor> GetTestMethodAttributes(Scenario scenario)
@@ -79,6 +88,6 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
 
         SourceBuilder.AppendLine();
         SourceBuilder.AppendLine("// MsTest specific customization:");
-        SourceBuilder.AppendLine("testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs(_testContext);");
+        SourceBuilder.AppendLine("testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs(TestContext);");
     }
 }

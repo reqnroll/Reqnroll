@@ -53,7 +53,7 @@ public class XUnitFeatureSourceGeneratorTests
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
             .Which.Should().ContainMethod("AddTwoNumbers")
-            .Which.Should().HaveAttribute("global::XUnit.Fact");
+            .Which.Should().HaveAttribute("global::Xunit.Fact");
     }
 
     [Fact]
@@ -103,6 +103,6 @@ public class XUnitFeatureSourceGeneratorTests
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
             .Which.Should().ContainMethod("AddTwoNumbers")
-            .Which.Should().HaveAttribute("global::XUnit.Fact");
+            .Which.Should().HaveAttribute("global::Xunit.Fact");
     }
 }

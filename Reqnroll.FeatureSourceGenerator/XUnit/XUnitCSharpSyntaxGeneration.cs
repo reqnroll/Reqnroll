@@ -17,11 +17,7 @@ public class XUnitCSharpSyntaxGeneration(FeatureInformation featureInfo) : CShar
     }
 
     protected override IEnumerable<string> GetInterfaces() => 
-        base.GetInterfaces().Concat(
-            [
-                $"global::Xunit.IClassFixture<{GetClassName()}.Lifetime>",
-                "global::Xunit.IAsyncLifetime"
-            ]);
+        base.GetInterfaces().Concat([ $"global::Xunit.IClassFixture<{GetClassName()}.Lifetime>" ]);
 
     protected override void AppendTestFixturePreamble()
     {
@@ -37,7 +33,7 @@ public class XUnitCSharpSyntaxGeneration(FeatureInformation featureInfo) : CShar
         // Lifetime class is initialzed once per feature, then passed to the constructor of each test class instance.
         SourceBuilder.AppendLine($"public {GetClassName()}(Lifetime lifetime)");
         SourceBuilder.BeginBlock("{");
-        SourceBuilder.AppendLine("Lifetime = lifetime");
+        SourceBuilder.AppendLine("Lifetime = lifetime;");
         SourceBuilder.EndBlock("}");
     }
 
@@ -72,6 +68,6 @@ public class XUnitCSharpSyntaxGeneration(FeatureInformation featureInfo) : CShar
     protected override void AppendTestRunnerLookupForScenario(Scenario scenario)
     {
         // For xUnit test runners are scoped to the whole feature execution lifetime
-        SourceBuilder.AppendLine("var testRunner = Lifecycle.TestRunner");
+        SourceBuilder.AppendLine("var testRunner = Lifecycle.TestRunner;");
     }
 }

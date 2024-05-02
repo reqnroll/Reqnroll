@@ -199,13 +199,6 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
 
     protected virtual void AppendScenarioInitializeMethodBody()
     {
-        SourceBuilder.AppendLine("// handle feature initialization");
-        SourceBuilder.AppendLine(
-            "if (testRunner.FeatureContext == null || !object.ReferenceEquals(testRunner.FeatureContext.FeatureInfo, FeatureInfo))");
-        SourceBuilder.AppendLine("await testRunner.OnFeatureStartAsync(FeatureInfo);");
-        SourceBuilder.AppendLine();
-
-        SourceBuilder.AppendLine("// handle scenario initialization");
         SourceBuilder.AppendLine("testRunner.OnScenarioInitialize(scenarioInfo);");
     }
 
