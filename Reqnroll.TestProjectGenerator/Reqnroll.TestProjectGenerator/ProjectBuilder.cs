@@ -37,7 +37,8 @@ namespace Reqnroll.TestProjectGenerator
             Configuration configuration,
             CurrentVersionDriver currentVersionDriver,
             Folders folders,
-            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
+            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder,
+            SourceGeneratorPlatform sourceGenerator)
         {
             _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
@@ -47,12 +48,14 @@ namespace Reqnroll.TestProjectGenerator
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
+            SourceGenerator = sourceGenerator;
             var projectGuidString = $"{ProjectGuid:N}".Substring(24);
             ProjectName = $"TestProj_{projectGuidString}";
         }
 
         public Guid ProjectGuid { get; } = Guid.NewGuid();
         public Configuration Configuration { get; }
+        public SourceGeneratorPlatform SourceGenerator { get; }
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
         public TargetFramework TargetFramework { get; set; } = TargetFramework.Netcoreapp31;

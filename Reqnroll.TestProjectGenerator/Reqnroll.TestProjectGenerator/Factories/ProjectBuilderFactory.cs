@@ -11,6 +11,7 @@ namespace Reqnroll.TestProjectGenerator.Factories
         protected readonly FeatureFileGenerator _featureFileGenerator;
         protected readonly Folders _folders;
         protected readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
+        protected readonly SourceGeneratorPlatform _sourceGenerator;
         protected readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         protected readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -25,7 +26,8 @@ namespace Reqnroll.TestProjectGenerator.Factories
             BindingsGeneratorFactory bindingsGeneratorFactory,
             FeatureFileGenerator featureFileGenerator,
             Folders folders,
-            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
+            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder,
+            SourceGeneratorPlatform sourceGenerator)
         {
             _testProjectFolders = testProjectFolders;
             _testRunConfiguration = testRunConfiguration;
@@ -35,6 +37,7 @@ namespace Reqnroll.TestProjectGenerator.Factories
             _featureFileGenerator = featureFileGenerator;
             _folders = folders;
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
+            _sourceGenerator = sourceGenerator;
         }
 
         public ProjectBuilder CreateProject(string language)
@@ -112,7 +115,16 @@ namespace Reqnroll.TestProjectGenerator.Factories
         {
             var configuration = new Configuration();
 
-            return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, configuration, _currentVersionDriver, _folders, _targetFrameworkMonikerStringBuilder);
+            return new ProjectBuilder(
+                _testProjectFolders,
+                _featureFileGenerator,
+                _bindingsGeneratorFactory,
+                _configurationGeneratorFactory,
+                configuration,
+                _currentVersionDriver,
+                _folders,
+                _targetFrameworkMonikerStringBuilder,
+                _sourceGenerator);
         }
     }
 }
