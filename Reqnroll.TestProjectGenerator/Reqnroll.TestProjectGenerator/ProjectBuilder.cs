@@ -377,7 +377,7 @@ namespace Reqnroll.TestProjectGenerator
                     break;
                 case UnitTestProvider.MSTest when _parallelTestExecution:
                     _project.AddFile(
-                        new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.ClassLevel)]"));
+                        new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.MethodLevel)]"));
                     break;
                 case UnitTestProvider.MSTest when !_parallelTestExecution:
                     _project.AddFile(new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: DoNotParallelize]"));

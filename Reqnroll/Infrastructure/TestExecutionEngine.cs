@@ -270,6 +270,24 @@ namespace Reqnroll.Infrastructure
             throw _errorProvider.GetPendingStepDefinitionError();
         }
 
+        public virtual ITestExecutionEngine GetScenarioExecutionEngine()
+        {
+            var scenarioContextManager = _contextManager.GetScenarioContextManager();
+
+            var scenarioEngine = new TestExecutionEngine(_stepFormatter, _testTracer, _errorProvider, _stepArgumentTypeConverter, _reqnrollConfiguration, _bindingRegistry, _unitTestRuntimeProvider, scenarioContextManager,
+                _stepDefinitionMatchService, _bindingInvoker, _obsoleteStepHandler, _analyticsEventProvider, _analyticsTransmitter, _testRunnerManager,
+                _runtimePluginTestExecutionLifecycleEventEmitter, _testThreadExecutionEventPublisher, _testPendingMessageFactory, _testUndefinedMessageFactory, _testObjectResolver, _testRunContext);
+
+            scenarioContextManager.InitScenarioExecutionEngine(scenarioEngine);
+
+            return scenarioEngine;
+        }
+
+        public virtual void InitScenarioRunner(ITestRunner testRunner)
+        {
+            _contextManager.InitScenarioRunner(testRunner);
+        }
+
         protected virtual async Task OnBlockStartAsync(ScenarioBlock block)
         {
             if (block == ScenarioBlock.None)

@@ -176,7 +176,7 @@ namespace Reqnroll.Generator.Generation
             _testGeneratorProvider.SetTestClassInitializeMethod(generationContext);
 
             //testRunner = TestRunnerManager.GetTestRunnerForAssembly(null, [test_worker_id]);
-            var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
+            var testRunnerField = generationContext.FeatureRunnerField == null ? _scenarioPartHelper.GetTestRunnerExpression() : _scenarioPartHelper.GetTestFeatureRunnerExpression();
 
             var testRunnerParameters = new[]
             {
@@ -229,7 +229,7 @@ namespace Reqnroll.Generator.Generation
             
             _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);
 
-            var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
+            var testRunnerField = generationContext.FeatureRunnerField == null ? _scenarioPartHelper.GetTestRunnerExpression() : _scenarioPartHelper.GetTestFeatureRunnerExpression();
 
             // await testRunner.OnFeatureEndAsync();
             var expression = new CodeMethodInvokeExpression(

@@ -65,6 +65,12 @@ namespace Reqnroll.Generator.UnitTestProvider
                 new CodeThisReferenceExpression(), TESTCONTEXT_FIELD_NAME), new CodePropertySetValueReferenceExpression()));
 
             generationContext.TestClass.Members.Add(testContextProperty);
+
+            // Add a feature Test Runner
+            var field = new CodeMemberField(CodeDomHelper.GetGlobalizedTypeName(typeof(ITestRunner)), Generation.GeneratorConstants.FEATURETESTRUNNER_FIELD);
+            field.Attributes |= MemberAttributes.Static;
+            generationContext.FeatureRunnerField = field;
+            generationContext.TestClass.Members.Add(field);
         }
 
         public virtual void SetTestClassCategories(TestClassGenerationContext generationContext, IEnumerable<string> featureCategories)
@@ -101,7 +107,6 @@ namespace Reqnroll.Generator.UnitTestProvider
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
-            generationContext.TestRunnerField.Attributes |= MemberAttributes.Static;
 
             generationContext.TestClassInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(
                 TESTCONTEXT_TYPE, "testContext"));
@@ -125,6 +130,15 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected virtual void FixTestRunOrderingIssue(TestClassGenerationContext generationContext)
         {
             //see https://github.com/reqnroll/Reqnroll/issues/96
+
+            var getTestRunnerExpression = new CodeMethodInvokeExpression(
+                new CodeVariableReferenceExpression(generationContext.FeatureRunnerField.Name),
+                nameof(ITestRunner.GetScenarioTestRunner));
+
+            generationContext.TestInitializeMethod.Statements.Add(
+                new CodeAssignStatement(
+                    new CodeVariableReferenceExpression(generationContext.TestRunnerField.Name),
+                    getTestRunnerExpression));
 
             //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo.Title != "<current_feature_title>")
             //  <TestClass>.<TestClassInitialize>(null);

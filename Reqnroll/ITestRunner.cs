@@ -34,5 +34,7 @@ namespace Reqnroll
         Task ButAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
 
         void Pending();
+
+        ITestRunner GetScenarioTestRunner();
     }
 }

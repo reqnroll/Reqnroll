@@ -173,6 +173,11 @@ namespace Reqnroll.Generator.Generation
             return new CodeVariableReferenceExpression(GeneratorConstants.TESTRUNNER_FIELD);
         }
 
+        public CodeExpression GetTestFeatureRunnerExpression()
+        {
+            return new CodeVariableReferenceExpression(GeneratorConstants.FEATURETESTRUNNER_FIELD);
+        }
+
         private CodeExpression GetStringArrayExpression(IEnumerable<string> items, ParameterSubstitution paramToIdentifier)
         {
             return new CodeArrayCreateExpression(typeof(string[]), items.Select(item => GetSubstitutedString(item, paramToIdentifier)).ToArray());
