@@ -611,18 +611,18 @@ namespace Reqnroll.Infrastructure
 
             for (var i = 0; i < match.Arguments.Length; i++)
             {
-                arguments[i] = await ConvertArg(match.Arguments[i], bindingParameters[i].Type);
+                arguments[i] = await ConvertArg(match.Arguments[i], _contextManager, bindingParameters[i].Type);
             }
 
             return arguments;
         }
 
-        private async Task<object> ConvertArg(object value, IBindingType typeToConvertTo)
+        private async Task<object> ConvertArg(object value, IContextManager contextManager, IBindingType typeToConvertTo)
         {
             Debug.Assert(value != null);
             Debug.Assert(typeToConvertTo != null);
 
-            return await _stepArgumentTypeConverter.ConvertAsync(value, typeToConvertTo, FeatureContext.BindingCulture);
+            return await _stepArgumentTypeConverter.ConvertAsync(value, typeToConvertTo, _contextManager, FeatureContext.BindingCulture);
         }
 
         #endregion
