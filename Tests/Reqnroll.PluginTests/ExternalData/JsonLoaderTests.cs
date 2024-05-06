@@ -91,7 +91,7 @@ namespace Reqnroll.PluginTests.ExternalData
             Assert.Equal(3, firstItem.Fields.Count);
             Assert.Equal("Chocolate", firstItem.Fields["product"].AsString());
             Assert.Equal("brown", firstItem.Fields["color"].AsString());
-            Assert.Equal("[\r\n  {\r\n    \"name\": \"Dark Chocolate\",\r\n    \"price\": \"1.6\"\r\n  },\r\n  {\r\n    \"name\": \"Milk Chocolate\",\r\n    \"price\": \"1.55\"\r\n  }\r\n]", firstItem.Fields["varieties"].AsString());
+            Assert.Equal($"[{Environment.NewLine}  {{{Environment.NewLine}    \"name\": \"Dark Chocolate\",{Environment.NewLine}    \"price\": \"1.6\"{Environment.NewLine}  }},{Environment.NewLine}  {{{Environment.NewLine}    \"name\": \"Milk Chocolate\",{Environment.NewLine}    \"price\": \"1.55\"{Environment.NewLine}  }}{Environment.NewLine}]", firstItem.Fields["varieties"].AsString());
         }
 
         [Fact]
