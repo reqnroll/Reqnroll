@@ -10,19 +10,12 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
     {
         public DataSources.DataTable FlattenDataSetToDataTable(JObject originalJson, string[] objectPath)
         {
-            try
-            {
-                var header = GenerateHeader(originalJson, objectPath);
-                var dataTable = new DataSources.DataTable(header.ToArray());
-                var records = GenerateRecordsFromNestedObjects(originalJson, objectPath, new List<DataRecord>());
-                foreach (var record in records) dataTable.Items.Add(record);
+            var header = GenerateHeader(originalJson, objectPath);
+            var dataTable = new DataSources.DataTable(header.ToArray());
+            var records = GenerateRecordsFromNestedObjects(originalJson, objectPath, new List<DataRecord>());
+            foreach (var record in records) dataTable.Items.Add(record);
 
-                return dataTable;
-            }
-            catch (System.NullReferenceException)
-            {
-                throw new ExternalDataPluginException($"Unable to flatten {objectPath} into DataTable");
-            }
+            return dataTable;
         }
 
         private static List<string> GenerateHeader(JObject originalJson, string[] objectPath)
