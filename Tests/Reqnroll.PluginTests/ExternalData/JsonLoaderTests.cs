@@ -3,6 +3,8 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Newtonsoft.Json;
+using Reqnroll.ExternalData.ReqnrollPlugin;
 using Reqnroll.ExternalData.ReqnrollPlugin.Loaders;
 using Xunit;
 
@@ -11,8 +13,9 @@ namespace Reqnroll.PluginTests.ExternalData
     public class JsonLoaderTests
     {
         private static readonly string SampleFilesFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".", "ExternalData", "SampleFiles");
-        private string _productsSampleFilePath = Path.Combine(SampleFilesFolder, "products.json");
-        private string _nestedProductsSampleFilePath = Path.Combine(SampleFilesFolder, "products-nested-dataset.json");
+        private readonly string _productsSampleFilePath = Path.Combine(SampleFilesFolder, "products.json");
+        private readonly string _productsInvalidSampleFilePath = Path.Combine(SampleFilesFolder, "products-invalid.json");
+        private readonly string _nestedProductsSampleFilePath = Path.Combine(SampleFilesFolder, "products-nested-dataset.json");
 
         private string SampleFeatureFilePathInSampleFileFolder =>
             Path.Combine(Path.GetDirectoryName(_productsSampleFilePath) ?? ".", "Sample.feature");
@@ -119,6 +122,15 @@ namespace Reqnroll.PluginTests.ExternalData
             Assert.Equal("orange", lastItem.Fields["color"].AsString());
             Assert.Equal("1.6", lastItem.Fields["price"].AsString(CultureInfo.GetCultureInfo("en-us")));
             Assert.Equal("Tangerine", lastItem.Fields["name"].AsString());
+        }
+
+        [Fact]
+        public void Can_handle_invalid_json_file_format()
+        {
+            var sut = CreateSut();
+
+            var externalDataPluginException = Assert.Throws<ExternalDataPluginException>(() => sut.LoadDataSource(_productsInvalidSampleFilePath, null));
+            Assert.IsType<JsonReaderException>(externalDataPluginException.InnerException);
         }
     }
 }

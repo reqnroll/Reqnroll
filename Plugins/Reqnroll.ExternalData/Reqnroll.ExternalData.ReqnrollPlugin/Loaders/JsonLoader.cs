@@ -50,7 +50,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
 
         private DataSource LoadJsonDataSource(string fileContent, string sourceFilePath)
         {
-            JObject fileJson = ParseJson(fileContent);
+            JObject fileJson = ParseJson(fileContent, sourceFilePath);
             var dataSets = DetermineDataSets(fileJson, "");
             var dataSetsRecord = new DataRecord();
             var jsonDataTableGenerator = new JsonDataTableGenerator();
@@ -63,7 +63,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
             return new DataSource(dataSetsRecord, dataSets.First());
         }
 
-        private static JObject ParseJson(string fileContent)
+        private static JObject ParseJson(string fileContent, string sourceFilePath)
         {
             JObject fileJson;
             try
@@ -72,7 +72,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders
             }
             catch (JsonReaderException jsonReaderException)
             {
-                throw new ExternalDataPluginException($"Failed to parse json file: {jsonReaderException}");
+                throw new ExternalDataPluginException($"Failed to parse json file {sourceFilePath}", jsonReaderException);
             }
 
             return fileJson;
