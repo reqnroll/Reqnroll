@@ -222,7 +222,7 @@ namespace Reqnroll.RuntimeTests
 
         private StepArgumentTypeConverter CreateStepArgumentTypeConverter()
         {
-            return new StepArgumentTypeConverter(new Mock<ITestTracer>().Object, bindingRegistryStub.Object, contextManagerStub.Object, methodBindingInvokerStub.Object);
+            return new StepArgumentTypeConverter(new Mock<ITestTracer>().Object, bindingRegistryStub.Object, methodBindingInvokerStub.Object);
         }
 
         [Fact]

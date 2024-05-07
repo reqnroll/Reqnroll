@@ -23,6 +23,7 @@ namespace Reqnroll.Generator
         public CodeMemberMethod ScenarioCleanupMethod { get; private set; }
         public CodeMemberMethod FeatureBackgroundMethod { get; private set; }
         public CodeMemberField TestRunnerField { get; private set; }
+        public CodeMemberField FeatureRunnerField { get; internal set; }
 
         public bool GenerateRowTests { get; private set; }
 

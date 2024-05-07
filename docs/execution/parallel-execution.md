@@ -19,7 +19,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 | Scheduling unit  | Description          | Runner support       |
 | ---------------- | -------------------- | -------------------- |
-| Scenario         | Scenarios can run in parallel with each other (also from different features) | N/A     |
+| Scenario         | Scenarios can run in parallel with each other (also from different features) | MsTest |
 | Feature          | Features can run in parallel with each other. Scenarios from the same feature are running on the same test thread. | NUnit, MsTest, xUnit |
 | Test assembly    | Different test assemblies can run in parallel with each other | e.g. VSTest |
 
@@ -74,10 +74,6 @@ Parallelisation must be configured by setting an assembly-level attribute in the
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 [assembly: Parallelize(Scope = ExecutionScope.ClassLevel)]
-```
-
-```{note}
-Reqnroll does not support scenario level parallelization with MsTest (when scenarios from the same feature execute in parallel). If you configure a higher level MsTest parallelization than "ClassLevel" your tests will fail with runtime errors.
 ```
 
 ### xUnit Configuration

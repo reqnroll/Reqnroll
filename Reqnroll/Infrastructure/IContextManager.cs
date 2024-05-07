@@ -10,6 +10,9 @@ namespace Reqnroll.Infrastructure
         ScenarioStepContext StepContext { get; }
         StepDefinitionType? CurrentTopLevelStepDefinitionType { get; }
 
+        void InitScenarioExecutionEngine(ITestExecutionEngine testExecutionEngine);
+        void InitScenarioRunner(ITestRunner testRunner);
+
         void InitializeFeatureContext(FeatureInfo featureInfo);
         void CleanupFeatureContext();
 
@@ -18,5 +21,7 @@ namespace Reqnroll.Infrastructure
 
         void InitializeStepContext(StepInfo stepInfo);
         void CleanupStepContext();
+
+        IContextManager GetScenarioContextManager();
     }
 }

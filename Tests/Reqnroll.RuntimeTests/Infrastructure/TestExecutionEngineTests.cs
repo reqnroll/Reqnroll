@@ -349,7 +349,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "user bar", null, null);
 
-            _stepArgumentTypeConverterMock.Verify(i => i.ConvertAsync(It.IsAny<object>(), It.IsAny<IBindingType>(), It.IsAny<CultureInfo>()), Times.Never);
+            _stepArgumentTypeConverterMock.Verify(i => i.ConvertAsync(It.IsAny<object>(), It.IsAny<IBindingType>(), contextManagerStub.Object, It.IsAny<CultureInfo>()), Times.Never);
         }
 
         [Fact]

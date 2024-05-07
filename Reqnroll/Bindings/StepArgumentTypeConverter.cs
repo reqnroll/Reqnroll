@@ -15,14 +15,12 @@ namespace Reqnroll.Bindings
     {
         private readonly ITestTracer testTracer;
         private readonly IBindingRegistry bindingRegistry;
-        private readonly IContextManager contextManager;
         private readonly IAsyncBindingInvoker bindingInvoker;
 
-        public StepArgumentTypeConverter(ITestTracer testTracer, IBindingRegistry bindingRegistry, IContextManager contextManager, IAsyncBindingInvoker bindingInvoker)
+        public StepArgumentTypeConverter(ITestTracer testTracer, IBindingRegistry bindingRegistry, IAsyncBindingInvoker bindingInvoker)
         {
             this.testTracer = testTracer;
             this.bindingRegistry = bindingRegistry;
-            this.contextManager = contextManager;
             this.bindingInvoker = bindingInvoker;
         }
 
@@ -37,13 +35,13 @@ namespace Reqnroll.Bindings
             return stepTransformations.Length > 0 ? stepTransformations[0] : null;
         }
 
-        public async Task<object> ConvertAsync(object value, IBindingType typeToConvertTo, CultureInfo cultureInfo)
+        public async Task<object> ConvertAsync(object value, IBindingType typeToConvertTo, IContextManager contextManager, CultureInfo cultureInfo)
         {
             if (value == null) throw new ArgumentNullException(nameof(value));
 
             var stepTransformation = GetMatchingStepTransformation(value, typeToConvertTo, true);
             if (stepTransformation != null)
-                return await DoTransformAsync(stepTransformation, value, cultureInfo);
+                return await DoTransformAsync(stepTransformation, value, contextManager, cultureInfo);
 
             if (typeToConvertTo is RuntimeBindingType convertToType && convertToType.Type.IsInstanceOfType(value))
                 return value;
@@ -51,20 +49,20 @@ namespace Reqnroll.Bindings
             return ConvertSimple(typeToConvertTo, value, cultureInfo);
         }
 
-        private async Task<object> DoTransformAsync(IStepArgumentTransformationBinding stepTransformation, object value, CultureInfo cultureInfo)
+        private async Task<object> DoTransformAsync(IStepArgumentTransformationBinding stepTransformation, object value, IContextManager contextManager, CultureInfo cultureInfo)
         {
             object[] arguments;
             if (stepTransformation.Regex != null && value is string stringValue)
-                arguments = await GetStepTransformationArgumentsFromRegexAsync(stepTransformation, stringValue, cultureInfo);
+                arguments = await GetStepTransformationArgumentsFromRegexAsync(stepTransformation, stringValue, contextManager, cultureInfo);
             else
-                arguments = new[] { await ConvertAsync(value, stepTransformation.Method.Parameters.ElementAtOrDefault(0)?.Type ?? new RuntimeBindingType(typeof(object)), cultureInfo)};
+                arguments = new[] { await ConvertAsync(value, stepTransformation.Method.Parameters.ElementAtOrDefault(0)?.Type ?? new RuntimeBindingType(typeof(object)), contextManager, cultureInfo)};
 
             var result = await bindingInvoker.InvokeBindingAsync(stepTransformation, contextManager, arguments, testTracer, new DurationHolder());
 
             return result;
         }
 
-        private async Task<object[]> GetStepTransformationArgumentsFromRegexAsync(IStepArgumentTransformationBinding stepTransformation, string stepSnippet, CultureInfo cultureInfo)
+        private async Task<object[]> GetStepTransformationArgumentsFromRegexAsync(IStepArgumentTransformationBinding stepTransformation, string stepSnippet, IContextManager contextManager, CultureInfo cultureInfo)
         {
             var match = stepTransformation.Regex.Match(stepSnippet);
             var argumentStrings = match.Groups.Cast<Group>().Skip(1).Select(g => g.Value).ToList();
@@ -74,7 +72,7 @@ namespace Reqnroll.Bindings
 
             for (int i = 0; i < argumentStrings.Count; i++)
             {
-                result[i] = await ConvertAsync(argumentStrings[i], bindingParameters[i].Type, cultureInfo);
+                result[i] = await ConvertAsync(argumentStrings[i], bindingParameters[i].Type, contextManager, cultureInfo);
             }
 
             return result;

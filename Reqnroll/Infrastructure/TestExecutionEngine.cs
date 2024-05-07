@@ -270,6 +270,24 @@ namespace Reqnroll.Infrastructure
             throw _errorProvider.GetPendingStepDefinitionError();
         }
 
+        public virtual ITestExecutionEngine GetScenarioExecutionEngine()
+        {
+            var scenarioContextManager = _contextManager.GetScenarioContextManager();
+
+            var scenarioEngine = new TestExecutionEngine(_stepFormatter, _testTracer, _errorProvider, _stepArgumentTypeConverter, _reqnrollConfiguration, _bindingRegistry, _unitTestRuntimeProvider, scenarioContextManager,
+                _stepDefinitionMatchService, _bindingInvoker, _obsoleteStepHandler, _analyticsEventProvider, _analyticsTransmitter, _testRunnerManager,
+                _runtimePluginTestExecutionLifecycleEventEmitter, _testThreadExecutionEventPublisher, _testPendingMessageFactory, _testUndefinedMessageFactory, _testObjectResolver, _testRunContext);
+
+            scenarioContextManager.InitScenarioExecutionEngine(scenarioEngine);
+
+            return scenarioEngine;
+        }
+
+        public virtual void InitScenarioRunner(ITestRunner testRunner)
+        {
+            _contextManager.InitScenarioRunner(testRunner);
+        }
+
         protected virtual async Task OnBlockStartAsync(ScenarioBlock block)
         {
             if (block == ScenarioBlock.None)
@@ -611,18 +629,18 @@ namespace Reqnroll.Infrastructure
 
             for (var i = 0; i < match.Arguments.Length; i++)
             {
-                arguments[i] = await ConvertArg(match.Arguments[i], bindingParameters[i].Type);
+                arguments[i] = await ConvertArg(match.Arguments[i], _contextManager, bindingParameters[i].Type);
             }
 
             return arguments;
         }
 
-        private async Task<object> ConvertArg(object value, IBindingType typeToConvertTo)
+        private async Task<object> ConvertArg(object value, IContextManager contextManager, IBindingType typeToConvertTo)
         {
             Debug.Assert(value != null);
             Debug.Assert(typeToConvertTo != null);
 
-            return await _stepArgumentTypeConverter.ConvertAsync(value, typeToConvertTo, FeatureContext.BindingCulture);
+            return await _stepArgumentTypeConverter.ConvertAsync(value, typeToConvertTo, _contextManager, FeatureContext.BindingCulture);
         }
 
         #endregion

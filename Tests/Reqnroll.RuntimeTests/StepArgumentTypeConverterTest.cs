@@ -26,7 +26,7 @@ namespace Reqnroll.RuntimeTests
             List<IStepArgumentTransformationBinding> stepTransformations = new List<IStepArgumentTransformationBinding>();
             bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(stepTransformations);
 
-            _stepArgumentTypeConverter = new StepArgumentTypeConverter(new Mock<ITestTracer>().Object, bindingRegistryStub.Object, new Mock<IContextManager>().Object, methodBindingInvokerStub.Object);
+            _stepArgumentTypeConverter = new StepArgumentTypeConverter(new Mock<ITestTracer>().Object, bindingRegistryStub.Object, methodBindingInvokerStub.Object);
             _enUSCulture = new CultureInfo("en-US", false);
         }
 

@@ -116,6 +116,7 @@ namespace Reqnroll.Infrastructure
             }
         }
 
+        private readonly ITestTracer testTracer;
         private readonly IObjectContainer testThreadContainer;
         private readonly InternalContextManager<ScenarioContext> scenarioContextManager;
         private readonly InternalContextManager<FeatureContext> featureContextManager;
@@ -132,6 +133,7 @@ namespace Reqnroll.Infrastructure
             this.featureContextManager = new InternalContextManager<FeatureContext>(testTracer);
             this.scenarioContextManager = new InternalContextManager<ScenarioContext>(testTracer);
             this.stepContextManager = new StackedInternalContextManager<ScenarioStepContext>(testTracer);
+            this.testTracer = testTracer;
             this.testThreadContainer = testThreadContainer;
             this.containerBuilder = containerBuilder;
 
@@ -183,12 +185,39 @@ namespace Reqnroll.Infrastructure
         {
             var scenarioContainer = containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo);
             var newContext = scenarioContainer.Resolve<ScenarioContext>();
+
+            if (isSecnarioContextManager)
+            {
+                scenarioContainer.RegisterInstanceAs(this, typeof(IContextManager));
+                if (scenarioTestExecutionEngine != null)
+                    scenarioContainer.RegisterInstanceAs(scenarioTestExecutionEngine, typeof(ITestExecutionEngine));
+                if (scenarioTestRunner != null)
+                    scenarioContainer.RegisterInstanceAs(scenarioTestRunner, typeof(ITestRunner));
+            }
+
             scenarioContextManager.Init(newContext, scenarioContainer);
 #pragma warning disable 618
             ScenarioContext.Current = newContext;
 #pragma warning restore 618
 
             ResetCurrentStepStack();
+        }
+
+        bool isSecnarioContextManager;
+        ITestExecutionEngine scenarioTestExecutionEngine;
+        ITestRunner scenarioTestRunner;
+
+        public void InitScenarioExecutionEngine(ITestExecutionEngine testExecutionEngine)
+        {
+            scenarioTestExecutionEngine = testExecutionEngine;
+            if (scenarioContextManager.Instance?.ScenarioContainer != null)
+                scenarioContextManager.Instance.ScenarioContainer.RegisterInstanceAs(testExecutionEngine, typeof(ITestExecutionEngine));
+        }
+        public void InitScenarioRunner(ITestRunner testRunner)
+        {
+            scenarioTestRunner = testRunner;
+            if (scenarioContextManager.Instance?.ScenarioContainer != null)
+                scenarioContextManager.Instance.ScenarioContainer.RegisterInstanceAs(testRunner, typeof(ITestRunner));
         }
 
         private void ResetCurrentStepStack()
@@ -224,6 +253,26 @@ namespace Reqnroll.Infrastructure
             featureContextManager?.Dispose();
             scenarioContextManager?.Dispose();
             stepContextManager?.Dispose();
+        }
+
+        public ContextManager(ContextManager featureContextManager)
+        {
+            this.testTracer = featureContextManager.testTracer;
+            this.testThreadContainer = featureContextManager.testThreadContainer;
+            this.containerBuilder = featureContextManager.containerBuilder;
+            this.isSecnarioContextManager = true;
+
+            this.featureContextManager = featureContextManager.featureContextManager;
+            this.scenarioContextManager = new InternalContextManager<ScenarioContext>(testTracer);
+
+            this.stepContextManager = new StackedInternalContextManager<ScenarioStepContext>(testTracer);
+
+            InitializeTestThreadContext();
+        }
+
+        public IContextManager GetScenarioContextManager()
+        {
+            return new ContextManager(this);
         }
     }
 }

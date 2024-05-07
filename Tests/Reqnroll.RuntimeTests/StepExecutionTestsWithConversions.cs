@@ -16,7 +16,7 @@ namespace Reqnroll.RuntimeTests
     {
         public static async Task<object> ConvertAsync(this IStepArgumentTypeConverter converter, object value, Type typeToConvertTo, CultureInfo cultureInfo)
         {
-            return await converter.ConvertAsync(value, new RuntimeBindingType(typeToConvertTo), cultureInfo);
+            return await converter.ConvertAsync(value, new RuntimeBindingType(typeToConvertTo), It.IsAny<IContextManager>(), cultureInfo);
         }
 
         public static Expression<Func<IStepArgumentTypeConverter, bool>> GetCanConvertMethodFilter(object argument, Type type)
@@ -26,7 +26,7 @@ namespace Reqnroll.RuntimeTests
 
         public static Expression<Func<IStepArgumentTypeConverter, Task<object>>> GetConvertAsyncMethodFilter(object argument, Type type)
         {
-            return c => c.ConvertAsync(It.Is<object>(s => s.Equals(argument)), It.Is<IBindingType>(bt => bt.TypeEquals(type)), It.IsAny<CultureInfo>());
+            return c => c.ConvertAsync(It.Is<object>(s => s.Equals(argument)), It.Is<IBindingType>(bt => bt.TypeEquals(type)), It.IsAny<IContextManager>(), It.IsAny<CultureInfo>());
                 //Arg<string>.Is.Equal(argument),
                 //Arg<IBindingType>.Matches(bt => bt.TypeEquals(type)), 
                 //Arg<CultureInfo>.Is.Anything);

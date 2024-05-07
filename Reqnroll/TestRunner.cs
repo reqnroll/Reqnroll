@@ -104,5 +104,12 @@ namespace Reqnroll
         {
             _executionEngine.Pending();
         }
+
+        public ITestRunner GetScenarioTestRunner()
+        {
+            var testRunner = new TestRunner(_executionEngine.GetScenarioExecutionEngine());
+            testRunner._executionEngine.InitScenarioRunner(testRunner);
+            return testRunner;
+        }
     }
 }

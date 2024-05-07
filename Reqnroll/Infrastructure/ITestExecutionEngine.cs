@@ -24,5 +24,8 @@ namespace Reqnroll.Infrastructure
         Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg);
 
         void Pending();
+
+        ITestExecutionEngine GetScenarioExecutionEngine();
+        void InitScenarioRunner(ITestRunner testRunner);
     }
 }
