@@ -7,12 +7,15 @@
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <!-- NuGet packaging properties -->
   <PropertyGroup>
     <IsPackable>true</IsPackable>
     <IncludeBuildOutput>false</IncludeBuildOutput>
+    <DevelopmentDependency>true</DevelopmentDependency>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
@@ -56,8 +59,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Microsoft.CodeAnalysis"/>
-    <Using Include="Microsoft.CodeAnalysis.Text"/>
+    <Using Include="Microsoft.CodeAnalysis" />
+    <Using Include="Microsoft.CodeAnalysis.Text" />
   </ItemGroup>
 
 </Project>

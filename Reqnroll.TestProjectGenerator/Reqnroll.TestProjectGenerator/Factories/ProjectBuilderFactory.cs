@@ -11,7 +11,6 @@ namespace Reqnroll.TestProjectGenerator.Factories
         protected readonly FeatureFileGenerator _featureFileGenerator;
         protected readonly Folders _folders;
         protected readonly TargetFrameworkMonikerStringBuilder _targetFrameworkMonikerStringBuilder;
-        protected readonly SourceGeneratorPlatform _sourceGenerator;
         protected readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         protected readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -26,8 +25,7 @@ namespace Reqnroll.TestProjectGenerator.Factories
             BindingsGeneratorFactory bindingsGeneratorFactory,
             FeatureFileGenerator featureFileGenerator,
             Folders folders,
-            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder,
-            SourceGeneratorPlatform sourceGenerator)
+            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
         {
             _testProjectFolders = testProjectFolders;
             _testRunConfiguration = testRunConfiguration;
@@ -37,7 +35,6 @@ namespace Reqnroll.TestProjectGenerator.Factories
             _featureFileGenerator = featureFileGenerator;
             _folders = folders;
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
-            _sourceGenerator = sourceGenerator;
         }
 
         public ProjectBuilder CreateProject(string language)
@@ -124,7 +121,7 @@ namespace Reqnroll.TestProjectGenerator.Factories
                 _currentVersionDriver,
                 _folders,
                 _targetFrameworkMonikerStringBuilder,
-                _sourceGenerator);
+                _testRunConfiguration.SourceGenerator);
         }
     }
 }
