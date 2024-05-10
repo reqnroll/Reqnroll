@@ -7,7 +7,6 @@ using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
-using Reqnroll.Infrastructure;
 using Reqnroll.Parser;
 using Reqnroll.Tracing;
 
@@ -127,7 +126,7 @@ namespace Reqnroll.Generator.Generation
             //await testRunner.CollectScenarioErrorsAsync();
             var expression = new CodeMethodInvokeExpression(
                 testRunnerField,
-                nameof(TestRunner.CollectScenarioErrorsAsync));
+                nameof(ITestRunner.CollectScenarioErrorsAsync));
 
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
@@ -296,7 +295,7 @@ namespace Reqnroll.Generator.Generation
             scenarioInitializeMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
                     testRunnerField,
-                    nameof(ITestExecutionEngine.OnScenarioInitialize),
+                    nameof(ITestRunner.OnScenarioInitialize),
                     new CodeVariableReferenceExpression("scenarioInfo")));
         }
 
@@ -313,7 +312,7 @@ namespace Reqnroll.Generator.Generation
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
             var expression = new CodeMethodInvokeExpression(
                 testRunnerField,
-                nameof(ITestExecutionEngine.OnScenarioStartAsync));
+                nameof(ITestRunner.OnScenarioStartAsync));
 
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
