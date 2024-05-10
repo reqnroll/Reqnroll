@@ -283,35 +283,35 @@ public class BindingInvokerTests
         public string LoadedValue { get; set; }
 
         // ReSharper disable once UnusedMember.Local
-        public void SetAsyncLocal_Sync(AsyncLocalType asyncLocalType)
+        public void SetAsyncLocal_Sync(AsyncLocalType asyncLocalType, string content)
         {
             switch (asyncLocalType)
             {
                 case AsyncLocalType.Uninitialized:
-                    _uninitializedAsyncLocal.Value = "42";
+                    _uninitializedAsyncLocal.Value = content;
                     break;
                 case AsyncLocalType.CtorInitialized:
-                    _ctorInitializedAsyncLocal.Value = "42";
+                    _ctorInitializedAsyncLocal.Value = content;
                     break;
                 case AsyncLocalType.Boxed:
-                    _boxedAsyncLocal.Value!.Value = "42";
+                    _boxedAsyncLocal.Value!.Value = content;
                     break;
             }
         }
 
         // ReSharper disable once UnusedMember.Local
-        public async Task SetAsyncLocal_Async(AsyncLocalType asyncLocalType)
+        public async Task SetAsyncLocal_Async(AsyncLocalType asyncLocalType, string content)
         {
             switch (asyncLocalType)
             {
                 case AsyncLocalType.Uninitialized:
-                    _uninitializedAsyncLocal.Value = "42";
+                    _uninitializedAsyncLocal.Value = content;
                     break;
                 case AsyncLocalType.CtorInitialized:
-                    _ctorInitializedAsyncLocal.Value = "42";
+                    _ctorInitializedAsyncLocal.Value = content;
                     break;
                 case AsyncLocalType.Boxed:
-                    _boxedAsyncLocal.Value!.Value = "42";
+                    _boxedAsyncLocal.Value!.Value = content;
                     break;
             }
             await Task.Delay(1);
@@ -352,11 +352,24 @@ public class BindingInvokerTests
         var contextManager = CreateContextManagerWith();
 
         if (setAs != null)
-            await InvokeBindingAsync(sut, contextManager, typeof(StepDefClassWithAsyncLocal), "SetAsyncLocal_" + setAs, asyncLocalType);
+            await InvokeBindingAsync(sut, contextManager, typeof(StepDefClassWithAsyncLocal), "SetAsyncLocal_" + setAs, asyncLocalType, "42");
         await InvokeBindingAsync(sut, contextManager, typeof(StepDefClassWithAsyncLocal), nameof(StepDefClassWithAsyncLocal.GetAsyncLocal_Async), asyncLocalType, expectedResult);
 
         var stepDefClass = contextManager.ScenarioContext.ScenarioContainer.Resolve<StepDefClassWithAsyncLocal>();
         stepDefClass.LoadedValue.Should().Be(expectedResult, $"Error was not propagated for {description}");
+    }
+
+    [Fact]
+    public async Task ExecutionContext_can_be_changed_multiple_times()
+    {
+        var sut = CreateSut();
+        var contextManager = CreateContextManagerWith();
+
+        await InvokeBindingAsync(sut, contextManager, typeof(StepDefClassWithAsyncLocal), "SetAsyncLocal_Sync", AsyncLocalType.Uninitialized, "14");
+        await InvokeBindingAsync(sut, contextManager, typeof(StepDefClassWithAsyncLocal), "SetAsyncLocal_Sync", AsyncLocalType.Uninitialized, "42");
+        await InvokeBindingAsync(sut, contextManager, typeof(StepDefClassWithAsyncLocal), nameof(StepDefClassWithAsyncLocal.GetAsyncLocal_Async), AsyncLocalType.Uninitialized, "42");
+        var stepDefClass = contextManager.ScenarioContext.ScenarioContainer.Resolve<StepDefClassWithAsyncLocal>();
+        stepDefClass.LoadedValue.Should().Be("42", $"Error was not propagated");
     }
 
     #endregion   
