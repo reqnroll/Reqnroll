@@ -207,14 +207,14 @@ namespace Reqnroll.Generator.Generation
                         new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME))));
 
             //await testRunner.OnFeatureStartAsync(featureInfo);
-            var onFeatureStartExpression = new CodeMethodInvokeExpression(
-                testRunnerField,
-                nameof(ITestRunner.OnFeatureStartAsync),
-                new CodeVariableReferenceExpression("featureInfo"));
+            //var onFeatureStartExpression = new CodeMethodInvokeExpression(
+            //    testRunnerField,
+            //    nameof(ITestRunner.OnFeatureStartAsync),
+            //    new CodeVariableReferenceExpression("featureInfo"));
 
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
+            //_codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
 
-            testClassInitializeMethod.Statements.Add(onFeatureStartExpression);
+            //testClassInitializeMethod.Statements.Add(onFeatureStartExpression);
         }
 
         private void SetupTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -231,13 +231,13 @@ namespace Reqnroll.Generator.Generation
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
             // await testRunner.OnFeatureEndAsync();
-            var expression = new CodeMethodInvokeExpression(
-                testRunnerField,
-                nameof(ITestRunner.OnFeatureEndAsync));
+            //var expression = new CodeMethodInvokeExpression(
+            //    testRunnerField,
+            //    nameof(ITestRunner.OnFeatureEndAsync));
 
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+            //_codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
-            testClassCleanupMethod.Statements.Add(expression);
+            //testClassCleanupMethod.Statements.Add(expression);
             
             // testRunner = null;
             testClassCleanupMethod.Statements.Add(
@@ -289,14 +289,33 @@ namespace Reqnroll.Generator.Generation
             scenarioInitializeMethod.Name = GeneratorConstants.SCENARIO_INITIALIZE_NAME;
             scenarioInitializeMethod.Parameters.Add(
                 new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)), "scenarioInfo"));
+            _codeDomHelper.MarkCodeMemberMethodAsAsync(scenarioInitializeMethod);
 
-            //testRunner.OnScenarioInitialize(scenarioInfo);
+            //private static readonly FeatureInfo __featureInfo = new FeatureInfo("xxxx");
+            var featureInfoField = new CodeMemberField(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), "__featureInfo");
+            featureInfoField.Attributes = MemberAttributes.Private | MemberAttributes.Final | MemberAttributes.Static;
+            featureInfoField.InitExpression = 
+                new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)),
+                     new CodeObjectCreateExpression(typeof(CultureInfo),
+                                                    new CodePrimitiveExpression(generationContext.Feature.Language)),
+                     new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
+                     new CodePrimitiveExpression(generationContext.Feature.Name),
+                     new CodePrimitiveExpression(generationContext.Feature.Description),
+                     new CodeFieldReferenceExpression(
+                         new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Reqnroll.ProgrammingLanguage))),
+                         _codeDomHelper.TargetLanguage.ToString()),
+                     new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME));
+            generationContext.TestClass.Members.Add(featureInfoField);
+
+            //testRunner.OnScenarioInitialize2(__featureInfo, scenarioInfo);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
             scenarioInitializeMethod.Statements.Add(
-                new CodeMethodInvokeExpression(
-                    testRunnerField,
-                    nameof(ITestRunner.OnScenarioInitialize),
-                    new CodeVariableReferenceExpression("scenarioInfo")));
+                _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(
+                    new CodeMethodInvokeExpression(
+                        testRunnerField,
+                        nameof(ITestRunner.OnScenarioInitialize2),
+                        new CodeFieldReferenceExpression(null, featureInfoField.Name),
+                        new CodeVariableReferenceExpression("scenarioInfo"))));
         }
 
         private void SetupScenarioStartMethod(TestClassGenerationContext generationContext)

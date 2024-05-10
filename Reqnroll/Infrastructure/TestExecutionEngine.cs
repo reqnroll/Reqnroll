@@ -141,10 +141,13 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
         {
+            if (FeatureContext != null && FeatureContext.FeatureInfo == featureInfo)
+                return; // this feature has already been started
+
             // if the unit test provider would execute the fixture teardown code
             // only delayed (at the end of the execution), we automatically close
             // the current feature if necessary
-            if (_unitTestRuntimeProvider.DelayedFixtureTearDown && FeatureContext != null)
+            if (/*_unitTestRuntimeProvider.DelayedFixtureTearDown && */FeatureContext != null)
             {
                 await OnFeatureEndAsync();
             }
@@ -162,7 +165,7 @@ namespace Reqnroll.Infrastructure
             // if the unit test provider would execute the fixture teardown code
             // only delayed (at the end of the execution), we ignore the
             // feature-end call, if the feature has been closed already
-            if (_unitTestRuntimeProvider.DelayedFixtureTearDown &&
+            if (/*_unitTestRuntimeProvider.DelayedFixtureTearDown &&*/
                 FeatureContext == null)
                 return;
 

@@ -50,6 +50,12 @@ namespace Reqnroll
             _executionEngine.OnScenarioInitialize(scenarioInfo);
         }
 
+        public async Task OnScenarioInitialize2(FeatureInfo featureInfo, ScenarioInfo scenarioInfo)
+        {
+            await _executionEngine.OnFeatureStartAsync(featureInfo);
+            _executionEngine.OnScenarioInitialize(scenarioInfo);
+        }
+
         public async Task OnScenarioStartAsync()
         {
             await _executionEngine.OnScenarioStartAsync();
