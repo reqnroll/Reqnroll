@@ -250,7 +250,7 @@ namespace Reqnroll.Generator.CodeDom
             return typeof(void).FullName!.Equals(codeTypeReference.BaseType);
         }
 
-        public void MarkCodeMethodInvokeExpressionAsAwait(CodeMethodInvokeExpression expression)
+        public CodeMethodInvokeExpression MarkCodeMethodInvokeExpressionAsAwait(CodeMethodInvokeExpression expression)
         {
             if (expression.Method.TargetObject is CodeVariableReferenceExpression variableExpression)
             {
@@ -276,6 +276,7 @@ namespace Reqnroll.Generator.CodeDom
             {
                 expression.Method.TargetObject = GetAwaitedMethodThisTargetObject(expression.Method.TargetObject);
             }
+            return expression;
         }
 
         private CodeExpression GetAwaitedMethodThisTargetObject(CodeExpression thisExpression)
