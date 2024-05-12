@@ -2,4 +2,8 @@
   <PropertyGroup>
     <ReqnrollEnableMSBuildGeneration>false</ReqnrollEnableMSBuildGeneration>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Gherkin Include="**/*.feature" />
+  </ItemGroup>
 </Project>
