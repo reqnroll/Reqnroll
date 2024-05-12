@@ -42,11 +42,11 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
     protected virtual void AppendClassInitializeMethod()
     {
         SourceBuilder.AppendLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitialize]");
-        SourceBuilder.AppendLine("public static Task IntializeFeatureAsync(TestContext testContext)");
+        SourceBuilder.AppendLine("public static Task IntializeFeatureAsync(global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)");
         SourceBuilder.BeginBlock("{");
         SourceBuilder.AppendLine("var testWorkerId = global::System.Threading.Thread.CurrentThread.ManagedThreadId.ToString();");
         SourceBuilder.AppendLine("var testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, testWorkerId);");
-        SourceBuilder.AppendLine("return testRunner.OnFeatureStartAsync(featureInfo);");
+        SourceBuilder.AppendLine("return testRunner.OnFeatureStartAsync(FeatureInfo);");
         SourceBuilder.EndBlock("}");
     }
 
