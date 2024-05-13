@@ -22,16 +22,18 @@ namespace Reqnroll.Bindings
             // The ExecutionContext only flows down, so async binding methods cannot directly change it, but even if all binding method
             // is async the constructor of the binding classes are run in sync, so they should be able to change the ExecutionContext. 
             // (The binding classes are created as part of the 'bindingDelegate' this method receives.
-
-            try
+            return await InvokeInExecutionContext(executionContext?.Value, () =>
             {
-                return await InvokeInExecutionContext(executionContext?.Value, () => CreateDelegateInvocationTask(bindingDelegate, invokeArgs));
-            }
-            finally
-            {
-                if (executionContext != null)
-                    executionContext.Value = ExecutionContext.Capture();
-            }
+                try
+                {
+                    return CreateDelegateInvocationTask(bindingDelegate, invokeArgs);
+                }
+                finally
+                {
+                    if (executionContext != null)
+                        executionContext.Value = ExecutionContext.Capture();
+                }
+            });
         }
 
         private Task<object> InvokeInExecutionContext(ExecutionContext executionContext, Func<Task<object>> callback)

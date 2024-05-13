@@ -10,6 +10,7 @@
 * Fix: Adding @ignore to an Examples block generates invalid code for NUnit v3+ (#103)
 * Fix: #111 @ignore attribute is not inherited to the scenarios from Rule
 * Support for JSON files added to SpecFlow.ExternalData
+* Fix: #120 Capture ExecutionContext after every binding invoke
 
 # v1.0.1 - 2024-02-16
 
