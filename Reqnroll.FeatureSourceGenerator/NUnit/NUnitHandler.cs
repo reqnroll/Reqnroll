@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.FeatureSourceGenerator.NUnit;
+﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+
+namespace Reqnroll.FeatureSourceGenerator.NUnit;
 
 /// <summary>
 /// The handler for NUnit.
@@ -7,13 +9,13 @@ public class NUnitHandler : ITestFrameworkHandler
 {
     public string FrameworkName => "NUnit";
 
-    public bool CanGenerateLanguage(string language) => string.Equals(language, LanguageNames.CSharp, StringComparison.Ordinal);
+    public bool CanGenerateLanguage(LanguageInformation language) => language is CSharpLanguageInformation;
 
     public SourceText GenerateTestFixture(FeatureInformation feature)
     {
-        return feature.CompilationInformation.Language switch
+        return feature.CompilationInformation switch
         {
-            LanguageNames.CSharp => new NUnitCSharpSyntaxGeneration(feature).GetSourceText(),
+            CompilationInformation<CSharpLanguageInformation> => new NUnitCSharpSyntaxGeneration(feature).GetSourceText(),
             _ => throw new NotSupportedException(),
         };
     }

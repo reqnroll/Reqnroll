@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
@@ -6,7 +7,7 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp;
 /// A generator of Reqnroll test fixtures for the C# language.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public class CSharpTestFixtureSourceGenerator : TestFixtureSourceGenerator
+public class CSharpTestFixtureSourceGenerator : TestFixtureSourceGenerator<CSharpLanguageInformation>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="CSharpTestFixtureSourceGenerator"/> class.
@@ -22,5 +23,13 @@ public class CSharpTestFixtureSourceGenerator : TestFixtureSourceGenerator
     /// <param name="handlers">The handlers to use.</param>
     internal CSharpTestFixtureSourceGenerator(params ITestFrameworkHandler[] handlers) : base(handlers.ToImmutableArray())
     {
+    }
+
+    /// <inheritdoc />
+    protected override CSharpLanguageInformation GetLanguageInformation(Compilation compilation)
+    {
+        var cSharpCompilation = (CSharpCompilation)compilation;
+
+        return new CSharpLanguageInformation(cSharpCompilation.LanguageVersion);
     }
 }

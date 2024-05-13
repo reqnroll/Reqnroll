@@ -1,12 +1,12 @@
 ﻿using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator;
-public sealed record CompilationInformation(
+
+public abstract record CompilationInformation(
     string? AssemblyName,
-    string Language,
     ImmutableArray<AssemblyIdentity> ReferencedAssemblies)
 {
-    public bool Equals(CompilationInformation other)
+    public virtual bool Equals(CompilationInformation other)
     {
         if (other is null)
         {
@@ -32,8 +32,37 @@ public sealed record CompilationInformation(
 
             foreach (var assembly in ReferencedAssemblies)
             {
-                hash = hash * 43 + assembly?.GetHashCode() ?? 0;
+                hash = hash * 43 + assembly.GetHashCode();
             }
+
+            return hash;
+        }
+    }
+}
+
+public record CompilationInformation<TLanguage>(
+    string? AssemblyName,
+    ImmutableArray<AssemblyIdentity> ReferencedAssemblies,
+    TLanguage Language) : CompilationInformation(AssemblyName, ReferencedAssemblies)
+    where TLanguage : LanguageInformation
+{
+    public virtual bool Equals(CompilationInformation<TLanguage> other)
+    {
+        if (!base.Equals(other))
+        {
+            return false;
+        }
+
+        return Language.Equals(other.Language);
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked // Overflow is fine, just wrap
+        {
+            int hash = base.GetHashCode();
+
+            hash = hash * 43 + Language.GetHashCode();
 
             return hash;
         }

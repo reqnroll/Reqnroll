@@ -1,4 +1,5 @@
 ﻿using Gherkin.Ast;
+using Microsoft.CodeAnalysis.CSharp;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
@@ -16,6 +17,8 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp;
 public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo)
 {
     public FeatureInformation FeatureInformation { get; } = featureInfo;
+
+    protected bool SupportsNullable { get; }
 
     private bool IsLineMappingEnabled { get; } = featureInfo.FeatureSyntax.FilePath != null;
 

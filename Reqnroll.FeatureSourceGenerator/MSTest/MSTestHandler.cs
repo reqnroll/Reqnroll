@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.FeatureSourceGenerator.MSTest;
+﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+
+namespace Reqnroll.FeatureSourceGenerator.MSTest;
 
 /// <summary>
 /// The handler for MSTest.
@@ -7,13 +9,13 @@ public class MSTestHandler : ITestFrameworkHandler
 {
     public string FrameworkName => "MSTest";
 
-    public bool CanGenerateLanguage(string language) => string.Equals(language, LanguageNames.CSharp, StringComparison.Ordinal);
+    public bool CanGenerateLanguage(LanguageInformation language) => language is CSharpLanguageInformation;
 
     public SourceText GenerateTestFixture(FeatureInformation feature)
     {
-        return feature.CompilationInformation.Language switch
+        return feature.CompilationInformation switch
         {
-            LanguageNames.CSharp => new MSTestCSharpTestFixtureGeneration(feature).GetSourceText(),
+            CompilationInformation<CSharpLanguageInformation> => new MSTestCSharpTestFixtureGeneration(feature).GetSourceText(),
             _ => throw new NotSupportedException(),
         };
     }

@@ -4,7 +4,7 @@ public interface ITestFrameworkHandler
 {
     string FrameworkName { get; }
 
-    bool CanGenerateLanguage(string language);
+    bool CanGenerateLanguage(LanguageInformation language);
 
     SourceText GenerateTestFixture(FeatureInformation feature);
 

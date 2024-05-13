@@ -1,4 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.VisualBasic;
 using Reqnroll.FeatureSourceGenerator.Gherkin;
 using System.Collections.Immutable;
 
@@ -7,7 +9,9 @@ namespace Reqnroll.FeatureSourceGenerator;
 /// <summary>
 /// Defines the basis of a source-generator which processes Gherkin feature files into test fixtures.
 /// </summary>
-public abstract class TestFixtureSourceGenerator(ImmutableArray<ITestFrameworkHandler> testFrameworkHandlers) : IIncrementalGenerator
+public abstract class TestFixtureSourceGenerator<TLanguage>(
+    ImmutableArray<ITestFrameworkHandler> testFrameworkHandlers) : IIncrementalGenerator
+    where TLanguage : LanguageInformation
 {
     public static readonly DiagnosticDescriptor NoTestFrameworkFound = new(
         id: DiagnosticIds.NoTestFrameworkFound,
@@ -43,11 +47,11 @@ public abstract class TestFixtureSourceGenerator(ImmutableArray<ITestFrameworkHa
 
         // Extract information about the compilation.
         var compilationInformation = context.CompilationProvider
-            .Select(static (compilation, cancellationToken) =>
+            .Select((compilation, cancellationToken) =>
             {
-                return new CompilationInformation(
+                return new CompilationInformation<TLanguage>(
                     AssemblyName: compilation.AssemblyName,
-                    Language: compilation.Language,
+                    Language: GetLanguageInformation(compilation),
                     ReferencedAssemblies: compilation.ReferencedAssemblyNames.ToImmutableArray());
             });
 
@@ -210,4 +214,6 @@ public abstract class TestFixtureSourceGenerator(ImmutableArray<ITestFrameworkHa
             }
         });
     }
+
+    protected abstract TLanguage GetLanguageInformation(Compilation compilation);
 }

@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.FeatureSourceGenerator.XUnit;
+﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+
+namespace Reqnroll.FeatureSourceGenerator.XUnit;
 
 /// <summary>
 /// The handler for xUnit.
@@ -7,13 +9,13 @@ public class XUnitHandler : ITestFrameworkHandler
 {
     public string FrameworkName => "xUnit";
 
-    public bool CanGenerateLanguage(string language) => string.Equals(language, LanguageNames.CSharp, StringComparison.Ordinal);
+    public bool CanGenerateLanguage(LanguageInformation language) => language is CSharpLanguageInformation;
 
     public SourceText GenerateTestFixture(FeatureInformation feature)
     {
-        return feature.CompilationInformation.Language switch
+        return feature.CompilationInformation switch
         {
-            LanguageNames.CSharp => new XUnitCSharpSyntaxGeneration(feature).GetSourceText(),
+            CompilationInformation<CSharpLanguageInformation> => new XUnitCSharpSyntaxGeneration(feature).GetSourceText(),
             _ => throw new NotSupportedException(),
         };
     }
