@@ -111,11 +111,6 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             {
                 throw new NotImplementedException();
             }
-
-            public bool DelayedFixtureTearDown
-            {
-                get { throw new NotImplementedException(); }
-            }
         }
 
         public void Dispose()

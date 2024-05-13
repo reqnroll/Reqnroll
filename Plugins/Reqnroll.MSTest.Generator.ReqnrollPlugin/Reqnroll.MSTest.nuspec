@@ -19,17 +19,17 @@
       <group targetFramework=".NETFramework4.6.2">
         <dependency id="Reqnroll" version="[$version$]" />
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
-        <dependency id="MSTest.TestFramework" version="2.1.2" />
+        <dependency id="MSTest.TestFramework" version="2.2.8" />
       </group>
       <group targetFramework=".NETStandard2.0">
         <dependency id="Reqnroll" version="[$version$]" />
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
-        <dependency id="MSTest.TestFramework" version="2.1.2" />
+        <dependency id="MSTest.TestFramework" version="2.2.8" />
       </group>
       <group targetFramework="net6.0">
         <dependency id="Reqnroll" version="[$version$]" />
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
-        <dependency id="MSTest.TestFramework" version="2.1.2" />
+        <dependency id="MSTest.TestFramework" version="2.2.8" />
       </group>
     </dependencies>
   </metadata>

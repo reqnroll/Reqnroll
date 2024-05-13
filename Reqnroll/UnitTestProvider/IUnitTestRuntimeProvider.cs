@@ -5,6 +5,5 @@ namespace Reqnroll.UnitTestProvider
         void TestPending(string message);
         void TestInconclusive(string message);
         void TestIgnore(string message);
-        bool DelayedFixtureTearDown { get; }
     }
 }
