@@ -2,6 +2,7 @@
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
 using System;
+using System.Runtime.InteropServices;
 
 namespace Reqnroll.SystemTests.Portability;
 
@@ -32,6 +33,11 @@ public abstract class PortabilityTestBase : SystemTestBase
     {
         RunSkippableTest(() =>
         {
+            //TODO: Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) &&
+                unitTestProvider == UnitTestProvider.xUnit)
+                Assert.Inconclusive("Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved");
+
             _testRunConfiguration.UnitTestProvider = unitTestProvider;
 
             PrepareGeneratorAllInSamples();
