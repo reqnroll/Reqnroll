@@ -25,10 +25,15 @@ public abstract class PortabilityTestBase : SystemTestBase
     }
 
     [TestMethod]
-    public void GeneratorAllIn_sample_can_be_handled()
+    [DataRow(UnitTestProvider.MSTest)]
+    [DataRow(UnitTestProvider.NUnit3)]
+    [DataRow(UnitTestProvider.xUnit)]
+    public void GeneratorAllIn_sample_can_be_handled(UnitTestProvider unitTestProvider)
     {
         RunSkippableTest(() =>
         {
+            _testRunConfiguration.UnitTestProvider = unitTestProvider;
+
             PrepareGeneratorAllInSamples();
 
             ExecuteTests();
