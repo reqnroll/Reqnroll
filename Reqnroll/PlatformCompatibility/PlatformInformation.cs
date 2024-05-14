@@ -21,6 +21,6 @@ public class PlatformInformation
 
     private static string GetMainDotNetFrameworkDescription()
     {
-        return Regex.Replace(RuntimeInformation.FrameworkDescription, @"(?<mver>\d+\.\d+)(\.\d+)*", "${mver}");
+        return Regex.Replace(RuntimeInformation.FrameworkDescription, @"(?<mver>\d+\.\d+).*", "${mver}");
     }
 }
