@@ -170,17 +170,21 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         var feature = FeatureInformation.FeatureSyntax.GetRoot().Feature;
 
         SourceBuilder
-            .Append("private static readonly string[] featureTags = new string[] { ")
+            .Append("private static readonly string[] FeatureTags = new string[] { ")
             .AppendConstantList(feature.Tags.Select(tag => tag.Name.TrimStart('@')))
             .AppendLine(" };")
             .AppendLine();
 
         SourceBuilder
-            .Append("private static readonly global::Reqnroll.FeatureInfo FeatureInfo = new global::Reqnroll.FeatureInfo(")
-            .Append("new global::System.Globalization.CultureInfo(\"").Append(feature.Language).Append("\"), ")
-            .AppendConstant(Path.GetDirectoryName(FeatureInformation.FeatureSyntax.FilePath).Replace("\\", "\\\\")).Append(", ")
-            .AppendConstant(feature.Name).Append(", ")
-            .AppendLine("null, global::Reqnroll.ProgrammingLanguage.CSharp, featureTags);")
+            .AppendLine("private static readonly global::Reqnroll.FeatureInfo FeatureInfo = new global::Reqnroll.FeatureInfo(")
+            .BeginBlock()
+            .AppendLine("new global::System.Globalization.CultureInfo(").AppendConstant(feature.Language).AppendLine("), ")
+            .AppendConstant(Path.GetDirectoryName(FeatureInformation.FeatureSyntax.FilePath).Replace("\\", "\\\\")).AppendLine(", ")
+            .AppendConstant(feature.Name).AppendLine(", ")
+            .AppendLine("null, ")
+            .AppendLine("global::Reqnroll.ProgrammingLanguage.CSharp, ")
+            .AppendLine("FeatureTags);")
+            .EndBlock()
             .AppendLine();
 
         AppendScenarioInitializeMethod();
@@ -319,7 +323,7 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
             "var argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary(); // needed for scenario outlines");
 
         // TODO: Add support for rules.
-        SourceBuilder.AppendLine("var inheritedTags = featureTags; // will be more complex if there are rules");
+        SourceBuilder.AppendLine("var inheritedTags = FeatureTags; // will be more complex if there are rules");
 
         SourceBuilder
             .Append("var scenarioInfo = new global::Reqnroll.ScenarioInfo(")
