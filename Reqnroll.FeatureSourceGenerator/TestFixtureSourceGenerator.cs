@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.VisualBasic;
+using Reqnroll.FeatureSourceGenerator.CSharp;
 using Reqnroll.FeatureSourceGenerator.Gherkin;
 using System.Collections.Immutable;
 
@@ -125,11 +126,11 @@ public abstract class TestFixtureSourceGenerator<TLanguage>(
                         return 
                         [ 
                             Diagnostic.Create(
-                            TestFrameworkNotSupported,
-                            Location.None,
-                            targetTestFrameworkIdentifier,
-                            compilationInfo.Language,
-                            frameworks) 
+                                TestFrameworkNotSupported,
+                                Location.None,
+                                targetTestFrameworkIdentifier,
+                                compilationInfo.Language,
+                                frameworks) 
                         ];
                     }
                 }
@@ -163,9 +164,13 @@ public abstract class TestFixtureSourceGenerator<TLanguage>(
                 var featureNamespace = rootNamespace;
                 if (options.TryGetValue("build_metadata.AdditionalFiles.RelativeDir", out var relativeDir))
                 {
-                    featureNamespace = relativeDir
+                    var featureNamespaceParts = relativeDir
                         .Replace(Path.DirectorySeparatorChar, '.')
-                        .Replace(Path.AltDirectorySeparatorChar, '.');
+                        .Replace(Path.AltDirectorySeparatorChar, '.')
+                        .Split('.')
+                        .Select(part => DotNetSyntax.CreateIdentifier(part));
+
+                    featureNamespace = string.Join(".", featureNamespaceParts);
 
                     featureHintName = relativeDir + featureHintName;
                 }
