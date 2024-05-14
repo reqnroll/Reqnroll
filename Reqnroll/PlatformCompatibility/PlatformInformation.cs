@@ -10,7 +10,14 @@ public class PlatformInformation
     public static string DotNetFullVersion { get; } = FileVersionInfo.GetVersionInfo(typeof(Uri).Assembly.Location).ProductVersion;
     public static string DotNetFrameworkDescription => RuntimeInformation.FrameworkDescription;
     public static string DotNetFrameworkMainDescription { get; } = GetMainDotNetFrameworkDescription();
-    public static bool IsDotNetFramework => DotNetFrameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase);
+    public static bool IsDotNetFramework { get; } = GetIsDotNetFramework();
+
+    private static bool GetIsDotNetFramework()
+    {
+        string frameworkDescription = DotNetFrameworkDescription;
+        return frameworkDescription.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase) ||
+               frameworkDescription.StartsWith("Mono", StringComparison.OrdinalIgnoreCase);
+    }
 
     private static string GetMainDotNetFrameworkDescription()
     {
