@@ -20,8 +20,7 @@
     <_Reqnroll_xUnitGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'" >net462</_Reqnroll_xUnitGeneratorPlugin>
     <_Reqnroll_xUnitGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_xUnitGeneratorPlugin)\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll</_Reqnroll_xUnitGeneratorPluginPath>
 
-    <_Reqnroll_xUnitRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">netstandard2.0</_Reqnroll_xUnitRuntimePlugin>
-    <_Reqnroll_xUnitRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_Reqnroll_xUnitRuntimePlugin>
+    <_Reqnroll_xUnitRuntimePlugin>netstandard2.0</_Reqnroll_xUnitRuntimePlugin>
     <_Reqnroll_xUnitRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_xUnitRuntimePlugin)\Reqnroll.xUnit.ReqnrollPlugin.dll</_Reqnroll_xUnitRuntimePluginPath>
 
     <SourceReqnrollAssemblyHooksFile Condition="'$(SourceReqnrollAssemblyHooksFile)' == ''">$(MSBuildThisFileDirectory)xUnit.AssemblyHooks$(DefaultLanguageSourceExtension)</SourceReqnrollAssemblyHooksFile>

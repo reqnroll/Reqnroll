@@ -21,8 +21,7 @@
     <_Reqnroll_MsTestGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_Reqnroll_MsTestGeneratorPlugin>
     <_Reqnroll_MsTestGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_MsTestGeneratorPlugin)\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll</_Reqnroll_MsTestGeneratorPluginPath>
 
-    <_Reqnroll_MsTestRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETCoreApp' ">netstandard2.0</_Reqnroll_MsTestRuntimePlugin>
-    <_Reqnroll_MsTestRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_Reqnroll_MsTestRuntimePlugin>
+    <_Reqnroll_MsTestRuntimePlugin>netstandard2.0</_Reqnroll_MsTestRuntimePlugin>
     <_Reqnroll_MsTestRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_MsTestRuntimePlugin)\Reqnroll.MSTest.ReqnrollPlugin.dll</_Reqnroll_MsTestRuntimePluginPath>
 
     <SourceReqnrollAssemblyHooksFile Condition="'$(SourceReqnrollAssemblyHooksFile)' == ''">$(MSBuildThisFileDirectory)MSTest.AssemblyHooks$(DefaultLanguageSourceExtension)</SourceReqnrollAssemblyHooksFile>

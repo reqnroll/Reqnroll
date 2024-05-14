@@ -57,7 +57,6 @@
     <Reqnroll_Core_Tools_TFM>netcoreapp3.1</Reqnroll_Core_Tools_TFM> 
     <Reqnroll_Net6_Tools_TFM>$(Reqnroll_Net6_TFM)</Reqnroll_Net6_Tools_TFM>
 
-    <Reqnroll_Runtime_TFM>$(Reqnroll_FullFramework_Runtime_TFM);$(Reqnroll_Core_Runtime_TFM);$(Reqnroll_Net6_TFM)</Reqnroll_Runtime_TFM>
     <Reqnroll_Generator_TFM>$(Reqnroll_FullFramework_Generator_TFM);$(Reqnroll_Core_Generator_TFM);$(Reqnroll_Net6_TFM)</Reqnroll_Generator_TFM>
     <Reqnroll_Test_TFM>$(Reqnroll_FullFramework_Test_TFM);$(Reqnroll_Core_Test_TFM)</Reqnroll_Test_TFM>
     <Reqnroll_Specs_TFM>$(Reqnroll_Net6_Specs_TFM)</Reqnroll_Specs_TFM>
