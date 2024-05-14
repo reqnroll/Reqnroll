@@ -6,7 +6,8 @@
     <_Reqnroll_SpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_Reqnroll_SpecFlowCompatibilityGeneratorPlugin>
     <_Reqnroll_SpecFlowCompatibilityGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_SpecFlowCompatibilityGeneratorPlugin)\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.dll</_Reqnroll_SpecFlowCompatibilityGeneratorPluginPath>
 
-    <_Reqnroll_SpecFlowCompatibilityRuntimePlugin>netstandard2.0</_Reqnroll_SpecFlowCompatibilityRuntimePlugin>
+    <_Reqnroll_SpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_Reqnroll_SpecFlowCompatibilityRuntimePlugin>
+    <_Reqnroll_SpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">netstandard2.0</_Reqnroll_SpecFlowCompatibilityRuntimePlugin>
     <_Reqnroll_SpecFlowCompatibilityRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_SpecFlowCompatibilityRuntimePlugin)\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll</_Reqnroll_SpecFlowCompatibilityRuntimePluginPath>
 
   </PropertyGroup>

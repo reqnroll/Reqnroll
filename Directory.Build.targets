@@ -8,10 +8,9 @@
       <NuspecProperties>$(NuspecProperties);author=$(Reqnroll_Authors)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);owner=$(Reqnroll_Owners)</NuspecProperties>
       
-      <NuspecProperties>$(NuspecProperties);Reqnroll_Net6_TFM=$(Reqnroll_Net6_TFM)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Reqnroll_Net6_Generator_TFM=$(Reqnroll_Net6_Generator_TFM)</NuspecProperties>
       
       <NuspecProperties>$(NuspecProperties);Reqnroll_FullFramework_Runtime_TFM=$(Reqnroll_FullFramework_Runtime_TFM)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);Reqnroll_Core_Runtime_TFM=$(Reqnroll_Core_Runtime_TFM)</NuspecProperties>
       
       <NuspecProperties>$(NuspecProperties);Reqnroll_FullFramework_Generator_TFM=$(Reqnroll_FullFramework_Generator_TFM)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);Reqnroll_Core_Generator_TFM=$(Reqnroll_Core_Generator_TFM)</NuspecProperties>

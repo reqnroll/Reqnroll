@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
@@ -21,11 +21,11 @@
     <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Runtime_TFM)'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
     <Reference Include="System.Configuration" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != '$(Reqnroll_FullFramework_Runtime_TFM)'">
+  <ItemGroup Condition="'$(TargetFramework)' != 'net462'">
     <Compile Remove="AppConfig\*.cs" />
   </ItemGroup>
 

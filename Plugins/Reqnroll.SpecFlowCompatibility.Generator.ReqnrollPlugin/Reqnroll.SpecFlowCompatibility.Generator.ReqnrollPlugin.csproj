@@ -28,7 +28,7 @@
     </ProjectReference>
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Runtime_TFM)'">
+  <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Generator_TFM)'">
     <Reference Include="System.Configuration" />
     <Compile Include="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\AppConfig\*.cs">
       <Link>AppConfig\%(RecursiveDir)%(Filename)%(Extension)</Link>
