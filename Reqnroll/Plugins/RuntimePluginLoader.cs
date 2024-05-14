@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Tracing;
 
 namespace Reqnroll.Plugins
@@ -15,7 +16,7 @@ namespace Reqnroll.Plugins
             }
             catch (Exception ex)
             {
-                throw new ReqnrollException($"Unable to load plugin: {pluginAssemblyName}. Please check https://go.reqnroll.net/doc-plugins for details.", ex);
+                throw new ReqnrollException($"Unable to load plugin: {pluginAssemblyName}. Please check https://go.reqnroll.net/doc-plugins for details. (Framework: {PlatformInformation.DotNetFrameworkDescription})", ex);
             }
 
             var pluginAttribute = (RuntimePluginAttribute)Attribute.GetCustomAttribute(assembly, typeof(RuntimePluginAttribute));

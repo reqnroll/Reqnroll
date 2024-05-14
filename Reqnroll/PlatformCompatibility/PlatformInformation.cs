@@ -4,7 +4,7 @@ using System;
 using System.Text.RegularExpressions;
 
 namespace Reqnroll.PlatformCompatibility;
-internal class PlatformInformation
+public class PlatformInformation
 {
     public static Architecture ProcessArchitecture => RuntimeInformation.ProcessArchitecture;
     public static string DotNetFullVersion { get; } = FileVersionInfo.GetVersionInfo(typeof(Uri).Assembly.Location).ProductVersion;

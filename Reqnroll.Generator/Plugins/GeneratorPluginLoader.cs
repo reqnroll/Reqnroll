@@ -1,7 +1,7 @@
 using System;
-using System.IO;
 using System.Reflection;
 using Reqnroll.Infrastructure;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 
 namespace Reqnroll.Generator.Plugins
@@ -17,7 +17,7 @@ namespace Reqnroll.Generator.Plugins
             }
             catch(Exception ex)
             {
-                throw new ReqnrollException($"Unable to load plugin assembly: {pluginDescriptor.Path}. Please check https://go.reqnroll.net/doc-plugins for details.", ex);
+                throw new ReqnrollException($"Unable to load plugin assembly: {pluginDescriptor.Path}. Please check https://go.reqnroll.net/doc-plugins for details. (Framework: {PlatformInformation.DotNetFrameworkDescription})", ex);
             }
 
             var pluginAttribute = (GeneratorPluginAttribute)Attribute.GetCustomAttribute(pluginAssembly, typeof(GeneratorPluginAttribute));

@@ -20,7 +20,15 @@ public class PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks
         var currentAssembly = typeof(PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks).Assembly;
         var containerBuilder = new MsTestContainerBuilder(testContext);
 
-        await global::Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly, containerBuilder: containerBuilder);
+        try
+        {
+            await global::Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly, containerBuilder: containerBuilder);
+        }
+        catch (System.Exception ex)
+        {
+            // wrap the exception because MsTest swallows the outer exception
+            throw new System.AggregateException(ex);
+        }
     }
 
     [AssemblyCleanup]
