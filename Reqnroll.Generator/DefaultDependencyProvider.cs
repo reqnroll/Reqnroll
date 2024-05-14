@@ -6,6 +6,8 @@ using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.Plugins;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Parser;
+using Reqnroll.PlatformCompatibility;
+using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
 
@@ -25,6 +27,7 @@ namespace Reqnroll.Generator
             container.RegisterTypeAs<TestHeaderWriter, ITestHeaderWriter>();
             container.RegisterTypeAs<TestUpToDateChecker, ITestUpToDateChecker>();
 
+            PlatformHelper.RegisterPluginAssemblyLoader(container);
             container.RegisterTypeAs<GeneratorPluginLoader, IGeneratorPluginLoader>();
             container.RegisterTypeAs<DefaultListener, ITraceListener>();
 

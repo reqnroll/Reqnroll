@@ -6,19 +6,14 @@ using Reqnroll.Plugins;
 
 namespace Reqnroll.Generator.Plugins
 {
-    public class GeneratorPluginLoader : IGeneratorPluginLoader
+    public class GeneratorPluginLoader(IPluginAssemblyLoader _pluginAssemblyLoader) : IGeneratorPluginLoader
     {
         public IGeneratorPlugin LoadPlugin(PluginDescriptor pluginDescriptor)
         {
             Assembly pluginAssembly;
             try
             {
-
-#if NETCOREAPP
-                pluginAssembly = PluginAssemblyResolver.Load(pluginDescriptor.Path);
-#else
-                pluginAssembly = Assembly.LoadFrom(pluginDescriptor.Path);
-#endif
+                pluginAssembly = _pluginAssemblyLoader.LoadAssembly(pluginDescriptor.Path);
             }
             catch(Exception ex)
             {

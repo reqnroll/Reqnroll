@@ -1,6 +1,3 @@
-using System;
-using System.IO;
-using System.Reflection;
 using FluentAssertions;
 using Reqnroll.Generator.Plugins;
 using Reqnroll.Plugins;
@@ -15,7 +12,7 @@ namespace Reqnroll.PluginTests.Generator
         public void LoadPlugin_LoadXUnitSuccessfully()
         {
             //ARRANGE
-            var generatorPluginLoader = new GeneratorPluginLoader();
+            var generatorPluginLoader = new GeneratorPluginLoader(new PluginAssemblyLoader());
 
             //ACT
             var pluginDescriptor = new PluginDescriptor("Reqnroll.xUnit.Generator.ReqnrollPlugin", "Reqnroll.xUnit.Generator.ReqnrollPlugin.dll", PluginType.Generator, "");
