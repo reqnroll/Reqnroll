@@ -9,13 +9,14 @@ public class XUnitHandler : ITestFrameworkHandler
 {
     public string FrameworkName => "xUnit";
 
-    public bool CanGenerateLanguage(LanguageInformation language) => language is CSharpLanguageInformation;
+    public bool CanGenerateForCompilation(CompilationInformation compilationInformation) => 
+        compilationInformation is CSharpCompilationInformation;
 
     public SourceText GenerateTestFixture(FeatureInformation feature)
     {
         return feature.CompilationInformation switch
         {
-            CompilationInformation<CSharpLanguageInformation> => new XUnitCSharpSyntaxGeneration(feature).GetSourceText(),
+            CSharpCompilationInformation => new XUnitCSharpSyntaxGeneration(feature).GetSourceText(),
             _ => throw new NotSupportedException(),
         };
     }

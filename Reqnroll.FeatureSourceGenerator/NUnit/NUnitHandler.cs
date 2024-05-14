@@ -9,13 +9,14 @@ public class NUnitHandler : ITestFrameworkHandler
 {
     public string FrameworkName => "NUnit";
 
-    public bool CanGenerateLanguage(LanguageInformation language) => language is CSharpLanguageInformation;
+    public bool CanGenerateForCompilation(CompilationInformation compilationInformation) => 
+        compilationInformation is CSharpCompilationInformation;
 
     public SourceText GenerateTestFixture(FeatureInformation feature)
     {
         return feature.CompilationInformation switch
         {
-            CompilationInformation<CSharpLanguageInformation> => new NUnitCSharpSyntaxGeneration(feature).GetSourceText(),
+            CSharpCompilationInformation => new NUnitCSharpSyntaxGeneration(feature).GetSourceText(),
             _ => throw new NotSupportedException(),
         };
     }

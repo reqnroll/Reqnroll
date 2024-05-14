@@ -1,8 +1,4 @@
-﻿using Microsoft.CodeAnalysis;
-using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.VisualBasic;
-using Reqnroll.FeatureSourceGenerator.CSharp;
-using Reqnroll.FeatureSourceGenerator.Gherkin;
+﻿using Reqnroll.FeatureSourceGenerator.Gherkin;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator;
@@ -10,9 +6,8 @@ namespace Reqnroll.FeatureSourceGenerator;
 /// <summary>
 /// Defines the basis of a source-generator which processes Gherkin feature files into test fixtures.
 /// </summary>
-public abstract class TestFixtureSourceGenerator<TLanguage>(
+public abstract class TestFixtureSourceGenerator(
     ImmutableArray<ITestFrameworkHandler> testFrameworkHandlers) : IIncrementalGenerator
-    where TLanguage : LanguageInformation
 {
     public static readonly DiagnosticDescriptor NoTestFrameworkFound = new(
         id: DiagnosticIds.NoTestFrameworkFound,
@@ -48,20 +43,14 @@ public abstract class TestFixtureSourceGenerator<TLanguage>(
 
         // Extract information about the compilation.
         var compilationInformation = context.CompilationProvider
-            .Select((compilation, cancellationToken) =>
-            {
-                return new CompilationInformation<TLanguage>(
-                    AssemblyName: compilation.AssemblyName,
-                    Language: GetLanguageInformation(compilation),
-                    ReferencedAssemblies: compilation.ReferencedAssemblyNames.ToImmutableArray());
-            });
+            .Select((compilation, _) => GetCompilationInformation(compilation));
 
         // Find compatible test frameworks and choose a default based on referenced assemblies.
         var testFrameworkInformation = compilationInformation
             .Select((compilationInfo, cancellationToken) =>
             {
                 var compatibleHandlers = _testFrameworkHandlers
-                    .Where(handler => handler.CanGenerateLanguage(compilationInfo.Language))
+                    .Where(handler => handler.CanGenerateForCompilation(compilationInfo))
                     .ToImmutableArray();
 
                 if (!compatibleHandlers.Any())
@@ -69,7 +58,7 @@ public abstract class TestFixtureSourceGenerator<TLanguage>(
                     // This condition should only be possible if Roslyn is compiling a language we have produced a generator for
                     // without also including a compatible test framework handler; it should never occur in practice.
                     throw new InvalidOperationException(
-                        $"No test framework handlers are available which can generate {compilationInfo.Language}.");
+                        $"No test framework handlers are available which can generate code for the current compilation.");
                 }
 
                 var availableHandlers = compatibleHandlers
@@ -129,7 +118,6 @@ public abstract class TestFixtureSourceGenerator<TLanguage>(
                                 TestFrameworkNotSupported,
                                 Location.None,
                                 targetTestFrameworkIdentifier,
-                                compilationInfo.Language,
                                 frameworks) 
                         ];
                     }
@@ -220,5 +208,5 @@ public abstract class TestFixtureSourceGenerator<TLanguage>(
         });
     }
 
-    protected abstract TLanguage GetLanguageInformation(Compilation compilation);
+    protected abstract CompilationInformation GetCompilationInformation(Compilation compilation);
 }

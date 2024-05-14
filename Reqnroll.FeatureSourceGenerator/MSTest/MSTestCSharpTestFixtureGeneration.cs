@@ -25,7 +25,12 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
         SourceBuilder.AppendLine("// start: MSTest Specific part");
         SourceBuilder.AppendLine();
 
-        SourceBuilder.AppendLine("public global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext TestContext { get; set; }");
+        SourceBuilder.Append("public global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext");
+        if (AreNullableReferenceTypesEnabled)
+        {
+            SourceBuilder.Append("?");
+        }
+        SourceBuilder.AppendLine(" TestContext { get; set; }");
         SourceBuilder.AppendLine();
 
         AppendClassInitializeMethod();

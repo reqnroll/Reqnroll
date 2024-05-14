@@ -39,33 +39,3 @@ public abstract record CompilationInformation(
         }
     }
 }
-
-public record CompilationInformation<TLanguage>(
-    string? AssemblyName,
-    ImmutableArray<AssemblyIdentity> ReferencedAssemblies,
-    TLanguage Language) : CompilationInformation(AssemblyName, ReferencedAssemblies)
-    where TLanguage : LanguageInformation
-{
-    public virtual bool Equals(CompilationInformation<TLanguage> other)
-    {
-        if (!base.Equals(other))
-        {
-            return false;
-        }
-
-        return Language.Equals(other.Language);
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked // Overflow is fine, just wrap
-        {
-            int hash = base.GetHashCode();
-
-            hash = hash * 43 + Language.GetHashCode();
-
-            return hash;
-        }
-    }
-}
-

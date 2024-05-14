@@ -18,7 +18,10 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
 {
     public FeatureInformation FeatureInformation { get; } = featureInfo;
 
-    protected bool SupportsNullable { get; }
+    public CSharpCompilationInformation CompilationInformation { get; } = 
+        (CSharpCompilationInformation)featureInfo.CompilationInformation;
+
+    protected bool AreNullableReferenceTypesEnabled => CompilationInformation.HasNullableReferencesEnabled;
 
     private bool IsLineMappingEnabled { get; } = featureInfo.FeatureSyntax.FilePath != null;
 

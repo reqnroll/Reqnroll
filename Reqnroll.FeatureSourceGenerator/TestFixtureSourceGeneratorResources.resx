@@ -124,7 +124,7 @@
     <value>No test framework detected</value>
   </data>
   <data name="TestFrameworkNotSupportedMessage" xml:space="preserve">
-    <value>The specified test framework "{0}" is not supported by Reqnroll in {1} projects. Supported frameworks identifiers: {2} </value>
+    <value>The specified test framework "{0}" is not supported by the current compilation. Supported test framework identifiers: {1} </value>
   </data>
   <data name="TestFrameworkNotSupportedTitle" xml:space="preserve">
     <value>Test framework not supported</value>
