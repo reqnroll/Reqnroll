@@ -9,7 +9,6 @@ using System.Runtime.ExceptionServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Reqnroll.Bindings.Reflection;
-using Reqnroll.Compatibility;
 using Reqnroll.Configuration;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Infrastructure;
