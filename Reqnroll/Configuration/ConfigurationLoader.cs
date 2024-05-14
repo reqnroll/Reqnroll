@@ -96,7 +96,6 @@ namespace Reqnroll.Configuration
 
         public void TraceConfigSource(ITraceListener traceListener, ReqnrollConfiguration reqnrollConfiguration)
         {
-            traceListener.WriteToolOutput($"PlatformInformation: .NET: {PlatformInformation.DotNetFrameworkDescription}, IsDotNetFramework: {PlatformInformation.IsDotNetFramework}");
             switch (reqnrollConfiguration.ConfigSource)
             {
                 case ConfigSource.Default:
