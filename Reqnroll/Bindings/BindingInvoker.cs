@@ -168,11 +168,7 @@ namespace Reqnroll.Bindings
                     parameters.ToArray());
             }
 
-#if WINDOWS_PHONE
-            return ExpressionCompiler.ExpressionCompiler.Compile(lambda);
-#else
             return lambda.Compile();
-#endif
         }
 
         protected virtual Expression GetBindingMethodCallExpression(Expression instance, MethodInfo method, Expression[] argumentsExpressions)

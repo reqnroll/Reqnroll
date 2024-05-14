@@ -8,12 +8,7 @@ namespace Reqnroll.Plugins
         public IReadOnlyList<string> Merge(IReadOnlyList<string> pluginPaths)
         {
             // Idea is to filter out the same assemblies stored on different paths. Shortcut: check if we even have duplicated assemblies
-            var hashset = new HashSet<string>(
-#if NETCOREAPP2_1_OR_GREATER
-                // initialize with expected size when available
-                pluginPaths.Count
-#endif
-                );
+            var hashset = new HashSet<string>();
 
             List<string> modifiedList = null;
             for (var i = 0; i < pluginPaths.Count; i++)

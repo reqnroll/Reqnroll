@@ -10,9 +10,7 @@ namespace Reqnroll
     /// <summary>
     /// An alias for the <see cref="DataTable"/> class for backwards compatibility. 
     /// </summary>
-#if !BODI_LIMITEDRUNTIME
     [Serializable]
-#endif
     public class Table
     {
         internal const string ERROR_NO_CELLS_TO_ADD = "No cells to add";
@@ -175,9 +173,7 @@ namespace Reqnroll
         }
     }
 
-#if !BODI_LIMITEDRUNTIME
     [Serializable]
-#endif
     public class DataTableRows : IEnumerable<DataTableRow>
     {
         private readonly List<DataTableRow> _innerList = new();
@@ -207,9 +203,7 @@ namespace Reqnroll
         }
     }
 
-#if !BODI_LIMITEDRUNTIME
     [Serializable]
-#endif
     public class DataTableRow : IDictionary<string, string>
     {
         private readonly Table _table;
