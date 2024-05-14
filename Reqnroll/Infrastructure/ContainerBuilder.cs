@@ -6,6 +6,7 @@ using Reqnroll.Configuration;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
+using Reqnroll.PlatformCompatibility;
 
 namespace Reqnroll.Infrastructure
 {
@@ -161,6 +162,7 @@ namespace Reqnroll.Infrastructure
             bool traceMissingPluginAttribute)
         {
             traceListener.WriteToolOutput($"Loading plugin {pluginPath}");
+            traceListener.WriteToolOutput($"PlatformInformation: .NET: {PlatformInformation.DotNetFrameworkDescription}, IsDotNetFramework: {PlatformInformation.IsDotNetFramework}");
 
             var plugin = pluginLoader.LoadPlugin(pluginPath, traceListener, traceMissingPluginAttribute);
             var runtimePluginParameters = new RuntimePluginParameters();
