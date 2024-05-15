@@ -9,7 +9,9 @@ All types of plugins are created in a similar way.
 
 ## Runtime plugins
 
-Runtime plugins need to target .NET Framework 4.6.2 and .NET Standard 2.0.
+Runtime plugins should target .NET Standard 2.0 to be compatible with all .NET versions supported 
+by Reqnroll. Targetting a more specific version will limit the compatibility of your plugin.
+
 Reqnroll searches for files that end with `.ReqnrollPlugin.dll` in the following locations:
 
 * The folder containing your `Reqnroll.dll` file
@@ -44,7 +46,15 @@ Mandatory:
 
 ## Generator plugins
 
-Generator plugins need to target .NET Framework 4.7.1 and .NET Core 3.1.
+Runtime plugins should target .NET Standard 2.0 to be compatible with all scenarios supported by 
+Reqnroll. 
+
+The generator plugins are invoked during build. They are usually invoked in a .NET environment 
+according to your .NET SDK (e.g. .NET 8.0), but in some cases (when built using MSBuild or in Visual Studio) 
+they might be invoked in a .NET 4.8 environment. Therefore, you have to make sure that your plugin
+works in both environments. If necessary, you can multi-target your plugin, but using the right compiled
+version of your plugin is the responsibility of the plugin itself.
+
 The MSBuild task needs to know which generator plugins it should use. You therefore have to add your generator plugin to the `ReqnrollGeneratorPlugins` ItemGroup.
 This is passed to the MSBuild task as a parameter and later used to load the plugins.
 
@@ -65,28 +75,31 @@ This is passed to the MSBuild task as a parameter and later used to load the plu
 
 ## Combined Package with both plugins
 
-If you need to update generator and runtime plugins with a single NuGet package (as we are doing with the `Reqnroll.xUnit`, `Reqnroll.NUnit` and `Reqnroll.xUnit` packages), you can do so.
+You can have a single NuGet package that contains both the runtime and generator plugins. 
+We use this approach for the `Reqnroll.xUnit`, `Reqnroll.NUnit` and `Reqnroll.xUnit` packages
+for example.
 
-As with the separate plugins, you need two projects. One for the runtime plugin, and one for the generator plugin. As you only want one NuGet package, the **NuSpec files must only be present in the generator project**.
-This is because the generator plugin is built with a higher .NET Framework version (.NET 4.7.1), meaning you can add a dependency on the Runtime plugin (which is only .NET 4.6.1). This will not working the other way around.
+The combined package can be built from a single project, or from two projects. The latter 
+allows you to have different dependencies for the runtime and generator plugins.
+
+If you use two projects for the combined package, the **NuSpec files should only be present 
+in the generator project**. This is because the generators typically have more dependencies.
 
 You can simply combine the contents of the `.targets` and `.props` file to a single one.
-
 
 ## Tips & Tricks
 
 ### Building Plugins on non-Windows machines
 
-For building .NET 4.6.2 projects on non- Windows machines, the .NET Framework reference assemblies are needed.
+For building .NET 4.6.2 projects on non-Windows machines, the .NET Framework reference assemblies are needed.
 
 You can add them with following PackageReference to your project:
 
-``` xml
+```xml
 <ItemGroup>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0">
         <PrivateAssets>all</PrivateAssets>
         <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
 </ItemGroup>
-
 ```
