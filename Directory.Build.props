@@ -44,7 +44,6 @@
     <!-- for Reqnroll.Tools.MsBuild.Generation -->
     <Reqnroll_FullFramework_Tools_TFM>net462</Reqnroll_FullFramework_Tools_TFM>
     <Reqnroll_Core_Tools_TFM>netstandard2.0</Reqnroll_Core_Tools_TFM> 
-    <Reqnroll_Tools_TFM>net462;netstandard2.0</Reqnroll_Tools_TFM>
 
     <Reqnroll_EnableStrongNameSigning>true</Reqnroll_EnableStrongNameSigning>
   </PropertyGroup>

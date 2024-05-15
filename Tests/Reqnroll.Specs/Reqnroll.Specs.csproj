@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
   <Import Project="../../Reqnroll.Tools.MsBuild.Generation/build/Reqnroll.Tools.MsBuild.Generation.props" />
@@ -57,8 +57,8 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_Reqnroll_Needed_MSBuildGenerator>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Generator_TFM)</_Reqnroll_Needed_MSBuildGenerator>
+    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
+    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
   </PropertyGroup>
 
 
