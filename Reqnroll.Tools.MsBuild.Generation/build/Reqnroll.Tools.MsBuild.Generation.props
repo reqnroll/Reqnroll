@@ -67,7 +67,7 @@
 
 
   <PropertyGroup>
-    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_Reqnroll_TaskFolder)' == ''">netcoreapp3.1</_Reqnroll_TaskFolder>
+    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_Reqnroll_TaskFolder)' == ''">netstandard2.0</_Reqnroll_TaskFolder>
     <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_Reqnroll_TaskFolder)' == ''">net462</_Reqnroll_TaskFolder>
     <_Reqnroll_TaskAssembly Condition=" '$(_Reqnroll_TaskAssembly)' == '' ">..\tasks\$(_Reqnroll_TaskFolder)\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
   </PropertyGroup>

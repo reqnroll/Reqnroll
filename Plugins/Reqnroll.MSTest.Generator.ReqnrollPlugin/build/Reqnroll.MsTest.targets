@@ -17,7 +17,7 @@
 
   <PropertyGroup>
 
-    <_Reqnroll_MsTestGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netcoreapp3.1</_Reqnroll_MsTestGeneratorPlugin>
+    <_Reqnroll_MsTestGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_Reqnroll_MsTestGeneratorPlugin>
     <_Reqnroll_MsTestGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_Reqnroll_MsTestGeneratorPlugin>
     <_Reqnroll_MsTestGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_MsTestGeneratorPlugin)\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll</_Reqnroll_MsTestGeneratorPluginPath>
 

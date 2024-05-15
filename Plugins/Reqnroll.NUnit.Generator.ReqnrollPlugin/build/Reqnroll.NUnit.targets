@@ -17,7 +17,7 @@
 
   <PropertyGroup>
 
-    <_Reqnroll_NUnitGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netcoreapp3.1</_Reqnroll_NUnitGeneratorPlugin>
+    <_Reqnroll_NUnitGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_Reqnroll_NUnitGeneratorPlugin>
     <_Reqnroll_NUnitGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_Reqnroll_NUnitGeneratorPlugin>
     <_Reqnroll_NUnitGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_NUnitGeneratorPlugin)\Reqnroll.NUnit.Generator.ReqnrollPlugin.dll</_Reqnroll_NUnitGeneratorPluginPath>
 
