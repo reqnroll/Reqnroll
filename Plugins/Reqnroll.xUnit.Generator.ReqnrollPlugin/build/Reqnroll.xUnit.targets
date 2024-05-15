@@ -16,8 +16,7 @@
 
   <PropertyGroup>
 
-    <_Reqnroll_xUnitGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'" >netstandard2.0</_Reqnroll_xUnitGeneratorPlugin>
-    <_Reqnroll_xUnitGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'" >net462</_Reqnroll_xUnitGeneratorPlugin>
+    <_Reqnroll_xUnitGeneratorPlugin>netstandard2.0</_Reqnroll_xUnitGeneratorPlugin>
     <_Reqnroll_xUnitGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_xUnitGeneratorPlugin)\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll</_Reqnroll_xUnitGeneratorPluginPath>
 
     <_Reqnroll_xUnitRuntimePlugin>netstandard2.0</_Reqnroll_xUnitRuntimePlugin>
