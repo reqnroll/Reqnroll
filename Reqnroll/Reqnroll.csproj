@@ -18,12 +18,13 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
+  <!-- build time dependencies -->
   <ItemGroup>
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-
+    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
   </ItemGroup>
 
   <ItemGroup>
@@ -31,10 +32,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
     <PackageReference Include="Gherkin" Version="19.0.3" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="16.0.0" />
-
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="SpecFlow.Internal.Json" Version="1.0.8" />

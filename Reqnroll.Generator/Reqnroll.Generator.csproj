@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_Generator_TFM)</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Reqnroll.Generator</AssemblyName>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
@@ -20,7 +20,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gherkin" Version="19.0.3" />
     <PackageReference Include="System.CodeDom" Version="4.4.0" />
   </ItemGroup>
 
