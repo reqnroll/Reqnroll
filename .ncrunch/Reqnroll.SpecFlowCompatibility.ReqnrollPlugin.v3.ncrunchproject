@@ -1,3 +1,7 @@
 ﻿<ProjectConfiguration>
-  <Settings />
+  <Settings>
+    <CustomBuildProperties>
+      <Value>TargetFrameworks = netstandard2.0</Value>
+    </CustomBuildProperties>
+  </Settings>
 </ProjectConfiguration>
