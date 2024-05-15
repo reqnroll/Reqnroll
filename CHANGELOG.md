@@ -11,6 +11,7 @@
 * Fix: #111 @ignore attribute is not inherited to the scenarios from Rule
 * Support for JSON files added to SpecFlow.ExternalData
 * Fix: #120 Capture ExecutionContext after every binding invoke
+* Allow creating single target (netstandard2.0) plugins
 
 # v1.0.1 - 2024-02-16
 
