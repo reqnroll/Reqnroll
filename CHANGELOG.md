@@ -12,6 +12,7 @@
 * Support for JSON files added to SpecFlow.ExternalData
 * Fix: #120 Capture ExecutionContext after every binding invoke
 * Allow creating single target (netstandard2.0) plugins
+* MsTest: Use ClassCleanupBehavior.EndOfClass instead of custom implementation (preparation for MsTest v4.0)
 
 # v1.0.1 - 2024-02-16
 
