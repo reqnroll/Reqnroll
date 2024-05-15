@@ -91,4 +91,19 @@
     </None>
   </ItemGroup>
 
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <!-- We create a 'tasks' folder in the output folder with only those files 
+         that are needed for the task to run, according to Reqnroll.Tools.MsBuild.Generation.nuspec.
+         This is needed only for the Reqnroll projects within the solution (Specs, *.IntegrationTest),
+         and not used for producing the NuGet package.
+    -->
+    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Tools_TFM)'">
+      <TaskFiles Include="$(OutDir)\*.dll" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_Core_Tools_TFM)'">
+      <TaskFiles Include="$(OutDir)\*.dll;$(OutDir)\*.deps.json" Exclude="$(OutDir)\System.*;$(OutDir)\Microsoft.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(TaskFiles)" DestinationFolder="$(OutDir)\tasks" />
+  </Target>
+
 </Project>
