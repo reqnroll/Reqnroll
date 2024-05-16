@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.CucumberExpressions;
@@ -17,7 +18,12 @@ namespace Reqnroll.RuntimeTests
 
         public IEnumerable<string> ValidationErrors => GeneralErrorMessages.Concat(BindingSpecificErrorMessages);
 
-        public BindingSourceProcessorStub() : base(new BindingFactory(new StepDefinitionRegexCalculator(ConfigurationLoader.GetDefault()), new CucumberExpressionStepDefinitionBindingBuilderFactory(new CucumberExpressionParameterTypeRegistry(new BindingRegistry()))))
+        public BindingSourceProcessorStub() 
+            : base(
+                new BindingFactory(
+                    new StepDefinitionRegexCalculator(ConfigurationLoader.GetDefault()),
+                    new CucumberExpressionStepDefinitionBindingBuilderFactory(new CucumberExpressionParameterTypeRegistry(new BindingRegistry())),
+                    ConfigurationLoader.GetDefault()))
         {
         }
 

@@ -1,13 +1,11 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using Reqnroll.BoDi;
 using FluentAssertions;
 using Xunit;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Configuration;
 using Reqnroll.Configuration.JsonConfig;
-using Reqnroll.Plugins;
 
 namespace Reqnroll.RuntimeTests.Configuration
 {
@@ -29,7 +27,8 @@ namespace Reqnroll.RuntimeTests.Configuration
             ""generator"": { ""allowDebugGeneratedFiles"": false },
             ""runtime"": {              
               ""stopAtFirstError"": false,
-              ""missingOrPendingStepsOutcome"": ""Inconclusive""
+              ""missingOrPendingStepsOutcome"": ""Inconclusive"",
+              ""enableCucumberStepDefinitionBindings"": false
             },
             ""trace"": {
               ""traceSuccessfulSteps"": true,
@@ -96,6 +95,32 @@ namespace Reqnroll.RuntimeTests.Configuration
             var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
 
             runtimeConfig.StopAtFirstError.Should().BeFalse();
+        }
+
+        [Fact]
+        public void Check_Runtime_enableCucumberStepDefinitionBindings_as_true()
+        {
+            string config = @"{
+                                ""runtime"": { ""enableCucumberStepDefinitionBindings"": true }
+                            }";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.EnableCucumberStepDefinitionBindings.Should().BeTrue();
+        }
+
+        [Fact]
+        public void Check_Runtime_enableCucumberStepDefinitionBindings_as_false()
+        {
+            string config = @"{
+                                ""runtime"": { ""enableCucumberStepDefinitionBindings"": false }
+                            }";
+
+
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.EnableCucumberStepDefinitionBindings.Should().BeFalse();
         }
 
         [Fact]
@@ -486,6 +511,7 @@ namespace Reqnroll.RuntimeTests.Configuration
             config.StopAtFirstError.Should().Be(ConfigDefaults.StopAtFirstError);
             config.MissingOrPendingStepsOutcome.Should().Be(ConfigDefaults.MissingOrPendingStepsOutcome);
             config.ObsoleteBehavior.Should().Be(ConfigDefaults.ObsoleteBehavior);
+            config.EnableCucumberStepDefinitionBindings.Should().Be(ConfigDefaults.EnableCucumberStepDefinitionBindings);
             config.CustomDependencies.Should().NotBeNull();
             config.CustomDependencies.Count.Should().Be(0);
 

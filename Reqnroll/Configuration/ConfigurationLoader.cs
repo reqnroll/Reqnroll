@@ -47,6 +47,7 @@ namespace Reqnroll.Configuration
         public static string[] DefaultAddNonParallelizableMarkerForTags => ConfigDefaults.AddNonParallelizableMarkerForTags;
 
         public static ObsoleteBehavior DefaultObsoleteBehavior => ConfigDefaults.ObsoleteBehavior;
+        public static bool DefaultEnableCucumberStepDefinitionBindings => ConfigDefaults.EnableCucumberStepDefinitionBindings;
 
         public static bool DefaultColoredOutput => ConfigDefaults.ColoredOutput;
 
@@ -131,6 +132,7 @@ namespace Reqnroll.Configuration
                 DefaultAllowRowTests,
                 DefaultAddNonParallelizableMarkerForTags,
                 DefaultObsoleteBehavior,
+                DefaultEnableCucumberStepDefinitionBindings,
                 DefaultColoredOutput
                 );
         }

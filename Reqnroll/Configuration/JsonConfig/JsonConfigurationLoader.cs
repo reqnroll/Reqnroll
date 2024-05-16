@@ -31,6 +31,7 @@ namespace Reqnroll.Configuration.JsonConfig
             bool allowDebugGeneratedFiles = reqnrollConfiguration.AllowDebugGeneratedFiles;
             var addNonParallelizableMarkerForTags = reqnrollConfiguration.AddNonParallelizableMarkerForTags;
             var obsoleteBehavior = reqnrollConfiguration.ObsoleteBehavior;
+            var enableCucumberStepDefinitionBindings = reqnrollConfiguration.EnableCucumberStepDefinitionBindings;
 
             if (jsonConfig.Language != null)
             {
@@ -58,6 +59,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 missingOrPendingStepsOutcome = jsonConfig.Runtime.MissingOrPendingStepsOutcome;
                 stopAtFirstError = jsonConfig.Runtime.StopAtFirstError;
                 obsoleteBehavior = jsonConfig.Runtime.ObsoleteBehavior;
+                enableCucumberStepDefinitionBindings = jsonConfig.Runtime.EnableCucumberStepDefinitionBindings;
 
                 if (jsonConfig.Runtime.Dependencies != null)
                 {
@@ -121,6 +123,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 allowRowTests,
                 addNonParallelizableMarkerForTags,
                 obsoleteBehavior,
+                enableCucumberStepDefinitionBindings,
                 coloredOutput
             )
             {

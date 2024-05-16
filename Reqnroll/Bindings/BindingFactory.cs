@@ -1,17 +1,23 @@
 using Reqnroll.Bindings.CucumberExpressions;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.Configuration;
 
 namespace Reqnroll.Bindings;
 
 public class BindingFactory : IBindingFactory
 {
-    private readonly IStepDefinitionRegexCalculator stepDefinitionRegexCalculator;
+    private readonly IStepDefinitionRegexCalculator _stepDefinitionRegexCalculator;
     private readonly ICucumberExpressionStepDefinitionBindingBuilderFactory _cucumberExpressionStepDefinitionBindingBuilderFactory;
+    private readonly ReqnrollConfiguration _reqnrollConfiguration;
 
-    public BindingFactory(IStepDefinitionRegexCalculator stepDefinitionRegexCalculator, ICucumberExpressionStepDefinitionBindingBuilderFactory cucumberExpressionStepDefinitionBindingBuilderFactory)
+    public BindingFactory(
+        IStepDefinitionRegexCalculator stepDefinitionRegexCalculator,
+        ICucumberExpressionStepDefinitionBindingBuilderFactory cucumberExpressionStepDefinitionBindingBuilderFactory,
+        ReqnrollConfiguration reqnrollConfiguration)
     {
-        this.stepDefinitionRegexCalculator = stepDefinitionRegexCalculator;
-        _cucumberExpressionStepDefinitionBindingBuilderFactory = cucumberExpressionStepDefinitionBindingBuilderFactory;
+        this._stepDefinitionRegexCalculator = stepDefinitionRegexCalculator;
+        this._cucumberExpressionStepDefinitionBindingBuilderFactory = cucumberExpressionStepDefinitionBindingBuilderFactory;
+        this._reqnrollConfiguration = reqnrollConfiguration;
     }
 
     public IHookBinding CreateHookBinding(IBindingMethod bindingMethod, HookType hookType, BindingScope bindingScope,
@@ -22,11 +28,17 @@ public class BindingFactory : IBindingFactory
 
     public IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(StepDefinitionType stepDefinitionType, IBindingMethod bindingMethod, BindingScope bindingScope, string expressionString)
     {
-        return expressionString == null
-            ? new MethodNameStepDefinitionBindingBuilder(stepDefinitionRegexCalculator, stepDefinitionType, bindingMethod, bindingScope)
-            : CucumberExpressionStepDefinitionBindingBuilder.IsCucumberExpression(expressionString)
-                ? _cucumberExpressionStepDefinitionBindingBuilderFactory.Create(stepDefinitionType, bindingMethod, bindingScope, expressionString)
-                : new RegexStepDefinitionBindingBuilder(stepDefinitionType, bindingMethod, bindingScope, expressionString);
+        if (expressionString == null)
+        {
+            return new MethodNameStepDefinitionBindingBuilder(_stepDefinitionRegexCalculator, stepDefinitionType, bindingMethod, bindingScope);
+        }
+
+        if (_reqnrollConfiguration.EnableCucumberStepDefinitionBindings && CucumberExpressionStepDefinitionBindingBuilder.IsCucumberExpression(expressionString))
+        {
+            return _cucumberExpressionStepDefinitionBindingBuilderFactory.Create(stepDefinitionType, bindingMethod, bindingScope, expressionString);
+        }
+
+        return new RegexStepDefinitionBindingBuilder(stepDefinitionType, bindingMethod, bindingScope, expressionString);
     }
 
     public IStepArgumentTransformationBinding CreateStepArgumentTransformation(string regexString,

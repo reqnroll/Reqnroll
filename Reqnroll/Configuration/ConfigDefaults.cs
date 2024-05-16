@@ -14,6 +14,7 @@ namespace Reqnroll.Configuration
         public const bool DetectAmbiguousMatches = true;
         public const bool StopAtFirstError = false;
         public const MissingOrPendingStepsOutcome MissingOrPendingStepsOutcome = Reqnroll.Configuration.MissingOrPendingStepsOutcome.Pending;
+        public const bool EnableCucumberStepDefinitionBindings = true;
 
         public const bool TraceSuccessfulSteps = true;
         public const bool TraceTimings = false;

@@ -4,6 +4,9 @@
   /*
 
   Changelog:
+  
+  1.1
+  - Add properties.runtime.enableCucumberStepDefinitionBindings
 
   1.0
   - Initial Reqnroll configuration schema
@@ -76,6 +79,11 @@
           "description": "Determines whether the execution should stop when encountering the first error, or whether it should attempt to try and match subsequent steps (in order to detect missing steps).",
           "type": "boolean",
           "default": false
+        },
+        "enableCucumberStepDefinitionBindings": {
+          "description": "Determines whether the step definition binding should consider cucumber expressions",
+          "type": "boolean",
+          "default": true
         }
       }
     },

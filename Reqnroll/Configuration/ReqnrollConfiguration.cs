@@ -32,6 +32,7 @@ namespace Reqnroll.Configuration
             bool allowRowTests,
             string[] addNonParallelizableMarkerForTags,
             ObsoleteBehavior obsoleteBehavior,
+            bool enableCucumberStepDefinitionBindings,
             bool coloredOutput
         )
         {
@@ -51,6 +52,7 @@ namespace Reqnroll.Configuration
             AllowRowTests = allowRowTests;
             AddNonParallelizableMarkerForTags = addNonParallelizableMarkerForTags;
             ObsoleteBehavior = obsoleteBehavior;
+            EnableCucumberStepDefinitionBindings = enableCucumberStepDefinitionBindings;
             ColoredOutput = coloredOutput;
         }
 
@@ -68,6 +70,7 @@ namespace Reqnroll.Configuration
         public bool StopAtFirstError { get; set; }
         public MissingOrPendingStepsOutcome MissingOrPendingStepsOutcome { get; set; }
         public ObsoleteBehavior ObsoleteBehavior { get; set; }
+        public bool EnableCucumberStepDefinitionBindings { get; set; }
 
         //generator settings
         public bool AllowDebugGeneratedFiles { get; set; }
@@ -93,6 +96,7 @@ namespace Reqnroll.Configuration
                                                               && AllowDebugGeneratedFiles == other.AllowDebugGeneratedFiles
                                                               && AllowRowTests == other.AllowRowTests
                                                               && ObsoleteBehavior == other.ObsoleteBehavior
+                                                              && EnableCucumberStepDefinitionBindings == other.EnableCucumberStepDefinitionBindings
                                                               && TraceSuccessfulSteps == other.TraceSuccessfulSteps
                                                               && TraceTimings == other.TraceTimings
                                                               && MinTracedDuration.Equals(other.MinTracedDuration)
@@ -134,6 +138,7 @@ namespace Reqnroll.Configuration
                 hashCode = (hashCode * 397) ^ AllowDebugGeneratedFiles.GetHashCode();
                 hashCode = (hashCode * 397) ^ AllowRowTests.GetHashCode();
                 hashCode = (hashCode * 397) ^ (int)ObsoleteBehavior;
+                hashCode = (hashCode * 397) ^ EnableCucumberStepDefinitionBindings.GetHashCode();
                 hashCode = (hashCode * 397) ^ TraceSuccessfulSteps.GetHashCode();
                 hashCode = (hashCode * 397) ^ TraceTimings.GetHashCode();
                 hashCode = (hashCode * 397) ^ MinTracedDuration.GetHashCode();
