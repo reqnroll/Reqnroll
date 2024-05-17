@@ -39,10 +39,15 @@ namespace Reqnroll.Bindings
 
         public async Task<object> ConvertAsync(object value, IBindingType typeToConvertTo, CultureInfo cultureInfo)
         {
+            return await ConvertAsync(value, typeToConvertTo, cultureInfo, null);
+        }
+
+        private async Task<object> ConvertAsync(object value, IBindingType typeToConvertTo, CultureInfo cultureInfo, IStepArgumentTransformationBinding lastBindingUsed)
+        {
             if (value == null) throw new ArgumentNullException(nameof(value));
 
             var stepTransformation = GetMatchingStepTransformation(value, typeToConvertTo, true);
-            if (stepTransformation != null)
+            if (stepTransformation != null && lastBindingUsed != stepTransformation)
                 return await DoTransformAsync(stepTransformation, value, cultureInfo);
 
             if (typeToConvertTo is RuntimeBindingType convertToType && convertToType.Type.IsInstanceOfType(value))
@@ -55,16 +60,16 @@ namespace Reqnroll.Bindings
         {
             object[] arguments;
             if (stepTransformation.Regex != null && value is string stringValue)
-                arguments = await GetStepTransformationArgumentsFromRegexAsync(stepTransformation, stringValue, cultureInfo);
+                arguments = await GetStepTransformationArgumentsFromRegexAsync(stepTransformation, stringValue, cultureInfo, stepTransformation);
             else
-                arguments = new[] { await ConvertAsync(value, stepTransformation.Method.Parameters.ElementAtOrDefault(0)?.Type ?? new RuntimeBindingType(typeof(object)), cultureInfo)};
+                arguments = new[] { await ConvertAsync(value, stepTransformation.Method.Parameters.ElementAtOrDefault(0)?.Type ?? new RuntimeBindingType(typeof(object)), cultureInfo, stepTransformation) };
 
             var result = await bindingInvoker.InvokeBindingAsync(stepTransformation, contextManager, arguments, testTracer, new DurationHolder());
 
             return result;
         }
 
-        private async Task<object[]> GetStepTransformationArgumentsFromRegexAsync(IStepArgumentTransformationBinding stepTransformation, string stepSnippet, CultureInfo cultureInfo)
+        private async Task<object[]> GetStepTransformationArgumentsFromRegexAsync(IStepArgumentTransformationBinding stepTransformation, string stepSnippet, CultureInfo cultureInfo, IStepArgumentTransformationBinding lastBindingUsed)
         {
             var match = stepTransformation.Regex.Match(stepSnippet);
             var argumentStrings = match.Groups.Cast<Group>().Skip(1).Select(g => g.Value).ToList();
@@ -74,7 +79,7 @@ namespace Reqnroll.Bindings
 
             for (int i = 0; i < argumentStrings.Count; i++)
             {
-                result[i] = await ConvertAsync(argumentStrings[i], bindingParameters[i].Type, cultureInfo);
+                result[i] = await ConvertAsync(argumentStrings[i], bindingParameters[i].Type, cultureInfo, lastBindingUsed);
             }
 
             return result;
