@@ -26,6 +26,7 @@ namespace Reqnroll
         protected readonly ITestTracer _testTracer;
 
         private readonly ConcurrentDictionary<string, ITestRunner> _testRunnerRegistry = new();
+        private readonly ConcurrentBag<IObjectContainer> _testThreadContainers = new();
         public bool IsTestRunInitialized { get; private set; }
         private int _wasDisposed = 0;
         private int _wasSingletonInstanceDisabled = 0;
@@ -119,7 +120,7 @@ namespace Reqnroll
         protected virtual ITestRunner CreateTestRunnerInstance()
         {
             var testThreadContainer = _containerBuilder.CreateTestThreadContainer(_globalContainer);
-
+            _testThreadContainers.Add(testThreadContainer);
             return testThreadContainer.Resolve<ITestRunner>();
         }
 
@@ -173,10 +174,17 @@ namespace Reqnroll
             {
                 await FireTestRunEndAsync();
 
+                foreach (var objectContainer in _testThreadContainers)
+                {
+                    objectContainer.Dispose();
+                }
+
                 // this call dispose on this object, but the disposeLockObj will avoid double execution
                 _globalContainer.Dispose();
 
                 _testRunnerRegistry.Clear();
+                while (_testThreadContainers.TryTake(out _))
+                    ; // TryTake() used instead of Clear(), because Clear() is not available in .NET Standard
                 OnTestRunnerManagerDisposed(this);
             }
         }

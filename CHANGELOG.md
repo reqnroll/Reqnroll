@@ -12,6 +12,7 @@
 * Support for JSON files added to SpecFlow.ExternalData
 * Fix: #120 Capture ExecutionContext after every binding invoke
 * MsTest: Use ClassCleanupBehavior.EndOfClass instead of custom implementation (preparation for MsTest v4.0)
+* Fix: #123 Dispose objects registred in TestThread-Container correctly 
 
 # v1.0.1 - 2024-02-16
 

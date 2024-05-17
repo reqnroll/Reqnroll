@@ -229,6 +229,18 @@ public abstract class SystemTestBase
         return expectedNrOfTests;
     }
 
+    protected void CheckAnyOutputContainsText(string text)
+    {
+        _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
+        _vsTestExecutionDriver.CheckAnyOutputContainsText(text);
+    }
+
+    protected void CheckAnyOutputDoesNotContainsText(string text)
+    {
+        _vsTestExecutionDriver.LastTestExecutionResult.Should().NotBeNull();
+        _vsTestExecutionDriver.CheckAnyOutputDoesNotContainsText(text);
+    }
+
     protected void AddHookBinding(string eventType, string? name = null, string code = "")
     {
         _projectsDriver.AddHookBinding(eventType, name, code: code);

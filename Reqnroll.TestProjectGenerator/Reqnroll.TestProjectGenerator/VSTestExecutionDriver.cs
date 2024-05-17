@@ -76,6 +76,15 @@ namespace Reqnroll.TestProjectGenerator
             containsAtAll.Should().BeTrue($"either Trx output or program output should contain '{text}'. Trx Output is: {LastTestExecutionResult.TrxOutput}");
         }
 
+        public void CheckAnyOutputDoesNotContainsText(string text)
+        {
+            var textWithoutWhitespace = WithoutWhitespace(text);
+            bool trxContainsEntry = WithoutWhitespace(LastTestExecutionResult.TrxOutput).Contains(textWithoutWhitespace);
+            bool outputContainsEntry = WithoutWhitespace(LastTestExecutionResult.Output).Contains(textWithoutWhitespace);
+            bool containsAtAll = trxContainsEntry || outputContainsEntry;
+            containsAtAll.Should().BeFalse($"nether Trx output or program output should contain '{text}'. Trx Output is: {LastTestExecutionResult.TrxOutput}");
+        }
+
         public static string WithoutWhitespace(string input)
         {
             return sWhitespace.Replace(input, string.Empty);

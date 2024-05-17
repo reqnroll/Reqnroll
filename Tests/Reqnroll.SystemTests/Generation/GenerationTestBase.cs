@@ -289,5 +289,97 @@ public abstract class GenerationTestBase : SystemTestBase
 
     #endregion
 
+    [TestMethod]
+    public void Check_pooled_pbjects_are_reused_and_disposed()
+    {
+        AddFeatureFile("""
+Feature: DispoableFeatureA
+
+Scenario: ScenarioA1
+	When something happens
+
+Scenario: ScenarioA2
+	When something happens
+""");
+
+        AddFeatureFile("""
+Feature: DispoableFeatureB
+
+Scenario: ScenarioB1
+	When something happens
+
+Scenario: ScenarioB2
+	When something happens
+""");
+
+        AddBindingClass("""
+using Reqnroll;
+using Reqnroll.Tracing;
+
+[Binding]
+public sealed class DispoableStepDefinitions
+{
+    private readonly ITestRunner _TestRunner;
+
+    sealed class MyDummyResource : IDisposable
+    {
+        public static int CreatedCount { get; private set; }
+        public static int DisposedCount { get; private set; }
+        private bool _Disposed;
+        private readonly ITraceListener _traceListener;
+
+        public MyDummyResource(ITraceListener traceListener) 
+        {
+            _traceListener = traceListener;
+            CreatedCount += 1;
+
+            WriteLine(FormattableString.Invariant($"CreatedCount: {CreatedCount}."));
+        }
+        public void Dispose()
+        {
+            if (_Disposed)
+                throw new ObjectDisposedException(GetType().FullName);
+            _Disposed = true;
+            DisposedCount += 1;
+
+            WriteLine(FormattableString.Invariant($"DisposedCount: {DisposedCount}."));
+        }
+
+        void WriteLine(string line)
+        {
+            _traceListener.WriteTestOutput(line);
+            System.Diagnostics.Trace.WriteLine(line);
+            // Write to StandardOutput, to ensure that SystemTests see the output when disposing TestThreadContext
+            using var standardOutput = new StreamWriter(Console.OpenStandardOutput());
+            standardOutput.WriteLine(line);
+        }
+    }
+
+    public DispoableStepDefinitions(ITestRunner testRunner)
+    {
+        _TestRunner = testRunner;
+    }
+
+    [When(".*"), BeforeScenario, AfterScenario]
+    public void ScenarioHooks()
+    {
+        _TestRunner.ScenarioContext.ScenarioContainer.Resolve<TestThreadContext>().TestThreadContainer.Resolve<MyDummyResource>();
+    }
+
+    [BeforeFeature, AfterFeature]
+    public static void FeatureHooks(ITestRunner testRunner)
+    {
+        testRunner.FeatureContext.FeatureContainer.Resolve<TestThreadContext>().TestThreadContainer.Resolve<MyDummyResource>();
+    }
+}
+""");
+        ExecuteTests();
+        ShouldAllScenariosPass(4);
+        CheckAnyOutputContainsText("CreatedCount: 1.");
+        CheckAnyOutputDoesNotContainsText("CreatedCount: 2.");
+        CheckAnyOutputContainsText("DisposedCount: 1.");
+        CheckAnyOutputDoesNotContainsText("DisposedCount: 2.");
+    }
+
     //TODO: test parallel execution (details TBD) - maybe this should be in a separate test class
 }
