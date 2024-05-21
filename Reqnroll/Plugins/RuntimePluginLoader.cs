@@ -1,25 +1,22 @@
 using System;
 using System.Reflection;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Tracing;
 
 namespace Reqnroll.Plugins
 {
-    public class RuntimePluginLoader : IRuntimePluginLoader
+    public class RuntimePluginLoader(IPluginAssemblyLoader _pluginAssemblyLoader) : IRuntimePluginLoader
     {
         public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener, bool traceMissingPluginAttribute)
         {
             Assembly assembly;
             try
             {
-#if NETSTANDARD
-                assembly = PluginAssemblyResolver.Load(pluginAssemblyName);
-#else
-                assembly = Assembly.LoadFrom(pluginAssemblyName);
-#endif
+                assembly = _pluginAssemblyLoader.LoadAssembly(pluginAssemblyName);
             }
             catch (Exception ex)
             {
-                throw new ReqnrollException($"Unable to load plugin: {pluginAssemblyName}. Please check https://go.reqnroll.net/doc-plugins for details.", ex);
+                throw new ReqnrollException($"Unable to load plugin: {pluginAssemblyName}. Please check https://go.reqnroll.net/doc-plugins for details. (Framework: {PlatformInformation.DotNetFrameworkDescription})", ex);
             }
 
             var pluginAttribute = (RuntimePluginAttribute)Attribute.GetCustomAttribute(assembly, typeof(RuntimePluginAttribute));

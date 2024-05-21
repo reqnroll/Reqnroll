@@ -2,7 +2,7 @@
 
   <PropertyGroup>
 
-    <_Reqnroll_SpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netcoreapp3.1</_Reqnroll_SpecFlowCompatibilityGeneratorPlugin>
+    <_Reqnroll_SpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_Reqnroll_SpecFlowCompatibilityGeneratorPlugin>
     <_Reqnroll_SpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_Reqnroll_SpecFlowCompatibilityGeneratorPlugin>
     <_Reqnroll_SpecFlowCompatibilityGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_SpecFlowCompatibilityGeneratorPlugin)\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.dll</_Reqnroll_SpecFlowCompatibilityGeneratorPluginPath>
 

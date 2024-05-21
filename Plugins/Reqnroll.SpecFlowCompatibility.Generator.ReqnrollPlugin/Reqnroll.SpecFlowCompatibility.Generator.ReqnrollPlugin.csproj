@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_Generator_TFM)</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.SpecFlowCompatibility.nuspec</NuspecFile>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
@@ -17,22 +17,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-
     <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-    <ProjectReference Include="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Runtime_TFM)'">
-    <Reference Include="System.Configuration" />
-    <Compile Include="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\AppConfig\*.cs">
-      <Link>AppConfig\%(RecursiveDir)%(Filename)%(Extension)</Link>
-    </Compile>
+    <ProjectReference Include="..\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.csproj" />
   </ItemGroup>
 
 </Project>

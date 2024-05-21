@@ -1,28 +1,23 @@
 using System;
-using System.IO;
 using System.Reflection;
 using Reqnroll.Infrastructure;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 
 namespace Reqnroll.Generator.Plugins
 {
-    public class GeneratorPluginLoader : IGeneratorPluginLoader
+    public class GeneratorPluginLoader(IPluginAssemblyLoader _pluginAssemblyLoader) : IGeneratorPluginLoader
     {
         public IGeneratorPlugin LoadPlugin(PluginDescriptor pluginDescriptor)
         {
             Assembly pluginAssembly;
             try
             {
-
-#if NETCOREAPP
-                pluginAssembly = PluginAssemblyResolver.Load(pluginDescriptor.Path);
-#else
-                pluginAssembly = Assembly.LoadFrom(pluginDescriptor.Path);
-#endif
+                pluginAssembly = _pluginAssemblyLoader.LoadAssembly(pluginDescriptor.Path);
             }
             catch(Exception ex)
             {
-                throw new ReqnrollException($"Unable to load plugin assembly: {pluginDescriptor.Path}. Please check https://go.reqnroll.net/doc-plugins for details.", ex);
+                throw new ReqnrollException($"Unable to load plugin assembly: {pluginDescriptor.Path}. Please check https://go.reqnroll.net/doc-plugins for details. (Framework: {PlatformInformation.DotNetFrameworkDescription})", ex);
             }
 
             var pluginAttribute = (GeneratorPluginAttribute)Attribute.GetCustomAttribute(pluginAssembly, typeof(GeneratorPluginAttribute));

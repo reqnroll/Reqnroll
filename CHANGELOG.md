@@ -11,6 +11,7 @@
 * Fix: #111 @ignore attribute is not inherited to the scenarios from Rule
 * Support for JSON files added to SpecFlow.ExternalData
 * Fix: #120 Capture ExecutionContext after every binding invoke
+* Allow creating single target (netstandard2.0) plugins
 * MsTest: Use ClassCleanupBehavior.EndOfClass instead of custom implementation (preparation for MsTest v4.0)
 * Fix: #71 StackOverflowException when using [StepArgumentTransformation] with same input and output type (for example string)
 

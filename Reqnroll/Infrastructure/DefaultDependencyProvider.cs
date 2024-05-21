@@ -15,6 +15,7 @@ using Reqnroll.Plugins;
 using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
+using Reqnroll.PlatformCompatibility;
 
 namespace Reqnroll.Infrastructure
 {
@@ -56,6 +57,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<DefaultSkeletonTemplateProvider, ISkeletonTemplateProvider>();
             container.RegisterTypeAs<StepTextAnalyzer, IStepTextAnalyzer>();
 
+            PlatformHelper.RegisterPluginAssemblyLoader(container);
             container.RegisterTypeAs<RuntimePluginLoader, IRuntimePluginLoader>();
             container.RegisterTypeAs<RuntimePluginLocator, IRuntimePluginLocator>();
             container.RegisterTypeAs<RuntimePluginLocationMerger, IRuntimePluginLocationMerger>();

@@ -1,6 +1,6 @@
 using System;
 
-namespace Reqnroll.Compatibility
+namespace Reqnroll.PlatformCompatibility
 {
 	internal static class EnumHelper
     {
