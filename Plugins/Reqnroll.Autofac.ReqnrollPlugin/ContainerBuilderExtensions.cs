@@ -1,7 +1,6 @@
 using System;
-using System.Linq;
+using System.Reflection;
 using Autofac;
-using Reqnroll;
 
 namespace Reqnroll.Autofac.ReqnrollPlugin
 {
@@ -13,7 +12,7 @@ namespace Reqnroll.Autofac.ReqnrollPlugin
         /// <summary>
         /// Add Reqnroll binding for classes in the assembly where typeof TAssemblyType resides.
         /// </summary>
-        /// <typeparam name="TAssemblyType">The type in an assembly to search for bindings.</typeparam>
+        /// <typeparam name="TAssemblyType">Any type in an assembly to search for bindings.</typeparam>
         /// <param name="builder">The builder.</param>
         /// <returns>The builder.</returns>
         public static ContainerBuilder AddReqnrollBindings<TAssemblyType>(this ContainerBuilder builder) => builder.AddReqnrollBindings(typeof(TAssemblyType));
@@ -22,12 +21,20 @@ namespace Reqnroll.Autofac.ReqnrollPlugin
         /// Add Reqnroll binding for classes in the assembly where the type resides.
         /// </summary>
         /// <param name="builder">The builder.</param>
-        /// <param name="type">The type in an assembly to search for bindings.</param>
+        /// <param name="type">Any type in an assembly to search for bindings.</param>
         /// <returns>The builder.</returns>
-        public static ContainerBuilder AddReqnrollBindings(this ContainerBuilder builder, Type type)
+        public static ContainerBuilder AddReqnrollBindings(this ContainerBuilder builder, Type type) => builder.AddReqnrollBindings(type.Assembly);
+
+        /// <summary>
+        /// Add Reqnroll binding for classes in an assembly.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        /// <param name="assembly">The assembly to search for bindings.</param>
+        /// <returns>The builder.</returns>
+        public static ContainerBuilder AddReqnrollBindings(this ContainerBuilder builder, Assembly assembly)
         {
             builder
-               .RegisterAssemblyTypes(type.Assembly)
+               .RegisterAssemblyTypes(assembly)
                .Where(t => Attribute.IsDefined(t, typeof(BindingAttribute)))
                .SingleInstance();
             return builder;

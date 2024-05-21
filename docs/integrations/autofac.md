@@ -50,6 +50,10 @@ Then
 ```csharp
 containerBuilder.AddReqnrollBindings<AnyClassInTheReqnrollProject>()
 ```
+Or overload
+```csharp
+containerBuilder.AddReqnrollBindings(Assembly.GetExecutingAssembly())
+```
 
   Or manually register like so:
 ```csharp
