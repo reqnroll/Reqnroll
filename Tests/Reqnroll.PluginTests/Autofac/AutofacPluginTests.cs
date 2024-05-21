@@ -9,7 +9,6 @@ using Moq;
 using Reqnroll.Autofac;
 using Reqnroll.Autofac.ReqnrollPlugin;
 using Reqnroll.Bindings;
-using Reqnroll.Bindings.Discovery;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
@@ -104,8 +103,6 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
         _testRunContainer = new ObjectContainer();
         var bindingRegistryMock = new Mock<IBindingRegistry>();
         _testRunContainer.RegisterInstanceAs(bindingRegistryMock.Object);
-        var runtimeBindingRegistryBuilderMock = new Mock<IRuntimeBindingRegistryBuilder>();
-        _testRunContainer.RegisterInstanceAs(runtimeBindingRegistryBuilderMock.Object);
         var testAssemblyProvider = new Mock<ITestAssemblyProvider>();
         _testRunContainer.RegisterInstanceAs(testAssemblyProvider.Object);
 

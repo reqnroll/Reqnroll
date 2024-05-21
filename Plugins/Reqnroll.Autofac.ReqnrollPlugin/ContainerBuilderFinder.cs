@@ -3,26 +3,20 @@ using System.Linq;
 using System.Reflection;
 using Autofac;
 using Reqnroll.Autofac.ReqnrollPlugin;
-using Reqnroll.Bindings.Discovery;
-using Reqnroll.Infrastructure;
 using ContainerBuilder = Autofac.ContainerBuilder;
 
 namespace Reqnroll.Autofac;
 
 public class ContainerBuilderFinder : IContainerBuilderFinder
 {
-    private readonly IRuntimeBindingRegistryBuilder _bindingRegistryBuilder;
-    private readonly ITestAssemblyProvider _testAssemblyProvider;
     private readonly IConfigurationMethodsProvider _configurationMethodsProvider;
     private readonly Lazy<Func<ContainerBuilder, ContainerBuilder>> _createConfigureGlobalContainer;
     private readonly Lazy<Func<ContainerBuilder, ContainerBuilder>> _createConfigureScenarioContainer;
     private readonly Lazy<Func<ContainerBuilder, ContainerBuilder>> _legacyCreateScenarioContainerBuilder;
     private readonly Lazy<Func<ILifetimeScope>> _getFeatureLifetimeScope;
 
-    public ContainerBuilderFinder(IRuntimeBindingRegistryBuilder bindingRegistryBuilder, ITestAssemblyProvider testAssemblyProvider, IConfigurationMethodsProvider configurationMethodsProvider)
+    public ContainerBuilderFinder(IConfigurationMethodsProvider configurationMethodsProvider)
     {
-        _bindingRegistryBuilder = bindingRegistryBuilder;
-        _testAssemblyProvider = testAssemblyProvider;
         _configurationMethodsProvider = configurationMethodsProvider;
 
         static ContainerBuilder InvokeVoidAndReturnBuilder(ContainerBuilder containerBuilder, MethodInfo methodInfo)
@@ -38,7 +32,6 @@ public class ContainerBuilderFinder : IContainerBuilderFinder
 
     public Func<ContainerBuilder, ContainerBuilder> GetConfigureGlobalContainer()
     {
-        _bindingRegistryBuilder.BuildBindingsFromAssembly(_testAssemblyProvider.TestAssembly);
         return _createConfigureGlobalContainer.Value;
     }
 
