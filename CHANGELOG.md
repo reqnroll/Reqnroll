@@ -14,6 +14,8 @@
 * Allow creating single target (netstandard2.0) plugins
 * MsTest: Use ClassCleanupBehavior.EndOfClass instead of custom implementation (preparation for MsTest v4.0)
 * Fix: #71 StackOverflowException when using [StepArgumentTransformation] with same input and output type (for example string)
+* Fix: Autofac without hook does not run GlobalDependencies (#127)
+* Fix: Reqnroll.Autofac shows wrongly ambiguous step definition (#56)
 
 # v1.0.1 - 2024-02-16
 
