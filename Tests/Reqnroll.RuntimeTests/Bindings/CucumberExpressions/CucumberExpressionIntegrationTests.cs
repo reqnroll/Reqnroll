@@ -57,6 +57,11 @@ public class SampleUser
     public override int GetHashCode() => UserName.GetHashCode();
 }
 
+public record SampleComplexUser(string Firstname, string Surname, int Age, int Height)
+{
+    public static SampleComplexUser Create(string firstname, string surname, int age, int height) => new(firstname, surname, age, height);
+}
+
 public class CucumberExpressionIntegrationTests
 {
     public class SampleBindings
@@ -100,9 +105,24 @@ public class CucumberExpressionIntegrationTests
             ExecutedParams.Add((userParam, typeof(SampleUser)));
         }
 
+        public void StepDefWithCustomComplexClassParam(SampleComplexUser userParam)
+        {
+            ExecutedParams.Add((userParam, typeof(SampleComplexUser)));
+        }
+
         public int ConvertFortyTwo()
         {
             return 42;
+        }
+
+        public string ConvertToStringLowercase(string str)
+        {
+            return str.ToLower();
+        }
+
+        public int ConvertToIntPlus100(int nr)
+        {
+            return nr + 100;
         }
     }
 
@@ -420,6 +440,66 @@ public class CucumberExpressionIntegrationTests
             new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertFortyTwo))));
 
         var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async void Should_match_step_with_customized_built_in_parameter_without_recursion_string()
+    {
+        var expression = "there is a user {string} registered";
+        var stepText = "there is a user 'Marvin' registered";
+        var expectedParam = ("marvin", typeof(string));
+        var methodName = nameof(SampleBindings.StepDefWithStringParam);
+
+        IStepArgumentTransformationBinding transformation = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToStringLowercase))));
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async void Should_match_step_with_customized_built_in_parameter_without_recursion_int32()
+    {
+        var expression = "I have {int} cucumbers in my belly";
+        var stepText = "I have 43 cucumbers in my belly";
+        var expectedParam = (143, typeof(int));
+        var methodName = nameof(SampleBindings.StepDefWithIntParam);
+
+        IStepArgumentTransformationBinding transformation = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToIntPlus100))));
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async void Should_match_step_with_custom_parameter_with_additional_step_arguments()
+    {
+        var expression = "there is a {user} registered";
+        var stepText = "there is a user Marvin Smith he is 27 years old and 175 height registered";
+        var expectedParam = (new SampleComplexUser("marvin", "smith", 127, 275), typeof(SampleComplexUser));
+        var methodName = nameof(SampleBindings.StepDefWithCustomComplexClassParam);
+
+        IStepArgumentTransformationBinding transformationStringWithouthBlanks = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToStringLowercase))));
+
+        IStepArgumentTransformationBinding transformationIntPlus100 = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToIntPlus100))));
+
+        IStepArgumentTransformationBinding transformationSampleComplexUser = new StepArgumentTransformationBinding(
+            "user ([A-Za-z]+) ([A-Za-z]+) he is ([0-9]+) years old and ([0-9]+) height",
+            new RuntimeBindingMethod(typeof(SampleComplexUser).GetMethod(nameof(SampleComplexUser.Create))),
+            "user");
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformationStringWithouthBlanks, transformationIntPlus100, transformationSampleComplexUser });
 
         sampleBindings.ExecutedParams.Should().Contain(expectedParam);
     }

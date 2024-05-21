@@ -12,6 +12,7 @@
 * Support for JSON files added to SpecFlow.ExternalData
 * Fix: #120 Capture ExecutionContext after every binding invoke
 * MsTest: Use ClassCleanupBehavior.EndOfClass instead of custom implementation (preparation for MsTest v4.0)
+* Fix: #71 StackOverflowException when using [StepArgumentTransformation] with same input and output type (for example string)
 
 # v1.0.1 - 2024-02-16
 
