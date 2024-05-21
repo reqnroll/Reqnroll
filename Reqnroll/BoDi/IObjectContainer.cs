@@ -62,6 +62,14 @@ public interface IObjectContainer : IDisposable
     IStrategyRegistration RegisterFactoryAs<TInterface>(Func<IObjectContainer, TInterface> factoryDelegate, string name = null);
 
     /// <summary>
+    /// Registers an instance produced by <paramref name="factoryDelegate"/>. The delegate will be called only once and the instance it returned will be returned in each resolution.
+    /// </summary>
+    /// <typeparam name="TInterface">Interface to register as.</typeparam>
+    /// <param name="factoryDelegate">The function to run to obtain the instance.</param>
+    /// <param name="name">A name to resolve named instance, otherwise null.</param>
+    IStrategyRegistration RegisterFactoryAs<TInterface>(Func<TInterface> factoryDelegate, string name = null);
+
+    /// <summary>
     /// Resolves an implementation object for an interface or type.
     /// </summary>
     /// <typeparam name="T">The interface or type.</typeparam>
