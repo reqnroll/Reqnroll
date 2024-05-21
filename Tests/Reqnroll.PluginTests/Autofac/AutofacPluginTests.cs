@@ -2,13 +2,13 @@
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
+using System.Reflection;
 using Autofac;
 using Autofac.Core.Registration;
 using FluentAssertions;
 using Moq;
 using Reqnroll.Autofac;
 using Reqnroll.Autofac.ReqnrollPlugin;
-using Reqnroll.Bindings;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
@@ -44,6 +44,11 @@ public class AutofacPluginTests
 
     interface IScenarioDependency1;
     class ScenarioDependency1 : IScenarioDependency1;
+    class ScenarioDependency2(IGlobalDependency1 globalDependency1) : IScenarioDependency1
+    {
+        public IGlobalDependency1 CurrentGlobalDependency1 { get; } = globalDependency1;
+    }
+
     interface IGlobalDependency1;
     class GlobalDependency1 : IGlobalDependency1;
 
@@ -63,6 +68,15 @@ public class AutofacPluginTests
         {
             containerBuilder
                 .RegisterType<ScenarioDependency1>()
+                .As<IScenarioDependency1>()
+                .SingleInstance();
+        }
+
+        [ScenarioDependencies]
+        public static void SetupScenarioContainerWithGlobalDep(global::Autofac.ContainerBuilder containerBuilder)
+        {
+            containerBuilder
+                .RegisterType<ScenarioDependency2>()
                 .As<IScenarioDependency1>()
                 .SingleInstance();
         }
@@ -101,10 +115,9 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
     {
         _runtimePluginEvents = new RuntimePluginEvents();
         _testRunContainer = new ObjectContainer();
-        var bindingRegistryMock = new Mock<IBindingRegistry>();
-        _testRunContainer.RegisterInstanceAs(bindingRegistryMock.Object);
-        var testAssemblyProvider = new Mock<ITestAssemblyProvider>();
-        _testRunContainer.RegisterInstanceAs(testAssemblyProvider.Object);
+        var testAssemblyProviderMock = new Mock<ITestAssemblyProvider>();
+        testAssemblyProviderMock.SetupGet(tap => tap.TestAssembly).Returns(Assembly.GetExecutingAssembly());
+        _testRunContainer.RegisterInstanceAs(testAssemblyProviderMock.Object);
 
         _testThreadContainer = new ObjectContainer(_testRunContainer);
         _featureContainer = new ObjectContainer(_testThreadContainer);
@@ -231,6 +244,31 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
 
         var resolvedTestThreadContext = resolver.ResolveBindingInstance(typeof(TestThreadContext), scenarioContainer);
         resolvedTestThreadContext.Should().BeSameAs(testThreadContext);
+    }
+
+
+    [Fact]
+    public void Should_allow_having_scenario_dependency_that_depends_on_a_global()
+    {
+        // Arrange
+        var sut = new TestableAutofacPlugin(typeof(ContainerSetup1),
+                                            nameof(ContainerSetup1.SetupGlobalContainer),
+                                            nameof(ContainerSetup1.SetupScenarioContainerWithGlobalDep));
+
+        // Act
+        var scenarioContainer = InitializeToScenarioContainer(sut);
+
+        // Assert
+
+
+        var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
+        var scenarioDep1 = resolver.ResolveBindingInstance(typeof(IScenarioDependency1), scenarioContainer);
+        var dep2 = scenarioDep1.Should().BeOfType<ScenarioDependency2>().Subject;
+
+        var globalDep1 = resolver.ResolveBindingInstance(typeof(IGlobalDependency1), scenarioContainer);
+        globalDep1.Should().NotBeNull();
+
+        dep2.CurrentGlobalDependency1.Should().BeSameAs(globalDep1);
     }
 
     [Fact]
