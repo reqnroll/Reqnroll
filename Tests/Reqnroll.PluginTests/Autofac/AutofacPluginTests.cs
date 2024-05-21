@@ -202,7 +202,7 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
 
 
     [Fact]
-    public void Should_allows_resolving_common_reqnroll_objects()
+    public void Should_allow_resolving_common_reqnroll_objects()
     {
         // Arrange
         var sut = new TestableAutofacPlugin(typeof(ContainerSetup1),
