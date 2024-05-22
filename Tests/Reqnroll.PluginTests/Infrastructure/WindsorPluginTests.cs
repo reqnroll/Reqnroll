@@ -36,7 +36,7 @@ namespace Reqnroll.PluginTests.Infrastructure
 
             var objectContainer = new Mock<IObjectContainer>();
             var container = new Mock<IWindsorContainer>();
-            objectContainer.Setup(x => x.IsRegistered<IWindsorContainer>()).Returns(false);
+            objectContainer.Setup(x => x.IsRegistered<IWindsorContainer>(null)).Returns(false);
             objectContainer.Setup(x => x.Resolve<IWindsorContainer>()).Returns(container.Object);
 
             resolver.ResolveBindingInstance(typeof(ITraceListener), objectContainer.Object);
@@ -52,7 +52,7 @@ namespace Reqnroll.PluginTests.Infrastructure
 
             var objectContainer = new Mock<IObjectContainer>();
             var container = new Mock<IWindsorContainer>();
-            objectContainer.Setup(x => x.IsRegistered<IWindsorContainer>()).Returns(true);
+            objectContainer.Setup(x => x.IsRegistered<IWindsorContainer>(null)).Returns(true);
             objectContainer.Setup(x => x.Resolve<IWindsorContainer>()).Returns(container.Object);
 
             resolver.ResolveBindingInstance(typeof(ITraceListener), objectContainer.Object);

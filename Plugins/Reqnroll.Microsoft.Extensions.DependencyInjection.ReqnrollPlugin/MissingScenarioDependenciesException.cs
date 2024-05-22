@@ -8,8 +8,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
         public MissingScenarioDependenciesException()
             : base("No method marked with [ScenarioDependencies] attribute found.")
         {
-            // TODO: Fix help link
-            HelpLink = @"https://github.com/solidtoken/SpecFlow.DependencyInjection#usage";
+            HelpLink = "https://go.reqnroll.net/doc-msdi";
         }
     }
 }
