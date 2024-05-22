@@ -14,18 +14,23 @@ namespace Reqnroll.TestProjectGenerator
         protected string _nugetFolder;
         protected string _packageFolder;
         protected string _sourceRoot;
+        protected string _testFolder;
         protected string _reqnroll;
         protected string _vsAdapterFolder;
 
         protected bool _vsAdapterFolderChanged;
         private string _externalNuGetFolder;
 
-        public string TestFolder => Path.GetDirectoryName(new Uri(Assembly.GetExecutingAssembly().Location).LocalPath);
-
         public Folders(ConfigurationDriver configurationDriver, ArtifactNamingConvention artifactNamingConvention)
         {
             _configurationDriver = configurationDriver;
             _artifactNamingConvention = artifactNamingConvention;
+        }
+
+        public virtual string TestFolder
+        {
+            get => _testFolder ?? Directory.GetCurrentDirectory();
+            set => _testFolder = value;
         }
 
         public virtual string SourceRoot
