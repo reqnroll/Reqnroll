@@ -6,13 +6,17 @@ Contributing can be a rewarding way to teach, improve existing skills, refine th
 
 We do all of our development [on GitHub](https://github.com/reqnroll/Reqnroll). If you are not familiar with GitHub or pull requests please check out [this guide](https://guides.github.com/activities/hello-world/) to get started.
 
-Other prerequisites to develop are:
+Minumum prerequisites to develop:
 
-- .NET 5 SDK
-- .NET Core 3.1 SDK
-- .NET Core 2.1 SDK
-- .NET 4.6.1 SDK
-- .NET 4.7.1 SDK
+- .NET 8.0 SDK
+- .NET 4.6.2 SDK
+
+In order to run all system tests, you will need to have the following SDKs installed:
+
+- .NET 4.7.2 SDK
+- .NET 4.8.1 SDK
+- .NET 6.0 SDK
+- .NET 7.0 SDK
 
 and of course **C# knowledge** if you are looking to contribute by coding.
 
@@ -34,31 +38,23 @@ Guidelines for bug reports:
 
 3. **Isolate and report the problem** &mdash; ideally create a reduced test case. Fill out the provided template.
 
-We label issues that need help, but may not be of a critical nature or require intensive Reqnroll knowledge, to [Up For Grabs](https://github.com/reqnroll/Reqnroll/labels/up-for-grabs). This is a list of easier tasks that anybody who wants to get into Reqnroll development can try.
+We label issues that need help, but may not be of a critical nature or require intensive Reqnroll knowledge, to [good first issue](https://github.com/reqnroll/Reqnroll/labels/good%20first%20issue). This is a list of easier tasks that anybody who wants to get into Reqnroll development can try.
 
 #### Feature requests
 
-Feature requests are welcome. But please take a moment to find out whether your idea fits with the scope and aims of the project. It's up to *you* to make a strong case to convince the community of the merits of this feature. Please visit the [community discussions](https://github.com/orgs/reqnroll/discussions) to check out the existing requests and vote on the ones already proposed by the community. Since much of the work is done by volunteers, someone who believes in the idea will have to write the code.  Please provide as much detail and context as possible.
+Feature requests are welcome. But please take a moment to find out whether your idea fits with the scope and aims of the project. It's up to *you* to make a strong case to convince the community of the merits of this feature. Please visit the ["ideas" section of the discussion borad](https://github.com/orgs/reqnroll/discussions/categories/ideas) to check out the existing requests and vote on the ones already proposed by the community. Since much of the work is done by volunteers, someone who believes in the idea will have to write the code. Please provide as much detail and context as possible.
 
 #### New Features
 
-If you decide to implement one of the existing feature requests or have one of your own, please create an issue before to discuss what and how you are implementing the new feature. There is a possibility that we might not approve your changes, therefore, it is in the interest of both parties to find this out as early as possible to avoid wasting time.
+If you decide to implement one of the existing feature requests or have one of your own, **please create a topic in the ["ideas" section of the discussion borad](https://github.com/orgs/reqnroll/discussions/categories/ideas) before to discuss what and how you are implementing the new feature**. There is a possibility that we might not approve your changes, therefore, it is in the interest of both parties to find this out as early as possible to avoid wasting time.
 
 #### Naming Conventions and Reserved ID - NuGet Packages
 
 Microsoft has introduced [package identity verification](https://github.com/NuGet/Home/wiki/NuGet-Package-Identity-Verification#nuget-package-id-prefix-reservation) for packages on nuget.org. This will allow developers to reserve particular ID prefixes used for identification. This in turn should help users identify which packages have been submitted by the owner of the ID prefix.
 
-We have reserved the **“Reqnroll”** NuGet package prefix, which is used to identify official Reqnroll packages. This will mean that new packages with the Reqnroll prefix can only be submitted by Reqnroll, and will indicate that these packages are official.
+We have reserved the **`Reqnroll`** NuGet package prefix, which is used to identify official Reqnroll packages. This will mean that new packages with the Reqnroll prefix can only be submitted by Reqnroll, and will indicate that these packages are official.
 
-We have also requested the **"Reqnroll.Contrib"** prefix be made publicly accessible for developers who want to release their own packages for Reqnroll. If you want to submit your own package for Reqnroll whose name begins with “Reqnroll”, you can use this prefix. This will indicate to users that the package is intended for use with Reqnroll, but is a third-party contribution.
-
-These changes will not affect existing packages using the Reqnroll prefix that have already been submitted to nuget.org. If you are the owner of such a package, you should be able to update the package as usual. You may however want to change the name of your package to reflect the new convention.
-
-In summary, here are the prefixes we have:
-
-- Reqnroll.*
-
-You can find out more about package IDs on [nuget.org blog](https://blog.nuget.org/20170417/Package-identity-and-trust.html).
+Please [contact us](https://reqnroll.net/contact/) if you would like to submit a package with the Reqnroll prefix.
 
 ## How to contribute
 
@@ -109,44 +105,45 @@ Visual Studio:
 
 CLI:
 
-- Execute build.ps1 in [PowerShell](https://github.com/powershell/powershell)
-
-![buildps1](https://raw.githubusercontent.com/reqnroll/Reqnroll/main/docs/_static/images/buildps1.png)
+- Execute `dotnet build` in a shell
 
 ## Running tests
 
-The Reqnroll tests are usually multi-platform tests, that means that the same test can be executed multiple times with the different platforms (e.g. .NET Framework 4.7.1, .NET 5, .NET 6). This also means that normally it is not a good idea to just "run all tests", but select a platform for development (.NET 6 is recommended) and run the tests for that one only locally.
+Running tests should be possible by running them from Visual Studio or by executing `dotnet test` in a shell. Some tests in the `Reqnroll.SystemTests` might be ignored if you do not have all the recommended SDKs installed (see above).
 
-There are unit and integration tests. The unit tests run fast, but the integration tests take more time to run.
+We have three type of tests:
 
-Unit test projects:
+### Requirements tests using BDD
+
+There tests should contain illustrative scenarios that describe the behavior of the system. They are not suitable to provide full coverage for all cases (use unit tests for that).
+
+Currently we have the following projects in this category:
+* Reqnroll.Specs - BDD tests for Reqnroll, currently under review and restructuring. Please ask for guidance before working on this project.
+* Reqnroll.ExternalData.ReqnrollPlugin.IntegrationTest
+* Reqnroll.Verify.ReqnrollPlugin.IntegrationTest
+
+### Unit tests
+
+These tests are executed in isolation and should provide full coverage for all cases. They are fast to run and should be used to test the behavior of the system in detail.
+
+Currently we have the following projects in this category:
+
 * Reqnroll.RuntimeTests
 * Reqnroll.GeneratorTests
 * Reqnroll.PluginTests
+
+### System (end-to-end) tests
+
+The purpose of these tests is to verify the behavior of the system as a whole. They are slower to run and should be used to test the behavior of the system in a real-world scenario.
+
+These tests are executed end-to-end, i.e. they create sample projects and solutions, install the interim versions of Reqnroll to these projects and configure them for the particular behavior specified by the scenarios. Because of this, the execution of a single test takes approx. 10 seconds.
+
+To optimize the execution certain settings of these tests (e.g. the temporary folder to be used) can be configured using environment variables. You can find a list of these variables in the [ConfigurationDriver class](Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator/ConfigurationDriver.cs). E.g. to override the temporary folder you can set the `REQNROLL_TEST_TEMPFOLDER` environment variable.
+
+Currently we have the following projects in this category:
+
+* Reqnroll.SystemTests
 * Reqnroll.TestProjectGenerator.Tests
-* Reqnroll.ExternalData.ReqnrollPlugin.UnitTests
-
-Integration test projects:
-* Reqnroll.MsBuildNetSdk.IntegrationTests
-* Reqnroll.Specs
-
-### Running the Reqnroll Reqnroll tests (Specs)
-
-Reqnroll has over 200 Reqnroll scenarios that describe all major behavior. These tests are executed end-to-end, i.e. they create sample projects and solutions, install the interim versions of Reqnroll to these projects and configure them for the particular behavior specified by the scenarios. Because of this, the execution of a single test takes approx. 10 seconds. 
-
-Although the Specs project itself is not cross-compiled for the different platforms (but always runs in .NET 6), the project is configured in a way that it generates multiple tests for each scenario, for the different platforms and the different unit test framework (MsTest, NUnit, xUnit). 
-
-The generated tests have specific categories for the platform (e.g. `Net60`) and the unit test framework (e.g. `xUnit`), so you can filter for these categories to run only one platform and only one unit test framework once. In the Visual Studio Test Window, you can use a filter expression like `Trait:xUnit Trait:Net60`. 
-
-Hints to speed up tests:
-* Always select a unit test framework and a platform category to run tests.
-* Add the `%TEMP%\SF` folder to the Microsoft Defender Antivirus exclusion list.
-* Add the following processes to the Microsoft Defender Antivirus exclusion list: dotnet.exe, MSBuild.exe, vstest.console.exe, VBCSCompiler.exe, testhost.exe, testhost.x86.exe
-
-Other notes:
-* The Specs tests use an interim version of Reqnroll that you have just built locally. The version number of this package is calculated automatically by the git commits, so after every commit there will be a new version. You might need to do a rebuild to pick it up if you see failures related to not found Reqnroll package versions.
-* Unfortunately Visual Studio likes to lock the Reqnroll assemblies. Sometimes this is just an instance of MsBuild that you can kill with Process Explorer, but sometimes you need to restart Visual Studio unfortunately. 
-
  
 ## Building documentation
 
@@ -164,31 +161,33 @@ To build local documentation:
 
   
 
-- Install sphinx:
+- Setup Python environment for the project:
 
-  ```bash
-  pip install sphinx
-  ```
-
-- Install dependencies in the working directory
-
-  ```bash
-  pip install -r docs/requirements.txt (Path to requirements can vary)
+  ```PowerShell
+  cd .\docs
+  .\setupenv.ps1
   ```
 
 - Run (PS or CMD) from the working directory
 
-  ```bash
-  ./make html
+  ```PowerShell
+  .\make.cmd html
   ```
 
   - Result: html pages are generated in the working directory
     - _build/html/index.html
 
+- For editing the documentation it is recommended to use the "autobuild" option of Sphinx, that monitorse the changed files and rebuilds the documentation automatically:
+
+  ```PowerShell
+  .\autobuild.cmd
+  ```
+
+  - Result: the documentation is available at http://localhost:8000
+
 ## Where can I go for help?
 
 Please ask in our [Contributor Q&A](https://github.com/orgs/reqnroll/discussions/categories/contributor-q-a) discussion group.
-
 
 
 Thank you for your contributions!
