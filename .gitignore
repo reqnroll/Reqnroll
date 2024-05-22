@@ -375,7 +375,7 @@ GitExtensions.settings.backup
 *.AssemblyHooks.vb
 
 # Version for Specs
-Tests/Reqnroll.Specs/NuGetPackageVersion.cs
+Tests/**/NuGetPackageVersion.cs
 
 #Analytics
 AppInsightsInstrumentationKey.cs
