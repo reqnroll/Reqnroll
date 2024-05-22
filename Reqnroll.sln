@@ -9,12 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.gitignore = .gitignore
 		CHANGELOG.md = CHANGELOG.md
-		CommonAssemblyInfo.cs = CommonAssemblyInfo.cs
+		CONTRIBUTING.md = CONTRIBUTING.md
 		LICENSE = LICENSE
-		nuget.config = nuget.config
 		README.md = README.md
-		reqnroll-config.json = reqnroll-config.json
-		Reqnroll.sln.DotSettings = Reqnroll.sln.DotSettings
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{0359B7D7-7E29-48E9-8DF9-7D1FACFA5CFA}"
@@ -22,8 +19,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{D87E7021-4926-4F5A-AC81-92AFC575FB7E}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
-		Directory.Build.rsp = Directory.Build.rsp
 		Directory.Build.targets = Directory.Build.targets
+		nuget.config = nuget.config
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Specs", "Tests\Reqnroll.Specs\Reqnroll.Specs.csproj", "{2D7D31B3-E8D0-445A-BB24-216ABA3CB778}"
@@ -111,6 +108,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.SystemTests", "Tests\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj", "{C658B37D-FD36-4868-9070-4EB452FAE526}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin", "Plugins\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.csproj", "{6CBEB31D-5F98-460F-B193-578AEEA78CF9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{53475D78-4500-4399-9539-0D5403C13C7A}"
+	ProjectSection(SolutionItems) = preProject
+		reqnroll-config.json = reqnroll-config.json
+		reqnroll-icon.png = reqnroll-icon.png
+		reqnroll.ico = reqnroll.ico
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -275,6 +279,7 @@ Global
 		{B6B374C2-ABD8-4F3B-BBF4-505992309168} = {577A0375-1436-446C-802B-3C75C8CEF94F}
 		{C658B37D-FD36-4868-9070-4EB452FAE526} = {A10B5CD6-38EC-4D7E-9D1C-2EBA8017E437}
 		{6CBEB31D-5F98-460F-B193-578AEEA78CF9} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
+		{53475D78-4500-4399-9539-0D5403C13C7A} = {577A0375-1436-446C-802B-3C75C8CEF94F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4D0636F-0160-4FA5-81A3-9784C7E3B3A4}
