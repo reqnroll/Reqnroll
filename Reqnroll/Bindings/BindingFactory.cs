@@ -3,17 +3,12 @@ using Reqnroll.Bindings.Reflection;
 
 namespace Reqnroll.Bindings;
 
-public class BindingFactory : IBindingFactory
+public class BindingFactory(
+    IStepDefinitionRegexCalculator _stepDefinitionRegexCalculator, 
+    ICucumberExpressionStepDefinitionBindingBuilderFactory _cucumberExpressionStepDefinitionBindingBuilderFactory,
+    ICucumberExpressionDetector _cucumberExpressionDetector)
+    : IBindingFactory
 {
-    private readonly IStepDefinitionRegexCalculator stepDefinitionRegexCalculator;
-    private readonly ICucumberExpressionStepDefinitionBindingBuilderFactory _cucumberExpressionStepDefinitionBindingBuilderFactory;
-
-    public BindingFactory(IStepDefinitionRegexCalculator stepDefinitionRegexCalculator, ICucumberExpressionStepDefinitionBindingBuilderFactory cucumberExpressionStepDefinitionBindingBuilderFactory)
-    {
-        this.stepDefinitionRegexCalculator = stepDefinitionRegexCalculator;
-        _cucumberExpressionStepDefinitionBindingBuilderFactory = cucumberExpressionStepDefinitionBindingBuilderFactory;
-    }
-
     public IHookBinding CreateHookBinding(IBindingMethod bindingMethod, HookType hookType, BindingScope bindingScope,
         int hookOrder)
     {
@@ -23,8 +18,8 @@ public class BindingFactory : IBindingFactory
     public IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(StepDefinitionType stepDefinitionType, IBindingMethod bindingMethod, BindingScope bindingScope, string expressionString)
     {
         return expressionString == null
-            ? new MethodNameStepDefinitionBindingBuilder(stepDefinitionRegexCalculator, stepDefinitionType, bindingMethod, bindingScope)
-            : CucumberExpressionStepDefinitionBindingBuilder.IsCucumberExpression(expressionString)
+            ? new MethodNameStepDefinitionBindingBuilder(_stepDefinitionRegexCalculator, stepDefinitionType, bindingMethod, bindingScope)
+            : _cucumberExpressionDetector.IsCucumberExpression(expressionString)
                 ? _cucumberExpressionStepDefinitionBindingBuilderFactory.Create(stepDefinitionType, bindingMethod, bindingScope, expressionString)
                 : new RegexStepDefinitionBindingBuilder(stepDefinitionType, bindingMethod, bindingScope, expressionString);
     }

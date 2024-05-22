@@ -45,6 +45,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<BindingRegistry, IBindingRegistry>();
             container.RegisterTypeAs<BindingFactory, IBindingFactory>();
             container.RegisterTypeAs<CucumberExpressionStepDefinitionBindingBuilderFactory, ICucumberExpressionStepDefinitionBindingBuilderFactory>();
+            container.RegisterTypeAs<CucumberExpressionDetector, ICucumberExpressionDetector>();
             container.RegisterTypeAs<StepDefinitionRegexCalculator, IStepDefinitionRegexCalculator>();
 #pragma warning disable CS0618
             container.RegisterTypeAs<BindingInvoker, IBindingInvoker>();
