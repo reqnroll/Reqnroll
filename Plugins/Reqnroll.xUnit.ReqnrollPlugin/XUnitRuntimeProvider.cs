@@ -19,7 +19,5 @@ namespace Reqnroll.xUnit.ReqnrollPlugin
         {
             Skip.If(true, message);
         }
-
-        public bool DelayedFixtureTearDown => false;
     }
 }

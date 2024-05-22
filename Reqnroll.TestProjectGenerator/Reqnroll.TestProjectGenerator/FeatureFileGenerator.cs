@@ -1,17 +1,15 @@
 using System;
 using Reqnroll.TestProjectGenerator.Data;
 
-namespace Reqnroll.TestProjectGenerator.NewApi._1_Memory
+namespace Reqnroll.TestProjectGenerator;
+
+public class FeatureFileGenerator
 {
-    public class FeatureFileGenerator
+    public ProjectFile Generate(string featureFileContent, string featureFileName = null)
     {
-        public ProjectFile Generate(string featureFileContent, string featureFileName = null)
-        {
-            featureFileName = featureFileName ?? $"FeatureFile{Guid.NewGuid():N}.feature";
+        featureFileName = featureFileName ?? $"FeatureFile{Guid.NewGuid():N}.feature";
 
-
-            string fileContent = featureFileContent.Replace("'''", "\"\"\"");
-            return new ProjectFile(featureFileName, "None", fileContent);
-        }
+        string fileContent = featureFileContent.Replace("'''", "\"\"\"");
+        return new ProjectFile(featureFileName, "None", fileContent);
     }
 }

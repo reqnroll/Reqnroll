@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
+using System;
 using System.Runtime.InteropServices;
 
 namespace Reqnroll.SystemTests.Portability;
@@ -10,37 +12,85 @@ namespace Reqnroll.SystemTests.Portability;
 [TestCategory("Portability")]
 public abstract class PortabilityTestBase : SystemTestBase
 {
-    [TestMethod]
-    public void GeneratorAllIn_sample_can_be_handled()
+    private void RunSkippableTest(Action test)
     {
-        PrepareGeneratorAllInSamples();
+        try
+        {
+            test();
+        }
+        catch (DotNetSdkNotInstalledException ex)
+        {
+            if (!new ConfigurationDriver().PipelineMode)
+                Assert.Inconclusive(ex.ToString());
+        }
+    }
 
-        ExecuteTests();
+    [TestMethod]
+    [DataRow(UnitTestProvider.MSTest)]
+    [DataRow(UnitTestProvider.NUnit3)]
+    [DataRow(UnitTestProvider.xUnit)]
+    public void GeneratorAllIn_sample_can_be_handled(UnitTestProvider unitTestProvider)
+    {
+        RunSkippableTest(() =>
+        {
+            //TODO: Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) &&
+                unitTestProvider == UnitTestProvider.xUnit)
+                Assert.Inconclusive("Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved");
 
-        ShouldAllScenariosPass();
+            _testRunConfiguration.UnitTestProvider = unitTestProvider;
+
+            PrepareGeneratorAllInSamples();
+
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+        });
     }
 
     [TestMethod]
     [TestCategory("MsBuild")]
     public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild()
     {
-        PrepareGeneratorAllInSamples();
-        _compilationDriver.SetBuildTool(BuildTool.MSBuild);
-
-        _compilationDriver.CompileSolution();
+        RunSkippableTest(() =>
+        {
+            PrepareGeneratorAllInSamples();
+            _compilationDriver.SetBuildTool(BuildTool.MSBuild);
+            _compilationDriver.CompileSolution();
+        });
     }
 
     [TestMethod]
     [TestCategory("DotnetMSBuild")]
     public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild()
     {
-        PrepareGeneratorAllInSamples();
-        _compilationDriver.SetBuildTool(BuildTool.DotnetMSBuild);
+        RunSkippableTest(() =>
+        {
+            PrepareGeneratorAllInSamples();
+            _compilationDriver.SetBuildTool(BuildTool.DotnetMSBuild);
 
-        _compilationDriver.CompileSolution();
+            _compilationDriver.CompileSolution();
+        });
     }
 
-    //TODO: test different outcomes: success, failure, pending, undefined, ignored (scenario & scenario outline)
-    //TODO: test async steps (async steps are executed in order)
-    //TODO: test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
+    #region Test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
+    [TestMethod]
+    public void TestRun_hooks_are_executed()
+    {
+        RunSkippableTest(() =>
+        {
+            AddSimpleScenario();
+            AddPassingStepBinding();
+            AddHookBinding("BeforeTestRun");
+            AddHookBinding("AfterTestRun");
+
+            ExecuteTests();
+
+            _bindingDriver.AssertExecutedHooksEqual(
+                "BeforeTestRun",
+                "AfterTestRun");
+            ShouldAllScenariosPass();
+        });
+    }
+    #endregion
 }

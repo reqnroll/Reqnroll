@@ -19,7 +19,5 @@ namespace Reqnroll.NUnit.ReqnrollPlugin
         {
             Assert.Ignore(message);
         }
-
-        public bool DelayedFixtureTearDown => false;
     }
 }

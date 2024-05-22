@@ -26,6 +26,8 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             {
                 File.WriteAllText(absolutePath, projectFile.Content);
             }
+
+            projectFile.Freeze();
         }
     }
 }

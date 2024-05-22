@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Reqnroll.TestProjectGenerator.Data;
-using Reqnroll.TestProjectGenerator.NewApi._1_Memory;
 
 namespace Reqnroll.TestProjectGenerator.ConfigurationModel
 {

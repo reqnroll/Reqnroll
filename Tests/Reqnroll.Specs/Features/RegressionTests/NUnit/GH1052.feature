@@ -1,4 +1,6 @@
 @NUnit3
+#TODO: port to System Tests
+@ignore
 Feature: GH1052
 
 Wrong scenario context injected when running tests in parallel using NUnit (also specrun) - https://github.com/reqnroll/Reqnroll/issues/1052

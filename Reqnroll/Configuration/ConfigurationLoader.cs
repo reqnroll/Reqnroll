@@ -4,8 +4,8 @@ using System.Globalization;
 using System.IO;
 using Reqnroll.BoDi;
 using Reqnroll.BindingSkeletons;
-using Reqnroll.Compatibility;
 using Reqnroll.Configuration.JsonConfig;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Tracing;
 
 namespace Reqnroll.Configuration

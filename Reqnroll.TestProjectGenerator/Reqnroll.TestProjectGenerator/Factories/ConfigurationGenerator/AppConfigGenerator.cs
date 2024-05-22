@@ -9,7 +9,6 @@ using Reqnroll.TestProjectGenerator.ConfigurationModel.Dependencies;
 using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Extensions;
 using Reqnroll.TestProjectGenerator.Helpers;
-using Reqnroll.TestProjectGenerator.NewApi._1_Memory;
 
 namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
 {

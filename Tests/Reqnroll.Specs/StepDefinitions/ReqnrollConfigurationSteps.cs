@@ -1,25 +1,24 @@
 using Reqnroll.Specs.Drivers;
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
-using ConfigurationDriver = Reqnroll.TestProjectGenerator.Driver.ConfigurationDriver;
 
 namespace Reqnroll.Specs.StepDefinitions
 {
     [Binding]
     public class ReqnrollConfigurationSteps
     {
-        private readonly ConfigurationDriver _configurationDriver;
+        private readonly ConfigurationFileDriver _configurationFileDriver;
         private readonly JsonConfigurationParserDriver _jsonConfigurationParserDriver;
         private readonly ConfigurationLoaderDriver _configurationLoaderDriver;
         private readonly TestSuiteSetupDriver _testSuiteSetupDriver;
 
         public ReqnrollConfigurationSteps(
-            ConfigurationDriver configurationDriver,
+            ConfigurationFileDriver configurationFileDriver,
             JsonConfigurationParserDriver jsonConfigurationParserDriver,
             ConfigurationLoaderDriver configurationLoaderDriver,
             TestSuiteSetupDriver testSuiteSetupDriver)
         {
-            _configurationDriver = configurationDriver;
+            _configurationFileDriver = configurationFileDriver;
             _jsonConfigurationParserDriver = jsonConfigurationParserDriver;
             _configurationLoaderDriver = configurationLoaderDriver;
             _testSuiteSetupDriver = testSuiteSetupDriver;
@@ -28,7 +27,7 @@ namespace Reqnroll.Specs.StepDefinitions
         [Given(@"the project has no reqnroll\.json configuration")]
         public void GivenTheProjectHasNoReqnroll_JsonConfiguration()
         {
-            _configurationDriver.SetConfigurationFormat(ConfigurationFormat.None);
+            _configurationFileDriver.SetConfigurationFormat(ConfigurationFormat.None);
         }
 
         [Given(@"there is a project with this reqnroll\.json configuration")]
@@ -47,31 +46,31 @@ namespace Reqnroll.Specs.StepDefinitions
         [Given(@"the project is configured to use the (.+) provider")]
         public void GivenTheProjectIsConfiguredToUseTheUnitTestProvider(string providerName)
         {
-            _configurationDriver.SetUnitTestProvider(providerName);
+            _configurationFileDriver.SetUnitTestProvider(providerName);
         }
 
         [Given(@"Reqnroll is configured in the reqnroll\.json")]
         public void GivenReqnrollIsConfiguredInTheReqnrollJson()
         {
-            _configurationDriver.SetConfigurationFormat(ConfigurationFormat.Json);
+            _configurationFileDriver.SetConfigurationFormat(ConfigurationFormat.Json);
         }
         
         [Given(@"obsoleteBehavior configuration value is set to (.*)")]
         public void GivenObsoleteBehaviorConfigurationValueIsSetTo(string obsoleteBehaviorValue)
         {
-            _configurationDriver.SetRuntimeObsoleteBehavior(obsoleteBehaviorValue);
+            _configurationFileDriver.SetRuntimeObsoleteBehavior(obsoleteBehaviorValue);
         }
 
         [Given(@"row testing is (.+)")]
         public void GivenRowTestingIsRowTest(bool enabled)
         {
-            _configurationDriver.SetIsRowTestsAllowed(enabled);
+            _configurationFileDriver.SetIsRowTestsAllowed(enabled);
         }
 
         [Given(@"the type '(.*)' is registered as '(.*)' in Reqnroll runtime configuration")]
         public void GivenTheTypeIsRegisteredAsInReqnrollRuntimeConfiguration(string typeName, string interfaceName)
         {
-            _configurationDriver.AddRuntimeRegisterDependency(typeName, interfaceName);
+            _configurationFileDriver.AddRuntimeRegisterDependency(typeName, interfaceName);
         }
         
         [Given(@"there is a scenario")]

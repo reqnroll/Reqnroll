@@ -155,6 +155,7 @@ namespace Reqnroll.TestProjectGenerator
             var testResults = from unitTestResultElement in testRunResultsElement?.Elements(_unitTestResultElementName) ?? Enumerable.Empty<XElement>()
                 let outputElement = unitTestResultElement.Element(_unitTestResultOutputElementName)
                 let idAttribute = unitTestResultElement.Attribute("executionId")
+                let testNameAttribute = unitTestResultElement.Attribute("testName")
                 let outcomeAttribute = unitTestResultElement.Attribute("outcome")
                 let stdOutElement = outputElement?.Element(_unitTestResultStdOutElementName)
                 let errorInfoElement = outputElement?.Element(xmlns + "ErrorInfo")
@@ -165,6 +166,7 @@ namespace Reqnroll.TestProjectGenerator
                 select new TestResult
                 {
                     Id = idAttribute.Value,
+                    TestName = testNameAttribute.Value,
                     Outcome = outcomeAttribute.Value,
                     StdOut = stdOutElement?.Value,
                     ErrorMessage = errorMessage?.Value,

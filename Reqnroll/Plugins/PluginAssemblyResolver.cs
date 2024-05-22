@@ -1,5 +1,3 @@
-#if NETSTANDARD
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -77,5 +75,3 @@ namespace Reqnroll.Plugins
         }
     }
 }
-
-#endif

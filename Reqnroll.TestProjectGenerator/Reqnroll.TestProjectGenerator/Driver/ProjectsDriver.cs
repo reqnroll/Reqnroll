@@ -12,6 +12,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
         private readonly SolutionDriver _solutionDriver;
         private readonly ProjectBuilderFactory _projectBuilderFactory;
         private readonly TestProjectFolders _testProjectFolders;
+        public ProjectFile LastFeatureFile { get; private set; }
 
         public ProjectsDriver(SolutionDriver solutionDriver, ProjectBuilderFactory projectBuilderFactory, TestProjectFolders testProjectFolders)
         {
@@ -59,9 +60,9 @@ namespace Reqnroll.TestProjectGenerator.Driver
             AddHookBinding(_solutionDriver.DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
-        public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
+        public void AddHookBinding(string eventType, string name = null, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
         {
-            AddHookBinding(_solutionDriver.DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
+            AddHookBinding(_solutionDriver.DefaultProject, eventType, name ?? eventType, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
         private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,  IList<string> classScopeAttributeTags = null)
@@ -81,27 +82,34 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public void AddFeatureFile(string featureFileContent)
         {
-            _solutionDriver.DefaultProject.AddFeatureFile(featureFileContent);
+            LastFeatureFile = _solutionDriver.DefaultProject.AddFeatureFile(featureFileContent);
         }
 
         public void AddScenario(string scenarioContent)
         {
-            AddFeatureFile(
-                $$"""
-                  Feature: Sample Feature
-                  
-                  {{scenarioContent}}
-                  """);
+            if (LastFeatureFile != null)
+            {
+                LastFeatureFile.Append(scenarioContent);
+            }
+            else
+            {
+                AddFeatureFile(
+                    $$"""
+                      Feature: Sample Feature
+
+                      {{scenarioContent}}
+                      """);
+            }
         }
 
-        public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode)
+        public void AddStepBinding(string attributeName, string regex, string csharpcode, string vbnetcode = null)
         {
             _solutionDriver.DefaultProject.AddStepBinding(attributeName, regex, csharpcode, vbnetcode);
         }
 
         public void AddLoggingStepBinding(string attributeName, string methodName, string regex)
         {
-            _solutionDriver.DefaultProject.AddLoggingStepBinding(attributeName, methodName, Path.Combine(_testProjectFolders.PathToSolutionDirectory, "steps.log"), regex);
+            _solutionDriver.DefaultProject.AddLoggingStepBinding(attributeName, methodName, regex);
         }
 
         public void AddStepBinding(string projectName, string bindingCode) => AddStepBinding(_solutionDriver.Projects[projectName], bindingCode);
@@ -157,7 +165,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             _solutionDriver.DefaultProject.AddNuGetPackage(nugetPackage, nugetVersion);
         }
 
-        public void AddFailingStepBinding(string scenarioBlock, string stepRegex)
+        public void AddFailingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
         {
             AddStepBinding(scenarioBlock, stepRegex, @"throw new System.Exception(""simulated failure"");", @"Throw New System.Exception(""simulated failure"")");
         }

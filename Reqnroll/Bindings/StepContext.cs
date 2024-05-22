@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Reqnroll.Compatibility;
 using Reqnroll.Configuration;
+using Reqnroll.PlatformCompatibility;
 
 namespace Reqnroll.Bindings
 {

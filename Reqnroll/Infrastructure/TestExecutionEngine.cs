@@ -7,10 +7,10 @@ using Reqnroll.BoDi;
 using Reqnroll.Analytics;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
-using Reqnroll.Compatibility;
 using Reqnroll.Configuration;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
@@ -141,15 +141,6 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
         {
-            // if the unit test provider would execute the fixture teardown code
-            // only delayed (at the end of the execution), we automatically close
-            // the current feature if necessary
-            if (_unitTestRuntimeProvider.DelayedFixtureTearDown && FeatureContext != null)
-            {
-                await OnFeatureEndAsync();
-            }
-
-
             _contextManager.InitializeFeatureContext(featureInfo);
 
             _testThreadExecutionEventPublisher.PublishEvent(new FeatureStartedEvent(FeatureContext));
@@ -159,13 +150,6 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnFeatureEndAsync()
         {
-            // if the unit test provider would execute the fixture teardown code
-            // only delayed (at the end of the execution), we ignore the
-            // feature-end call, if the feature has been closed already
-            if (_unitTestRuntimeProvider.DelayedFixtureTearDown &&
-                FeatureContext == null)
-                return;
-
             await FireEventsAsync(HookType.AfterFeature);
 
             if (_reqnrollConfiguration.TraceTimings)

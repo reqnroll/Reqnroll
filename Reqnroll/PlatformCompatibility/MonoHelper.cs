@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace Reqnroll.Compatibility
+namespace Reqnroll.PlatformCompatibility
 {
 	internal class MonoHelper
     {

@@ -6,12 +6,12 @@ namespace Reqnroll.Specs.Drivers
 {
     public class ConfigurationLoaderDriver
     {
-        private readonly ConfigurationDriver _configurationDriver;
+        private readonly ConfigurationFileDriver _configurationFileDriver;
         private readonly SolutionDriver _solutionDriver;
 
-        public ConfigurationLoaderDriver(ConfigurationDriver configurationDriver, SolutionDriver solutionDriver)
+        public ConfigurationLoaderDriver(ConfigurationFileDriver configurationFileDriver, SolutionDriver solutionDriver)
         {
-            _configurationDriver = configurationDriver;
+            _configurationFileDriver = configurationFileDriver;
             _solutionDriver = solutionDriver;
         }
 
@@ -21,11 +21,11 @@ namespace Reqnroll.Specs.Drivers
 
             foreach (string stepAssemblyName in reqnrollConfiguration.AdditionalStepAssemblies)
             {
-                _configurationDriver.AddStepAssembly(project, new BindingAssembly(stepAssemblyName));
+                _configurationFileDriver.AddStepAssembly(project, new BindingAssembly(stepAssemblyName));
             }
 
-            _configurationDriver.SetBindingCulture(project, reqnrollConfiguration.BindingCulture);
-            _configurationDriver.SetFeatureLanguage(project, reqnrollConfiguration.FeatureLanguage);
+            _configurationFileDriver.SetBindingCulture(project, reqnrollConfiguration.BindingCulture);
+            _configurationFileDriver.SetFeatureLanguage(project, reqnrollConfiguration.FeatureLanguage);
         }
     }
 }

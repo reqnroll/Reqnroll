@@ -385,3 +385,4 @@ docs/_build/*
 /docs/Lib/
 /docs/Scripts/
 /docs/pyvenv.cfg
+nCrunchTemp*.csproj

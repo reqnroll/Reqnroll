@@ -1,7 +1,0 @@
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="15.0"  >
-
-  <PropertyGroup>
-    <ReqnrollBaseVersion Condition="'$(ReqnrollBaseVersion)' == ''">3.5.0</ReqnrollBaseVersion>
-  </PropertyGroup>
-  
-</Project>

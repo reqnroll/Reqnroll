@@ -1,8 +1,5 @@
 ﻿<ProjectConfiguration>
   <Settings>
-    <CustomBuildProperties>
-      <Value>TargetFrameworks = net6.0</Value>
-    </CustomBuildProperties>
-    <IgnoreThisComponentCompletely>False</IgnoreThisComponentCompletely>
+    <NUnit3Enabled>False</NUnit3Enabled>
   </Settings>
 </ProjectConfiguration>

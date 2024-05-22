@@ -21,7 +21,7 @@ namespace Reqnroll.PluginTests.Infrastructure
         [Fact]
         public void Can_load_Windsor_plugin()
         {
-            var loader = new RuntimePluginLoader();
+            var loader = new RuntimePluginLoader(new PluginAssemblyLoader());
             var listener = new Mock<ITraceListener>();
 
             var plugin = loader.LoadPlugin("Reqnroll.Windsor.ReqnrollPlugin.dll", listener.Object, It.IsAny<bool>());

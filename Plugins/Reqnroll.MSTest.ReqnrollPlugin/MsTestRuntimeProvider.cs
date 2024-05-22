@@ -19,7 +19,5 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
         {
             TestInconclusive(message); // there is no dynamic "Ignore" in mstest
         }
-
-        public bool DelayedFixtureTearDown => true;
     }
 }

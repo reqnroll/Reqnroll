@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Reqnroll.Compatibility
+namespace Reqnroll.PlatformCompatibility
 {
 	internal static class CultureInfoHelper
     {

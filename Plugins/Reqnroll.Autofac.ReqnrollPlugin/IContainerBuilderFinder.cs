@@ -9,7 +9,7 @@ namespace Reqnroll.Autofac
 
         Func<ContainerBuilder, ContainerBuilder> GetConfigureGlobalContainer();
 
-        Func<ContainerBuilder, ContainerBuilder> GetCreateScenarioContainerBuilder();
+        Func<ContainerBuilder, ContainerBuilder> GetLegacyCreateScenarioContainerBuilder();
 
         Func<ILifetimeScope> GetFeatureLifetimeScope();
     }

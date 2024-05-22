@@ -13,7 +13,6 @@ public class GeneratorPlugin : IGeneratorPlugin
 {
     public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
-#if NETFRAMEWORK
         generatorPluginEvents.ConfigurationDefaults += (_, args) =>
         {
             var configuration = args.ReqnrollProjectConfiguration.ReqnrollConfiguration;
@@ -24,6 +23,5 @@ public class GeneratorPlugin : IGeneratorPlugin
                 loader.UpdateFromAppConfig(configuration, configSection);
             }
         };
-#endif
     }
 }
