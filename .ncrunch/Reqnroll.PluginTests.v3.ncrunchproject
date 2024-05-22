@@ -10,6 +10,9 @@
       <NamedTestSelector>
         <TestName>Reqnroll.PluginTests.Infrastructure.WindsorPluginTests.Can_load_Windsor_plugin</TestName>
       </NamedTestSelector>
+      <NamedTestSelector>
+        <TestName>Reqnroll.PluginTests.Infrastructure.MicrosoftExtensionsDependencyInjectionTests.LoadPlugin_MicrosoftExtensionsDependencyInjection_ShouldNotBeNull</TestName>
+      </NamedTestSelector>
     </IgnoredTests>
   </Settings>
 </ProjectConfiguration>

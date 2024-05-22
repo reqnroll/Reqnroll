@@ -109,17 +109,18 @@ public interface IObjectContainer : IDisposable
     IEnumerable<T> ResolveAll<T>() where T : class;
 
     /// <summary>
-    /// Determines whether the interface or type is registered.
+    /// Determines whether the interface or type is registered optionally with the specified name.
     /// </summary>
     /// <typeparam name="T">The interface or type.</typeparam>
+    /// <param name="name">The name or <c>null</c>.</param>
     /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
-    bool IsRegistered<T>();
+    bool IsRegistered<T>(string name = null);
 
     /// <summary>
     /// Determines whether the interface or type is registered with the specified name.
     /// </summary>
-    /// <typeparam name="T">The interface or type.</typeparam>
+    /// <param name="type">The interface or type.</param>
     /// <param name="name">The name.</param>
     /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
-    bool IsRegistered<T>(string name);
+    bool IsRegistered(Type type, string name = null);
 }
