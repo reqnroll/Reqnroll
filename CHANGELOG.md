@@ -1,22 +1,21 @@
 # [vNext]
 
-* Fix for #44 in which user code namespaces that included "Reqnroll" within them caused the code generation to fail
-* Include built-in dependency injection framework (BoDi) to the main repository as "Reqnroll.BoDi" based on v1.5 of [BoDi](https://github.com/SpecFlowOSS/BoDi/)
-* Resolve dependencies of [BeforeTestRun] / [AfterTestRun] hooks from the 
-  test run (global) context instead of the test thread context.
-* Support for PriorityAttribute in MsTest adapter
-* Support for Scenario Outline / DataRowAttribute in MsTest adapter
-* Fix for #81 in which Cucumber Expressions fail when two enums or two custom types with the same short name (differing namespaces) are used as parameters
-* Fix: Adding @ignore to an Examples block generates invalid code for NUnit v3+ (#103)
-* Fix: #111 @ignore attribute is not inherited to the scenarios from Rule
-* Support for JSON files added to SpecFlow.ExternalData
-* Fix: #120 Capture ExecutionContext after every binding invoke
-* Allow creating single target (netstandard2.0) plugins
+* MsTest: Support for PriorityAttribute
+* MsTest: Support for `[DataRow]` attribute for scenario outlines (default behavior)
 * MsTest: Use ClassCleanupBehavior.EndOfClass instead of custom implementation (preparation for MsTest v4.0)
-* Fix: #71 StackOverflowException when using [StepArgumentTransformation] with same input and output type (for example string)
+* SpecFlow.ExternalData: Support for loading data from JSON files
+* Reqnroll.Microsoft.Extensions.DependencyInjection: Port [SolidToken.SpecFlow.DependencyInjection](https://github.com/solidtoken/SpecFlow.DependencyInjection) to Reqnroll. Thanks to @mbhoek (Solid Token) for the contribution! (#94)
+* Plugins: Allow creating single target (netstandard2.0) plugins
+* Dependencies: Include built-in dependency injection framework (BoDi) to the main repository as "Reqnroll.BoDi" based on v1.5 of [BoDi](https://github.com/SpecFlowOSS/BoDi/)
+* Fix: User code namespaces that included "Reqnroll" within them caused the code generation to fail (#44)
+* Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wonrly resolved from the test thread context instead of the test run (global) context instead (#58)
+* Fix: Cucumber Expressions fail when two enums or two custom types with the same short name (differing namespaces) are used as parameters (#81)
+* Fix: Adding `@ignore` to an Examples block generates invalid code for NUnit v3+ (#103)
+* Fix: `@ignore` attribute is not inherited to the scenarios from Rule (#111)
+* Fix: Capture ExecutionContext after every binding invoke (#120)
+* Fix: StackOverflowException when using `[StepArgumentTransformation]` with same input and output type, for example string (#71)
 * Fix: Autofac without hook does not run GlobalDependencies (#127)
 * Fix: Reqnroll.Autofac shows wrongly ambiguous step definition (#56)
-* Port SolidToken.SpecFlow.DependencyInjection to Reqnroll. Thanks to @SolidToken for the contribution! (#94)
 
 # v1.0.1 - 2024-02-16
 
