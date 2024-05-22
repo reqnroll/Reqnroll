@@ -23,7 +23,7 @@ Reqnroll can also be installed on any .NET frameworks that supports .NET Standar
 
 ## Visual Studio
 
-- Visual Studio 2022 (Workloads: ASP.NET and web development **or** .NET Desktop environment **or** .NET Core cross- platform development)
+- Visual Studio 2022 (Workloads: ASP.NET and web development **or** .NET Desktop environment **or** .NET Core cross-platform development)
 
 ## Test Execution Frameworks
 
