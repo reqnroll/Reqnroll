@@ -16,6 +16,7 @@
 * Fix: #71 StackOverflowException when using [StepArgumentTransformation] with same input and output type (for example string)
 * Fix: Autofac without hook does not run GlobalDependencies (#127)
 * Fix: Reqnroll.Autofac shows wrongly ambiguous step definition (#56)
+* Port SolidToken.SpecFlow.DependencyInjection to Reqnroll. Thanks to @SolidToken for the contribution! (#94)
 
 # v1.0.1 - 2024-02-16
 
