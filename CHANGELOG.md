@@ -1,5 +1,7 @@
 # [vNext]
 
+# v2.0.0 - 2024-05-22
+
 ## Breaking changes:
 
 * The namespace of the `IObjectContainer` class has been changed from `BoDi` to `Reqnroll.BoDi`. You might need to update the namespace usages.
