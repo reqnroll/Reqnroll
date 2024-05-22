@@ -42,7 +42,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Generator", "Reqnr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Utils", "Reqnroll.Utils\Reqnroll.Utils.csproj", "{D719B8EA-6C89-4B81-AABD-65ACF562F521}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.TestProjectGenerator", "Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj", "{FA04B445-D04C-4075-9EB0-4D0A70E47FC4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.TestProjectGenerator", "Tests\TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj", "{FA04B445-D04C-4075-9EB0-4D0A70E47FC4}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Tools.MsBuild.Generation", "Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj", "{AE2FCDBB-0933-4751-BF17-8D9BF9B2055A}"
 EndProject
@@ -54,9 +54,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Licenses", "Licenses", "{D7
 		Licenses\System.ValueTuple-LICENSE-MIT.txt = Licenses\System.ValueTuple-LICENSE-MIT.txt
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reqnroll.TestProjectGenerator", "Reqnroll.TestProjectGenerator", "{974420E8-FEEA-4564-B4CE-BE06F7457E3B}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjectGenerator", "TestProjectGenerator", "{974420E8-FEEA-4564-B4CE-BE06F7457E3B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.TestProjectGenerator.Tests", "Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.Tests\Reqnroll.TestProjectGenerator.Tests.csproj", "{1B51F6C9-226E-479B-9212-E6C02A1E6633}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.TestProjectGenerator.Tests", "Tests\TestProjectGenerator\Reqnroll.TestProjectGenerator.Tests\Reqnroll.TestProjectGenerator.Tests.csproj", "{1B51F6C9-226E-479B-9212-E6C02A1E6633}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{8BE0FE31-6A52-452E-BE71-B8C64A3ED402}"
 EndProject
@@ -96,7 +96,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Verify.ReqnrollPlu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Verify.ReqnrollPlugin.IntegrationTest", "Plugins\Reqnroll.Verify\Reqnroll.Verify.ReqnrollPlugin.IntegrationTest\Reqnroll.Verify.ReqnrollPlugin.IntegrationTest.csproj", "{68E341C2-12C9-4DAC-AB04-A11C7CF94F30}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.TestProjectGenerator.Cli", "Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.Cli\Reqnroll.TestProjectGenerator.Cli.csproj", "{56BECF00-09F0-463A-A720-BED4495E51E8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.TestProjectGenerator.Cli", "Tests\TestProjectGenerator\Reqnroll.TestProjectGenerator.Cli\Reqnroll.TestProjectGenerator.Cli.csproj", "{56BECF00-09F0-463A-A720-BED4495E51E8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SpecFlowCompatibility", "SpecFlowCompatibility", "{6070E0CF-FA21-4E82-8A22-3B638CA84525}"
 EndProject
@@ -252,6 +252,7 @@ Global
 		{48E0CB65-33D4-49CD-9E22-1AD49D8684B0} = {0359B7D7-7E29-48E9-8DF9-7D1FACFA5CFA}
 		{7E637287-6E34-4BEC-8226-B052062AEA1F} = {0359B7D7-7E29-48E9-8DF9-7D1FACFA5CFA}
 		{FA04B445-D04C-4075-9EB0-4D0A70E47FC4} = {974420E8-FEEA-4564-B4CE-BE06F7457E3B}
+		{974420E8-FEEA-4564-B4CE-BE06F7457E3B} = {A10B5CD6-38EC-4D7E-9D1C-2EBA8017E437}
 		{1B51F6C9-226E-479B-9212-E6C02A1E6633} = {974420E8-FEEA-4564-B4CE-BE06F7457E3B}
 		{D649B28A-352C-4CB0-B6F2-0570DD181F60} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
 		{D151832C-15D6-4869-9999-B245443BC23E} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}

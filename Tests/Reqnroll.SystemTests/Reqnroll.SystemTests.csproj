@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
+    <ProjectReference Include="..\TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
