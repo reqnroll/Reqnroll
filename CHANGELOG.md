@@ -16,6 +16,7 @@
 * Fix: StackOverflowException when using `[StepArgumentTransformation]` with same input and output type, for example string (#71)
 * Fix: Autofac without hook does not run GlobalDependencies (#127)
 * Fix: Reqnroll.Autofac shows wrongly ambiguous step definition (#56)
+* Fix: Dispose objects registred in test thread container at the end of test execution (#123)
 
 # v1.0.1 - 2024-02-16
 

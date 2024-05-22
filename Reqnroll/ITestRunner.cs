@@ -10,6 +10,7 @@ namespace Reqnroll
         string TestWorkerId { get; }
         FeatureContext FeatureContext { get; }
         ScenarioContext ScenarioContext { get; }
+        ITestThreadContext TestThreadContext { get; }
 
         void InitializeTestRunner(string testWorkerId);
 
