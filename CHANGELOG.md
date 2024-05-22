@@ -1,5 +1,11 @@
 # [vNext]
 
+## Breaking changes:
+
+* The namespace of the `IObjectContainer` class has been changed from `BoDi` to `Reqnroll.BoDi`. You might need to update the namespace usages.
+
+## Improvements:
+
 * MsTest: Support for PriorityAttribute
 * MsTest: Support for `[DataRow]` attribute for scenario outlines (default behavior)
 * MsTest: Use ClassCleanupBehavior.EndOfClass instead of custom implementation (preparation for MsTest v4.0)
@@ -7,6 +13,9 @@
 * Reqnroll.Microsoft.Extensions.DependencyInjection: Port [SolidToken.SpecFlow.DependencyInjection](https://github.com/solidtoken/SpecFlow.DependencyInjection) to Reqnroll. Thanks to @mbhoek (Solid Token) for the contribution! (#94)
 * Plugins: Allow creating single target (netstandard2.0) plugins
 * Dependencies: Include built-in dependency injection framework (BoDi) to the main repository as "Reqnroll.BoDi" based on v1.5 of [BoDi](https://github.com/SpecFlowOSS/BoDi/)
+
+## Bug fixes:
+
 * Fix: User code namespaces that included "Reqnroll" within them caused the code generation to fail (#44)
 * Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wonrly resolved from the test thread context instead of the test run (global) context instead (#58)
 * Fix: Cucumber Expressions fail when two enums or two custom types with the same short name (differing namespaces) are used as parameters (#81)
