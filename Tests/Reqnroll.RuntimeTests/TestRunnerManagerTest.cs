@@ -1,7 +1,8 @@
+using System;
 using System.Reflection;
+using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
-using Reqnroll.Infrastructure;
 
 namespace Reqnroll.RuntimeTests
 {
@@ -16,9 +17,7 @@ namespace Reqnroll.RuntimeTests
 
         public TestRunnerManagerTest()
         {
-            var globalContainer = new RuntimeTestsContainerBuilder().CreateGlobalContainer(typeof(TestRunnerManagerTest).Assembly);
-            testRunnerManager = globalContainer.Resolve<TestRunnerManager>();
-            testRunnerManager.Initialize(anAssembly);
+            testRunnerManager = (TestRunnerManager)TestRunnerManager.GetTestRunnerManager(anAssembly, new RuntimeTestsContainerBuilder());
         }
 
         [Fact]
@@ -56,6 +55,29 @@ namespace Reqnroll.RuntimeTests
             var testRunner2 = testRunnerManager.GetTestRunner("1");
 
             testRunner1.Should().NotBe(testRunner2);
+        }
+
+        class DisposableClass : IDisposable
+        {
+            public bool IsDisposed { get; private set; }
+            public void Dispose()
+            {
+                IsDisposed = true;
+            }
+        }
+
+        [Fact]
+        public async Task Should_dispose_test_thread_container_at_after_test_run()
+        {
+            var testRunner1 = testRunnerManager.GetTestRunner("0");
+            var testRunner2 = testRunnerManager.GetTestRunner("1");
+
+            var disposableClass = new DisposableClass();
+            testRunner1.TestThreadContext.TestThreadContainer.RegisterInstanceAs(disposableClass, dispose: true);
+
+            await TestRunnerManager.OnTestRunEndAsync(anAssembly);
+
+            disposableClass.IsDisposed.Should().BeTrue();
         }
     }
 }

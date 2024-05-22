@@ -15,15 +15,11 @@ namespace Reqnroll
             _executionEngine = executionEngine;
         }
 
-        public FeatureContext FeatureContext
-        {
-            get { return _executionEngine.FeatureContext; }
-        }
+        public FeatureContext FeatureContext => _executionEngine.FeatureContext;
 
-        public ScenarioContext ScenarioContext
-        {
-            get { return _executionEngine.ScenarioContext; }
-        }
+        public ScenarioContext ScenarioContext => _executionEngine.ScenarioContext;
+
+        public ITestThreadContext TestThreadContext => _executionEngine.TestThreadContext;
 
         public async Task OnTestRunStartAsync()
         {
