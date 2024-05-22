@@ -487,16 +487,11 @@ public class ObjectContainer : IObjectContainer
         return factoryRegistration;
     }
 
-    public bool IsRegistered<T>()
-    {
-        return IsRegistered<T>(null);
-    }
+    public bool IsRegistered<T>(string name = null) => IsRegistered(typeof(T), name);
 
-    public bool IsRegistered<T>(string name)
+    public bool IsRegistered(Type type, string name = null)
     {
-        Type typeToResolve = typeof(T);
-
-        var keyToResolve = new RegistrationKey(typeToResolve, name);
+        var keyToResolve = new RegistrationKey(type, name);
 
         return _registrations.ContainsKey(keyToResolve);
     }

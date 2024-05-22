@@ -4,9 +4,8 @@ using System.Globalization;
 using System.Linq;
 using Gherkin;
 using Reqnroll.Bindings;
-using Reqnroll.Compatibility;
 using Reqnroll.Parser;
-
+using Reqnroll.PlatformCompatibility;
 
 namespace Reqnroll.Tracing
 {

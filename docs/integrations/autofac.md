@@ -48,41 +48,47 @@ using Reqnroll.Autofac.ReqnrollPlugin;
 ```
 Then
 ```csharp
-containerBuilder.AddReqnrollBindings(typeof(YourClassInTheReqnrollProject))
+containerBuilder.AddReqnrollBindings<AnyClassInTheReqnrollProject>()
 ```
 Or overload
 ```csharp
-containerBuilder.AddReqnrollBindings<YourClassInTheReqnrollProject>()
+containerBuilder.AddReqnrollBindings(Assembly.GetExecutingAssembly())
 ```
 
   Or manually register like so:
 ```csharp
 builder
-  .RegisterAssemblyTypes(typeof(TestDependencies).Assembly)
+  .RegisterAssemblyTypes(typeof(AnyClassInTheReqnrollProject).Assembly)
   .Where(t => Attribute.IsDefined(t, typeof(BindingAttribute)))
   .SingleInstance();
 ```
   ### 3. A typical dependency builder method for `[GlobalDependencies]` with `[ScenarioDependencies]` probably looks like this:
 
 ```csharp
-[GlobalDependencies]
-public static void CreateGlobalContainer(ContainerBuilder containerBuilder)
+public class SetupTestDependencies
 {
+  [GlobalDependencies]
+  public static void SetupGlobalContainer(ContainerBuilder containerBuilder)
+  {
     // Register globally scoped runtime dependencies
-    Dependencies.RegisterGlobalDependencies(containerBuilder);
+    containerBuilder
+      .RegisterType<MyGlobalService>()
+      .As<IMyGlobalService>()
+      .SingleInstance();
+  }
 
-    //TODO: add Services that are shared globally.
-}
+  [ScenarioDependencies]
+  public static void SetupScenarioContainer(ContainerBuilder containerBuilder)
+  {
+    // Register scenario scoped runtime dependencies
+    containerBuilder
+      .RegisterType<MyService>()
+      .As<IMyService>()
+      .SingleInstance();
 
-[ScenarioDependencies]
-public static void CreateContainerBuilder(ContainerBuilder containerBuilder)
-{
-  // Register scenario scoped runtime dependencies
-  Dependencies.RegisterScenarioDependencies(containerBuilder);
-  
-  //TODO: add customizations, stubs required for testing
-
-  containerBuilder.AddReqnrollBindings<TestDependencies>()
+    // register binding classes
+    containerBuilder.AddReqnrollBindings<SetupTestDependencies>();
+  }
 }
 ```
 
@@ -109,8 +115,7 @@ public static ILifetimeScope GetFeatureLifetimeScope()
 public static void ConfigureContainerBuilder(ContainerBuilder containerBuilder)
 {
     //TODO: add customizations, stubs required for testing
-
-    containerBuilder.AddReqnrollBindings<TestDependencies>();
+    containerBuilder.AddReqnrollBindings<SetupTestDependencies>();
 }
 ```
 
