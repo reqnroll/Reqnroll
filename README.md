@@ -29,6 +29,13 @@ The extension can be installed via NuGet packages from nuget.org. The main packa
 
 All contributors are welcome! For more information see the [Contribution guidelines](CONTRIBUTING.md)
 
+## Sponsors
+
+* [Spec Solutions](https://www.specsolutions.eu/)
+* [Info Support](https://www.infosupport.com/)
+
+See all sponsors and information about sponsorship on the [Sponsorship page](https://reqnroll.net/sponsorship) of our website.
+
 ## License
 
 Reqnroll for VisualStudio is licensed under the [BSD 3-Clause License](LICENSE).
