@@ -154,8 +154,5 @@ namespace Reqnroll.Generator.UnitTestProvider
         {
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
         }
-
-        public CodeExpression GetTestWorkerIdExpression() 
-            => new CodePropertyReferenceExpression(GetTestContextExpression(), TESTCONTEXT_WORKERID_PROPERTY);
     }
 }

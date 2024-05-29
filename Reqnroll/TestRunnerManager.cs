@@ -2,6 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -17,19 +18,21 @@ namespace Reqnroll;
 
 public class TestRunnerManager : ITestRunnerManager
 {
-    public const string TestRunStartWorkerId = "TestRunStart";
-
     protected readonly IObjectContainer _globalContainer;
     protected readonly IContainerBuilder _containerBuilder;
     protected readonly ReqnrollConfiguration _reqnrollConfiguration;
     protected readonly IRuntimeBindingRegistryBuilder _bindingRegistryBuilder;
     protected readonly ITestTracer _testTracer;
 
-    private readonly ConcurrentDictionary<string, ITestRunner> _testRunnerRegistry = new();
+    private readonly ConcurrentDictionary<IObjectContainer, object> _availableTestWorkerContainers = new();
+    private readonly ConcurrentDictionary<IObjectContainer, object> _usedTestWorkerContainers = new();
+    private int _nextTestWorkerContainerId;
+
     public bool IsTestRunInitialized { get; private set; }
     private int _wasDisposed = 0;
     private int _wasSingletonInstanceDisabled = 0;
     private readonly object _createTestRunnerLockObject = new();
+    private volatile ITestRunner _globalTestRunner;
 
     public Assembly TestAssembly { get; private set; }
     public Assembly[] BindingAssemblies { get; private set; }
@@ -48,14 +51,13 @@ public class TestRunnerManager : ITestRunnerManager
 
     private int GetWorkerTestRunnerCount()
     {
-        var hasTestRunStartWorker = _testRunnerRegistry.ContainsKey(TestRunStartWorkerId);
-        return _testRunnerRegistry.Count - (hasTestRunStartWorker ? 1 : 0);
+        var hasTestRunStartWorker = _globalTestRunner != null;
+        return _usedTestWorkerContainers.Count - (hasTestRunStartWorker ? 1 : 0);
     }
 
-    public virtual ITestRunner CreateTestRunner(string testWorkerId = "default-worker")
+    public virtual ITestRunner CreateTestRunner()
     {
         var testRunner = CreateTestRunnerInstance();
-        testRunner.InitializeTestRunner(testWorkerId);
 
         if (!IsTestRunInitialized)
         {
@@ -70,6 +72,15 @@ public class TestRunnerManager : ITestRunnerManager
         }
 
         return testRunner;
+    }
+
+    public virtual void ReleaseTestThreadContext(ITestThreadContext testThreadContext)
+    {
+        var testThreadContainer = testThreadContext.TestThreadContainer;
+        if (!_usedTestWorkerContainers.TryRemove(testThreadContainer, out _))
+            throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was already released");
+        if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, null))
+            throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was released twice");
     }
 
     protected virtual void InitializeBindingRegistry(ITestRunner testRunner)
@@ -100,10 +111,23 @@ public class TestRunnerManager : ITestRunnerManager
         await DisposeAsync();
     }
 
+    ITestRunner GetOrCreateGlobalTestRunner()
+    {
+        if (_globalTestRunner == null)
+        {
+            lock (_availableTestWorkerContainers)
+            {
+                if (_globalTestRunner == null)
+                    _globalTestRunner = GetTestRunner();
+            }
+        }
+        return _globalTestRunner;
+    }
+
     public async Task FireTestRunEndAsync()
     {
         // this method must not be called multiple times
-        var onTestRunnerEndExecutionHost = _testRunnerRegistry.Values.FirstOrDefault();
+        var onTestRunnerEndExecutionHost = GetOrCreateGlobalTestRunner();
         if (onTestRunnerEndExecutionHost != null)
             await onTestRunnerEndExecutionHost.OnTestRunEndAsync();
     }
@@ -111,14 +135,38 @@ public class TestRunnerManager : ITestRunnerManager
     public async Task FireTestRunStartAsync()
     {
         // this method must not be called multiple times
-        var onTestRunnerStartExecutionHost = _testRunnerRegistry.Values.FirstOrDefault();
+        var onTestRunnerStartExecutionHost = GetOrCreateGlobalTestRunner();
         if (onTestRunnerStartExecutionHost != null)
             await onTestRunnerStartExecutionHost.OnTestRunStartAsync();
     }
 
     protected virtual ITestRunner CreateTestRunnerInstance()
     {
-        var testThreadContainer = _containerBuilder.CreateTestThreadContainer(_globalContainer);
+        IObjectContainer testThreadContainer = null;
+        for (int i = 0; i < 5 && testThreadContainer == null; i++) // Try to get a available Container max 5 times
+        {
+            var items = _availableTestWorkerContainers.ToArray();
+            if (items.Length == 0)
+                break; // No Containers are available
+            foreach (var item in items)
+            {
+                if (!_availableTestWorkerContainers.TryRemove(item.Key, out _))
+                    continue; // Container was already taken by another thread
+                testThreadContainer = item.Key;
+                break;
+            }
+        }
+        
+        if (testThreadContainer == null)
+        {
+            testThreadContainer = _containerBuilder.CreateTestThreadContainer(_globalContainer);
+            var id = Interlocked.Increment(ref _nextTestWorkerContainerId);
+            var testThreadContainerInfo = new TestThreadContainerInfo(id.ToString(CultureInfo.InvariantCulture));
+            testThreadContainer.RegisterInstanceAs(testThreadContainerInfo);
+        }
+
+        if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, null))
+            throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} is already in usage");
 
         return testThreadContainer.Resolve<ITestRunner>();
     }
@@ -128,12 +176,11 @@ public class TestRunnerManager : ITestRunnerManager
         TestAssembly = assignedTestAssembly;
     }
 
-    public virtual ITestRunner GetTestRunner(string testWorkerId)
+    public virtual ITestRunner GetTestRunner()
     {
-        testWorkerId ??= Guid.NewGuid().ToString(); //Creates a Test Runner with a unique test thread
         try
         {
-            return GetTestRunnerWithoutExceptionHandling(testWorkerId);
+            return GetTestRunnerWithoutExceptionHandling();
         }
         catch (Exception ex)
         {
@@ -142,22 +189,11 @@ public class TestRunnerManager : ITestRunnerManager
         }
     }
 
-    private ITestRunner GetTestRunnerWithoutExceptionHandling(string testWorkerId)
+    private ITestRunner GetTestRunnerWithoutExceptionHandling()
     {
-        if (testWorkerId == null)
-            throw new ArgumentNullException(nameof(testWorkerId));
+        var testRunner = CreateTestRunner();
 
-        bool wasAdded = false;
-
-        var testRunner = _testRunnerRegistry.GetOrAdd(
-            testWorkerId,
-            workerId =>
-            {
-                wasAdded = true;
-                return CreateTestRunner(workerId);
-            });
-
-        if (wasAdded && IsMultiThreaded && Interlocked.CompareExchange(ref _wasSingletonInstanceDisabled, 1, 0) == 0)
+        if (IsMultiThreaded && Interlocked.CompareExchange(ref _wasSingletonInstanceDisabled, 1, 0) == 0)
         {
             FeatureContext.DisableSingletonInstance();
             ScenarioContext.DisableSingletonInstance();
@@ -173,15 +209,32 @@ public class TestRunnerManager : ITestRunnerManager
         {
             await FireTestRunEndAsync();
 
-            foreach (var testRunner in _testRunnerRegistry.Values)
+            if (_globalTestRunner != null)
             {
-                testRunner.TestThreadContext.TestThreadContainer.Dispose();
+                ReleaseTestThreadContext(_globalTestRunner.TestThreadContext);
             }
 
-            // this call dispose on this object, but the disposeLockObj will avoid double execution
+            var items = _availableTestWorkerContainers.ToArray();
+            while (items.Length > 0)
+            {
+                foreach (var item in items)
+                {
+                    item.Key.Dispose();
+                    _availableTestWorkerContainers.TryRemove(item.Key, out _);
+                }
+                items = _availableTestWorkerContainers.ToArray();
+            }
+
+            var notReleasedRunner = _usedTestWorkerContainers.ToArray();
+            if (notReleasedRunner.Length > 0)
+            {
+                var errorText = $"Found {notReleasedRunner.Length} not released TestRunners (ids: {string.Join(",", notReleasedRunner.Select(x => TestThreadContainerInfo.GetId(x.Key)))})";
+                _globalContainer.Resolve<ITestTracer>().TraceWarning(errorText);
+            }
+
+            // this call dispose on this object, but _wasDisposed will avoid double execution
             _globalContainer.Dispose();
 
-            _testRunnerRegistry.Clear();
             OnTestRunnerManagerDisposed(this);
         }
     }
@@ -256,20 +309,24 @@ public class TestRunnerManager : ITestRunnerManager
         }
     }
 
-    public static async Task OnTestRunStartAsync(Assembly testAssembly = null, string testWorkerId = null, IContainerBuilder containerBuilder = null)
+    public static async Task OnTestRunStartAsync(Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, createIfMissing: true, containerBuilder: containerBuilder);
-        testRunnerManager.GetTestRunner(testWorkerId ?? TestRunStartWorkerId);
 
         await testRunnerManager.FireTestRunStartAsync();
     }
 
-    public static ITestRunner GetTestRunnerForAssembly(Assembly testAssembly = null, string testWorkerId = null, IContainerBuilder containerBuilder = null)
+    public static ITestRunner GetTestRunnerForAssembly(Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);
-        return testRunnerManager.GetTestRunner(testWorkerId);
+        return testRunnerManager.GetTestRunner();
+    }
+
+    public static void ReleaseTestRunner(ITestRunner testRunner)
+    {
+        testRunner.TestThreadContext.TestThreadContainer.Resolve<ITestRunnerManager>().ReleaseTestThreadContext(testRunner.TestThreadContext);
     }
 
     internal static async Task ResetAsync()

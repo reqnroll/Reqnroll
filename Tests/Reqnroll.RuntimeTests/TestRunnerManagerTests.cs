@@ -19,38 +19,48 @@ public class TestRunnerManagerTests
     [Fact]
     public void CreateTestRunner_should_be_able_to_create_a_TestRunner()
     {
-        var testRunner = _testRunnerManager.CreateTestRunner("0");
+        var testRunner = _testRunnerManager.CreateTestRunner();
 
         testRunner.Should().NotBeNull();
         testRunner.Should().BeOfType<TestRunner>();
+
+        TestRunnerManager.ReleaseTestRunner(testRunner);
     }
 
     [Fact]
     public void GetTestRunner_should_be_able_to_create_a_TestRunner()
     {
-        var testRunner = _testRunnerManager.GetTestRunner("0");
+        var testRunner = _testRunnerManager.GetTestRunner();
 
         testRunner.Should().NotBeNull();
         testRunner.Should().BeOfType<TestRunner>();
+
+        TestRunnerManager.ReleaseTestRunner(testRunner);
     }
 
     [Fact]
-    public void GetTestRunner_should_cache_instance()
+    public void Should_return_different_thread_ids_for_different_instances()
     {
-        var testRunner1 = _testRunnerManager.GetTestRunner("0");
-        var testRunner2 = _testRunnerManager.GetTestRunner("0");
+        // Use an explicit new ITestRunnerManager to make sure that the Ids are created in a new way.
+        var container = new RuntimeTestsContainerBuilder().CreateGlobalContainer(_anAssembly);
+        var testRunnerManager = container.Resolve<ITestRunnerManager>();
+        testRunnerManager.Initialize(_anAssembly);
 
-
-        testRunner1.Should().Be(testRunner2);
-    }
-
-    [Fact]
-    public void Should_return_different_instances_for_different_thread_ids()
-    {
-        var testRunner1 = _testRunnerManager.GetTestRunner("0");
-        var testRunner2 = _testRunnerManager.GetTestRunner("1");
+        var testRunner1 = testRunnerManager.GetTestRunner();
+        var testRunner2 = testRunnerManager.GetTestRunner();
 
         testRunner1.Should().NotBe(testRunner2);
+        testRunner1.TestWorkerId.Should().Be("1");
+        testRunner2.TestWorkerId.Should().Be("2");
+
+        TestRunnerManager.ReleaseTestRunner(testRunner1);
+        TestRunnerManager.ReleaseTestRunner(testRunner2);
+
+        // TestRunner3 reused an existing TestThreadContainer, so the Id should be one of the previously created ones
+        var testRunner3 = testRunnerManager.GetTestRunner();
+        testRunner3.TestWorkerId.Should().Match(x => x == "1" || x == "2");
+
+        TestRunnerManager.ReleaseTestRunner(testRunner3);
     }
 
     class DisposableClass : IDisposable
@@ -65,14 +75,17 @@ public class TestRunnerManagerTests
     [Fact]
     public async Task Should_dispose_test_thread_container_at_after_test_run()
     {
-        var testRunner1 = _testRunnerManager.GetTestRunner("0");
-        var testRunner2 = _testRunnerManager.GetTestRunner("1");
+        var testRunner1 = _testRunnerManager.GetTestRunner();
+        var testRunner2 = _testRunnerManager.GetTestRunner();
 
         var disposableClass1 = new DisposableClass();
         testRunner1.TestThreadContext.TestThreadContainer.RegisterInstanceAs(disposableClass1, dispose: true);
 
         var disposableClass2 = new DisposableClass();
         testRunner2.TestThreadContext.TestThreadContainer.RegisterInstanceAs(disposableClass2, dispose: true);
+
+        TestRunnerManager.ReleaseTestRunner(testRunner1);
+        TestRunnerManager.ReleaseTestRunner(testRunner2);
 
         await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
 

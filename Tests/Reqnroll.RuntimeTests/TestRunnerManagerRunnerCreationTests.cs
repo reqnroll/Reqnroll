@@ -48,7 +48,7 @@ namespace Reqnroll.RuntimeTests
         {
             var factory = CreateTestRunnerFactory();
 
-            var testRunner = factory.CreateTestRunner("0");
+            var testRunner = factory.CreateTestRunner();
             testRunner.Should().NotBeNull();
         }
 
@@ -56,7 +56,7 @@ namespace Reqnroll.RuntimeTests
         public void Should_initialize_test_runner_with_the_provided_assembly()
         {
             var factory = CreateTestRunnerFactory();
-            factory.CreateTestRunner("0");
+            factory.CreateTestRunner();
 
             factory.IsTestRunInitialized.Should().BeTrue();
         }
@@ -67,7 +67,7 @@ namespace Reqnroll.RuntimeTests
             var factory = CreateTestRunnerFactory();
             _reqnrollConfigurationStub.AddAdditionalStepAssembly(anotherAssembly);
 
-            factory.CreateTestRunner("0");
+            factory.CreateTestRunner();
 
             factory.IsTestRunInitialized.Should().BeTrue();
         }
@@ -78,7 +78,7 @@ namespace Reqnroll.RuntimeTests
             var factory = CreateTestRunnerFactory();
             _reqnrollConfigurationStub.AddAdditionalStepAssembly(anotherAssembly);
 
-            factory.CreateTestRunner("0");
+            factory.CreateTestRunner();
 
             factory.IsTestRunInitialized.Should().BeTrue();
         }
@@ -92,19 +92,22 @@ namespace Reqnroll.RuntimeTests
             //see https://github.com/reqnroll/Reqnroll/issues/638
             if (!TestEnvironmentHelper.IsBeingRunByNCrunch())
             {
-                var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(anAssembly, "0", new RuntimeTestsContainerBuilder());
+                var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(anAssembly, new RuntimeTestsContainerBuilder());
                 await testRunner1.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
                 testRunner1.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null));
                 await testRunner1.OnScenarioStartAsync();
                 var tracer1 = testRunner1.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
 
-                var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(anAssembly, "1", new RuntimeTestsContainerBuilder());
+                var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(anAssembly, new RuntimeTestsContainerBuilder());
                 await testRunner2.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
                 testRunner2.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null));
                 await testRunner1.OnScenarioStartAsync();
                 var tracer2 = testRunner2.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
 
                 tracer1.Should().NotBeSameAs(tracer2);
+
+                TestRunnerManager.ReleaseTestRunner(testRunner1);
+                TestRunnerManager.ReleaseTestRunner(testRunner2);
             }       
         }
     }

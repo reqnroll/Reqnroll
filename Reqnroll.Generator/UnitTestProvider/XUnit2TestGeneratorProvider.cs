@@ -33,7 +33,6 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string IGNORE_TEST_CLASS = "IgnoreTestClass";
         protected internal const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
         protected internal const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
-        protected internal const string XUNITPARALLELWORKERTRACKER_INSTANCE = "Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance";
 
         public XUnit2TestGeneratorProvider(CodeDomHelper codeDomHelper)
         {
@@ -178,19 +177,6 @@ namespace Reqnroll.Generator.UnitTestProvider
                         nameof(IObjectContainer.RegisterInstanceAs),
                         new CodeTypeReference(OUTPUT_INTERFACE)),
                     new CodeVariableReferenceExpression(OUTPUT_INTERFACE_FIELD_NAME)));
-
-            // Wrap FeatureTearDown:
-            // var testWorkerId = <testRunner>.TestWorkerId;
-            // <FeatureTearDown>
-            // XUnitParallelWorkerTracker.Instance.ReleaseWorker(testWorkerId);
-            generationContext.TestClassCleanupMethod.Statements.Insert(0, 
-                new CodeVariableDeclarationStatement(typeof(string), "testWorkerId", 
-                    new CodePropertyReferenceExpression(new CodeVariableReferenceExpression(generationContext.TestRunnerField.Name), "TestWorkerId")));
-            generationContext.TestClassCleanupMethod.Statements.Add(
-                new CodeMethodInvokeExpression(
-                    new CodeVariableReferenceExpression(GlobalNamespaceIfCSharp(XUNITPARALLELWORKERTRACKER_INSTANCE)),
-                    "ReleaseWorker",
-                    new CodeVariableReferenceExpression("testWorkerId")));
         }
 
         protected virtual void IgnoreFeature(TestClassGenerationContext generationContext)
@@ -412,14 +398,6 @@ namespace Reqnroll.Generator.UnitTestProvider
         public void MarkCodeMethodInvokeExpressionAsAwait(CodeMethodInvokeExpression expression)
         {
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
-        }
-
-        public CodeExpression GetTestWorkerIdExpression()
-        {
-            // XUnitParallelWorkerTracker.Instance.GetWorkerId()
-            return new CodeMethodInvokeExpression(
-                new CodeVariableReferenceExpression(GlobalNamespaceIfCSharp(XUNITPARALLELWORKERTRACKER_INSTANCE)),
-                "GetWorkerId");
         }
 
         private string GlobalNamespaceIfCSharp(string typeName)

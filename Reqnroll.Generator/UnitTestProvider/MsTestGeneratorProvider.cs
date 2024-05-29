@@ -228,14 +228,5 @@ namespace Reqnroll.Generator.UnitTestProvider
         {
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
         }
-
-        public CodeExpression GetTestWorkerIdExpression()
-        {
-            // System.Threading.Thread.CurrentThread.ManagedThreadId.ToString()
-            return new CodeMethodInvokeExpression(
-                new CodeVariableReferenceExpression("System.Threading.Thread.CurrentThread.ManagedThreadId"),
-                nameof(ToString)
-            );
-        }
     }
 }

@@ -19,19 +19,25 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task GetTestRunner_without_arguments_should_return_TestRunner_instance()
         {
-            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(testWorkerId: "0", containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(containerBuilder: new RuntimeTestsContainerBuilder());
 
             testRunner.Should().NotBeNull();
             testRunner.Should().BeOfType<TestRunner>();
+
+            TestRunnerManager.ReleaseTestRunner(testRunner);
         }
 
         [Fact]
         public async Task GetTestRunner_should_return_different_instances_for_different_assemblies()
         {
-            var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, "0", containerBuilder: new RuntimeTestsContainerBuilder());
-            var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(anotherAssembly, "0", containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(anotherAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
 
             testRunner1.Should().NotBe(testRunner2);
+            testRunner1.TestThreadContext.Should().NotBe(testRunner2.TestThreadContext);
+
+            TestRunnerManager.ReleaseTestRunner(testRunner1);
+            TestRunnerManager.ReleaseTestRunner(testRunner2);
         }
 
         [Fact]
@@ -81,7 +87,8 @@ namespace Reqnroll.RuntimeTests
         public async Task OnTestRunEnd_should_fire_AfterTestRun_events()
         {
             // make sure a test runner is initialized
-            TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, "0", containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            TestRunnerManager.ReleaseTestRunner(testRunner);
 
             AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
             await TestRunnerManager.OnTestRunEndAsync(thisAssembly);
@@ -93,7 +100,8 @@ namespace Reqnroll.RuntimeTests
         public async Task OnTestRunEnd_without_arguments_should_fire_AfterTestRun_events_for_calling_assembly()
         {
             // make sure a test runner is initialized
-            TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, "0", containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            TestRunnerManager.ReleaseTestRunner(testRunner);
 
             AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
             await TestRunnerManager.OnTestRunEndAsync();
@@ -105,7 +113,8 @@ namespace Reqnroll.RuntimeTests
         public async Task OnTestRunEnd_should_not_fire_AfterTestRun_events_multiple_times()
         {
             // make sure a test runner is initialized
-            TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, "0", containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            TestRunnerManager.ReleaseTestRunner(testRunner);
 
             AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
             await TestRunnerManager.OnTestRunEndAsync(thisAssembly);
