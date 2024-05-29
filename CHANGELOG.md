@@ -1,5 +1,7 @@
 # [vNext]
 
+# v2.0.1 - 2024-05-29
+
 ## Bug fixes:
 
 * Fix: BeforeTestRun not run in .NET462 up to .NET481 in multitarget test project (#146)

@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>2.0.1</VersionPrefix>
+    <VersionPrefix>2.0.2</VersionPrefix>
     <VersionSuffix>local</VersionSuffix>
     <AssemblyVersion>2.0.0</AssemblyVersion>
   </PropertyGroup>
