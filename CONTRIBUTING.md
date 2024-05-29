@@ -189,5 +189,6 @@ To build local documentation:
 
 Please ask in our [Contributor Q&A](https://github.com/orgs/reqnroll/discussions/categories/contributor-q-a) discussion group.
 
+There is also our [Discord server](https://discord.gg/vyZv9z4hGY).
 
 Thank you for your contributions!
