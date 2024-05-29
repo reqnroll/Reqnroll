@@ -3,6 +3,8 @@ using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
 using System;
 using System.Runtime.InteropServices;
+using Reqnroll.TestProjectGenerator.Data;
+using System.Collections.Generic;
 
 namespace Reqnroll.SystemTests.Portability;
 
@@ -12,8 +14,24 @@ namespace Reqnroll.SystemTests.Portability;
 [TestCategory("Portability")]
 public abstract class PortabilityTestBase : SystemTestBase
 {
+    public static IEnumerable<object[]> GetAllUnitTestProviders()
+    {
+        return [
+            [UnitTestProvider.MSTest],
+            [UnitTestProvider.NUnit3],
+            [UnitTestProvider.xUnit],
+        ];
+    }
+
     private void RunSkippableTest(Action test)
     {
+        //TODO: Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) &&
+            _testRunConfiguration.UnitTestProvider == UnitTestProvider.xUnit &&
+            (_testRunConfiguration.TargetFramework == TargetFramework.Net462 ||
+             _testRunConfiguration.TargetFramework == TargetFramework.Net472))
+            Assert.Inconclusive("Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved");
+
         try
         {
             test();
@@ -26,20 +44,12 @@ public abstract class PortabilityTestBase : SystemTestBase
     }
 
     [TestMethod]
-    [DataRow(UnitTestProvider.MSTest)]
-    [DataRow(UnitTestProvider.NUnit3)]
-    [DataRow(UnitTestProvider.xUnit)]
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
     public void GeneratorAllIn_sample_can_be_handled(UnitTestProvider unitTestProvider)
     {
+        _testRunConfiguration.UnitTestProvider = unitTestProvider;
         RunSkippableTest(() =>
         {
-            //TODO: Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) &&
-                unitTestProvider == UnitTestProvider.xUnit)
-                Assert.Inconclusive("Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved");
-
-            _testRunConfiguration.UnitTestProvider = unitTestProvider;
-
             PrepareGeneratorAllInSamples();
 
             ExecuteTests();
@@ -50,8 +60,10 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     [TestMethod]
     [TestCategory("MsBuild")]
-    public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild()
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
+    public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild(UnitTestProvider unitTestProvider)
     {
+        _testRunConfiguration.UnitTestProvider = unitTestProvider;
         RunSkippableTest(() =>
         {
             PrepareGeneratorAllInSamples();
@@ -62,8 +74,10 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     [TestMethod]
     [TestCategory("DotnetMSBuild")]
-    public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild()
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
+    public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild(UnitTestProvider unitTestProvider)
     {
+        _testRunConfiguration.UnitTestProvider = unitTestProvider;
         RunSkippableTest(() =>
         {
             PrepareGeneratorAllInSamples();
@@ -75,8 +89,10 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     #region Test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
     [TestMethod]
-    public void TestRun_hooks_are_executed()
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
+    public void TestRun_hooks_are_executed(UnitTestProvider unitTestProvider)
     {
+        _testRunConfiguration.UnitTestProvider = unitTestProvider;
         RunSkippableTest(() =>
         {
             AddSimpleScenario();
