@@ -25,12 +25,14 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     private void RunSkippableTest(Action test)
     {
-        //TODO: Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved
+        // Mono is not officially supported by xUnit v2 that we use to test. 
+        // See https://xunit.net/docs/v3-alpha#v2-changes
+        // Related: https://github.com/reqnroll/Reqnroll/issues/132
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) &&
             _testRunConfiguration.UnitTestProvider == UnitTestProvider.xUnit &&
             (_testRunConfiguration.TargetFramework == TargetFramework.Net462 ||
              _testRunConfiguration.TargetFramework == TargetFramework.Net472))
-            Assert.Inconclusive("Temporarily disabled tests until https://github.com/reqnroll/Reqnroll/issues/132 is resolved");
+            Assert.Inconclusive("Disabled because xUnit v2 is not supported on Mono");
 
         try
         {
