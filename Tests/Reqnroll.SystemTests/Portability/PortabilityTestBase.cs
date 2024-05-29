@@ -50,10 +50,15 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     [TestMethod]
     [TestCategory("MsBuild")]
-    public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild()
+    [DataRow(UnitTestProvider.MSTest)]
+    [DataRow(UnitTestProvider.NUnit3)]
+    [DataRow(UnitTestProvider.xUnit)]
+    public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild(UnitTestProvider unitTestProvider)
     {
         RunSkippableTest(() =>
         {
+            _testRunConfiguration.UnitTestProvider = unitTestProvider;
+
             PrepareGeneratorAllInSamples();
             _compilationDriver.SetBuildTool(BuildTool.MSBuild);
             _compilationDriver.CompileSolution();
@@ -62,10 +67,15 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     [TestMethod]
     [TestCategory("DotnetMSBuild")]
-    public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild()
+    [DataRow(UnitTestProvider.MSTest)]
+    [DataRow(UnitTestProvider.NUnit3)]
+    [DataRow(UnitTestProvider.xUnit)]
+    public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild(UnitTestProvider unitTestProvider)
     {
         RunSkippableTest(() =>
         {
+            _testRunConfiguration.UnitTestProvider = unitTestProvider;
+
             PrepareGeneratorAllInSamples();
             _compilationDriver.SetBuildTool(BuildTool.DotnetMSBuild);
 
@@ -75,10 +85,15 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     #region Test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
     [TestMethod]
-    public void TestRun_hooks_are_executed()
+    [DataRow(UnitTestProvider.MSTest)]
+    [DataRow(UnitTestProvider.NUnit3)]
+    [DataRow(UnitTestProvider.xUnit)]
+    public void TestRun_hooks_are_executed(UnitTestProvider unitTestProvider)
     {
         RunSkippableTest(() =>
         {
+            _testRunConfiguration.UnitTestProvider = unitTestProvider;
+
             AddSimpleScenario();
             AddPassingStepBinding();
             AddHookBinding("BeforeTestRun");
