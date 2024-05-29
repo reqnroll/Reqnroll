@@ -8,7 +8,7 @@ public class CucumberExpressionDetector : ICucumberExpressionDetector
     private static readonly Regex CommonRegexStepDefPatterns = new(@"(\([^\)]+[\*\+]\)|\.\*)");
     private static readonly Regex ExtendedRegexStepDefPatterns = new(@"(\\\.|\\d\+)"); // \. \d+
 
-    public bool IsCucumberExpression(string cucumberExpressionCandidate)
+    public virtual bool IsCucumberExpression(string cucumberExpressionCandidate)
     {
         if (cucumberExpressionCandidate.StartsWith("^") || cucumberExpressionCandidate.EndsWith("$"))
             return false;
