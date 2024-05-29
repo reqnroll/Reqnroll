@@ -271,6 +271,8 @@ This will add the markers to all step definition attributes.
 [When("I $ something")]
 ```
 
+**Solution 3:** If none of the above solutions are possible, you can also consider changing the cucumber expression detection strategy as described in [](how-to-configure-cucumber-expression-behavior.md).
+
 #### Expression matching problems during test execution
 
 In some very special cases it can happen that the expression is wrongly identified as cucumber expression, but you only get the step binding error during test execution (usually `No matching step definition found` error), because the expression is valid as regex and as cucumber expression as well, but with different meaning. 
