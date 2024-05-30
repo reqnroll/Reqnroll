@@ -29,7 +29,7 @@ Changing the cucumber expression detection strategy might cause incompatibilitie
 Because of that we recommend to apply this only temporarily or if the other solution (add the regex start and end markers) cannot be applied.
 ```
 
-In order to override the detection strategy, you need to implement a simle Reqnroll runtime plugin. In the simplest case this is just adding a C# file to your Reqnroll project.
+In order to override the detection strategy, you need to implement a simple Reqnroll runtime plugin. In the simplest case this is just adding a C# file to your Reqnroll project.
 
 The plugin should look like the following (this is the file you need to add to your project):
 
