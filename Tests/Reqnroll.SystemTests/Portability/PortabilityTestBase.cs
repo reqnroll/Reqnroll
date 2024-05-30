@@ -5,6 +5,9 @@ using System;
 using System.Runtime.InteropServices;
 using Reqnroll.TestProjectGenerator.Data;
 using System.Collections.Generic;
+using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
+using Reqnroll.TestProjectGenerator.FilesystemWriter;
 
 namespace Reqnroll.SystemTests.Portability;
 
@@ -101,6 +104,18 @@ public abstract class PortabilityTestBase : SystemTestBase
             AddPassingStepBinding();
             AddHookBinding("BeforeTestRun");
             AddHookBinding("AfterTestRun");
+
+            var solutionWriteToDiskDriver = _testContainer.GetService<SolutionWriteToDiskDriver>();
+            var solutionDriver = _testContainer.GetService<SolutionDriver> ();
+            //solutionWriteToDiskDriver.WriteSolutionToDisk(false);
+            var prj = solutionDriver.Projects.Values.First();
+            prj.AddFile(new ProjectFile("xunit.runner.json", "Content", """
+                                                                        {
+                                                                          "$schema": "https://xunit.net/schema/current/xunit.runner.schema.json",
+                                                                          "diagnosticMessages": true,
+                                                                          "internalDiagnosticMessages": true
+                                                                        }
+                                                                        """, CopyToOutputDirectory.CopyIfNewer));
 
             ExecuteTests();
 

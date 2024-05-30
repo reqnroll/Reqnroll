@@ -189,7 +189,7 @@ namespace Reqnroll.TestProjectGenerator
 
         public string GenerateTrxLoggerParameter()
         {
-            return "--logger trx";
+            return "--logger trx --logger \"console;verbosity=detailed\"";
         }
 
         public string GenerateVerbosityParameter(string verbosity)
