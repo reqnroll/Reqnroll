@@ -50,10 +50,7 @@ public abstract class PortabilityTestBase : SystemTestBase
     }
 
     [TestMethod]
-    [DataRow(UnitTestProvider.MSTest)]
-    [DataRow(UnitTestProvider.NUnit3)]
-    [DataRow(UnitTestProvider.xUnit)]
-    //[DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
     public void GeneratorAllIn_sample_can_be_handled(UnitTestProvider unitTestProvider)
     {
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
@@ -69,10 +66,7 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     [TestMethod]
     [TestCategory("MsBuild")]
-    [DataRow(UnitTestProvider.MSTest)]
-    [DataRow(UnitTestProvider.NUnit3)]
-    [DataRow(UnitTestProvider.xUnit)]
-    //[DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
     public void GeneratorAllIn_sample_can_be_compiled_with_MsBuild(UnitTestProvider unitTestProvider)
     {
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
@@ -86,10 +80,7 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     [TestMethod]
     [TestCategory("DotnetMSBuild")]
-    [DataRow(UnitTestProvider.MSTest)]
-    [DataRow(UnitTestProvider.NUnit3)]
-    [DataRow(UnitTestProvider.xUnit)]
-    //[DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
     public void GeneratorAllIn_sample_can_be_compiled_with_DotnetMSBuild(UnitTestProvider unitTestProvider)
     {
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
@@ -104,10 +95,7 @@ public abstract class PortabilityTestBase : SystemTestBase
 
     #region Test before/after test run hooks (.NET Framework version of Reqnroll is subscribed to assembly unload)
     [TestMethod]
-    [DataRow(UnitTestProvider.MSTest)]
-    [DataRow(UnitTestProvider.NUnit3)]
-    [DataRow(UnitTestProvider.xUnit)]
-    //[DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
+    [DynamicData(nameof(GetAllUnitTestProviders), DynamicDataSourceType.Method)]
     public void TestRun_hooks_are_executed(UnitTestProvider unitTestProvider)
     {
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
