@@ -1,7 +1,13 @@
 # [vNext]
 
+## Breaking changes:
+
+* Reqnroll.Verify: now targets net472 and net6.0. Support for net462 is dropped.
+* Reqnroll.Verify: now depends on Verify.Xunit 24.2.0 instead of Verify 17.7.0.
+
 ## Improvements:
 
+* XUnit: dependency was updated from 2.4.1 to 2.8.1
 * Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160)
 * Generate symbol packages, use deterministic build and update package metadata (#161)
 
@@ -37,7 +43,7 @@
 ## Bug fixes:
 
 * Fix: User code namespaces that included "Reqnroll" within them caused the code generation to fail (#44)
-* Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wonrly resolved from the test thread context instead of the test run (global) context instead (#58)
+* Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wrongly resolved from the test thread context instead of the test run (global) context instead (#58)
 * Fix: Cucumber Expressions fail when two enums or two custom types with the same short name (differing namespaces) are used as parameters (#81)
 * Fix: Adding `@ignore` to an Examples block generates invalid code for NUnit v3+ (#103)
 * Fix: `@ignore` attribute is not inherited to the scenarios from Rule (#111)
@@ -45,7 +51,7 @@
 * Fix: StackOverflowException when using `[StepArgumentTransformation]` with same input and output type, for example string (#71)
 * Fix: Autofac without hook does not run GlobalDependencies (#127)
 * Fix: Reqnroll.Autofac shows wrongly ambiguous step definition (#56)
-* Fix: Dispose objects registred in test thread container at the end of test execution (#123)
+* Fix: Dispose objects registered in test thread container at the end of test execution (#123)
 
 # v1.0.1 - 2024-02-16
 

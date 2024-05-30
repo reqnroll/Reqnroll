@@ -23,6 +23,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+    <ProjectReference Include="..\..\..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
 </Project>
