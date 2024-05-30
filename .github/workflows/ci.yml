@@ -197,6 +197,11 @@ jobs:
       with:
         name: systemtests-windows-trx
         path: "**/*.trx"
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages-for-test
+        path: "GeneratedNuGetPackages/**/*.nupkg"
 
 
   system-tests-linux:
