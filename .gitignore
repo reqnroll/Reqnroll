@@ -367,8 +367,6 @@ Reqnroll.sln.GhostDoc.xml
 Features.Generated/
 GitExtensions.settings.backup
 
-/Installer/NuGetPackages/Reqnroll.Tools.MsBuild.Generation/build/Reqnroll.Tools.MsBuild.Generation.targets
-/Installer/NuGetPackages/Reqnroll.Tools.MsBuild.Generation/build/Reqnroll.Tools.MsBuild.Generation.props
 /Tests/Reqnroll.MsBuildNetSdk.IntegrationTests/Features/dummy.feature.cs
 *.feature.cs
 *.AssemblyHooks.cs

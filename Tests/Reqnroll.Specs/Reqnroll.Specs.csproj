@@ -1,7 +1,7 @@
 ﻿<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="../../Reqnroll.Tools.MsBuild.Generation/build/Reqnroll.Tools.MsBuild.Generation.props" />
+  <Import Project="build/Reqnroll.Tools.MsBuild.Generation.OwnTests.props" />
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -56,13 +56,6 @@
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
-  <PropertyGroup>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
-  </PropertyGroup>
-
-
-
   <Target Name="WriteNuGetVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs" OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs" TextToReplace="NUGET_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
 
@@ -79,10 +72,6 @@
   <ItemGroup>
     <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <_Reqnroll_TaskAssembly>..\..\Reqnroll.Tools.MsBuild.Generation\bin\$(Configuration)\$(_Reqnroll_Needed_MSBuildGenerator)\tasks\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
-  </PropertyGroup>
 
   <Import Project="..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" /> <!-- has to be before the PropertyGroup change-->
   <PropertyGroup>
