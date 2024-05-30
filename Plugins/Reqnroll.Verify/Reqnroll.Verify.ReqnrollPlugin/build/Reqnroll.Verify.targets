@@ -2,8 +2,5 @@
   <PropertyGroup>
     <_VerifyGeneratorPluginFramework Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_VerifyGeneratorPluginFramework>
     <_VerifyGeneratorPluginFramework Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_VerifyGeneratorPluginFramework>
-
-    <_VerifyGeneratorPluginPath>$(MSBuildThisFileDirectory)$(_VerifyGeneratorPluginFramework)\Reqnroll.Verify.ReqnrollPlugin.dll</_VerifyGeneratorPluginPath>
-
   </PropertyGroup>
 </Project>
