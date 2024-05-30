@@ -15,7 +15,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit3PackageVersion = "3.13.1";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.17.0";
-        private const string XUnitPackageVersion = "2.8.1";
+        private const string XUnitPackageVersion = "2.4.2";
         private const string MSTestPackageVersion = "2.2.8";
         private const string InternalJsonPackageName = "SpecFlow.Internal.Json";
         private const string InternalJsonVersion = "1.0.8";

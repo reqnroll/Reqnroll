@@ -7,7 +7,6 @@
 
 ## Improvements:
 
-* XUnit: dependency was updated from 2.4.1 to 2.8.1
 * Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160)
 * Generate symbol packages, use deterministic build and update package metadata (#161)
 
