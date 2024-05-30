@@ -161,7 +161,7 @@ namespace Reqnroll.TestProjectGenerator
             var argumentsBuilder = new StringBuilder("--no-build ");
 
             argumentsBuilder.Append(GenerateTrxLoggerParameter());
-            argumentsBuilder.Append($" {GenerateVerbosityParameter("n")}");
+            argumentsBuilder.Append($" {GenerateVerbosityParameter("d")}");
 
             string additionalPackagesFoldersParameters = GenerateAdditionalPackagesFoldersParameters();
             if (additionalPackagesFoldersParameters is string additionalPackagesFoldersParametersString)

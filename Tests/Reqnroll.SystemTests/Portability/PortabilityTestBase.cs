@@ -106,6 +106,7 @@ public abstract class PortabilityTestBase : SystemTestBase
             if (unitTestProvider == UnitTestProvider.xUnit)
                 _projectsDriver.AddStepBinding("StepDefinition", ".*", """
                                                                    var assembly = System.Reflection.Assembly.Load("Reqnroll.xUnit.ReqnrollPlugin");
+                                                                   global::Log.LogCustom("assemblyPath", assembly?.Location ?? "<null>");
                                                                    var frameworkType = assembly.GetType("Reqnroll.xUnit.ReqnrollPlugin.XunitTestFrameworkWithAssemblyFixture"); // this is null in 2.0.0 and not null in 2.0.1
                                                                    global::Log.LogCustom("frameworkType", frameworkType?.ToString() ?? "<null>");
                                                                    try
@@ -139,6 +140,7 @@ public abstract class PortabilityTestBase : SystemTestBase
             ExecuteTests();
 
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("frameworkType")));
+            Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("assemblyPath")));
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("loaderException")));
             _bindingDriver.AssertExecutedHooksEqual(
                 "BeforeTestRun",
