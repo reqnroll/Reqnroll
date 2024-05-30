@@ -139,6 +139,7 @@ public abstract class PortabilityTestBase : SystemTestBase
 
             ExecuteTests();
 
+            Console.WriteLine(_testRunConfiguration.TargetFramework);
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("frameworkType")));
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("assemblyPath")));
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("loaderException")));
