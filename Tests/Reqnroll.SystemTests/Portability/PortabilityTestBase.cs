@@ -107,7 +107,17 @@ public abstract class PortabilityTestBase : SystemTestBase
                                                                    var assembly = System.Reflection.Assembly.Load("Reqnroll.xUnit.ReqnrollPlugin");
                                                                    var frameworkType = assembly.GetType("Reqnroll.xUnit.ReqnrollPlugin.XunitTestFrameworkWithAssemblyFixture"); // this is null in 2.0.0 and not null in 2.0.1
                                                                    global::Log.LogCustom("frameworkType", frameworkType?.ToString() ?? "<null>");
-                                                                   var allTypes = assembly.GetTypes();
+                                                                   try
+                                                                   {
+                                                                       var allTypes = assembly.GetTypes();
+                                                                   }
+                                                                   catch (System.Reflection.ReflectionTypeLoadException ex)
+                                                                   {
+                                                                       foreach (var loaderException in ex.LoaderExceptions)
+                                                                       {
+                                                                           global::Log.LogCustom("loaderException", loaderException?.ToString() ?? "<null>");
+                                                                       }
+                                                                   }
                                                                    """);
 
 
@@ -127,6 +137,7 @@ public abstract class PortabilityTestBase : SystemTestBase
             ExecuteTests();
 
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("frameworkType")));
+            Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("loaderException")));
             _bindingDriver.AssertExecutedHooksEqual(
                 "BeforeTestRun",
                 "AfterTestRun");
