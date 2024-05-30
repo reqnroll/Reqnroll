@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll.TestProjectGenerator.FilesystemWriter;
+using FluentAssertions;
 
 namespace Reqnroll.SystemTests.Portability;
 
@@ -101,13 +102,19 @@ public abstract class PortabilityTestBase : SystemTestBase
         RunSkippableTest(() =>
         {
             AddSimpleScenario();
-            AddPassingStepBinding();
+            //AddPassingStepBinding();
+            _projectsDriver.AddStepBinding("StepDefinition", ".*", """
+                                                                   var assembly = System.Reflection.Assembly.Load("Reqnroll.xUnit.ReqnrollPlugin");
+                                                                   var frameworkType = assembly.GetType("Reqnroll.xUnit.ReqnrollPlugin.XunitTestFrameworkWithAssemblyFixture"); // this is null in 2.0.0 and not null in 2.0.1
+                                                                   global::Log.LogCustom("frameworkType", frameworkType?.ToString() ?? "<null>");
+                                                                   var allTypes = assembly.GetTypes();
+                                                                   """);
+
+
             AddHookBinding("BeforeTestRun");
             AddHookBinding("AfterTestRun");
 
-            var solutionWriteToDiskDriver = _testContainer.GetService<SolutionWriteToDiskDriver>();
             var solutionDriver = _testContainer.GetService<SolutionDriver> ();
-            //solutionWriteToDiskDriver.WriteSolutionToDisk(false);
             var prj = solutionDriver.Projects.Values.First();
             prj.AddFile(new ProjectFile("xunit.runner.json", "Content", """
                                                                         {
@@ -119,6 +126,7 @@ public abstract class PortabilityTestBase : SystemTestBase
 
             ExecuteTests();
 
+            Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("frameworkType")));
             _bindingDriver.AssertExecutedHooksEqual(
                 "BeforeTestRun",
                 "AfterTestRun");
