@@ -107,6 +107,9 @@ public abstract class PortabilityTestBase : SystemTestBase
                 _projectsDriver.AddStepBinding("StepDefinition", ".*", """
                                                                    var assembly = System.Reflection.Assembly.Load("Reqnroll.xUnit.ReqnrollPlugin");
                                                                    global::Log.LogCustom("assemblyPath", assembly?.Location ?? "<null>");
+                                                                   #pragma warning disable SYSLIB0012
+                                                                   global::Log.LogCustom("assemblyCodeBase", assembly?.CodeBase ?? "<null>");
+                                                                   #pragma warning restore SYSLIB0012
                                                                    var frameworkType = assembly.GetType("Reqnroll.xUnit.ReqnrollPlugin.XunitTestFrameworkWithAssemblyFixture"); // this is null in 2.0.0 and not null in 2.0.1
                                                                    global::Log.LogCustom("frameworkType", frameworkType?.ToString() ?? "<null>");
                                                                    try
@@ -142,6 +145,7 @@ public abstract class PortabilityTestBase : SystemTestBase
             Console.WriteLine(_testRunConfiguration.TargetFramework);
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("frameworkType")));
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("assemblyPath")));
+            Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("assemblyCodeBase")));
             Console.WriteLine(string.Join(",", _bindingDriver.GetActualLogLines("loaderException")));
             _bindingDriver.AssertExecutedHooksEqual(
                 "BeforeTestRun",
