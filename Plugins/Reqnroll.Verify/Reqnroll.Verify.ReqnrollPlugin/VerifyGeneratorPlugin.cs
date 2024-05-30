@@ -1,8 +1,8 @@
-using Reqnroll.Verify.ReqnrollPlugin;
 using Reqnroll.Generator.Plugins;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Infrastructure;
 using Reqnroll.UnitTestProvider;
+using Reqnroll.Verify.ReqnrollPlugin;
 
 [assembly:GeneratorPlugin(typeof(VerifyGeneratorPlugin))]
 

@@ -15,7 +15,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit3PackageVersion = "3.13.1";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.17.0";
-        private const string XUnitPackageVersion = "2.4.2";
+        private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.8";
         private const string InternalJsonPackageName = "SpecFlow.Internal.Json";
         private const string InternalJsonVersion = "1.0.8";
@@ -312,11 +312,11 @@ namespace Reqnroll.TestProjectGenerator
             {
                 _project.AddNuGetPackage("xunit.core", XUnitPackageVersion);
                 _project.AddNuGetPackage("xunit.extensibility.core", XUnitPackageVersion,
-                    new NuGetPackageAssembly("xunit.core, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.core.dll"));
+                    new NuGetPackageAssembly($"xunit.core, Version={XUnitPackageVersion}.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.core.dll"));
                 _project.AddNuGetPackage("xunit.extensibility.execution", XUnitPackageVersion,
-                    new NuGetPackageAssembly("xunit.execution.desktop, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
+                    new NuGetPackageAssembly($"xunit.execution.desktop, Version={XUnitPackageVersion}.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "net452\\xunit.execution.desktop.dll"));
                 _project.AddNuGetPackage("xunit.assert", XUnitPackageVersion,
-                    new NuGetPackageAssembly("xunit.assert, Version=2.4.2.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
+                    new NuGetPackageAssembly($"xunit.assert, Version={XUnitPackageVersion}.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.1\\xunit.assert.dll"));
                 _project.AddNuGetPackage("xunit.abstractions", "2.0.3",
                     new NuGetPackageAssembly("xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c", "netstandard1.0\\xunit.abstractions.dll"));
             }
