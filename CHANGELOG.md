@@ -2,6 +2,7 @@
 
 ## Bug fixes:
 
+* Fix: Building a Reqnroll project on macOS ARM64 architecture (eg MacBook M1) fails (#152)
 * Fix: xUnit .NET framework Reqnroll projects might not run BeforeTestRun even with the fix for #146 (#152)
 
 # v2.0.1 - 2024-05-29

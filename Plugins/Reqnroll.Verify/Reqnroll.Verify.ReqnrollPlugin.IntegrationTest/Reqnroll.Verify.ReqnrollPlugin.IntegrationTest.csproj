@@ -1,7 +1,7 @@
 ﻿<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.props" />
+  <Import Project="..\..\..\Tests\Reqnroll.Specs\build/Reqnroll.Tools.MsBuild.Generation.OwnTests.props" />
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -30,9 +30,6 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
-
     <_VerifyGeneratorPluginFramework Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_VerifyGeneratorPluginFramework>
     <_VerifyGeneratorPluginFramework Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_VerifyGeneratorPluginFramework>
   </PropertyGroup>
@@ -51,10 +48,6 @@
   <ItemGroup>
     <Folder Include="Features\" />
   </ItemGroup>
-
-  <PropertyGroup>
-    <_Reqnroll_TaskAssembly>..\..\Reqnroll.Tools.MsBuild.Generation\bin\$(Configuration)\$(_Reqnroll_Needed_MSBuildGenerator)\tasks\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
-  </PropertyGroup>
 
   <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
   <!-- has to be before the PropertyGroup change-->
