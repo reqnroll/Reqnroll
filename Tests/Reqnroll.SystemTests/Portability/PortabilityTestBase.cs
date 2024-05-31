@@ -151,7 +151,7 @@ public abstract class PortabilityTestBase : SystemTestBase
                 "BeforeTestRun",
                 "AfterTestRun");
             ShouldAllScenariosPass();
-            // dummy change to trigger build 9
+            // dummy change to trigger build 10
             if (unitTestProvider == UnitTestProvider.xUnit && _testRunConfiguration.TargetFramework == TargetFramework.Net462) 
                 throw new Exception("artificial error to show log of successful test");
         });
