@@ -1,5 +1,7 @@
 # [vNext]
 
+# v2.0.2 - 2024-05-31
+
 ## Bug fixes:
 
 * Fix: Building a Reqnroll project on macOS ARM64 architecture (eg MacBook M1) fails (#152)
