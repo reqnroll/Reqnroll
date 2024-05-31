@@ -199,6 +199,7 @@ jobs:
         path: "**/*.trx"
     - name: Upload packages
       uses: actions/upload-artifact@v4
+      if: always()
       with:
         name: packages-for-test
         path: "GeneratedNuGetPackages/**/*.nupkg"
