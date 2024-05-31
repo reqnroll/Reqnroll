@@ -152,8 +152,8 @@ public abstract class PortabilityTestBase : SystemTestBase
                 "AfterTestRun");
             ShouldAllScenariosPass();
             // dummy change to trigger build 14
-            if (unitTestProvider == UnitTestProvider.xUnit && _testRunConfiguration.TargetFramework == TargetFramework.Net462) 
-                throw new Exception("artificial error to show log of successful test");
+            //if (unitTestProvider == UnitTestProvider.xUnit && _testRunConfiguration.TargetFramework == TargetFramework.Net462) 
+            //    throw new Exception("artificial error to show log of successful test");
         });
     }
     #endregion
