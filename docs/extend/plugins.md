@@ -5,6 +5,10 @@ Reqnroll supports the following types of plugins:
 * Runtime
 * Generator
 
+```{note}
+The versioning and compatibility of the Reqnroll plugins is described in detail in the [Compatibility page](../installation/compatibility.md#versioning-policy).
+```
+
 All types of plugins are created in a similar way.
 
 ## Runtime plugins
