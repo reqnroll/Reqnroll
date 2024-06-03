@@ -15,6 +15,11 @@
     <CompatibilityVersionUpperRange>3</CompatibilityVersionUpperRange>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <GitBranch Condition=" '$(GitBranch)' == ''">$(GITHUB_REF_NAME)</GitBranch>
+    <GitCommitSha Condition=" '$(GitCommitSha)' == ''">$(GITHUB_SHA)</GitCommitSha>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)/LICENSE" Pack="true" PackagePath=""/>
     <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.2">

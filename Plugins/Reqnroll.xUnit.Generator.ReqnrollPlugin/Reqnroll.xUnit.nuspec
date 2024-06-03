@@ -10,9 +10,10 @@
     <summary>Package to use Reqnroll with xUnit 2.4 and later</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
     <icon>images\reqnroll-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="file">LICENSE</license>
+    <license type="expression">BSD-3-Clause</license>
     <tags>reqnroll xUnit</tags>
     <copyright>$copyright$</copyright>
     <dependencies>
