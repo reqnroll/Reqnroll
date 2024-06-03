@@ -2,7 +2,7 @@
 
 ## Improvements:
 
-* Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accodingly (#160).
+* Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160).
 
 # v2.0.2 - 2024-05-31
 
