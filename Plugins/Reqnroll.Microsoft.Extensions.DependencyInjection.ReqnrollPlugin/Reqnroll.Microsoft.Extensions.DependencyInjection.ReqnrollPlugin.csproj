@@ -8,8 +8,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Microsoft.Extensions.DependencyInjection.nuspec</NuspecFile>
     
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
-
     <RootNamespace>Reqnroll.Microsoft.Extensions.DependencyInjection</RootNamespace>
   </PropertyGroup>
 
