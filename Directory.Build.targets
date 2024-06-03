@@ -7,6 +7,7 @@
       <NuspecProperties>$(NuspecProperties);copyright=$(Reqnroll_Copyright)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);author=$(Reqnroll_Authors)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);owner=$(Reqnroll_Owners)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
       
       <NuspecProperties>$(NuspecProperties);Reqnroll_FullFramework_Tools_TFM=$(Reqnroll_FullFramework_Tools_TFM)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);Reqnroll_Core_Tools_TFM=$(Reqnroll_Core_Tools_TFM)</NuspecProperties>

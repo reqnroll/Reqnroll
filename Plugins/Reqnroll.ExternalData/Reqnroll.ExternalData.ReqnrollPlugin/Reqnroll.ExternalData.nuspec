@@ -15,7 +15,7 @@
     <tags>reqnroll externaldata json</tags>
     <copyright>$copyright$</copyright>
     <dependencies>
-      <dependency id="Reqnroll" version="[$version$]" />
+      <dependency id="Reqnroll" version="$CompatibilityVersionRange$" />
     </dependencies>
   </metadata>
   <files>
