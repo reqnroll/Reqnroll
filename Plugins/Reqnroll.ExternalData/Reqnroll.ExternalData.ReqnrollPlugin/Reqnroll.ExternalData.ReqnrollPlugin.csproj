@@ -7,8 +7,6 @@
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
