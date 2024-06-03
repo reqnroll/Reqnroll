@@ -6,8 +6,8 @@
     <title>Reqnroll.NUnit</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
-    <description>Package to use Reqnroll with NUnit 3.13 and later</description>
-    <summary>Package to use Reqnroll with NUnit 3.13 and later</summary>
+    <description>Package to use Reqnroll with NUnit 3.13 and later. $summary$</description>
+    <summary>Package to use Reqnroll with NUnit 3.13 and later. $summary$</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />

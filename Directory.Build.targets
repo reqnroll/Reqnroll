@@ -7,6 +7,7 @@
       <NuspecProperties>$(NuspecProperties);copyright=$(Reqnroll_Copyright)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);author=$(Reqnroll_Authors)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);owner=$(Reqnroll_Owners)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);summary=$(Reqnroll_Summary)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);branch=$(GitBranch)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);commit=$(GitCommitSha)</NuspecProperties>
