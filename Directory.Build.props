@@ -20,6 +20,8 @@
     <GitCommitSha Condition=" '$(GitCommitSha)' == ''">$(GITHUB_SHA)</GitCommitSha>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

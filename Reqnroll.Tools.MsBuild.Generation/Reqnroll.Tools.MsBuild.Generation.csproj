@@ -9,6 +9,7 @@
     
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <NoPackageAnalysis>true</NoPackageAnalysis>
+    <IncludeSymbols>false</IncludeSymbols>
   </PropertyGroup>
 
   <ItemGroup>
