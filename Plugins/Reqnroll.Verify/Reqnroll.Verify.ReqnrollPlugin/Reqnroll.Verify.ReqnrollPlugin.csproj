@@ -15,17 +15,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.1.1">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Verify.Xunit" Version="24.2.0"/>
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Verify.Xunit" Version="24.2.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference Include="..\..\..\Reqnroll\Reqnroll.csproj"/>
   </ItemGroup>
 </Project>

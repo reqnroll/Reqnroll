@@ -1,9 +1,6 @@
 # [vNext]
 
-## Breaking changes:
-
-* Reqnroll.Verify: now targets net472 and net6.0. Support for net462 is dropped.
-* Reqnroll.Verify: now depends on Verify.Xunit 24.2.0 instead of Verify 17.7.0.
+* Reqnroll.Verify: Support for Verify v24 (Verify.Xunit v24.2.0) for .NET 4.7.2+ and .NET 6.0+. For earlier versions of Verify or for .NET 4.6.2, use the latest 2.0.3 version of the plugin that is compatible with Reqnroll v2.*. (#151)
 
 ## Improvements:
 
