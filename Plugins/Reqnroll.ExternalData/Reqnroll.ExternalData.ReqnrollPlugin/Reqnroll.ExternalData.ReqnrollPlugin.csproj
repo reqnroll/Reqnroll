@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.ExternalData.nuspec</NuspecFile>
@@ -7,10 +7,7 @@
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <ItemGroup>

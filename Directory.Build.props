@@ -6,6 +6,7 @@
     <Reqnroll_Copyright>Copyright © Reqnroll</Reqnroll_Copyright>
     <Reqnroll_Authors>Reqnroll</Reqnroll_Authors>
     <Reqnroll_Owners>Reqnroll</Reqnroll_Owners>
+    <Reqnroll_Summary>Reqnroll is an open-source Cucumber-style BDD test automation framework for .NET. It has been created as a reboot of the SpecFlow project.</Reqnroll_Summary>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -13,6 +14,15 @@
     <VersionSuffix>local</VersionSuffix>
     <AssemblyVersion>2.0.0</AssemblyVersion>
     <CompatibilityVersionUpperRange>3</CompatibilityVersionUpperRange>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <GitBranch Condition=" '$(GitBranch)' == ''">$(GITHUB_REF_NAME)</GitBranch>
+    <GitCommitSha Condition=" '$(GitCommitSha)' == ''">$(GITHUB_SHA)</GitCommitSha>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>

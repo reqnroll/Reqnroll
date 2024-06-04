@@ -136,7 +136,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: packages
-        path: "GeneratedNuGetPackages/**/*.nupkg"
+        path: "GeneratedNuGetPackages/**/*.*nupkg"
     - name: Upload TRX files
       uses: actions/upload-artifact@v4
       if: always()

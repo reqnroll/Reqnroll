@@ -7,7 +7,10 @@
       <NuspecProperties>$(NuspecProperties);copyright=$(Reqnroll_Copyright)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);author=$(Reqnroll_Authors)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);owner=$(Reqnroll_Owners)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);summary=$(Reqnroll_Summary)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);branch=$(GitBranch)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);commit=$(GitCommitSha)</NuspecProperties>
       
       <NuspecProperties>$(NuspecProperties);Reqnroll_FullFramework_Tools_TFM=$(Reqnroll_FullFramework_Tools_TFM)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);Reqnroll_Core_Tools_TFM=$(Reqnroll_Core_Tools_TFM)</NuspecProperties>
@@ -16,14 +19,14 @@
 
   <Target Name="CleanupNupkgs" BeforeTargets="Build" >
     <ItemGroup>
-      <Nupkgs2Delete Include="$(PackageOutputAbsolutePath)\*.nupkg"/>
+      <Nupkgs2Delete Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
     </ItemGroup>
     <Delete Files="@(Nupkgs2Delete)" />
   </Target>
 
   <Target Name="CopyNupkgToFolder" AfterTargets="Pack">
     <ItemGroup>
-      <GeneratedNupkgs Include="$(PackageOutputAbsolutePath)\*.nupkg"/>
+      <GeneratedNupkgs Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
     </ItemGroup>
     <Copy SourceFiles="@(GeneratedNupkgs)" DestinationFolder="$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)" />
   </Target>

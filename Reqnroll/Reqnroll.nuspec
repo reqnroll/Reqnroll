@@ -6,13 +6,14 @@
     <title>Reqnroll</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
-    <description>Reqnroll aims at bridging the communication gap between domain experts and developers by binding business readable behavior specifications to the underlying implementation. Our mission is to provide a pragmatic and frictionless approach to Acceptance Test Driven Development and Behavior Driven Development for .NET projects today.</description>
-    <summary>Reqnroll aims at bridging the communication gap between domain experts and developers by binding business readable behavior specifications to the underlying implementation. Our mission is to provide a pragmatic and frictionless approach to Acceptance Test Driven Development and Behavior Driven Development for .NET projects today.</summary>
+    <readme>README.md</readme>
+    <description>$summary$</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
     <icon>images\reqnroll-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="file">LICENSE</license>
+    <license type="expression">BSD-3-Clause</license>
     <tags>reqnroll bdd gherkin cucumber</tags>
     <copyright>$copyright$</copyright>
     <dependencies>
@@ -40,6 +41,7 @@
 
     <file src="$SolutionDir$CHANGELOG.md" target="CHANGELOG.md" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
+    <file src="PackageReadme.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
 
   </files>
