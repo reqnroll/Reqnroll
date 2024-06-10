@@ -66,7 +66,7 @@ Please adhere to the coding conventions in the project (indentation, accurate co
 
 in order to craft an excellent pull request:
 
-1. [Fork](https://docs.github.com/articles/fork-a-repo) the project, clone your fork, and configure the remotes.
+1. [Fork](https://docs.github.com/articles/fork-a-repo) the project, clone your fork, and configure the remotes. If you are already in the [contributors team](https://github.com/orgs/reqnroll/teams/contributors), you can just clone the project.
 
 2. Configure your local setup. Information to do this can be found below.
 
@@ -74,9 +74,9 @@ in order to craft an excellent pull request:
 
 4. Create a new topic branch (off of `main`) to contain your feature, change, or fix.
 
-   **IMPORTANT**: Making changes in `main` is discouraged. You should always  keep your local `main` in sync with upstream `main` and make your changes in topic branches.
+   **IMPORTANT**: Making changes in `main` is not enabled. You should always keep your local `main` in sync with upstream `main` and make your changes in topic branches.
 
-5. Commit your changes in logical chunks. Keep your commit messages organized, with a short description in the first line and more detailed information on the following lines. Feel free to use Git's [interactive rebase](https://docs.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
+5. Commit your changes in logical chunks. Keep your commit messages organized, with a short description in the first line and more detailed information on the following lines. Before submitting to review, feel free to use Git's [interactive rebase](https://docs.github.com/articles/interactive-rebase) feature to tidy up your commits before making them public.
 
 6. Newly added tests should pass and be green, same applies to unit tests:
 
@@ -84,17 +84,24 @@ in order to craft an excellent pull request:
 
 7. Push your topic branch up to your fork.
 
-8. [Open a Pull Request ](https://docs.github.com/articles/using-pull-requests/) with a clear title and description.
+8. [Open a Draft Pull Request](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests#draft-pull-requests) with a clear title and description.
 
-9. If you haven't updated your pull request for a while, you should consider rebasing on `main` and resolving any conflicts.
+9. Make sure the CI validation passes and all the changes you see in the "Files changed" tab was intentional.
+
+10. If everything is fine, mark your draft pull request [Ready for Review](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/changing-the-stage-of-a-pull-request). 
+
+11. Make the necessary code changed requested by the reviewers as new commits and push your branch again. 
+
+   **IMPORTANT**: Once the review process has been started, do not apply rebase or force push on the branch, because the 
+   reviewers will need to review the entire change again (full review) instead of just reviewing the fixes. Don not worry about the commit structure, we will squash the changes to a single commit anyway.
+
+12. If you haven't updated your pull request for a while, need to resolve a conflict, or require any new change from the `main`, merge the upstream `main` into your branch. Do not rebase your branch on `main` once the pull request has been reviewed.
 
 Some important notes to keep in mind:
 
-- _Never ever_ merge upstream `main` into your branches. You  should always `git rebase` on `main` to bring your changes up to date when  necessary.
-- Do not send code style changes as pull requests like changing the indentation of some particular code snippet or how a function is called.
-  Those will not be accepted as they pollute the repository history with non functional changes and are often based on personal preferences.
 - By submitting a patch, you agree that your work will be licensed under the license used by the project.
 - If you have any large pull request in mind (e.g. Implementing features, refactoring code, etc), **please ask first** otherwise you risk spending a lot of time working on something that the project's developers might not want to merge into the project. 
+- Do not send code style changes as pull requests like changing the indentation of some particular code snippet or how a function is called. Those will not be accepted as they pollute the repository history with non functional changes and are often based on personal preferences.
 
 ## Building sources
 
