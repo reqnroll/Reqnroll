@@ -93,7 +93,7 @@ in order to craft an excellent pull request:
 11. Make the necessary code changed requested by the reviewers as new commits and push your branch again. 
 
    **IMPORTANT**: Once the review process has been started, do not apply rebase or force push on the branch, because the 
-   reviewers will need to review the entire change again (full review) instead of just reviewing the fixes. Don not worry about the commit structure, we will squash the changes to a single commit anyway.
+   reviewers will need to review the entire change again (full review) instead of just reviewing the fixes. Don't worry about the commit structure, we will squash the changes to a single commit anyway.
 
 12. If you haven't updated your pull request for a while, need to resolve a conflict, or require any new change from the `main`, merge the upstream `main` into your branch. Do not rebase your branch on `main` once the pull request has been reviewed.
 
