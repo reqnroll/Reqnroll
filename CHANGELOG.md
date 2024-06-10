@@ -4,6 +4,7 @@
 
 * Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160)
 * Generate symbol packages, use deterministic build and update package metadata (#161)
+* Add binding attribute to example class `CalculatorStepDefinitions`
 
 # v2.0.2 - 2024-05-31
 
