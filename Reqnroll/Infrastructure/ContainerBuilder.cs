@@ -108,7 +108,7 @@ namespace Reqnroll.Infrastructure
             return scenarioContainer;
         }
 
-        public IObjectContainer CreateFeatureContainer(IObjectContainer testThreadContainer, FeatureInfo featureInfo)
+        public virtual IObjectContainer CreateFeatureContainer(IObjectContainer testThreadContainer, FeatureInfo featureInfo)
         {
             if (testThreadContainer == null)
                 throw new ArgumentNullException(nameof(testThreadContainer));

@@ -1,7 +1,9 @@
 using System;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Reqnroll.Tracing;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests;
@@ -91,5 +93,46 @@ public class TestRunnerManagerTests
 
         disposableClass1.IsDisposed.Should().BeTrue();
         disposableClass2.IsDisposed.Should().BeTrue();
+    }
+
+    [Fact]
+    public void First_call_to_CreateTestRunner_should_initialize_binding_registry()
+    {
+        _testRunnerManager.IsTestRunInitialized.Should().BeFalse("binding registry should not be initialized initially");
+
+        _testRunnerManager.CreateTestRunner();
+
+        _testRunnerManager.IsTestRunInitialized.Should().BeTrue("binding registry be initialized");
+    }
+
+    [Fact]
+    public async Task OnTestRunStartAsync_should_initialize_binding_registry()
+    {
+        _testRunnerManager.IsTestRunInitialized.Should().BeFalse("binding registry should not be initialized initially");
+
+        await TestRunnerManager.OnTestRunStartAsync(_anAssembly);
+
+        _testRunnerManager.IsTestRunInitialized.Should().BeTrue("binding registry be initialized");
+    }
+
+    [Fact]
+    public async Task Should_resolve_a_test_runner_specific_test_tracer()
+    {
+        var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder());
+        await testRunner1.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
+        testRunner1.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null));
+        await testRunner1.OnScenarioStartAsync();
+        var tracer1 = testRunner1.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
+
+        var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder());
+        await testRunner2.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
+        testRunner2.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null));
+        await testRunner1.OnScenarioStartAsync();
+        var tracer2 = testRunner2.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
+
+        tracer1.Should().NotBeSameAs(tracer2);
+
+        TestRunnerManager.ReleaseTestRunner(testRunner1);
+        TestRunnerManager.ReleaseTestRunner(testRunner2);
     }
 }
