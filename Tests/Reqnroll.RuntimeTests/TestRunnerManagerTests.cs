@@ -8,14 +8,20 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests;
 
-public class TestRunnerManagerTests
+public class TestRunnerManagerTests : IAsyncLifetime
 {
     private readonly Assembly _anAssembly = Assembly.GetExecutingAssembly();
-    private readonly TestRunnerManager _testRunnerManager;
+    private TestRunnerManager _testRunnerManager;
 
-    public TestRunnerManagerTests()
+    public async Task InitializeAsync()
     {
+        await TestRunnerManager.ResetAsync();
         _testRunnerManager = (TestRunnerManager)TestRunnerManager.GetTestRunnerManager(_anAssembly, new RuntimeTestsContainerBuilder());
+    }
+
+    public async Task DisposeAsync()
+    {
+        //nop;
     }
 
     [Fact]
@@ -101,16 +107,6 @@ public class TestRunnerManagerTests
         _testRunnerManager.IsTestRunInitialized.Should().BeFalse("binding registry should not be initialized initially");
 
         _testRunnerManager.CreateTestRunner();
-
-        _testRunnerManager.IsTestRunInitialized.Should().BeTrue("binding registry be initialized");
-    }
-
-    [Fact]
-    public async Task OnTestRunStartAsync_should_initialize_binding_registry()
-    {
-        _testRunnerManager.IsTestRunInitialized.Should().BeFalse("binding registry should not be initialized initially");
-
-        await TestRunnerManager.OnTestRunStartAsync(_anAssembly);
 
         _testRunnerManager.IsTestRunInitialized.Should().BeTrue("binding registry be initialized");
     }

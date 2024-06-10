@@ -8,8 +8,8 @@ namespace Reqnroll.RuntimeTests
 {
     public class TestRunnerManagerStaticApiTest : IAsyncLifetime
     {
-        private readonly Assembly thisAssembly = Assembly.GetExecutingAssembly();
-        private readonly Assembly anotherAssembly = typeof(TestRunnerManager).Assembly;
+        private readonly Assembly _anAssembly = Assembly.GetExecutingAssembly();
+        private readonly Assembly _anotherAssembly = typeof(TestRunnerManager).Assembly;
 
         public async Task InitializeAsync()
         {
@@ -30,8 +30,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task GetTestRunner_should_return_different_instances_for_different_assemblies()
         {
-            var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
-            var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(anotherAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(_anotherAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
 
             testRunner1.Should().NotBe(testRunner2);
             testRunner1.TestThreadContext.Should().NotBe(testRunner2.TestThreadContext);
@@ -46,7 +46,7 @@ namespace Reqnroll.RuntimeTests
             var testRunnerManager = TestRunnerManager.GetTestRunnerManager(containerBuilder: new RuntimeTestsContainerBuilder());
 
             testRunnerManager.Should().NotBeNull();
-            testRunnerManager.TestAssembly.Should().BeSameAs(thisAssembly);
+            testRunnerManager.TestAssembly.Should().BeSameAs(_anAssembly);
         }
 
         [Fact]
@@ -87,11 +87,11 @@ namespace Reqnroll.RuntimeTests
         public async Task OnTestRunEnd_should_fire_AfterTestRun_events()
         {
             // make sure a test runner is initialized
-            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
             TestRunnerManager.ReleaseTestRunner(testRunner);
 
             AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
-            await TestRunnerManager.OnTestRunEndAsync(thisAssembly);
+            await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
 
             AfterTestRunTestBinding.AfterTestRunCallCount.Should().Be(1);
         }
@@ -100,7 +100,7 @@ namespace Reqnroll.RuntimeTests
         public async Task OnTestRunEnd_without_arguments_should_fire_AfterTestRun_events_for_calling_assembly()
         {
             // make sure a test runner is initialized
-            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
             TestRunnerManager.ReleaseTestRunner(testRunner);
 
             AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
@@ -113,21 +113,32 @@ namespace Reqnroll.RuntimeTests
         public async Task OnTestRunEnd_should_not_fire_AfterTestRun_events_multiple_times()
         {
             // make sure a test runner is initialized
-            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
             TestRunnerManager.ReleaseTestRunner(testRunner);
 
             AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
-            await TestRunnerManager.OnTestRunEndAsync(thisAssembly);
-            await TestRunnerManager.OnTestRunEndAsync(thisAssembly);
+            await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
+            await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
 
             AfterTestRunTestBinding.AfterTestRunCallCount.Should().Be(1);
+        }
+
+        [Fact]
+        public async Task OnTestRunStartAsync_should_initialize_binding_registry()
+        {
+            var testRunnerManager = (TestRunnerManager)TestRunnerManager.GetTestRunnerManager(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            testRunnerManager.IsTestRunInitialized.Should().BeFalse("binding registry should not be initialized initially");
+
+            await TestRunnerManager.OnTestRunStartAsync(_anAssembly);
+
+            testRunnerManager.IsTestRunInitialized.Should().BeTrue("binding registry be initialized");
         }
 
         [Fact]
         public async Task OnTestRunStart_should_fire_BeforeTestRun_events()
         {
             BeforeTestRunTestBinding.BeforeTestRunCallCount = 0; //reset
-            await TestRunnerManager.OnTestRunStartAsync(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            await TestRunnerManager.OnTestRunStartAsync(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
 
             BeforeTestRunTestBinding.BeforeTestRunCallCount.Should().Be(1);
         }
@@ -145,27 +156,11 @@ namespace Reqnroll.RuntimeTests
         public async Task OnTestRunStart_should_not_fire_BeforeTestRun_events_multiple_times()
         {
             BeforeTestRunTestBinding.BeforeTestRunCallCount = 0; //reset
-            await TestRunnerManager.OnTestRunStartAsync(thisAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
-            await TestRunnerManager.OnTestRunStartAsync(thisAssembly);
+            await TestRunnerManager.OnTestRunStartAsync(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
+            await TestRunnerManager.OnTestRunStartAsync(_anAssembly);
 
             BeforeTestRunTestBinding.BeforeTestRunCallCount.Should().Be(1);
         }
-
-        //[Fact]
-        //public void DomainUnload_event_should_not_fire_AfterTestRun_events_multiple_times_after_OnTestRunEnd()
-        //{
-        //    // make sure a test runner is initialized
-        //    TestRunnerManager.GetTestRunner(thisAssembly);
-
-        //    AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
-        //    TestRunnerManager.OnTestRunEnd(thisAssembly);
-
-        //    // simulating DomainUnload event
-        //    var trm = (TestRunnerManager)TestRunnerManager.GetTestRunnerManager(thisAssembly);
-        //    trm.OnDomainUnload();
-
-        //    AfterTestRunTestBinding.AfterTestRunCallCount.Should().Be(1);
-        //}
 
         public async Task DisposeAsync()
         {
