@@ -4,7 +4,10 @@
 
 * Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160)
 * Generate symbol packages, use deterministic build and update package metadata (#161)
-* Add binding attribute to example class `CalculatorStepDefinitions`
+
+## Bug fixes:
+
+* Fix: Project created with `dotnet new reqnroll-project` contains an invalid binding class (`[Binding]` attribute missing) (#169)
 
 # v2.0.2 - 2024-05-31
 
@@ -38,7 +41,7 @@
 ## Bug fixes:
 
 * Fix: User code namespaces that included "Reqnroll" within them caused the code generation to fail (#44)
-* Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wonrly resolved from the test thread context instead of the test run (global) context instead (#58)
+* Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wrongly resolved from the test thread context instead of the test run (global) context instead (#58)
 * Fix: Cucumber Expressions fail when two enums or two custom types with the same short name (differing namespaces) are used as parameters (#81)
 * Fix: Adding `@ignore` to an Examples block generates invalid code for NUnit v3+ (#103)
 * Fix: `@ignore` attribute is not inherited to the scenarios from Rule (#111)
@@ -46,7 +49,7 @@
 * Fix: StackOverflowException when using `[StepArgumentTransformation]` with same input and output type, for example string (#71)
 * Fix: Autofac without hook does not run GlobalDependencies (#127)
 * Fix: Reqnroll.Autofac shows wrongly ambiguous step definition (#56)
-* Fix: Dispose objects registred in test thread container at the end of test execution (#123)
+* Fix: Dispose objects registered in test thread container at the end of test execution (#123)
 
 # v1.0.1 - 2024-02-16
 
