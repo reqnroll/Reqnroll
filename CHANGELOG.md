@@ -9,6 +9,8 @@
 
 * Fix: Project created with `dotnet new reqnroll-project` contains an invalid binding class (`[Binding]` attribute missing) (#169)
 
+*Contributors of this release (in alphabetical order):* @gasparnagy, @mcraa
+
 # v2.0.2 - 2024-05-31
 
 ## Bug fixes:
