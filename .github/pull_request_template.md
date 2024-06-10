@@ -22,6 +22,6 @@
 
 
 - [ ] I've added tests for my code. (most of the time mandatory)
-- [ ] I have added an entry to the changelog. (mandatory)
+- [ ] I have added an entry to the changelog & included my GitHub handle to the release contributors list. (mandatory)
 - [ ] My change requires a change to the documentation.
 - [ ] I have updated the documentation accordingly.
