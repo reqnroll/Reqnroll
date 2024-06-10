@@ -2,6 +2,14 @@
 
 ## Improvements:
 
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v2.0.3 - 2024-06-10
+
+## Improvements:
+
 * Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160)
 * Generate symbol packages, use deterministic build and update package metadata (#161)
 
