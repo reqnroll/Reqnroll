@@ -46,10 +46,57 @@ internal static class EnumerableEqualityExtensions
 
             foreach (var item in set)
             {
-                hash += 13 + item?.GetHashCode() ?? 0;
+                hash *= 13 + item?.GetHashCode() ?? 0;
             }
 
             return hash;
         }
+    }
+
+    public static int GetSequenceHashCode<T>(this IEnumerable<T> sequence) =>
+        sequence.GetSequenceHashCode(EqualityComparer<T>.Default);
+
+    public static int GetSequenceHashCode<T>(this IEnumerable<T> sequence, IEqualityComparer<T> itemComparer)
+    {
+        unchecked
+        {
+            var hash = 23;
+
+            var index = 0;
+            foreach (var item in sequence)
+            {
+                hash *= 13 + index++ + (item is null ? 0 : itemComparer.GetHashCode(item));
+            }
+
+            return hash;
+        }
+    }
+
+    public static bool SetEqual<T>(this IEnumerable<T> first, IEnumerable<T> second)
+    {
+        if (first is null)
+        {
+            return second is null;
+        }
+
+        if (ReferenceEquals(first, second))
+        {
+            return true;
+        }
+
+        var items = first.ToList();
+
+        var count = 0;
+
+        foreach (var item in second)
+        {
+            count++;
+            if (!items.Remove(item))
+            {
+                return false;
+            }
+        }
+
+        return items.Count == count;
     }
 }

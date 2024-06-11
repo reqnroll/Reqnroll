@@ -7,20 +7,16 @@ namespace Reqnroll.FeatureSourceGenerator;
 /// <summary>
 /// Provides a description of a .NET attribute instance.
 /// </summary>
-/// <param name="typeName">The name of the attribute's type.</param>
-/// <param name="ns">The namespace of the attribute's type.</param>
+/// <param name="type">The attribute's type.</param>
 /// <param name="positionalArguments">The positional arguments of the attribute.</param>
 /// <param name="namedArguments">The named arguments of the attribute.</param>
 public class AttributeDescriptor(
-    string typeName,
-    string ns,
+    TypeIdentifier type,
     ImmutableArray<object?>? positionalArguments = null,
     ImmutableDictionary<string, object?>? namedArguments = null)
     : IEquatable<AttributeDescriptor>
 {
-    public string TypeName { get; } = typeName;
-
-    public string Namespace { get; } = ns;
+    public TypeIdentifier Type { get; } = type;
 
     public ImmutableArray<object?> PositionalArguments { get; } = 
         ThrowIfArgumentTypesNotValid(
@@ -120,8 +116,7 @@ public class AttributeDescriptor(
         {
             var hash = 47;
 
-            hash *= 13 + TypeName.GetHashCode();
-            hash *= 13 + Namespace.GetHashCode();
+            hash *= 13 + Type.GetHashCode();
 
             var index = 0;
             foreach (var item in PositionalArguments)
@@ -193,8 +188,7 @@ public class AttributeDescriptor(
             return false;
         }
 
-        return TypeName.Equals(other.TypeName) &&
-            Namespace.Equals(other.Namespace) &&
+        return Type.Equals(other.Type) &&
             ArgumentsEqual(other);
     }
 
@@ -322,7 +316,7 @@ public class AttributeDescriptor(
             argumentList = string.Empty;
         }
 
-        return $"[{Namespace}.{TypeName}{argumentList}]";
+        return $"[{Type}{argumentList}]";
     }
 
     private static string ToLiteralString(object? value)
@@ -361,7 +355,7 @@ public class AttributeDescriptor(
 
     public AttributeDescriptor WithPositionalArguments(params object?[] positionalArguments)
     {
-        return new AttributeDescriptor(TypeName, Namespace, positionalArguments.ToImmutableArray(), NamedArguments);
+        return new AttributeDescriptor(Type, positionalArguments.ToImmutableArray(), NamedArguments);
     }
 
     public AttributeDescriptor WithNamedArguments(object namedArguments)
@@ -373,6 +367,6 @@ public class AttributeDescriptor(
             arguments.Add(propertyDescriptor.Name, propertyDescriptor.GetValue(namedArguments));
         }
 
-        return new AttributeDescriptor(TypeName, Namespace, PositionalArguments, arguments.ToImmutableDictionary());
+        return new AttributeDescriptor(Type, PositionalArguments, arguments.ToImmutableDictionary());
     }
 }

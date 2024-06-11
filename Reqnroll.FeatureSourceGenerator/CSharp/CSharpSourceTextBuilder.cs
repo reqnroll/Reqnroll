@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Security.Cryptography.X509Certificates;
+using System.Text;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
@@ -35,7 +37,7 @@ public class CSharpSourceTextBuilder
         return this;
     }
 
-    public CSharpSourceTextBuilder AppendConstantList(IEnumerable<object?> values)
+    public CSharpSourceTextBuilder AppendConstantList<T>(IEnumerable<T> values)
     {
         var first = true;
 
@@ -50,23 +52,42 @@ public class CSharpSourceTextBuilder
                 Append(", ");
             }
 
-            AppendConstant(value);
+            AppendLiteral(value);
         }
 
         return this;
     }
 
-    public CSharpSourceTextBuilder AppendConstant(object? value)
+    public CSharpSourceTextBuilder AppendLiteral(object? value)
     {
         return value switch
         {
             null => Append("null"),
-            string s => AppendConstant(s),
+            string s => AppendLiteral(s),
+            ImmutableArray<string> array => AppendLiteralArray(array),
+            ImmutableArray<object?> array => AppendLiteralArray(array),
             _ => throw new NotSupportedException($"Values of type {value.GetType().FullName} cannot be encoded as a constant in C#.")
         };
     }
 
-    private CSharpSourceTextBuilder AppendConstant(string? s)
+    private CSharpSourceTextBuilder AppendLiteralArray<T>(ImmutableArray<T> array)
+    {
+        if (!CSharpSyntax.TypeAliases.TryGetValue(typeof(T), out var typeName))
+        {
+            typeName = $"global::{typeof(T).FullName}";
+        }
+
+        Append("new ").Append(typeName);
+
+        if (array.Length == 0) 
+        {
+            return Append("[0]");
+        }
+
+        return Append("[] { ").AppendConstantList(array).Append(" }");
+    }
+
+    private CSharpSourceTextBuilder AppendLiteral(string? s)
     {
         if (s == null)
         {
@@ -214,5 +235,40 @@ public class CSharpSourceTextBuilder
     public SourceText ToSourceText()
     {
         return SourceText.From(_buffer.ToString(), Encoding);
+    }
+
+    public CSharpSourceTextBuilder AppendAttributeBlock(AttributeDescriptor attribute)
+    {
+        Append('[');
+        AppendTypeIdentifier(attribute.Type);
+
+        if (attribute.NamedArguments.Count > 0 || attribute.PositionalArguments.Length > 0)
+        {
+            Append('(');
+
+            AppendConstantList(attribute.PositionalArguments);
+
+            var firstProperty = true;
+            foreach (var (name, value) in attribute.NamedArguments)
+            {
+                if (!firstProperty)
+                {
+
+                }
+
+                firstProperty = false;
+            }
+
+            Append(')');
+        }
+
+        Append(']');
+
+        return this;
+    }
+
+    public CSharpSourceTextBuilder AppendTypeIdentifier(TypeIdentifier identifier)
+    {
+        return this;
     }
 }

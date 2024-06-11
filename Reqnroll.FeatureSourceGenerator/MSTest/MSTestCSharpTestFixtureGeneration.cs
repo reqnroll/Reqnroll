@@ -6,17 +6,13 @@ namespace Reqnroll.FeatureSourceGenerator.MSTest;
 
 internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo) : CSharpTestFixtureGeneration(featureInfo)
 {
-    const string MSTestNamespace = "Microsoft.VisualStudio.TestTools.UnitTesting";
+    private static readonly NamespaceString MSTestNamespace = new("Microsoft.VisualStudio.TestTools.UnitTesting");
 
     protected override IEnumerable<AttributeDescriptor> GetTestFixtureAttributes()
     {
         return base.GetTestFixtureAttributes().Concat(
         [
-            new AttributeDescriptor(
-                "TestClass",
-                MSTestNamespace,
-                ImmutableArray<object?>.Empty,
-                ImmutableArray<KeyValuePair<string, object?>>.Empty)
+            new AttributeDescriptor(new TypeIdentifier(MSTestNamespace, new IdentifierString("TestClass")))
         ]);
     }
 
@@ -70,18 +66,56 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
     {
         var attributes = new List<AttributeDescriptor>
         {
-            new("TestMethod", MSTestNamespace),
-            new("Description", MSTestNamespace, ImmutableArray.Create<object?>(scenario.Name)),
-            new("TestProperty", MSTestNamespace, ImmutableArray.Create<object?>("FeatureTitle", Document.Feature.Name))
+            new(
+                new TypeIdentifier(MSTestNamespace, new IdentifierString("TestMethod"))),
+            new(
+                new TypeIdentifier(MSTestNamespace, new IdentifierString("Description")),
+                ImmutableArray.Create<object?>(scenario.Name)),
+            new(
+                new TypeIdentifier(MSTestNamespace, new IdentifierString("TestProperty")),
+                ImmutableArray.Create<object?>("FeatureTitle", Document.Feature.Name))
         };
 
         foreach (var tag in Document.Feature.Tags.Concat(scenario.Tags))
         {
             attributes.Add(
                 new AttributeDescriptor(
-                    "TestCategory",
-                    MSTestNamespace,
+                    new TypeIdentifier(MSTestNamespace, new IdentifierString("TestCategory")),
                     ImmutableArray.Create<object?>(tag.Name.TrimStart('@'))));
+        }
+
+        foreach (var example in scenario.Examples)
+        {
+            var values = new object?[example.TableHeader.Cells.Count() + 1];
+
+            // Add tags as the last argument in the values passed to the data-row.
+            values[values.Length - 1] = example.Tags
+                .Select(tag => tag.Name.TrimStart('@'))
+                .ToImmutableArray();
+
+            foreach (var row in example.TableBody)
+            {
+                var i = 0;
+                foreach (var cell in row.Cells)
+                {
+                    values[i++] = cell.Value;
+                }
+
+                // DataRow's constructor is DataRow(object? data, params object?[] moreData)
+                // Because we often pass an array of strings as a second argument, we always wrap moreData
+                // in an explicit array to avoid the compiler mistaking our string array as the moreData value.
+                var first = values.First();
+                var others = values.Skip(1).ToImmutableArray();
+
+                var positionalArguments = others.Length > 0 ?
+                    ImmutableArray.Create(first, others) :
+                    ImmutableArray.Create(first);
+
+                attributes.Add(
+                    new AttributeDescriptor(
+                        new TypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")),
+                        positionalArguments));
+            }
         }
 
         return base.GetTestMethodAttributes(scenario).Concat(attributes);

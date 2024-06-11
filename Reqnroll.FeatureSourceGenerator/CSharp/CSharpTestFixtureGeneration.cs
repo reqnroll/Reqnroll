@@ -1,5 +1,6 @@
 ﻿using Gherkin.Ast;
 using Microsoft.CodeAnalysis.CSharp;
+using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
@@ -43,7 +44,8 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         return SourceBuilder.ToSourceText();
     }
 
-    protected virtual string GetClassName() => CSharpSyntax.CreateIdentifier(Document.Feature.Name + Document.Feature.Keyword);
+    protected virtual string GetClassName() => 
+        CSharpSyntax.CreateTypeIdentifier(Document.Feature.Name + Document.Feature.Keyword);
 
     protected virtual string? GetBaseType() => null;
 
@@ -105,7 +107,20 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
             {
                 case Scenario scenario:
                     SourceBuilder.AppendLine();
-                    AppendTestMethodForScenario(scenario);
+                    AppendTestMethodForScenario(scenario, null);
+                    break;
+
+                case Rule rule:
+                    foreach (var ruleChild in rule.Children)
+                    {
+                        switch (ruleChild)
+                        {
+                            case Scenario scenario:
+                                SourceBuilder.AppendLine();
+                                AppendTestMethodForScenario(scenario, rule);
+                                break;
+                        }
+                    }
                     break;
             }
         }
@@ -115,42 +130,42 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
 
     private void AppendAttribute(AttributeDescriptor attribute)
     {
-        SourceBuilder.Append("[global::").Append(attribute.Namespace).Append(".").Append(attribute.TypeName);
+        //SourceBuilder.Append("[global::").AppendTypeIdentifier();
 
-        if (attribute.Arguments.Any() || attribute.PropertyValues.Any())
-        {
-            var first = true;
+        //if (attribute.PositionalArguments.Any() || attribute.NamedArguments.Any())
+        //{
+        //    var first = true;
 
-            SourceBuilder.Append("(");
+        //    SourceBuilder.Append("(");
 
-            foreach (var argument in attribute.Arguments)
-            {
-                if (!first)
-                {
-                    SourceBuilder.Append(", ");
-                }
+        //    foreach (var argument in attribute.PositionalArguments)
+        //    {
+        //        if (!first)
+        //        {
+        //            SourceBuilder.Append(", ");
+        //        }
 
-                first = false;
+        //        first = false;
 
-                SourceBuilder.AppendConstant(argument);
-            }
+        //        SourceBuilder.AppendLiteral(argument);
+        //    }
 
-            foreach (var (propertyName, propertyValue) in attribute.PropertyValues)
-            {
-                if (!first)
-                {
-                    SourceBuilder.Append(", ");
-                }
+        //    foreach (var (name, argument) in attribute.NamedArguments)
+        //    {
+        //        if (!first)
+        //        {
+        //            SourceBuilder.Append(", ");
+        //        }
 
-                first = false;
+        //        first = false;
 
-                SourceBuilder.Append(propertyName).Append(" = ").AppendConstant(propertyValue);
-            }
+        //        SourceBuilder.Append(name).Append(" = ").AppendLiteral(argument);
+        //    }
 
-            SourceBuilder.Append(")");
-        }
+        //    SourceBuilder.Append(")");
+        //}
 
-        SourceBuilder.AppendLine("]");
+        //SourceBuilder.AppendLine("]");
     }
 
     protected virtual IEnumerable<AttributeDescriptor> GetTestFixtureAttributes() => [];
@@ -178,9 +193,9 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         SourceBuilder
             .AppendLine("private static readonly global::Reqnroll.FeatureInfo FeatureInfo = new global::Reqnroll.FeatureInfo(")
             .BeginBlock()
-            .AppendLine("new global::System.Globalization.CultureInfo(").AppendConstant(feature.Language).AppendLine("), ")
-            .AppendConstant(Path.GetDirectoryName(FeatureInformation.FeatureSyntax.FilePath).Replace("\\", "\\\\")).AppendLine(", ")
-            .AppendConstant(feature.Name).AppendLine(", ")
+            .AppendLine("new global::System.Globalization.CultureInfo(").AppendLiteral(feature.Language).AppendLine("), ")
+            .AppendLiteral(Path.GetDirectoryName(FeatureInformation.FeatureSyntax.FilePath).Replace("\\", "\\\\")).AppendLine(", ")
+            .AppendLiteral(feature.Name).AppendLine(", ")
             .AppendLine("null, ")
             .AppendLine("global::Reqnroll.ProgrammingLanguage.CSharp, ")
             .AppendLine("FeatureTags);")
@@ -212,7 +227,7 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         SourceBuilder.AppendLine("testRunner.OnScenarioInitialize(scenarioInfo);");
     }
 
-    protected virtual void AppendTestMethodForScenario(Scenario scenario)
+    protected virtual void AppendTestMethodForScenario(Scenario scenario, Rule? rule)
     {
         var attributes = GetTestMethodAttributes(scenario);
 
@@ -221,20 +236,73 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
             AppendAttribute(attribute);
         }
 
-        SourceBuilder.Append("public async Task ").Append(CSharpSyntax.CreateIdentifier(scenario.Name)).AppendLine("()");
+        var parameters = GetTestMethodParameters(scenario);
+
+        SourceBuilder
+            .Append("public async Task ")
+            .Append(CSharpSyntax.CreateMethodIdentifier(scenario.Name));
+
+        if (parameters.Length > 0)
+        {
+            SourceBuilder
+                .AppendLine("(")
+                .BeginBlock();
+
+            var first = true;
+
+            foreach (var parameter in parameters)
+            {
+                if (first)
+                {
+                    first = false;
+                }
+                else
+                {
+                    SourceBuilder.AppendLine(",");
+                }
+
+                SourceBuilder.Append(parameter);
+            }
+
+            SourceBuilder
+                .Append(")")
+                .EndBlock();
+        }
+        else
+        {
+            SourceBuilder.AppendLine("()");
+        }
+
         SourceBuilder.BeginBlock("{");
 
-        AppendTestMethodBodyForScenario(scenario);
+        AppendTestMethodBodyForScenario(scenario, rule);
 
         SourceBuilder.EndBlock("}");
     }
 
-    protected virtual void AppendTestMethodBodyForScenario(Scenario scenario)
+    protected virtual ImmutableArray<string> GetTestMethodParameters(Scenario scenario)
+    {
+        var parameters = new List<string>();
+
+        var example = scenario.Examples.FirstOrDefault();
+
+        if (example != null)
+        {
+            parameters.AddRange(
+                example.TableHeader.Cells.Select(heading => $"string {CSharpSyntax.CreateParameterIdentifier(heading.Value)}"));
+
+            parameters.Add("string[] exampleTags");
+        }
+
+        return parameters.ToImmutableArray();
+    }
+
+    protected virtual void AppendTestMethodBodyForScenario(Scenario scenario, Rule? rule)
     {
         AppendTestRunnerLookupForScenario(scenario);
         SourceBuilder.AppendLine();
 
-        AppendScenarioInfo(scenario);
+        AppendScenarioInfo(scenario, rule);
         SourceBuilder.AppendLine();
 
         SourceBuilder.AppendLine("try");
@@ -301,9 +369,9 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
                     _ => throw new NotSupportedException($"Steps of type \"{step.Keyword}\" are not supported.") // TODO: Add message from resx
                 })
             .Append("Async(")
-            .AppendConstant(step.Text)
+            .AppendLiteral(step.Text)
             .Append(", null, null, ")
-            .AppendConstant(step.Keyword)
+            .AppendLiteral(step.Keyword)
             .AppendLine(");");
 
         if (IsLineMappingEnabled)
@@ -312,22 +380,33 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         }
     }
 
-    protected virtual void AppendScenarioInfo(Scenario scenario)
+    protected virtual void AppendScenarioInfo(Scenario scenario, Rule? rule)
     {
         SourceBuilder.AppendLine("// start: calculate ScenarioInfo");
         SourceBuilder
-            .Append("string[] tagsOfScenario = new string[] { ")
+            .Append("var tagsOfScenario = new string[] { ")
             .AppendConstantList(scenario.Tags.Select(tag => tag.Name.TrimStart('@')))
             .AppendLine(" };");
         SourceBuilder.AppendLine(
             "var argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary(); // needed for scenario outlines");
 
-        // TODO: Add support for rules.
-        SourceBuilder.AppendLine("var inheritedTags = FeatureTags; // will be more complex if there are rules");
+        if (rule == null)
+        {
+            SourceBuilder.AppendLine("var inheritedTags = FeatureTags;");
+        }
+        else
+        {
+            SourceBuilder
+                .Append("var ruleTags = new string[] { ")
+                .AppendConstantList(rule.Tags.Select(tag => tag.Name.TrimStart('@')))
+                .AppendLine(" };");
+
+            SourceBuilder.AppendLine("var inheritedTags = FeatureTags.Concat(ruleTags)");
+        }
 
         SourceBuilder
             .Append("var scenarioInfo = new global::Reqnroll.ScenarioInfo(")
-            .AppendConstant(scenario.Name)
+            .AppendLiteral(scenario.Name)
             .AppendLine(", null, tagsOfScenario, argumentsOfScenario, inheritedTags);");
         SourceBuilder.AppendLine("// end: calculate ScenarioInfo");
     }

@@ -25,7 +25,13 @@ internal static class CSharpSyntax
         { typeof(void), "void" }
     };
 
-    public static string CreateIdentifier(string s)
+    public static string CreateTypeIdentifier(string s) => CreateIdentifier(s, capitalizeFirstWord: true);
+
+    public static string CreateMethodIdentifier(string s) => CreateIdentifier(s, capitalizeFirstWord: true);
+
+    public static string CreateParameterIdentifier(string s) => CreateIdentifier(s, capitalizeFirstWord: false);
+
+    private static string CreateIdentifier(string s, bool capitalizeFirstWord)
     {
         var sb = new StringBuilder();
         var newWord = true;
@@ -52,7 +58,15 @@ internal static class CSharpSyntax
 
             if (newWord)
             {
-                sb.Append(char.ToUpper(c));
+                if (sb.Length == 0 && !capitalizeFirstWord)
+                {
+                    sb.Append(c);
+                }
+                else
+                {
+                    sb.Append(char.ToUpper(c));
+                }
+
                 newWord = false;
             }
             else

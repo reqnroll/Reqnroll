@@ -4,13 +4,13 @@ using Reqnroll.FeatureSourceGenerator.CSharp;
 namespace Reqnroll.FeatureSourceGenerator.XUnit;
 public class XUnitCSharpSyntaxGeneration(FeatureInformation featureInfo) : CSharpTestFixtureGeneration(featureInfo)
 {
-    const string XUnitNamespace = "Xunit";
+    private readonly NamespaceString XUnitNamespace = new("Xunit");
 
     protected override IEnumerable<AttributeDescriptor> GetTestMethodAttributes(Scenario scenario)
     {
         var attributes = new List<AttributeDescriptor>
         {
-            new("Fact", XUnitNamespace)
+            new(new TypeIdentifier(XUnitNamespace, new IdentifierString("Fact")))
         };
 
         return base.GetTestMethodAttributes(scenario).Concat(attributes);

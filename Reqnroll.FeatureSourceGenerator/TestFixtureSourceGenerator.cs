@@ -1,7 +1,14 @@
-﻿using Reqnroll.FeatureSourceGenerator.Gherkin;
+﻿using Gherkin;
+using Gherkin.Ast;
+using Microsoft.CodeAnalysis.VisualBasic;
+using Reqnroll.FeatureSourceGenerator.Gherkin;
+using System.Collections;
 using System.Collections.Immutable;
+using System.Runtime.CompilerServices;
 
 namespace Reqnroll.FeatureSourceGenerator;
+
+using Location = Microsoft.CodeAnalysis.Location;
 
 /// <summary>
 /// Defines the basis of a source-generator which processes Gherkin feature files into test fixtures.
@@ -179,34 +186,223 @@ public abstract class TestFixtureSourceGenerator(
                 ];
             });
 
-        // Emit source files for each feature by invoking the generator.
-        context.RegisterSourceOutput(featureInformationOrErrors, static (context, featureOrError) =>
+        // Filter features and errors.
+        var features = featureInformationOrErrors
+            .Where(result => result.IsSuccess)
+            .Select((result, _) => (FeatureInformation)result);
+        var errors = featureInformationOrErrors
+            .Where(result => !result.IsSuccess)
+            .Select((result, _) => (Diagnostic)result);
+
+        // Generate scenario information from features.
+        var scenarios = features
+            .SelectMany(static (feature, cancellationToken) =>
+                feature.FeatureSyntax.GetRoot().Feature.Children.SelectMany(child => 
+                    GetScenarioInformation(child, feature, cancellationToken)));
+
+        // Generate scenario methods for each scenario.
+        var methods = scenarios
+            .Select(static (scenario, cancellationToken) => 
+                (Method: scenario.Feature.TestFrameworkHandler.GenerateTestFixtureMethod(scenario, cancellationToken),
+                Scenario: scenario));
+
+        // Generate test fixtures for each feature.
+        var fixtures = methods.Collect()
+            .WithComparer(ImmutableArrayEqualityComparer<(TestFixtureMethod Method, ScenarioInformation Scenario)>.Default)
+            .SelectMany(static (methods, cancellationToken) =>
+                methods
+                    .GroupBy(item => item.Scenario.Feature, item => item.Method)
+                    .Select(group => new TestFixtureComposition(group.Key, group.ToImmutableArray())))
+            .Select(static (composition, cancellationToken) => 
+                composition.Feature.TestFrameworkHandler.GenerateTestFixture(
+                    composition.Feature,
+                    composition.Methods,
+                    cancellationToken));
+
+        // Emit errors.
+        context.RegisterSourceOutput(errors, static (context, error) => context.ReportDiagnostic(error));
+
+        // Emit parsing diagnostics.
+        context.RegisterSourceOutput(features, static (context, feature) =>
         {
-            // If an error, report diagnostic.
-            if (!featureOrError.IsSuccess)
-            {
-                var error = (Diagnostic)featureOrError;
-                context.ReportDiagnostic(error);
-                return;
-            }
-
-            var feature = (FeatureInformation)featureOrError;
-
-            // Report any syntax errors in the parsing of the document.
             foreach (var diagnostic in feature.FeatureSyntax.GetDiagnostics())
             {
                 context.ReportDiagnostic(diagnostic);
             }
-
-            // Generate the test fixture source.
-            var source = feature.TestFrameworkHandler.GenerateTestFixture(feature);
-
-            if (source != null)
-            {
-                context.AddSource(feature.FeatureHintName, source);
-            }
         });
+
+        // Emit source files for fixtures.
+        context.RegisterSourceOutput(
+            fixtures, 
+            static (context, fixture) => context.AddSource(fixture.HintName, fixture.Render()));
+    }
+
+    private static IEnumerable<ScenarioInformation> GetScenarioInformation(
+        IHasLocation child,
+        FeatureInformation feature,
+        CancellationToken cancellationToken)
+    {
+        return child switch
+        {
+            Scenario scenario => [ GetScenarioInformation(scenario, feature, cancellationToken) ],
+            Rule rule => GetScenarioInformation(rule, feature, cancellationToken),
+            _ => []
+        };
+    }
+
+    private static ScenarioInformation GetScenarioInformation(
+        Scenario scenario,
+        FeatureInformation feature,
+        CancellationToken cancellationToken) => 
+        GetScenarioInformation(scenario, null, ImmutableArray<string>.Empty, feature, cancellationToken);
+
+    private static ScenarioInformation GetScenarioInformation(
+        Scenario scenario,
+        string? ruleName,
+        ImmutableArray<string> ruleTags,
+        FeatureInformation feature,
+        CancellationToken cancellationToken)
+    {
+        var exampleSets = new List<ScenarioExampleSet>();
+
+        foreach (var example in scenario.Examples)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var examples = new ScenarioExampleSet(
+                example.TableHeader.Cells.Select(cell => cell.Value).ToImmutableArray(),
+                example.TableBody.Select(row => row.Cells.Select(cell => cell.Value).ToImmutableArray()).ToImmutableArray(),
+                example.Tags.Select(tag => tag.Name).ToImmutableArray());
+
+            exampleSets.Add(examples);
+        }
+
+        var steps = new List<ScenarioStep>();
+
+        foreach (var step in scenario.Steps)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var scenarioStep = new ScenarioStep(
+                step.KeywordType,
+                step.Keyword,
+                step.Text,
+                step.Location.Line);
+
+            steps.Add(scenarioStep);
+        }
+
+        return new ScenarioInformation(
+            feature,
+            scenario.Name,
+            scenario.Tags.Select(tag => tag.Name).ToImmutableArray(),
+            steps.ToImmutableArray(),
+            exampleSets.ToImmutableArray(),
+            ruleName,
+            ruleTags);
+    }
+
+    private static IEnumerable<ScenarioInformation> GetScenarioInformation(
+        Rule rule,
+        FeatureInformation feature,
+        CancellationToken cancellationToken)
+    {
+        var tags = rule.Tags.Select(tag => tag.Name).ToImmutableArray();
+
+        foreach (var child in rule.Children)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            switch (child)
+            {
+                case Scenario scenario:
+                    yield return GetScenarioInformation(scenario, rule.Name, tags, feature, cancellationToken);
+                    break;
+            }
+        }
     }
 
     protected abstract CompilationInformation GetCompilationInformation(Compilation compilation);
+}
+
+public record ScenarioStep(StepKeywordType KeywordType, string Keyword, string Text, int LineNumber);
+
+public class ScenarioExampleSet : IEnumerable<IEnumerable<(string Name, string Value)>>, IEquatable<ScenarioExampleSet?>
+{
+    public ScenarioExampleSet(
+        ImmutableArray<string> headings,
+        ImmutableArray<ImmutableArray<string>> values,
+        ImmutableArray<string> tags)
+    {
+        foreach (var set in values)
+        {
+            if (set.Length != headings.Length)
+            {
+                throw new ArgumentException(
+                    "Values must contain sets with the same number of values as the headings.",
+                    nameof(values));
+            }
+        }
+
+        Headings = headings;
+        Values = values;
+        Tags = tags;
+    }
+
+    public ImmutableArray<string> Headings { get; }
+
+    public ImmutableArray<ImmutableArray<string>> Values { get; }
+
+    public ImmutableArray<string> Tags { get; }
+
+    public override bool Equals(object? obj) => Equals(obj as ScenarioExampleSet);
+
+    public bool Equals(ScenarioExampleSet? other)
+    {
+        if (other is null)
+        {
+            return false;
+        }
+
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return (Headings.Equals(other.Headings) || Headings.SequenceEqual(other.Headings)) &&
+            (Values.Equals(other.Values) || Values.SequenceEqual(other.Values, ImmutableArrayEqualityComparer<string>.Default)) &&
+            (Tags.Equals(other.Tags) || Tags.SequenceEqual(other.Tags));
+    }
+
+    public override int GetHashCode()
+    {
+        unchecked
+        {
+            var hash = 43961407;
+
+            hash *= 32360441 + Headings.GetSequenceHashCode();
+            hash *= 32360441 + Values.GetSequenceHashCode(ImmutableArrayEqualityComparer<string>.Default);
+            hash *= 32360441 + Tags.GetSequenceHashCode();
+
+            return hash;
+        }
+    }
+
+    public IEnumerator<IEnumerable<(string Name, string Value)>> GetEnumerator()
+    {
+        foreach (var set in Values)
+        {
+            yield return GetAsRow(set);
+        }
+    }
+
+    private IEnumerable<(string Name, string Value)> GetAsRow(ImmutableArray<string> set)
+    {
+        for (var i = 0; i < Headings.Length; i++)
+        {
+            yield return (Name: Headings[i], Value: set[i]);
+        }
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 }

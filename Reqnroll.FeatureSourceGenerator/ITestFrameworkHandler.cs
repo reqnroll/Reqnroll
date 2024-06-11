@@ -6,7 +6,12 @@ public interface ITestFrameworkHandler
 
     bool CanGenerateForCompilation(CompilationInformation compilationInformation);
 
-    SourceText GenerateTestFixture(FeatureInformation feature);
+    TestFixtureMethod GenerateTestFixtureMethod(ScenarioInformation scenarioInformation, CancellationToken cancellationToken);
+
+    TestFixture GenerateTestFixture(
+        FeatureInformation featureInformation,
+        IEnumerable<TestFixtureMethod> methods,
+        CancellationToken cancellationToken);
 
     bool IsTestFrameworkReferenced(CompilationInformation compilationInformation);
 }
