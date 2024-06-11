@@ -4,7 +4,7 @@
 
 * Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160)
 * Generate symbol packages, use deterministic build and update package metadata (#161)
-* Separate `TestThreadContext` from `ITestRunner` and handle `ITestRunner.TestWorkerId` test framework independently
+* Optimize creation of test-thread context using test framework independent resource pooling (#144)
 
 # v2.0.2 - 2024-05-31
 
