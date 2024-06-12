@@ -147,7 +147,7 @@ Use this section to determine the Reqnroll trace output.
 * - Setting
   - Value
   - Description
-* - stepDefinitionSnippetStyle
+* - stepDefinitionSkeletonStyle
   - `CucumberExpressionAttribute` / `RegexAttribute`
   - Specifies the default [step definition style](../automation/step-definitions.md#step-matching-styles-rules).<br/> *Default:* `CucumberExpressionAttribute`
 * - coloredOutput

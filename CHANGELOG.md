@@ -2,9 +2,25 @@
 
 ## Improvements:
 
+* Reqnroll.Verify: Support for Verify v24 (Verify.Xunit v24.2.0) for .NET 4.7.2+ and .NET 6.0+. For earlier versions of Verify or for .NET 4.6.2, use the latest 2.0.3 version of the plugin that is compatible with Reqnroll v2.*. (#151)
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* @ajeckmans
+
+# v2.0.3 - 2024-06-10
+
+## Improvements:
+
 * Update [versioning policy for plugins](https://docs.reqnroll.net/latest/installation/compatibility.html#versioning-policy) and set plugin dependencies accordingly (#160)
 * Generate symbol packages, use deterministic build and update package metadata (#161)
 * Optimize creation of test-thread context using test framework independent resource pooling (#144)
+
+## Bug fixes:
+
+* Fix: Project created with `dotnet new reqnroll-project` contains an invalid binding class (`[Binding]` attribute missing) (#169)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy, @mcraa
 
 # v2.0.2 - 2024-05-31
 
@@ -38,7 +54,7 @@
 ## Bug fixes:
 
 * Fix: User code namespaces that included "Reqnroll" within them caused the code generation to fail (#44)
-* Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wonrly resolved from the test thread context instead of the test run (global) context instead (#58)
+* Fix: Dependencies of [BeforeTestRun] / [AfterTestRun] hooks are wrongly resolved from the test thread context instead of the test run (global) context instead (#58)
 * Fix: Cucumber Expressions fail when two enums or two custom types with the same short name (differing namespaces) are used as parameters (#81)
 * Fix: Adding `@ignore` to an Examples block generates invalid code for NUnit v3+ (#103)
 * Fix: `@ignore` attribute is not inherited to the scenarios from Rule (#111)
@@ -46,7 +62,7 @@
 * Fix: StackOverflowException when using `[StepArgumentTransformation]` with same input and output type, for example string (#71)
 * Fix: Autofac without hook does not run GlobalDependencies (#127)
 * Fix: Reqnroll.Autofac shows wrongly ambiguous step definition (#56)
-* Fix: Dispose objects registred in test thread container at the end of test execution (#123)
+* Fix: Dispose objects registered in test thread container at the end of test execution (#123)
 
 # v1.0.1 - 2024-02-16
 

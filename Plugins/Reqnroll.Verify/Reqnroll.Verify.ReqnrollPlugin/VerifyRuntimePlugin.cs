@@ -1,10 +1,10 @@
 using System.Collections;
 using System.IO;
-using Reqnroll.Verify.ReqnrollPlugin;
-using Reqnroll;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
+using Reqnroll.Verify.ReqnrollPlugin;
 using VerifyTests;
+using VerifyXunit;
 
 [assembly: RuntimePlugin(typeof(VerifyRuntimePlugin))]
 
@@ -28,7 +28,7 @@ public class VerifyRuntimePlugin : IRuntimePlugin
         var scenarioContext = e.ObjectContainer.Resolve<ScenarioContext>();
         var featureContext = e.ObjectContainer.Resolve<FeatureContext>();
 
-        VerifierSettings.DerivePathInfo(
+        Verifier.DerivePathInfo(
             (sourceFile, projectDirectory, type, method) =>
             {
                 string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;

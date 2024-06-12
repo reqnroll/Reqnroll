@@ -22,7 +22,7 @@ namespace Reqnroll.PluginTests.ExternalData
         {
             var sut = CreateSut();
             var result = sut.LoadDataSource(_productsSampleFilePath, null);
-            
+
             Assert.True(result.IsDataTable);
             Assert.Equal(3, result.AsDataTable.Items.Count);
             Assert.Equal("Chocolate", result.AsDataTable.Items[0].Fields["product"].AsString());
@@ -53,7 +53,7 @@ Juice", result.Items[2].Fields["product"].AsString());
         {
             var sut = CreateSut();
             var result = sut.LoadDataSource(
-                Path.GetFileName(_productsSampleFilePath), 
+                Path.GetFileName(_productsSampleFilePath),
                 SampleFeatureFilePathInSampleFileFolder);
 
             Assert.True(result.IsDataTable);
@@ -63,8 +63,8 @@ Juice", result.Items[2].Fields["product"].AsString());
         public void Can_handle_invalid_path()
         {
             var sut = CreateSut();
-            
-            Assert.Throws<ExternalDataPluginException>(() => 
+
+            Assert.Throws<ExternalDataPluginException>(() =>
                 sut.LoadDataSource(
                     "no-such-file.csv",
                     SampleFeatureFilePathInSampleFileFolder));
@@ -76,7 +76,7 @@ Juice", result.Items[2].Fields["product"].AsString());
             _productsSampleFilePath = Path.Combine(SampleFilesFolder, "products-invalid.csv");
 
             var sut = CreateSut();
-            Assert.Throws<ExternalDataPluginException>(() => 
+            Assert.Throws<ExternalDataPluginException>(() =>
                 sut.LoadDataSource(_productsSampleFilePath, null));
         }
 
@@ -86,11 +86,11 @@ Juice", result.Items[2].Fields["product"].AsString());
             _productsSampleFilePath = Path.Combine(SampleFilesFolder, "products-empty.csv");
 
             var sut = CreateSut();
-            
+
             var result = sut.LoadDataSource(_productsSampleFilePath, null);
 
             Assert.True(result.IsDataTable);
-            Assert.Equal(0, result.AsDataTable.Items.Count);
+            Assert.Empty(result.AsDataTable.Items);
         }
     }
 }
