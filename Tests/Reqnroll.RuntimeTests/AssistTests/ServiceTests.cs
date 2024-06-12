@@ -17,13 +17,14 @@ namespace Reqnroll.RuntimeTests.AssistTests
         {
             var expectedDefaultComparers = new object[]
             {
-                typeof(DateTimeValueComparer),
                 typeof(BoolValueComparer),
-                typeof(GuidValueComparer),
+                typeof(DateTimeValueComparer),
+                typeof(DateTimeOffsetValueComparer),
+                typeof(DefaultValueComparer),
                 typeof(DecimalValueComparer),
                 typeof(DoubleValueComparer),
+                typeof(GuidValueComparer),
                 typeof(FloatValueComparer),
-                typeof(DefaultValueComparer),
             };
 
             var service = new Service();
@@ -53,12 +54,11 @@ namespace Reqnroll.RuntimeTests.AssistTests
                 typeof(CharValueRetriever),
                 typeof(BoolValueRetriever),
                 typeof(DateTimeValueRetriever),
+                typeof(DateTimeOffsetValueRetriever),
                 typeof(GuidValueRetriever),
                 typeof(EnumValueRetriever),
                 typeof(TimeSpanValueRetriever),
-                typeof(DateTimeOffsetValueRetriever),
                 typeof(UriValueRetriever),
-
                 typeof(ArrayValueRetriever),
                 typeof(ListValueRetriever),
             };
