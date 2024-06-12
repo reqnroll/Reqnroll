@@ -4,10 +4,11 @@
 
 * Reqnroll.Verify: Support for Verify v24 (Verify.Xunit v24.2.0) for .NET 4.7.2+ and .NET 6.0+. For earlier versions of Verify or for .NET 4.6.2, use the latest 2.0.3 version of the plugin that is compatible with Reqnroll v2.*. (#151)
 * Optimize creation of test-thread context using test framework independent resource pooling (#144)
+* Support DateTimeOffset in value comparer (#180)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @ajeckmans, @obligaron
+*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @obligaron
 
 # v2.0.3 - 2024-06-10
 
