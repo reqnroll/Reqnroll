@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Reqnroll
@@ -5,13 +6,14 @@ namespace Reqnroll
     public interface ITestRunner
     {
         /// <summary>
-        /// The ID of the parallel test worker processing the current scenario. How the worker ID is obtained is dependent on the test execution framework.
+        /// The ID of the parallel test worker processing the current scenario.
         /// </summary>
         string TestWorkerId { get; }
         FeatureContext FeatureContext { get; }
         ScenarioContext ScenarioContext { get; }
         ITestThreadContext TestThreadContext { get; }
 
+        [Obsolete("TestWorkerId is now managed by Reqnroll internally - Method will be removed in v3")]
         void InitializeTestRunner(string testWorkerId);
 
         Task OnTestRunStartAsync();

@@ -5,7 +5,7 @@ namespace Reqnroll
     public interface ISyncTestRunner
     {
         /// <summary>
-        /// The ID of the parallel test worker processing the current scenario. How the worker ID is obtained is dependent on the test execution framework.
+        /// The ID of the parallel test worker processing the current scenario.
         /// </summary>
         string TestWorkerId { get; }
 

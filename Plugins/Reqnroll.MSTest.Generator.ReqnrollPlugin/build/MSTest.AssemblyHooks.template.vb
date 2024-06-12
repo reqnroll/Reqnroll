@@ -16,7 +16,7 @@ Public NotInheritable Class PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks
     Public Shared Async Function AssemblyInitializeAsync(testContext As TestContext) As Task
         Dim currentAssembly As Assembly = GetType(PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks).Assembly
         Dim containerBuilder As New MsTestContainerBuilder(testContext)
-        Await Global.Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly, Nothing, containerBuilder)
+        Await Global.Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly, containerBuilder)
     End Function
 
     <AssemblyCleanup>

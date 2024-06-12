@@ -177,15 +177,9 @@ namespace Reqnroll.Generator.Generation
             //testRunner = TestRunnerManager.GetTestRunnerForAssembly(null, [test_worker_id]);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
-            var testRunnerParameters = new[]
-            {
-                new CodePrimitiveExpression(null),
-                _testGeneratorProvider.GetTestWorkerIdExpression()
-            };
-
             var getTestRunnerExpression = new CodeMethodInvokeExpression(
                 new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
-                nameof(TestRunnerManager.GetTestRunnerForAssembly), testRunnerParameters);
+                nameof(TestRunnerManager.GetTestRunnerForAssembly));
 
             testClassInitializeMethod.Statements.Add(
                 new CodeAssignStatement(
@@ -238,7 +232,14 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
             testClassCleanupMethod.Statements.Add(expression);
-            
+
+            // 
+            testClassCleanupMethod.Statements.Add(
+                new CodeMethodInvokeExpression(
+                    new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
+                    nameof(TestRunnerManager.ReleaseTestRunner),
+                    testRunnerField));
+
             // testRunner = null;
             testClassCleanupMethod.Statements.Add(
                 new CodeAssignStatement(
