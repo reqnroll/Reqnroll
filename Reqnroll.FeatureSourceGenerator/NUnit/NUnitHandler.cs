@@ -12,11 +12,11 @@ public class NUnitHandler : ITestFrameworkHandler
     public bool CanGenerateForCompilation(CompilationInformation compilationInformation) => 
         compilationInformation is CSharpCompilationInformation;
 
-    public SourceText GenerateTestFixture(FeatureInformation feature)
+    public ITestFixtureGenerator GetTestFixtureGenerator(CompilationInformation compilation)
     {
-        return feature.CompilationInformation switch
+        return compilation switch
         {
-            CSharpCompilationInformation => new NUnitCSharpSyntaxGeneration(feature).GetSourceText(),
+            CSharpCompilationInformation => new NUnitCSharpTestFixtureGenerator(),
             _ => throw new NotSupportedException(),
         };
     }

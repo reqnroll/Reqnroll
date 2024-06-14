@@ -1,10 +1,8 @@
 ﻿using Gherkin;
 using Gherkin.Ast;
-using Microsoft.CodeAnalysis.VisualBasic;
 using Reqnroll.FeatureSourceGenerator.Gherkin;
 using System.Collections;
 using System.Collections.Immutable;
-using System.Runtime.CompilerServices;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
@@ -182,7 +180,8 @@ public abstract class TestFixtureSourceGenerator(
                         FeatureHintName: featureHintName,
                         FeatureNamespace: featureNamespace,
                         CompilationInformation: compilationInfo,
-                        TestFrameworkHandler: testFramework)
+                        TestFrameworkHandler: testFramework,
+                        TestFixtureGenerator: testFramework.GetTestFixtureGenerator(compilationInfo))
                 ];
             });
 
@@ -203,18 +202,18 @@ public abstract class TestFixtureSourceGenerator(
         // Generate scenario methods for each scenario.
         var methods = scenarios
             .Select(static (scenario, cancellationToken) => 
-                (Method: scenario.Feature.TestFrameworkHandler.GenerateTestFixtureMethod(scenario, cancellationToken),
+                (Method: scenario.Feature.TestFixtureGenerator.GenerateTestMethod(scenario, cancellationToken),
                 Scenario: scenario));
 
         // Generate test fixtures for each feature.
         var fixtures = methods.Collect()
-            .WithComparer(ImmutableArrayEqualityComparer<(TestFixtureMethod Method, ScenarioInformation Scenario)>.Default)
+            .WithComparer(ImmutableArrayEqualityComparer<(TestMethod Method, ScenarioInformation Scenario)>.Default)
             .SelectMany(static (methods, cancellationToken) =>
                 methods
                     .GroupBy(item => item.Scenario.Feature, item => item.Method)
                     .Select(group => new TestFixtureComposition(group.Key, group.ToImmutableArray())))
             .Select(static (composition, cancellationToken) => 
-                composition.Feature.TestFrameworkHandler.GenerateTestFixture(
+                composition.Feature.TestFixtureGenerator.GenerateTestFixture(
                     composition.Feature,
                     composition.Methods,
                     cancellationToken));

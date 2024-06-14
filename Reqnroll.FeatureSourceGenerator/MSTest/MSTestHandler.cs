@@ -1,4 +1,6 @@
-﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Reqnroll.FeatureSourceGenerator.CSharp;
+using System.Threading;
 
 namespace Reqnroll.FeatureSourceGenerator.MSTest;
 
@@ -9,21 +11,21 @@ public class MSTestHandler : ITestFrameworkHandler
 {
     public string FrameworkName => "MSTest";
 
-    public bool CanGenerateForCompilation(CompilationInformation compilationInformation) => 
-        compilationInformation is CSharpCompilationInformation;
+    public bool CanGenerateForCompilation(CompilationInformation compilation) => 
+        compilation is CSharpCompilationInformation;
 
-    public SourceText GenerateTestFixture(FeatureInformation feature)
+    public bool IsTestFrameworkReferenced(CompilationInformation compilation)
     {
-        return feature.CompilationInformation switch
-        {
-            CSharpCompilationInformation => new MSTestCSharpTestFixtureGeneration(feature).GetSourceText(),
-            _ => throw new NotSupportedException(),
-        };
+        return compilation.ReferencedAssemblies
+            .Any(assembly => assembly.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework");
     }
 
-    public bool IsTestFrameworkReferenced(CompilationInformation compilationInformation)
+    public ITestFixtureGenerator GetTestFixtureGenerator(CompilationInformation compilation)
     {
-        return compilationInformation.ReferencedAssemblies
-            .Any(assembly => assembly.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework");
+        return compilation switch
+        {
+            CSharpCompilationInformation => new MSTestCSharpTestFixtureGenerator(),
+            _ => throw new NotSupportedException(),
+        };
     }
 }

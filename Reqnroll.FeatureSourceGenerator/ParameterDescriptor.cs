@@ -1,41 +1,54 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Reqnroll.FeatureSourceGenerator;
-public class ParameterDescriptor: IEquatable<ParameterDescriptor>
+﻿namespace Reqnroll.FeatureSourceGenerator;
+public class ParameterDescriptor: IEquatable<ParameterDescriptor?>
 {
-    public ParameterDescriptor(string name)
+    public ParameterDescriptor(IdentifierString name, TypeIdentifier type)
     {
-        if (string.IsNullOrEmpty(name))
+        if (name.IsEmpty)
         {
-            throw new ArgumentException("Value cannot be null or an empty string.", nameof(name));
+            throw new ArgumentException("Value cannot be an empty identifier.", nameof(name));
+        }
+
+        if (type.IsEmpty)
+        {
+            throw new ArgumentException("Value cannot be an empty identifier.", nameof(type));
         }
 
         Name = name;
+        Type = type;
     }
 
-    public string Name { get; }
+    public IdentifierString Name { get; }
+
+    public TypeIdentifier Type { get; }
 
     public bool Equals(ParameterDescriptor? other)
     {
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
         if (other is null)
         {
             return false;
         }
 
-        return Name.Equals(other.Name);
+        if (ReferenceEquals(this, other))
+        {
+            return true;
+        }
+
+        return Name.Equals(other.Name) &&
+            Type.Equals(other.Type);
     }
 
     public override bool Equals(object obj) => Equals(obj as ParameterDescriptor);
 
     public override int GetHashCode()
     {
-        return base.GetHashCode();
+        unchecked
+        {
+            var hash = 65362369;
+
+            hash *= 45172373 + Name.GetHashCode();
+            hash *= 45172373 + Type.GetHashCode();
+
+            return hash;
+        }
     }
 }

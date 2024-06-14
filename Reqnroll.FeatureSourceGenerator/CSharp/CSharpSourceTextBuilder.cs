@@ -240,7 +240,7 @@ public class CSharpSourceTextBuilder
     public CSharpSourceTextBuilder AppendAttributeBlock(AttributeDescriptor attribute)
     {
         Append('[');
-        AppendTypeIdentifier(attribute.Type);
+        AppendTypeReference(attribute.Type);
 
         if (attribute.NamedArguments.Count > 0 || attribute.PositionalArguments.Length > 0)
         {
@@ -267,7 +267,7 @@ public class CSharpSourceTextBuilder
         return this;
     }
 
-    public CSharpSourceTextBuilder AppendTypeIdentifier(TypeIdentifier identifier)
+    public CSharpSourceTextBuilder AppendTypeReference(TypeIdentifier identifier)
     {
         return this;
     }

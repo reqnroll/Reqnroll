@@ -7,4 +7,5 @@ public record FeatureInformation(
     string FeatureHintName,
     string FeatureNamespace,
     CompilationInformation CompilationInformation,
-    ITestFrameworkHandler TestFrameworkHandler);
+    ITestFrameworkHandler TestFrameworkHandler,
+    ITestFixtureGenerator TestFixtureGenerator);

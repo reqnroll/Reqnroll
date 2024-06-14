@@ -2,7 +2,7 @@
 
 namespace Reqnroll.FeatureSourceGenerator;
 
-internal record TestFixtureComposition(FeatureInformation Feature, ImmutableArray<TestFixtureMethod> Methods)
+internal record TestFixtureComposition(FeatureInformation Feature, ImmutableArray<TestMethod> Methods)
 {
     public override int GetHashCode()
     {
@@ -11,7 +11,7 @@ internal record TestFixtureComposition(FeatureInformation Feature, ImmutableArra
             var hash = 49151149;
 
             hash *= 983819 + Feature.GetHashCode();
-            hash *= 983819 + Methods.GetSequenceHashCode();
+            hash *= 983819 + Methods.GetSetHashCode();
 
             return hash;
         }
@@ -25,6 +25,6 @@ internal record TestFixtureComposition(FeatureInformation Feature, ImmutableArra
         }
 
         return Feature.Equals(other.Feature) &&
-            (Methods.Equals(other.Methods) || Methods.SequenceEqual(other.Methods));
+            (Methods.Equals(other.Methods) || Methods.SetEqual(other.Methods));
     }
 }
