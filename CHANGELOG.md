@@ -8,7 +8,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @obligaron
+* Fix: Reqnroll.Autofac: Objects registered in the global container cannot be relsolved in BeforeTestRun/AfterTestRun hooks (#183)
+
+*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @gasparnagy, @obligaron
 
 # v2.0.3 - 2024-06-10
 

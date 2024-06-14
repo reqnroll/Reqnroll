@@ -159,6 +159,22 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
         globalDep1.Should().NotBeNull();
     }
 
+    [Fact] public void Should_allow_global_registrations_to_GlobalContainer()
+    {
+        // Arrange
+        var sut = new TestableAutofacPlugin(typeof(ContainerSetup1), nameof(ContainerSetup1.SetupGlobalContainer));
+        
+        // Act
+        sut.Initialize(_runtimePluginEvents, new RuntimePluginParameters(), new UnitTestProviderConfiguration());
+        var reqnrollConfiguration = ConfigurationLoader.GetDefault();
+        _runtimePluginEvents.RaiseCustomizeGlobalDependencies(_testRunContainer, reqnrollConfiguration);
+
+        // Assert
+        var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
+        var globalDep1 = resolver.ResolveBindingInstance(typeof(IGlobalDependency1), _testRunContainer);
+        globalDep1.Should().NotBeNull();
+    }
+
     private ObjectContainer InitializeToScenarioContainer(TestableAutofacPlugin sut)
     {
         sut.Initialize(_runtimePluginEvents, new RuntimePluginParameters(), new UnitTestProviderConfiguration());

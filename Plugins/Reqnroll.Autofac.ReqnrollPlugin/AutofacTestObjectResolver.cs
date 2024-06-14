@@ -21,6 +21,12 @@ namespace Reqnroll.Autofac
                 return lifeTimeScope.Resolve(bindingType);
             }
 
+            if (container.IsRegistered<IContainer>())
+            {
+                var lifeTimeScope = container.Resolve<IContainer>();
+                return lifeTimeScope.Resolve(bindingType);
+            }
+
             return container.Resolve(bindingType);
         }
     }
