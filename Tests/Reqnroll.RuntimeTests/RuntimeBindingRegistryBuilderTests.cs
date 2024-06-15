@@ -21,10 +21,28 @@ namespace Reqnroll.RuntimeTests
         [Binding]
         public class StepTransformationExample
         {
-            [StepArgumentTransformation("BindingRegistryTests")]
-            public int Transform(string val)
+            [StepArgumentTransformation("prop1 .*")]
+            public int TransformProperty1(string val)
             {
                 return 42;
+            }
+            
+            [StepArgumentTransformation(Regex="prop2 .*")]
+            public int TransformProperty2(string val)
+            {
+                return 43;
+            }
+            
+            [StepArgumentTransformation(Regex="prop3 .*", Order = 5)]
+            public int TransformProperty3(string val)
+            {
+                return 44;
+            }
+            
+            [StepArgumentTransformation(Order = 10)]
+            public int TransformGlobal(string val)
+            {
+                return 45;
             }
         }
 
@@ -295,6 +313,34 @@ namespace Reqnroll.RuntimeTests
                     s =>
                         s.HookType == HookType.AfterTestRun && s.Method.Name == "AfterOrderTenThousandAnd4" &&
                         s.HookOrder == 10004));
+        }
+        
+         [Fact]
+        public void ShouldFindStepArgumentTransformations_WithSpecifiedOrder()
+        {
+            var builder = CreateSut();
+
+            BuildCompleteBindingFromType(builder, typeof (StepTransformationExample));
+
+            Assert.Single(
+                bindingSourceProcessorStub.StepArgumentTransformationBindings,
+                sat =>
+                    sat.Method.Name == nameof(StepTransformationExample.TransformProperty1) && sat.Order == default);
+            
+            Assert.Single(
+                bindingSourceProcessorStub.StepArgumentTransformationBindings,
+                sat =>
+                    sat.Method.Name == nameof(StepTransformationExample.TransformProperty2) && sat.Order == default);
+            
+            Assert.Single(
+                bindingSourceProcessorStub.StepArgumentTransformationBindings,
+                sat =>
+                    sat.Method.Name == nameof(StepTransformationExample.TransformProperty3) && sat.Order == 5);
+            
+            Assert.Single(
+                bindingSourceProcessorStub.StepArgumentTransformationBindings,
+                sat =>
+                    sat.Method.Name == nameof(StepTransformationExample.TransformGlobal) && sat.Order == 10);
         }
 
         [Fact]

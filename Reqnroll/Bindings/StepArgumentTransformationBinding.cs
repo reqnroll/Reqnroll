@@ -8,16 +8,19 @@ namespace Reqnroll.Bindings
         public string Name { get; }
 
         public Regex Regex { get; }
+        
+        public int Order { get; }
 
-        public StepArgumentTransformationBinding(Regex regex, IBindingMethod bindingMethod, string name = null)
+        public StepArgumentTransformationBinding(Regex regex, IBindingMethod bindingMethod, string name = null, int order = default)
             : base(bindingMethod)
         {
             Regex = regex;
             Name = name;
+            Order = order;
         }
 
-        public StepArgumentTransformationBinding(string regexString, IBindingMethod bindingMethod, string name = null)
-            : this(CreateRegexOrNull(regexString), bindingMethod, name)
+        public StepArgumentTransformationBinding(string regexString, IBindingMethod bindingMethod, string name = null, int order = default)
+            : this(CreateRegexOrNull(regexString), bindingMethod, name, order)
         {
         }
 
