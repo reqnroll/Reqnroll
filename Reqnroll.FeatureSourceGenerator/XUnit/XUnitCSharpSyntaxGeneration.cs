@@ -10,7 +10,7 @@ public class XUnitCSharpSyntaxGeneration(FeatureInformation featureInfo) : CShar
     {
         var attributes = new List<AttributeDescriptor>
         {
-            new(new TypeIdentifier(XUnitNamespace, new IdentifierString("Fact")))
+            new(new NamedTypeIdentifier(XUnitNamespace, new IdentifierString("Fact")))
         };
 
         return base.GetTestMethodAttributes(scenario).Concat(attributes);

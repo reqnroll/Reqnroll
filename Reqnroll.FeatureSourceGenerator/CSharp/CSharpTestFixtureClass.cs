@@ -11,7 +11,7 @@ public class CSharpTestFixtureClass : TestFixtureClass
     private static readonly Encoding Encoding = new UTF8Encoding(false);
 
     public CSharpTestFixtureClass(
-        TypeIdentifier identifier,
+        NamedTypeIdentifier identifier,
         string hintName,
         ImmutableArray<AttributeDescriptor> attributes = default,
         ImmutableArray<CSharpTestMethod> methods = default) :

@@ -1,6 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Reqnroll.FeatureSourceGenerator.CSharp;
-using System.Threading;
+﻿using Reqnroll.FeatureSourceGenerator.CSharp;
 
 namespace Reqnroll.FeatureSourceGenerator.MSTest;
 

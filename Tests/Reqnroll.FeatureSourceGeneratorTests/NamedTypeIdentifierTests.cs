@@ -1,27 +1,15 @@
 ﻿namespace Reqnroll.FeatureSourceGenerator;
 
-public class TypeIdentifierTests
+public class NamedTypeIdentifierTests
 {
-    [Fact]
-    public void DefaultValue_IsEmpty()
-    {
-        var identifier = default(TypeIdentifier);
-
-        identifier.IsEmpty.Should().BeTrue();
-        identifier.LocalName.IsEmpty.Should().BeTrue();
-        identifier.Namespace.IsEmpty.Should().BeTrue();
-        identifier.ToString().Should().Be("");
-    }
-
     [Theory]
     [InlineData("Parser")]
     [InlineData("__Parser")]
     [InlineData("X509")]
-    public void Constructor_CreatesTypeIdentifierFromValidName(string name)
+    public void Constructor_CreatesNamedTypeIdentifierFromValidName(string name)
     {
-        var identifier = new TypeIdentifier(new IdentifierString(name));
+        var identifier = new NamedTypeIdentifier(new IdentifierString(name));
 
-        identifier.IsEmpty.Should().BeFalse();
         identifier.LocalName.Should().Be(name);
         identifier.Namespace.IsEmpty.Should().BeTrue();
         identifier.ToString().Should().Be(name);
@@ -31,13 +19,12 @@ public class TypeIdentifierTests
     [InlineData("Reqnroll", "Parser")]
     [InlineData("Reqnroll", "__Parser")]
     [InlineData("Reqnroll", "X509")]
-    public void Constructor_CreatesTypeIdentifierFromValidNameAndNamespace(string ns, string name)
+    public void Constructor_CreatesNamedTypeIdentifierFromValidNameAndNamespace(string ns, string name)
     {
         var nsx = new NamespaceString(ns);
 
-        var identifier = new TypeIdentifier(nsx, new IdentifierString(name));
+        var identifier = new NamedTypeIdentifier(nsx, new IdentifierString(name));
 
-        identifier.IsEmpty.Should().BeFalse();
         identifier.LocalName.Should().Be(name);
         identifier.Namespace.Should().Be(nsx);
         identifier.ToString().Should().Be($"{ns}.{name}");
@@ -48,9 +35,8 @@ public class TypeIdentifierTests
     [InlineData(null)]
     public void Constructor_CreatesEmptyTypeIdentifierFromEmptyNameValue(string name)
     {
-        var identifier = new TypeIdentifier(new IdentifierString(name));
+        var identifier = new NamedTypeIdentifier(new IdentifierString(name));
 
-        identifier.IsEmpty.Should().BeTrue();
         identifier.LocalName.IsEmpty.Should().BeTrue();
         identifier.Namespace.IsEmpty.Should().BeTrue();
         identifier.ToString().Should().Be("");
@@ -59,9 +45,9 @@ public class TypeIdentifierTests
     [Theory]
     [InlineData("")]
     [InlineData(null)]
-    public void Constructor_ThrowsArgumentExceptionWhenUsingAnEmptyNameWithANonEmptyNamespace(string name)
+    public void Constructor_ThrowsArgumentExceptionWhenUsingAnEmptyName(string name)
     {
-        Func<TypeIdentifier> ctr = () => new TypeIdentifier(new NamespaceString("Reqnroll"), new IdentifierString(name));
+        Func<NamedTypeIdentifier> ctr = () => new NamedTypeIdentifier(new NamespaceString("Reqnroll"), new IdentifierString(name));
 
         ctr.Should().Throw<ArgumentException>();
     }
@@ -73,7 +59,7 @@ public class TypeIdentifierTests
     [InlineData("1FeatureSourceGenerator")]
     public void Constructor_ThrowsArgumentExceptionWhenUsingAnInvalidLocalNameValue(string name)
     {
-        Func<TypeIdentifier> ctr = () => new TypeIdentifier(new IdentifierString(name));
+        Func<NamedTypeIdentifier> ctr = () => new NamedTypeIdentifier(new IdentifierString(name));
 
         ctr.Should().Throw<ArgumentException>();
     }
@@ -87,8 +73,8 @@ public class TypeIdentifierTests
         string ns2,
         string name2)
     {
-        var typeId1 = new TypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
-        var typeId2 = new TypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
+        var typeId1 = new NamedTypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
+        var typeId2 = new NamedTypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
 
         typeId1.Equals(typeId2).Should().BeTrue();
     }
@@ -102,8 +88,8 @@ public class TypeIdentifierTests
         string ns2,
         string name2)
     {
-        var typeId1 = new TypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
-        var typeId2 = new TypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
+        var typeId1 = new NamedTypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
+        var typeId2 = new NamedTypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
 
         typeId1.Equals(typeId2).Should().BeFalse();
     }
@@ -117,8 +103,8 @@ public class TypeIdentifierTests
         string ns2,
         string name2)
     {
-        var typeId1 = new TypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
-        var typeId2 = new TypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
+        var typeId1 = new NamedTypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
+        var typeId2 = new NamedTypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
 
         typeId1.Equals(typeId2).Should().BeFalse();
     }
@@ -132,7 +118,7 @@ public class TypeIdentifierTests
     [InlineData("", "", null, true)]
     public void EqualsString_ReturnsCaseSensitiveEquivalence(string ns, string name, string identifier, bool expected)
     {
-        new TypeIdentifier(new NamespaceString(ns), new IdentifierString(name)).Equals(identifier).Should().Be(expected);
+        new NamedTypeIdentifier(new NamespaceString(ns), new IdentifierString(name)).Equals(identifier).Should().Be(expected);
     }
 
     [Theory]
@@ -148,24 +134,10 @@ public class TypeIdentifierTests
         string ns2,
         string name2)
     {
-        var typeId1 = new TypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
-        var typeId2 = new TypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
+        var typeId1 = new NamedTypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
+        var typeId2 = new NamedTypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
 
         typeId1.GetHashCode().Should().Be(typeId2.GetHashCode());
-    }
-
-    [Theory]
-    [InlineData("Reqnroll", "Parser", "Reqnroll.Parser", true)]
-    [InlineData("Reqnroll", "Parser", "Reqnroll.parser", false)]
-    [InlineData("Reqnroll", "_Parser", "Reqnroll._Parser", true)]
-    [InlineData(null, "_Parser", "_Parser", true)]
-    [InlineData(null, "_Parser", "_parser", false)]
-    [InlineData(null, null, "", true)]
-    [InlineData(null, null, null, true)]
-    [InlineData("", "", null, true)]
-    public void EqualityOperatorWithString_ReturnsEquivalenceWithCaseSensitivity(string ns, string name, string id, bool expected)
-    {
-        (new TypeIdentifier(new NamespaceString(ns), new IdentifierString(name)) == id).Should().Be(expected);
     }
 
     [Theory]
@@ -182,28 +154,10 @@ public class TypeIdentifierTests
         string name2,
         bool expected)
     {
-        var typeId1 = new TypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
-        var typeId2 = new TypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
+        var typeId1 = new NamedTypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
+        var typeId2 = new NamedTypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
 
         (typeId1 == typeId2).Should().Be(expected);
-    }
-
-    [Theory]
-    [InlineData("Reqnroll", "Parser", "Reqnroll.Parser", false)]
-    [InlineData("Reqnroll", "Parser", "Reqnroll.parser", true)]
-    [InlineData("Reqnroll", "_Parser", "Reqnroll._Parser", false)]
-    [InlineData(null, "_Parser", "_Parser", false)]
-    [InlineData(null, "_Parser", "_parser", true)]
-    [InlineData(null, null, "", false)]
-    [InlineData(null, null, null, false)]
-    [InlineData("", "", null, false)]
-    public void InequalityOperatorWithString_ReturnsNonEquivalenceWithCaseSensitivity(
-        string ns,
-        string name,
-        string id,
-        bool expected)
-    {
-        (new TypeIdentifier(new NamespaceString(ns), new IdentifierString(name)) != id).Should().Be(expected);
     }
 
     [Theory]
@@ -220,8 +174,8 @@ public class TypeIdentifierTests
         string name2,
         bool expected)
     {
-        var typeId1 = new TypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
-        var typeId2 = new TypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
+        var typeId1 = new NamedTypeIdentifier(new NamespaceString(ns1), new IdentifierString(name1));
+        var typeId2 = new NamedTypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
 
         (typeId1 != typeId2).Should().Be(expected);
     }

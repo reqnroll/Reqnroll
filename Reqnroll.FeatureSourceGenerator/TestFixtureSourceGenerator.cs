@@ -253,12 +253,11 @@ public abstract class TestFixtureSourceGenerator(
         Scenario scenario,
         FeatureInformation feature,
         CancellationToken cancellationToken) => 
-        GetScenarioInformation(scenario, null, ImmutableArray<string>.Empty, feature, cancellationToken);
+        GetScenarioInformation(scenario, null, feature, cancellationToken);
 
     private static ScenarioInformation GetScenarioInformation(
         Scenario scenario,
-        string? ruleName,
-        ImmutableArray<string> ruleTags,
+        RuleInformation? rule,
         FeatureInformation feature,
         CancellationToken cancellationToken)
     {
@@ -297,8 +296,7 @@ public abstract class TestFixtureSourceGenerator(
             scenario.Tags.Select(tag => tag.Name).ToImmutableArray(),
             steps.ToImmutableArray(),
             exampleSets.ToImmutableArray(),
-            ruleName,
-            ruleTags);
+            rule);
     }
 
     private static IEnumerable<ScenarioInformation> GetScenarioInformation(
@@ -315,7 +313,7 @@ public abstract class TestFixtureSourceGenerator(
             switch (child)
             {
                 case Scenario scenario:
-                    yield return GetScenarioInformation(scenario, rule.Name, tags, feature, cancellationToken);
+                    yield return GetScenarioInformation(scenario, new RuleInformation(rule.Name, tags), feature, cancellationToken);
                     break;
             }
         }

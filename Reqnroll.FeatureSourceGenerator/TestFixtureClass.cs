@@ -16,21 +16,17 @@ public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>
     /// within the compilation.</param>
     /// <param name="attributes">The attributes which are applied to the feature.</param>
     public TestFixtureClass(
-        TypeIdentifier identifier,
+        NamedTypeIdentifier identifier,
         string hintName,
         ImmutableArray<AttributeDescriptor> attributes = default)
     {
-        if (identifier.IsEmpty)
-        {
-            throw new ArgumentException("Value cannot be an empty identifier.", nameof(identifier));
-        }
+        Identifier = identifier ?? throw new ArgumentNullException(nameof(identifier));
 
         if (string.IsNullOrEmpty(hintName))
         {
             throw new ArgumentException("Value cannot be null or an empty string.", nameof(hintName));
         }
 
-        Identifier = identifier;
         HintName = hintName;
 
         Attributes = attributes.IsDefault ? ImmutableArray<AttributeDescriptor>.Empty : attributes;
@@ -39,7 +35,7 @@ public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>
     /// <summary>
     /// Gets the identifier of the class.
     /// </summary>
-    public TypeIdentifier Identifier { get; }
+    public NamedTypeIdentifier Identifier { get; }
 
     /// <summary>
     /// Gets the attributes which are applied to the fixture.

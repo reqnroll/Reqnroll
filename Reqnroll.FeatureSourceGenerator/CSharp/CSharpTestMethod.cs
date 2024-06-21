@@ -2,7 +2,7 @@
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
-public abstract class CSharpTestMethod(
+public class CSharpTestMethod(
     IdentifierString identifier,
     ImmutableArray<AttributeDescriptor> attributes = default,
     ImmutableArray<ParameterDescriptor> parameters = default) : 

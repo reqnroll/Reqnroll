@@ -12,7 +12,7 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
     {
         return base.GetTestFixtureAttributes().Concat(
         [
-            new AttributeDescriptor(new TypeIdentifier(MSTestNamespace, new IdentifierString("TestClass")))
+            new AttributeDescriptor(new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestClass")))
         ]);
     }
 
@@ -67,12 +67,12 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
         var attributes = new List<AttributeDescriptor>
         {
             new(
-                new TypeIdentifier(MSTestNamespace, new IdentifierString("TestMethod"))),
+                new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestMethod"))),
             new(
-                new TypeIdentifier(MSTestNamespace, new IdentifierString("Description")),
+                new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("Description")),
                 ImmutableArray.Create<object?>(scenario.Name)),
             new(
-                new TypeIdentifier(MSTestNamespace, new IdentifierString("TestProperty")),
+                new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestProperty")),
                 ImmutableArray.Create<object?>("FeatureTitle", Document.Feature.Name))
         };
 
@@ -80,7 +80,7 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
         {
             attributes.Add(
                 new AttributeDescriptor(
-                    new TypeIdentifier(MSTestNamespace, new IdentifierString("TestCategory")),
+                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestCategory")),
                     ImmutableArray.Create<object?>(tag.Name.TrimStart('@'))));
         }
 
@@ -113,7 +113,7 @@ internal class MSTestCSharpTestFixtureGeneration(FeatureInformation featureInfo)
 
                 attributes.Add(
                     new AttributeDescriptor(
-                        new TypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")),
+                        new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")),
                         positionalArguments));
             }
         }

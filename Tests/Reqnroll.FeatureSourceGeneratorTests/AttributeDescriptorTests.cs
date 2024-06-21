@@ -8,36 +8,36 @@ public class AttributeDescriptorTests
     public static IEnumerable<object[]> StringRepresentationExamples { get; } =
         [
             [ 
-                new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar"))),
+                new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar"))),
                 "[Foo.Bar]"
             ],
             [ 
                 new AttributeDescriptor(
-                    new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")),
+                    new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")),
                     [ "Fizz" ]),
                 "[Foo.Bar(\"Fizz\")]"
             ],
             [
                 new AttributeDescriptor(
-                    new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), 
+                    new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), 
                     [ "Fizz", "Buzz" ]), 
                 "[Foo.Bar(\"Fizz\", \"Buzz\")]"
             ],
             [
                 new AttributeDescriptor(
-                    new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), 
+                    new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), 
                     [ 1, 2 ]),
                 "[Foo.Bar(1, 2)]"
             ],
             [
                 new AttributeDescriptor(
-                    new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), 
+                    new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), 
                     [ ImmutableArray.Create<string>() ]), 
                 "[Foo.Bar(new string[] {})]"
             ],
             [ 
                 new AttributeDescriptor(
-                    new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")),
+                    new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")),
                     [ ImmutableArray.Create("potato", "pancakes") ]),
                 "[Foo.Bar(new string[] {\"potato\", \"pancakes\"})]" 
             ]
@@ -52,12 +52,12 @@ public class AttributeDescriptorTests
 
     public static IEnumerable<object[]> DescriptorExamples { get; } =
         [
-            [ () => new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar"))) ],
-            [ () => new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ "Fizz" ]) ],
-            [ () => new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ "Fizz", "Buzz" ]) ],
-            [ () => new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ 1, 2 ]) ],
-            [ () => new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ ImmutableArray.Create<string>() ]) ],
-            [ () => new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ ImmutableArray.Create("potato") ]) ]
+            [ () => new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar"))) ],
+            [ () => new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ "Fizz" ]) ],
+            [ () => new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ "Fizz", "Buzz" ]) ],
+            [ () => new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ 1, 2 ]) ],
+            [ () => new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ ImmutableArray.Create<string>() ]) ],
+            [ () => new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")), [ ImmutableArray.Create("potato") ]) ]
         ];
 
     [Theory]
@@ -89,7 +89,7 @@ public class AttributeDescriptorTests
     [InlineData((ushort)100.01)]
     public void DescriptorsCanBeCreatedWithSomeBuiltInTypesAsArguments(object? argument)
     {
-        var attribute = new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
+        var attribute = new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
             .WithPositionalArguments(argument)
             .WithNamedArguments(new { Property = argument });
 
@@ -104,7 +104,7 @@ public class AttributeDescriptorTests
     [InlineData(ConsoleKey.Add)]
     public void DescriptorsCanBeCreatedWithEnumsAsArguments(object? argument)
     {
-        var attribute = new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
+        var attribute = new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
             .WithPositionalArguments(argument)
             .WithNamedArguments(new { Property = argument });
 
@@ -132,7 +132,7 @@ public class AttributeDescriptorTests
     {
         var argument = ImmutableArray.Create(value, value);
 
-        var attribute = new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
+        var attribute = new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
             .WithPositionalArguments(argument)
             .WithNamedArguments(new { Property = argument });
 
@@ -149,7 +149,7 @@ public class AttributeDescriptorTests
     {
         var argument = ImmutableArray.Create(value, value);
 
-        var attribute = new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
+        var attribute = new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
             .WithPositionalArguments(argument)
             .WithNamedArguments(new { Property = argument });
 
@@ -164,7 +164,7 @@ public class AttributeDescriptorTests
     [InlineData(typeof(AttributeDescriptorTests))]
     public void DescriptorsCanBeCreatedWithTypesAsArguments(Type argument)
     {
-        var attribute = new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
+        var attribute = new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")))
             .WithPositionalArguments(argument)
             .WithNamedArguments(new { Property = argument });
 
@@ -179,7 +179,7 @@ public class AttributeDescriptorTests
     {
         var argument = Array.Empty<string>();
 
-        var attribute = new AttributeDescriptor(new TypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")));
+        var attribute = new AttributeDescriptor(new NamedTypeIdentifier(new NamespaceString("Foo"), new IdentifierString("Bar")));
 
         attribute
             .Invoking(attribute => attribute.WithPositionalArguments([ argument ]))

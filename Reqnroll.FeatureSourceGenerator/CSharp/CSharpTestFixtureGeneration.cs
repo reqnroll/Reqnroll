@@ -1,5 +1,4 @@
 ﻿using Gherkin.Ast;
-using Microsoft.CodeAnalysis.CSharp;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
@@ -45,7 +44,7 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
     }
 
     protected virtual string GetClassName() => 
-        CSharpSyntax.CreateTypeIdentifier(Document.Feature.Name + Document.Feature.Keyword);
+        CSharpSyntax.GenerateTypeIdentifier(Document.Feature.Name + Document.Feature.Keyword);
 
     protected virtual string? GetBaseType() => null;
 
@@ -289,7 +288,7 @@ public abstract class CSharpTestFixtureGeneration(FeatureInformation featureInfo
         if (example != null)
         {
             parameters.AddRange(
-                example.TableHeader.Cells.Select(heading => $"string {CSharpSyntax.CreateParameterIdentifier(heading.Value)}"));
+                example.TableHeader.Cells.Select(heading => $"string {CSharpSyntax.GenerateParameterIdentifier(heading.Value)}"));
 
             parameters.Add("string[] exampleTags");
         }

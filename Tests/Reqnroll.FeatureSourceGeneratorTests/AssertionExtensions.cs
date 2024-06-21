@@ -36,4 +36,12 @@ public static class AssertionExtensions
     [Pure]
     public static CSharpMethodDeclarationAssertions Should(this MethodDeclarationSyntax? actualValue) =>
         new(actualValue);
+
+    /// <summary>
+    /// Returns an <see cref="TestMethodAssertions"/> object that can be used to assert the
+    /// current <see cref="TestMethod"/>.
+    /// </summary>
+    [Pure]
+    public static TestMethodAssertions Should(this TestMethod? actualValue) =>
+        new(actualValue);
 }

@@ -4,15 +4,11 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Reqnroll.FeatureSourceGenerator;
 using Reqnroll.FeatureSourceGenerator.CSharp;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
-using System.Data.Common;
 using Xunit.Abstractions;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
-using static SyntaxFactory;
-
-public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
+public class MSTestFeatureSourceGenerationTests(ITestOutputHelper output)
 {
     [Fact]
     public void GeneratorProducesMSTestOutputWhenWhenBuildPropertyConfiguredForMSTest()
@@ -113,76 +109,6 @@ public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
             .Which.Should().HaveSingleAttribute("global::Microsoft.VisualStudio.TestTools.UnitTesting.TestClass");
     }
-
-    [Fact]
-    public void GeneratorProducesMSTestDataRowsForScenarioExamples()
-    {
-        var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(asm => !asm.IsDynamic)
-            .Select(asm => MetadataReference.CreateFromFile(asm.Location));
-
-        var compilation = CSharpCompilation.Create("test", references: references);
-
-        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.MSTest]);
-
-        const string featureText =
-            """
-            #language: en
-            @featureTag1
-            Feature: Sample
-
-            Scenario Outline: Sample Scenario Outline
-                When <what> happens
-            @example_tag
-            Examples:
-                | what |
-                | foo  |
-                | bar  |
-            Examples: Second example without tags - in this case the tag list is null.
-                | what |
-                | baz  |
-            """;
-
-        var optionsProvider = new FakeAnalyzerConfigOptionsProvider(
-            new InMemoryAnalyzerConfigOptions(new Dictionary<string, string>
-            {
-                { "build_property.ReqnrollTargetTestFramework", "MSTest" }
-            }));
-
-        var driver = CSharpGeneratorDriver
-            .Create(generator)
-            .AddAdditionalTexts([new FeatureFile("Sample.feature", featureText)])
-            .WithUpdatedAnalyzerConfigOptions(optionsProvider)
-            .RunGeneratorsAndUpdateCompilation(compilation, out var generatedCompilation, out var diagnostics);
-
-        diagnostics.Should().BeEmpty();
-
-        var generatedSyntaxTree = generatedCompilation.SyntaxTrees.Should().ContainSingle()
-            .Which.Should().BeAssignableTo<CSharpSyntaxTree>().Subject!;
-
-        output.WriteLine($"Generated source:\n{generatedSyntaxTree}");
-
-        generatedSyntaxTree.GetDiagnostics().Should().BeEmpty();
-
-        generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
-            .Which.Should().ContainSingleClassDeclaration("SampleFeature")
-            .Which.Should().ContainMethod("SampleScenarioOutline")
-            .Which.Should().HaveAttribuesEquivalentTo(
-            [
-                MSTestSyntax.Attribute("TestMethod"),
-                MSTestSyntax.Attribute("Description", "Sample Scenario Outline"),
-                MSTestSyntax.Attribute("TestProperty", "FeatureTitle", "Sample"),
-                MSTestSyntax.Attribute("TestCategory", "featureTag1"),
-                MSTestSyntax.Attribute("DataRow", "foo", ImmutableArray.Create<object>( ImmutableArray.Create("example_tag") )),
-                MSTestSyntax.Attribute("DataRow", "bar", ImmutableArray.Create<object>( ImmutableArray.Create("example_tag") )),
-                MSTestSyntax.Attribute("DataRow", "baz", ImmutableArray.Create<object>( ImmutableArray<string>.Empty ))
-            ]);
-            //.And.HaveParametersEquivalentTo(
-            //[
-            //    Parameter(Identifier("what")).WithType(PredefinedType(Token(SyntaxKind.StringKeyword))),
-            //    Parameter(Identifier("exampleTags")).WithType(ArrayType(PredefinedType(Token(SyntaxKind.StringKeyword))))
-            //]);
-    }
 }
 
 internal static class MSTestSyntax
@@ -192,7 +118,7 @@ internal static class MSTestSyntax
     public static AttributeDescriptor Attribute(string type, params object?[] args)
     {
         return new AttributeDescriptor(
-            new TypeIdentifier(Namespace, new IdentifierString(type)),
+            new NamedTypeIdentifier(Namespace, new IdentifierString(type)),
             [.. args]);
     }
 

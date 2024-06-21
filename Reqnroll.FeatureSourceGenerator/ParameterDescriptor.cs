@@ -8,11 +8,6 @@ public class ParameterDescriptor: IEquatable<ParameterDescriptor?>
             throw new ArgumentException("Value cannot be an empty identifier.", nameof(name));
         }
 
-        if (type.IsEmpty)
-        {
-            throw new ArgumentException("Value cannot be an empty identifier.", nameof(type));
-        }
-
         Name = name;
         Type = type;
     }
@@ -51,4 +46,6 @@ public class ParameterDescriptor: IEquatable<ParameterDescriptor?>
             return hash;
         }
     }
+
+    public override string ToString() => $"{Type} {Name}";
 }

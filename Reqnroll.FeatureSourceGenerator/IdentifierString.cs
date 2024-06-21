@@ -6,6 +6,8 @@ public readonly struct IdentifierString : IEquatable<IdentifierString>, IEquatab
 {
     private readonly string? _value;
 
+    public static readonly IdentifierString Empty = default;
+
     public IdentifierString(string? s)
     {
         if (string.IsNullOrEmpty(s))

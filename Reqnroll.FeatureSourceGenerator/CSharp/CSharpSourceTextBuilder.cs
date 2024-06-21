@@ -267,7 +267,7 @@ public class CSharpSourceTextBuilder
         return this;
     }
 
-    public CSharpSourceTextBuilder AppendTypeReference(TypeIdentifier identifier)
+    public CSharpSourceTextBuilder AppendTypeReference(TypeIdentifier type)
     {
         return this;
     }

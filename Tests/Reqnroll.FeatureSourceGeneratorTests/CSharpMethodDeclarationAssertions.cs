@@ -249,7 +249,7 @@ internal static class SyntaxInterpreter
     {
         var type = attribute.Name switch
         {
-            QualifiedNameSyntax qname => new TypeIdentifier(
+            QualifiedNameSyntax qname => new NamedTypeIdentifier(
                 new NamespaceString(
                     qname.Left.ToString().StartsWith("global::") ? 
                         qname.Left.ToString()[8..] : 
