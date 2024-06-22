@@ -7,6 +7,7 @@ namespace Reqnroll.Infrastructure
     {
         FeatureContext FeatureContext { get; }
         ScenarioContext ScenarioContext { get; }
+        ITestThreadContext TestThreadContext { get; }
 
         Task OnTestRunStartAsync();
         Task OnTestRunEndAsync();

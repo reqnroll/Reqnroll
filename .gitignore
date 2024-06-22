@@ -367,15 +367,13 @@ Reqnroll.sln.GhostDoc.xml
 Features.Generated/
 GitExtensions.settings.backup
 
-/Installer/NuGetPackages/Reqnroll.Tools.MsBuild.Generation/build/Reqnroll.Tools.MsBuild.Generation.targets
-/Installer/NuGetPackages/Reqnroll.Tools.MsBuild.Generation/build/Reqnroll.Tools.MsBuild.Generation.props
 /Tests/Reqnroll.MsBuildNetSdk.IntegrationTests/Features/dummy.feature.cs
 *.feature.cs
 *.AssemblyHooks.cs
 *.AssemblyHooks.vb
 
 # Version for Specs
-Tests/Reqnroll.Specs/NuGetPackageVersion.cs
+Tests/**/NuGetPackageVersion.cs
 
 #Analytics
 AppInsightsInstrumentationKey.cs
@@ -385,3 +383,4 @@ docs/_build/*
 /docs/Lib/
 /docs/Scripts/
 /docs/pyvenv.cfg
+nCrunchTemp*.csproj

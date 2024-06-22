@@ -8,6 +8,7 @@ The key differences between SpecFlow and Reqnroll are the following:
 * The namespace of the classes has been changed from `TechTalk.SpecFlow` to `Reqnroll` and some classes that had SpecFlow in their name (e.g. `ISpecFlowOutputHelper`) have been renamed accordingly. An optional *SpecFlow Compatibility Package* has been created to migrate without changing all namespaces, see below.
 * There is a new `DataTable` alias for the `Table` class to better match Gherkin terminology. The `Table` class can still be used.
 * The main extension methods of the *Assist helpers* have been moved to the `Reqnroll` namespace, so that they can be used without an additional namespace using statement. The helpers are now referred to as [](../automation/datatable-helpers.md).
+* The namespace of `IObjectContainer` has been changed from `BoDi` to `Reqnroll.BoDi`. If you have used special customizations that required to access the dependency injection container directly, you might need to update the namespace usings.
 * The [Reqnroll Visual Studio extension](../installation/setup-ide.md#setup-vs) has been reworked in a way that it can handle both SpecFlow and Reqnroll projects (also for .NET 8.0).
 * The integration plugins that have been managed by SpecFlow have been also ported to work with Reqnroll (e.g. `Reqnroll.Autofac`). See [](../integrations/available-plugins.md).
 * The "SpecFlow.Actions" plugins that provide a ready-to-use support for different automation technologies (e.g. Selenium) are ported as `Reqnroll.SpecFlowCompatibility.Actions.*` packages (e.g. `Reqnroll.SpecFlowCompatibility.Actions.Selenium`). 
@@ -18,6 +19,11 @@ This article provides you a step-by-step guidance to migrate SpecFlow projects t
 2. [](#with-namespace-changes): requires simple changes, mostly doable with search-and-replace.
 
 It is also worth mentioning that Reqnroll is based on the SpecFlow v4 codebase, so if you migrate from SpecFlow v3, you should consider the [](#breaking-changes-specflow-v3) section as well.
+
+```{tip}
+It is recommended to upgrade directly to the latest version of Reqnroll (e.g. v2.0), as we keep improving the migration experience and fix issues that might block migration.
+```
+
 
 {#specflow-compatibility-package}
 ## Migrate with the Reqnroll SpecFlow Compatibility Package
@@ -55,8 +61,8 @@ After the change, your project file might look like this:
     <PackageReference Include="MSTest.TestFramework" Version="3.2.0" />
 
     <!-- Reqnroll -->
-    <PackageReference Include="Reqnroll.MsTest" Version="1.0.0" />
-    <PackageReference Include="Reqnroll.SpecFlowCompatibility" Version="1.0.0" />
+    <PackageReference Include="Reqnroll.MsTest" Version="2.0.0" />
+    <PackageReference Include="Reqnroll.SpecFlowCompatibility" Version="2.0.0" />
   </ItemGroup>
   [...]
 </Project>
@@ -145,7 +151,7 @@ After the change, your project file might look like this:
     <PackageReference Include="MSTest.TestFramework" Version="3.2.0" />
 
     <!-- Reqnroll -->
-    <PackageReference Include="Reqnroll.MsTest" Version="1.0.0" />
+    <PackageReference Include="Reqnroll.MsTest" Version="2.0.0" />
   </ItemGroup>
   [...]
 </Project>
@@ -264,6 +270,8 @@ This will add the markers to all step definition attributes.
 ```
 [When("I $ something")]
 ```
+
+**Solution 3:** If none of the above solutions are possible, you can also consider changing the cucumber expression detection strategy as described in [](how-to-configure-cucumber-expression-behavior.md).
 
 #### Expression matching problems during test execution
 

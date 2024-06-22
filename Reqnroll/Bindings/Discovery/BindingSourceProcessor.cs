@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Bindings.Reflection;
-using Reqnroll.Compatibility;
+using Reqnroll.PlatformCompatibility;
 
 namespace Reqnroll.Bindings.Discovery
 {

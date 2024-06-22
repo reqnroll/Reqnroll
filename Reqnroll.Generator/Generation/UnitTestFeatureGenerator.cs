@@ -7,7 +7,6 @@ using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
-using Reqnroll.Infrastructure;
 using Reqnroll.Parser;
 using Reqnroll.Tracing;
 
@@ -127,7 +126,7 @@ namespace Reqnroll.Generator.Generation
             //await testRunner.CollectScenarioErrorsAsync();
             var expression = new CodeMethodInvokeExpression(
                 testRunnerField,
-                nameof(TestRunner.CollectScenarioErrorsAsync));
+                nameof(ITestRunner.CollectScenarioErrorsAsync));
 
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
@@ -178,15 +177,9 @@ namespace Reqnroll.Generator.Generation
             //testRunner = TestRunnerManager.GetTestRunnerForAssembly(null, [test_worker_id]);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
-            var testRunnerParameters = new[]
-            {
-                new CodePrimitiveExpression(null),
-                _testGeneratorProvider.GetTestWorkerIdExpression()
-            };
-
             var getTestRunnerExpression = new CodeMethodInvokeExpression(
                 new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
-                nameof(TestRunnerManager.GetTestRunnerForAssembly), testRunnerParameters);
+                nameof(TestRunnerManager.GetTestRunnerForAssembly));
 
             testClassInitializeMethod.Statements.Add(
                 new CodeAssignStatement(
@@ -239,7 +232,14 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
             testClassCleanupMethod.Statements.Add(expression);
-            
+
+            // 
+            testClassCleanupMethod.Statements.Add(
+                new CodeMethodInvokeExpression(
+                    new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
+                    nameof(TestRunnerManager.ReleaseTestRunner),
+                    testRunnerField));
+
             // testRunner = null;
             testClassCleanupMethod.Statements.Add(
                 new CodeAssignStatement(
@@ -296,7 +296,7 @@ namespace Reqnroll.Generator.Generation
             scenarioInitializeMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
                     testRunnerField,
-                    nameof(ITestExecutionEngine.OnScenarioInitialize),
+                    nameof(ITestRunner.OnScenarioInitialize),
                     new CodeVariableReferenceExpression("scenarioInfo")));
         }
 
@@ -313,7 +313,7 @@ namespace Reqnroll.Generator.Generation
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
             var expression = new CodeMethodInvokeExpression(
                 testRunnerField,
-                nameof(ITestExecutionEngine.OnScenarioStartAsync));
+                nameof(ITestRunner.OnScenarioStartAsync));
 
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 

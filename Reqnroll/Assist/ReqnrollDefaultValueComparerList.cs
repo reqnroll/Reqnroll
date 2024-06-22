@@ -9,6 +9,7 @@ namespace Reqnroll.Assist
         public ReqnrollDefaultValueComparerList()
             : base(new List<IValueComparer> {
                     new DateTimeValueComparer(),
+                    new DateTimeOffsetValueComparer(),
                     new BoolValueComparer(),
                     new GuidValueComparer(),
                     new DecimalValueComparer(),

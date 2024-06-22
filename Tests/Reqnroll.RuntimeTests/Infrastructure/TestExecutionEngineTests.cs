@@ -379,7 +379,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             {
                 await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
 
-                Assert.True(false, "execution of the step should have failed because of the exeption thrown by the before scenario block hook");
+                Assert.Fail("execution of the step should have failed because of the exeption thrown by the before scenario block hook");
             }
             catch (Exception)
             {

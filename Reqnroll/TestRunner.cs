@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Reqnroll.Bindings;
 using Reqnroll.Infrastructure;
@@ -8,31 +9,28 @@ namespace Reqnroll
     {
         private readonly ITestExecutionEngine _executionEngine;
 
-        public string TestWorkerId { get; private set; }
+        public string TestWorkerId => TestThreadContainerInfo.GetId(TestThreadContext.TestThreadContainer);
 
         public TestRunner(ITestExecutionEngine executionEngine)
         {
             _executionEngine = executionEngine;
         }
 
-        public FeatureContext FeatureContext
-        {
-            get { return _executionEngine.FeatureContext; }
-        }
+        public FeatureContext FeatureContext => _executionEngine.FeatureContext;
 
-        public ScenarioContext ScenarioContext
-        {
-            get { return _executionEngine.ScenarioContext; }
-        }
+        public ScenarioContext ScenarioContext => _executionEngine.ScenarioContext;
+
+        public ITestThreadContext TestThreadContext => _executionEngine.TestThreadContext;
 
         public async Task OnTestRunStartAsync()
         {
             await _executionEngine.OnTestRunStartAsync();
         }
 
+        [Obsolete("TestWorkerId is now managed by Reqnroll internally - Method will be removed in v3")]
         public void InitializeTestRunner(string testWorkerId)
         {
-            TestWorkerId = testWorkerId;
+            // do nothing method will be removed
         }
 
         public async Task OnFeatureStartAsync(FeatureInfo featureInfo)

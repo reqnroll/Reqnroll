@@ -57,6 +57,11 @@ public class SampleUser
     public override int GetHashCode() => UserName.GetHashCode();
 }
 
+public record SampleComplexUser(string Firstname, string Surname, int Age, int Height)
+{
+    public static SampleComplexUser Create(string firstname, string surname, int age, int height) => new(firstname, surname, age, height);
+}
+
 public class CucumberExpressionIntegrationTests
 {
     public class SampleBindings
@@ -100,9 +105,24 @@ public class CucumberExpressionIntegrationTests
             ExecutedParams.Add((userParam, typeof(SampleUser)));
         }
 
+        public void StepDefWithCustomComplexClassParam(SampleComplexUser userParam)
+        {
+            ExecutedParams.Add((userParam, typeof(SampleComplexUser)));
+        }
+
         public int ConvertFortyTwo()
         {
             return 42;
+        }
+
+        public string ConvertToStringLowercase(string str)
+        {
+            return str.ToLower();
+        }
+
+        public int ConvertToIntPlus100(int nr)
+        {
+            return nr + 100;
         }
     }
 
@@ -175,7 +195,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_simple_cucumber_expression()
+    public async Task Should_match_step_with_simple_cucumber_expression()
     {
         var expression = "there is something";
         var stepText = "there is something";
@@ -187,7 +207,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_parameterless_cucumber_expression()
+    public async Task Should_match_step_with_parameterless_cucumber_expression()
     {
         var expression = "there is/are something(s) here \\/ now";
         var stepText = "there are something here / now";
@@ -199,7 +219,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_string_parameter_using_apostrophe()
+    public async Task Should_match_step_with_string_parameter_using_apostrophe()
     {
         var expression = "there is a user {string} registered";
         var stepText = "there is a user 'Marvin' registered";
@@ -212,7 +232,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_string_parameter_using_quotes()
+    public async Task Should_match_step_with_string_parameter_using_quotes()
     {
         var expression = "there is a user {string} registered";
         var stepText = "there is a user \"Marvin\" registered";
@@ -225,7 +245,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_word_parameter()
+    public async Task Should_match_step_with_word_parameter()
     {
         var expression = "there is a user {word} registered";
         var stepText = "there is a user Marvin registered";
@@ -238,7 +258,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_int_parameter()
+    public async Task Should_match_step_with_int_parameter()
     {
         var expression = "I have {int} cucumbers in my belly";
         var stepText = "I have 42 cucumbers in my belly";
@@ -251,7 +271,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_float_parameter()
+    public async Task Should_match_step_with_float_parameter()
     {
         var expression = "I have {float} cucumbers in my belly";
         var stepText = "I have 42.1 cucumbers in my belly";
@@ -264,7 +284,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_float_parameter_to_double()
+    public async Task Should_match_step_with_float_parameter_to_double()
     {
         var expression = "I have {float} cucumbers in my belly";
         var stepText = "I have 42.1 cucumbers in my belly";
@@ -277,7 +297,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_double_parameter()
+    public async Task Should_match_step_with_double_parameter()
     {
         var expression = "I have {double} cucumbers in my belly";
         var stepText = "I have 42.1 cucumbers in my belly";
@@ -290,7 +310,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_decimal_parameter()
+    public async Task Should_match_step_with_decimal_parameter()
     {
         var expression = "I have {decimal} cucumbers in my belly";
         var stepText = "I have 42.1 cucumbers in my belly";
@@ -303,7 +323,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_float_parameter_to_decimal()
+    public async Task Should_match_step_with_float_parameter_to_decimal()
     {
         var expression = "I have {float} cucumbers in my belly";
         var stepText = "I have 42.1 cucumbers in my belly";
@@ -316,7 +336,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_joker_parameter()
+    public async Task Should_match_step_with_joker_parameter()
     {
         var expression = "there is a user {} registered";
         var stepText = "there is a user Marvin registered";
@@ -330,7 +350,7 @@ public class CucumberExpressionIntegrationTests
 
     // build-in types supported by Reqnroll
     [Fact]
-    public async void Should_match_step_with_Int32_parameter()
+    public async Task Should_match_step_with_Int32_parameter()
     {
         var expression = "I have {Int32} cucumbers in my belly";
         var stepText = "I have 42 cucumbers in my belly";
@@ -344,7 +364,7 @@ public class CucumberExpressionIntegrationTests
 
     // enum support
     [Fact]
-    public async void Should_match_step_with_enum_parameter()
+    public async Task Should_match_step_with_enum_parameter()
     {
         var expression = "I have {SampleColorEnum} cucumbers in my belly";
         var stepText = "I have Yellow cucumbers in my belly";
@@ -359,14 +379,14 @@ public class CucumberExpressionIntegrationTests
     // custom type conversion support
 
     [Fact]
-    public async void Should_match_step_with_custom_parameter_with_type_name()
+    public async Task Should_match_step_with_custom_parameter_with_type_name()
     {
         var expression = "there is a {SampleUser} registered";
         var stepText = "there is a user Marvin registered";
         var expectedParam = (new SampleUser("Marvin"), typeof(SampleUser));
         var methodName = nameof(SampleBindings.StepDefWithCustomClassParam);
         IStepArgumentTransformationBinding transformation = new StepArgumentTransformationBinding(
-            "user ([A-Z][a-z]+)", 
+            "user ([A-Z][a-z]+)",
             new RuntimeBindingMethod(typeof(SampleUser).GetMethod(nameof(SampleUser.Create))));
 
         var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation});
@@ -376,14 +396,14 @@ public class CucumberExpressionIntegrationTests
 
 
     [Fact]
-    public async void Should_match_step_with_custom_parameter_with_custom_name()
+    public async Task Should_match_step_with_custom_parameter_with_custom_name()
     {
         var expression = "there is a {user} registered";
         var stepText = "there is a user Marvin registered";
         var expectedParam = (new SampleUser("Marvin"), typeof(SampleUser));
         var methodName = nameof(SampleBindings.StepDefWithCustomClassParam);
         IStepArgumentTransformationBinding transformation = new StepArgumentTransformationBinding(
-            "user ([A-Z][a-z]+)", 
+            "user ([A-Z][a-z]+)",
             new RuntimeBindingMethod(typeof(SampleUser).GetMethod(nameof(SampleUser.Create))),
             "user");
 
@@ -393,7 +413,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_customized_built_in_parameter_with_type_name()
+    public async Task Should_match_step_with_customized_built_in_parameter_with_type_name()
     {
         var expression = "I have {Int32} cucumbers in my belly";
         var stepText = "I have forty two cucumbers in my belly";
@@ -409,7 +429,7 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
-    public async void Should_match_step_with_customized_built_in_parameter_with_simple_name()
+    public async Task Should_match_step_with_customized_built_in_parameter_with_simple_name()
     {
         var expression = "I have {int} cucumbers in my belly";
         var stepText = "I have forty two cucumbers in my belly";
@@ -420,6 +440,66 @@ public class CucumberExpressionIntegrationTests
             new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertFortyTwo))));
 
         var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async Task Should_match_step_with_customized_built_in_parameter_without_recursion_string()
+    {
+        var expression = "there is a user {string} registered";
+        var stepText = "there is a user 'Marvin' registered";
+        var expectedParam = ("marvin", typeof(string));
+        var methodName = nameof(SampleBindings.StepDefWithStringParam);
+
+        IStepArgumentTransformationBinding transformation = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToStringLowercase))));
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async Task Should_match_step_with_customized_built_in_parameter_without_recursion_int32()
+    {
+        var expression = "I have {int} cucumbers in my belly";
+        var stepText = "I have 43 cucumbers in my belly";
+        var expectedParam = (143, typeof(int));
+        var methodName = nameof(SampleBindings.StepDefWithIntParam);
+
+        IStepArgumentTransformationBinding transformation = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToIntPlus100))));
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async Task Should_match_step_with_custom_parameter_with_additional_step_arguments()
+    {
+        var expression = "there is a {user} registered";
+        var stepText = "there is a user Marvin Smith he is 27 years old and 175 height registered";
+        var expectedParam = (new SampleComplexUser("marvin", "smith", 127, 275), typeof(SampleComplexUser));
+        var methodName = nameof(SampleBindings.StepDefWithCustomComplexClassParam);
+
+        IStepArgumentTransformationBinding transformationStringWithouthBlanks = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToStringLowercase))));
+
+        IStepArgumentTransformationBinding transformationIntPlus100 = new StepArgumentTransformationBinding(
+            (string)null,
+            new RuntimeBindingMethod(typeof(SampleBindings).GetMethod(nameof(SampleBindings.ConvertToIntPlus100))));
+
+        IStepArgumentTransformationBinding transformationSampleComplexUser = new StepArgumentTransformationBinding(
+            "user ([A-Za-z]+) ([A-Za-z]+) he is ([0-9]+) years old and ([0-9]+) height",
+            new RuntimeBindingMethod(typeof(SampleComplexUser).GetMethod(nameof(SampleComplexUser.Create))),
+            "user");
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformationStringWithouthBlanks, transformationIntPlus100, transformationSampleComplexUser });
 
         sampleBindings.ExecutedParams.Should().Contain(expectedParam);
     }

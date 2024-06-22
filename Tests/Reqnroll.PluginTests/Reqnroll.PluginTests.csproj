@@ -10,6 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Plugins\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Plugins\Reqnroll.Autofac.ReqnrollPlugin\Reqnroll.Autofac.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.Windsor.ReqnrollPlugin\Reqnroll.Windsor.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
@@ -23,18 +25,24 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.2.0" />
     <PackageReference Include="FluentAssertions" Version="6.7.0" />
     <PackageReference Include="Moq" Version="4.17.2" />
-    <PackageReference Include="xunit" Version="2.4.2" />
-    <PackageReference Include="xunit.runner.console" Version="2.4.2">
+    <PackageReference Include="xunit" Version="2.8.1" />
+    <PackageReference Include="xunit.runner.console" Version="2.8.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="ExternalData\SampleFiles\products-invalid.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExternalData\SampleFiles\products-nested-dataset.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="ExternalData\SampleFiles\products-empty.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
@@ -45,6 +53,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ExternalData\SampleFiles\products.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="ExternalData\SampleFiles\products.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="ExternalData\SampleFiles\products.xlsx">

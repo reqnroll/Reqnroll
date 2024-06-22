@@ -10,9 +10,10 @@
     <summary>Package to enable the code-behind file generation during build time http://reqnroll.net/documentation/Generate-Tests-from-MsBuild/</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
     <icon>images\reqnroll-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <license type="file">LICENSE</license>
+    <license type="expression">BSD-3-Clause</license>
     <tags>reqnroll msbuild</tags>
     <copyright>$copyright$</copyright>
     <dependencies>
@@ -22,13 +23,13 @@
   <files>
     <file src="build\**\*" target="build" />
     <file src="buildMultiTargeting\**\*" target="buildMultiTargeting" />
-    <file src="bin\$config$\net462\*.dll" target="tasks\$Reqnroll_FullFramework_Generator_TFM$" />
-    <file src="bin\$config$\netcoreapp3.1\*.dll" exclude="bin\$config$\netcoreapp3.1\System.*;bin\$config$\netcoreapp3.1\Microsoft.*" target="tasks\$Reqnroll_Core_Tools_TFM$" />
-    <file src="bin\$config$\netcoreapp3.1\*.deps.json" target="tasks\$Reqnroll_Core_Tools_TFM$" />
-
-    <file src="bin\$config$\net6.0\*.dll" exclude="bin\$config$\net6.0\System.*;bin\$config$\net6.0\Microsoft.*" target="tasks\$Reqnroll_Net6_TFM$" />
-    <file src="bin\$config$\net6.0\*.deps.json" target="tasks\$Reqnroll_Net6_TFM$" />
     
+    <file src="bin\$config$\net462\*.dll" target="tasks\$Reqnroll_FullFramework_Tools_TFM$" />
+    <file src="bin\$config$\netstandard2.0\*.dll" 
+          exclude="bin\$config$\netstandard2.0\System.*;bin\$config$\netstandard2.0\Microsoft.*" 
+          target="tasks\$Reqnroll_Core_Tools_TFM$" />
+    <file src="bin\$config$\netstandard2.0\*.deps.json" target="tasks\$Reqnroll_Core_Tools_TFM$" />
+
     <file src="$SolutionDir$\Licenses\**\*" target="licenses" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />

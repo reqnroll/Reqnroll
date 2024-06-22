@@ -62,6 +62,14 @@ public interface IObjectContainer : IDisposable
     IStrategyRegistration RegisterFactoryAs<TInterface>(Func<IObjectContainer, TInterface> factoryDelegate, string name = null);
 
     /// <summary>
+    /// Registers an instance produced by <paramref name="factoryDelegate"/>. The delegate will be called only once and the instance it returned will be returned in each resolution.
+    /// </summary>
+    /// <typeparam name="TInterface">Interface to register as.</typeparam>
+    /// <param name="factoryDelegate">The function to run to obtain the instance.</param>
+    /// <param name="name">A name to resolve named instance, otherwise null.</param>
+    IStrategyRegistration RegisterFactoryAs<TInterface>(Func<TInterface> factoryDelegate, string name = null);
+
+    /// <summary>
     /// Resolves an implementation object for an interface or type.
     /// </summary>
     /// <typeparam name="T">The interface or type.</typeparam>
@@ -101,17 +109,18 @@ public interface IObjectContainer : IDisposable
     IEnumerable<T> ResolveAll<T>() where T : class;
 
     /// <summary>
-    /// Determines whether the interface or type is registered.
+    /// Determines whether the interface or type is registered optionally with the specified name.
     /// </summary>
     /// <typeparam name="T">The interface or type.</typeparam>
+    /// <param name="name">The name or <c>null</c>.</param>
     /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
-    bool IsRegistered<T>();
+    bool IsRegistered<T>(string name = null);
 
     /// <summary>
     /// Determines whether the interface or type is registered with the specified name.
     /// </summary>
-    /// <typeparam name="T">The interface or type.</typeparam>
+    /// <param name="type">The interface or type.</param>
     /// <param name="name">The name.</param>
     /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
-    bool IsRegistered<T>(string name);
+    bool IsRegistered(Type type, string name = null);
 }

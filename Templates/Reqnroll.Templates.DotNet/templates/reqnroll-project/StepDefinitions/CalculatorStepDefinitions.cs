@@ -2,6 +2,7 @@ using Reqnroll;
 
 namespace Template.StepDefinitions;
 
+[Binding]
 public sealed class CalculatorStepDefinitions
 {
     // For additional details on Reqnroll step definitions see https://go.reqnroll.net/doc-stepdef

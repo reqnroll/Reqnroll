@@ -7,8 +7,9 @@ This part contains details of the following topics.
 
 available-plugins
 autofac
-fsharp
+dependency-injection
 windsor
+fsharp
 externaldata
 mstest
 nunit

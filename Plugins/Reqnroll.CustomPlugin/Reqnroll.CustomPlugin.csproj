@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.CustomPlugin.nuspec</NuspecFile>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <NoPackageAnalysis>true</NoPackageAnalysis>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+  </ItemGroup>
+
+</Project>

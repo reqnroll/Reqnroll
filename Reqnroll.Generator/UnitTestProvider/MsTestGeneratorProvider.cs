@@ -13,6 +13,8 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string PROPERTY_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute";
         protected internal const string TESTFIXTURESETUP_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitializeAttribute";
         protected internal const string TESTFIXTURETEARDOWN_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute";
+        protected internal const string CLASSCLEANUPBEHAVIOR_ENUM = "Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior";
+        protected internal const string CLASSCLEANUPBEHAVIOR_ENDOFCLASS = "EndOfClass";
         protected internal const string TESTSETUP_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.TestInitializeAttribute";
         protected internal const string TESTTEARDOWN_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.TestCleanupAttribute";
         protected internal const string IGNORE_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.IgnoreAttribute";
@@ -112,7 +114,9 @@ namespace Reqnroll.Generator.UnitTestProvider
         public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
-            CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR);
+            // [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior.EndOfClass)]
+            var attribute = CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR);
+            attribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(CLASSCLEANUPBEHAVIOR_ENUM), CLASSCLEANUPBEHAVIOR_ENDOFCLASS)));
         }
 
 
@@ -223,15 +227,6 @@ namespace Reqnroll.Generator.UnitTestProvider
         public void MarkCodeMethodInvokeExpressionAsAwait(CodeMethodInvokeExpression expression)
         {
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
-        }
-
-        public CodeExpression GetTestWorkerIdExpression()
-        {
-            // System.Threading.Thread.CurrentThread.ManagedThreadId.ToString()
-            return new CodeMethodInvokeExpression(
-                new CodeVariableReferenceExpression("System.Threading.Thread.CurrentThread.ManagedThreadId"),
-                nameof(ToString)
-            );
         }
     }
 }

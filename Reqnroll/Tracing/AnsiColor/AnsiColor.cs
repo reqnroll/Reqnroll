@@ -23,9 +23,6 @@ public readonly struct AnsiColor
     public static AnsiColor Background(int r, int g, int b) => new(TerminalControlSequences.SetBackgroundColor, new TerminalRgbColor(r, g, b));
     public static AnsiColor Composite(params AnsiColor[] codes) => new(codes);
 
-#if NET3_0_OR_GREATER
-    [return: System.Diagnostics.CodeAnalysis.NotNullIfNotNull("text")]
-#endif
     public static string? ColorizeText(string? text, AnsiColor code)
     {
         if (text == null) return null;
@@ -70,7 +67,7 @@ public readonly struct AnsiColor
 
     private TerminalControlSequences GetResetSequence(TerminalControlSequences controlSequence)
     {
-        switch (ControlSequence)
+        switch (controlSequence)
         {
             case TerminalControlSequences.SetForegroundColor: return TerminalControlSequences.DefaultForegroundColor;
             case TerminalControlSequences.SetBackgroundColor: return TerminalControlSequences.DefaultBackgroundColor;

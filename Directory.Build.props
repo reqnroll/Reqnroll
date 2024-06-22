@@ -6,12 +6,23 @@
     <Reqnroll_Copyright>Copyright © Reqnroll</Reqnroll_Copyright>
     <Reqnroll_Authors>Reqnroll</Reqnroll_Authors>
     <Reqnroll_Owners>Reqnroll</Reqnroll_Owners>
+    <Reqnroll_Summary>Reqnroll is an open-source Cucumber-style BDD test automation framework for .NET. It has been created as a reboot of the SpecFlow project.</Reqnroll_Summary>
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>1.0.2</VersionPrefix>
+    <VersionPrefix>2.1.0</VersionPrefix>
     <VersionSuffix>local</VersionSuffix>
-    <AssemblyVersion>1.0.0</AssemblyVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
+    <CompatibilityVersionUpperRange>3</CompatibilityVersionUpperRange>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <GitBranch Condition=" '$(GitBranch)' == ''">$(GITHUB_REF_NAME)</GitBranch>
+    <GitCommitSha Condition=" '$(GitCommitSha)' == ''">$(GITHUB_SHA)</GitCommitSha>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
@@ -36,32 +47,9 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Reqnroll_FullFramework_TFM>net462</Reqnroll_FullFramework_TFM>
-
-    <Reqnroll_Net6_TFM>net6.0</Reqnroll_Net6_TFM>
-    
-
-    <Reqnroll_FullFramework_Runtime_TFM>$(Reqnroll_FullFramework_TFM)</Reqnroll_FullFramework_Runtime_TFM>
-    <Reqnroll_Core_Runtime_TFM>netstandard2.0</Reqnroll_Core_Runtime_TFM>
-
-    <Reqnroll_FullFramework_Generator_TFM>$(Reqnroll_FullFramework_TFM)</Reqnroll_FullFramework_Generator_TFM>
-    <Reqnroll_Core_Generator_TFM>netcoreapp3.1</Reqnroll_Core_Generator_TFM>
-
-    <Reqnroll_FullFramework_Test_TFM>$(Reqnroll_FullFramework_TFM)</Reqnroll_FullFramework_Test_TFM>
-    <Reqnroll_Core_Test_TFM>netcoreapp3.1;net6.0</Reqnroll_Core_Test_TFM>
-
-    <Reqnroll_FullFramework_Specs_TFM>$(Reqnroll_FullFramework_TFM)</Reqnroll_FullFramework_Specs_TFM>
-    <Reqnroll_Net6_Specs_TFM>$(Reqnroll_Net6_TFM)</Reqnroll_Net6_Specs_TFM>
-
-    <Reqnroll_FullFramework_Tools_TFM>$(Reqnroll_FullFramework_TFM)</Reqnroll_FullFramework_Tools_TFM>
-    <Reqnroll_Core_Tools_TFM>netcoreapp3.1</Reqnroll_Core_Tools_TFM> 
-    <Reqnroll_Net6_Tools_TFM>$(Reqnroll_Net6_TFM)</Reqnroll_Net6_Tools_TFM>
-
-    <Reqnroll_Runtime_TFM>$(Reqnroll_FullFramework_Runtime_TFM);$(Reqnroll_Core_Runtime_TFM);$(Reqnroll_Net6_TFM)</Reqnroll_Runtime_TFM>
-    <Reqnroll_Generator_TFM>$(Reqnroll_FullFramework_Generator_TFM);$(Reqnroll_Core_Generator_TFM);$(Reqnroll_Net6_TFM)</Reqnroll_Generator_TFM>
-    <Reqnroll_Test_TFM>$(Reqnroll_FullFramework_Test_TFM);$(Reqnroll_Core_Test_TFM)</Reqnroll_Test_TFM>
-    <Reqnroll_Specs_TFM>$(Reqnroll_Net6_Specs_TFM)</Reqnroll_Specs_TFM>
-    <Reqnroll_Tools_TFM>$(Reqnroll_FullFramework_Tools_TFM);$(Reqnroll_Core_Tools_TFM);$(Reqnroll_Net6_Tools_TFM)</Reqnroll_Tools_TFM>
+    <!-- for Reqnroll.Tools.MsBuild.Generation -->
+    <Reqnroll_FullFramework_Tools_TFM>net462</Reqnroll_FullFramework_Tools_TFM>
+    <Reqnroll_Core_Tools_TFM>netstandard2.0</Reqnroll_Core_Tools_TFM> 
 
     <Reqnroll_EnableStrongNameSigning>true</Reqnroll_EnableStrongNameSigning>
   </PropertyGroup>
