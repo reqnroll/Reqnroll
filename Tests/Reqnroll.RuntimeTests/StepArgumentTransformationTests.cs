@@ -79,14 +79,14 @@ namespace Reqnroll.RuntimeTests
         }
     }
 
-    public class StepTransformationTests
+    public class StepArgumentTransformationTests
     {
         private readonly Mock<IBindingRegistry> bindingRegistryStub = new Mock<IBindingRegistry>();
         private readonly Mock<IContextManager> contextManagerStub = new Mock<IContextManager>();
         private readonly Mock<IAsyncBindingInvoker> methodBindingInvokerStub = new Mock<IAsyncBindingInvoker>();
         private readonly List<IStepArgumentTransformationBinding> stepTransformations = new List<IStepArgumentTransformationBinding>();
 
-        public StepTransformationTests()
+        public StepArgumentTransformationTests()
         {
             // ScenarioContext is needed, because the [Binding]-instances live there
             var scenarioContext = new ScenarioContext(new ObjectContainer(), null, new TestObjectResolver());

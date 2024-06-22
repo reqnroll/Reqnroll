@@ -18,7 +18,7 @@ A step argument transformation is used to convert an argument if:
 * The regular expression (if specified) matches the original (string) argument
 
 ```{note}
-If multiple matching transformation are available, a warning is output in the trace and the first transformation is used.
+If multiple matching transformations are available and no order is specified, a warning is output in the trace and the first transformation is used. If the order is specified, the transformation with the lowest order value is used.
 ```
 
 The following example transforms a relative period of time (`in 3 days`) into a `DateTime` structure.
@@ -65,6 +65,32 @@ public class Transforms
     {
        return booksTable.CreateSet<Books>();
     }
+}
+```
+
+The following example transforms a string argument to a Rating model. If regex matches the expression, the given rating score will be parsed. Otherwise, the default rating will be used.
+
+```{code-block} csharp
+:caption: C# File
+[Binding]
+public class Transforms
+{
+    [StepArgumentTransformation(@"with (\d+) score")]
+    public Rating RatingTransformation(int score)
+    {
+      return new Rating(score);
+    }
+    
+    [StepArgumentTransformation(Order = 10)]
+    public Rating GlobalRatingTransformation(string input) 
+    {
+        return Rating.DefaultRating;
+    }
+}
+
+public record Rating(int Value) 
+{
+    public static Rating DefaultRating => new Rating(50);
 }
 ```
 

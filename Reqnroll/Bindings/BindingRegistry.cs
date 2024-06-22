@@ -46,7 +46,7 @@ namespace Reqnroll.Bindings
 
         public virtual IEnumerable<IStepArgumentTransformationBinding> GetStepTransformations()
         {
-            return _stepArgumentTransformations;
+            return _stepArgumentTransformations.OrderBy(s => s.Order);
         }
 
         public IEnumerable<BindingError> GetErrorMessages()
