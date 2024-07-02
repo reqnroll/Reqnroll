@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 
-namespace Reqnroll.FeatureSourceGenerator;
+namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 
 public readonly struct IdentifierString : IEquatable<IdentifierString>, IEquatable<string?>
 {
@@ -115,10 +115,10 @@ public readonly struct IdentifierString : IEquatable<IdentifierString>, IEquatab
 
     public static bool operator !=(IdentifierString identifier, string? s) => !Equals(identifier, s);
 
-    public static bool operator ==(IdentifierString identifier1, IdentifierString identifier2) => 
+    public static bool operator ==(IdentifierString identifier1, IdentifierString identifier2) =>
         Equals(identifier1, identifier2);
 
-    public static bool operator !=(IdentifierString identifier1, IdentifierString identifier2) => 
+    public static bool operator !=(IdentifierString identifier1, IdentifierString identifier2) =>
         !Equals(identifier1, identifier2);
 
     public static implicit operator string(IdentifierString identifier) => identifier.ToString();

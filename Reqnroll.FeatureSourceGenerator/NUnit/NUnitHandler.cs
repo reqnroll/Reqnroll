@@ -7,18 +7,17 @@ namespace Reqnroll.FeatureSourceGenerator.NUnit;
 /// </summary>
 public class NUnitHandler : ITestFrameworkHandler
 {
-    public string FrameworkName => "NUnit";
+    public string TestFrameworkName => "NUnit";
 
-    public bool CanGenerateForCompilation(CompilationInformation compilationInformation) => 
-        compilationInformation is CSharpCompilationInformation;
-
-    public ITestFixtureGenerator GetTestFixtureGenerator(CompilationInformation compilation)
+    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>() 
+        where TCompilationInformation : CompilationInformation
     {
-        return compilation switch
+        if (typeof(TCompilationInformation).IsAssignableFrom(typeof(CSharpCompilationInformation)))
         {
-            CSharpCompilationInformation => new NUnitCSharpTestFixtureGenerator(),
-            _ => throw new NotSupportedException(),
-        };
+            return (ITestFixtureGenerator<TCompilationInformation>)new NUnitCSharpTestFixtureGenerator(this);
+        }
+
+        return null;
     }
 
     public bool IsTestFrameworkReferenced(CompilationInformation compilationInformation)

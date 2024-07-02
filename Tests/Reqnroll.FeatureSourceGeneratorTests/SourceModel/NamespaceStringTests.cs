@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.FeatureSourceGenerator;
+﻿using Reqnroll.FeatureSourceGenerator;
+
+namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 
 public class NamespaceStringTests
 {

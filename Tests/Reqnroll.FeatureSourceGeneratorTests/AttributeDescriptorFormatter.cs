@@ -1,4 +1,5 @@
 ﻿using FluentAssertions.Formatting;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
 
 namespace Reqnroll.FeatureSourceGenerator;
 

@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Reqnroll.FeatureSourceGenerator;
 using Reqnroll.FeatureSourceGenerator.CSharp;
-using System.Collections.Immutable;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
 using Xunit.Abstractions;
 
 namespace Reqnroll.FeatureSourceGenerator;
@@ -28,7 +28,7 @@ public class MSTestFeatureSourceGenerationTests(ITestOutputHelper output)
             Feature: Calculator
 
             @mytag
-            Scenario: Add two numbers
+            Scenario: Add two "simple" numbers
                 Given the first number is 50
                 And the second number is 70
                 When the two numbers are added

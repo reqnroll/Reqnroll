@@ -1,7 +1,8 @@
 ﻿using Gherkin;
 using Gherkin.Ast;
+using Microsoft.CodeAnalysis;
 using Reqnroll.FeatureSourceGenerator.Gherkin;
-using System.Collections;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator;
@@ -11,8 +12,9 @@ using Location = Microsoft.CodeAnalysis.Location;
 /// <summary>
 /// Defines the basis of a source-generator which processes Gherkin feature files into test fixtures.
 /// </summary>
-public abstract class TestFixtureSourceGenerator(
+public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
     ImmutableArray<ITestFrameworkHandler> testFrameworkHandlers) : IIncrementalGenerator
+    where TCompilationInformation : CompilationInformation
 {
     public static readonly DiagnosticDescriptor NoTestFrameworkFound = new(
         id: DiagnosticIds.NoTestFrameworkFound,
@@ -50,15 +52,17 @@ public abstract class TestFixtureSourceGenerator(
         var compilationInformation = context.CompilationProvider
             .Select((compilation, _) => GetCompilationInformation(compilation));
 
-        // Find compatible test frameworks and choose a default based on referenced assemblies.
-        var testFrameworkInformation = compilationInformation
+        // Find compatible generator and choose a default based on referenced assemblies.
+        var generatorInformation = compilationInformation
             .Select((compilationInfo, cancellationToken) =>
             {
-                var compatibleHandlers = _testFrameworkHandlers
-                    .Where(handler => handler.CanGenerateForCompilation(compilationInfo))
+                var compatibleGenerators = _testFrameworkHandlers
+                    .Select(handler => handler.GetTestFixtureGenerator<TCompilationInformation>())
+                    .Where(generator => generator != null)
+                    .Select(generator => generator!)
                     .ToImmutableArray();
 
-                if (!compatibleHandlers.Any())
+                if (!compatibleGenerators.Any())
                 {
                     // This condition should only be possible if Roslyn is compiling a language we have produced a generator for
                     // without also including a compatible test framework handler; it should never occur in practice.
@@ -66,30 +70,30 @@ public abstract class TestFixtureSourceGenerator(
                         $"No test framework handlers are available which can generate code for the current compilation.");
                 }
 
-                var availableHandlers = compatibleHandlers
-                    .Where(handler => handler.IsTestFrameworkReferenced(compilationInfo))
+                var useableGenerators = compatibleGenerators
+                    .Where(generator => generator.TestFrameworkHandler.IsTestFrameworkReferenced(compilationInfo))
                     .ToImmutableArray();
 
-                var defaultHandlers = availableHandlers.FirstOrDefault();
+                var defaultGenerator = useableGenerators.FirstOrDefault();
 
-                return new TestFrameworkInformation(
-                    compatibleHandlers,
-                    availableHandlers,
-                    defaultHandlers);
+                return new GeneratorInformation<TCompilationInformation>(
+                    compatibleGenerators,
+                    useableGenerators,
+                    defaultGenerator);
             });
 
         // Obtain the options which will influence the generation of features and combine with all other information
         // to produce parsed syntax ready for translation into test fixtures.
-        var featureInformationOrErrors = featureFiles
+        var testFixtureGenerationContextsOrErrors = featureFiles
             .Combine(context.AnalyzerConfigOptionsProvider)
             .Combine(compilationInformation)
-            .Combine(testFrameworkInformation)
-            .SelectMany(static IEnumerable<StepResult<FeatureInformation>> (input, cancellationToken) =>
+            .Combine(generatorInformation)
+            .SelectMany(static IEnumerable<StepResult<TestFixtureGenerationContext<TCompilationInformation>>> (input, cancellationToken) =>
             {
-                var (((featureFile, optionsProvider), compilationInfo), testFrameworkInformation) = input;
+                var (((featureFile, optionsProvider), compilationInfo), generatorInformation) = input;
 
-                var options = optionsProvider.GetOptions(featureFile); 
-                
+                var options = optionsProvider.GetOptions(featureFile);
+
                 var source = featureFile.GetText(cancellationToken);
 
                 // If there is no source text, we can skip this file completely.
@@ -98,52 +102,56 @@ public abstract class TestFixtureSourceGenerator(
                     return [];
                 }
 
-                // Select the test framework from the following sources:
+                // Select the generator from the following sources:
                 // 1. The reqnroll.target_test_framework value from .editorconfig
                 // 2. The ReqnrollTargetTestFramework from the build system properties (MSBuild project files or command-line argument)
                 // 3. The assemblies referenced by the compilation indicating the presence of a test framework.
-                ITestFrameworkHandler? testFramework;
+                ITestFixtureGenerator<TCompilationInformation>? generator;
                 if (options.TryGetValue("reqnroll.target_test_framework", out var targetTestFrameworkIdentifier)
                     || options.TryGetValue("build_property.ReqnrollTargetTestFramework", out targetTestFrameworkIdentifier))
                 {
                     // Select the target framework from the option specified.
-                    testFramework = testFrameworkInformation.CompatibleHandlers
-                        .SingleOrDefault(handler => 
-                            string.Equals(handler.FrameworkName, targetTestFrameworkIdentifier, StringComparison.OrdinalIgnoreCase));
+                    generator = generatorInformation.CompatibleGenerators
+                        .SingleOrDefault(generator => string.Equals(
+                            generator.TestFrameworkHandler.TestFrameworkName,
+                            targetTestFrameworkIdentifier,
+                            StringComparison.OrdinalIgnoreCase));
 
-                    if (testFramework == null)
+                    if (generator == null)
                     {
                         // The properties specified a test framework which is not recognised or not supported for this language.
-                        var frameworkNames = testFrameworkInformation.CompatibleHandlers.Select(framework => framework.FrameworkName);
+                        var frameworkNames = generatorInformation.CompatibleGenerators
+                            .Select(generator => generator.TestFrameworkHandler.TestFrameworkName);
                         var frameworks = string.Join(", ", frameworkNames);
 
-                        return 
-                        [ 
+                        return
+                        [
                             Diagnostic.Create(
                                 TestFrameworkNotSupported,
                                 Location.None,
                                 targetTestFrameworkIdentifier,
-                                frameworks) 
+                                frameworks)
                         ];
                     }
                 }
-                else if (testFrameworkInformation.DefaultHandler != null)
+                else if (generatorInformation.DefaultGenerator != null)
                 {
                     // Use the default handler.
-                    testFramework = testFrameworkInformation.DefaultHandler;
+                    generator = generatorInformation.DefaultGenerator;
                 }
                 else
                 {
                     // Report that no suitable target test framework could be determined.
-                    var frameworkNames = testFrameworkInformation.CompatibleHandlers.Select(framework => framework.FrameworkName);
+                    var frameworkNames = generatorInformation.CompatibleGenerators
+                        .Select(generator => generator.TestFrameworkHandler.TestFrameworkName);
                     var frameworks = string.Join(", ", frameworkNames);
 
-                    return 
-                    [ 
+                    return
+                    [
                         Diagnostic.Create(
                             NoTestFrameworkFound,
                             Location.None,
-                            frameworks) 
+                            frameworks)
                     ];
                 }
 
@@ -154,111 +162,127 @@ public abstract class TestFixtureSourceGenerator(
                 }
 
                 var featureHintName = Path.GetFileNameWithoutExtension(featureFile.Path);
-                var featureNamespace = rootNamespace;
+                var testFixtureNamespace = rootNamespace;
                 if (options.TryGetValue("build_metadata.AdditionalFiles.RelativeDir", out var relativeDir))
                 {
-                    var featureNamespaceParts = relativeDir
+                    var testFixtureNamespaceParts = relativeDir
                         .Replace(Path.DirectorySeparatorChar, '.')
                         .Replace(Path.AltDirectorySeparatorChar, '.')
                         .Split('.')
                         .Select(part => DotNetSyntax.CreateIdentifier(part));
 
-                    featureNamespace = string.Join(".", featureNamespaceParts);
+                    testFixtureNamespace = string.Join(".", testFixtureNamespaceParts);
 
                     featureHintName = relativeDir + featureHintName;
                 }
 
                 // Parse the feature file and output the result.
-                var parser = new GherkinSyntaxParser();
+                var parser = new Parser { StopAtFirstError = false };
 
-                var featureSyntax = parser.Parse(source, featureFile.Path, cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+
+                GherkinDocument document;
+
+                try
+                {
+                    // CONSIDER: Using a parser that doesn't throw exceptions for syntax errors.
+                    document = parser.Parse(new SourceTokenScanner(source));
+                }
+                catch (CompositeParserException ex)
+                {
+                    var diagnostics = ex.Errors
+                        .Select(error => GherkinSyntaxParser.CreateGherkinDiagnostic(error, source, featureFile.Path));
+
+                    return [.. diagnostics];
+                }
+
+                var feature = document.Feature;
+
+                var featureInformation = new FeatureInformation(
+                    feature.Name,
+                    feature.Description,
+                    feature.Language,
+                    feature.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray(),
+                    featureFile.Path);
+
+                var scenarioInformations = feature.Children
+                    .SelectMany(child => CreateScenarioInformations(child, cancellationToken))
+                    .ToImmutableArray();
 
                 return
                 [
-                    new FeatureInformation(
-                        FeatureSyntax: featureSyntax,
-                        FeatureHintName: featureHintName,
-                        FeatureNamespace: featureNamespace,
-                        CompilationInformation: compilationInfo,
-                        TestFrameworkHandler: testFramework,
-                        TestFixtureGenerator: testFramework.GetTestFixtureGenerator(compilationInfo))
+                    new TestFixtureGenerationContext<TCompilationInformation>(
+                            featureInformation,
+                            scenarioInformations,
+                            featureHintName,
+                            new NamespaceString(testFixtureNamespace),
+                            compilationInfo,
+                            generator)
                 ];
             });
+                
 
-        // Filter features and errors.
-        var features = featureInformationOrErrors
+        // Filter contexts and errors.
+        var testFixtureGenerationContexts = testFixtureGenerationContextsOrErrors
             .Where(result => result.IsSuccess)
-            .Select((result, _) => (FeatureInformation)result);
-        var errors = featureInformationOrErrors
+            .Select((result, _) => (TestFixtureGenerationContext<TCompilationInformation>)result);
+        var errors = testFixtureGenerationContextsOrErrors
             .Where(result => !result.IsSuccess)
             .Select((result, _) => (Diagnostic)result);
 
-        // Generate scenario information from features.
-        var scenarios = features
-            .SelectMany(static (feature, cancellationToken) =>
-                feature.FeatureSyntax.GetRoot().Feature.Children.SelectMany(child => 
-                    GetScenarioInformation(child, feature, cancellationToken)));
+        // Set up test method generation contexts from feature generation contexts.
+        var testMethodGenerationContexts = testFixtureGenerationContexts
+            .SelectMany(static (context, cancellationToken) => 
+                context.ScenarioInformations.Select(scenario => 
+                    new TestMethodGenerationContext<TCompilationInformation>(scenario, context)));
 
-        // Generate scenario methods for each scenario.
-        var methods = scenarios
-            .Select(static (scenario, cancellationToken) => 
-                (Method: scenario.Feature.TestFixtureGenerator.GenerateTestMethod(scenario, cancellationToken),
-                Scenario: scenario));
+        // Generate test methods for each scenario.
+        var methods = testMethodGenerationContexts
+            .Select(static (context, cancellationToken) => 
+                (Method: context.TestFixtureGenerator.GenerateTestMethod(context, cancellationToken),
+                Context: context));
 
         // Generate test fixtures for each feature.
         var fixtures = methods.Collect()
-            .WithComparer(ImmutableArrayEqualityComparer<(TestMethod Method, ScenarioInformation Scenario)>.Default)
+            .WithComparer(ImmutableArrayEqualityComparer<(TestMethod Method, TestMethodGenerationContext<TCompilationInformation> Context)>.Default)
             .SelectMany(static (methods, cancellationToken) =>
                 methods
-                    .GroupBy(item => item.Scenario.Feature, item => item.Method)
-                    .Select(group => new TestFixtureComposition(group.Key, group.ToImmutableArray())))
+                    .GroupBy(item => item.Context.TestFixtureGenerationContext, item => item.Method)
+                    .Select(group => new TestFixtureComposition<TCompilationInformation>(group.Key, group.ToImmutableArray())))
             .Select(static (composition, cancellationToken) => 
-                composition.Feature.TestFixtureGenerator.GenerateTestFixture(
-                    composition.Feature,
+                composition.Context.TestFixtureGenerator.GenerateTestFixtureClass(
+                    composition.Context,
                     composition.Methods,
                     cancellationToken));
 
         // Emit errors.
         context.RegisterSourceOutput(errors, static (context, error) => context.ReportDiagnostic(error));
 
-        // Emit parsing diagnostics.
-        context.RegisterSourceOutput(features, static (context, feature) =>
-        {
-            foreach (var diagnostic in feature.FeatureSyntax.GetDiagnostics())
-            {
-                context.ReportDiagnostic(diagnostic);
-            }
-        });
-
         // Emit source files for fixtures.
         context.RegisterSourceOutput(
             fixtures, 
-            static (context, fixture) => context.AddSource(fixture.HintName, fixture.Render()));
+            static (context, fixture) => context.AddSource(fixture.HintName, fixture.Render(context.CancellationToken)));
     }
 
-    private static IEnumerable<ScenarioInformation> GetScenarioInformation(
+    private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
         IHasLocation child,
-        FeatureInformation feature,
         CancellationToken cancellationToken)
     {
         return child switch
         {
-            Scenario scenario => [ GetScenarioInformation(scenario, feature, cancellationToken) ],
-            Rule rule => GetScenarioInformation(rule, feature, cancellationToken),
+            Scenario scenario => [CreateScenarioInformation(scenario,  cancellationToken)],
+            Rule rule => CreateScenarioInformations(rule, cancellationToken),
             _ => []
         };
     }
 
-    private static ScenarioInformation GetScenarioInformation(
+    private static ScenarioInformation CreateScenarioInformation(
         Scenario scenario,
-        FeatureInformation feature,
-        CancellationToken cancellationToken) => 
-        GetScenarioInformation(scenario, null, feature, cancellationToken);
+        CancellationToken cancellationToken) => CreateScenarioInformation(scenario, null, cancellationToken);
 
-    private static ScenarioInformation GetScenarioInformation(
+    private static ScenarioInformation CreateScenarioInformation(
         Scenario scenario,
         RuleInformation? rule,
-        FeatureInformation feature,
         CancellationToken cancellationToken)
     {
         var exampleSets = new List<ScenarioExampleSet>();
@@ -270,7 +294,7 @@ public abstract class TestFixtureSourceGenerator(
             var examples = new ScenarioExampleSet(
                 example.TableHeader.Cells.Select(cell => cell.Value).ToImmutableArray(),
                 example.TableBody.Select(row => row.Cells.Select(cell => cell.Value).ToImmutableArray()).ToImmutableArray(),
-                example.Tags.Select(tag => tag.Name).ToImmutableArray());
+                example.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray());
 
             exampleSets.Add(examples);
         }
@@ -291,20 +315,19 @@ public abstract class TestFixtureSourceGenerator(
         }
 
         return new ScenarioInformation(
-            feature,
             scenario.Name,
-            scenario.Tags.Select(tag => tag.Name).ToImmutableArray(),
+            scenario.Location.Line,
+            scenario.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray(),
             steps.ToImmutableArray(),
             exampleSets.ToImmutableArray(),
             rule);
     }
 
-    private static IEnumerable<ScenarioInformation> GetScenarioInformation(
+    private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
         Rule rule,
-        FeatureInformation feature,
         CancellationToken cancellationToken)
     {
-        var tags = rule.Tags.Select(tag => tag.Name).ToImmutableArray();
+        var tags = rule.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray();
 
         foreach (var child in rule.Children)
         {
@@ -313,93 +336,14 @@ public abstract class TestFixtureSourceGenerator(
             switch (child)
             {
                 case Scenario scenario:
-                    yield return GetScenarioInformation(scenario, new RuleInformation(rule.Name, tags), feature, cancellationToken);
+                    yield return CreateScenarioInformation(
+                        scenario,
+                        new RuleInformation(rule.Name, tags),
+                        cancellationToken);
                     break;
             }
         }
     }
 
-    protected abstract CompilationInformation GetCompilationInformation(Compilation compilation);
-}
-
-public record ScenarioStep(StepKeywordType KeywordType, string Keyword, string Text, int LineNumber);
-
-public class ScenarioExampleSet : IEnumerable<IEnumerable<(string Name, string Value)>>, IEquatable<ScenarioExampleSet?>
-{
-    public ScenarioExampleSet(
-        ImmutableArray<string> headings,
-        ImmutableArray<ImmutableArray<string>> values,
-        ImmutableArray<string> tags)
-    {
-        foreach (var set in values)
-        {
-            if (set.Length != headings.Length)
-            {
-                throw new ArgumentException(
-                    "Values must contain sets with the same number of values as the headings.",
-                    nameof(values));
-            }
-        }
-
-        Headings = headings;
-        Values = values;
-        Tags = tags;
-    }
-
-    public ImmutableArray<string> Headings { get; }
-
-    public ImmutableArray<ImmutableArray<string>> Values { get; }
-
-    public ImmutableArray<string> Tags { get; }
-
-    public override bool Equals(object? obj) => Equals(obj as ScenarioExampleSet);
-
-    public bool Equals(ScenarioExampleSet? other)
-    {
-        if (other is null)
-        {
-            return false;
-        }
-
-        if (ReferenceEquals(this, other))
-        {
-            return true;
-        }
-
-        return (Headings.Equals(other.Headings) || Headings.SequenceEqual(other.Headings)) &&
-            (Values.Equals(other.Values) || Values.SequenceEqual(other.Values, ImmutableArrayEqualityComparer<string>.Default)) &&
-            (Tags.Equals(other.Tags) || Tags.SequenceEqual(other.Tags));
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            var hash = 43961407;
-
-            hash *= 32360441 + Headings.GetSequenceHashCode();
-            hash *= 32360441 + Values.GetSequenceHashCode(ImmutableArrayEqualityComparer<string>.Default);
-            hash *= 32360441 + Tags.GetSequenceHashCode();
-
-            return hash;
-        }
-    }
-
-    public IEnumerator<IEnumerable<(string Name, string Value)>> GetEnumerator()
-    {
-        foreach (var set in Values)
-        {
-            yield return GetAsRow(set);
-        }
-    }
-
-    private IEnumerable<(string Name, string Value)> GetAsRow(ImmutableArray<string> set)
-    {
-        for (var i = 0; i < Headings.Length; i++)
-        {
-            yield return (Name: Headings[i], Value: set[i]);
-        }
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    protected abstract TCompilationInformation GetCompilationInformation(Compilation compilation);
 }

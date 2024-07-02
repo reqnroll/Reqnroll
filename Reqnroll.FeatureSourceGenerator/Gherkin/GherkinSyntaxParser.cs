@@ -6,7 +6,7 @@ namespace Reqnroll.FeatureSourceGenerator.Gherkin;
 
 using Location = global::Gherkin.Ast.Location;
 
-public class GherkinSyntaxParser
+internal static class GherkinSyntaxParser
 {
     public static readonly DiagnosticDescriptor SyntaxError = new(
         id: DiagnosticIds.SyntaxError,
@@ -16,37 +16,37 @@ public class GherkinSyntaxParser
         DiagnosticSeverity.Error,
         true);
 
-    public GherkinSyntaxTree Parse(SourceText text, string path, CancellationToken cancellationToken = default)
-    {
-        var parser = new Parser { StopAtFirstError = false };
+    //public GherkinSyntaxTree Parse(SourceText text, string path, CancellationToken cancellationToken = default)
+    //{
+    //    var parser = new Parser { StopAtFirstError = false };
 
-        GherkinDocument? document = null;
-        ImmutableArray<Diagnostic>? diagnostics = null;
+    //    GherkinDocument? document = null;
+    //    ImmutableArray<Diagnostic>? diagnostics = null;
 
-        cancellationToken.ThrowIfCancellationRequested();
+    //    cancellationToken.ThrowIfCancellationRequested();
 
-        try
-        {
-            // CONSIDER: Using a parser that doesn't throw exceptions for syntax errors.
-            document = parser.Parse(new SourceTokenScanner(text));
-        }
-        catch (CompositeParserException ex)
-        {
-            diagnostics = ex.Errors.Select(error => CreateGherkinDiagnostic(error, text, path)).ToImmutableArray();
-        }
+    //    try
+    //    {
+    //        // CONSIDER: Using a parser that doesn't throw exceptions for syntax errors.
+    //        document = parser.Parse(new SourceTokenScanner(text));
+    //    }
+    //    catch (CompositeParserException ex)
+    //    {
+    //        diagnostics = ex.Errors.Select(error => CreateGherkinDiagnostic(error, text, path)).ToImmutableArray();
+    //    }
 
-        return new GherkinSyntaxTree(
-            document ?? new GherkinDocument(null, []),
-            diagnostics ?? ImmutableArray<Diagnostic>.Empty,
-            path);
-    }
+    //    return new GherkinSyntaxTree(
+    //        document ?? new GherkinDocument(null, []),
+    //        diagnostics ?? ImmutableArray<Diagnostic>.Empty,
+    //        path);
+    //}
 
-    private Diagnostic CreateGherkinDiagnostic(ParserException exception, SourceText text, string path)
+    public static Diagnostic CreateGherkinDiagnostic(ParserException exception, SourceText text, string path)
     {
         return Diagnostic.Create(SyntaxError, CreateLocation(exception.Location, text, path), exception.Message);
     }
 
-    private Microsoft.CodeAnalysis.Location CreateLocation(Location location, SourceText text, string path)
+    private static Microsoft.CodeAnalysis.Location CreateLocation(Location location, SourceText text, string path)
     {
         var start = text.Lines[location.Line].Start + location.Column;
 

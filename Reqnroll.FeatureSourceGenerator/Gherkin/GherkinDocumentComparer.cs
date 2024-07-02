@@ -2,16 +2,16 @@
 
 namespace Reqnroll.FeatureSourceGenerator.Gherkin;
 
-internal class GherkinDocumentComparer : IEqualityComparer<GherkinDocument>
+internal class GherkinDocumentComparer : IEqualityComparer<GherkinDocument?>
 {
     public static GherkinDocumentComparer Default { get; } = new GherkinDocumentComparer();
 
-    public bool Equals(GherkinDocument x, GherkinDocument y)
+    public bool Equals(GherkinDocument? x, GherkinDocument? y)
     {
         return false;
     }
 
-    public int GetHashCode(GherkinDocument obj)
+    public int GetHashCode(GherkinDocument? obj)
     {
         if (obj == null)
         {

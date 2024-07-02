@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Diagnostics.Contracts;
 
 namespace Reqnroll.FeatureSourceGenerator;
@@ -38,8 +39,16 @@ public static class AssertionExtensions
         new(actualValue);
 
     /// <summary>
-    /// Returns an <see cref="TestMethodAssertions"/> object that can be used to assert the
-    /// current <see cref="TestMethod"/>.
+    /// Returns an <see cref="AttributeAssertions"/> object that can be used to assert the
+    /// subject with attributes.
+    /// </summary>
+    [Pure]
+    public static AttributeAssertions Should(this IHasAttributes? actualValue) =>
+        new(actualValue);
+
+    /// <summary>
+    /// Returns a <see cref="TestMethodAssertions"/> object that can be used to assert the
+    /// subject with attributes.
     /// </summary>
     [Pure]
     public static TestMethodAssertions Should(this TestMethod? actualValue) =>

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Immutable;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
@@ -37,7 +37,7 @@ public class CSharpSourceTextBuilder
         return this;
     }
 
-    public CSharpSourceTextBuilder AppendConstantList<T>(IEnumerable<T> values)
+    public CSharpSourceTextBuilder AppendLiteralList<T>(IEnumerable<T> values)
     {
         var first = true;
 
@@ -66,11 +66,11 @@ public class CSharpSourceTextBuilder
             string s => AppendLiteral(s),
             ImmutableArray<string> array => AppendLiteralArray(array),
             ImmutableArray<object?> array => AppendLiteralArray(array),
-            _ => throw new NotSupportedException($"Values of type {value.GetType().FullName} cannot be encoded as a constant in C#.")
+            _ => throw new NotSupportedException($"Values of type {value.GetType().FullName} cannot be encoded as a literal value in C#.")
         };
     }
 
-    private CSharpSourceTextBuilder AppendLiteralArray<T>(ImmutableArray<T> array)
+    public CSharpSourceTextBuilder AppendLiteralArray<T>(ImmutableArray<T> array)
     {
         if (!CSharpSyntax.TypeAliases.TryGetValue(typeof(T), out var typeName))
         {
@@ -84,17 +84,19 @@ public class CSharpSourceTextBuilder
             return Append("[0]");
         }
 
-        return Append("[] { ").AppendConstantList(array).Append(" }");
+        return Append("[] { ").AppendLiteralList(array).Append(" }");
     }
 
-    private CSharpSourceTextBuilder AppendLiteral(string? s)
+    public CSharpSourceTextBuilder AppendLiteral(string? s)
     {
         if (s == null)
         {
             return Append("null");
         }
 
-        _buffer.Append('"').Append(s).Append('"');
+        var escapedValue = CSharpSyntax.FormatLiteral(s);
+
+        Append(escapedValue);
         return this;
     }
 
@@ -158,7 +160,6 @@ public class CSharpSourceTextBuilder
     /// </summary>
     public CSharpSourceTextBuilder BeginBlock()
     {
-        AppendLine();
         _context = new CodeBlock(_context);
         return this;
     }
@@ -167,7 +168,7 @@ public class CSharpSourceTextBuilder
     /// Appends the specified text and starts a new block.
     /// </summary>
     /// <param name="text">The text to append.</param>
-    public CSharpSourceTextBuilder BeginBlock(string text) => Append(text).BeginBlock();
+    public CSharpSourceTextBuilder BeginBlock(string text) => AppendLine(text).BeginBlock();
 
     /// <summary>
     /// Ends the current block and begins a new line.
@@ -246,17 +247,21 @@ public class CSharpSourceTextBuilder
         {
             Append('(');
 
-            AppendConstantList(attribute.PositionalArguments);
+            AppendLiteralList(attribute.PositionalArguments);
 
             var firstProperty = true;
             foreach (var (name, value) in attribute.NamedArguments)
             {
-                if (!firstProperty)
+                if (firstProperty)
                 {
-
+                    firstProperty = false;
+                }
+                else
+                {
+                    Append(", ");
                 }
 
-                firstProperty = false;
+                Append(name).Append(" = ").AppendLiteral(value);
             }
 
             Append(')');
@@ -269,6 +274,40 @@ public class CSharpSourceTextBuilder
 
     public CSharpSourceTextBuilder AppendTypeReference(TypeIdentifier type)
     {
+        return type switch
+        {
+            NamedTypeIdentifier namedType => AppendTypeReference(namedType),
+            ArrayTypeIdentifier arrayType => AppendTypeReference(arrayType),
+            _ => throw new NotImplementedException()
+        };
+    }
+
+    public CSharpSourceTextBuilder AppendTypeReference(NamedTypeIdentifier type)
+    {
+        if (!type.Namespace.IsEmpty)
+        {
+            Append("global::").Append(type.Namespace).Append('.');
+        }
+
+        Append(type.LocalName);
+
+        if (type.IsNullable)
+        {
+            Append('?');
+        }
+
+        return this;
+    }
+
+    public CSharpSourceTextBuilder AppendTypeReference(ArrayTypeIdentifier type)
+    {
+        AppendTypeReference(type.ItemType).Append("[]");
+
+        if (type.IsNullable)
+        {
+            Append('?');
+        }
+
         return this;
     }
 }

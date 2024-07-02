@@ -7,7 +7,7 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp;
 /// A generator of Reqnroll test fixtures for the C# language.
 /// </summary>
 [Generator(LanguageNames.CSharp)]
-public class CSharpTestFixtureSourceGenerator : TestFixtureSourceGenerator
+public class CSharpTestFixtureSourceGenerator : TestFixtureSourceGenerator<CSharpCompilationInformation>
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="CSharpTestFixtureSourceGenerator"/> class.
@@ -25,7 +25,7 @@ public class CSharpTestFixtureSourceGenerator : TestFixtureSourceGenerator
     {
     }
 
-    protected override CompilationInformation GetCompilationInformation(Compilation compilation)
+    protected override CSharpCompilationInformation GetCompilationInformation(Compilation compilation)
     {
         var cSharpCompilation = (CSharpCompilation)compilation;
 

@@ -1,10 +1,14 @@
-﻿using System.Globalization;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
+using System.Globalization;
 using System.Text;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
 internal static class CSharpSyntax
 {
+    public static IdentifierString ExampleTagsParameterName { get; } = new IdentifierString("_exampleTags");
+
     public static readonly Dictionary<Type, string> TypeAliases = new()
     {
         { typeof(byte), "byte" },
@@ -109,5 +113,10 @@ internal static class CSharpSyntax
             || category == UnicodeCategory.DecimalDigitNumber
             || category == UnicodeCategory.ConnectorPunctuation
             || category == UnicodeCategory.Format;
+    }
+
+    internal static string FormatLiteral(string s)
+    {
+        return SymbolDisplay.FormatLiteral(s, true);
     }
 }

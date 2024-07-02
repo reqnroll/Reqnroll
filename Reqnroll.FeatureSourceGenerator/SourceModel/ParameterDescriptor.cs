@@ -1,5 +1,5 @@
-﻿namespace Reqnroll.FeatureSourceGenerator;
-public class ParameterDescriptor: IEquatable<ParameterDescriptor?>
+﻿namespace Reqnroll.FeatureSourceGenerator.SourceModel;
+public class ParameterDescriptor : IEquatable<ParameterDescriptor?>
 {
     public ParameterDescriptor(IdentifierString name, TypeIdentifier type)
     {

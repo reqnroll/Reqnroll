@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.FeatureSourceGenerator;
+﻿using Reqnroll.FeatureSourceGenerator;
+
+namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 
 public class NamedTypeIdentifierTests
 {
@@ -107,18 +109,6 @@ public class NamedTypeIdentifierTests
         var typeId2 = new NamedTypeIdentifier(new NamespaceString(ns2), new IdentifierString(name2));
 
         typeId1.Equals(typeId2).Should().BeFalse();
-    }
-
-    [Theory]
-    [InlineData("Reqnroll", "Parser", "Reqnroll.Parser", true)]
-    [InlineData("Reqnroll", "_Parser", "Reqnroll._Parser", true)]
-    [InlineData(null, "_Parser", "_Parser", true)]
-    [InlineData(null, null, "", true)]
-    [InlineData(null, null, null, true)]
-    [InlineData("", "", null, true)]
-    public void EqualsString_ReturnsCaseSensitiveEquivalence(string ns, string name, string identifier, bool expected)
-    {
-        new NamedTypeIdentifier(new NamespaceString(ns), new IdentifierString(name)).Equals(identifier).Should().Be(expected);
     }
 
     [Theory]

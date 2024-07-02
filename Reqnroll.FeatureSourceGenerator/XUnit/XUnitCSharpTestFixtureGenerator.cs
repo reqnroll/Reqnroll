@@ -1,19 +1,45 @@
 ﻿
+using Reqnroll.FeatureSourceGenerator.CSharp;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
+using System.Collections.Immutable;
+
 namespace Reqnroll.FeatureSourceGenerator.XUnit;
 
-internal class XUnitCSharpTestFixtureGenerator : ITestFixtureGenerator
+internal class XUnitCSharpTestFixtureGenerator(XUnitHandler testFrameworkHandler) :
+    CSharpTestFixtureGenerator<CSharpTestFixtureClass, CSharpTestMethod>(testFrameworkHandler)
 {
-    public TestFixtureClass GenerateTestFixture(
-        FeatureInformation feature, 
-        IEnumerable<TestMethod> methods, 
-        CancellationToken cancellationToken = default)
+    protected override CSharpTestFixtureClass CreateTestFixtureClass(
+        TestFixtureGenerationContext<CSharpCompilationInformation> context,
+        NamedTypeIdentifier identifier,
+        FeatureInformation feature,
+        ImmutableArray<AttributeDescriptor> attributes,
+        ImmutableArray<CSharpTestMethod> methods,
+        CSharpRenderingOptions renderingOptions)
     {
         throw new NotImplementedException();
     }
 
-    public TestMethod GenerateTestMethod(
-        ScenarioInformation scenario, 
-        CancellationToken cancellationToken = default)
+    protected override CSharpTestMethod CreateTestMethod(
+        TestMethodGenerationContext<CSharpCompilationInformation> context,
+        IdentifierString identifier,
+        ScenarioInformation scenario,
+        ImmutableArray<AttributeDescriptor> attributes,
+        ImmutableArray<ParameterDescriptor> parameters,
+        ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override ImmutableArray<AttributeDescriptor> GenerateTestFixtureClassAttributes(
+        TestFixtureGenerationContext<CSharpCompilationInformation> context,
+        CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
+
+    protected override ImmutableArray<AttributeDescriptor> GenerateTestMethodAttributes(
+        TestMethodGenerationContext<CSharpCompilationInformation> context,
+        CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

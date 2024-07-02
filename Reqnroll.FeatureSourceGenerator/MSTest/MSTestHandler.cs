@@ -1,16 +1,15 @@
-﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Reqnroll.FeatureSourceGenerator.CSharp;
+using Reqnroll.FeatureSourceGenerator.CSharp.MSTest;
 
 namespace Reqnroll.FeatureSourceGenerator.MSTest;
 
 /// <summary>
-/// The handler for MSTest.
+/// The MSTest framework handler.
 /// </summary>
 public class MSTestHandler : ITestFrameworkHandler
 {
-    public string FrameworkName => "MSTest";
-
-    public bool CanGenerateForCompilation(CompilationInformation compilation) => 
-        compilation is CSharpCompilationInformation;
+    public string TestFrameworkName => "MSTest";
 
     public bool IsTestFrameworkReferenced(CompilationInformation compilation)
     {
@@ -18,12 +17,14 @@ public class MSTestHandler : ITestFrameworkHandler
             .Any(assembly => assembly.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework");
     }
 
-    public ITestFixtureGenerator GetTestFixtureGenerator(CompilationInformation compilation)
+    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>() 
+        where TCompilationInformation : CompilationInformation
     {
-        return compilation switch
+        if (typeof(TCompilationInformation).IsAssignableFrom(typeof(CSharpCompilationInformation)))
         {
-            CSharpCompilationInformation => new MSTestCSharpTestFixtureGenerator(),
-            _ => throw new NotSupportedException(),
-        };
+            return (ITestFixtureGenerator<TCompilationInformation>)new MSTestCSharpTestFixtureGenerator(this);
+        }
+
+        return null;
     }
 }

@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.FeatureSourceGenerator;
+﻿using Reqnroll.FeatureSourceGenerator.SourceModel;
+
+namespace Reqnroll.FeatureSourceGenerator;
 
 public readonly struct NamespaceString : IEquatable<NamespaceString>, IEquatable<string>
 {

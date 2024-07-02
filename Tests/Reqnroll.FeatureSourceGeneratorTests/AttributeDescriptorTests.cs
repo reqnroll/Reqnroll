@@ -1,4 +1,5 @@
 ﻿using FluentAssertions.Execution;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator;

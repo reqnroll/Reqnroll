@@ -4,10 +4,10 @@ using System.Collections.Immutable;
 namespace Reqnroll.FeatureSourceGenerator.Gherkin;
 public class GherkinSyntaxTree : IEquatable<GherkinSyntaxTree>
 {
-    private readonly GherkinDocument _root;
+    private readonly GherkinDocument? _root;
     private readonly ImmutableArray<Diagnostic> _diagnostics;
 
-    internal GherkinSyntaxTree(GherkinDocument root, ImmutableArray<Diagnostic> diagnostics, string? path)
+    internal GherkinSyntaxTree(GherkinDocument? root, ImmutableArray<Diagnostic> diagnostics, string? path)
     {
         _root = root;
         _diagnostics = diagnostics;
@@ -53,6 +53,6 @@ public class GherkinSyntaxTree : IEquatable<GherkinSyntaxTree>
 
     public ImmutableArray<Diagnostic> GetDiagnostics() => _diagnostics;
 
-    public GherkinDocument GetRoot() => _root;
+    public GherkinDocument? GetRoot() => _root;
 }
 

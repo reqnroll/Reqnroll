@@ -60,6 +60,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="ebvn2meh.ura~" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Microsoft.CodeAnalysis" />
     <Using Include="Microsoft.CodeAnalysis.Text" />
   </ItemGroup>

@@ -7,18 +7,17 @@ namespace Reqnroll.FeatureSourceGenerator.XUnit;
 /// </summary>
 public class XUnitHandler : ITestFrameworkHandler
 {
-    public string FrameworkName => "xUnit";
+    public string TestFrameworkName => "xUnit";
 
-    public bool CanGenerateForCompilation(CompilationInformation compilationInformation) => 
-        compilationInformation is CSharpCompilationInformation;
-
-    public ITestFixtureGenerator GetTestFixtureGenerator(CompilationInformation compilation)
+    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>() 
+        where TCompilationInformation : CompilationInformation
     {
-        return compilation switch
+        if (typeof(TCompilationInformation).IsAssignableFrom(typeof(CSharpCompilationInformation)))
         {
-            CSharpCompilationInformation => new XUnitCSharpTestFixtureGenerator(),
-            _ => throw new NotSupportedException(),
-        };
+            return (ITestFixtureGenerator<TCompilationInformation>)new XUnitCSharpTestFixtureGenerator(this);
+        }
+
+        return null;
     }
 
     public bool IsTestFrameworkReferenced(CompilationInformation compilationInformation)

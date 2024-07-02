@@ -1,4 +1,6 @@
-﻿namespace Reqnroll.FeatureSourceGenerator;
+﻿using Reqnroll.FeatureSourceGenerator;
+
+namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 
 public class IdentifierStringTests
 {
@@ -103,11 +105,11 @@ public class IdentifierStringTests
     }
 
     [Theory]
-    [InlineData("Parser",  "Parser", true)]
-    [InlineData("_Parser" , "_Parser", true)]
-    [InlineData("_Parser","_parser", false)]
-    [InlineData("Parser",  "parser", false)]
-    [InlineData("Parser",  "_Parser", false)]
+    [InlineData("Parser", "Parser", true)]
+    [InlineData("_Parser", "_Parser", true)]
+    [InlineData("_Parser", "_parser", false)]
+    [InlineData("Parser", "parser", false)]
+    [InlineData("Parser", "_Parser", false)]
     public void EqualityOperatorWithIdentifierString_ReturnsEquivalenceWithCaseSensitivity(string? id1, string? id2, bool expected)
     {
         (new IdentifierString(id1) == new IdentifierString(id2)).Should().Be(expected);

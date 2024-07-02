@@ -1,10 +1,12 @@
-﻿namespace Reqnroll.FeatureSourceGenerator;
+﻿using Reqnroll.FeatureSourceGenerator;
+
+namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 public class ParameterDescriptorTests
 {
     [Fact]
     public void Constructor_ThrowsArgumentExceptionWhenNameIsEmpty()
     {
-        Func<ParameterDescriptor> ctr = () => 
+        Func<ParameterDescriptor> ctr = () =>
             new ParameterDescriptor(IdentifierString.Empty, new NamedTypeIdentifier(new IdentifierString("string")));
 
         ctr.Should().Throw<ArgumentException>();

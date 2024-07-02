@@ -3,6 +3,7 @@ using FluentAssertions.Execution;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
 using System.ComponentModel.DataAnnotations;
 using System.Drawing;

@@ -2,7 +2,7 @@
 using System.Collections.Immutable;
 using System.ComponentModel;
 
-namespace Reqnroll.FeatureSourceGenerator;
+namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 
 /// <summary>
 /// Provides a description of a .NET attribute instance.
@@ -18,7 +18,7 @@ public class AttributeDescriptor(
 {
     public NamedTypeIdentifier Type { get; } = type;
 
-    public ImmutableArray<object?> PositionalArguments { get; } = 
+    public ImmutableArray<object?> PositionalArguments { get; } =
         ThrowIfArgumentTypesNotValid(
             positionalArguments.GetValueOrDefault(ImmutableArray<object?>.Empty),
             nameof(positionalArguments));
@@ -77,7 +77,7 @@ public class AttributeDescriptor(
                 if (IsImmutableArrayType(valueType))
                 {
                     var array = (IEnumerable)value;
-                    foreach(var item in array)
+                    foreach (var item in array)
                     {
                         ThrowIfArgumentTypeNotValid(item, paramName);
                     }
@@ -111,7 +111,7 @@ public class AttributeDescriptor(
     }
 
     private int CalculateHashCode()
-    { 
+    {
         unchecked
         {
             var hash = 47;
@@ -124,7 +124,7 @@ public class AttributeDescriptor(
                 hash *= 13 + index++ + GetItemHash(item);
             }
 
-            foreach(var (name, value) in NamedArguments)
+            foreach (var (name, value) in NamedArguments)
             {
                 hash *= 13 + name.GetHashCode() + GetItemHash(value);
             }
