@@ -7,7 +7,7 @@ namespace Reqnroll.TestProjectGenerator.Cli
     public class FoldersOverride : Folders
     {
         private readonly SolutionConfiguration _solutionConfiguration;
-        public FoldersOverride(SolutionConfiguration solutionConfiguration, ArtifactNamingConvention artifactNamingConvention) : base(null, artifactNamingConvention)
+        public FoldersOverride(SolutionConfiguration solutionConfiguration, ArtifactNamingConvention artifactNamingConvention) : base(new ConfigurationDriver(), artifactNamingConvention)
         {
             _solutionConfiguration = solutionConfiguration;
         }
