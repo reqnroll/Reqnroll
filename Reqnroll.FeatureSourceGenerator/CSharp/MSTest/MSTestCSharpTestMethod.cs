@@ -2,14 +2,23 @@
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp.MSTest;
-public class MSTestCSharpTestMethod(
-    IdentifierString identifier,
-    ScenarioInformation scenario,
-    ImmutableArray<AttributeDescriptor> attributes = default,
-    ImmutableArray<ParameterDescriptor> parameters = default,
-    ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters = default) : 
-    CSharpTestMethod(identifier, scenario, attributes, parameters, scenarioParameters)
+public class MSTestCSharpTestMethod : CSharpTestMethod
 {
+    public MSTestCSharpTestMethod(
+        IdentifierString identifier,
+        ScenarioInformation scenario,
+        ImmutableArray<StepInvocation> stepInvocations,
+        ImmutableArray<AttributeDescriptor> attributes = default,
+        ImmutableArray<ParameterDescriptor> parameters = default,
+        ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters = default) 
+        : base(identifier, scenario, stepInvocations, attributes, parameters, scenarioParameters)
+    {
+    }
+
+    public MSTestCSharpTestMethod(TestMethodDescriptor descriptor) : base(descriptor)
+    {
+    }
+
     protected override void RenderTestRunnerLookupTo(
         CSharpSourceTextBuilder sourceBuilder,
         CSharpRenderingOptions renderingOptions,

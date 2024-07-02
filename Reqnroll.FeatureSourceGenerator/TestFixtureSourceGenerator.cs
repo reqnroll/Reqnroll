@@ -306,7 +306,14 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             cancellationToken.ThrowIfCancellationRequested();
 
             var scenarioStep = new ScenarioStep(
-                step.KeywordType,
+                step.KeywordType switch
+                {
+                    StepKeywordType.Context => StepType.Context,
+                    StepKeywordType.Action => StepType.Action,
+                    StepKeywordType.Outcome => StepType.Outcome,
+                    StepKeywordType.Conjunction => StepType.Conjunction,
+                    _ => throw new NotSupportedException()
+                },
                 step.Keyword,
                 step.Text,
                 step.Location.Line);

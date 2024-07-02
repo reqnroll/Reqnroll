@@ -1,5 +1,3 @@
-﻿using Gherkin;
+﻿namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 
-namespace Reqnroll.FeatureSourceGenerator.SourceModel;
-
-public record ScenarioStep(StepKeywordType KeywordType, string Keyword, string Text, int LineNumber);
+public record ScenarioStep(StepType StepType, string Keyword, string Text, int LineNumber);

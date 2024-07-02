@@ -12,24 +12,18 @@ internal class MSTestCSharpTestFixtureGenerator(MSTestHandler frameworkHandler) 
 {
     protected override MSTestCSharpTestFixtureClass CreateTestFixtureClass(
         TestFixtureGenerationContext<CSharpCompilationInformation> context,
-        NamedTypeIdentifier identifier,
-        FeatureInformation feature,
-        ImmutableArray<AttributeDescriptor> attributes,
+        TestFixtureDescriptor descriptor,
         ImmutableArray<CSharpTestMethod> methods,
         CSharpRenderingOptions renderingOptions)
     {
-        return new MSTestCSharpTestFixtureClass(identifier, context.FeatureHintName, feature, attributes, methods, renderingOptions);
+        return new MSTestCSharpTestFixtureClass(descriptor, methods, renderingOptions);
     }
 
     protected override CSharpTestMethod CreateTestMethod(
         TestMethodGenerationContext<CSharpCompilationInformation> context,
-        IdentifierString identifier,
-        ScenarioInformation scenario,
-        ImmutableArray<AttributeDescriptor> attributes,
-        ImmutableArray<ParameterDescriptor> parameters,
-        ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters)
+        TestMethodDescriptor descriptor)
     {
-        return new MSTestCSharpTestMethod(identifier, scenario, attributes, parameters, scenarioParameters);
+        return new MSTestCSharpTestMethod(descriptor);
     }
 
     protected override ImmutableArray<AttributeDescriptor> GenerateTestFixtureClassAttributes(

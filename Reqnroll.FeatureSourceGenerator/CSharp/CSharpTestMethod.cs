@@ -1,16 +1,25 @@
-﻿using System.Collections.Immutable;
-using Reqnroll.FeatureSourceGenerator.SourceModel;
+﻿using Reqnroll.FeatureSourceGenerator.SourceModel;
+using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
 
-public class CSharpTestMethod(
+public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
+{
+    public CSharpTestMethod(
     IdentifierString identifier,
     ScenarioInformation scenario,
+    ImmutableArray<StepInvocation> stepInvocations,
     ImmutableArray<AttributeDescriptor> attributes = default,
     ImmutableArray<ParameterDescriptor> parameters = default,
-        ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters = default) : 
-    TestMethod(identifier, scenario, attributes, parameters, scenarioParameters), IEquatable<CSharpTestMethod?>
-{
+    ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters = default) 
+        : base(identifier, scenario, stepInvocations, attributes, parameters, scenarioParameters)
+    {
+    }
+
+    public CSharpTestMethod(TestMethodDescriptor descriptor) : base(descriptor)
+    {
+    }
+
     public override bool Equals(object obj) => Equals(obj as CSharpTestMethod);
 
     public bool Equals(CSharpTestMethod? other) => base.Equals(other);
@@ -110,10 +119,10 @@ public class CSharpTestMethod(
         sourceBuilder.AppendLine();
         sourceBuilder.AppendLine("// start: invocation of scenario steps");
 
-        foreach (var step in Scenario.Steps)
+        foreach (var invocation in StepInvocations)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            RenderScenarioStepInvocationTo(step, sourceBuilder, renderingOptions, cancellationToken);
+            RenderScenarioStepInvocationTo(invocation, sourceBuilder, renderingOptions, cancellationToken);
         }
 
         sourceBuilder.AppendLine("// end: invocation of scenario steps");
@@ -130,31 +139,48 @@ public class CSharpTestMethod(
     }
 
     protected virtual void RenderScenarioStepInvocationTo(
-        ScenarioStep step,
+        StepInvocation invocation,
         CSharpSourceTextBuilder sourceBuilder,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
         if (renderingOptions.EnableLineMapping)
         {
-            sourceBuilder.AppendDirective($"#line {step.LineNumber}");
+            sourceBuilder.AppendDirective($"#line {invocation.SourceLineNumber}");
         }
 
         sourceBuilder
             .Append("await testRunner.")
             .Append(
-                step.KeywordType switch
+                invocation.Type switch
                 {
-                    global::Gherkin.StepKeywordType.Context => "Given",
-                    global::Gherkin.StepKeywordType.Action => "When",
-                    global::Gherkin.StepKeywordType.Outcome => "Then",
-                    global::Gherkin.StepKeywordType.Conjunction => "And",
-                    _ => throw new NotSupportedException() 
+                    StepType.Context => "Given",
+                    StepType.Action => "When",
+                    StepType.Outcome => "Then",
+                    StepType.Conjunction => "And",
+                    _ => throw new NotSupportedException()
                 })
-            .Append("Async(")
-            .AppendLiteral(step.Text)
+            .Append("Async(");
+
+        if (invocation.Arguments.IsEmpty)
+        {
+            sourceBuilder.AppendLiteral(invocation.Text);
+        }
+        else
+        {
+            sourceBuilder.Append("string.Format(").AppendLiteral(invocation.Text);
+
+            foreach (var argument in invocation.Arguments)
+            {
+                sourceBuilder.Append(", ").Append(argument);
+            }
+
+            sourceBuilder.Append(")");
+        }
+
+        sourceBuilder
             .Append(", null, null, ")
-            .AppendLiteral(step.Keyword)
+            .AppendLiteral(invocation.Keyword)
             .AppendLine(");");
 
         if (renderingOptions.EnableLineMapping)

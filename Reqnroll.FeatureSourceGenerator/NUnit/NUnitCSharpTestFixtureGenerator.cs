@@ -9,9 +9,7 @@ internal class NUnitCSharpTestFixtureGenerator(NUnitHandler testFrameworkHandler
 {
     protected override CSharpTestFixtureClass CreateTestFixtureClass(
         TestFixtureGenerationContext<CSharpCompilationInformation> context,
-        NamedTypeIdentifier identifier,
-        FeatureInformation feature,
-        ImmutableArray<AttributeDescriptor> attributes,
+        TestFixtureDescriptor descriptor,
         ImmutableArray<CSharpTestMethod> methods,
         CSharpRenderingOptions renderingOptions)
     {
@@ -20,11 +18,7 @@ internal class NUnitCSharpTestFixtureGenerator(NUnitHandler testFrameworkHandler
 
     protected override CSharpTestMethod CreateTestMethod(
         TestMethodGenerationContext<CSharpCompilationInformation> context,
-        IdentifierString identifier,
-        ScenarioInformation scenario,
-        ImmutableArray<AttributeDescriptor> attributes,
-        ImmutableArray<ParameterDescriptor> parameters,
-        ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters)
+        TestMethodDescriptor descriptor)
     {
         throw new NotImplementedException();
     }

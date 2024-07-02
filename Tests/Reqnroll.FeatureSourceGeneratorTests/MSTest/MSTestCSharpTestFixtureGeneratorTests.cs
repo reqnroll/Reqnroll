@@ -45,7 +45,7 @@ public class MSTestCSharpTestFixtureGeneratorTests
             "Sample Scenario",
             22,
             [],
-            [new ScenarioStep(StepKeywordType.Action, "When", "foo happens", 6)]);
+            [new ScenarioStep(StepType.Action, "When", "foo happens", 6)]);
 
         var testFixtureGenerationContext = new TestFixtureGenerationContext<CSharpCompilationInformation>(
             featureInfo,
@@ -77,7 +77,7 @@ public class MSTestCSharpTestFixtureGeneratorTests
             "Sample Scenario",
             22,
             [],
-            [new ScenarioStep(StepKeywordType.Action, "When", "foo happens", 6)]);
+            [new ScenarioStep(StepType.Action, "When", "foo happens", 6)]);
 
         var testFixtureGenerationContext = new TestFixtureGenerationContext<CSharpCompilationInformation>(
             featureInfo,
@@ -105,6 +105,11 @@ public class MSTestCSharpTestFixtureGeneratorTests
             ]);
 
         method.Should().HaveNoParameters();
+
+        method.StepInvocations.Should().BeEquivalentTo(
+            [
+                new StepInvocation(StepType.Action, 6, "When", "foo happens")
+            ]);
     }
 
     [Fact]
@@ -117,7 +122,7 @@ public class MSTestCSharpTestFixtureGeneratorTests
             "Sample Scenario Outline",
             22,
             [],
-            [ new ScenarioStep(StepKeywordType.Action, "When", "<what> happens", 6) ],
+            [ new ScenarioStep(StepType.Action, "When", "<what> happens", 6) ],
             [ exampleSet1, exampleSet2 ]);
 
         var featureInfo = new FeatureInformation(
@@ -149,7 +154,7 @@ public class MSTestCSharpTestFixtureGeneratorTests
                     ["Sample Scenario Outline"]),
                 new AttributeDescriptor(
                     new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestProperty")),
-                    namedArguments: new Dictionary<string, object?>{ { "FeatureTitle", "Sample" } }.ToImmutableDictionary()),
+                    positionalArguments: ["FeatureTitle", "Sample"]),
                 new AttributeDescriptor(
                     new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")),
                     ["foo", ImmutableArray.Create<object?>(ImmutableArray.Create("example_tag"))]),
@@ -168,8 +173,13 @@ public class MSTestCSharpTestFixtureGeneratorTests
                     new NamedTypeIdentifier(new NamespaceString("System"), new IdentifierString("String"))),
 
                 new ParameterDescriptor(
-                    new IdentifierString("_tags"),
+                    new IdentifierString("_exampleTags"),
                     new ArrayTypeIdentifier(new NamedTypeIdentifier(new NamespaceString("System"), new IdentifierString("String"))))
+            ]);
+
+        method.StepInvocations.Should().BeEquivalentTo(
+            [
+                new StepInvocation(StepType.Action, 6, "When", "{0} happens", [new IdentifierString("what")])
             ]);
     }
 }

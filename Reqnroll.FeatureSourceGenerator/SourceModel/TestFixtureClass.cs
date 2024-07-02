@@ -1,4 +1,5 @@
-﻿using System.Collections.Immutable;
+﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 
@@ -16,7 +17,7 @@ public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>, IHasAttr
     /// within the compilation.</param>
     /// <param name="featureInformation">The feature information that will be included in the test fixture.</param>
     /// <param name="attributes">The attributes which are applied to the feature.</param>
-    public TestFixtureClass(
+    protected TestFixtureClass(
         NamedTypeIdentifier identifier,
         string hintName,
         FeatureInformation featureInformation,
@@ -33,6 +34,15 @@ public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>, IHasAttr
         FeatureInformation = featureInformation;
 
         Attributes = attributes.IsDefault ? ImmutableArray<AttributeDescriptor>.Empty : attributes;
+    }
+
+    protected TestFixtureClass(TestFixtureDescriptor descriptor) : 
+        this(
+            descriptor.Identifier ?? throw new ArgumentException($"{nameof(descriptor.Identifier)} cannot be null.", nameof(descriptor)),
+            descriptor.HintName ?? throw new ArgumentException($"{nameof(descriptor.HintName)} cannot be null.", nameof(descriptor)),
+            descriptor.Feature ?? throw new ArgumentException($"{nameof(descriptor.Feature)} cannot be null.", nameof(descriptor)),
+            descriptor.Attributes)
+    {
     }
 
     /// <summary>

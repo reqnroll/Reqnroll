@@ -7,26 +7,42 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp;
 /// <summary>
 /// Represents a class which is a test fixture to execute the scenarios associated with a feature.
 /// </summary>
-public class CSharpTestFixtureClass(
-    NamedTypeIdentifier identifier,
-    string hintName,
-    FeatureInformation feature,
-    ImmutableArray<AttributeDescriptor> attributes = default,
-    ImmutableArray<CSharpTestMethod> methods = default,
-    CSharpRenderingOptions? renderingOptions = null) : TestFixtureClass(
-        identifier,
-        hintName,
-        feature,
-        attributes), IEquatable<CSharpTestFixtureClass?>
+public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFixtureClass?>
 {
+    public CSharpTestFixtureClass(
+        NamedTypeIdentifier identifier,
+        string hintName,
+        FeatureInformation feature,
+        ImmutableArray<AttributeDescriptor> attributes = default,
+        ImmutableArray<CSharpTestMethod> methods = default,
+        CSharpRenderingOptions? renderingOptions = null) 
+        : base(
+            identifier,
+            hintName,
+            feature,
+            attributes)
+    {
+        Methods = methods.IsDefault ? ImmutableArray<CSharpTestMethod>.Empty : methods;
+        RenderingOptions = renderingOptions ?? new CSharpRenderingOptions();
+    }
+
+    public CSharpTestFixtureClass(
+        TestFixtureDescriptor descriptor,
+        ImmutableArray<CSharpTestMethod> methods = default,
+        CSharpRenderingOptions? renderingOptions = null) : base(descriptor)
+    {
+        Methods = methods.IsDefault ? ImmutableArray<CSharpTestMethod>.Empty : methods;
+        RenderingOptions = renderingOptions ?? new CSharpRenderingOptions();
+    }
+
     private static readonly Encoding Encoding = new UTF8Encoding(false);
 
-    public ImmutableArray<CSharpTestMethod> Methods { get; } = 
-        methods.IsDefault ? ImmutableArray<CSharpTestMethod>.Empty : methods;
+    public ImmutableArray<CSharpTestMethod> Methods { get; }
 
-    public CSharpRenderingOptions RenderingOptions { get; } = renderingOptions ?? new CSharpRenderingOptions();
+    public CSharpRenderingOptions RenderingOptions { get; }
 
-    public ImmutableArray<NamespaceString> NamespaceUsings { get; } = ImmutableArray.Create(new NamespaceString("System.Linq"));
+    public virtual ImmutableArray<NamespaceString> NamespaceUsings { get; } = 
+        ImmutableArray.Create(new NamespaceString("System.Linq"));
 
     public override IEnumerable<TestMethod> GetMethods() => Methods;
 

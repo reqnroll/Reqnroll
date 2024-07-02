@@ -2,14 +2,27 @@
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp.MSTest;
-public class MSTestCSharpTestFixtureClass(
-    NamedTypeIdentifier identifier,
-    string hintName,
-    FeatureInformation feature,
-    ImmutableArray<AttributeDescriptor> attributes = default,
-    ImmutableArray<CSharpTestMethod> methods = default,
-    CSharpRenderingOptions? renderingOptions = null) : CSharpTestFixtureClass(identifier, hintName, feature, attributes, methods, renderingOptions)
+public class MSTestCSharpTestFixtureClass : CSharpTestFixtureClass
 {
+    public MSTestCSharpTestFixtureClass(
+        NamedTypeIdentifier identifier,
+        string hintName,
+        FeatureInformation feature,
+        ImmutableArray<AttributeDescriptor> attributes = default,
+        ImmutableArray<CSharpTestMethod> methods = default,
+        CSharpRenderingOptions? renderingOptions = null)
+        : base(identifier, hintName, feature, attributes, methods, renderingOptions)
+    {
+    }
+
+    public MSTestCSharpTestFixtureClass(
+        TestFixtureDescriptor descriptor,
+        ImmutableArray<CSharpTestMethod> methods = default,
+        CSharpRenderingOptions? renderingOptions = null) 
+        : base(descriptor, methods, renderingOptions)
+    {
+    }
+
     protected override void RenderTestFixtureContentTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
     {
         RenderTestRunnerFieldTo(sourceBuilder);
