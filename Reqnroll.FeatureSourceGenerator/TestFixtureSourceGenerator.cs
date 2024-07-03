@@ -196,6 +196,14 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     return [.. diagnostics];
                 }
 
+                // Determine whether we should include ignored examples in our sample sets.
+                var emitIgnoredExamples = false;
+                if (options.TryGetValue("reqnroll.emit_ignored_examples", out var emitIgnoredExamplesValue) ||
+                    options.TryGetValue("build_property.ReqnrollEmitIgnoredExamples", out emitIgnoredExamplesValue))
+                {
+                    bool.TryParse(emitIgnoredExamplesValue, out emitIgnoredExamples);
+                }
+
                 var feature = document.Feature;
 
                 var featureInformation = new FeatureInformation(
@@ -206,18 +214,18 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     featureFile.Path);
 
                 var scenarioInformations = feature.Children
-                    .SelectMany(child => CreateScenarioInformations(child, cancellationToken))
+                    .SelectMany(child => CreateScenarioInformations(child, emitIgnoredExamples, cancellationToken))
                     .ToImmutableArray();
 
                 return
                 [
                     new TestFixtureGenerationContext<TCompilationInformation>(
-                            featureInformation,
-                            scenarioInformations,
-                            featureHintName,
-                            new NamespaceString(testFixtureNamespace),
-                            compilationInfo,
-                            generator)
+                        featureInformation,
+                        scenarioInformations,
+                        featureHintName,
+                        new NamespaceString(testFixtureNamespace),
+                        compilationInfo,
+                        generator)
                 ];
             });
                 
@@ -266,23 +274,26 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
 
     private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
         IHasLocation child,
+        bool emitIgnoredExamples,
         CancellationToken cancellationToken)
     {
         return child switch
         {
-            Scenario scenario => [CreateScenarioInformation(scenario,  cancellationToken)],
-            Rule rule => CreateScenarioInformations(rule, cancellationToken),
+            Scenario scenario => [CreateScenarioInformation(scenario, emitIgnoredExamples, cancellationToken)],
+            Rule rule => CreateScenarioInformations(rule, emitIgnoredExamples, cancellationToken),
             _ => []
         };
     }
 
     private static ScenarioInformation CreateScenarioInformation(
         Scenario scenario,
-        CancellationToken cancellationToken) => CreateScenarioInformation(scenario, null, cancellationToken);
+        bool emitIgnoredExamples,
+        CancellationToken cancellationToken) => CreateScenarioInformation(scenario, null, emitIgnoredExamples, cancellationToken);
 
     private static ScenarioInformation CreateScenarioInformation(
         Scenario scenario,
         RuleInformation? rule,
+        bool emitIgnoredExamples,
         CancellationToken cancellationToken)
     {
         var exampleSets = new List<ScenarioExampleSet>();
@@ -295,6 +306,11 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 example.TableHeader.Cells.Select(cell => cell.Value).ToImmutableArray(),
                 example.TableBody.Select(row => row.Cells.Select(cell => cell.Value).ToImmutableArray()).ToImmutableArray(),
                 example.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray());
+
+            if (!emitIgnoredExamples && examples.Tags.Contains("ignore", StringComparer.OrdinalIgnoreCase))
+            {
+                continue;
+            }
 
             exampleSets.Add(examples);
         }
@@ -332,6 +348,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
 
     private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
         Rule rule,
+        bool emitIgnoredExamples,
         CancellationToken cancellationToken)
     {
         var tags = rule.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray();
@@ -346,6 +363,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     yield return CreateScenarioInformation(
                         scenario,
                         new RuleInformation(rule.Name, tags),
+                        emitIgnoredExamples,
                         cancellationToken);
                     break;
             }

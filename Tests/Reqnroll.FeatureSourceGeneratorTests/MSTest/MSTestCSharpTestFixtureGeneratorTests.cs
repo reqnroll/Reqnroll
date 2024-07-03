@@ -1,5 +1,4 @@
-﻿using Gherkin;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Reqnroll.FeatureSourceGenerator.CSharp;
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;

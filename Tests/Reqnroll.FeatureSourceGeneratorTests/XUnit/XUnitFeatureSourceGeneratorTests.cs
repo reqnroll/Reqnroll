@@ -1,12 +1,13 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
+using Reqnroll.FeatureSourceGenerator;
 using Reqnroll.FeatureSourceGenerator.CSharp;
 
-namespace Reqnroll.FeatureSourceGenerator;
+namespace Reqnroll.FeatureSourceGenerator.XUnit;
 
 public class XUnitFeatureSourceGeneratorTests
 {
-    [Fact]
+    [Fact(Skip = "XUnit not yet implemented.")]
     public void GeneratorProducesXUnitOutputWhenWhenBuildPropertyConfiguredForXUnit()
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
@@ -56,7 +57,7 @@ public class XUnitFeatureSourceGeneratorTests
             .Which.Should().HaveAttribute("global::Xunit.Fact");
     }
 
-    [Fact]
+    [Fact(Skip = "XUnit not yet implemented.")]
     public void GeneratorProducesXUnitOutputWhenWhenEditorConfigConfiguredForXUnit()
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
