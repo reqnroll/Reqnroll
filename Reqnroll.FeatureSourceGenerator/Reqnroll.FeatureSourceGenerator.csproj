@@ -17,6 +17,7 @@
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <DevelopmentDependency>true</DevelopmentDependency>
     <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -57,10 +58,7 @@
   <ItemGroup>
     <Content Include="..\reqnroll-icon.png" Link="reqnroll-icon.png" PackagePath="\images" PackageCopyToOutput="true" />
     <None Include="build\**" Pack="True" PackagePath="\build" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="ebvn2meh.ura~" />
+    <None Update="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
   <ItemGroup>
