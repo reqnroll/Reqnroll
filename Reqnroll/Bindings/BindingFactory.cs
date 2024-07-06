@@ -25,7 +25,8 @@ public class BindingFactory(
     }
 
     public IStepArgumentTransformationBinding CreateStepArgumentTransformation(string regexString,
-        IBindingMethod bindingMethod, string parameterTypeName = null, int order = default)
+        IBindingMethod bindingMethod, string parameterTypeName = null, 
+        int order = StepArgumentTransformationAttribute.DefaultOrder)
     {
         return new StepArgumentTransformationBinding(regexString, bindingMethod, parameterTypeName, order);
     }

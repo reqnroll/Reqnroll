@@ -199,7 +199,7 @@ namespace Reqnroll.Bindings.Discovery
         {
             string regex = stepArgumentTransformationAttribute.TryGetAttributeValue<string>(0) ?? stepArgumentTransformationAttribute.TryGetAttributeValue<string>(nameof(StepArgumentTransformationAttribute.Regex));
             string name = stepArgumentTransformationAttribute.TryGetAttributeValue<string>(nameof(StepArgumentTransformationAttribute.Name));
-            int order = stepArgumentTransformationAttribute.TryGetAttributeValue<int>(nameof(StepArgumentTransformationAttribute.Order));
+            int order = stepArgumentTransformationAttribute.TryGetAttributeValue(nameof(StepArgumentTransformationAttribute.Order), StepArgumentTransformationAttribute.DefaultOrder);
 
             var validationResult = ValidateStepArgumentTransformation(bindingSourceMethod, stepArgumentTransformationAttribute);
             if (!validationResult.IsValid)

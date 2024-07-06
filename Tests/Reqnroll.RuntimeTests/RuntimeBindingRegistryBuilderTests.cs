@@ -319,7 +319,7 @@ namespace Reqnroll.RuntimeTests
             Assert.Single(
                 bindingSourceProcessorStub.StepArgumentTransformationBindings,
                 sat =>
-                    sat.Method.Name == nameof(StepTransformationExample.Transform) && sat.Order == default);
+                    sat.Method.Name == nameof(StepTransformationExample.Transform) && sat.Order == StepArgumentTransformationAttribute.DefaultOrder);
             
             Assert.Single(
                 bindingSourceProcessorStub.StepArgumentTransformationBindings,
