@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 internal static class CommonTypes
 {
-    public static readonly NamedTypeIdentifier String =
-        new(new NamespaceString("System"), new IdentifierString("String"));
+    public static readonly QualifiedTypeIdentifier String =
+        new(new NamespaceString("System"), new SimpleTypeIdentifier(new IdentifierString("String")));
 }

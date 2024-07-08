@@ -11,12 +11,12 @@ namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 /// <param name="positionalArguments">The positional arguments of the attribute.</param>
 /// <param name="namedArguments">The named arguments of the attribute.</param>
 public class AttributeDescriptor(
-    NamedTypeIdentifier type,
+    QualifiedTypeIdentifier type,
     ImmutableArray<object?>? positionalArguments = null,
     ImmutableDictionary<string, object?>? namedArguments = null)
     : IEquatable<AttributeDescriptor>
 {
-    public NamedTypeIdentifier Type { get; } = type;
+    public QualifiedTypeIdentifier Type { get; } = type;
 
     public ImmutableArray<object?> PositionalArguments { get; } =
         ThrowIfArgumentTypesNotValid(

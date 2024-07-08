@@ -118,7 +118,7 @@ internal static class MSTestSyntax
     public static AttributeDescriptor Attribute(string type, params object?[] args)
     {
         return new AttributeDescriptor(
-            new NamedTypeIdentifier(Namespace, new IdentifierString(type)),
+            Namespace + new SimpleTypeIdentifier(new IdentifierString(type)),
             [.. args]);
     }
 

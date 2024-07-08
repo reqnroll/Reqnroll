@@ -5,7 +5,7 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp.MSTest;
 public class MSTestCSharpTestFixtureClass : CSharpTestFixtureClass
 {
     public MSTestCSharpTestFixtureClass(
-        NamedTypeIdentifier identifier,
+        QualifiedTypeIdentifier identifier,
         string hintName,
         FeatureInformation feature,
         ImmutableArray<AttributeDescriptor> attributes = default,

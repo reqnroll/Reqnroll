@@ -7,7 +7,7 @@ namespace Reqnroll.FeatureSourceGenerator.XUnit;
 
 public class XUnitFeatureSourceGeneratorTests
 {
-    [Fact(Skip = "XUnit not yet implemented.")]
+    [Fact]
     public void GeneratorProducesXUnitOutputWhenWhenBuildPropertyConfiguredForXUnit()
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
@@ -57,7 +57,7 @@ public class XUnitFeatureSourceGeneratorTests
             .Which.Should().HaveAttribute("global::Xunit.Fact");
     }
 
-    [Fact(Skip = "XUnit not yet implemented.")]
+    [Fact]
     public void GeneratorProducesXUnitOutputWhenWhenEditorConfigConfiguredForXUnit()
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()

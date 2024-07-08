@@ -1,4 +1,5 @@
 ﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+using Reqnroll.FeatureSourceGenerator.CSharp.XUnit;
 
 namespace Reqnroll.FeatureSourceGenerator.XUnit;
 
@@ -7,9 +8,11 @@ namespace Reqnroll.FeatureSourceGenerator.XUnit;
 /// </summary>
 public class XUnitHandler : ITestFrameworkHandler
 {
+    internal static readonly NamespaceString XUnitNamespace = new("Xunit");
+
     public string TestFrameworkName => "xUnit";
 
-    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>() 
+    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>()
         where TCompilationInformation : CompilationInformation
     {
         if (typeof(TCompilationInformation).IsAssignableFrom(typeof(CSharpCompilationInformation)))

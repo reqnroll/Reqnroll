@@ -58,7 +58,7 @@ public class MSTestCSharpTestFixtureGeneratorTests
 
         testFixture.Should().HaveAttribuesEquivalentTo(
             [
-                new AttributeDescriptor(new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestClass"))),
+                new AttributeDescriptor(MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestClass"))),
             ]);
     }
 
@@ -94,12 +94,12 @@ public class MSTestCSharpTestFixtureGeneratorTests
 
         method.Should().HaveAttribuesEquivalentTo(
             [
-                new AttributeDescriptor(new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestMethod"))),
+                new AttributeDescriptor(MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestMethod"))),
                 new AttributeDescriptor(
-                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("Description")),
+                    MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
                     ["Sample Scenario"]),
                 new AttributeDescriptor(
-                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestProperty")),
+                    MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestProperty")),
                     positionalArguments: ["FeatureTitle", "Sample"])
             ]);
 
@@ -147,21 +147,21 @@ public class MSTestCSharpTestFixtureGeneratorTests
 
         method.Should().HaveAttribuesEquivalentTo(
             [
-                new AttributeDescriptor(new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestMethod"))),
+                new AttributeDescriptor(MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestMethod"))),
                 new AttributeDescriptor(
-                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("Description")),
+                    MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
                     ["Sample Scenario Outline"]),
                 new AttributeDescriptor(
-                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestProperty")),
+                    MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestProperty")),
                     positionalArguments: ["FeatureTitle", "Sample"]),
                 new AttributeDescriptor(
-                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")),
+                    MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("DataRow")),
                     ["foo", ImmutableArray.Create<object?>(ImmutableArray.Create("example_tag"))]),
                 new AttributeDescriptor(
-                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")),
+                    MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("DataRow")),
                     ["bar", ImmutableArray.Create<object?>(ImmutableArray.Create("example_tag"))]),
                 new AttributeDescriptor(
-                    new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")),
+                    MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("DataRow")),
                     ["baz", ImmutableArray.Create<object?>(ImmutableArray<string>.Empty)])
             ]);
 
@@ -169,11 +169,11 @@ public class MSTestCSharpTestFixtureGeneratorTests
             [
                 new ParameterDescriptor(
                     new IdentifierString("what"), 
-                    new NamedTypeIdentifier(new NamespaceString("System"), new IdentifierString("String"))),
+                    new NamespaceString("System") + new SimpleTypeIdentifier(new IdentifierString("String"))),
 
                 new ParameterDescriptor(
                     new IdentifierString("_exampleTags"),
-                    new ArrayTypeIdentifier(new NamedTypeIdentifier(new NamespaceString("System"), new IdentifierString("String"))))
+                    new ArrayTypeIdentifier(new NamespaceString("System") + new SimpleTypeIdentifier(new IdentifierString("String"))))
             ]);
 
         method.StepInvocations.Should().BeEquivalentTo(

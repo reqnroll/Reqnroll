@@ -16,9 +16,9 @@ public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>, IHasAttr
     /// a virtual path and virtual filename that makes sense within the context of a project. The value must be unique
     /// within the compilation.</param>
     /// <param name="featureInformation">The feature information that will be included in the test fixture.</param>
-    /// <param name="attributes">The attributes which are applied to the feature.</param>
+    /// <param name="attributes">The attributes which are applied to the class.</param>
     protected TestFixtureClass(
-        NamedTypeIdentifier identifier,
+        QualifiedTypeIdentifier identifier,
         string hintName,
         FeatureInformation featureInformation,
         ImmutableArray<AttributeDescriptor> attributes = default)
@@ -48,15 +48,20 @@ public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>, IHasAttr
     /// <summary>
     /// Gets the identifier of the class.
     /// </summary>
-    public NamedTypeIdentifier Identifier { get; }
+    public QualifiedTypeIdentifier Identifier { get; }
 
     /// <summary>
-    /// Gets the attributes which are applied to the fixture.
+    /// Gets the interfaces which are implemented by the class.
+    /// </summary>
+    public virtual ImmutableArray<TypeIdentifier> Interfaces => ImmutableArray<TypeIdentifier>.Empty;
+
+    /// <summary>
+    /// Gets the attributes which are applied to the class.
     /// </summary>
     public ImmutableArray<AttributeDescriptor> Attributes { get; }
 
     /// <summary>
-    /// Gets the hint name associated with the test fixture.
+    /// Gets the hint name associated with the test class.
     /// </summary>
     public string HintName { get; }
 

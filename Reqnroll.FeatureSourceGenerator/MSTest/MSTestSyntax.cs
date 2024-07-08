@@ -6,21 +6,21 @@ internal static class MSTestSyntax
 {
     public static readonly NamespaceString MSTestNamespace = new("Microsoft.VisualStudio.TestTools.UnitTesting");
     public static AttributeDescriptor TestClassAttribute() =>
-        new(new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestClass")));
+        new(MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestClass")));
 
     public static AttributeDescriptor TestMethodAttribute() => 
-        new(new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestMethod")));
+        new(MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestMethod")));
 
     public static AttributeDescriptor DescriptionAttribute(string description) =>
         new(
-            new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("Description")),
+            MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
             ImmutableArray.Create<object?>(description));
 
     public static AttributeDescriptor TestPropertyAttribute(string propertyName, object? propertyValue) =>
         new(
-            new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("TestProperty")),
+            MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("TestProperty")),
             positionalArguments: ImmutableArray.Create(propertyName, propertyValue));
 
     public static AttributeDescriptor DataRowAttribute(ImmutableArray<object?> values) =>
-        new(new NamedTypeIdentifier(MSTestNamespace, new IdentifierString("DataRow")), values);
+        new(MSTestNamespace + new SimpleTypeIdentifier(new IdentifierString("DataRow")), values);
 }

@@ -16,9 +16,12 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
 {
     public ITestFrameworkHandler TestFrameworkHandler { get; } = testFrameworkHandler;
 
-    protected abstract ImmutableArray<AttributeDescriptor> GenerateTestFixtureClassAttributes(
+    protected virtual ImmutableArray<AttributeDescriptor> GenerateTestFixtureClassAttributes(
         TestFixtureGenerationContext<CSharpCompilationInformation> context,
-        CancellationToken cancellationToken);
+        CancellationToken cancellationToken)
+    {
+        return ImmutableArray<AttributeDescriptor>.Empty;
+    }
 
     protected virtual ImmutableArray<ParameterDescriptor> GenerateTestMethodParameters(
         TestMethodGenerationContext<CSharpCompilationInformation> context,
@@ -148,12 +151,14 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
             featureTitle += " Feature";
         }
 
-        var identifier = CSharpSyntax.GenerateTypeIdentifier(featureTitle);
-        
+        var className = CSharpSyntax.GenerateTypeIdentifier(featureTitle);
+        var qualifiedClassName = context.TestFixtureNamespace + new SimpleTypeIdentifier(className);
+
         var descriptor = new TestFixtureDescriptor
         {
-            Identifier = new NamedTypeIdentifier(context.TestFixtureNamespace, identifier),
+            Identifier = qualifiedClassName,
             Feature = feature,
+            Interfaces = GenerateTestFixtureInterfaces(context, qualifiedClassName, cancellationToken),
             Attributes = GenerateTestFixtureClassAttributes(context, cancellationToken),
             HintName = context.FeatureHintName
         };
@@ -166,6 +171,14 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
             descriptor,
             methods.ToImmutableArray(),
             generationOptions);
+    }
+
+    protected virtual ImmutableArray<TypeIdentifier> GenerateTestFixtureInterfaces(
+        TestFixtureGenerationContext<CSharpCompilationInformation> context,
+        QualifiedTypeIdentifier qualifiedClassName,
+        CancellationToken cancellationToken)
+    {
+        return ImmutableArray<TypeIdentifier>.Empty;
     }
 
     protected abstract TTestFixtureClass CreateTestFixtureClass(

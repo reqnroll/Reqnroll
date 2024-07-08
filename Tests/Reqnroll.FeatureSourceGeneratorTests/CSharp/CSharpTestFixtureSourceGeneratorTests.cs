@@ -37,7 +37,7 @@ public class CSharpTestFixtureSourceGeneratorTests
                 It.IsAny<IEnumerable<TestMethod>>(),
                 It.IsAny<CancellationToken>()))
             .Returns(new CSharpTestFixtureClass(
-                new NamedTypeIdentifier(new IdentifierString("Mock")),
+                new NamespaceString("Test") + new SimpleTypeIdentifier(new IdentifierString("Mock")),
                 "Mock.feature",
                 new FeatureInformation("Mock", null, "en")));
     }

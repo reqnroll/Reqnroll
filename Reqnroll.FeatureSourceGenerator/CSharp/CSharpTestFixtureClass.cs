@@ -10,7 +10,7 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp;
 public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFixtureClass?>
 {
     public CSharpTestFixtureClass(
-        NamedTypeIdentifier identifier,
+        QualifiedTypeIdentifier identifier,
         string hintName,
         FeatureInformation feature,
         ImmutableArray<AttributeDescriptor> attributes = default,
@@ -57,6 +57,7 @@ public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFix
 
     public void RenderTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken = default)
     {
+        
         sourceBuilder.Append("namespace ").Append(Identifier.Namespace).AppendLine();
         sourceBuilder.BeginBlock("{");
 
@@ -80,7 +81,7 @@ public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFix
             }
         }
 
-        sourceBuilder.Append("public partial class ").AppendLine(Identifier.LocalName);
+        sourceBuilder.Append("public partial class ").AppendTypeReference(Identifier.LocalType).AppendLine();
         sourceBuilder.BeginBlock("{");
 
         if (RenderingOptions.EnableLineMapping && FeatureInformation.FilePath != null)

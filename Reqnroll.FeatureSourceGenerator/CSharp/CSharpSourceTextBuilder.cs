@@ -276,25 +276,55 @@ public class CSharpSourceTextBuilder
     {
         return type switch
         {
-            NamedTypeIdentifier namedType => AppendTypeReference(namedType),
+            SimpleTypeIdentifier simpleType => AppendTypeReference(simpleType),
+            GenericTypeIdentifier genericType => AppendTypeReference(genericType),
+            QualifiedTypeIdentifier qualifiedType => AppendTypeReference(qualifiedType),
             ArrayTypeIdentifier arrayType => AppendTypeReference(arrayType),
             _ => throw new NotImplementedException()
         };
     }
 
-    public CSharpSourceTextBuilder AppendTypeReference(NamedTypeIdentifier type)
+    public CSharpSourceTextBuilder AppendTypeReference(SimpleTypeIdentifier type)
     {
-        if (!type.Namespace.IsEmpty)
-        {
-            Append("global::").Append(type.Namespace).Append('.');
-        }
-
-        Append(type.LocalName);
+        Append(type.Name);
 
         if (type.IsNullable)
         {
             Append('?');
         }
+
+        return this;
+    }
+
+    public CSharpSourceTextBuilder AppendTypeReference(GenericTypeIdentifier type)
+    {
+        Append(type.Name);
+
+        Append('<');
+
+        AppendTypeReference(type.TypeArguments[0]);
+
+        for (var i = 1;  i < type.TypeArguments.Length; i++)
+        {
+            Append(',');
+            AppendTypeReference(type.TypeArguments[i]);
+        }
+
+        Append('>');
+
+        if (type.IsNullable)
+        {
+            Append('?');
+        }
+
+        return this;
+    }
+
+    public CSharpSourceTextBuilder AppendTypeReference(QualifiedTypeIdentifier type)
+    {
+        Append("global::").Append(type.Namespace).Append('.');
+
+        AppendTypeReference(type.LocalType);
 
         return this;
     }

@@ -101,5 +101,20 @@ public readonly struct NamespaceString : IEquatable<NamespaceString>, IEquatable
 
     public static bool operator !=(NamespaceString ns, string s) => !Equals(ns, s);
 
+    public static QualifiedTypeIdentifier operator +(NamespaceString ns, LocalTypeIdentifier localType)
+    {
+        if (ns.IsEmpty)
+        {
+            throw new ArgumentException("Cannot qualify a type with an empty namespace.", nameof(ns));
+        }
+
+        if (localType is null)
+        {
+            throw new ArgumentNullException(nameof(localType));
+        }
+
+        return new QualifiedTypeIdentifier(ns, localType);
+    }
+
     public static implicit operator string(NamespaceString ns) => ns.ToString();
 }
