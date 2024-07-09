@@ -81,7 +81,20 @@ public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFix
             }
         }
 
-        sourceBuilder.Append("public partial class ").AppendTypeReference(Identifier.LocalType).AppendLine();
+        sourceBuilder.Append("public partial class ").AppendTypeReference(Identifier.LocalType);
+
+        if (!Interfaces.IsEmpty)
+        {
+            sourceBuilder.Append(" :").AppendTypeReference(Interfaces[0]);
+
+            for (var i = 1; i < Interfaces.Length; i++)
+            {
+                sourceBuilder.Append(" ,").AppendTypeReference(Interfaces[i]);
+            }
+        }
+
+        sourceBuilder.AppendLine();
+
         sourceBuilder.BeginBlock("{");
 
         if (RenderingOptions.EnableLineMapping && FeatureInformation.FilePath != null)
