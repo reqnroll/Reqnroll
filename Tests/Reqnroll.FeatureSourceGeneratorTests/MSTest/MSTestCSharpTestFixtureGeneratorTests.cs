@@ -1,34 +1,11 @@
-﻿using Microsoft.CodeAnalysis;
-using Reqnroll.FeatureSourceGenerator.CSharp;
+﻿using Reqnroll.FeatureSourceGenerator.CSharp;
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.MSTest;
-public class MSTestCSharpTestFixtureGeneratorTests
+public class MSTestCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGeneratorTestBase<MSTestHandler>(new MSTestHandler())
 {
-    public MSTestCSharpTestFixtureGeneratorTests()
-    {
-        var references = AppDomain.CurrentDomain.GetAssemblies()
-            .Where(asm => !asm.IsDynamic)
-            .Select(AssemblyIdentity.FromAssemblyDefinition);
-
-        Compilation = new CSharpCompilationInformation(
-            "Test.dll",
-            references.ToImmutableArray(),
-            Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp11,
-            true);
-
-        TestHandler = new MSTestHandler();
-        Generator = TestHandler.GetTestFixtureGenerator<CSharpCompilationInformation>()!;
-    }
-
     private static readonly NamespaceString MSTestNamespace = new("Microsoft.VisualStudio.TestTools.UnitTesting");
-
-    protected CSharpCompilationInformation Compilation { get; }
-
-    protected MSTestHandler TestHandler { get; }
-
-    protected ITestFixtureGenerator<CSharpCompilationInformation> Generator { get; }
 
     [Fact]
     public void GenerateTestFixture_CreatesClassForFeatureWithMsTestAttributes()

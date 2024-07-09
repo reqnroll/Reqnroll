@@ -1,4 +1,5 @@
 ﻿using Reqnroll.FeatureSourceGenerator.SourceModel;
+using Reqnroll.FeatureSourceGenerator.XUnit;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp.XUnit;
@@ -13,6 +14,7 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
         CSharpRenderingOptions? renderingOptions = null)
         : base(identifier, hintName, feature, attributes, methods, renderingOptions)
     {
+        Interfaces = ImmutableArray.Create<TypeIdentifier>(XUnitSyntax.LifetimeInterfaceType(Identifier));
     }
 
     public XUnitCSharpTestFixtureClass(
@@ -21,7 +23,10 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
         CSharpRenderingOptions? renderingOptions = null)
         : base(descriptor, methods, renderingOptions)
     {
+        Interfaces = ImmutableArray.Create<TypeIdentifier>(XUnitSyntax.LifetimeInterfaceType(Identifier));
     }
+
+    public override ImmutableArray<TypeIdentifier> Interfaces { get; }
 
     //protected override IEnumerable<string> GetInterfaces() =>
     //    base.GetInterfaces().Concat([$"global::Xunit.IClassFixture<{GetClassName()}.Lifetime>"]);
