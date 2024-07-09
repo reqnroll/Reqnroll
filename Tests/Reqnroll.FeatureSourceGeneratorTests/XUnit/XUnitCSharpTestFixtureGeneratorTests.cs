@@ -43,4 +43,50 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
                     ])
             ]);
     }
+
+    [Fact]
+    public void GenerateTestMethod_CreatesParameterlessMethodForScenarioWithoutExamples()
+    {
+        var featureInfo = new FeatureInformation(
+            "Sample",
+            null,
+            "en",
+            ["featureTag1"],
+            null);
+
+        var scenarioInfo = new ScenarioInformation(
+            "Sample Scenario",
+            22,
+            [],
+            [new ScenarioStep(StepType.Action, "When", "foo happens", 6)]);
+
+        var testFixtureGenerationContext = new TestFixtureGenerationContext<CSharpCompilationInformation>(
+            featureInfo,
+            [scenarioInfo],
+            "Sample.feature",
+            new NamespaceString("Reqnroll.Tests"),
+            Compilation,
+            Generator);
+
+        var testMethodGenerationContext = new TestMethodGenerationContext<CSharpCompilationInformation>(
+            scenarioInfo,
+            testFixtureGenerationContext);
+
+        var method = Generator.GenerateTestMethod(testMethodGenerationContext);
+
+        method.Should().HaveAttribuesEquivalentTo(
+            [
+                new AttributeDescriptor(XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Fact"))),
+                new AttributeDescriptor(
+                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
+                    ["Sample Scenario"]),
+            ]);
+
+        method.Should().HaveNoParameters();
+
+        method.StepInvocations.Should().BeEquivalentTo(
+            [
+                new StepInvocation(StepType.Action, 6, "When", "foo happens")
+            ]);
+    }
 }
