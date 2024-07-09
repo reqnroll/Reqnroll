@@ -15,4 +15,23 @@ internal static class XUnitSyntax
                     testFixtureType.LocalType,
                     new SimpleTypeIdentifier(new IdentifierString("Lifecycle")))));
     }
+
+    internal static AttributeDescriptor SkippableFactAttribute(string displayName)
+    {
+        return new AttributeDescriptor(
+            XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("SkippableFact")),
+            namedArguments: ImmutableDictionary.CreateRange(
+            [
+                new KeyValuePair<IdentifierString, object?>(
+                    new IdentifierString("DisplayName"),
+                    displayName)
+            ]));
+    }
+
+    internal static AttributeDescriptor TraitAttribute(string name, string value)
+    {
+        return new AttributeDescriptor(
+            XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Trait")),
+            ImmutableArray.Create<object?>(name, value));
+    }
 }

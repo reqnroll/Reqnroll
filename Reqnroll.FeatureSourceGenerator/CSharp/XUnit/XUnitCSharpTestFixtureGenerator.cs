@@ -31,16 +31,8 @@ internal class XUnitCSharpTestFixtureGenerator(XUnitHandler testFrameworkHandler
         CancellationToken cancellationToken)
     {
         return ImmutableArray.Create(
-            new AttributeDescriptor(
-                XUnitHandler.XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Fact"))));
-    }
-
-    protected override ImmutableArray<TypeIdentifier> GenerateTestFixtureInterfaces(
-        TestFixtureGenerationContext<CSharpCompilationInformation> context,
-        QualifiedTypeIdentifier qualifiedClassName,
-        CancellationToken cancellationToken)
-    {
-        return ImmutableArray.Create<TypeIdentifier>(
-            XUnitHandler.XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("IClassFixture")));
+            XUnitSyntax.SkippableFactAttribute(context.ScenarioInformation.Name),
+            XUnitSyntax.TraitAttribute("FeatureTitle", context.FeatureInformation.Name),
+            XUnitSyntax.TraitAttribute("Description", context.ScenarioInformation.Name));
     }
 }

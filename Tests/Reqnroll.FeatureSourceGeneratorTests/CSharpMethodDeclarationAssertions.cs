@@ -260,12 +260,12 @@ internal static class SyntaxInterpreter
         };
 
         ImmutableArray<object?> positionalArguments;
-        ImmutableDictionary<string, object?> namedArguments;
+        ImmutableDictionary<IdentifierString, object?> namedArguments;
 
         if (attribute.ArgumentList == null)
         {
             positionalArguments = [];
-            namedArguments = ImmutableDictionary<string, object?>.Empty;
+            namedArguments = ImmutableDictionary<IdentifierString, object?>.Empty;
         }
         else
         {
@@ -276,7 +276,9 @@ internal static class SyntaxInterpreter
 
             namedArguments = attribute.ArgumentList.Arguments
                 .Where(arg => arg.NameEquals != null)
-                .ToImmutableDictionary(arg => arg.NameEquals!.Name.ToString(), arg => GetLiteralValue(arg.Expression));
+                .ToImmutableDictionary(
+                    arg => new IdentifierString(arg.NameEquals!.Name.ToString()),
+                    arg => GetLiteralValue(arg.Expression));
         }
 
         return new AttributeDescriptor(

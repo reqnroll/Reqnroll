@@ -13,7 +13,7 @@ namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 public class AttributeDescriptor(
     QualifiedTypeIdentifier type,
     ImmutableArray<object?>? positionalArguments = null,
-    ImmutableDictionary<string, object?>? namedArguments = null)
+    ImmutableDictionary<IdentifierString, object?>? namedArguments = null)
     : IEquatable<AttributeDescriptor>
 {
     public QualifiedTypeIdentifier Type { get; } = type;
@@ -23,8 +23,8 @@ public class AttributeDescriptor(
             positionalArguments.GetValueOrDefault(ImmutableArray<object?>.Empty),
             nameof(positionalArguments));
 
-    public ImmutableDictionary<string, object?> NamedArguments { get; } =
-        ThrowIfArgumentTypesNotValid(namedArguments ?? ImmutableDictionary<string, object?>.Empty, nameof(namedArguments));
+    public ImmutableDictionary<IdentifierString, object?> NamedArguments { get; } =
+        ThrowIfArgumentTypesNotValid(namedArguments ?? ImmutableDictionary<IdentifierString, object?>.Empty, nameof(namedArguments));
 
     private int? _hashCode;
 
@@ -91,8 +91,8 @@ public class AttributeDescriptor(
         }
     }
 
-    private static ImmutableDictionary<string, object?> ThrowIfArgumentTypesNotValid(
-        ImmutableDictionary<string, object?> namedArguments,
+    private static ImmutableDictionary<IdentifierString, object?> ThrowIfArgumentTypesNotValid(
+        ImmutableDictionary<IdentifierString, object?> namedArguments,
         string paramName)
     {
         foreach (var item in namedArguments.Values)
@@ -199,8 +199,8 @@ public class AttributeDescriptor(
     }
 
     private static bool ArgumentDictionaryEqual(
-        ImmutableDictionary<string, object?> first,
-        ImmutableDictionary<string, object?> second)
+        ImmutableDictionary<IdentifierString, object?> first,
+        ImmutableDictionary<IdentifierString, object?> second)
     {
         if (ReferenceEquals(first, second))
         {
@@ -360,11 +360,11 @@ public class AttributeDescriptor(
 
     public AttributeDescriptor WithNamedArguments(object namedArguments)
     {
-        var arguments = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
+        var arguments = new Dictionary<IdentifierString, object?>();
 
         foreach (PropertyDescriptor propertyDescriptor in TypeDescriptor.GetProperties(namedArguments))
         {
-            arguments.Add(propertyDescriptor.Name, propertyDescriptor.GetValue(namedArguments));
+            arguments.Add(new IdentifierString(propertyDescriptor.Name), propertyDescriptor.GetValue(namedArguments));
         }
 
         return new AttributeDescriptor(Type, PositionalArguments, arguments.ToImmutableDictionary());

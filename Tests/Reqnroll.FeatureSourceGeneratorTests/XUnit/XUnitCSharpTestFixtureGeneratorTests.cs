@@ -1,5 +1,6 @@
 ﻿using Reqnroll.FeatureSourceGenerator.CSharp;
 using Reqnroll.FeatureSourceGenerator.SourceModel;
+using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.XUnit;
 public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGeneratorTestBase<XUnitHandler>(new XUnitHandler())
@@ -76,10 +77,17 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         method.Should().HaveAttribuesEquivalentTo(
             [
-                new AttributeDescriptor(XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Fact"))),
                 new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
-                    ["Sample Scenario"]),
+                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("SkippableFact")),
+                    namedArguments: new Dictionary<IdentifierString, object?>{ 
+                        { new IdentifierString("DisplayName"), "Sample Scenario" } 
+                    }.ToImmutableDictionary()),
+                new AttributeDescriptor(
+                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Trait")),
+                    ["FeatureTitle", "Sample"]),
+                new AttributeDescriptor(
+                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Trait")),
+                    ["Description", "Sample Scenario"])
             ]);
 
         method.Should().HaveNoParameters();

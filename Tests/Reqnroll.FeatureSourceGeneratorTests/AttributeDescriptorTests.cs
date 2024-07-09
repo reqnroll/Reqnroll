@@ -97,7 +97,7 @@ public class AttributeDescriptorTests
         using var assertions = new AssertionScope();
 
         attribute.PositionalArguments[0].Should().Be(argument);
-        attribute.NamedArguments["Property"].Should().Be(argument);
+        attribute.NamedArguments[new IdentifierString("Property")].Should().Be(argument);
     }
 
     [Theory]
@@ -112,7 +112,7 @@ public class AttributeDescriptorTests
         using var assertions = new AssertionScope();
 
         attribute.PositionalArguments[0].Should().Be(argument);
-        attribute.NamedArguments["Property"].Should().Be(argument);
+        attribute.NamedArguments[new IdentifierString("Property")].Should().Be(argument);
     }
 
     [Theory]
@@ -140,7 +140,7 @@ public class AttributeDescriptorTests
         using var assertions = new AssertionScope();
 
         attribute.PositionalArguments[0].Should().Be(argument);
-        attribute.NamedArguments["Property"].Should().Be(argument);
+        attribute.NamedArguments[new IdentifierString("Property")].Should().Be(argument);
     }
 
     [Theory]
@@ -157,7 +157,7 @@ public class AttributeDescriptorTests
         using var assertions = new AssertionScope();
 
         attribute.PositionalArguments[0].Should().Be(argument);
-        attribute.NamedArguments["Property"].Should().Be(argument);
+        attribute.NamedArguments[new IdentifierString("Property")].Should().Be(argument);
     }
 
     [Theory]
@@ -172,7 +172,7 @@ public class AttributeDescriptorTests
         using var assertions = new AssertionScope();
 
         attribute.PositionalArguments[0].Should().Be(argument);
-        attribute.NamedArguments["Property"].Should().Be(argument);
+        attribute.NamedArguments[new IdentifierString("Property")].Should().Be(argument);
     }
 
     [Fact]
