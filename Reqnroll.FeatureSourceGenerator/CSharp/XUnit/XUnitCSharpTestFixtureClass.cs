@@ -28,52 +28,65 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
 
     public override ImmutableArray<TypeIdentifier> Interfaces { get; }
 
-    //protected override IEnumerable<string> GetInterfaces() =>
-    //    base.GetInterfaces().Concat([$"global::Xunit.IClassFixture<{GetClassName()}.Lifetime>"]);
+    protected override void RenderTestFixtureContentTo(
+        CSharpSourceTextBuilder sourceBuilder,
+        CancellationToken cancellationToken)
+    {
+        RenderLifetimeClassTo(sourceBuilder, cancellationToken);
 
-    //protected override void AppendTestFixturePreamble()
-    //{
-    //    AppendLifetimeClass();
+        cancellationToken.ThrowIfCancellationRequested();
 
-    //    AppendConstructor();
+        RenderConstructorTo(sourceBuilder, cancellationToken);
 
-    //    base.AppendTestFixturePreamble();
-    //}
+        cancellationToken.ThrowIfCancellationRequested();
 
-    //protected virtual void AppendConstructor()
-    //{
-    //    // Lifetime class is initialzed once per feature, then passed to the constructor of each test class instance.
-    //    SourceBuilder.AppendLine($"public {GetClassName()}(Lifetime lifetime)");
-    //    SourceBuilder.BeginBlock("{");
-    //    SourceBuilder.AppendLine("Lifetime = lifetime;");
-    //    SourceBuilder.EndBlock("}");
-    //}
+        base.RenderTestFixtureContentTo(sourceBuilder, cancellationToken);
+    }
 
-    //protected virtual void AppendLifetimeClass()
-    //{
-    //    // This class represents the feature lifetime in the xUnit framework.
-    //    SourceBuilder.AppendLine("public class Lifetime : global::Xunit.IAsyncLifetime");
-    //    SourceBuilder.BeginBlock("{");
+    protected virtual void RenderConstructorTo(
+        CSharpSourceTextBuilder SourceBuilder,
+        CancellationToken cancellationToken)
+    {
+        var className = Identifier.LocalType switch
+        {
+            SimpleTypeIdentifier simple => simple.Name,
+            GenericTypeIdentifier generic => generic.Name,
+            _ => throw new NotImplementedException(
+                $"Writing constructor for {Identifier.GetType().Name} values is not implemented.")
+        };
 
-    //    SourceBuilder.AppendLine("public global::Reqnroll.TestRunner TestRunner { get; private set; }");
+        // Lifetime class is initialzed once per feature, then passed to the constructor of each test class instance.
+        SourceBuilder.Append("public ").Append(className).AppendLine("(Lifetime lifetime)");
+        SourceBuilder.BeginBlock("{");
+        SourceBuilder.AppendLine("Lifetime = lifetime;");
+        SourceBuilder.EndBlock("}");
+    }
 
-    //    SourceBuilder.AppendLine("public global::System.Threading.Tasks.Task InitializeAsync()");
-    //    SourceBuilder.BeginBlock("{");
-    //    // Our XUnit infrastructure uses a custom mechanism for identifying worker IDs.
-    //    SourceBuilder.AppendLine("var testWorkerId = global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance.GetWorkerId();");
-    //    SourceBuilder.AppendLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, testWorkerId);");
-    //    SourceBuilder.AppendLine("return TestRunner.OnFeatureStartAsync(featureInfo);");
-    //    SourceBuilder.EndBlock("}");
+    protected virtual void RenderLifetimeClassTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    {
+        // This class represents the feature lifetime in the xUnit framework.
+        sourceBuilder.AppendLine("public class Lifetime : global::Xunit.IAsyncLifetime");
+        sourceBuilder.BeginBlock("{");
 
-    //    SourceBuilder.AppendLine("public async global::System.Threading.Tasks.Task DisposeAsync()");
-    //    SourceBuilder.BeginBlock("{");
-    //    SourceBuilder.BeginBlock("var testWorkerId = testRunner.TestWorkerId;");
-    //    SourceBuilder.BeginBlock("await testRunner.OnFeatureEndAsync();");
-    //    SourceBuilder.BeginBlock("TestRunner = null;");
-    //    SourceBuilder.BeginBlock("global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance.ReleaseWorker(testWorkerId);");
-    //    SourceBuilder.EndBlock("}");
+        sourceBuilder.AppendLine("public global::Reqnroll.TestRunner TestRunner { get; private set; }");
 
-    //    SourceBuilder.EndBlock("}");
-    //    SourceBuilder.AppendLine();
-    //}
+        sourceBuilder.AppendLine("public global::System.Threading.Tasks.Task InitializeAsync()");
+        sourceBuilder.BeginBlock("{");
+        // Our XUnit infrastructure uses a custom mechanism for identifying worker IDs.
+        sourceBuilder.AppendLine("var testWorkerId = global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance.GetWorkerId();");
+        sourceBuilder.AppendLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, testWorkerId);");
+        sourceBuilder.AppendLine("return TestRunner.OnFeatureStartAsync(featureInfo);");
+        sourceBuilder.EndBlock("}");
+
+        sourceBuilder.AppendLine("public async global::System.Threading.Tasks.Task DisposeAsync()");
+        sourceBuilder.BeginBlock("{");
+        sourceBuilder.BeginBlock("var testWorkerId = testRunner.TestWorkerId;");
+        sourceBuilder.BeginBlock("await testRunner.OnFeatureEndAsync();");
+        sourceBuilder.BeginBlock("TestRunner = null;");
+        sourceBuilder.BeginBlock("global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance.ReleaseWorker(testWorkerId);");
+        sourceBuilder.EndBlock("}");
+
+        sourceBuilder.EndBlock("}");
+        sourceBuilder.AppendLine();
+    }
 }
