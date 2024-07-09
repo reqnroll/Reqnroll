@@ -42,6 +42,6 @@ The `ScenarioContext` class has a static helper method to throw the default `Pen
 [When("I set the current ScenarioContext to pending")]
 public void WhenIHaveAPendingStep()
 {
-    ScenarioContext.Pending();
+    ScenarioContext.StepIsPending();
 }
 ```
