@@ -17,9 +17,18 @@ namespace Reqnroll
         /// </summary>
         public string Name { get; set; }
 
-        public StepArgumentTransformationAttribute(string regex)
+        /// <summary>
+        /// Specifies the deterministic order for step argument transformations. Lower numbers have higher priority.
+        /// Default value is <see cref="StepArgumentTransformationAttribute.DefaultOrder">10000</see>.
+        /// </summary>
+        public int Order { get; set; }
+        
+        public const int DefaultOrder = 10000;
+
+        public StepArgumentTransformationAttribute(string regex, int order = DefaultOrder)
         {
             Regex = regex;
+            Order = order;
         }
 
         public StepArgumentTransformationAttribute()
