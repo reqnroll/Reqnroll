@@ -8,7 +8,7 @@ using Xunit.Abstractions;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
-public class MSTestFeatureSourceGenerationTests(ITestOutputHelper output)
+public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
 {
     [Fact]
     public void GeneratorProducesMSTestOutputWhenWhenBuildPropertyConfiguredForMSTest()

@@ -30,9 +30,40 @@ internal class XUnitCSharpTestFixtureGenerator(XUnitHandler testFrameworkHandler
         TestMethodGenerationContext<CSharpCompilationInformation> context,
         CancellationToken cancellationToken)
     {
-        return ImmutableArray.Create(
-            XUnitSyntax.SkippableFactAttribute(context.ScenarioInformation.Name),
-            XUnitSyntax.TraitAttribute("FeatureTitle", context.FeatureInformation.Name),
-            XUnitSyntax.TraitAttribute("Description", context.ScenarioInformation.Name));
+        var scenario = context.ScenarioInformation;
+        var feature = context.FeatureInformation;
+
+        var attributes = new List<AttributeDescriptor>();
+
+        if (scenario.Examples.IsEmpty)
+        {
+            attributes.Add(XUnitSyntax.SkippableFactAttribute(context.ScenarioInformation.Name));
+        }
+        else
+        {
+            attributes.Add(XUnitSyntax.SkippableTheoryAttribute(context.ScenarioInformation.Name));
+        }
+
+        attributes.Add(XUnitSyntax.TraitAttribute("FeatureTitle", context.FeatureInformation.Name));
+        attributes.Add(XUnitSyntax.TraitAttribute("Description", context.ScenarioInformation.Name));
+
+        foreach (var tag in scenario.Tags)
+        {
+            attributes.Add(XUnitSyntax.TraitAttribute("Category", tag));
+        }
+
+        foreach (var set in scenario.Examples)
+        {
+            foreach (var example in set)
+            {
+                var values = example.Select(example => (object?)example.Value).ToList();
+
+                values.Add(set.Tags);
+
+                attributes.Add(XUnitSyntax.InlineDataAttribute(values.ToImmutableArray()));
+            }
+        }
+
+        return attributes.ToImmutableArray();
     }
 }

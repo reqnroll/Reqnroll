@@ -14,7 +14,8 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
         CSharpRenderingOptions? renderingOptions = null)
         : base(identifier, hintName, feature, attributes, methods, renderingOptions)
     {
-        Interfaces = ImmutableArray.Create<TypeIdentifier>(XUnitSyntax.LifetimeInterfaceType(Identifier));
+        Interfaces = ImmutableArray.Create<TypeIdentifier>(
+            XUnitSyntax.LifetimeInterfaceType(Identifier));
     }
 
     public XUnitCSharpTestFixtureClass(
@@ -23,7 +24,8 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
         CSharpRenderingOptions? renderingOptions = null)
         : base(descriptor, methods, renderingOptions)
     {
-        Interfaces = ImmutableArray.Create<TypeIdentifier>(XUnitSyntax.LifetimeInterfaceType(Identifier));
+        Interfaces = ImmutableArray.Create<TypeIdentifier>(
+            XUnitSyntax.LifetimeInterfaceType(Identifier));
     }
 
     public override ImmutableArray<TypeIdentifier> Interfaces { get; }
@@ -36,9 +38,17 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
 
         cancellationToken.ThrowIfCancellationRequested();
 
+        sourceBuilder.AppendLine("private readonly FeatureLifetime _lifetime;");
+        sourceBuilder.AppendLine();
+
+        sourceBuilder.AppendLine("private readonly global::Xunit.Abstractions.ITestOutputHelper _testOutputHelper;");
+        sourceBuilder.AppendLine();
+
         RenderConstructorTo(sourceBuilder, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
+
+        sourceBuilder.AppendLine();
 
         base.RenderTestFixtureContentTo(sourceBuilder, cancellationToken);
     }
@@ -56,37 +66,69 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
         };
 
         // Lifetime class is initialzed once per feature, then passed to the constructor of each test class instance.
-        SourceBuilder.Append("public ").Append(className).AppendLine("(Lifetime lifetime)");
+        // Output helper is included to by registered in the container.
+        SourceBuilder.Append("public ").Append(className).AppendLine("(FeatureLifetime lifetime, " +
+            "global::Xunit.Abstractions.ITestOutputHelper testOutputHelper)");
         SourceBuilder.BeginBlock("{");
-        SourceBuilder.AppendLine("Lifetime = lifetime;");
+        SourceBuilder.AppendLine("_lifetime = lifetime;");
+        SourceBuilder.AppendLine("_testOutputHelper = testOutputHelper;");
         SourceBuilder.EndBlock("}");
     }
 
     protected virtual void RenderLifetimeClassTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
     {
         // This class represents the feature lifetime in the xUnit framework.
-        sourceBuilder.AppendLine("public class Lifetime : global::Xunit.IAsyncLifetime");
+        sourceBuilder.AppendLine("public class FeatureLifetime : global::Xunit.IAsyncLifetime");
         sourceBuilder.BeginBlock("{");
+        RenderLifetimeClassContentTo(sourceBuilder, cancellationToken);
+        sourceBuilder.EndBlock("}");
+        sourceBuilder.AppendLine();
+    }
 
-        sourceBuilder.AppendLine("public global::Reqnroll.TestRunner TestRunner { get; private set; }");
+    private void RenderLifetimeClassContentTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        sourceBuilder.Append("public global::Reqnroll.ITestRunner");
+
+        if (RenderingOptions.UseNullableReferenceTypes)
+        {
+            sourceBuilder.Append('?');
+        }
+
+        sourceBuilder.AppendLine(" TestRunner { get; private set; }");
+
+        sourceBuilder.AppendLine();
 
         sourceBuilder.AppendLine("public global::System.Threading.Tasks.Task InitializeAsync()");
         sourceBuilder.BeginBlock("{");
-        // Our XUnit infrastructure uses a custom mechanism for identifying worker IDs.
-        sourceBuilder.AppendLine("var testWorkerId = global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance.GetWorkerId();");
-        sourceBuilder.AppendLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(null, testWorkerId);");
-        sourceBuilder.AppendLine("return TestRunner.OnFeatureStartAsync(featureInfo);");
+        sourceBuilder.AppendLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();");
+        sourceBuilder.Append("return TestRunner.OnFeatureStartAsync(").AppendTypeReference(Identifier).Append(".FeatureInfo").AppendLine(");");
         sourceBuilder.EndBlock("}");
+
+        sourceBuilder.AppendLine();
 
         sourceBuilder.AppendLine("public async global::System.Threading.Tasks.Task DisposeAsync()");
         sourceBuilder.BeginBlock("{");
-        sourceBuilder.BeginBlock("var testWorkerId = testRunner.TestWorkerId;");
-        sourceBuilder.BeginBlock("await testRunner.OnFeatureEndAsync();");
-        sourceBuilder.BeginBlock("TestRunner = null;");
-        sourceBuilder.BeginBlock("global::Reqnroll.xUnit.ReqnrollPlugin.XUnitParallelWorkerTracker.Instance.ReleaseWorker(testWorkerId);");
-        sourceBuilder.EndBlock("}");
+        sourceBuilder.Append("await TestRunner");
 
+        if (RenderingOptions.UseNullableReferenceTypes)
+        {
+            sourceBuilder.Append('!');
+        }
+
+        sourceBuilder.AppendLine(".OnFeatureEndAsync();");
+        sourceBuilder.AppendLine("global::Reqnroll.TestRunnerManager.ReleaseTestRunner(TestRunner);");
+        sourceBuilder.AppendLine("TestRunner = null;");
         sourceBuilder.EndBlock("}");
-        sourceBuilder.AppendLine();
+    }
+
+    protected override void RenderScenarioInitializeMethodBodyTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    {
+        base.RenderScenarioInitializeMethodBodyTo(sourceBuilder, cancellationToken);
+
+        sourceBuilder.AppendLine(
+            "testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs" +
+            "<global::Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);");
     }
 }

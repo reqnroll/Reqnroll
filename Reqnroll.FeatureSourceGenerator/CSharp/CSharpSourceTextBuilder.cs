@@ -276,12 +276,27 @@ public class CSharpSourceTextBuilder
     {
         return type switch
         {
-            SimpleTypeIdentifier simpleType => AppendTypeReference(simpleType),
-            GenericTypeIdentifier genericType => AppendTypeReference(genericType),
+            LocalTypeIdentifier localType => AppendTypeReference(localType),
             QualifiedTypeIdentifier qualifiedType => AppendTypeReference(qualifiedType),
             ArrayTypeIdentifier arrayType => AppendTypeReference(arrayType),
-            _ => throw new NotImplementedException()
+            NestedTypeIdentifier nestedType => AppendTypeReference(nestedType),
+            _ => throw new NotImplementedException($"Appending references of type {type.GetType().Name} is not implemented.")
         };
+    }
+
+    public CSharpSourceTextBuilder AppendTypeReference(LocalTypeIdentifier type)
+    {
+        return type switch
+        {
+            SimpleTypeIdentifier simpleType => AppendTypeReference(simpleType),
+            GenericTypeIdentifier genericType => AppendTypeReference(genericType),
+            _ => throw new NotImplementedException($"Appending references of type {type.GetType().Name} is not implemented.")
+        };
+    }
+
+    public CSharpSourceTextBuilder AppendTypeReference(NestedTypeIdentifier type)
+    {
+        return AppendTypeReference(type.EncapsulatingType).Append('.').AppendTypeReference(type.LocalType);
     }
 
     public CSharpSourceTextBuilder AppendTypeReference(SimpleTypeIdentifier type)

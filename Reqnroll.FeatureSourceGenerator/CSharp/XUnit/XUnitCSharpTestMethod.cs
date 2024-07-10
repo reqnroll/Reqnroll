@@ -25,6 +25,19 @@ internal class XUnitCSharpTestMethod : CSharpTestMethod
         CancellationToken cancellationToken)
     {
         // For xUnit test runners are scoped to the whole feature execution lifetime
-        sourceBuilder.AppendLine("var testRunner = Lifecycle.TestRunner;");
+        sourceBuilder.Append("global::Reqnroll.ITestRunner");
+
+        if (renderingOptions.UseNullableReferenceTypes)
+        {
+            sourceBuilder.Append('?');
+        }
+        
+        sourceBuilder.AppendLine(" testRunner = _lifetime.TestRunner;");
+
+        sourceBuilder
+            .AppendLine("if (testRunner == null)")
+            .BeginBlock("{")
+            .AppendLine("throw new global::System.InvalidOperationException(\"The test fixture lifecycle has not been initialized.\");")
+            .EndBlock("}");
     }
 }

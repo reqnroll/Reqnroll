@@ -2,10 +2,11 @@
 using Microsoft.CodeAnalysis.CSharp;
 using Reqnroll.FeatureSourceGenerator;
 using Reqnroll.FeatureSourceGenerator.CSharp;
+using Xunit.Abstractions;
 
 namespace Reqnroll.FeatureSourceGenerator.XUnit;
 
-public class XUnitFeatureSourceGeneratorTests
+public class XUnitFeatureSourceGeneratorTests(ITestOutputHelper output)
 {
     [Fact]
     public void GeneratorProducesXUnitOutputWhenWhenBuildPropertyConfiguredForXUnit()
@@ -49,12 +50,14 @@ public class XUnitFeatureSourceGeneratorTests
         var generatedSyntaxTree = generatedCompilation.SyntaxTrees.Should().ContainSingle()
             .Which.Should().BeAssignableTo<CSharpSyntaxTree>().Subject!;
 
+        output.WriteLine($"Generated source:\n{generatedSyntaxTree}");
+
         generatedSyntaxTree.GetDiagnostics().Should().BeEmpty();
 
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
             .Which.Should().ContainMethod("AddTwoNumbers")
-            .Which.Should().HaveAttribute("global::Xunit.Fact");
+            .Which.Should().HaveAttribute("global::Xunit.SkippableFact");
     }
 
     [Fact]
@@ -99,11 +102,13 @@ public class XUnitFeatureSourceGeneratorTests
         var generatedSyntaxTree = generatedCompilation.SyntaxTrees.Should().ContainSingle()
             .Which.Should().BeAssignableTo<CSharpSyntaxTree>().Subject!;
 
+        output.WriteLine($"Generated source:\n{generatedSyntaxTree}");
+
         generatedSyntaxTree.GetDiagnostics().Should().BeEmpty();
 
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
             .Which.Should().ContainMethod("AddTwoNumbers")
-            .Which.Should().HaveAttribute("global::Xunit.Fact");
+            .Which.Should().HaveAttribute("global::Xunit.SkippableFact");
     }
 }
