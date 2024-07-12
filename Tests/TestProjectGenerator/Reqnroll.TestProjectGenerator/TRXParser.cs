@@ -94,24 +94,8 @@ namespace Reqnroll.TestProjectGenerator
                 case UnitTestProvider.xUnit: return CalculateXUnitTestExecutionResult(testExecutionResult, trx);
                 case UnitTestProvider.MSTest: return CalculateMsTestTestExecutionResult(testExecutionResult);
                 case UnitTestProvider.NUnit3: return CalculateNUnitTestExecutionResult(testExecutionResult);
-                case UnitTestProvider.SpecRun: return CalculateSpecRunTestExecutionResult(testExecutionResult);
                 default: throw new NotSupportedException($"The specified unit test provider is not supported: {testRunConfiguration.UnitTestProvider}");
             }
-        }
-
-        private TestExecutionResult CalculateSpecRunTestExecutionResult(TestExecutionResult testExecutionResult)
-        {
-            bool FilterIgnored(TestResult testResult) => testResult.StdOut.Contains("-> Ignored");
-
-            bool FilterPending(TestResult testResult) => testResult.StdOut.Contains("TechTalk.SpecRun.PendingTestException")
-                                                         || testResult.StdOut.Contains("No matching step definition found for the step.");
-
-            var testResultsWithOutput = testExecutionResult.TestResults.Where(tr => !(tr?.StdOut is null)).ToArray();
-
-            testExecutionResult.Ignored = testResultsWithOutput.Where(FilterIgnored).Count();
-            testExecutionResult.Pending = testResultsWithOutput.Where(FilterPending).Count();
-
-            return testExecutionResult;
         }
 
         private TestExecutionResult CalculateNUnitTestExecutionResult(TestExecutionResult testExecutionResult)

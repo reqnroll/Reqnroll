@@ -15,7 +15,7 @@ namespace Reqnroll.TestProjectGenerator.Cli
     partial class Program
     {
         private const string DefaultReqnrollNuGetVersion = "3.4.3";
-        private const UnitTestProvider DefaultUnitTestProvider = UnitTestProvider.SpecRun;
+        private const UnitTestProvider DefaultUnitTestProvider = UnitTestProvider.MSTest;
         private const TargetFramework DefaultTargetFramework = TargetFramework.Netcoreapp31;
         private const ProjectFormat DefaultProjectFormat = ProjectFormat.New;
         private const ConfigurationFormat DefaultConfigurationFormat = ConfigurationFormat.Json;
