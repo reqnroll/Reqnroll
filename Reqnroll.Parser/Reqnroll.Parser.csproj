@@ -11,7 +11,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gherkin" Version="19.0.3" />
+    <PackageReference Include="Gherkin" Version="28.0.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gherkin;
 using Gherkin.Ast;
 using Reqnroll.ExternalData.ReqnrollPlugin.Transformation;
 using Reqnroll.Parser;
@@ -52,7 +53,7 @@ namespace Reqnroll.PluginTests.ExternalData
                 "Scenario Outline",
                 $"SO {++_scenarioCounter}",
                 null,
-                new[] { new Step(null, "Given ", "the customer has <product>", null) },
+                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has <product>", null) },
                 new[] { new Examples(new Tag[0], null, "Examples", "", "", new Gherkin.Ast.TableRow(null, new[] { new TableCell(null, "product") }), new Gherkin.Ast.TableRow[0]) });
         }
 
@@ -64,7 +65,7 @@ namespace Reqnroll.PluginTests.ExternalData
                 "Scenario",
                 $"S {++_scenarioCounter}",
                 null,
-                new[] { new Step(null, "Given ", "the customer has food", null) }, 
+                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has food", null) }, 
                 null);
         }
 
