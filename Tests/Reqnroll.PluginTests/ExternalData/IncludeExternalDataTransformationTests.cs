@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Gherkin;
 using Gherkin.Ast;
 using Moq;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
@@ -67,7 +68,7 @@ namespace Reqnroll.PluginTests.ExternalData
                 "Scenario Outline",
                 "SO 1",
                 null,
-                new[] { new Step(null, "Given ", "the customer has <product>", null) },
+                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has <product>", null) },
                 examples);
         }
 
@@ -79,7 +80,7 @@ namespace Reqnroll.PluginTests.ExternalData
                 "Scenario",
                 "S 1",
                 null,
-                new[] { new Step(null, "Given ", "the customer has stuff", null) },
+                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has stuff", null) },
                 null);
         }
 

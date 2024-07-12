@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gherkin" Version="19.0.3" />
-    <PackageReference Include="Cucumber.CucumberExpressions" Version="16.0.0" />
+    <PackageReference Include="Gherkin" Version="28.0.0" />
+    <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="6.0.0" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
     <PackageReference Include="SpecFlow.Internal.Json" Version="1.0.8" />
