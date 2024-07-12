@@ -239,7 +239,6 @@ namespace Reqnroll.TestProjectGenerator
                 // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
                 _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
 
-                _project.AddNuGetPackage("Gherkin", "19.0.3", new NuGetPackageAssembly("Gherkin, Version=19.0.3.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "net45\\Gherkin.dll"));
                 _project.AddNuGetPackage("Cucumber.CucumberExpressions", "16.0.0", new NuGetPackageAssembly("CucumberExpressions, Version=16.0.0.0, Culture=neutral, PublicKeyToken=86496cfa5b4a5851", "netstandard2.0\\CucumberExpressions.dll"));
                 _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.4", new NuGetPackageAssembly("System.Threading.Tasks.Extensions", "netstandard2.0\\System.Threading.Tasks.Extensions.dll"));
                 _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "6.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "netstandard2.0\\Microsoft.Bcl.AsyncInterfaces.dll"));
