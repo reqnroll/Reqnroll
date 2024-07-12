@@ -4,6 +4,7 @@ using Microsoft.CodeAnalysis;
 using Reqnroll.FeatureSourceGenerator.Gherkin;
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
@@ -195,6 +196,8 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
 
                     return [.. diagnostics];
                 }
+
+                Debugger.Launch();
 
                 // Determine whether we should include ignored examples in our sample sets.
                 var emitIgnoredExamples = false;

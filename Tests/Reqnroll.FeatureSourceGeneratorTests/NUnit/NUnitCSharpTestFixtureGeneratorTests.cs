@@ -2,13 +2,13 @@
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
 
-namespace Reqnroll.FeatureSourceGenerator.XUnit;
-public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGeneratorTestBase<XUnitHandler>(new XUnitHandler())
+namespace Reqnroll.FeatureSourceGenerator.NUnit;
+public class NUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGeneratorTestBase<NUnitHandler>(new NUnitHandler())
 {
-    private static readonly NamespaceString XUnitNamespace = new("Xunit");
+    private static readonly NamespaceString NUnitNamespace = new("NUnit.Framework");
 
     [Fact]
-    public void GenerateTestFixture_CreatesClassForFeatureWithXUnitLifetimeInterface()
+    public void GenerateTestFixture_CreatesClassForFeatureWithNUnitAttributes()
     {
         var featureInfo = new FeatureInformation(
             "Sample",
@@ -25,7 +25,7 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         var testFixtureGenerationContext = new TestFixtureGenerationContext<CSharpCompilationInformation>(
             featureInfo,
-            [scenarioInfo],
+            [ scenarioInfo ],
             "Sample.feature",
             new NamespaceString("Reqnroll.Tests"),
             Compilation,
@@ -33,15 +33,11 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         var testFixture = Generator.GenerateTestFixtureClass(testFixtureGenerationContext, []);
 
-        testFixture.Interfaces.Should().BeEquivalentTo(
+        testFixture.Should().HaveAttribuesEquivalentTo(
             [
-                XUnitNamespace + new GenericTypeIdentifier(
-                    new IdentifierString("IClassFixture"),
-                    [
-                        new NestedTypeIdentifier(
-                            new SimpleTypeIdentifier(new IdentifierString("SampleFeature")),
-                            new SimpleTypeIdentifier(new IdentifierString("FeatureLifetime")))
-                    ])
+                new AttributeDescriptor(
+                    NUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
+                    ["Sample"]),
             ]);
     }
 
@@ -63,7 +59,7 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         var testFixtureGenerationContext = new TestFixtureGenerationContext<CSharpCompilationInformation>(
             featureInfo,
-            [scenarioInfo],
+            [ scenarioInfo ],
             "Sample.feature",
             new NamespaceString("Reqnroll.Tests"),
             Compilation,
@@ -77,17 +73,10 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         method.Should().HaveAttribuesEquivalentTo(
             [
+                new AttributeDescriptor(NUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Test"))),
                 new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("SkippableFact")),
-                    namedArguments: new Dictionary<IdentifierString, object?>{ 
-                        { new IdentifierString("DisplayName"), "Sample Scenario" } 
-                    }.ToImmutableDictionary()),
-                new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Trait")),
-                    ["FeatureTitle", "Sample"]),
-                new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Trait")),
-                    ["Description", "Sample Scenario"])
+                    NUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
+                    ["Sample Scenario"])
             ]);
 
         method.Should().HaveNoParameters();
@@ -99,7 +88,7 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
     }
 
     [Fact]
-    public void GenerateTestMethod_CreatesMethodWithInlineDataAttributesWhenScenarioHasExamples()
+    public void GenerateTestMethod_CreatesMethodWithTestCaseAttributesWhenScenarioHasExamples()
     {
         var exampleSet1 = new ScenarioExampleSet(["what"], [["foo"], ["bar"]], ["example_tag"]);
         var exampleSet2 = new ScenarioExampleSet(["what"], [["baz"]], []);
@@ -135,24 +124,18 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
         method.Should().HaveAttribuesEquivalentTo(
             [
                 new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("SkippableTheory")),
-                    namedArguments: new Dictionary<IdentifierString, object?>{
-                        { new IdentifierString("DisplayName"), "Sample Scenario Outline" }
-                    }.ToImmutableDictionary()),
+                    NUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Description")),
+                    ["Sample Scenario Outline"]),
                 new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Trait")),
-                    ["FeatureTitle", "Sample"]),
+                    NUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("TestCase")),
+                    ["foo", ImmutableArray.Create("example_tag")],
+                    new Dictionary<IdentifierString, object?>{{ new IdentifierString("Category"), "example_tag" } }.ToImmutableDictionary()),
                 new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("Trait")),
-                    ["Description", "Sample Scenario Outline"]),
+                    NUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("TestCase")),
+                    ["bar", ImmutableArray.Create("example_tag")],
+                    new Dictionary<IdentifierString, object?>{{ new IdentifierString("Category"), "example_tag" } }.ToImmutableDictionary()),
                 new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("InlineData")),
-                    ["foo", ImmutableArray.Create("example_tag")]),
-                new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("InlineData")),
-                    ["bar", ImmutableArray.Create("example_tag")]),
-                new AttributeDescriptor(
-                    XUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("InlineData")),
+                    NUnitNamespace + new SimpleTypeIdentifier(new IdentifierString("TestCase")),
                     ["baz", ImmutableArray<string>.Empty])
             ]);
 

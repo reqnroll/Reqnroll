@@ -4,12 +4,12 @@ using Reqnroll.FeatureSourceGenerator;
 using Reqnroll.FeatureSourceGenerator.CSharp;
 using Xunit.Abstractions;
 
-namespace Reqnroll.FeatureSourceGenerator.MSTest;
+namespace Reqnroll.FeatureSourceGenerator.NUnit;
 
-public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
+public class NUnitFeatureSourceGeneratorTests(ITestOutputHelper output)
 {
     [Fact]
-    public void GeneratorProducesMSTestOutputWhenWhenBuildPropertyConfiguredForMSTest()
+    public void GeneratorProducesNUnitOutputWhenWhenBuildPropertyConfiguredForNUnit()
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
             .Where(asm => !asm.IsDynamic)
@@ -17,7 +17,7 @@ public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
 
         var compilation = CSharpCompilation.Create("test", references: references);
 
-        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.MSTest]);
+        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.NUnit]);
 
         const string featureText =
             """
@@ -36,7 +36,7 @@ public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
         var optionsProvider = new FakeAnalyzerConfigOptionsProvider(
             new InMemoryAnalyzerConfigOptions(new Dictionary<string, string>
             {
-                { "build_property.ReqnrollTargetTestFramework", "MSTest" }
+                { "build_property.ReqnrollTargetTestFramework", "NUnit" }
             }));
 
         var driver = CSharpGeneratorDriver
@@ -45,20 +45,22 @@ public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
             .WithUpdatedAnalyzerConfigOptions(optionsProvider)
             .RunGeneratorsAndUpdateCompilation(compilation, out var generatedCompilation, out var diagnostics);
 
-        diagnostics.Should().BeEmpty();
-
         var generatedSyntaxTree = generatedCompilation.SyntaxTrees.Should().ContainSingle()
             .Which.Should().BeAssignableTo<CSharpSyntaxTree>().Subject!;
+
+        output.WriteLine($"Generated source:\n{generatedSyntaxTree}");
+
+        diagnostics.Should().BeEmpty();
 
         generatedSyntaxTree.GetDiagnostics().Should().BeEmpty();
 
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
-            .Which.Should().HaveSingleAttribute("global::Microsoft.VisualStudio.TestTools.UnitTesting.TestClass");
+            .Which.Should().HaveSingleAttribute("global::NUnit.Framework.Description");
     }
 
     [Fact]
-    public void GeneratorProducesMSTestOutputWhenWhenEditorConfigConfiguredForMSTest()
+    public void GeneratorProducesNUnitOutputWhenWhenEditorConfigConfiguredForNUnit()
     {
         var references = AppDomain.CurrentDomain.GetAssemblies()
             .Where(asm => !asm.IsDynamic)
@@ -66,7 +68,7 @@ public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
 
         var compilation = CSharpCompilation.Create("test", references: references);
 
-        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.MSTest]);
+        var generator = new CSharpTestFixtureSourceGenerator([BuiltInTestFrameworkHandlers.NUnit]);
 
         const string featureText =
             """
@@ -85,7 +87,7 @@ public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
         var optionsProvider = new FakeAnalyzerConfigOptionsProvider(
             new InMemoryAnalyzerConfigOptions(new Dictionary<string, string>
             {
-                { "reqnroll.target_test_framework", "MSTest" }
+                { "reqnroll.target_test_framework", "NUnit" }
             }));
 
         var driver = CSharpGeneratorDriver
@@ -94,17 +96,17 @@ public class MSTestFeatureSourceGeneratorTests(ITestOutputHelper output)
             .WithUpdatedAnalyzerConfigOptions(optionsProvider)
             .RunGeneratorsAndUpdateCompilation(compilation, out var generatedCompilation, out var diagnostics);
 
-        diagnostics.Should().BeEmpty();
-
         var generatedSyntaxTree = generatedCompilation.SyntaxTrees.Should().ContainSingle()
             .Which.Should().BeAssignableTo<CSharpSyntaxTree>().Subject!;
 
         output.WriteLine($"Generated source:\n{generatedSyntaxTree}");
 
+        diagnostics.Should().BeEmpty();
+
         generatedSyntaxTree.GetDiagnostics().Should().BeEmpty();
 
         generatedSyntaxTree.GetRoot().Should().ContainSingleNamespaceDeclaration("test")
             .Which.Should().ContainSingleClassDeclaration("CalculatorFeature")
-            .Which.Should().HaveSingleAttribute("global::Microsoft.VisualStudio.TestTools.UnitTesting.TestClass");
+            .Which.Should().HaveSingleAttribute("global::NUnit.Framework.Description");
     }
 }

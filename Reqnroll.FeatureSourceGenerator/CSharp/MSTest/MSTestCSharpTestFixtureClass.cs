@@ -9,17 +9,17 @@ public class MSTestCSharpTestFixtureClass : CSharpTestFixtureClass
         string hintName,
         FeatureInformation feature,
         ImmutableArray<AttributeDescriptor> attributes = default,
-        ImmutableArray<CSharpTestMethod> methods = default,
+        ImmutableArray<MSTestCSharpTestMethod> methods = default,
         CSharpRenderingOptions? renderingOptions = null)
-        : base(identifier, hintName, feature, attributes, methods, renderingOptions)
+        : base(identifier, hintName, feature, attributes, methods.CastArray<CSharpTestMethod>(), renderingOptions)
     {
     }
 
     public MSTestCSharpTestFixtureClass(
         TestFixtureDescriptor descriptor,
-        ImmutableArray<CSharpTestMethod> methods = default,
+        ImmutableArray<MSTestCSharpTestMethod> methods = default,
         CSharpRenderingOptions? renderingOptions = null) 
-        : base(descriptor, methods, renderingOptions)
+        : base(descriptor, methods.CastArray<CSharpTestMethod>(), renderingOptions)
     {
     }
 

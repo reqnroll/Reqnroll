@@ -6,4 +6,9 @@
   <ItemGroup>
     <Gherkin Include="**/*.feature" />
   </ItemGroup>
+
+  <ItemGroup>
+    <CompilerVisibleProperty Include="ReqnrollTargetTestFramework" />
+    <CompilerVisibleProperty Include="ReqnrollEmitIgnoredExamples" />
+  </ItemGroup>
 </Project>

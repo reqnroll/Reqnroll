@@ -1,10 +1,10 @@
 ﻿using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
 
-namespace Reqnroll.FeatureSourceGenerator.CSharp.XUnit;
-public class XUnitCSharpTestMethod : CSharpTestMethod
+namespace Reqnroll.FeatureSourceGenerator.CSharp.NUnit;
+public class NUnitCSharpTestMethod : CSharpTestMethod
 {
-    public XUnitCSharpTestMethod(
+    public NUnitCSharpTestMethod(
         IdentifierString identifier,
         ScenarioInformation scenario,
         ImmutableArray<StepInvocation> stepInvocations,
@@ -15,7 +15,7 @@ public class XUnitCSharpTestMethod : CSharpTestMethod
     {
     }
 
-    public XUnitCSharpTestMethod(TestMethodDescriptor descriptor) : base(descriptor)
+    public NUnitCSharpTestMethod(TestMethodDescriptor descriptor) : base(descriptor)
     {
     }
 
@@ -24,20 +24,20 @@ public class XUnitCSharpTestMethod : CSharpTestMethod
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
-        // For xUnit test runners are scoped to the whole feature execution lifetime
+        // For NUnit we use a test-runner assigned to the class.
         sourceBuilder.Append("global::Reqnroll.ITestRunner");
 
         if (renderingOptions.UseNullableReferenceTypes)
         {
             sourceBuilder.Append('?');
         }
-        
-        sourceBuilder.AppendLine(" testRunner = _lifetime.TestRunner;");
+
+        sourceBuilder.AppendLine(" testRunner = _testRunner;");
 
         sourceBuilder
             .AppendLine("if (testRunner == null)")
             .BeginBlock("{")
-            .AppendLine("throw new global::System.InvalidOperationException(\"The test fixture lifecycle has not been initialized.\");")
+            .AppendLine("throw new global::System.InvalidOperationException(\"TestRunner has not been assigned to the test fixture.\");")
             .EndBlock("}");
     }
 }

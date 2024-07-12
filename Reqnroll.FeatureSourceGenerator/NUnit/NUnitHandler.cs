@@ -1,4 +1,5 @@
 ﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+using Reqnroll.FeatureSourceGenerator.CSharp.NUnit;
 
 namespace Reqnroll.FeatureSourceGenerator.NUnit;
 

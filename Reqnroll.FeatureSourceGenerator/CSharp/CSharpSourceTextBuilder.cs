@@ -254,6 +254,11 @@ public class CSharpSourceTextBuilder
             {
                 if (firstProperty)
                 {
+                    if (!attribute.PositionalArguments.IsEmpty)
+                    {
+                        Append(", ");
+                    }
+
                     firstProperty = false;
                 }
                 else

@@ -13,10 +13,7 @@ internal class XUnitCSharpTestFixtureGenerator(XUnitHandler testFrameworkHandler
         ImmutableArray<XUnitCSharpTestMethod> methods,
         CSharpRenderingOptions renderingOptions)
     {
-        return new XUnitCSharpTestFixtureClass(
-            descriptor,
-            methods.Cast<CSharpTestMethod>().ToImmutableArray(),
-            renderingOptions);
+        return new XUnitCSharpTestFixtureClass(descriptor, methods, renderingOptions);
     }
 
     protected override XUnitCSharpTestMethod CreateTestMethod(
@@ -54,6 +51,8 @@ internal class XUnitCSharpTestFixtureGenerator(XUnitHandler testFrameworkHandler
 
         foreach (var set in scenario.Examples)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+
             foreach (var example in set)
             {
                 var values = example.Select(example => (object?)example.Value).ToList();

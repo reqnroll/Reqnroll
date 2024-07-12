@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <ReqnrollTargetTestFramework>NUnit</ReqnrollTargetTestFramework>
+    <ReqnrollEmitIgnoredExamples Condition="'$(ReqnrollEmitIgnoredExamples)' == ''" >true</ReqnrollEmitIgnoredExamples>
   </PropertyGroup>
   
   <ItemGroup>

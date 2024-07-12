@@ -8,18 +8,18 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp.MSTest;
 /// Performs generation of MSTest test fixtures in the C# language.
 /// </summary>
 internal class MSTestCSharpTestFixtureGenerator(MSTestHandler frameworkHandler) : 
-    CSharpTestFixtureGenerator<MSTestCSharpTestFixtureClass, CSharpTestMethod>(frameworkHandler)
+    CSharpTestFixtureGenerator<MSTestCSharpTestFixtureClass, MSTestCSharpTestMethod>(frameworkHandler)
 {
     protected override MSTestCSharpTestFixtureClass CreateTestFixtureClass(
         TestFixtureGenerationContext<CSharpCompilationInformation> context,
         TestFixtureDescriptor descriptor,
-        ImmutableArray<CSharpTestMethod> methods,
+        ImmutableArray<MSTestCSharpTestMethod> methods,
         CSharpRenderingOptions renderingOptions)
     {
         return new MSTestCSharpTestFixtureClass(descriptor, methods, renderingOptions);
     }
 
-    protected override CSharpTestMethod CreateTestMethod(
+    protected override MSTestCSharpTestMethod CreateTestMethod(
         TestMethodGenerationContext<CSharpCompilationInformation> context,
         TestMethodDescriptor descriptor)
     {
@@ -51,6 +51,8 @@ internal class MSTestCSharpTestFixtureGenerator(MSTestHandler frameworkHandler) 
         {
             foreach (var example in set)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+
                 // DataRow's constructor is DataRow(object? data, params object?[] moreData)
                 // Because we often pass an array of strings as a second argument, we always wrap moreData
                 // in an explicit array to avoid the compiler mistaking our string array as the moreData value.
