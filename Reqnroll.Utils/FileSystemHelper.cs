@@ -103,10 +103,16 @@ namespace Reqnroll.Utils
         // files are not the same.
         public static bool FileCompareContent(string filePath1, string fileContent)
         {
-            var currentFileContent = File.ReadAllText(filePath1);
+            try
+            {
+                var currentFileContent = File.ReadAllText(filePath1);
 
-            return string.CompareOrdinal(currentFileContent, fileContent) == 0;
-
+                return string.CompareOrdinal(currentFileContent, fileContent) == 0;
+            }
+            catch (IOException)
+            {
+                return false;
+            }
         }
 
         public static string NormalizeDirectorySeparators(string path)
