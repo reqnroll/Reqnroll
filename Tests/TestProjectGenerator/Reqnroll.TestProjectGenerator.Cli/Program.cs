@@ -5,21 +5,19 @@ using System.CommandLine;
 using System.CommandLine.Invocation;
 using System.IO;
 using System.Text.RegularExpressions;
-using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Conventions;
 using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Driver;
 
 namespace Reqnroll.TestProjectGenerator.Cli
 {
-    partial class Program
+    class Program
     {
         private const string DefaultReqnrollNuGetVersion = "3.4.3";
         private const UnitTestProvider DefaultUnitTestProvider = UnitTestProvider.MSTest;
         private const TargetFramework DefaultTargetFramework = TargetFramework.Netcoreapp31;
         private const ProjectFormat DefaultProjectFormat = ProjectFormat.New;
         private const ConfigurationFormat DefaultConfigurationFormat = ConfigurationFormat.Json;
-        private const string DefaultSpecRunNuGetVersion = "3.4.19";
 
         static int Main(string[] args)
         {
@@ -55,10 +53,6 @@ namespace Reqnroll.TestProjectGenerator.Cli
                     "--configuration-format",
                     () => DefaultConfigurationFormat,
                     $"The format of the generated Reqnroll configuration file. Default: '{DefaultConfigurationFormat}'."),
-                new Option<string>(
-                    "--specrun-nuget-version",
-                    () => DefaultSpecRunNuGetVersion,
-                    $"The SpecRun NuGet version referenced in the generated project (if SpecRun is used as unit test provider). Default: '{DefaultSpecRunNuGetVersion}'."),
                 new Option<int>(
                     "--feature-count",
                     () => 1,
@@ -73,13 +67,13 @@ namespace Reqnroll.TestProjectGenerator.Cli
                 {
                     var services = ConfigureServices();
 
-                    services.AddSingleton(s => new SolutionConfiguration
+                    services.AddSingleton(_ => new SolutionConfiguration
                     {
                         OutDir = generateSolutionParams.OutDir,
                         SolutionName = generateSolutionParams.SlnName
                     });
 
-                    services.AddSingleton(s => new TestRunConfiguration
+                    services.AddSingleton(_ => new TestRunConfiguration
                     {
                         ProgrammingLanguage = ProgrammingLanguage.CSharp,
                         UnitTestProvider = generateSolutionParams.UnitTestProvider,
@@ -88,19 +82,19 @@ namespace Reqnroll.TestProjectGenerator.Cli
                         TargetFramework = generateSolutionParams.TargetFramework,
                     });
 
-                    Func<string, Version> getRunnerReqnrollVersion = (string reqnrollNuGetVersion) =>
+                    Version GetReqnrollVersion(string reqnrollNuGetVersion)
                     {
                         var m = new Regex("^(\\d+)\\.(\\d+)").Match(reqnrollNuGetVersion);
                         return new Version(int.Parse(m.Groups[1].Value), int.Parse(m.Groups[2].Value), 0);
-                    };
-                    services.AddSingleton(s => new CurrentVersionDriver
+                    }
+
+                    services.AddSingleton(_ => new CurrentVersionDriver
                     {
                         ReqnrollNuGetVersion = generateSolutionParams.ReqnrollNuGetVersion.ToString(),
-                        ReqnrollVersion = getRunnerReqnrollVersion(generateSolutionParams.ReqnrollNuGetVersion),
-                        NuGetVersion = generateSolutionParams.SpecrunNuGetVersion.ToString()
+                        ReqnrollVersion = GetReqnrollVersion(generateSolutionParams.ReqnrollNuGetVersion),
                     });
 
-                    services.AddSingleton<GenerateSolutionParams>(s => generateSolutionParams);
+                    services.AddSingleton(_ => generateSolutionParams);
 
                     var serviceProvider = services.BuildServiceProvider();
 

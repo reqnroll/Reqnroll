@@ -23,8 +23,6 @@ namespace Reqnroll.TestProjectGenerator.Cli
 
         public ConfigurationFormat ConfigurationFormat { get; set; }
 
-        public string SpecrunNuGetVersion { get; set; }
-
         public int FeatureCount { get; set; }
     }
 }

@@ -33,7 +33,6 @@ public class Hooks
                 ConfigurationFormat = ConfigurationFormat.Json
             });
 
-        _currentVersionDriver.NuGetVersion = NuGetPackageVersion.Version;
         _currentVersionDriver.ReqnrollNuGetVersion = NuGetPackageVersion.Version;
         _scenarioContext.ScenarioContainer.RegisterTypeAs<OutputConnector, IOutputWriter>();
 
