@@ -72,7 +72,6 @@ public abstract class SystemTestBase
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.MSTest;
 
         _currentVersionDriver = _testContainer.GetService<CurrentVersionDriver>();
-        _currentVersionDriver.NuGetVersion = NuGetPackageVersion.Version;
         _currentVersionDriver.ReqnrollNuGetVersion = NuGetPackageVersion.Version;
 
         _folderCleaner = _testContainer.GetService<FolderCleaner>();

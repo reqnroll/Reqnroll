@@ -1,32 +1,34 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Xunit;
 using Reqnroll.Bindings;
+using Reqnroll.Bindings.Reflection;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
 
 namespace Reqnroll.RuntimeTests
 {
-    
     public class StepArgumentTypeConverterTests
     {
-        private IStepArgumentTypeConverter _stepArgumentTypeConverter;
-        private readonly Mock<IAsyncBindingInvoker> methodBindingInvokerStub = new Mock<IAsyncBindingInvoker>();
-        private CultureInfo _enUSCulture;
+        private readonly Mock<ITestTracer> _testTracer;
+        private readonly List<IStepArgumentTransformationBinding> _stepTransformations;
+        private readonly IStepArgumentTypeConverter _stepArgumentTypeConverter;
+        private readonly Mock<IAsyncBindingInvoker> methodBindingInvokerStub = new();
+        private readonly CultureInfo _enUSCulture;
 
         public StepArgumentTypeConverterTests()
         {
             Mock<IBindingRegistry> bindingRegistryStub = new Mock<IBindingRegistry>();
-            List<IStepArgumentTransformationBinding> stepTransformations = new List<IStepArgumentTransformationBinding>();
-            bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(stepTransformations);
+            _stepTransformations = new List<IStepArgumentTransformationBinding>();
+            bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(_stepTransformations);
+            _testTracer = new Mock<ITestTracer>();
 
-            _stepArgumentTypeConverter = new StepArgumentTypeConverter(new Mock<ITestTracer>().Object, bindingRegistryStub.Object, new Mock<IContextManager>().Object, methodBindingInvokerStub.Object);
+            _stepArgumentTypeConverter = new StepArgumentTypeConverter(_testTracer.Object, bindingRegistryStub.Object, new Mock<IContextManager>().Object, methodBindingInvokerStub.Object);
             _enUSCulture = new CultureInfo("en-US", false);
         }
 
@@ -121,6 +123,31 @@ namespace Reqnroll.RuntimeTests
             result.As<TestClass>().Time.Should().Be(originalValue);
         }
 
+        [Fact]
+        public async Task ShouldTraceWarningIfMultipleTransformationsFound()
+        {
+            var method = typeof(TestClass).GetMethod(nameof(TestClass.StringToIntConverter));
+            _stepTransformations.Add(new StepArgumentTransformationBinding(@"\d+", new RuntimeBindingMethod(method)));
+            _stepTransformations.Add(new StepArgumentTransformationBinding(@".*", new RuntimeBindingMethod(method)));
+            
+            await _stepArgumentTypeConverter.ConvertAsync("1", typeof(int), _enUSCulture);
+            
+            _testTracer.Verify(c => c.TraceWarning(It.IsAny<string>()), Times.Once);
+        }
+        
+        [Fact]
+        public async Task ShouldNotTraceWarningIfTransformationsHaveDifferentOrder()
+        {
+            var method = typeof(TestClass).GetMethod(nameof(TestClass.StringToIntConverter));
+
+            _stepTransformations.Add(new StepArgumentTransformationBinding(@"\d+", new RuntimeBindingMethod(method)));
+            _stepTransformations.Add(new StepArgumentTransformationBinding(@".*", new RuntimeBindingMethod(method), order: 10));
+            
+            await _stepArgumentTypeConverter.ConvertAsync("1", typeof(int), _enUSCulture);
+            
+            _testTracer.Verify(c => c.TraceWarning(It.IsAny<string>()), Times.Never);
+        }
+
         [TypeConverter(typeof(TessClassTypeConverter))]
         class TestClass
         {
@@ -138,8 +165,9 @@ namespace Reqnroll.RuntimeTests
                     return new TestClass { Time = (DateTimeOffset) value };
                 }
             }
-        }
 
-   
+            [StepArgumentTransformation]
+            public int StringToIntConverter(string value) => int.Parse(value);
+        }
     }
 }

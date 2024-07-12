@@ -199,14 +199,6 @@ namespace Reqnroll.TestProjectGenerator
 
         public string GenerateAdditionalPackagesFoldersParameters()
         {
-            if (_testRunConfiguration.UnitTestProvider != UnitTestProvider.SpecRun)
-            {
-                if (_testRunConfiguration.ProjectFormat == ProjectFormat.Old)
-                {
-                    return $" --test-adapter-path \"{_testProjectFolders.PathToNuGetPackages}\"";
-                }
-            }
-
             return null;
         }
     }

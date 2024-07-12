@@ -1,6 +1,5 @@
 using System.IO;
 using FluentAssertions;
-using Reqnroll.Specs.Drivers;
 using Reqnroll.Specs.Drivers.Parser;
 using Reqnroll.Specs.Support;
 using Reqnroll.TestProjectGenerator;
@@ -11,23 +10,25 @@ namespace Reqnroll.Specs.StepDefinitions
     [Binding]
     public class TestFileSteps
     {
-        private readonly TestFileManager testFileManager;
-        private readonly ParserDriver parserDriver;
+        private readonly TestFileManager _testFileManager;
+        private readonly ParserDriver _parserDriver;
         private readonly ProjectsDriver _projectsDriver;
+        private readonly ConfigurationDriver _configurationDriver;
 
-        public TestFileSteps(TestFileManager testFileManager, ParserDriver parserDriver, ProjectsDriver projectsDriver)
+        public TestFileSteps(TestFileManager testFileManager, ParserDriver parserDriver, ProjectsDriver projectsDriver, ConfigurationDriver configurationDriver)
         {
-            this.testFileManager = testFileManager;
-            this.parserDriver = parserDriver;
+            _testFileManager = testFileManager;
+            _parserDriver = parserDriver;
             _projectsDriver = projectsDriver;
+            _configurationDriver = configurationDriver;
         }
 
         [When(@"the test file '(.*)' is parsed")]
         public void WhenTheTestFileIsParsed(string testFile)
         {
-            string testFileContent = testFileManager.GetTestFileContent(testFile);
-            parserDriver.FileContent = testFileContent;
-            parserDriver.ParseFile();
+            string testFileContent = _testFileManager.GetTestFileContent(testFile);
+            _parserDriver.FileContent = testFileContent;
+            _parserDriver.ParseFile();
         }
 
         [When(@"the parsed result is saved to '(.*)'")]
@@ -35,23 +36,23 @@ namespace Reqnroll.Specs.StepDefinitions
         {
             var assemblyFolder = AssemblyFolderHelper.GetAssemblyFolder();
 
-            assemblyFolder.Should().EndWith(@"\bin\Debug\net5.0", "parsed file saving can only be done from a development environment");
-            parserDriver.SaveSerializedFeatureTo(Path.Combine(assemblyFolder, @"..\..\..\TestFiles", parsedFileName));
+            _configurationDriver.PipelineMode.Should().BeFalse("parsed file saving can only be done from a development environment");
+            _parserDriver.SaveSerializedFeatureTo(Path.Combine(assemblyFolder, @"..\..\..\TestFiles", parsedFileName));
         }
 
         [Then(@"the parsed result is the same as '(.*)'")]
         public void ThenTheParsedResultIsTheSameAs(string parsedFileName)
         {
-            string expected = testFileManager.GetTestFileContent(parsedFileName);
-            parserDriver.AssertParsedFeatureEqualTo(expected);
+            string expected = _testFileManager.GetTestFileContent(parsedFileName);
+            _parserDriver.AssertParsedFeatureEqualTo(expected);
         }
 
         [Given(@"all test files are inluded in the project")]
         public void GivenAllTestFilesAreInludedInTheProject()
         {
-            foreach (var testFile in testFileManager.GetTestFeatureFiles())
+            foreach (var testFile in _testFileManager.GetTestFeatureFiles())
             {
-                string testFileContent = testFileManager.GetTestFileContent(testFile);
+                string testFileContent = _testFileManager.GetTestFileContent(testFile);
 
                 _projectsDriver.AddFeatureFile(testFileContent);
             }

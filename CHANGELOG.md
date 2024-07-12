@@ -5,10 +5,15 @@
 * Reqnroll.Verify: Support for Verify v24 (Verify.Xunit v24.2.0) for .NET 4.7.2+ and .NET 6.0+. For earlier versions of Verify or for .NET 4.6.2, use the latest 2.0.3 version of the plugin that is compatible with Reqnroll v2.*. (#151)
 * Optimize creation of test-thread context using test framework independent resource pooling (#144)
 * Support DateTimeOffset in value comparer (#180)
+* Support 'Order' parameter for `StepArgumentTransformationAttribute` to prioritize execution (#185)
+* Upgrade to Gherkin v28 from v19 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#205)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @obligaron
+* Fix: Reqnroll.Autofac: Objects registered in the global container cannot be relsolved in BeforeTestRun/AfterTestRun hooks (#183)
+* Fix: Process cannot access the file when building a multi-target project (#197)
+
+*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @gasparnagy, @obligaron, @stbychkov
 
 # v2.0.3 - 2024-06-10
 

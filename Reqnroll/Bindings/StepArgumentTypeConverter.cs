@@ -29,13 +29,18 @@ namespace Reqnroll.Bindings
         protected virtual IStepArgumentTransformationBinding GetMatchingStepTransformation(object value, IBindingType typeToConvertTo, bool traceWarning)
         {
             var stepTransformations = bindingRegistry.GetStepTransformations().Where(t => CanConvert(t, value, typeToConvertTo)).ToArray();
-            if (stepTransformations.Length > 1 && traceWarning)
+            if (traceWarning && HasMultipleTransformationsWithSameOrder(stepTransformations))
             {
                 testTracer.TraceWarning($"Multiple step transformation matches to the input ({value}, target type: {typeToConvertTo}). We use the first.");
             }
 
             return stepTransformations.Length > 0 ? stepTransformations[0] : null;
         }
+
+        private bool HasMultipleTransformationsWithSameOrder(IStepArgumentTransformationBinding[] transformations) =>
+            transformations
+                .GroupBy(t => t.Order)
+                .Any(group => group.Count() > 1);
 
         public async Task<object> ConvertAsync(object value, IBindingType typeToConvertTo, CultureInfo cultureInfo)
         {

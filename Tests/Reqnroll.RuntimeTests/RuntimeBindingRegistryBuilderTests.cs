@@ -26,6 +26,18 @@ namespace Reqnroll.RuntimeTests
             {
                 return 42;
             }
+            
+            [StepArgumentTransformation(Regex="BindingRegistryTests2", Order = 5)]
+            public int TransformWithRegexAndOrder(string val)
+            {
+                return 43;
+            }
+            
+            [StepArgumentTransformation(Order = 10)]
+            public int TransformWithOrderAndWithoutRegex(string val)
+            {
+                return 44;
+            } 
         }
 
         private BindingSourceProcessorStub bindingSourceProcessorStub;
@@ -295,6 +307,29 @@ namespace Reqnroll.RuntimeTests
                     s =>
                         s.HookType == HookType.AfterTestRun && s.Method.Name == "AfterOrderTenThousandAnd4" &&
                         s.HookOrder == 10004));
+        }
+        
+         [Fact]
+        public void ShouldFindStepArgumentTransformations_WithSpecifiedOrder()
+        {
+            var builder = CreateSut();
+
+            BuildCompleteBindingFromType(builder, typeof (StepTransformationExample));
+
+            Assert.Single(
+                bindingSourceProcessorStub.StepArgumentTransformationBindings,
+                sat =>
+                    sat.Method.Name == nameof(StepTransformationExample.Transform) && sat.Order == StepArgumentTransformationAttribute.DefaultOrder);
+            
+            Assert.Single(
+                bindingSourceProcessorStub.StepArgumentTransformationBindings,
+                sat =>
+                    sat.Method.Name == nameof(StepTransformationExample.TransformWithRegexAndOrder) && sat.Order == 5);
+            
+            Assert.Single(
+                bindingSourceProcessorStub.StepArgumentTransformationBindings,
+                sat =>
+                    sat.Method.Name == nameof(StepTransformationExample.TransformWithOrderAndWithoutRegex) && sat.Order == 10);
         }
 
         [Fact]
