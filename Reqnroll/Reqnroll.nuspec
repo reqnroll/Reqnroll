@@ -19,7 +19,7 @@
     <dependencies>
       <group targetFramework="netstandard2.0">
         <dependency id="Gherkin" version="28.0.0"/>
-        <dependency id="Cucumber.CucumberExpressions" version="16.0.0"/>
+        <dependency id="Cucumber.CucumberExpressions" version="17.1.0"/>
 
         <dependency id="Microsoft.Extensions.DependencyModel" version="6.0.0" />
         <dependency id="System.Runtime.Loader" version="4.3.0" />
