@@ -26,8 +26,6 @@ namespace Reqnroll.TestProjectGenerator
 
         public string ReqnrollNuGetVersion { get; set; }
 
-        public string NuGetVersion { get; set; }
-
         public string MajorMinorPatchVersion { get; set; }
     }
 }

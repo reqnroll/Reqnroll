@@ -44,11 +44,6 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 new("Reqnroll Unstable", "https://www.myget.org/F/reqnroll-unstable/api/v3/index.json")
             };
 
-            if (testRunConfiguration.UnitTestProvider == UnitTestProvider.SpecRun)
-            {
-                NuGetSources.Add(new NuGetSource("Reqnroll CI", "https://www.myget.org/F/reqnroll/api/v3/index.json"));
-                NuGetSources.Add(new NuGetSource("Reqnroll Unstable", "https://www.myget.org/F/reqnroll-unstable/api/v3/index.json"));
-            }
             if (testRunConfiguration.TargetFramework == TargetFramework.Net50 && testRunConfiguration.UnitTestProvider == UnitTestProvider.NUnit3)
             {
                 //NUnit is not supporting .NET 5 in the latest release (3.12.0), so add the myget feed for the pre-release versions

@@ -1,15 +1,9 @@
-namespace Reqnroll.TestProjectGenerator
+namespace Reqnroll.TestProjectGenerator;
+
+public enum UnitTestProvider
 {
-    public enum UnitTestProvider
-    {
-        SpecRun,
-        SpecRunWithNUnit,
-        SpecRunWithNUnit2,
-        SpecRunWithMsTest,
-        MSTest,
-        xUnit,
-        NUnit3,
-        NUnit2
-        
-    }
+    MSTest,
+    xUnit,
+    NUnit3,
+    NUnit2
 }

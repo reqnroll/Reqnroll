@@ -263,10 +263,6 @@ namespace Reqnroll.TestProjectGenerator
 
                 switch (Configuration.UnitTestProvider)
                 {
-                    case UnitTestProvider.SpecRun:
-                    case UnitTestProvider.SpecRunWithMsTest:
-                    case UnitTestProvider.SpecRunWithNUnit:
-                        throw new NotSupportedException("Testing with SpecRun is not supported!");
                     case UnitTestProvider.MSTest:
                         ConfigureMSTest();
                         break;

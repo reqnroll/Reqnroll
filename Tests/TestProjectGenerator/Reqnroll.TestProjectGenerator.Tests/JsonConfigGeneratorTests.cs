@@ -18,7 +18,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         [Fact]
         public void FileNameIsAppConfig()
         {
-            var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration();
             var projectFile = _jsonConfigGenerator.Generate(configuration);
             projectFile.Path.Should().Be("reqnroll.json");
         }
@@ -26,7 +26,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         [Fact]
         public void BuildActionIsNone()
         {
-            var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration();
             var projectFile = _jsonConfigGenerator.Generate(configuration);
             projectFile.BuildAction.Should().Be("None");
         }
@@ -34,7 +34,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
         [Fact]
         public void SingleAdditionalStepAssembly()
         {
-            var configuration = new Configuration { UnitTestProvider = Reqnroll.TestProjectGenerator.UnitTestProvider.SpecRun };
+            var configuration = new Configuration();
             configuration.BindingAssemblies.Add(new BindingAssembly("AdditionalStepAssembly"));
 
             var projectFile = _jsonConfigGenerator.Generate(configuration);

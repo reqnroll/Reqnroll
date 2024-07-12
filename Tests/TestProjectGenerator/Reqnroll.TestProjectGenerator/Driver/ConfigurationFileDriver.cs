@@ -81,10 +81,6 @@ namespace Reqnroll.TestProjectGenerator.Driver
         {
             switch (providerName.ToLower())
             {
-                case "specrun+nunit": return UnitTestProvider.SpecRunWithNUnit;
-                case "specrun+nunit.2": return UnitTestProvider.SpecRunWithNUnit2;
-                case "specrun+mstest": return UnitTestProvider.SpecRunWithMsTest;
-                case "specrun": return UnitTestProvider.SpecRun;
                 case "mstest": return UnitTestProvider.MSTest;
                 case "xunit": return UnitTestProvider.xUnit;
                 case "nunit": return UnitTestProvider.NUnit3;
