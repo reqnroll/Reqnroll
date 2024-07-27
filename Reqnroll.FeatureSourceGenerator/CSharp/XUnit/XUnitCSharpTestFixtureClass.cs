@@ -54,7 +54,7 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
     }
 
     protected virtual void RenderConstructorTo(
-        CSharpSourceTextBuilder SourceBuilder,
+        CSharpSourceTextBuilder sourceBuilder,
         CancellationToken cancellationToken)
     {
         var className = Identifier.LocalType switch
@@ -65,14 +65,14 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
                 $"Writing constructor for {Identifier.GetType().Name} values is not implemented.")
         };
 
-        // Lifetime class is initialzed once per feature, then passed to the constructor of each test class instance.
+        // Lifetime class is initialized once per feature, then passed to the constructor of each test class instance.
         // Output helper is included to by registered in the container.
-        SourceBuilder.Append("public ").Append(className).AppendLine("(FeatureLifetime lifetime, " +
+        sourceBuilder.Append("public ").Append(className).AppendLine("(FeatureLifetime lifetime, " +
             "global::Xunit.Abstractions.ITestOutputHelper testOutputHelper)");
-        SourceBuilder.BeginBlock("{");
-        SourceBuilder.AppendLine("_lifetime = lifetime;");
-        SourceBuilder.AppendLine("_testOutputHelper = testOutputHelper;");
-        SourceBuilder.EndBlock("}");
+        sourceBuilder.BeginBlock("{");
+        sourceBuilder.AppendLine("_lifetime = lifetime;");
+        sourceBuilder.AppendLine("_testOutputHelper = testOutputHelper;");
+        sourceBuilder.EndBlock("}");
     }
 
     protected virtual void RenderLifetimeClassTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)

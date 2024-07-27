@@ -29,7 +29,7 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
     {
         var scenario = context.ScenarioInformation;
 
-        // In the case the scenario defines no examples, we don't pass any paramters.
+        // In the case the scenario defines no examples, we don't pass any parameters.
         if (scenario.Examples.IsEmpty)
         {
             return ImmutableArray<ParameterDescriptor>.Empty;
@@ -77,7 +77,7 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
     {
         var scenario = context.ScenarioInformation;
 
-        // In the case the scenario defines no examples, we don't pass any paramters to steps.
+        // In the case the scenario defines no examples, we don't pass any parameters to steps.
         if (scenario.Examples.IsEmpty)
         {
             return scenario.Steps
@@ -121,7 +121,7 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
     {
         var scenario = context.ScenarioInformation;
 
-        // In the case the scenario defines no examples, we don't pass any paramters.
+        // In the case the scenario defines no examples, we don't pass any parameters.
         if (scenario.Examples.IsEmpty)
         {
             return ImmutableArray<KeyValuePair<string, IdentifierString>>.Empty;

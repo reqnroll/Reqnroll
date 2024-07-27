@@ -61,7 +61,7 @@ internal class NUnitCSharpTestFixtureGenerator(NUnitHandler frameworkHandler) :
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var values = example.Select(example => (object?)example.Value).ToList();
+                var values = example.Select(exampleValue => (object?)exampleValue.Value).ToList();
 
                 values.Add(set.Tags);
 

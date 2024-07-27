@@ -68,7 +68,7 @@ public class MSTestCSharpTestFixtureClass : CSharpTestFixtureClass
     {
         sourceBuilder
             .AppendLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitialize]")
-            .AppendLine("public static Task IntializeFeatureAsync(global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)")
+            .AppendLine("public static Task InitializeFeatureAsync(global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)")
             .BeginBlock("{")
             .AppendLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();")
             .AppendLine("return TestRunner.OnFeatureStartAsync(FeatureInfo);")
