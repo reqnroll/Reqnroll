@@ -83,7 +83,10 @@ The *Reqnroll with Rider* extension cannot work together with the *SpecFlow for 
 3. Click `Marketplace`. 
 3. Enter `Reqnroll` in the search box and install.
 4. Enter `Gherkin` in the search box and install.
-5. Open csproj and verify your project contains `<Contents include = "**/*.feature*"/>`
+5. Open csproj and verify your project contains 
+`<ItemGroup>
+  <Content Include="**/*.feature"/>
+</ItemGroup>`
 5. Restart Rider.
 
 
