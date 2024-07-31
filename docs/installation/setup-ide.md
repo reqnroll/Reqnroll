@@ -76,18 +76,20 @@ In order to use Reqnroll with Rider, you need to install the [Reqnroll for Rider
 The *Reqnroll with Rider* extension cannot work together with the *SpecFlow for Rider* extension, as they both process feature files. As the Reqnroll extension also supports SpecFlow projects, you can remove the SpecFlow extension if you install the Reqnroll extension. Alternatively, you can disable the SpecFlow extension for the time you work with Reqnroll. 
 ```
 
-1. Open Rider and verify that you are using a compatible version. The following versions are verified to work with Reqnroll:
-    - `2024.1.4`
-    - `2024.2 EAP9 build 242.20224.162`
+1. Launch Rider and ensure you are using a compatible version. The following versions have been verified to work with Reqnroll:
+    - [Rider compatibility](https://plugins.jetbrains.com/plugin/24012-reqnroll-for-rider/versions)
 2. Top right of Rider click the gear icon and press plugins.
 3. Click `Marketplace`. 
-3. Enter `Reqnroll` in the search box and install.
-4. Enter `Gherkin` in the search box and install.
+4. Enter `Reqnroll` in the search box and install.
 5. Open csproj and verify your project contains 
-`<ItemGroup>
-  <Content Include="**/*.feature"/>
-</ItemGroup>`
-5. Restart Rider.
+    ```
+    <ItemGroup>
+      <Content Include="**/*.feature"/>
+    </ItemGroup>
+    ```
+   - This is a work around for a known issue found here [Content Include .feature files in .csproj](https://github.com/reqnroll/Reqnroll.Rider/issues/1)  
+  
+6. Restart Rider.
 
 
 
