@@ -108,8 +108,9 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 // 2. The ReqnrollTargetTestFramework from the build system properties (MSBuild project files or command-line argument)
                 // 3. The assemblies referenced by the compilation indicating the presence of a test framework.
                 ITestFixtureGenerator<TCompilationInformation>? generator;
-                if (options.TryGetValue("reqnroll.target_test_framework", out var targetTestFrameworkIdentifier)
+                if ((options.TryGetValue("reqnroll.target_test_framework", out var targetTestFrameworkIdentifier)
                     || options.TryGetValue("build_property.ReqnrollTargetTestFramework", out targetTestFrameworkIdentifier))
+                    && !string.IsNullOrEmpty(targetTestFrameworkIdentifier))
                 {
                     // Select the target framework from the option specified.
                     generator = generatorInformation.CompatibleGenerators
@@ -196,8 +197,6 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
 
                     return [.. diagnostics];
                 }
-
-                Debugger.Launch();
 
                 // Determine whether we should include ignored examples in our sample sets.
                 var emitIgnoredExamples = false;
