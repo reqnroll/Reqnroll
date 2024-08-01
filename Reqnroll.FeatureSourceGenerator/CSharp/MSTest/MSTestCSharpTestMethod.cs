@@ -26,7 +26,15 @@ public class MSTestCSharpTestMethod : CSharpTestMethod
     {
         // For MSTest we use a test-runner assigned to the class.
         sourceBuilder
-            .AppendLine("global::Reqnroll.ITestRunner testRunner = TestRunner;")
+            .Append("global::Reqnroll.ITestRunner");
+
+        if (renderingOptions.UseNullableReferenceTypes)
+        {
+            sourceBuilder.Append('?');
+        }
+
+        sourceBuilder
+            .AppendLine(" testRunner = TestRunner;")
             .AppendLine("if (testRunner == null)")
             .BeginBlock("{")
             .AppendLine("throw new global::System.InvalidOperationException(\"TestRunner has not been assigned to the test fixture.\");")
