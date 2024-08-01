@@ -91,6 +91,8 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             .Combine(generatorInformation)
             .SelectMany(static IEnumerable<StepResult<TestFixtureGenerationContext<TCompilationInformation>>> (input, cancellationToken) =>
             {
+                Debugger.Launch();
+
                 var (((featureFile, optionsProvider), compilationInfo), generatorInformation) = input;
 
                 var options = optionsProvider.GetOptions(featureFile);

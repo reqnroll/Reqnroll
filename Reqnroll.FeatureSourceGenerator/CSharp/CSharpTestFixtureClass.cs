@@ -200,7 +200,7 @@ public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFix
         }
 
         return base.Equals(other) &&
-            Methods.SequenceEqual(other.Methods) &&
+            Methods.SequenceEqual(other!.Methods) &&
             RenderingOptions.Equals(other.RenderingOptions);
     }
 

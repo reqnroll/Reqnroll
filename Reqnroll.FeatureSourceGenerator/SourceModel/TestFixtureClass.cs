@@ -6,7 +6,7 @@ namespace Reqnroll.FeatureSourceGenerator.SourceModel;
 /// <summary>
 /// Represents a Reqnroll text fixture class.
 /// </summary>
-public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>, IHasAttributes
+public abstract class TestFixtureClass : IHasAttributes
 {
     /// <summary>
     /// Initializes a new instance of the test fixture class.
@@ -77,7 +77,7 @@ public abstract class TestFixtureClass : IEquatable<TestFixtureClass?>, IHasAttr
 
     public override bool Equals(object obj) => Equals(obj as TestFixtureClass);
 
-    public bool Equals(TestFixtureClass? other)
+    protected bool Equals(TestFixtureClass? other)
     {
         if (other is null)
         {

@@ -98,6 +98,8 @@ public abstract class TestMethod : IEquatable<TestMethod?>, IHasAttributes
         unchecked
         {
             var hash = 86434151;
+
+            hash *= 83155477 + GetType().GetHashCode();
             
             hash *= 83155477 + Identifier.GetHashCode();
             hash *= 83155477 + Scenario.GetHashCode();
@@ -110,7 +112,7 @@ public abstract class TestMethod : IEquatable<TestMethod?>, IHasAttributes
         }
     }
 
-    public bool Equals(TestMethod? other)
+    public virtual bool Equals(TestMethod? other)
     {
         if (other is null)
         {
@@ -122,7 +124,9 @@ public abstract class TestMethod : IEquatable<TestMethod?>, IHasAttributes
             return true;
         }
 
-        return Identifier.Equals(other.Identifier) &&
+        return
+            GetType().Equals(other.GetType()) &&
+            Identifier.Equals(other.Identifier) &&
             Scenario.Equals(other.Scenario) &&
             (StepInvocations.Equals(other.StepInvocations) || StepInvocations.SequenceEqual(other.StepInvocations)) &&
             (Attributes.Equals(other.Attributes) || Attributes.SetEquals(other.Attributes)) &&
