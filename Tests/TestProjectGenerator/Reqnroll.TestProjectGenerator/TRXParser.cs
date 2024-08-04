@@ -147,17 +147,41 @@ namespace Reqnroll.TestProjectGenerator
                 let innerResultsElement = unitTestResultElement.Element(_unitTestResultInnerResultsElementName)
                 where idAttribute != null
                 where outcomeAttribute != null
+                let steps = ParseTestOutput(stdOutElement)
                 select new TestResult
                 {
                     Id = idAttribute.Value,
                     TestName = testNameAttribute.Value,
                     Outcome = outcomeAttribute.Value,
                     StdOut = stdOutElement?.Value,
+                    Steps = steps,
                     ErrorMessage = errorMessage?.Value,
                     InnerResults = GetTestResultsInternal(innerResultsElement, xmlns)
                 };
 
             return testResults.ToList();
+        }
+
+        private static List<TestStepResult> ParseTestOutput(XElement stdOutElement)
+        {
+            if (stdOutElement == null)
+            {
+                return null;
+            }
+
+            var stdOutText = stdOutElement.Value;
+
+            var logLines = stdOutText.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+
+            var primaryOutput = logLines.TakeWhile(line => line != "TestContext Messages:");
+
+            var steps = primaryOutput
+                .Where(line => line.StartsWith("Given ") || 
+                    line.StartsWith("When ") || 
+                    line.StartsWith("Then ") || 
+                    line.StartsWith("And "));
+
+            return steps.Select(step => new TestStepResult { Step = step }).ToList();
         }
 
         private int GetNUnitIgnoredCount(TestExecutionResult testExecutionResult)
