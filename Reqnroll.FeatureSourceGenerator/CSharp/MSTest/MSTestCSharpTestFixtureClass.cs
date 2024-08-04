@@ -23,83 +23,83 @@ public class MSTestCSharpTestFixtureClass : CSharpTestFixtureClass
     {
     }
 
-    protected override void RenderTestFixtureContentTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected override void RenderTestFixtureContentTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
-        RenderTestRunnerFieldTo(sourceBuilder);
+        RenderTestRunnerFieldTo(writer);
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        RenderTestContextPropertyTo(sourceBuilder);
+        RenderTestContextPropertyTo(writer);
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        RenderClassInitializeMethodTo(sourceBuilder, cancellationToken);
+        RenderClassInitializeMethodTo(writer, cancellationToken);
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        RenderClassCleanupMethodTo(sourceBuilder, cancellationToken);
+        RenderClassCleanupMethodTo(writer, cancellationToken);
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        base.RenderTestFixtureContentTo(sourceBuilder, cancellationToken);
+        base.RenderTestFixtureContentTo(writer, cancellationToken);
     }
 
-    private void RenderTestRunnerFieldTo(CSharpSourceTextBuilder sourceBuilder)
+    private void RenderTestRunnerFieldTo(CSharpSourceTextWriter writer)
     {
-        sourceBuilder.Append("private static global::Reqnroll.ITestRunner");
+        writer.Write("private static global::Reqnroll.ITestRunner");
         if (RenderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append("?");
+            writer.Write("?");
         }
-        sourceBuilder.AppendLine(" TestRunner;");
+        writer.WriteLine(" TestRunner;");
     }
 
-    private void RenderTestContextPropertyTo(CSharpSourceTextBuilder sourceBuilder)
+    private void RenderTestContextPropertyTo(CSharpSourceTextWriter writer)
     {
-        sourceBuilder.Append("public global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext");
+        writer.Write("public global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext");
         if (RenderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append("?");
+            writer.Write("?");
         }
-        sourceBuilder.AppendLine(" TestContext { get; set; }");
+        writer.WriteLine(" TestContext { get; set; }");
     }
 
-    protected virtual void RenderClassInitializeMethodTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected virtual void RenderClassInitializeMethodTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
-        sourceBuilder
-            .AppendLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitialize]")
-            .AppendLine("public static Task InitializeFeatureAsync(global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)")
+        writer
+            .WriteLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassInitialize]")
+            .WriteLine("public static Task InitializeFeatureAsync(global::Microsoft.VisualStudio.TestTools.UnitTesting.TestContext testContext)")
             .BeginBlock("{")
-            .AppendLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();")
-            .AppendLine("return TestRunner.OnFeatureStartAsync(FeatureInfo);")
+            .WriteLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();")
+            .WriteLine("return TestRunner.OnFeatureStartAsync(FeatureInfo);")
             .EndBlock("}");
     }
 
     protected virtual void RenderClassCleanupMethodTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CancellationToken cancellationToken)
     {
-        sourceBuilder
-            .AppendLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanup(" +
+        writer
+            .WriteLine("[global::Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanup(" +
                 "Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior.EndOfClass)]")
-            .AppendLine("public static async Task TeardownFeatureAsync()")
+            .WriteLine("public static async Task TeardownFeatureAsync()")
             .BeginBlock("{")
-            .Append("if (TestRunner == null)")
+            .Write("if (TestRunner == null)")
             .BeginBlock("{")
-            .AppendLine("return;")
+            .WriteLine("return;")
             .EndBlock("}")
-            .AppendLine("await TestRunner.OnFeatureEndAsync();")
-            .AppendLine("global::Reqnroll.TestRunnerManager.ReleaseTestRunner(TestRunner);")
-            .AppendLine("TestRunner = null;")
+            .WriteLine("await TestRunner.OnFeatureEndAsync();")
+            .WriteLine("global::Reqnroll.TestRunnerManager.ReleaseTestRunner(TestRunner);")
+            .WriteLine("TestRunner = null;")
             .EndBlock("}");
     }
 
     protected override void RenderScenarioInitializeMethodBodyTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CancellationToken cancellationToken)
     {
-        base.RenderScenarioInitializeMethodBodyTo(sourceBuilder, cancellationToken);
+        base.RenderScenarioInitializeMethodBodyTo(writer, cancellationToken);
 
-        sourceBuilder.AppendLine("testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs(TestContext);");
+        writer.WriteLine("testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs(TestContext);");
     }
 }

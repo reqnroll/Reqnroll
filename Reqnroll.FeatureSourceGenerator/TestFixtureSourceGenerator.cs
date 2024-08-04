@@ -91,8 +91,6 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             .Combine(generatorInformation)
             .SelectMany(static IEnumerable<StepResult<TestFixtureGenerationContext<TCompilationInformation>>> (input, cancellationToken) =>
             {
-                Debugger.Launch();
-
                 var (((featureFile, optionsProvider), compilationInfo), generatorInformation) = input;
 
                 var options = optionsProvider.GetOptions(featureFile);
@@ -190,6 +188,8 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 try
                 {
                     // CONSIDER: Using a parser that doesn't throw exceptions for syntax errors.
+                    // CONSIDER: Using a parser that uses Roslyn text data-types.
+                    // CONSIDER: Using a parser that supports incremental parsing.
                     document = parser.Parse(new SourceTokenScanner(source));
                 }
                 catch (CompositeParserException ex)
@@ -218,7 +218,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     featureFile.Path);
 
                 var scenarioInformations = feature.Children
-                    .SelectMany(child => CreateScenarioInformations(child, emitIgnoredExamples, cancellationToken))
+                    .SelectMany(child => CreateScenarioInformations(featureFile.Path, child, emitIgnoredExamples, cancellationToken))
                     .ToImmutableArray();
 
                 return
@@ -277,24 +277,27 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
     }
 
     private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
+        string sourceFilePath,
         IHasLocation child,
         bool emitIgnoredExamples,
         CancellationToken cancellationToken)
     {
         return child switch
         {
-            Scenario scenario => [CreateScenarioInformation(scenario, emitIgnoredExamples, cancellationToken)],
-            Rule rule => CreateScenarioInformations(rule, emitIgnoredExamples, cancellationToken),
+            Scenario scenario => [CreateScenarioInformation(sourceFilePath, scenario, emitIgnoredExamples, cancellationToken)],
+            Rule rule => CreateScenarioInformations(sourceFilePath, rule, emitIgnoredExamples, cancellationToken),
             _ => []
         };
     }
 
     private static ScenarioInformation CreateScenarioInformation(
+        string sourceFilePath,
         Scenario scenario,
         bool emitIgnoredExamples,
-        CancellationToken cancellationToken) => CreateScenarioInformation(scenario, null, emitIgnoredExamples, cancellationToken);
+        CancellationToken cancellationToken) => CreateScenarioInformation(sourceFilePath, scenario, null, emitIgnoredExamples, cancellationToken);
 
     private static ScenarioInformation CreateScenarioInformation(
+        string sourceFilePath,
         Scenario scenario,
         RuleInformation? rule,
         bool emitIgnoredExamples,
@@ -325,6 +328,11 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            var startPosition = new LinePosition(step.Location.Line, step.Location.Column);
+            // We assume as single character gap between keyword and step text; could be more.
+            var endPosition = new LinePosition(startPosition.Line, startPosition.Character + step.Keyword.Length + step.Text.Length + 1);
+            var position = new FileLinePositionSpan(sourceFilePath, new LinePositionSpan(startPosition, endPosition));
+
             var scenarioStep = new ScenarioStep(
                 step.KeywordType switch
                 {
@@ -336,14 +344,20 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 },
                 step.Keyword,
                 step.Text,
-                step.Location.Line);
+                position);
 
             steps.Add(scenarioStep);
         }
 
+        var keywordAndNameStartPosition = new LinePosition(scenario.Location.Line, scenario.Location.Column);
+        // We assume as single character gap between keyword and scenario name; could be more.
+        var keywordAndNameEndPosition = new LinePosition(
+            scenario.Location.Line, 
+            scenario.Location.Column + scenario.Keyword.Length + scenario.Name.Length + 1);
+
         return new ScenarioInformation(
             scenario.Name,
-            scenario.Location.Line,
+            new FileLinePositionSpan(sourceFilePath, keywordAndNameStartPosition, keywordAndNameEndPosition),
             scenario.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray(),
             steps.ToImmutableArray(),
             exampleSets.ToImmutableArray(),
@@ -351,6 +365,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
     }
 
     private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
+        string sourceFilePath,
         Rule rule,
         bool emitIgnoredExamples,
         CancellationToken cancellationToken)
@@ -365,6 +380,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             {
                 case Scenario scenario:
                     yield return CreateScenarioInformation(
+                        sourceFilePath,
                         scenario,
                         new RuleInformation(rule.Name, tags),
                         emitIgnoredExamples,

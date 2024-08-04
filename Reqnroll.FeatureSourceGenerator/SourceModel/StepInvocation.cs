@@ -1,16 +1,16 @@
 ﻿using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.SourceModel;
-public class StepInvocation(
+public sealed class StepInvocation(
     StepType type,
-    int sourceLineNumber,
+    FileLinePositionSpan position,
     string keyword,
     string text,
-    ImmutableArray<IdentifierString> arguments = default)
+    ImmutableArray<IdentifierString> arguments = default) : IEquatable<StepInvocation?>
 {
     public StepType Type { get; } = type;
 
-    public int SourceLineNumber { get; } = sourceLineNumber;
+    public FileLinePositionSpan Position { get; } = position;
 
     public string Keyword { get; } = keyword;
 
@@ -19,8 +19,7 @@ public class StepInvocation(
     public ImmutableArray<IdentifierString> Arguments { get; } = 
         arguments.IsDefault ? ImmutableArray<IdentifierString>.Empty : arguments;
 
-
-    public virtual bool Equals(StepInvocation? other)
+    public bool Equals(StepInvocation? other)
     {
         if (other is null)
         {
@@ -33,7 +32,7 @@ public class StepInvocation(
         }
 
         return Type.Equals(other.Type) &&
-            SourceLineNumber.Equals(other.SourceLineNumber) &&
+            Position.Equals(other.Position) &&
             Keyword.Equals(other.Keyword) &&
             Text.Equals(other.Text) &&
             (Arguments.Equals(other.Arguments) || Arguments.SequenceEqual(other.Arguments));
@@ -46,7 +45,7 @@ public class StepInvocation(
             var hash = 92321497;
 
             hash *= 47886541 + Type.GetHashCode();
-            hash *= 47886541 + SourceLineNumber.GetHashCode();
+            hash *= 47886541 + Position.GetHashCode();
             hash *= 47886541 + Keyword.GetHashCode();
             hash *= 47886541 + Text.GetHashCode();
             hash *= 47886541 + Arguments.GetSequenceHashCode();

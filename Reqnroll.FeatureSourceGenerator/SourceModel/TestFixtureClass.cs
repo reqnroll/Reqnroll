@@ -89,6 +89,11 @@ public abstract class TestFixtureClass : IHasAttributes
             return true;
         }
 
+        if (GetType() != other.GetType())
+        {
+            return false;
+        }
+
         return Identifier.Equals(other.Identifier) &&
             (Attributes.Equals(other.Attributes) || Attributes.SetEquals(other.Attributes)) &&
             HintName.Equals(other.HintName, StringComparison.Ordinal) &&

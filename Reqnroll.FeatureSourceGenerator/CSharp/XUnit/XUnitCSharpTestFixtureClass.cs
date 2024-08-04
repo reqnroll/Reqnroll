@@ -31,30 +31,30 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
     public override ImmutableArray<TypeIdentifier> Interfaces { get; }
 
     protected override void RenderTestFixtureContentTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CancellationToken cancellationToken)
     {
-        RenderLifetimeClassTo(sourceBuilder, cancellationToken);
+        RenderLifetimeClassTo(writer, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        sourceBuilder.AppendLine("private readonly FeatureLifetime _lifetime;");
-        sourceBuilder.AppendLine();
+        writer.WriteLine("private readonly FeatureLifetime _lifetime;");
+        writer.WriteLine();
 
-        sourceBuilder.AppendLine("private readonly global::Xunit.Abstractions.ITestOutputHelper _testOutputHelper;");
-        sourceBuilder.AppendLine();
+        writer.WriteLine("private readonly global::Xunit.Abstractions.ITestOutputHelper _testOutputHelper;");
+        writer.WriteLine();
 
-        RenderConstructorTo(sourceBuilder, cancellationToken);
+        RenderConstructorTo(writer, cancellationToken);
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        base.RenderTestFixtureContentTo(sourceBuilder, cancellationToken);
+        base.RenderTestFixtureContentTo(writer, cancellationToken);
     }
 
     protected virtual void RenderConstructorTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter SourceBuilder,
         CancellationToken cancellationToken)
     {
         var className = Identifier.LocalType switch
@@ -65,69 +65,69 @@ public class XUnitCSharpTestFixtureClass : CSharpTestFixtureClass
                 $"Writing constructor for {Identifier.GetType().Name} values is not implemented.")
         };
 
-        // Lifetime class is initialized once per feature, then passed to the constructor of each test class instance.
+        // Lifetime class is initialzed once per feature, then passed to the constructor of each test class instance.
         // Output helper is included to by registered in the container.
-        sourceBuilder.Append("public ").Append(className).AppendLine("(FeatureLifetime lifetime, " +
+        SourceBuilder.Write("public ").Write(className).WriteLine("(FeatureLifetime lifetime, " +
             "global::Xunit.Abstractions.ITestOutputHelper testOutputHelper)");
-        sourceBuilder.BeginBlock("{");
-        sourceBuilder.AppendLine("_lifetime = lifetime;");
-        sourceBuilder.AppendLine("_testOutputHelper = testOutputHelper;");
-        sourceBuilder.EndBlock("}");
+        SourceBuilder.BeginBlock("{");
+        SourceBuilder.WriteLine("_lifetime = lifetime;");
+        SourceBuilder.WriteLine("_testOutputHelper = testOutputHelper;");
+        SourceBuilder.EndBlock("}");
     }
 
-    protected virtual void RenderLifetimeClassTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected virtual void RenderLifetimeClassTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
         // This class represents the feature lifetime in the xUnit framework.
-        sourceBuilder.AppendLine("public class FeatureLifetime : global::Xunit.IAsyncLifetime");
-        sourceBuilder.BeginBlock("{");
-        RenderLifetimeClassContentTo(sourceBuilder, cancellationToken);
-        sourceBuilder.EndBlock("}");
-        sourceBuilder.AppendLine();
+        writer.WriteLine("public class FeatureLifetime : global::Xunit.IAsyncLifetime");
+        writer.BeginBlock("{");
+        RenderLifetimeClassContentTo(writer, cancellationToken);
+        writer.EndBlock("}");
+        writer.WriteLine();
     }
 
-    private void RenderLifetimeClassContentTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    private void RenderLifetimeClassContentTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        sourceBuilder.Append("public global::Reqnroll.ITestRunner");
+        writer.Write("public global::Reqnroll.ITestRunner");
 
         if (RenderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append('?');
+            writer.Write('?');
         }
 
-        sourceBuilder.AppendLine(" TestRunner { get; private set; }");
+        writer.WriteLine(" TestRunner { get; private set; }");
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        sourceBuilder.AppendLine("public global::System.Threading.Tasks.Task InitializeAsync()");
-        sourceBuilder.BeginBlock("{");
-        sourceBuilder.AppendLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();");
-        sourceBuilder.Append("return TestRunner.OnFeatureStartAsync(").AppendTypeReference(Identifier).Append(".FeatureInfo").AppendLine(");");
-        sourceBuilder.EndBlock("}");
+        writer.WriteLine("public global::System.Threading.Tasks.Task InitializeAsync()");
+        writer.BeginBlock("{");
+        writer.WriteLine("TestRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();");
+        writer.Write("return TestRunner.OnFeatureStartAsync(").WriteTypeReference(Identifier).Write(".FeatureInfo").WriteLine(");");
+        writer.EndBlock("}");
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        sourceBuilder.AppendLine("public async global::System.Threading.Tasks.Task DisposeAsync()");
-        sourceBuilder.BeginBlock("{");
-        sourceBuilder.Append("await TestRunner");
+        writer.WriteLine("public async global::System.Threading.Tasks.Task DisposeAsync()");
+        writer.BeginBlock("{");
+        writer.Write("await TestRunner");
 
         if (RenderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append('!');
+            writer.Write('!');
         }
 
-        sourceBuilder.AppendLine(".OnFeatureEndAsync();");
-        sourceBuilder.AppendLine("global::Reqnroll.TestRunnerManager.ReleaseTestRunner(TestRunner);");
-        sourceBuilder.AppendLine("TestRunner = null;");
-        sourceBuilder.EndBlock("}");
+        writer.WriteLine(".OnFeatureEndAsync();");
+        writer.WriteLine("global::Reqnroll.TestRunnerManager.ReleaseTestRunner(TestRunner);");
+        writer.WriteLine("TestRunner = null;");
+        writer.EndBlock("}");
     }
 
-    protected override void RenderScenarioInitializeMethodBodyTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected override void RenderScenarioInitializeMethodBodyTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
-        base.RenderScenarioInitializeMethodBodyTo(sourceBuilder, cancellationToken);
+        base.RenderScenarioInitializeMethodBodyTo(writer, cancellationToken);
 
-        sourceBuilder.AppendLine(
+        writer.WriteLine(
             "testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs" +
             "<global::Xunit.Abstractions.ITestOutputHelper>(_testOutputHelper);");
     }

@@ -1,4 +1,6 @@
-﻿using Reqnroll.FeatureSourceGenerator.CSharp;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
+using Reqnroll.FeatureSourceGenerator.CSharp;
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
 
@@ -19,9 +21,15 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         var scenarioInfo = new ScenarioInformation(
             "Sample Scenario",
-            22,
+            new FileLinePositionSpan("Sample.feature", new LinePosition(3, 0), new LinePosition(3, 24)),
             [],
-            [new ScenarioStep(StepType.Action, "When", "foo happens", 6)]);
+            [
+                new ScenarioStep(
+                    StepType.Action,
+                    "When",
+                    "foo happens",
+                    new FileLinePositionSpan("Sample.feature", new LinePosition(4, 4), new LinePosition(4, 20)))
+            ]);
 
         var testFixtureGenerationContext = new TestFixtureGenerationContext<CSharpCompilationInformation>(
             featureInfo,
@@ -57,9 +65,15 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         var scenarioInfo = new ScenarioInformation(
             "Sample Scenario",
-            22,
+            new FileLinePositionSpan("Sample.feature", new LinePosition(3, 0), new LinePosition(3, 24)),
             [],
-            [new ScenarioStep(StepType.Action, "When", "foo happens", 6)]);
+            [
+                new ScenarioStep(
+                    StepType.Action,
+                    "When",
+                    "foo happens",
+                    new FileLinePositionSpan("Sample.feature", new LinePosition(4, 4), new LinePosition(4, 20)))
+            ]);
 
         var testFixtureGenerationContext = new TestFixtureGenerationContext<CSharpCompilationInformation>(
             featureInfo,
@@ -94,7 +108,11 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         method.StepInvocations.Should().BeEquivalentTo(
             [
-                new StepInvocation(StepType.Action, 6, "When", "foo happens")
+                new StepInvocation(
+                    StepType.Action,
+                    new FileLinePositionSpan("Sample.feature", new LinePosition(4, 4), new LinePosition(4, 20)), 
+                    "When", 
+                    "foo happens")
             ]);
     }
 
@@ -106,9 +124,15 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         var scenarioInfo = new ScenarioInformation(
             "Sample Scenario Outline",
-            22,
+            new FileLinePositionSpan("Sample.feature", new LinePosition(3, 0), new LinePosition(3, 24)),
             [],
-            [new ScenarioStep(StepType.Action, "When", "<what> happens", 6)],
+            [
+                new ScenarioStep(
+                    StepType.Action,
+                    "When",
+                    "<what> happens",
+                    new FileLinePositionSpan("Sample.feature", new LinePosition(4, 4), new LinePosition(4, 20)))
+            ],
             [exampleSet1, exampleSet2]);
 
         var featureInfo = new FeatureInformation(
@@ -169,7 +193,12 @@ public class XUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
 
         method.StepInvocations.Should().BeEquivalentTo(
             [
-                new StepInvocation(StepType.Action, 6, "When", "{0} happens", [new IdentifierString("what")])
+                new StepInvocation(
+                    StepType.Action,
+                    new FileLinePositionSpan("Sample.feature", new LinePosition(4, 4), new LinePosition(4, 20)), 
+                    "When", 
+                    "{0} happens", 
+                    [new IdentifierString("what")])
             ]);
     }
 }

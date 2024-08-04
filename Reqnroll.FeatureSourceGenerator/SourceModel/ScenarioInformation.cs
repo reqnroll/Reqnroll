@@ -1,9 +1,10 @@
 ﻿using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.SourceModel;
+
 public class ScenarioInformation(
     string name,
-    int lineNumber,
+    FileLinePositionSpan keywordAndNamePosition,
     ImmutableArray<string> tags,
     ImmutableArray<ScenarioStep> steps,
     ImmutableArray<ScenarioExampleSet> examples = default,
@@ -13,7 +14,7 @@ public class ScenarioInformation(
         throw new ArgumentException("Value cannot be null or an empty string", nameof(name)) :
         name;
 
-    public int LineNumber { get; } = lineNumber;
+    public FileLinePositionSpan KeywordAndNamePosition { get; } = keywordAndNamePosition;
 
     public ImmutableArray<string> Tags { get; } = tags.IsDefault ? ImmutableArray<string>.Empty : tags;
 

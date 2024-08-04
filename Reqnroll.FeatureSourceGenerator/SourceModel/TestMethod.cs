@@ -124,8 +124,12 @@ public abstract class TestMethod : IEquatable<TestMethod?>, IHasAttributes
             return true;
         }
 
+        if (GetType() != other.GetType())
+        {
+            return false;
+        }
+
         return
-            GetType().Equals(other.GetType()) &&
             Identifier.Equals(other.Identifier) &&
             Scenario.Equals(other.Scenario) &&
             (StepInvocations.Equals(other.StepInvocations) || StepInvocations.SequenceEqual(other.StepInvocations)) &&

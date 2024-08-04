@@ -20,24 +20,24 @@ public class NUnitCSharpTestMethod : CSharpTestMethod
     }
 
     protected override void RenderTestRunnerLookupTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
         // For NUnit we use a test-runner assigned to the class.
-        sourceBuilder.Append("global::Reqnroll.ITestRunner");
+        writer.Write("global::Reqnroll.ITestRunner");
 
         if (renderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append('?');
+            writer.Write('?');
         }
 
-        sourceBuilder.AppendLine(" testRunner = _testRunner;");
+        writer.WriteLine(" testRunner = _testRunner;");
 
-        sourceBuilder
-            .AppendLine("if (testRunner == null)")
+        writer
+            .WriteLine("if (testRunner == null)")
             .BeginBlock("{")
-            .AppendLine("throw new global::System.InvalidOperationException(\"TestRunner has not been assigned to the test fixture.\");")
+            .WriteLine("throw new global::System.InvalidOperationException(\"TestRunner has not been assigned to the test fixture.\");")
             .EndBlock("}");
     }
 }

@@ -20,24 +20,24 @@ public class XUnitCSharpTestMethod : CSharpTestMethod
     }
 
     protected override void RenderTestRunnerLookupTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
         // For xUnit test runners are scoped to the whole feature execution lifetime
-        sourceBuilder.Append("global::Reqnroll.ITestRunner");
+        writer.Write("global::Reqnroll.ITestRunner");
 
         if (renderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append('?');
+            writer.Write('?');
         }
         
-        sourceBuilder.AppendLine(" testRunner = _lifetime.TestRunner;");
+        writer.WriteLine(" testRunner = _lifetime.TestRunner;");
 
-        sourceBuilder
-            .AppendLine("if (testRunner == null)")
+        writer
+            .WriteLine("if (testRunner == null)")
             .BeginBlock("{")
-            .AppendLine("throw new global::System.InvalidOperationException(\"The test fixture lifecycle has not been initialized.\");")
+            .WriteLine("throw new global::System.InvalidOperationException(\"The test fixture lifecycle has not been initialized.\");")
             .EndBlock("}");
     }
 }

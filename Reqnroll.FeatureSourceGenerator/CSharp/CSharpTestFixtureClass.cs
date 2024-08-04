@@ -48,27 +48,27 @@ public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFix
 
     public override SourceText Render(CancellationToken cancellationToken = default)
     {
-        var buffer = new CSharpSourceTextBuilder();
+        var buffer = new CSharpSourceTextWriter();
 
         RenderTo(buffer, cancellationToken);
 
         return SourceText.From(buffer.ToString(), Encoding);
     }
 
-    public void RenderTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken = default)
+    public void RenderTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken = default)
     {
         
-        sourceBuilder.Append("namespace ").Append(Identifier.Namespace).AppendLine();
-        sourceBuilder.BeginBlock("{");
+        writer.Write("namespace ").Write(Identifier.Namespace).WriteLine();
+        writer.BeginBlock("{");
 
         if (!NamespaceUsings.IsEmpty)
         {
             foreach (var import in NamespaceUsings)
             {
-                sourceBuilder.Append("using ").Append(import).AppendLine(";");
+                writer.Write("using ").Write(import).WriteLine(";");
             }
 
-            sourceBuilder.AppendLine();
+            writer.WriteLine();
         }
 
         if (!Attributes.IsEmpty)
@@ -76,98 +76,97 @@ public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFix
             foreach (var attribute in Attributes)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                sourceBuilder.AppendAttributeBlock(attribute);
-                sourceBuilder.AppendLine();
+                writer.WriteAttributeBlock(attribute);
+                writer.WriteLine();
             }
         }
-
-        sourceBuilder.Append("public partial class ").AppendTypeReference(Identifier.LocalType);
-
-        if (!Interfaces.IsEmpty)
-        {
-            sourceBuilder.Append(" :").AppendTypeReference(Interfaces[0]);
-
-            for (var i = 1; i < Interfaces.Length; i++)
-            {
-                sourceBuilder.Append(" ,").AppendTypeReference(Interfaces[i]);
-            }
-        }
-
-        sourceBuilder.AppendLine();
-
-        sourceBuilder.BeginBlock("{");
 
         if (RenderingOptions.EnableLineMapping && FeatureInformation.FilePath != null)
         {
-            sourceBuilder.AppendDirective($"#line 1 \"{FeatureInformation.FilePath}\"");
-            sourceBuilder.AppendDirective("#line hidden");
-            sourceBuilder.AppendLine();
+            writer.WriteDirective("#line hidden");
+            writer.WriteLine();
         }
 
-        RenderTestFixtureContentTo(sourceBuilder, cancellationToken);
+        writer.Write("public partial class ").WriteTypeReference(Identifier.LocalType);
 
-        sourceBuilder.EndBlock("}");
-        sourceBuilder.EndBlock("}");
+        if (!Interfaces.IsEmpty)
+        {
+            writer.Write(" :").WriteTypeReference(Interfaces[0]);
+
+            for (var i = 1; i < Interfaces.Length; i++)
+            {
+                writer.Write(" ,").WriteTypeReference(Interfaces[i]);
+            }
+        }
+
+        writer.WriteLine();
+
+        writer.BeginBlock("{");
+
+        RenderTestFixtureContentTo(writer, cancellationToken);
+
+        writer.EndBlock("}");
+        writer.EndBlock("}");
     }
 
-    protected virtual void RenderTestFixtureContentTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected virtual void RenderTestFixtureContentTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
-        RenderFeatureInformationPropertiesTo(sourceBuilder);
+        RenderFeatureInformationPropertiesTo(writer);
 
-        RenderScenarioInitializeMethodTo(sourceBuilder, cancellationToken);
+        RenderScenarioInitializeMethodTo(writer, cancellationToken);
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        RenderMethodsTo(sourceBuilder, cancellationToken);
+        RenderMethodsTo(writer, cancellationToken);
     }
 
-    private void RenderFeatureInformationPropertiesTo(CSharpSourceTextBuilder sourceBuilder)
+    private void RenderFeatureInformationPropertiesTo(CSharpSourceTextWriter writer)
     {
-        sourceBuilder
-            .Append("private static readonly string[] FeatureTags = new string[] { ")
-            .AppendLiteralList(FeatureInformation.Tags)
-            .AppendLine(" };");
+        writer
+            .Write("private static readonly string[] FeatureTags = new string[] { ")
+            .WriteLiteralList(FeatureInformation.Tags)
+            .WriteLine(" };");
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        sourceBuilder
-            .AppendLine("private static readonly global::Reqnroll.FeatureInfo FeatureInfo = new global::Reqnroll.FeatureInfo(")
+        writer
+            .WriteLine("private static readonly global::Reqnroll.FeatureInfo FeatureInfo = new global::Reqnroll.FeatureInfo(")
             .BeginBlock()
-            .Append("new global::System.Globalization.CultureInfo(").AppendLiteral(FeatureInformation.Language).AppendLine("), ")
-            .AppendLiteral(Path.GetDirectoryName(FeatureInformation.FilePath)).AppendLine(", ")
-            .AppendLiteral(FeatureInformation.Name).AppendLine(", ")
-            .AppendLiteral(FeatureInformation.Description).AppendLine(", ")
-            .AppendLine("global::Reqnroll.ProgrammingLanguage.CSharp, ")
-            .AppendLine("FeatureTags);")
+            .Write("new global::System.Globalization.CultureInfo(").WriteLiteral(FeatureInformation.Language).WriteLine("), ")
+            .WriteLiteral(Path.GetDirectoryName(FeatureInformation.FilePath)).WriteLine(", ")
+            .WriteLiteral(FeatureInformation.Name).WriteLine(", ")
+            .WriteLiteral(FeatureInformation.Description).WriteLine(", ")
+            .WriteLine("global::Reqnroll.ProgrammingLanguage.CSharp, ")
+            .WriteLine("FeatureTags);")
             .EndBlock();
     }
 
     private void RenderScenarioInitializeMethodTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CancellationToken cancellationToken)
     {
-        sourceBuilder.AppendLine(
+        writer.WriteLine(
             "private global::System.Threading.Tasks.Task ScenarioInitialize(" +
             "global::Reqnroll.ITestRunner testRunner, " +
             "global::Reqnroll.ScenarioInfo scenarioInfo)");
 
-        sourceBuilder.BeginBlock("{");
+        writer.BeginBlock("{");
 
-        RenderScenarioInitializeMethodBodyTo(sourceBuilder, cancellationToken);
+        RenderScenarioInitializeMethodBodyTo(writer, cancellationToken);
 
-        sourceBuilder.AppendLine("return global::System.Threading.Tasks.Task.CompletedTask;");
+        writer.WriteLine("return global::System.Threading.Tasks.Task.CompletedTask;");
 
-        sourceBuilder.EndBlock("}");
+        writer.EndBlock("}");
     }
 
     protected virtual void RenderScenarioInitializeMethodBodyTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CancellationToken cancellationToken)
     {
-        sourceBuilder.AppendLine("testRunner.OnScenarioInitialize(scenarioInfo);");
+        writer.WriteLine("testRunner.OnScenarioInitialize(scenarioInfo);");
     }
 
-    protected virtual void RenderMethodsTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected virtual void RenderMethodsTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
         var first = true;
         foreach (var method in Methods)
@@ -176,10 +175,10 @@ public class CSharpTestFixtureClass : TestFixtureClass, IEquatable<CSharpTestFix
 
             if (!first)
             {
-                sourceBuilder.AppendLine();
+                writer.WriteLine();
             }
 
-            method.RenderTo(sourceBuilder, RenderingOptions);
+            method.RenderTo(writer, RenderingOptions);
 
             if (first)
             {

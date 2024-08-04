@@ -6,12 +6,12 @@ namespace Reqnroll.FeatureSourceGenerator.CSharp;
 public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
 {
     public CSharpTestMethod(
-    IdentifierString identifier,
-    ScenarioInformation scenario,
-    ImmutableArray<StepInvocation> stepInvocations,
-    ImmutableArray<AttributeDescriptor> attributes = default,
-    ImmutableArray<ParameterDescriptor> parameters = default,
-    ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters = default) 
+        IdentifierString identifier,
+        ScenarioInformation scenario,
+        ImmutableArray<StepInvocation> stepInvocations,
+        ImmutableArray<AttributeDescriptor> attributes = default,
+        ImmutableArray<ParameterDescriptor> parameters = default,
+        ImmutableArray<KeyValuePair<string, IdentifierString>> scenarioParameters = default) 
         : base(identifier, scenario, stepInvocations, attributes, parameters, scenarioParameters)
     {
     }
@@ -27,7 +27,7 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
     public override int GetHashCode() => base.GetHashCode();
 
     public void RenderTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken = default)
     {
@@ -36,17 +36,17 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
             foreach (var attribute in Attributes)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-                sourceBuilder.AppendAttributeBlock(attribute);
-                sourceBuilder.AppendLine();
+                writer.WriteAttributeBlock(attribute);
+                writer.WriteLine();
             }
         }
 
         // Our test methods are always asynchronous and never return a value.
-        sourceBuilder.Append("public async Task ").Append(Identifier);
+        writer.Write("public async Task ").Write(Identifier);
 
         if (!Parameters.IsEmpty)
         {
-            sourceBuilder.BeginBlock("(");
+            writer.BeginBlock("(");
 
             var first = true;
             foreach (var parameter in Parameters)
@@ -54,104 +54,114 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
                 cancellationToken.ThrowIfCancellationRequested();
                 if (!first)
                 {
-                    sourceBuilder.AppendLine(",");
+                    writer.WriteLine(",");
                 }
 
-                sourceBuilder
-                    .AppendTypeReference(parameter.Type)
-                    .Append(' ')
-                    .Append(parameter.Name);
+                writer
+                    .WriteTypeReference(parameter.Type)
+                    .Write(' ')
+                    .Write(parameter.Name);
 
                 first = false;
             }
 
-            sourceBuilder.EndBlock(")");
+            writer.EndBlock(")");
         }
         else
         {
-            sourceBuilder.AppendLine("()");
+            writer.WriteLine("()");
         }
 
-        sourceBuilder.BeginBlock("{");
+        writer.BeginBlock("{");
 
-        RenderMethodBodyTo(sourceBuilder, renderingOptions, cancellationToken);
+        RenderMethodBodyTo(writer, renderingOptions, cancellationToken);
 
-        sourceBuilder.EndBlock("}");
+        writer.EndBlock("}");
     }
 
     protected virtual void RenderMethodBodyTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        RenderTestRunnerLookupTo(sourceBuilder, renderingOptions, cancellationToken);
-        sourceBuilder.AppendLine();
+        RenderTestRunnerLookupTo(writer, renderingOptions, cancellationToken);
+        writer.WriteLine();
 
-        RenderScenarioInfoTo(sourceBuilder, renderingOptions, cancellationToken);
-        sourceBuilder.AppendLine();
+        RenderScenarioInfoTo(writer, renderingOptions, cancellationToken);
+        writer.WriteLine();
 
-        sourceBuilder.AppendLine("try");
-        sourceBuilder.BeginBlock("{");
-
-        if (renderingOptions.EnableLineMapping)
-        {
-            sourceBuilder.AppendDirective($"#line {Scenario.LineNumber}");
-        }
-
-        sourceBuilder.AppendLine("await ScenarioInitialize(testRunner, scenarioInfo);");
+        writer.WriteLine("try");
+        writer.BeginBlock("{");
 
         if (renderingOptions.EnableLineMapping)
         {
-            sourceBuilder.AppendDirective("#line hidden");
+            writer.WriteLineDirective(
+                Scenario.KeywordAndNamePosition.StartLinePosition,
+                Scenario.KeywordAndNamePosition.EndLinePosition,
+                writer.NewLineOffset,
+                Scenario.KeywordAndNamePosition.Path);
         }
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine("await ScenarioInitialize(testRunner, scenarioInfo);");
 
-        sourceBuilder.AppendLine("if (global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags))");
-        sourceBuilder.BeginBlock("{");
-        sourceBuilder.AppendLine("testRunner.SkipScenario();");
-        sourceBuilder.EndBlock("}");
-        sourceBuilder.AppendLine("else");
-        sourceBuilder.BeginBlock("{");
-        sourceBuilder.AppendLine("await testRunner.OnScenarioStartAsync();");
-        sourceBuilder.AppendLine();
-        sourceBuilder.AppendLine("// start: invocation of scenario steps");
+        if (renderingOptions.EnableLineMapping)
+        {
+            writer.WriteDirective("#line hidden");
+        }
+
+        writer.WriteLine();
+
+        writer.WriteLine("if (global::Reqnroll.TagHelper.ContainsIgnoreTag(scenarioInfo.CombinedTags))");
+        writer.BeginBlock("{");
+        writer.WriteLine("testRunner.SkipScenario();");
+        writer.EndBlock("}");
+        writer.WriteLine("else");
+        writer.BeginBlock("{");
+        writer.WriteLine("await testRunner.OnScenarioStartAsync();");
+        writer.WriteLine();
+        writer.WriteLine("// start: invocation of scenario steps");
 
         foreach (var invocation in StepInvocations)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            RenderScenarioStepInvocationTo(invocation, sourceBuilder, renderingOptions, cancellationToken);
+            RenderScenarioStepInvocationTo(invocation, writer, renderingOptions, cancellationToken);
         }
 
-        sourceBuilder.AppendLine("// end: invocation of scenario steps");
-        sourceBuilder.EndBlock("}");
-        sourceBuilder.AppendLine();
-        sourceBuilder.AppendLine("// finishing the scenario");
-        sourceBuilder.AppendLine("await testRunner.CollectScenarioErrorsAsync();");
+        writer.WriteLine("// end: invocation of scenario steps");
+        writer.EndBlock("}");
+        writer.WriteLine();
+        writer.WriteLine("// finishing the scenario");
+        writer.WriteLine("await testRunner.CollectScenarioErrorsAsync();");
 
-        sourceBuilder.EndBlock("}");
-        sourceBuilder.AppendLine("finally");
-        sourceBuilder.BeginBlock("{");
-        sourceBuilder.AppendLine("await testRunner.OnScenarioEndAsync();");
-        sourceBuilder.EndBlock("}");
+        writer.EndBlock("}");
+        writer.WriteLine("finally");
+        writer.BeginBlock("{");
+        writer.WriteLine("await testRunner.OnScenarioEndAsync();");
+        writer.EndBlock("}");
     }
 
     protected virtual void RenderScenarioStepInvocationTo(
         StepInvocation invocation,
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
-        if (renderingOptions.EnableLineMapping)
+        var position = invocation.Position;
+
+        if (position.Path != null && renderingOptions.EnableLineMapping)
         {
-            sourceBuilder.AppendDirective($"#line {invocation.SourceLineNumber}");
+            writer.WriteLineDirective(
+                position.StartLinePosition,
+                position.EndLinePosition,
+                writer.NewLineOffset,
+                position.Path);
         }
 
-        sourceBuilder
-            .Append("await testRunner.")
-            .Append(
+        writer
+            .Write("await testRunner.")
+            .Write(
                 invocation.Type switch
                 {
                     StepType.Context => "Given",
@@ -160,88 +170,88 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
                     StepType.Conjunction => "And",
                     _ => throw new NotSupportedException()
                 })
-            .Append("Async(");
+            .Write("Async(");
 
         if (invocation.Arguments.IsEmpty)
         {
-            sourceBuilder.AppendLiteral(invocation.Text);
+            writer.WriteLiteral(invocation.Text);
         }
         else
         {
-            sourceBuilder.Append("string.Format(").AppendLiteral(invocation.Text);
+            writer.Write("string.Format(").WriteLiteral(invocation.Text);
 
             foreach (var argument in invocation.Arguments)
             {
-                sourceBuilder.Append(", ").Append(argument);
+                writer.Write(", ").Write(argument);
             }
 
-            sourceBuilder.Append(")");
+            writer.Write(")");
         }
 
-        sourceBuilder
-            .Append(", null, null, ")
-            .AppendLiteral(invocation.Keyword)
-            .AppendLine(");");
+        writer
+            .Write(", null, null, ")
+            .WriteLiteral(invocation.Keyword)
+            .WriteLine(");");
 
         if (renderingOptions.EnableLineMapping)
         {
-            sourceBuilder.AppendDirective("#line hidden");
+            writer.WriteDirective("#line hidden");
         }
     }
 
     protected virtual void RenderScenarioInfoTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
-        sourceBuilder.AppendLine("// start: calculate ScenarioInfo");
-        sourceBuilder
-            .Append("var tagsOfScenario = new string[] { ")
-            .AppendLiteralList(Scenario.Tags)
-            .Append(" }");
+        writer.WriteLine("// start: calculate ScenarioInfo");
+        writer
+            .Write("var tagsOfScenario = new string[] { ")
+            .WriteLiteralList(Scenario.Tags)
+            .Write(" }");
 
         // If a parameter has been defined for passing tags from the example, include it in the scenario's tags.
         var exampleTagsParameter = Parameters.FirstOrDefault(parameter => parameter.Name == CSharpSyntax.ExampleTagsParameterName);
         if (exampleTagsParameter != null)
         {
-            sourceBuilder.Append(".Concat(").Append(exampleTagsParameter.Name).Append(").ToArray()");
+            writer.Write(".Concat(").Write(exampleTagsParameter.Name).Write(").ToArray()");
         }
-        sourceBuilder.AppendLine(";");
+        writer.WriteLine(";");
 
-        sourceBuilder.AppendLine(
+        writer.WriteLine(
             "var argumentsOfScenario = new global::System.Collections.Specialized.OrderedDictionary(); // needed for scenario outlines");
 
         foreach (var (name, value) in ParametersOfScenario)
         {
-            sourceBuilder
-                .Append("argumentsOfScenario.Add(").AppendLiteral(name).Append(", ").Append(value).Append(");");
+            writer
+                .Write("argumentsOfScenario.Add(").WriteLiteral(name).Write(", ").Write(value).Write(");");
         }
 
         if (Scenario.Rule == null)
         {
-            sourceBuilder.AppendLine("var inheritedTags = FeatureTags;");
+            writer.WriteLine("var inheritedTags = FeatureTags;");
         }
         else
         {
-            sourceBuilder
-                .Append("var ruleTags = new string[] { ")
-                .AppendLiteralList(Scenario.Rule.Tags)
-                .AppendLine(" };");
+            writer
+                .Write("var ruleTags = new string[] { ")
+                .WriteLiteralList(Scenario.Rule.Tags)
+                .WriteLine(" };");
 
-            sourceBuilder.AppendLine("var inheritedTags = FeatureTags.Concat(ruleTags).ToArray();");
+            writer.WriteLine("var inheritedTags = FeatureTags.Concat(ruleTags).ToArray();");
         }
 
-        sourceBuilder
-            .Append("var scenarioInfo = new global::Reqnroll.ScenarioInfo(")
-            .AppendLiteral(Scenario.Name)
-            .AppendLine(", null, tagsOfScenario, argumentsOfScenario, inheritedTags);");
-        sourceBuilder.AppendLine("// end: calculate ScenarioInfo");
+        writer
+            .Write("var scenarioInfo = new global::Reqnroll.ScenarioInfo(")
+            .WriteLiteral(Scenario.Name)
+            .WriteLine(", null, tagsOfScenario, argumentsOfScenario, inheritedTags);");
+        writer.WriteLine("// end: calculate ScenarioInfo");
     }
 
     /// <summary>
     /// Renders the code to provide the test runner instance for the test method.
     /// </summary>
-    /// <param name="sourceBuilder">The source builder to append the code to.</param>
+    /// <param name="writer">The source builder to append the code to.</param>
     /// <param name="renderingOptions">Options which control the rendering of the C# code.</param>
     /// <param name="cancellationToken">A token used to signal when rendering should be canceled.</param>
     /// <remarks>
@@ -252,10 +262,10 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
     /// </list>
     /// </remarks>
     protected virtual void RenderTestRunnerLookupTo(
-        CSharpSourceTextBuilder sourceBuilder,
+        CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
-        sourceBuilder.AppendLine("var testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();");
+        writer.WriteLine("var testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();");
     }
 }

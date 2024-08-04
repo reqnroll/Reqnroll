@@ -23,68 +23,68 @@ public class NUnitCSharpTestFixtureClass : CSharpTestFixtureClass
     {
     }
 
-    protected override void RenderTestFixtureContentTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected override void RenderTestFixtureContentTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
-        sourceBuilder.Append("private global::Reqnroll.ITestRunner");
+        writer.Write("private global::Reqnroll.ITestRunner");
 
         if (RenderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append('?');
+            writer.Write('?');
         }
         
-        sourceBuilder.AppendLine(" _testRunner;");
+        writer.WriteLine(" _testRunner;");
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        RenderFeatureSetupMethodTo(sourceBuilder);
+        RenderFeatureSetupMethodTo(writer);
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        RenderFeatureTearDownMethodTo(sourceBuilder);
+        RenderFeatureTearDownMethodTo(writer);
 
-        sourceBuilder.AppendLine();
+        writer.WriteLine();
 
-        base.RenderTestFixtureContentTo(sourceBuilder, cancellationToken);
+        base.RenderTestFixtureContentTo(writer, cancellationToken);
     }
 
-    private void RenderFeatureSetupMethodTo(CSharpSourceTextBuilder sourceBuilder)
+    private void RenderFeatureSetupMethodTo(CSharpSourceTextWriter writer)
     {
-        sourceBuilder
-            .AppendLine("[global::NUnit.Framework.OneTimeSetUp]")
-            .AppendLine("public virtual global::System.Threading.Tasks.Task FeatureSetupAsync()")
+        writer
+            .WriteLine("[global::NUnit.Framework.OneTimeSetUp]")
+            .WriteLine("public virtual global::System.Threading.Tasks.Task FeatureSetupAsync()")
             .BeginBlock("{")
-            .AppendLine("_testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();")
-            .AppendLine("return _testRunner.OnFeatureStartAsync(FeatureInfo);")
+            .WriteLine("_testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();")
+            .WriteLine("return _testRunner.OnFeatureStartAsync(FeatureInfo);")
             .EndBlock("}");
     }
 
-    private void RenderFeatureTearDownMethodTo(CSharpSourceTextBuilder sourceBuilder)
+    private void RenderFeatureTearDownMethodTo(CSharpSourceTextWriter writer)
     {
-        sourceBuilder
-            .AppendLine("[global::NUnit.Framework.OneTimeTearDown]")
-            .AppendLine("public async virtual global::System.Threading.Tasks.Task FeatureTearDownAsync()")
+        writer
+            .WriteLine("[global::NUnit.Framework.OneTimeTearDown]")
+            .WriteLine("public async virtual global::System.Threading.Tasks.Task FeatureTearDownAsync()")
             .BeginBlock("{");
 
-        sourceBuilder.Append("await _testRunner");
+        writer.Write("await _testRunner");
 
         if (RenderingOptions.UseNullableReferenceTypes)
         {
-            sourceBuilder.Append('!');
+            writer.Write('!');
         }
 
-        sourceBuilder.AppendLine(".OnFeatureEndAsync();");
+        writer.WriteLine(".OnFeatureEndAsync();");
 
-        sourceBuilder
-            .AppendLine("global::Reqnroll.TestRunnerManager.ReleaseTestRunner(_testRunner);")
-            .AppendLine("_testRunner = null;")
+        writer
+            .WriteLine("global::Reqnroll.TestRunnerManager.ReleaseTestRunner(_testRunner);")
+            .WriteLine("_testRunner = null;")
             .EndBlock("}");
     }
 
-    protected override void RenderScenarioInitializeMethodBodyTo(CSharpSourceTextBuilder sourceBuilder, CancellationToken cancellationToken)
+    protected override void RenderScenarioInitializeMethodBodyTo(CSharpSourceTextWriter writer, CancellationToken cancellationToken)
     {
-        base.RenderScenarioInitializeMethodBodyTo(sourceBuilder, cancellationToken);
+        base.RenderScenarioInitializeMethodBodyTo(writer, cancellationToken);
 
-        sourceBuilder.AppendLine(
+        writer.WriteLine(
             "testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<global::NUnit.Framework.TestContext>(" +
             "global::NUnit.Framework.TestContext.CurrentContext);");
     }
