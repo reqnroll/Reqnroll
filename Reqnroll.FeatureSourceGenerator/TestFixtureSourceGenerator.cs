@@ -1,10 +1,8 @@
 ﻿using Gherkin;
 using Gherkin.Ast;
-using Microsoft.CodeAnalysis;
 using Reqnroll.FeatureSourceGenerator.Gherkin;
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
-using System.Diagnostics;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
@@ -217,15 +215,13 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     feature.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray(),
                     featureFile.Path);
 
-                var scenarioInformations = feature.Children
-                    .SelectMany(child => CreateScenarioInformations(featureFile.Path, child, emitIgnoredExamples, cancellationToken))
-                    .ToImmutableArray();
+                var scenarioInformations = CreateScenarioInformations(featureFile.Path, feature, emitIgnoredExamples, cancellationToken);
 
                 return
                 [
                     new TestFixtureGenerationContext<TCompilationInformation>(
                         featureInformation,
-                        scenarioInformations,
+                        scenarioInformations.ToImmutableArray(),
                         featureHintName,
                         new NamespaceString(testFixtureNamespace),
                         compilationInfo,
@@ -278,27 +274,96 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
 
     private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
         string sourceFilePath,
-        IHasLocation child,
+        Feature feature,
         bool emitIgnoredExamples,
         CancellationToken cancellationToken)
     {
-        return child switch
+        var children = feature.Children.ToList();
+
+        var scenarios = new List<ScenarioInformation>();
+        var backgroundSteps = new List<SourceModel.Step>();
+
+        if (children.FirstOrDefault() is Background background)
         {
-            Scenario scenario => [CreateScenarioInformation(sourceFilePath, scenario, emitIgnoredExamples, cancellationToken)],
-            Rule rule => CreateScenarioInformations(sourceFilePath, rule, emitIgnoredExamples, cancellationToken),
-            _ => []
-        };
+            PopulateSteps(backgroundSteps, sourceFilePath, background, cancellationToken);
+        }
+
+        foreach (var child in children)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            switch (child)
+            {
+                case Scenario scenario:
+                    scenarios.Add(
+                        CreateScenarioInformation(sourceFilePath, scenario, backgroundSteps, emitIgnoredExamples, cancellationToken));
+                    break;
+
+                case Rule rule:
+                    scenarios.AddRange(
+                        CreateScenarioInformations(sourceFilePath, rule, backgroundSteps, emitIgnoredExamples, cancellationToken));
+                    break;
+            }
+        }
+
+        return scenarios;
+    }
+
+    private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
+        string sourceFilePath,
+        Rule rule,
+        IReadOnlyList<SourceModel.Step> backgroundSteps,
+        bool emitIgnoredExamples,
+        CancellationToken cancellationToken)
+    {
+        var tags = rule.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray();
+
+        var children = rule.Children.ToList();
+
+        var scenarios = new List<ScenarioInformation>();
+        var combinedBackgroundSteps = backgroundSteps.ToList();
+
+        if (children.FirstOrDefault() is Background background)
+        {
+            PopulateSteps(combinedBackgroundSteps, sourceFilePath, background, cancellationToken);
+        }
+
+        foreach (var child in rule.Children)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            switch (child)
+            {
+                case Scenario scenario:
+                    yield return CreateScenarioInformation(
+                        sourceFilePath,
+                        scenario,
+                        combinedBackgroundSteps,
+                        new RuleInformation(rule.Name, tags),
+                        emitIgnoredExamples,
+                        cancellationToken);
+                    break;
+            }
+        }
     }
 
     private static ScenarioInformation CreateScenarioInformation(
         string sourceFilePath,
         Scenario scenario,
+        IReadOnlyList<SourceModel.Step> backgroundSteps,
         bool emitIgnoredExamples,
-        CancellationToken cancellationToken) => CreateScenarioInformation(sourceFilePath, scenario, null, emitIgnoredExamples, cancellationToken);
+        CancellationToken cancellationToken) => CreateScenarioInformation(
+            sourceFilePath,
+            scenario,
+            backgroundSteps,
+            null,
+            emitIgnoredExamples,
+            cancellationToken);
 
     private static ScenarioInformation CreateScenarioInformation(
         string sourceFilePath,
         Scenario scenario,
+        IReadOnlyList<SourceModel.Step> backgroundSteps,
         RuleInformation? rule,
         bool emitIgnoredExamples,
         CancellationToken cancellationToken)
@@ -322,9 +387,31 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             exampleSets.Add(examples);
         }
 
-        var steps = new List<ScenarioStep>();
+        var steps = backgroundSteps.ToList();
+        PopulateSteps(steps, sourceFilePath, scenario, cancellationToken);
 
-        foreach (var step in scenario.Steps)
+        var keywordAndNameStartPosition = new LinePosition(scenario.Location.Line, scenario.Location.Column);
+        // We assume as single character gap between keyword and scenario name; could be more.
+        var keywordAndNameEndPosition = new LinePosition(
+            scenario.Location.Line,
+            scenario.Location.Column + scenario.Keyword.Length + scenario.Name.Length + 1);
+
+        return new ScenarioInformation(
+            scenario.Name,
+            new FileLinePositionSpan(sourceFilePath, keywordAndNameStartPosition, keywordAndNameEndPosition),
+            scenario.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray(),
+            steps.ToImmutableArray(),
+            exampleSets.ToImmutableArray(),
+            rule);
+    }
+
+    private static void PopulateSteps(
+        List<SourceModel.Step> steps,
+        string sourceFilePath,
+        StepsContainer container,
+        CancellationToken cancellationToken)
+    {
+        foreach (var step in container.Steps)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -333,7 +420,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             var endPosition = new LinePosition(startPosition.Line, startPosition.Character + step.Keyword.Length + step.Text.Length + 1);
             var position = new FileLinePositionSpan(sourceFilePath, new LinePositionSpan(startPosition, endPosition));
 
-            var scenarioStep = new ScenarioStep(
+            var scenarioStep = new SourceModel.Step(
                 step.KeywordType switch
                 {
                     StepKeywordType.Context => StepType.Context,
@@ -347,46 +434,6 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 position);
 
             steps.Add(scenarioStep);
-        }
-
-        var keywordAndNameStartPosition = new LinePosition(scenario.Location.Line, scenario.Location.Column);
-        // We assume as single character gap between keyword and scenario name; could be more.
-        var keywordAndNameEndPosition = new LinePosition(
-            scenario.Location.Line, 
-            scenario.Location.Column + scenario.Keyword.Length + scenario.Name.Length + 1);
-
-        return new ScenarioInformation(
-            scenario.Name,
-            new FileLinePositionSpan(sourceFilePath, keywordAndNameStartPosition, keywordAndNameEndPosition),
-            scenario.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray(),
-            steps.ToImmutableArray(),
-            exampleSets.ToImmutableArray(),
-            rule);
-    }
-
-    private static IEnumerable<ScenarioInformation> CreateScenarioInformations(
-        string sourceFilePath,
-        Rule rule,
-        bool emitIgnoredExamples,
-        CancellationToken cancellationToken)
-    {
-        var tags = rule.Tags.Select(tag => tag.Name.TrimStart('@')).ToImmutableArray();
-
-        foreach (var child in rule.Children)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            switch (child)
-            {
-                case Scenario scenario:
-                    yield return CreateScenarioInformation(
-                        sourceFilePath,
-                        scenario,
-                        new RuleInformation(rule.Name, tags),
-                        emitIgnoredExamples,
-                        cancellationToken);
-                    break;
-            }
         }
     }
 

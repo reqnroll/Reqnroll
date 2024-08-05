@@ -6,7 +6,7 @@ public class ScenarioInformation(
     string name,
     FileLinePositionSpan keywordAndNamePosition,
     ImmutableArray<string> tags,
-    ImmutableArray<ScenarioStep> steps,
+    ImmutableArray<Step> steps,
     ImmutableArray<ScenarioExampleSet> examples = default,
     RuleInformation? rule = null) : IEquatable<ScenarioInformation?>
 {
@@ -18,7 +18,7 @@ public class ScenarioInformation(
 
     public ImmutableArray<string> Tags { get; } = tags.IsDefault ? ImmutableArray<string>.Empty : tags;
 
-    public ImmutableArray<ScenarioStep> Steps { get; } = steps.IsDefault ? ImmutableArray<ScenarioStep>.Empty : steps;
+    public ImmutableArray<Step> Steps { get; } = steps.IsDefault ? ImmutableArray<Step>.Empty : steps;
 
     public ImmutableArray<ScenarioExampleSet> Examples { get; } = examples.IsDefault ? ImmutableArray<ScenarioExampleSet>.Empty : examples;
 

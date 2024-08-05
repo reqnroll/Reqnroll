@@ -24,7 +24,7 @@ public class NUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
             new FileLinePositionSpan("Sample.feature", new LinePosition(3, 0), new LinePosition(3, 24)),
             [],
             [
-                new ScenarioStep(
+                new Step(
                     StepType.Action,
                     "When",
                     "foo happens",
@@ -64,7 +64,7 @@ public class NUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
             new FileLinePositionSpan("Sample.feature", new LinePosition(3, 0), new LinePosition(3, 24)),
             [],
             [
-                new ScenarioStep(
+                new Step(
                     StepType.Action,
                     "When",
                     "foo happens",
@@ -116,7 +116,7 @@ public class NUnitCSharpTestFixtureGeneratorTests() : CSharpTestFixtureGenerator
             new FileLinePositionSpan("Sample.feature", new LinePosition(3, 0), new LinePosition(3, 24)),
             [],
             [
-                new ScenarioStep(
+                new Step(
                     StepType.Action,
                     "When",
                     "<what> happens",
