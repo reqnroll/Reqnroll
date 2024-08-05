@@ -1,6 +1,7 @@
 ﻿using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
+using Reqnroll.TestProjectGenerator;
 
 namespace Reqnroll.SystemTests.Generation;
 
@@ -285,6 +286,80 @@ public abstract class GenerationTestBase : SystemTestBase
             "-> parameters: what1=nothing,person=you:StepBinding",
             "-> parameters: what2=something,person=me:StepBinding",
             "-> parameters: what2=nothing,person=you:StepBinding");
+    }
+
+    #endregion
+
+    #region Test background support (backgrounds steps are executed at the appropriate times)
+
+    [TestMethod]
+    public void Handles_scenario_with_backgrounds()
+    {
+        AddFeatureFile(
+            """
+            Feature: Sample Feature
+
+            Background:
+                Given background step 1 is called
+
+            Scenario: Background Scenario Steps
+                When scenario step is called
+
+            Rule: Rule with background
+                Background:
+                    Given background step 2 is called
+                    
+                Scenario: Rule Background Scenario Steps
+                    When scenario step is called
+
+            """);
+
+        AddBindingClass(
+            """
+            namespace Background.StepDefinitions
+            {
+                [Binding]
+                public class BackgroundStepDefinitions
+                {
+                    [Given("background step 1 is called")]
+                    public async Task GivenBackgroundStep1IsCalled()
+                    {
+                        await Task.Run(() => global::Log.LogStep() );
+                    }
+                    [Given("background step 2 is called")]
+                    public async Task GivenBackgroundStep2IsCalled()
+                    {
+                        await Task.Run(() => global::Log.LogStep() );
+                    }
+                    [When("scenario step is called")]
+                    public async Task WhenScenarioStepIsCalled()
+                    {
+                        await Task.Run(() => global::Log.LogStep() );
+                    }
+                }
+            }
+            """);
+
+        ExecuteTests();
+
+        var results = _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults;
+
+        results.Should().ContainSingle(tr => tr.TestName == "Background Scenario Steps" || tr.TestName == "BackgroundScenarioSteps")
+            .Which.Steps.Should().BeEquivalentTo(
+            [
+                new TestStepResult { Step = "Given background step 1 is called" },
+                new TestStepResult { Step = "When scenario step is called" }
+            ]);
+
+        results.Should().ContainSingle(tr => tr.TestName == "Rule Background Scenario Steps" || tr.TestName == "RuleBackgroundScenarioSteps")
+            .Which.Steps.Should().BeEquivalentTo(
+            [
+                new TestStepResult { Step = "Given background step 1 is called" },
+                new TestStepResult { Step = "Given background step 2 is called" },
+                new TestStepResult { Step = "When scenario step is called" }
+            ]);
+
+        ShouldAllScenariosPass();
     }
 
     #endregion
