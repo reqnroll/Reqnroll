@@ -5,6 +5,9 @@ namespace Reqnroll.Events
 {
     public class ExecutionEvent : IExecutionEvent
     {
+        public DateTime Timestamp { get; }
+
+        public ExecutionEvent() => Timestamp = DateTime.Now;
     }
 
     public class TestRunStartedEvent : ExecutionEvent
