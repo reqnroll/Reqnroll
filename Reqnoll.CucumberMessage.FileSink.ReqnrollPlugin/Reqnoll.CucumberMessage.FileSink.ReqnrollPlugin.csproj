@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="6.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Reqnroll\Reqnroll.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Cucumber.Messages">
+      <HintPath>..\..\cucumber\messages\dotnet\Cucumber.Messages\bin\Debug\netstandard2.0\Cucumber.Messages.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+</Project>
