@@ -48,7 +48,7 @@ internal static class GherkinSyntaxParser
 
     private static Microsoft.CodeAnalysis.Location CreateLocation(Location location, SourceText text, string path)
     {
-        var start = text.Lines[location.Line].Start + location.Column;
+        var start = text.Lines[location.Line - 1].Start + location.Column;
 
         return Microsoft.CodeAnalysis.Location.Create(
             path,

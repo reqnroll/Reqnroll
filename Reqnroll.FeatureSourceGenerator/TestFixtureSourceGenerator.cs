@@ -3,6 +3,7 @@ using Gherkin.Ast;
 using Reqnroll.FeatureSourceGenerator.Gherkin;
 using Reqnroll.FeatureSourceGenerator.SourceModel;
 using System.Collections.Immutable;
+using System.Diagnostics;
 
 namespace Reqnroll.FeatureSourceGenerator;
 
@@ -92,6 +93,14 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 var (((featureFile, optionsProvider), compilationInfo), generatorInformation) = input;
 
                 var options = optionsProvider.GetOptions(featureFile);
+
+                // Launch a debugger if configured.
+                if (options.TryGetValue("reqnroll_feature_source_generator.launch_debugger", out var launchDebuggerValue) &&
+                    bool.TryParse(launchDebuggerValue, out var launchDebugger) &&
+                    launchDebugger)
+                {
+                    Debugger.Launch();
+                }
 
                 var source = featureFile.GetText(cancellationToken);
 
