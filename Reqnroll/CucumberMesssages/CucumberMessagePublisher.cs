@@ -9,15 +9,19 @@ using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.CucumberMesssages
 {
-    public class CucumberMessagePublisher
+    public class CucumberMessagePublisher : ICucumberMessagePublisher
     {
         private ICucumberMessageBroker broker;
 
-        public CucumberMessagePublisher(ITestThreadExecutionEventPublisher eventSource, ICucumberMessageBroker CucumberMessageBroker)
+        public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker)
         {
             broker = CucumberMessageBroker;
-            eventSource.AddHandler<FeatureStartedEvent>(FeatureStartedEventHandler);
-            eventSource.AddHandler<FeatureFinishedEvent>(FeatureFinishedEventHandler);
+        }
+
+        public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
+        {
+            testThreadEventPublisher.AddHandler<FeatureStartedEvent>(FeatureStartedEventHandler);
+            testThreadEventPublisher.AddHandler<FeatureFinishedEvent>(FeatureFinishedEventHandler);
         }
 
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
