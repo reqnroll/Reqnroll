@@ -197,6 +197,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     // CONSIDER: Using a parser that doesn't throw exceptions for syntax errors.
                     // CONSIDER: Using a parser that uses Roslyn text data-types.
                     // CONSIDER: Using a parser that supports incremental parsing.
+                    // CONSIDER: Using a parser that provides human-readable syntax errors.
                     document = parser.Parse(new SourceTokenScanner(source));
                 }
                 catch (CompositeParserException ex)
@@ -399,7 +400,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
         var steps = backgroundSteps.ToList();
         PopulateSteps(steps, sourceFilePath, scenario, cancellationToken);
 
-        var keywordAndNameStartPosition = new LinePosition(scenario.Location.Line, scenario.Location.Column);
+        var keywordAndNameStartPosition = scenario.Location.ToLinePosition();
         // We assume as single character gap between keyword and scenario name; could be more.
         var keywordAndNameEndPosition = new LinePosition(
             scenario.Location.Line,
@@ -424,7 +425,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var startPosition = new LinePosition(step.Location.Line, step.Location.Column);
+            var startPosition = step.Location.ToLinePosition();
             // We assume as single character gap between keyword and step text; could be more.
             var endPosition = new LinePosition(startPosition.Line, startPosition.Character + step.Keyword.Length + step.Text.Length + 1);
             var position = new FileLinePositionSpan(sourceFilePath, new LinePositionSpan(startPosition, endPosition));

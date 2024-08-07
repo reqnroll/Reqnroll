@@ -48,13 +48,16 @@ internal static class GherkinSyntaxParser
 
     private static Microsoft.CodeAnalysis.Location CreateLocation(Location location, SourceText text, string path)
     {
-        var start = text.Lines[location.Line - 1].Start + location.Column;
+        // Roslyn uses 0-based indexes for line and character-offset numbers.
+        // The Gherkin parser uses 1-based indexes for line and column numbers.
+        var positionStart = location.ToLinePosition();
+        var line = text.Lines[positionStart.Line];
+        var lineLength = line.Span.Length;
+        var positionEnd = new LinePosition(positionStart.Line, lineLength);
 
         return Microsoft.CodeAnalysis.Location.Create(
             path,
-            new TextSpan(start, 0),
-            new LinePositionSpan(
-                new LinePosition(location.Line, location.Column),
-                new LinePosition(location.Line, location.Column)));
+            new TextSpan(line.Span.Start + positionStart.Character, lineLength - positionStart.Character),
+            new LinePositionSpan(positionStart, positionEnd)); ;
     }
 }

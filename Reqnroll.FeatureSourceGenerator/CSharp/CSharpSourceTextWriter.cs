@@ -191,7 +191,10 @@ public class CSharpSourceTextWriter
 
     public CSharpSourceTextWriter WriteLineDirective(LinePosition start, LinePosition end, int offset, string filePath)
     {
-        return WriteDirective($"#line ({start.Line}, {start.Character}) - ({end.Line}, {end.Character}) {offset} \"{filePath}\"");
+        // Roslyn uses 0-based indexing for line number and character offset values.
+        // #line directives use 1-based indexing for line number of character offset values.
+        return WriteDirective(
+            $"#line ({start.Line + 1}, {start.Character + 1}) - ({end.Line + 1}, {end.Character + 1}) {offset} \"{filePath}\"");
     }
 
     public CSharpSourceTextWriter WriteDirective(string directive)
