@@ -4,6 +4,10 @@ using Reqnroll.UnitTestProvider;
 using Io.Cucumber.Messages;
 using Cucumber.Messages;
 using Io.Cucumber.Messages.Types;
+using System.Reflection;
+using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
+
+[assembly: RuntimePlugin(typeof(FileSinkPlugin))]
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 {
@@ -25,7 +29,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 {
                     Write(featureName, Serialize(message.Envelope));
                 }
-                else 
+                else
                 {
                     CloseFeatureStream(featureName);
                 }

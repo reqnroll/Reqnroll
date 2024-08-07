@@ -4,6 +4,9 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Title>Reqnroll Plugin which publishes test results as Cucumber Messages</Title>
+    <PackageIcon />
   </PropertyGroup>
 
   <ItemGroup>
@@ -11,12 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Reference Include="Cucumber.Messages">
-      <HintPath>..\..\cucumber\messages\dotnet\Cucumber.Messages\bin\Debug\netstandard2.0\Cucumber.Messages.dll</HintPath>
+      <HintPath>..\..\..\cucumber\messages\dotnet\Cucumber.Messages\bin\Debug\netstandard2.0\Cucumber.Messages.dll</HintPath>
     </Reference>
   </ItemGroup>
 
