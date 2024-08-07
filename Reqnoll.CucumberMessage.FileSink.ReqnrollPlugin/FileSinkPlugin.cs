@@ -27,7 +27,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 }
                 else 
                 {
-                    CloseFeature(featureName);
+                    CloseFeatureStream(featureName);
                 }
             }
         }
@@ -48,7 +48,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             fileStreams[featureName].WriteLine(cucumberMessage);
         }
 
-        private void CloseFeature(string featureName)
+        private void CloseFeatureStream(string featureName)
         {
             fileStreams[featureName].Close();
             fileStreams.Remove(featureName);

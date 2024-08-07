@@ -1,4 +1,5 @@
-﻿using Reqnroll.Plugins;
+﻿using Reqnroll.Events;
+using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using System.Collections.Generic;
 using System.Threading.Channels;
@@ -30,6 +31,12 @@ namespace Reqnroll.CucumberMesssages
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) => args.ObjectContainer.RegisterInstanceAs<ICucumberMessageSink>(this);
+            runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
+                {
+                    var publisher = args.ObjectContainer.Resolve<ICucumberMessagePublisher>();
+                    var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
+                    publisher.HookIntoTestThreadExecutionEventPublisher(testThreadExecutionEventPublisher);
+                };
         }
 
     }
