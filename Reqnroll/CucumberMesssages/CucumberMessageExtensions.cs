@@ -8,7 +8,6 @@ using System.Threading.Channels;
 
 namespace Reqnroll.CucumberMesssages
 {
-#if NETSTANDARD2_0
     public static class CucumberMessageExtensions
     {
         public static async IAsyncEnumerable<T> ReadAllAsync<T>(this ChannelReader<T> reader,
@@ -23,5 +22,4 @@ namespace Reqnroll.CucumberMesssages
             }
         }
     }
-#endif
 }
