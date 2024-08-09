@@ -19,8 +19,14 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private CucumberMessageSinkBase sinkBase = new CucumberMessageSinkBase();
 
+        public FileSinkPlugin()
+        {
+            Debugger.Launch();
+        }
+
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
+
             sinkBase.Initialize(runtimePluginEvents, runtimePluginParameters, unitTestProviderConfiguration);
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) => args.ObjectContainer.RegisterInstanceAs<ICucumberMessageSink>(this);
 
