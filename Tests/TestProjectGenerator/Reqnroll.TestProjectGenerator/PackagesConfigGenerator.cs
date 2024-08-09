@@ -38,6 +38,11 @@ namespace Reqnroll.TestProjectGenerator
                             xw.WriteAttributeString("allowedVersions", package.AllowedVersions);
                         }
 
+                        if (package.IsDevelopmentDependency)
+                        {
+                            xw.WriteAttributeString("developmentDependency", "true");
+                        }
+
                         if (!(tfm is null))
                         {
                             xw.WriteAttributeString("targetFramework", tfm);

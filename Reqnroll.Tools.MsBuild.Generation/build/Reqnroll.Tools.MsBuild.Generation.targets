@@ -41,7 +41,7 @@
   <!--
     net.sdk support: update default compile items to show generated files as nested items
   -->
-  <ItemGroup Condition="'$(_Reqnroll_EnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' ">
+  <ItemGroup Condition="'$(_Reqnroll_EnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' AND '$(ReqnrollEnableMSBuildGeneration)' == 'true' ">
     <Compile Update="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
              DependentUpon="%(Filename)"
              AutoGen="true"
@@ -53,7 +53,7 @@
 
 
   <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
-          Condition="'$(Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
+          Condition="'$(Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true' AND '$(ReqnrollEnableMSBuildGeneration)' == 'true'">
     <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
   </Target>
 
@@ -66,7 +66,8 @@
 
 
   <Target Name="UpdateFeatureFilesInProject"
-          DependsOnTargets="BeforeUpdateFeatureFilesInProject">
+          DependsOnTargets="BeforeUpdateFeatureFilesInProject"
+          Condition="'$(ReqnrollEnableMSBuildGeneration)' == 'true'">
 
     <Message Text="ReqnrollFeatureFiles: @(ReqnrollFeatureFiles)" Importance="high" Condition="'$(VerboseOutput)' == 'true'" />
 
@@ -139,11 +140,11 @@
 
   </Target>
 
-  <Target Name="BeforeUpdateFeatureFilesInProject">
+  <Target Name="BeforeUpdateFeatureFilesInProject" Condition="'$(ReqnrollEnableMSBuildGeneration)' == 'true'">
 
   </Target>
 
-  <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject">
+  <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject" Condition="'$(ReqnrollEnableMSBuildGeneration)' == 'true'">
     <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
       <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
@@ -156,11 +157,11 @@
     
   </Target>
 
-  <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject">
+  <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject" Condition="'$(ReqnrollEnableMSBuildGeneration)' == 'true'">
     <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
   </Target>
 
-  <Target Name="CleanFeatureFilesInProject" Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)' == 'true'">
+  <Target Name="CleanFeatureFilesInProject" Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)' == 'true' AND '$(ReqnrollEnableMSBuildGeneration)' == 'true'">
     <!-- remove known codebehind files for existing feature files -->
     <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
 

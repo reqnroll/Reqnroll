@@ -1,0 +1,7 @@
+<Project>
+  <Target Name="ReqnrollGeneratorSources" BeforeTargets="CoreCompile">
+    <ItemGroup>
+      <AdditionalFiles Include="%(Gherkin.Identity)" />
+    </ItemGroup>
+  </Target>
+</Project>

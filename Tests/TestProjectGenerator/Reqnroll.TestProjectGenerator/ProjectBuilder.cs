@@ -37,7 +37,8 @@ namespace Reqnroll.TestProjectGenerator
             Configuration configuration,
             CurrentVersionDriver currentVersionDriver,
             Folders folders,
-            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder)
+            TargetFrameworkMonikerStringBuilder targetFrameworkMonikerStringBuilder,
+            SourceGeneratorPlatform sourceGenerator)
         {
             _testProjectFolders = testProjectFolders;
             _featureFileGenerator = featureFileGenerator;
@@ -47,12 +48,14 @@ namespace Reqnroll.TestProjectGenerator
             _currentVersionDriver = currentVersionDriver;
             _folders = folders;
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
+            SourceGenerator = sourceGenerator;
             var projectGuidString = $"{ProjectGuid:N}".Substring(24);
             ProjectName = $"TestProj_{projectGuidString}";
         }
 
         public Guid ProjectGuid { get; } = Guid.NewGuid();
         public Configuration Configuration { get; }
+        public SourceGeneratorPlatform SourceGenerator { get; }
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
         public TargetFramework TargetFramework { get; set; } = TargetFramework.Netcoreapp31;
@@ -256,11 +259,6 @@ namespace Reqnroll.TestProjectGenerator
                         break;
                 }
 
-                if (IsReqnrollFeatureProject)
-                {
-                    _project.AddNuGetPackage("Reqnroll.Tools.MsBuild.Generation", _currentVersionDriver.ReqnrollNuGetVersion);
-                }
-
                 switch (Configuration.UnitTestProvider)
                 {
                     case UnitTestProvider.MSTest:
@@ -290,6 +288,11 @@ namespace Reqnroll.TestProjectGenerator
 
             if (IsReqnrollFeatureProject)
             {
+                if (SourceGenerator == SourceGeneratorPlatform.Roslyn)
+                {
+                    ConfigureFeatureSourceGenerator();
+                }
+
                 _project.AddNuGetPackage("Reqnroll.NUnit", _currentVersionDriver.ReqnrollNuGetVersion,
                     new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.NUnit.ReqnrollPlugin.dll"), "net462\\Reqnroll.NUnit.ReqnrollPlugin.dll"));
                 Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.NUnit", ReqnrollPluginType.Runtime));
@@ -325,10 +328,26 @@ namespace Reqnroll.TestProjectGenerator
 
             if (IsReqnrollFeatureProject)
             {
+                if (SourceGenerator == SourceGeneratorPlatform.Roslyn)
+                {
+                    ConfigureFeatureSourceGenerator();
+                }
+
                 _project.AddNuGetPackage("Reqnroll.xUnit", _currentVersionDriver.ReqnrollNuGetVersion,
                     new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.xUnit.ReqnrollPlugin.dll"), "net462\\Reqnroll.xUnit.ReqnrollPlugin.dll"));
                 Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.xUnit", ReqnrollPluginType.Runtime));
             }
+        }
+
+        private void ConfigureFeatureSourceGenerator()
+        {
+            _project.AddNuGetPackage(
+                "Reqnroll.FeatureSourceGenerator",
+                _currentVersionDriver.ReqnrollNuGetVersion,
+                isDevelopmentDependency: true,
+                assemblies: new NuGetPackageAssembly(
+                    GetReqnrollPublicAssemblyName("Reqnroll.FeatureSourceGenerator.dll"),
+                    "netstandard2.0\\Reqnroll.FeatureSourceGenerator.dll"));
         }
 
         private void ConfigureMSTest()
@@ -346,6 +365,11 @@ namespace Reqnroll.TestProjectGenerator
 
             if (IsReqnrollFeatureProject)
             {
+                if (SourceGenerator == SourceGeneratorPlatform.Roslyn)
+                {
+                    ConfigureFeatureSourceGenerator();
+                }
+
                 _project.AddNuGetPackage("Reqnroll.MSTest", _currentVersionDriver.ReqnrollNuGetVersion,
                     new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.MSTest.ReqnrollPlugin.dll"), "net462\\Reqnroll.MSTest.ReqnrollPlugin.dll"));
                 Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.MSTest", ReqnrollPluginType.Runtime));
