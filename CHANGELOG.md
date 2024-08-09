@@ -1,4 +1,4 @@
-# [vNext]
+# v2.1.0-local - 2024-08-09
 
 ## Bug fixes:
 * Modified VersionInfo class to force it to pull version information from the Reqnroll assembly

@@ -14,7 +14,7 @@ namespace Reqnroll.CucumberMesssages
     {
         private ICucumberMessageBroker broker;
         private IObjectContainer objectContainer;
-        private bool initialized = false;
+        //private bool initialized = false;
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         { 
@@ -24,11 +24,11 @@ namespace Reqnroll.CucumberMesssages
 
         public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
         {
-            if (initialized)
-            {
-                return;
-            }
-            initialized = true;
+            //if (initialized)
+            //{
+            //    return;
+            //}
+            //initialized = true;
 
             var traceListener = objectContainer.Resolve<ITraceListener>();
             traceListener.WriteTestOutput("HookIntoTestThreadExecutionEventPublisher");
