@@ -14,7 +14,6 @@ namespace Reqnroll.CucumberMesssages
     {
         protected IObjectContainer _testThreadContainer;
 
-        private ICucumberMessagePublisher _publisher;
         private Channel<ReqnrollCucumberMessage> _channel = Channel.CreateUnbounded<ReqnrollCucumberMessage>();
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
@@ -22,9 +21,6 @@ namespace Reqnroll.CucumberMesssages
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
                 _testThreadContainer = args.ObjectContainer;
-                _publisher = args.ObjectContainer.Resolve<ICucumberMessagePublisher>();
-                var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                _publisher.HookIntoTestThreadExecutionEventPublisher(testThreadExecutionEventPublisher);
             };
         }
 

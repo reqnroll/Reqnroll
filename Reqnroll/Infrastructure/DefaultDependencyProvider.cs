@@ -102,7 +102,7 @@ namespace Reqnroll.Infrastructure
 
             //Support for publishing Cucumber Messages
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
-            container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
+            container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
