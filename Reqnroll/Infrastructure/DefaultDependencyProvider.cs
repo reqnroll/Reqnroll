@@ -16,6 +16,7 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
+using Reqnroll.CucumberMesssages;
 
 namespace Reqnroll.Infrastructure
 {
@@ -98,6 +99,10 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEventEmitter, IRuntimePluginTestExecutionLifecycleEventEmitter>();
 
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
+
+            //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
+            container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
