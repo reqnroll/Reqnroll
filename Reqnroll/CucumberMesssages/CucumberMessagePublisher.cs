@@ -51,7 +51,7 @@ namespace Reqnroll.CucumberMesssages
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
-            broker.CompleteAsync(featureName);
+            broker.Complete(featureName);
         }
 
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
@@ -61,7 +61,7 @@ namespace Reqnroll.CucumberMesssages
             var traceListener = objectContainer.Resolve<ITraceListener>();
             traceListener.WriteTestOutput($"FeatureStartedEventHandler: {featureName}");
 
-            broker.PublishAsync(new ReqnrollCucumberMessage
+            broker.Publish(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
                 Envelope = Envelope.Create(new TestCaseStarted(1, "1", "2", "0", new Timestamp(1, 1)))

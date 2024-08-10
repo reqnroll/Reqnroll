@@ -5,6 +5,6 @@ namespace Reqnroll.CucumberMesssages
 {
     public interface ICucumberMessageSink
     {
-        Task Publish(ReqnrollCucumberMessage message);
+        void Publish(ReqnrollCucumberMessage message);
     }
 }

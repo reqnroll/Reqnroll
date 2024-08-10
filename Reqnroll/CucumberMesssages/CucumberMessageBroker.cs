@@ -14,8 +14,8 @@ namespace Reqnroll.CucumberMesssages
 
     public interface ICucumberMessageBroker
     {
-        Task CompleteAsync(string cucumberMessageSource);
-        Task PublishAsync(ReqnrollCucumberMessage message);
+        void Complete(string cucumberMessageSource);
+        void Publish(ReqnrollCucumberMessage message);
     }
 
     public class CucumberMessageBroker : ICucumberMessageBroker
@@ -27,9 +27,11 @@ namespace Reqnroll.CucumberMesssages
         { 
             _objectContainer = objectContainer;
         }
-        public async Task PublishAsync(ReqnrollCucumberMessage message)
+        public void Publish(ReqnrollCucumberMessage message)
         {
             var _traceListener = _objectContainer.Resolve<ITraceListener>();
+
+            //TODO: find a way to populate this list a single time
             var registeredSinks = _objectContainer.ResolveAll<ICucumberMessageSink>().ToList();
             _traceListener.WriteTestOutput("Broker publishing to " + registeredSinks.Count + " sinks");
 
@@ -37,12 +39,12 @@ namespace Reqnroll.CucumberMesssages
             {   
                 _traceListener.WriteTestOutput($"Broker publishing {message.CucumberMessageSource}");
 
-                await sink.Publish(message);
+                sink.Publish(message);
             }
         }
 
         // using an empty CucumberMessage to indicate completion
-        public async Task CompleteAsync(string cucumberMessageSource)
+        public  void Complete(string cucumberMessageSource)
         {
             var registeredSinks = _objectContainer.ResolveAll<ICucumberMessageSink>().ToList();
 
@@ -58,7 +60,7 @@ namespace Reqnroll.CucumberMesssages
             {
                 _traceListener.WriteTestOutput($"Broker publishing completion for {cucumberMessageSource}");
 
-                await sink.Publish(completionMessage);
+                sink.Publish(completionMessage);
             }
         }
     }
