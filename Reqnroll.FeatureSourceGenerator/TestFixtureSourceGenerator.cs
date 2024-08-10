@@ -57,9 +57,8 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             .Select((compilationInfo, cancellationToken) =>
             {
                 var compatibleGenerators = _testFrameworkHandlers
-                    .Select(handler => handler.GetTestFixtureGenerator<TCompilationInformation>())
+                    .Select(handler => handler.GetTestFixtureGenerator<TCompilationInformation>()!)
                     .Where(generator => generator != null)
-                    .Select(generator => generator!)
                     .ToImmutableArray();
 
                 if (!compatibleGenerators.Any())
@@ -95,9 +94,9 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 var options = optionsProvider.GetOptions(featureFile);
 
                 // Launch a debugger if configured.
-                if (options.TryGetValue("reqnroll_feature_source_generator.launch_debugger", out var launchDebuggerValue) &&
-                    bool.TryParse(launchDebuggerValue, out var launchDebugger) &&
-                    launchDebugger)
+                if (options.GetBooleanValue(
+                    "reqnroll_feature_source_generator.launch_debugger",
+                    "build_property.ReqnrollDebugGenerator") ?? false)
                 {
                     Debugger.Launch();
                 }
@@ -111,13 +110,14 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 }
 
                 // Select the generator from the following sources:
-                // 1. The reqnroll.target_test_framework value from .editorconfig
+                // 1. The reqnroll_feature_source_generator.target_test_framework value from .editorconfig
                 // 2. The ReqnrollTargetTestFramework from the build system properties (MSBuild project files or command-line argument)
                 // 3. The assemblies referenced by the compilation indicating the presence of a test framework.
                 ITestFixtureGenerator<TCompilationInformation>? generator;
-                if ((options.TryGetValue("reqnroll.target_test_framework", out var targetTestFrameworkIdentifier)
-                    || options.TryGetValue("build_property.ReqnrollTargetTestFramework", out targetTestFrameworkIdentifier))
-                    && !string.IsNullOrEmpty(targetTestFrameworkIdentifier))
+                var targetTestFrameworkIdentifier = options.GetStringValue(
+                    "reqnroll_feature_source_generator.target_test_framework",
+                    "build_property.ReqnrollTargetTestFramework");
+                if(!string.IsNullOrEmpty(targetTestFrameworkIdentifier))
                 {
                     // Select the target framework from the option specified.
                     generator = generatorInformation.CompatibleGenerators
@@ -164,21 +164,24 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     ];
                 }
 
-                // Determine the namespace of the feature from the project.
-                if (!optionsProvider.GlobalOptions.TryGetValue("build_property.RootNamespace", out var rootNamespace))
-                {
-                    rootNamespace = compilationInfo.AssemblyName ?? "ReqnrollFeatures";
-                }
+                // Determine the hint path and namespace for the generated test fixtured based on the project and the relative file path.
+                var rootNamespace = optionsProvider.GlobalOptions.GetStringValue("build_property.RootNamespace") ?? 
+                    compilationInfo.AssemblyName ?? 
+                    "ReqnrollFeatures";
 
                 var featureHintName = Path.GetFileNameWithoutExtension(featureFile.Path);
                 var testFixtureNamespace = rootNamespace;
-                if (options.TryGetValue("build_metadata.AdditionalFiles.RelativeDir", out var relativeDir))
+                var relativeDir = options.GetStringValue("build_metadata.AdditionalFiles.RelativeDir");
+                if (!string.IsNullOrEmpty(relativeDir))
                 {
-                    var testFixtureNamespaceParts = relativeDir
+                    var testFixtureNamespaceParts = relativeDir!
                         .Replace(Path.DirectorySeparatorChar, '.')
                         .Replace(Path.AltDirectorySeparatorChar, '.')
-                        .Split('.')
-                        .Select(part => DotNetSyntax.CreateIdentifier(part));
+                        .Split(['.'], StringSplitOptions.RemoveEmptyEntries)
+                        .Select(part => DotNetSyntax.CreateIdentifier(part))
+                        .ToList();
+
+                    testFixtureNamespaceParts.Insert(0, testFixtureNamespace);
 
                     testFixtureNamespace = string.Join(".", testFixtureNamespaceParts);
 
@@ -202,6 +205,10 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 }
                 catch (CompositeParserException ex)
                 {
+                    // We can't report errors for specific files using the built-in diagnostic system
+                    // https://github.com/dotnet/roslyn/issues/49531
+                    // Instead we will report the error by writing it as output.
+                    // Use the diagnostic to convey the feature hint name we'll use to write the error.
                     var diagnostics = ex.Errors
                         .Select(error => GherkinSyntaxParser.CreateGherkinDiagnostic(error, source, featureFile.Path));
 
@@ -209,12 +216,10 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 }
 
                 // Determine whether we should include ignored examples in our sample sets.
-                var emitIgnoredExamples = false;
-                if (options.TryGetValue("reqnroll.emit_ignored_examples", out var emitIgnoredExamplesValue) ||
-                    options.TryGetValue("build_property.ReqnrollEmitIgnoredExamples", out emitIgnoredExamplesValue))
-                {
-                    bool.TryParse(emitIgnoredExamplesValue, out emitIgnoredExamples);
-                }
+                var emitIgnoredExamples = options.GetBooleanValue(
+                    "reqnroll_feature_source_generator.emit_ignored_examples",
+                    "build_metadata.AdditionalFiles.EmitIgnoredExamples",
+                    "build_property.ReqnrollEmitIgnoredExamples") ?? false;
 
                 var feature = document.Feature;
 
@@ -274,7 +279,23 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                     cancellationToken));
 
         // Emit errors.
-        context.RegisterSourceOutput(errors, static (context, error) => context.ReportDiagnostic(error));
+        context.RegisterSourceOutput(
+            errors,
+            static (context, error) =>
+            {
+                // We can't report errors for specific files using the built-in diagnostic system
+                // https://github.com/dotnet/roslyn/issues/49531
+                // Instead we will report the error by writing it as output.
+
+                //if (error.Location == Location.None)
+                //{
+                context.ReportDiagnostic(error);
+                //}
+                //else
+                //{
+                //    context.AddSource(error.Location.GetLineSpan().Path, SourceText.From(""))
+                //}
+            });
 
         // Emit source files for fixtures.
         context.RegisterSourceOutput(

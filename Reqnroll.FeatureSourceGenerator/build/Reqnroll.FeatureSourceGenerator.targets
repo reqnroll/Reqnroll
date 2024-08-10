@@ -1,7 +1,11 @@
 <Project>
-  <Target Name="ReqnrollGeneratorSources" BeforeTargets="CoreCompile">
+  <!-- Target to add feature files to the AdditionalFiles group to be passed to the Roslyn compiler. -->
+  <Target
+    Name="AddFeaturesAsAdditionalFiles"
+    BeforeTargets="GenerateMSBuildEditorConfigFileCore;CoreCompile"
+    Condition="'@(Feature)' != ''">
     <ItemGroup>
-      <AdditionalFiles Include="%(Gherkin.Identity)" />
+      <AdditionalFiles Include="@(Feature)" />
     </ItemGroup>
   </Target>
 </Project>

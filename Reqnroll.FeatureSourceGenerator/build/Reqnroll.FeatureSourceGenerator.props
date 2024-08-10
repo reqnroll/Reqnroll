@@ -4,11 +4,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Gherkin Include="**/*.feature" />
+    <Feature Include="**\*.feature" />
   </ItemGroup>
 
   <ItemGroup>
+    <CompilerVisibleProperty Include="ReqnrollDebugGenerator" />
     <CompilerVisibleProperty Include="ReqnrollTargetTestFramework" />
     <CompilerVisibleProperty Include="ReqnrollEmitIgnoredExamples" />
+    
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="RelativeDir" />
+    <CompilerVisibleItemMetadata Include="AdditionalFiles" MetadataName="EmitIgnoredExamples" />
   </ItemGroup>
 </Project>
