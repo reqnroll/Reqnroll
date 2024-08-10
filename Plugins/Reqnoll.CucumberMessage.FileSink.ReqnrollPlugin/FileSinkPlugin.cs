@@ -8,16 +8,24 @@ using System.Reflection;
 using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
 using System.Diagnostics;
 using Reqnroll.Events;
+using System.Collections.Concurrent;
 
 [assembly: RuntimePlugin(typeof(FileSinkPlugin))]
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 {
+    //TODO: Add support for Reqnroll Configuration to initialize the FileSinkPlugin by specifying the path to the base directory.
+
     public class FileSinkPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private Task? fileWritingTask;
 
-        private CucumberMessageSinkBase sinkBase = new CucumberMessageSinkBase();
+        //Thread safe collections to hold:
+        // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
+        // 2. Dictionary of Feature Streams (Key: Feature Name, Value: StreamWriter)
+
+        private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
+        private readonly ConcurrentDictionary<string, StreamWriter> fileStreams = new();
 
         public FileSinkPlugin()
         {
@@ -27,7 +35,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
 
-            sinkBase.Initialize(runtimePluginEvents, runtimePluginParameters, unitTestProviderConfiguration);
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) => args.ObjectContainer.RegisterInstanceAs<ICucumberMessageSink>(this);
 
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
@@ -40,30 +47,42 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void CloseFileSink(TestRunFinishedEvent @event)
         {
+            postedMessages.CompleteAdding();
             fileWritingTask?.Wait();
             fileWritingTask = null;
         }
 
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
-            Console.WriteLine( "LaunchFileSink called" );
-            fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
+            Console.WriteLine("LaunchFileSink called");
+
+            if (!Directory.Exists(baseDirectory))
+            {
+                Directory.CreateDirectory(baseDirectory);
+            }
+
+            fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
+        }
+
+        public void Publish(ReqnrollCucumberMessage message)
+        {
+            postedMessages.Add(message);
         }
 
         private async Task ConsumeAndWriteToFiles()
         {
-            Console.WriteLine( "ConsumeAndWriteToFiles called" );
+            Console.WriteLine("ConsumeAndWriteToFiles called");
 
-            await foreach (var message in sinkBase.Consume())
+            foreach (var message in postedMessages.GetConsumingEnumerable())
             {
                 var featureName = message.CucumberMessageSource;
 
-                Console.WriteLine( "ConsumeAndWriteToFiles: " + featureName );
+                Console.WriteLine("ConsumeAndWriteToFiles: " + featureName);
                 if (message.Envelope != null)
                 {
                     var cm = Serialize(message.Envelope);
                     Console.WriteLine("ConsumeAndWriteToFiles: " + cm);
-                    Write(featureName, cm);
+                    await Write(featureName, cm);
                 }
                 else
                 {
@@ -72,7 +91,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             }
         }
 
-        private Dictionary<string, StreamWriter> fileStreams = new();
         private string baseDirectory = Path.Combine("C:\\Users\\clrud\\source\\repos\\scratch", "CucumberMessages");
         private bool disposedValue;
 
@@ -80,22 +98,20 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         {
             return NdjsonSerializer.Serialize(message);
         }
-        private void Write(string featureName, string cucumberMessage)
+        private async Task Write(string featureName, string cucumberMessage)
         {
-            string appName = Process.GetCurrentProcess().ProcessName;
-            string appDirectory = Path.Combine(baseDirectory, appName);
 
             if (!fileStreams.ContainsKey(featureName))
             {
-                fileStreams[featureName] = File.CreateText(Path.Combine(appDirectory, $"{featureName}.ndjson"));
+                fileStreams[featureName] = File.CreateText(Path.Combine(baseDirectory, $"{featureName}.ndjson"));
             }
-            fileStreams[featureName].WriteLine(cucumberMessage);
+            await fileStreams[featureName].WriteLineAsync(cucumberMessage);
         }
 
         private void CloseFeatureStream(string featureName)
         {
             fileStreams[featureName].Close();
-            fileStreams.Remove(featureName);
+            fileStreams.TryRemove(featureName, out var _);
         }
 
         protected virtual void Dispose(bool disposing)
@@ -105,6 +121,13 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 if (disposing)
                 {
                     CloseFileSink(new TestRunFinishedEvent());
+                    postedMessages.Dispose();
+                    foreach (var stream in fileStreams.Values)
+                    {
+                        stream.Close();
+                        stream.Dispose();
+                    };
+                    fileStreams.Clear();
                 }
 
                 disposedValue = true;
@@ -116,11 +139,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
-        }
-
-        public Task Publish(ReqnrollCucumberMessage message)
-        {
-            return sinkBase.Publish(message);
         }
     }
 }
