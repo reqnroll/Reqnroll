@@ -29,7 +29,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         public FileSinkPlugin()
         {
-            Debugger.Launch();
+            //Debugger.Launch();
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)

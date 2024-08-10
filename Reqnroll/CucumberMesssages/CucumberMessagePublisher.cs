@@ -9,6 +9,8 @@ using Io.Cucumber.Messages.Types;
 using Reqnroll.Tracing;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
+using Reqnroll.Time;
+using Cucumber.Messages;
 
 namespace Reqnroll.CucumberMesssages
 {
@@ -34,11 +36,6 @@ namespace Reqnroll.CucumberMesssages
 
         public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
         {
-            //if (initialized)
-            //{
-            //    return;
-            //}
-            //initialized = true;
 
             var traceListener = objectContainer.Resolve<ITraceListener>();
             traceListener.WriteTestOutput("HookIntoTestThreadExecutionEventPublisher");
@@ -51,6 +48,15 @@ namespace Reqnroll.CucumberMesssages
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
+
+            var ts = objectContainer.Resolve<IClock>().GetNowDateAndTime();
+
+            broker.Publish(new ReqnrollCucumberMessage
+            {
+                CucumberMessageSource = featureName,
+                Envelope = Envelope.Create(new TestRunFinished(null, true, Converters.ToTimestamp(ts), null))
+            });
+
             broker.Complete(featureName);
         }
 
@@ -61,10 +67,12 @@ namespace Reqnroll.CucumberMesssages
             var traceListener = objectContainer.Resolve<ITraceListener>();
             traceListener.WriteTestOutput($"FeatureStartedEventHandler: {featureName}");
 
+            var ts = objectContainer.Resolve<IClock>().GetNowDateAndTime();
+
             broker.Publish(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
-                Envelope = Envelope.Create(new TestCaseStarted(1, "1", "2", "0", new Timestamp(1, 1)))
+                Envelope = Envelope.Create(new TestRunStarted(Converters.ToTimestamp(ts)))
             });
         }
     }
