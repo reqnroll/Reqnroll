@@ -44,6 +44,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+
+    <!-- Registration of custom item type for ReSharper Build -->
+    <!-- https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
+    <AvailableItemName Include="ReqnrollFeatureFiles"/>
+    
     <ReqnrollFeatureFiles Include="**\*.feature" >
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
