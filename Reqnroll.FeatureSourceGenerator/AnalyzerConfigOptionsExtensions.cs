@@ -6,41 +6,34 @@ internal static class AnalyzerConfigOptionsExtensions
 {
     public static string? GetStringValue(this AnalyzerConfigOptions options, string name)
     {
-        options.TryGetValue(name, out var value);
-        return value;
+        if (options.TryGetValue(name, out var value))
+        {
+            return string.IsNullOrEmpty(value) ? null : value;
+        }
+
+        return null;
     }
 
     public static string? GetStringValue(this AnalyzerConfigOptions options, string name1, string name2)
     {
-        if (options.TryGetValue(name1, out var value) ||
-            options.TryGetValue(name2, out value))
-        {
-            return value;
-        }
-
-        return null;
+        return GetStringValue(options, name1) ?? GetStringValue(options, name2);
     }
 
     public static string? GetStringValue(this AnalyzerConfigOptions options, string name1, string name2, string name3)
     {
-        if (options.TryGetValue(name1, out var value) ||
-            options.TryGetValue(name2, out value) ||
-            options.TryGetValue(name3, out value))
-        {
-            return value;
-        }
-
-        return null;
+        return GetStringValue(options, name1) ?? GetStringValue(options, name2) ?? GetStringValue(options, name3);
     }
 
     public static bool? GetBooleanValue(this AnalyzerConfigOptions options, string name)
     {
-        if (options.TryGetValue(name, out var value))
+        if (options.TryGetValue(name, out var value) && !string.IsNullOrEmpty(value))
         {
             if (bool.TryParse(value, out bool result))
             {
                 return result;
             }
+
+            return false;
         }
 
         return null;
@@ -48,30 +41,12 @@ internal static class AnalyzerConfigOptionsExtensions
 
     public static bool? GetBooleanValue(this AnalyzerConfigOptions options, string name1, string name2)
     {
-        if (options.TryGetValue(name1, out var value) ||
-            options.TryGetValue(name2, out value))
-        {
-            if (bool.TryParse(value, out bool result))
-            {
-                return result;
-            }
-        }
-
-        return null;
+        return GetBooleanValue(options, name1) ?? GetBooleanValue(options, name2);
     }
 
     public static bool? GetBooleanValue(this AnalyzerConfigOptions options, string name1, string name2, string name3)
     {
-        if (options.TryGetValue(name1, out var value) ||
-            options.TryGetValue(name2, out value) ||
-            options.TryGetValue(name3, out value))
-        {
-            if (bool.TryParse(value, out bool result))
-            {
-                return result;
-            }
-        }
 
-        return null;
+        return GetBooleanValue(options, name1) ?? GetBooleanValue(options, name2) ?? GetBooleanValue(options, name3);
     }
 }
