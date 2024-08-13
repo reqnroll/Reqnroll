@@ -72,6 +72,47 @@ namespace Reqnroll.CucumberMesssages
             broker.Publish(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
+                Envelope = Envelope.Create(new Meta(
+                    Cucumber.Messages.ProtocolVersion.Version,
+                    new Product("placeholder", "placeholder"),
+                    new Product("placeholder", "placeholder"),
+                    new Product("placeholder", "placeholder"),
+                    new Product("placeholder", "placeholder"),
+                    null))
+            });
+
+            Gherkin.CucumberMessages.Types.Source gherkinSource = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
+            Io.Cucumber.Messages.Types.Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
+            broker.Publish(new ReqnrollCucumberMessage
+            {
+                CucumberMessageSource = featureName,
+                Envelope = Envelope.Create(messageSource)
+            });
+
+            Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.GherkinDocument>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument);
+            GherkinDocument gherkinDocument = CucumberMessageTransformer.ToGherkinDocument(gherkinDoc);
+
+            broker.Publish(new ReqnrollCucumberMessage
+            {
+                CucumberMessageSource = featureName,
+                Envelope = Envelope.Create(gherkinDocument)
+            });
+
+            var gherkinPickles = System.Text.Json.JsonSerializer.Deserialize<List<Gherkin.CucumberMessages.Types.Pickle>>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles);
+            var pickles = CucumberMessageTransformer.ToPickles(gherkinPickles);
+
+            foreach (var pickle in pickles)
+            {
+                broker.Publish(new ReqnrollCucumberMessage
+                {
+                    CucumberMessageSource = featureName,
+                    Envelope = Envelope.Create(pickle)
+                });
+            }
+
+            broker.Publish(new ReqnrollCucumberMessage
+            {
+                CucumberMessageSource = featureName,
                 Envelope = Envelope.Create(new TestRunStarted(Converters.ToTimestamp(ts)))
             });
         }

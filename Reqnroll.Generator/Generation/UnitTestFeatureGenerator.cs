@@ -3,7 +3,9 @@ using System.CodeDom;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
+using Reqnroll.CucumberMesssages;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
@@ -171,7 +173,7 @@ namespace Reqnroll.Generator.Generation
             testClassInitializeMethod.Name = GeneratorConstants.TESTCLASS_INITIALIZE_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassInitializeMethod);
-            
+
             _testGeneratorProvider.SetTestClassInitializeMethod(generationContext);
 
             //testRunner = TestRunnerManager.GetTestRunnerForAssembly(null, [test_worker_id]);
@@ -200,6 +202,8 @@ namespace Reqnroll.Generator.Generation
                             _codeDomHelper.TargetLanguage.ToString()),
                         new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME))));
 
+            PersistStaticCucumberMessagesToFeatureInfo(generationContext, testClassInitializeMethod);
+
             //await testRunner.OnFeatureStartAsync(featureInfo);
             var onFeatureStartExpression = new CodeMethodInvokeExpression(
                 testRunnerField,
@@ -209,6 +213,46 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
 
             testClassInitializeMethod.Statements.Add(onFeatureStartExpression);
+        }
+
+        private void PersistStaticCucumberMessagesToFeatureInfo(TestClassGenerationContext generationContext, CodeMemberMethod testClassInitializeMethod)
+        {
+            var CucumberMessagesInitializeMethod = new CodeMemberMethod();
+            CucumberMessagesInitializeMethod.Attributes = MemberAttributes.Private | MemberAttributes.Static;
+            CucumberMessagesInitializeMethod.Name = "CucumberMessagesInitializeMethod";
+            CucumberMessagesInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression("FeatureInfo", "featureInfo"));
+            generationContext.TestClass.Members.Add(CucumberMessagesInitializeMethod);
+
+            //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
+            var messageConverter = new CucumberMessagesConverter(new IncrementingIdGenerator());
+            var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
+            var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
+            var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(generationContext.Document);
+
+            // Serialize the Cucumber Messages to strings
+            var featureSourceMessageString = System.Text.Json.JsonSerializer.Serialize(featureSourceMessage);
+            var featureGherkinDocumentMessageString = System.Text.Json.JsonSerializer.Serialize(featureGherkinDocumentMessage);
+            var featurePickleMessagesString = System.Text.Json.JsonSerializer.Serialize(featurePickleMessages);
+
+            // Create a FeatureLevelCucumberMessages object and add it to featureInfo
+            var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureLevelCucumberMessages)),
+                new CodePrimitiveExpression(featureSourceMessageString),
+                new CodePrimitiveExpression(featureGherkinDocumentMessageString),
+                new CodePrimitiveExpression(featurePickleMessagesString));
+            CucumberMessagesInitializeMethod.Statements.Add(
+                new CodeAssignStatement(
+                    new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("featureInfo"), "FeatureCucumberMessages"),
+                    featureLevelCucumberMessagesExpression));
+
+            // Create a CodeMethodInvokeExpression to invoke the CucumberMessagesInitializeMethod
+            var invokeCucumberMessagesInitializeMethod = new CodeMethodInvokeExpression(
+                null,
+                "CucumberMessagesInitializeMethod",
+                new CodeVariableReferenceExpression("featureInfo"));
+
+            // Add the CodeMethodInvokeExpression to the testClassInitializeMethod statements
+            testClassInitializeMethod.Statements.Add(invokeCucumberMessagesInitializeMethod);
+
         }
 
         private void SetupTestClassCleanupMethod(TestClassGenerationContext generationContext)
