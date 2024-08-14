@@ -11,6 +11,7 @@ using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using Reqnroll.Time;
 using Cucumber.Messages;
+using Reqnroll.Bindings;
 
 namespace Reqnroll.CucumberMesssages
 {
@@ -110,11 +111,27 @@ namespace Reqnroll.CucumberMesssages
                 });
             }
 
+            var bindingRegistry = objectContainer.Resolve<IBindingRegistry>();
+            if (bindingRegistry.IsValid)
+            {
+                foreach (var binding in bindingRegistry.GetStepDefinitions())
+                {
+                    var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding);
+                    broker.Publish(new ReqnrollCucumberMessage
+                    {
+                        CucumberMessageSource = featureName,
+                        Envelope = Envelope.Create(stepDefinition)
+                    });
+                }
+            }
+
             broker.Publish(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
                 Envelope = Envelope.Create(new TestRunStarted(Converters.ToTimestamp(ts)))
             });
+
+           // throw new ApplicationException();
         }
     }
 }
