@@ -14,7 +14,7 @@ namespace CucumberMessages.CompatibilityTests
                     Given I have a passing step
                 """);
 
-            AddPassingStepBinding();
+            AddPassingStepBinding("Given");
 
             ExecuteTests();
 
