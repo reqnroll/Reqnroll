@@ -9,6 +9,6 @@ namespace Reqnroll.Parser
     {
         public GherkinDocument ConvertToCucumberMessagesGherkinDocument(ReqnrollDocument gherkinDocument);
         public Source ConvertToCucumberMessagesSource(ReqnrollDocument gherkinDocument);
-        public IEnumerable<Pickle> ConvertToCucumberMessagesPickles(ReqnrollDocument gherkinDocument);
+        public IEnumerable<Pickle> ConvertToCucumberMessagesPickles(GherkinDocument gherkinDocument);
     }
 }
