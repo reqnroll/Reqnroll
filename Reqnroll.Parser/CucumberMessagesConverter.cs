@@ -31,11 +31,10 @@ namespace Reqnroll.Parser
             };
         }
 
-        public IEnumerable<Pickle> ConvertToCucumberMessagesPickles(ReqnrollDocument gherkinDocument)
+        public IEnumerable<Pickle> ConvertToCucumberMessagesPickles(GherkinDocument gherkinDocument)
         {
             var pickleCompiler = new Gherkin.CucumberMessages.Pickles.PickleCompiler(_idGenerator);
-            var gd = ConvertToCucumberMessagesGherkinDocument(gherkinDocument);
-            return pickleCompiler.Compile(gd);
+            return pickleCompiler.Compile(gherkinDocument);
         }
     }
 }

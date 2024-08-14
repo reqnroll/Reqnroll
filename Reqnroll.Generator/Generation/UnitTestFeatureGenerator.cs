@@ -219,7 +219,7 @@ namespace Reqnroll.Generator.Generation
         {
             var CucumberMessagesInitializeMethod = new CodeMemberMethod();
             CucumberMessagesInitializeMethod.Attributes = MemberAttributes.Private | MemberAttributes.Static;
-            CucumberMessagesInitializeMethod.Name = "CucumberMessagesInitializeMethod";
+            CucumberMessagesInitializeMethod.Name = "InitializeCucumberMessages";
             CucumberMessagesInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression("FeatureInfo", "featureInfo"));
             generationContext.TestClass.Members.Add(CucumberMessagesInitializeMethod);
 
@@ -227,7 +227,7 @@ namespace Reqnroll.Generator.Generation
             var messageConverter = new CucumberMessagesConverter(new IncrementingIdGenerator());
             var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
             var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
-            var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(generationContext.Document);
+            var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocumentMessage);
 
             // Serialize the Cucumber Messages to strings
             var featureSourceMessageString = System.Text.Json.JsonSerializer.Serialize(featureSourceMessage);
@@ -247,7 +247,7 @@ namespace Reqnroll.Generator.Generation
             // Create a CodeMethodInvokeExpression to invoke the CucumberMessagesInitializeMethod
             var invokeCucumberMessagesInitializeMethod = new CodeMethodInvokeExpression(
                 null,
-                "CucumberMessagesInitializeMethod",
+                CucumberMessagesInitializeMethod.Name,
                 new CodeVariableReferenceExpression("featureInfo"));
 
             // Add the CodeMethodInvokeExpression to the testClassInitializeMethod statements
