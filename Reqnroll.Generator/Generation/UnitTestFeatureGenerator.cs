@@ -220,7 +220,7 @@ namespace Reqnroll.Generator.Generation
             var CucumberMessagesInitializeMethod = new CodeMemberMethod();
             CucumberMessagesInitializeMethod.Attributes = MemberAttributes.Private | MemberAttributes.Static;
             CucumberMessagesInitializeMethod.Name = "InitializeCucumberMessages";
-            CucumberMessagesInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression("FeatureInfo", "featureInfo"));
+            CucumberMessagesInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), "featureInfo"));
             generationContext.TestClass.Members.Add(CucumberMessagesInitializeMethod);
 
             //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
