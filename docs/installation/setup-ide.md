@@ -91,11 +91,3 @@ The *Reqnroll with Rider* extension cannot work together with the *SpecFlow for 
   
 6. Restart Rider.
 
-
-
-% TODO
-```{admonition} Documentation is in progress
-:class: warning
-
-This documentation page is in progress. Please, come back later or help contribute to it in our [open-source GitHub project](https://github.com/reqnroll/Reqnroll).
-```
