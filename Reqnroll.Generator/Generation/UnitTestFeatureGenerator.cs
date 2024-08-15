@@ -217,22 +217,34 @@ namespace Reqnroll.Generator.Generation
 
         private void PersistStaticCucumberMessagesToFeatureInfo(TestClassGenerationContext generationContext, CodeMemberMethod testClassInitializeMethod)
         {
+            string featureSourceMessageString = null; 
+            string featureGherkinDocumentMessageString = null;
+            string featurePickleMessagesString = null;
+            try 
+            {
+                //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
+                var messageConverter = new CucumberMessagesConverter(new IncrementingIdGenerator());
+                var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
+                var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
+                var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocumentMessage);
+
+                // Serialize the Cucumber Messages to strings
+                featureSourceMessageString = System.Text.Json.JsonSerializer.Serialize(featureSourceMessage);
+                featureGherkinDocumentMessageString = System.Text.Json.JsonSerializer.Serialize(featureGherkinDocumentMessage);
+                featurePickleMessagesString = System.Text.Json.JsonSerializer.Serialize(featurePickleMessages);
+            }
+            catch
+            {
+                // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
+                return;            
+            }
+            // Create a new method that will be added to the test class. It will be called to initialize the FeatureCucumberMessages property of the FeatureInfo object
             var CucumberMessagesInitializeMethod = new CodeMemberMethod();
             CucumberMessagesInitializeMethod.Attributes = MemberAttributes.Private | MemberAttributes.Static;
             CucumberMessagesInitializeMethod.Name = "InitializeCucumberMessages";
             CucumberMessagesInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), "featureInfo"));
             generationContext.TestClass.Members.Add(CucumberMessagesInitializeMethod);
 
-            //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
-            var messageConverter = new CucumberMessagesConverter(new IncrementingIdGenerator());
-            var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
-            var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
-            var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocumentMessage);
-
-            // Serialize the Cucumber Messages to strings
-            var featureSourceMessageString = System.Text.Json.JsonSerializer.Serialize(featureSourceMessage);
-            var featureGherkinDocumentMessageString = System.Text.Json.JsonSerializer.Serialize(featureGherkinDocumentMessage);
-            var featurePickleMessagesString = System.Text.Json.JsonSerializer.Serialize(featurePickleMessages);
 
             // Create a FeatureLevelCucumberMessages object and add it to featureInfo
             var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureLevelCucumberMessages)),

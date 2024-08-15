@@ -19,7 +19,7 @@ namespace Reqnroll.CucumberMesssages
     {
         private ICucumberMessageBroker broker;
         private IObjectContainer objectContainer;
-        //private bool initialized = false;
+        private Dictionary<string, FeatureState> featureState = new();
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         {
@@ -49,6 +49,9 @@ namespace Reqnroll.CucumberMesssages
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
+            var featureState = this.featureState[featureName];
+            if (!featureState.Enabled)
+                return;
 
             var ts = objectContainer.Resolve<IClock>().GetNowDateAndTime();
 
@@ -64,9 +67,21 @@ namespace Reqnroll.CucumberMesssages
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
+            var enabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source == null ? false : true;
+
+            var featureState = new FeatureState
+            {
+                Name = featureName,
+                Enabled = enabled
+            };
+
+            this.featureState[featureName] = featureState;
 
             var traceListener = objectContainer.Resolve<ITraceListener>();
             traceListener.WriteTestOutput($"FeatureStartedEventHandler: {featureName}");
+
+            if (!enabled)
+                return;
 
             var ts = objectContainer.Resolve<IClock>().GetNowDateAndTime();
 
