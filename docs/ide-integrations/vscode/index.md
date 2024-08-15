@@ -1,6 +1,6 @@
 # Reqnroll Visual Studio integration
 
-For setting up Reqnroll Visual Studio integration, please check the related [Setup Visual Studio 2022](../../installation/setup-ide.md#setup-vs) section of our IDE setup guide.
+For setting up Reqnroll Visual Studio Code integration using the VSCode Cucumber plugin, please check the related [Setup Visual Studio Code](../../installation/setup-ide.md#setup-vscode) section of our IDE setup guide.
 
 % TODO
 ```{admonition} Documentation is in progress

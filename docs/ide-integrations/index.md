@@ -6,4 +6,6 @@ This part contains details of the following topics.
 :maxdepth: 1
 
 visual-studio/index
+rider/index
+vscode/index
 ```

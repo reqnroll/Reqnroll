@@ -1,6 +1,6 @@
-# Reqnroll Visual Studio integration
+# Reqnroll Rider integration
 
-For setting up Reqnroll Visual Studio integration, please check the related [Setup Visual Studio 2022](../../installation/setup-ide.md#setup-vs) section of our IDE setup guide.
+For setting up Reqnroll Rider integration, please check the related [Setup Rider](../../installation/setup-ide.md#setup-rider) section of our IDE setup guide.
 
 % TODO
 ```{admonition} Documentation is in progress
