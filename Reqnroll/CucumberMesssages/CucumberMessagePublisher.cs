@@ -12,6 +12,11 @@ using Reqnroll.UnitTestProvider;
 using Reqnroll.Time;
 using Cucumber.Messages;
 using Reqnroll.Bindings;
+using System.Reflection;
+using ScenarioNameIDMap = System.Collections.Generic.Dictionary<string, string>;
+using StepPatternIDMap = System.Collections.Generic.Dictionary<string, string>;
+using TestCaseToPickleMap = System.Collections.Generic.Dictionary<string, string>;
+using System.Collections.Concurrent;
 
 namespace Reqnroll.CucumberMesssages
 {
@@ -19,7 +24,7 @@ namespace Reqnroll.CucumberMesssages
     {
         private ICucumberMessageBroker broker;
         private IObjectContainer objectContainer;
-        private Dictionary<string, FeatureState> featureState = new();
+        private ConcurrentDictionary<string, FeatureState> featureStatesByFeatureName = new();
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         {
@@ -49,17 +54,35 @@ namespace Reqnroll.CucumberMesssages
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
-            var featureState = this.featureState[featureName];
+            var featureState = featureStatesByFeatureName[featureName];
+            featureState.workerThreadMarkers.TryPop(out int result);
+ 
+            lock (featureState)
+            {
+                if (featureState.workerThreadMarkers.TryPeek(out result))
+                {
+                    // There are other threads still working on this feature, so we won't publish the TestRunFinished message just yet
+                    return;
+                }
+            }
+
+
             if (!featureState.Enabled)
                 return;
 
             var ts = objectContainer.Resolve<IClock>().GetNowDateAndTime();
 
-            broker.Publish(new ReqnrollCucumberMessage
+            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
+                //TODO: add feature status
                 Envelope = Envelope.Create(new TestRunFinished(null, true, Converters.ToTimestamp(ts), null))
             });
+
+            foreach (var message in featureState.Messages)
+            {
+                broker.Publish(message);
+            }
 
             broker.Complete(featureName);
         }
@@ -75,7 +98,15 @@ namespace Reqnroll.CucumberMesssages
                 Enabled = enabled
             };
 
-            this.featureState[featureName] = featureState;
+            if (!featureStatesByFeatureName.TryAdd(featureName, featureState))
+            {
+                // This feature has already been started by another thread (executing a different scenario)
+                var featureState_alreadyrunning = featureStatesByFeatureName[featureName];
+                featureState_alreadyrunning.workerThreadMarkers.Push(1); // add a marker that this thread is active as well
+
+                // None of the rest of this method should be executed
+                return;
+            }
 
             var traceListener = objectContainer.Resolve<ITraceListener>();
             traceListener.WriteTestOutput($"FeatureStartedEventHandler: {featureName}");
@@ -85,7 +116,7 @@ namespace Reqnroll.CucumberMesssages
 
             var ts = objectContainer.Resolve<IClock>().GetNowDateAndTime();
 
-            broker.Publish(new ReqnrollCucumberMessage
+            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
                 Envelope = Envelope.Create(new Meta(
@@ -99,7 +130,7 @@ namespace Reqnroll.CucumberMesssages
 
             Gherkin.CucumberMessages.Types.Source gherkinSource = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
             Io.Cucumber.Messages.Types.Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
-            broker.Publish(new ReqnrollCucumberMessage
+            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
                 Envelope = Envelope.Create(messageSource)
@@ -108,7 +139,7 @@ namespace Reqnroll.CucumberMesssages
             Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.GherkinDocument>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument);
             GherkinDocument gherkinDocument = CucumberMessageTransformer.ToGherkinDocument(gherkinDoc);
 
-            broker.Publish(new ReqnrollCucumberMessage
+            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
                 Envelope = Envelope.Create(gherkinDocument)
@@ -119,7 +150,7 @@ namespace Reqnroll.CucumberMesssages
 
             foreach (var pickle in pickles)
             {
-                broker.Publish(new ReqnrollCucumberMessage
+                featureState.Messages.Enqueue(new ReqnrollCucumberMessage
                 {
                     CucumberMessageSource = featureName,
                     Envelope = Envelope.Create(pickle)
@@ -132,7 +163,7 @@ namespace Reqnroll.CucumberMesssages
                 foreach (var binding in bindingRegistry.GetStepDefinitions())
                 {
                     var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding);
-                    broker.Publish(new ReqnrollCucumberMessage
+                    featureState.Messages.Enqueue(new ReqnrollCucumberMessage
                     {
                         CucumberMessageSource = featureName,
                         Envelope = Envelope.Create(stepDefinition)
@@ -140,13 +171,12 @@ namespace Reqnroll.CucumberMesssages
                 }
             }
 
-            broker.Publish(new ReqnrollCucumberMessage
+            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
                 Envelope = Envelope.Create(new TestRunStarted(Converters.ToTimestamp(ts)))
             });
 
-           // throw new ApplicationException();
         }
     }
 }
