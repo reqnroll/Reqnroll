@@ -9,6 +9,11 @@ using System.Threading.Tasks;
 
 namespace Reqnroll.CucumberMesssages
 {
+    /// <summary>
+    /// The purpose of this class is to transform Cucumber messages from the Gherkin.CucumberMessages.Types namespace to the Io.Cucumber.Messages.Types namespace
+    /// 
+    /// once the Gherkin project is updated to directly consume and produce Cucumber messages, this class can be removed
+    /// </summary>
     internal class CucumberMessageTransformer
     {
         internal static Io.Cucumber.Messages.Types.Source ToSource(Gherkin.CucumberMessages.Types.Source gherkinSource)
