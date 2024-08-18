@@ -1,4 +1,5 @@
-﻿using Io.Cucumber.Messages.Types;
+﻿using Gherkin.CucumberMessages;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using System.Linq;
 
@@ -6,7 +7,7 @@ namespace Reqnroll.CucumberMesssages
 {
     internal class CucumberMessageFactory
     {
-        internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding)
+        internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
         {
             var bindingSourceText = binding.SourceExpression;
             var expressionType = binding.ExpressionType;
@@ -21,7 +22,7 @@ namespace Reqnroll.CucumberMesssages
 
             var result = new StepDefinition
             (
-                "XX", // TODO: Generate an ID for this
+                idGenerator.GetNewId(),
                 stepDefinitionPattern,
                 sourceRef
             );
