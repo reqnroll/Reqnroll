@@ -55,10 +55,13 @@ namespace Reqnroll.CucumberMesssages
         {
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
             var featureState = featureStatesByFeatureName[featureName];
-            featureState.workerThreadMarkers.TryPop(out int result);
  
             lock (featureState)
             {
+                // Remove the worker thread marker for this thread
+                featureState.workerThreadMarkers.TryPop(out int result);
+
+                // Check if there are other threads still working on this feature
                 if (featureState.workerThreadMarkers.TryPeek(out result))
                 {
                     // There are other threads still working on this feature, so we won't publish the TestRunFinished message just yet
