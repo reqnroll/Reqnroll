@@ -13,10 +13,8 @@ using Reqnroll.Time;
 using Cucumber.Messages;
 using Reqnroll.Bindings;
 using System.Reflection;
-using ScenarioNameIDMap = System.Collections.Generic.Dictionary<string, string>;
-using StepPatternIDMap = System.Collections.Generic.Dictionary<string, string>;
-using TestCaseToPickleMap = System.Collections.Generic.Dictionary<string, string>;
 using System.Collections.Concurrent;
+using System.Linq;
 
 namespace Reqnroll.CucumberMesssages
 {
@@ -48,8 +46,9 @@ namespace Reqnroll.CucumberMesssages
 
             testThreadEventPublisher.AddHandler<FeatureStartedEvent>(FeatureStartedEventHandler);
             testThreadEventPublisher.AddHandler<FeatureFinishedEvent>(FeatureFinishedEventHandler);
+            testThreadEventPublisher.AddHandler<ScenarioStartedEvent>(ScenarioStartedEventHandler);
+            testThreadEventPublisher.AddHandler<ScenarioFinishedEvent>(ScenarioFinishedEventHandler);
         }
-
 
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
@@ -117,8 +116,6 @@ namespace Reqnroll.CucumberMesssages
             if (!enabled)
                 return;
 
-            var ts = objectContainer.Resolve<IClock>().GetNowDateAndTime();
-
             featureState.Messages.Enqueue(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
@@ -151,8 +148,13 @@ namespace Reqnroll.CucumberMesssages
             var gherkinPickles = System.Text.Json.JsonSerializer.Deserialize<List<Gherkin.CucumberMessages.Types.Pickle>>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles);
             var pickles = CucumberMessageTransformer.ToPickles(gherkinPickles);
 
+            string lastID = ExtractID(pickles);
+            featureState.IDGenerator = IdGeneratorFactory.Create(lastID);
+
             foreach (var pickle in pickles)
             {
+                featureState.PicklesByScenarioName.Add(pickle.Name, pickle);
+
                 featureState.Messages.Enqueue(new ReqnrollCucumberMessage
                 {
                     CucumberMessageSource = featureName,
@@ -165,7 +167,10 @@ namespace Reqnroll.CucumberMesssages
             {
                 foreach (var binding in bindingRegistry.GetStepDefinitions())
                 {
-                    var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding);
+                    var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, featureState.IDGenerator);
+                    var pattern = CanonicalizeStepDefinitionPattern(stepDefinition);
+                    featureState.StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
+
                     featureState.Messages.Enqueue(new ReqnrollCucumberMessage
                     {
                         CucumberMessageSource = featureName,
@@ -177,9 +182,51 @@ namespace Reqnroll.CucumberMesssages
             featureState.Messages.Enqueue(new ReqnrollCucumberMessage
             {
                 CucumberMessageSource = featureName,
-                Envelope = Envelope.Create(new TestRunStarted(Converters.ToTimestamp(ts)))
+                Envelope = Envelope.Create(new TestRunStarted(Converters.ToTimestamp(featureStartedEvent.Timestamp)))
             });
 
         }
+
+        private string CanonicalizeStepDefinitionPattern(StepDefinition stepDefinition)
+        {
+            var sr = stepDefinition.SourceReference;
+            var signature = sr.JavaMethod != null ? String.Join(",", sr.JavaMethod.MethodParameterTypes) : "";
+
+            return $"{stepDefinition.Pattern}({signature})";
+        }
+
+        private string ExtractID(List<Pickle> pickles)
+        {
+            return pickles.Last().Id;
+        }
+
+        private void ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
+        {
+            var featureName = scenarioStartedEvent.FeatureContext.FeatureInfo.Title;
+            var scenarioName = scenarioStartedEvent.ScenarioContext.ScenarioInfo.Title;
+
+            var featureState = featureStatesByFeatureName[featureName];
+
+            var scenarioState = new ScenarioState(scenarioStartedEvent.ScenarioContext, featureState);
+            featureState.ScenarioName2StateMap.Add(scenarioName, scenarioState);
+
+            foreach (Envelope e in scenarioState.ProcessEvent(scenarioStartedEvent))
+            {
+                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
+            }
+        }
+        private void ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
+        {
+            var featureName = scenarioFinishedEvent.FeatureContext.FeatureInfo.Title;
+            var scenarioName = scenarioFinishedEvent.ScenarioContext.ScenarioInfo.Title;
+            var featureState = featureStatesByFeatureName[featureName];
+            var scenarioState = featureState.ScenarioName2StateMap[scenarioName];
+            foreach (Envelope e in scenarioState.ProcessEvent(scenarioFinishedEvent))
+            {
+                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
+            }
+        }
+
+
     }
 }

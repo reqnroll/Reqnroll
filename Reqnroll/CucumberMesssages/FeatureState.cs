@@ -1,4 +1,6 @@
-﻿using System.Collections;
+﻿using Gherkin.CucumberMessages;
+using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 
@@ -14,10 +16,18 @@ namespace Reqnroll.CucumberMesssages
         public bool Started { get; set; }
         public bool Finished { get; set; }
 
-        public Dictionary<string, string> ScenarioNameIDMap = new Dictionary<string, string>(); // <scenarioName, scenarioID>
-        public Dictionary<string, string> StepPatternIDMap = new Dictionary<string, string>(); // <stepPattern, stepID>
+        //ID Generator to use when generating IDs for TestCase messages and beyond
+        // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
+        // otherwise we'll use a GUID ID generator
+        public IIdGenerator IDGenerator { get; set; }
 
-        public ConcurrentQueue<ReqnrollCucumberMessage> Messages = new ConcurrentQueue<ReqnrollCucumberMessage>();
-        public ConcurrentStack<int> workerThreadMarkers = new ConcurrentStack<int>();
+        //Lookup tables
+        public Dictionary<string, string> StepDefinitionsByPattern = new();
+        public Dictionary<string, Io.Cucumber.Messages.Types.Pickle> PicklesByScenarioName = new();
+
+        public Dictionary<string, ScenarioState> ScenarioName2StateMap = new(); 
+
+        public ConcurrentQueue<ReqnrollCucumberMessage> Messages = new();
+        public ConcurrentStack<int> workerThreadMarkers = new();
     }
 }
