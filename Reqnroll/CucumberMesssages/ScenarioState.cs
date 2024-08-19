@@ -9,8 +9,8 @@ namespace Reqnroll.CucumberMesssages
     internal class ScenarioState
     {
         private readonly IIdGenerator _idGenerator;
-        private string TestCaseStartedID;
 
+        public string TestCaseStartedID;
         public string Name { get; set; }
         public string TestCaseID { get; set; }
         public string PickleID { get; set; }
@@ -28,16 +28,13 @@ namespace Reqnroll.CucumberMesssages
         {
             TestCaseStartedID = _idGenerator.GetNewId();
 
-            //TODO: move Message creation to the CucumberMessageFactory
-            yield return Envelope.Create(new TestCase(TestCaseID, PickleID, new List<TestStep>()));
-            yield return Envelope.Create(new TestCaseStarted(0, TestCaseStartedID, TestCaseID, null, Converters.ToTimestamp(scenarioStartedEvent.Timestamp)));
+            yield return Envelope.Create(CucumberMessageFactory.ToTestCase(this, scenarioStartedEvent));
+            yield return Envelope.Create(CucumberMessageFactory.ToTestCaseStarted(this, scenarioStartedEvent));
         }
 
         internal IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
-            //TODO: move Message creation to the CucumberMessageFactory
-
-            yield return Envelope.Create(new TestCaseFinished(TestCaseStartedID, Converters.ToTimestamp(scenarioFinishedEvent.Timestamp), false));
+            yield return Envelope.Create(CucumberMessageFactory.ToTestCaseFinished(this, scenarioFinishedEvent));
         }
     }
 }

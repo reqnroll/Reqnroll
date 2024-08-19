@@ -1,12 +1,38 @@
-﻿using Gherkin.CucumberMessages;
+﻿using Cucumber.Messages;
+using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
+using Reqnroll.Events;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Reqnroll.CucumberMesssages
 {
     internal class CucumberMessageFactory
     {
+        public static TestRunStarted ToTestRunStarted(FeatureState featureState, FeatureStartedEvent featureStartedEvent)
+        {
+            return new TestRunStarted(Converters.ToTimestamp(featureStartedEvent.Timestamp));
+        }
+        internal static TestCase ToTestCase(ScenarioState scenarioState, ScenarioStartedEvent scenarioStartedEvent)
+        {
+            var testCase = new TestCase
+            (
+                scenarioState.TestCaseID,
+                scenarioState.PickleID,
+                new List<TestStep>()
+            );
+            return testCase;
+        }
+        internal static TestCaseStarted ToTestCaseStarted(ScenarioState scenarioState, ScenarioStartedEvent scenarioStartedEvent)
+        {
+            return new TestCaseStarted(0, scenarioState.TestCaseStartedID, scenarioState.TestCaseID, null, Converters.ToTimestamp(scenarioStartedEvent.Timestamp));
+        }
+        internal static TestCaseFinished ToTestCaseFinished(ScenarioState scenarioState, ScenarioFinishedEvent scenarioFinishedEvent)
+        {
+            return new TestCaseFinished(scenarioState.TestCaseStartedID, Converters.ToTimestamp(scenarioFinishedEvent.Timestamp), false);
+        }
         internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
         {
             var bindingSourceText = binding.SourceExpression;
