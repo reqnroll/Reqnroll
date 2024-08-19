@@ -116,88 +116,10 @@ namespace Reqnroll.CucumberMesssages
             if (!enabled)
                 return;
 
-            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
+            foreach (Envelope e in featureState.ProcessEvent(featureStartedEvent))
             {
-                CucumberMessageSource = featureName,
-                Envelope = Envelope.Create(new Meta(
-                    Cucumber.Messages.ProtocolVersion.Version,
-                    new Product("placeholder", "placeholder"),
-                    new Product("placeholder", "placeholder"),
-                    new Product("placeholder", "placeholder"),
-                    new Product("placeholder", "placeholder"),
-                    null))
-            });
-
-            Gherkin.CucumberMessages.Types.Source gherkinSource = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
-            Io.Cucumber.Messages.Types.Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
-            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
-            {
-                CucumberMessageSource = featureName,
-                Envelope = Envelope.Create(messageSource)
-            });
-
-            Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.GherkinDocument>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument);
-            GherkinDocument gherkinDocument = CucumberMessageTransformer.ToGherkinDocument(gherkinDoc);
-
-            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
-            {
-                CucumberMessageSource = featureName,
-                Envelope = Envelope.Create(gherkinDocument)
-            });
-
-            var gherkinPickles = System.Text.Json.JsonSerializer.Deserialize<List<Gherkin.CucumberMessages.Types.Pickle>>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles);
-            var pickles = CucumberMessageTransformer.ToPickles(gherkinPickles);
-
-            string lastID = ExtractID(pickles);
-            featureState.IDGenerator = IdGeneratorFactory.Create(lastID);
-
-            foreach (var pickle in pickles)
-            {
-                featureState.PicklesByScenarioName.Add(pickle.Name, pickle);
-
-                featureState.Messages.Enqueue(new ReqnrollCucumberMessage
-                {
-                    CucumberMessageSource = featureName,
-                    Envelope = Envelope.Create(pickle)
-                });
+                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
             }
-
-            var bindingRegistry = objectContainer.Resolve<IBindingRegistry>();
-            if (bindingRegistry.IsValid)
-            {
-                foreach (var binding in bindingRegistry.GetStepDefinitions())
-                {
-                    var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, featureState.IDGenerator);
-                    var pattern = CanonicalizeStepDefinitionPattern(stepDefinition);
-                    featureState.StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
-
-                    featureState.Messages.Enqueue(new ReqnrollCucumberMessage
-                    {
-                        CucumberMessageSource = featureName,
-                        Envelope = Envelope.Create(stepDefinition)
-                    });
-                }
-            }
-
-            featureState.Messages.Enqueue(new ReqnrollCucumberMessage
-            {
-                CucumberMessageSource = featureName,
-                Envelope = Envelope.Create(new TestRunStarted(Converters.ToTimestamp(featureStartedEvent.Timestamp)))
-            });
-
-        }
-
-        private string CanonicalizeStepDefinitionPattern(StepDefinition stepDefinition)
-        {
-            var sr = stepDefinition.SourceReference;
-            var signature = sr.JavaMethod != null ? String.Join(",", sr.JavaMethod.MethodParameterTypes) : "";
-
-            return $"{stepDefinition.Pattern}({signature})";
-        }
-
-        private string ExtractID(List<Pickle> pickles)
-        {
-            return pickles.Last().Id;
         }
 
         private void ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
