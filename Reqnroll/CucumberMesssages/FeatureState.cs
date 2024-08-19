@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Reqnroll.CucumberMesssages
 {
-    internal class FeatureState
+    public class FeatureState
     {
         public string Name { get; set; }
         public bool Enabled { get; set; } //This will be false if the feature could not be pickled
@@ -21,6 +21,14 @@ namespace Reqnroll.CucumberMesssages
         // and multiple FeatureStartedEvent and FeatureFinishedEvent events are fired
         public bool Started { get; set; }
         public bool Finished { get; set; }
+
+        public bool Success
+        {
+            get
+            {
+                return Enabled && Finished && ScenarioName2StateMap.Values.All(s => s.ScenarioExecutionStatus == ScenarioExecutionStatus.OK) ;
+            }
+        }
 
         //ID Generator to use when generating IDs for TestCase messages and beyond
         // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
@@ -31,7 +39,7 @@ namespace Reqnroll.CucumberMesssages
         public Dictionary<string, string> StepDefinitionsByPattern = new();
         public Dictionary<string, Io.Cucumber.Messages.Types.Pickle> PicklesByScenarioName = new();
 
-        public Dictionary<string, ScenarioState> ScenarioName2StateMap = new(); 
+        public Dictionary<string, ScenarioState> ScenarioName2StateMap = new();
 
         public ConcurrentQueue<ReqnrollCucumberMessage> Messages = new();
         public ConcurrentStack<int> workerThreadMarkers = new();
@@ -74,7 +82,7 @@ namespace Reqnroll.CucumberMesssages
                 foreach (var binding in bindingRegistry.GetStepDefinitions())
                 {
                     var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
-                    var pattern = CanonicalizeStepDefinitionPattern(binding);
+                    var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
                     StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
 
                     yield return Envelope.Create(stepDefinition);
@@ -84,26 +92,61 @@ namespace Reqnroll.CucumberMesssages
             yield return Envelope.Create(CucumberMessageFactory.ToTestRunStarted(this, featureStartedEvent));
 
         }
+
+
+        internal IEnumerable<Envelope> ProcessEvent(FeatureFinishedEvent featureFinishedEvent)
+        {
+            yield return Envelope.Create(CucumberMessageFactory.ToTestRunFinished(this, featureFinishedEvent));
+        }
+
+        internal IEnumerable<Envelope> ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
+        {
+            var scenarioName = scenarioStartedEvent.ScenarioContext.ScenarioInfo.Title;
+            var scenarioState = new ScenarioState(scenarioStartedEvent.ScenarioContext, this);
+            ScenarioName2StateMap.Add(scenarioName, scenarioState);
+
+            foreach (var e in scenarioState.ProcessEvent(scenarioStartedEvent))
+            {
+                yield return e;
+            }
+        }
+
         private string ExtractLastID(List<Pickle> pickles)
         {
             return pickles.Last().Id;
         }
 
-        //private string CanonicalizeStepDefinitionPattern(StepDefinition stepDefinition)
-        //{
-        //    var sr = stepDefinition.SourceReference;
-        //    var signature = sr.JavaMethod != null ? String.Join(",", sr.JavaMethod.MethodParameterTypes) : "";
-
-        //    return $"{stepDefinition.Pattern}({signature})";
-        //}
-        public string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition)
+        internal IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
-            
-            var signature = stepDefinition.Method != null ? String.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
+            var scenarioName = scenarioFinishedEvent.ScenarioContext.ScenarioInfo.Title;
+            var scenarioState = ScenarioName2StateMap[scenarioName];
 
-            return $"{stepDefinition.SourceExpression}({signature})";
+            foreach (var e in scenarioState.ProcessEvent(scenarioFinishedEvent))
+            {
+                yield return e;
+            }
         }
 
+        internal IEnumerable<Envelope> ProcessEvent(StepStartedEvent stepStartedEvent)
+        {
+            var scenarioName = stepStartedEvent.ScenarioContext.ScenarioInfo.Title;
+            var scenarioState = ScenarioName2StateMap[scenarioName];
 
+            foreach (var e in scenarioState.ProcessEvent(stepStartedEvent))
+            {
+                yield return e;
+            }
+        }
+
+        internal IEnumerable<Envelope> ProcessEvent(StepFinishedEvent stepFinishedEvent)
+        {
+            var scenarioName = stepFinishedEvent.ScenarioContext.ScenarioInfo.Title;
+            var scenarioState = ScenarioName2StateMap[scenarioName];
+
+            foreach (var e in scenarioState.ProcessEvent(stepFinishedEvent))
+            {
+                yield return e;
+            }
+        }
     }
 }
