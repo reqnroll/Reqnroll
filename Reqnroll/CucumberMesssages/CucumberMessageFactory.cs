@@ -21,7 +21,7 @@ namespace Reqnroll.CucumberMesssages
             (
                 scenarioState.TestCaseID,
                 scenarioState.PickleID,
-                new List<TestStep>()
+                new List<TestStep> ()
             );
             return testCase;
         }
