@@ -23,13 +23,6 @@ namespace Reqnroll.Configuration
                 return reqnrollJsonFileInAppDomainBaseDirectory;
             }
 
-            var reqnrollJsonFileTwoDirectoriesUp = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", configurationFileName);
-
-            if (File.Exists(reqnrollJsonFileTwoDirectoriesUp))
-            {
-                return reqnrollJsonFileTwoDirectoriesUp;
-            }
-
             var reqnrollJsonFileInCurrentDirectory = Path.Combine(Environment.CurrentDirectory, configurationFileName);
 
             if (File.Exists(reqnrollJsonFileInCurrentDirectory))
