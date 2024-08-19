@@ -74,7 +74,7 @@ namespace Reqnroll.CucumberMesssages
                 foreach (var binding in bindingRegistry.GetStepDefinitions())
                 {
                     var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
-                    var pattern = CanonicalizeStepDefinitionPattern(stepDefinition);
+                    var pattern = CanonicalizeStepDefinitionPattern(binding);
                     StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
 
                     yield return Envelope.Create(stepDefinition);
@@ -89,14 +89,20 @@ namespace Reqnroll.CucumberMesssages
             return pickles.Last().Id;
         }
 
-        private string CanonicalizeStepDefinitionPattern(StepDefinition stepDefinition)
+        //private string CanonicalizeStepDefinitionPattern(StepDefinition stepDefinition)
+        //{
+        //    var sr = stepDefinition.SourceReference;
+        //    var signature = sr.JavaMethod != null ? String.Join(",", sr.JavaMethod.MethodParameterTypes) : "";
+
+        //    return $"{stepDefinition.Pattern}({signature})";
+        //}
+        public string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition)
         {
-            var sr = stepDefinition.SourceReference;
-            var signature = sr.JavaMethod != null ? String.Join(",", sr.JavaMethod.MethodParameterTypes) : "";
+            
+            var signature = stepDefinition.Method != null ? String.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
 
-            return $"{stepDefinition.Pattern}({signature})";
+            return $"{stepDefinition.SourceExpression}({signature})";
         }
-
 
 
     }
