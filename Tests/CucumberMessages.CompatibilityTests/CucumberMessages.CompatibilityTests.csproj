@@ -10,24 +10,88 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CCK\cdata\cdata.cs" />
+    <Compile Remove="CCK\data-tables\data_tables.cs" />
+    <Compile Remove="CCK\examples-tables\examples_tables.cs" />
     <Compile Remove="CCK\minimal\minimal.cs" />
+    <Compile Remove="CCK\parameter-types\parameter_types.cs" />
     <Compile Remove="CCK\pending\pending.cs" />
+    <Compile Remove="CCK\rules\rules.cs" />
+    <Compile Remove="CCK\skipped\skipped.cs" />
+    <Compile Remove="CCK\undefined\undefined.cs" />
+    <Compile Remove="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="CCK\attachments\attachments.feature" />
+    <None Remove="CCK\attachments\attachments.feature.ndjson" />
+    <None Remove="CCK\attachments\cucumber.jpeg" />
+    <None Remove="CCK\attachments\cucumber.png" />
+    <None Remove="CCK\attachments\document.pdf" />
+    <None Remove="CCK\cdata\cdata.feature" />
+    <None Remove="CCK\cdata\cdata.feature.ndjson" />
+    <None Remove="CCK\data-tables\data_tables.feature" />
+    <None Remove="CCK\data-tables\data_tables.feature.ndjson" />
+    <None Remove="CCK\examples-tables\examples_tables.feature" />
+    <None Remove="CCK\examples-tables\examples_tables.feature.ndjson" />
+    <None Remove="CCK\hooks\cucumber.svg" />
+    <None Remove="CCK\hooks\hooks.feature" />
+    <None Remove="CCK\hooks\hooks.feature.ndjson" />
     <None Remove="CCK\minimal\minimal.feature" />
     <None Remove="CCK\minimal\minimal.feature.ndjson" />
     <None Remove="CCK\pending\pending.feature" />
     <None Remove="CCK\pending\pending.feature.ndjson" />
+    <None Remove="CCK\rules\parameter-types.feature" />
+    <None Remove="CCK\rules\parameter-types.feature.ndjson" />
+    <None Remove="CCK\rules\rules.feature" />
+    <None Remove="CCK\rules\rules.feature.ndjson" />
+    <None Remove="CCK\skipped\skipped.feature" />
+    <None Remove="CCK\skipped\skipped.feature.ndjson" />
+    <None Remove="CCK\undefined\undefined.feature" />
+    <None Remove="CCK\undefined\undefined.feature.ndjson" />
+    <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
+    <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="CCK\attachments\attachments.feature" />
+    <EmbeddedResource Include="CCK\attachments\attachments.feature.ndjson" />
+    <EmbeddedResource Include="CCK\attachments\cucumber.jpeg" />
+    <EmbeddedResource Include="CCK\attachments\cucumber.png" />
+    <EmbeddedResource Include="CCK\attachments\document.pdf" />
+    <EmbeddedResource Include="CCK\cdata\cdata.cs" />
+    <EmbeddedResource Include="CCK\cdata\cdata.feature" />
+    <EmbeddedResource Include="CCK\cdata\cdata.feature.ndjson" />
+    <EmbeddedResource Include="CCK\data-tables\data_tables.feature" />
+    <EmbeddedResource Include="CCK\data-tables\data_tables.feature.ndjson" />
+    <EmbeddedResource Include="CCK\data-tables\data_tables.cs" />
+    <EmbeddedResource Include="CCK\examples-tables\examples_tables.cs" />
+    <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature" />
+    <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature.ndjson" />
+    <EmbeddedResource Include="CCK\hooks\cucumber.svg" />
+    <EmbeddedResource Include="CCK\hooks\hooks.feature" />
+    <EmbeddedResource Include="CCK\hooks\hooks.feature.ndjson" />
     <EmbeddedResource Include="CCK\minimal\minimal.cs" />
     <EmbeddedResource Include="CCK\minimal\minimal.feature" />
     <EmbeddedResource Include="CCK\minimal\minimal.feature.ndjson" />
+    <EmbeddedResource Include="CCK\parameter-types\parameter_types.cs" />
     <EmbeddedResource Include="CCK\pending\pending.cs" />
     <EmbeddedResource Include="CCK\pending\pending.feature" />
     <EmbeddedResource Include="CCK\pending\pending.feature.ndjson" />
+    <EmbeddedResource Include="CCK\parameter-types\parameter_types.feature" />
+    <EmbeddedResource Include="CCK\parameter-types\parameter_types.feature.ndjson" />
+    <EmbeddedResource Include="CCK\rules\rules.cs" />
+    <EmbeddedResource Include="CCK\rules\rules.feature" />
+    <EmbeddedResource Include="CCK\rules\rules.feature.ndjson" />
+    <EmbeddedResource Include="CCK\skipped\skipped.cs" />
+    <EmbeddedResource Include="CCK\skipped\skipped.feature" />
+    <EmbeddedResource Include="CCK\skipped\skipped.feature.ndjson" />
+    <EmbeddedResource Include="CCK\undefined\undefined.cs" />
+    <EmbeddedResource Include="CCK\undefined\undefined.feature" />
+    <EmbeddedResource Include="CCK\undefined\undefined.feature.ndjson" />
+    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
+    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
+    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
   </ItemGroup>
 
   <ItemGroup>

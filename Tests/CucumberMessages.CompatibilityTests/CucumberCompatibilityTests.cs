@@ -26,31 +26,29 @@ namespace CucumberMessages.CompatibilityTests
 
         [TestMethod]
         [DataRow("minimal")]
+        [DataRow("cdata")]
+        [DataRow("pending")]
+        [DataRow("examples-tables")]
+        [DataRow("data-tables")]
+        [DataRow("parameter-types")]
+        [DataRow("skipped")]
+        [DataRow("undefined")]
+        [DataRow("unknown-parameter-type")]
+        [DataRow("rules")]
         public void CCKPassingScenarios(string scenarioName)
         {
             AddCucumberMessagePlugIn();
 
-            AddFeatureFileFromResource($"{scenarioName}/{scenarioName}.feature", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
-            AddBindingClassFromResource($"{scenarioName}/{scenarioName}.cs", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
-
-            ExecuteTests();
-
-            ShouldAllScenariosPass();
-        }
-
-        [TestMethod]
-        [DataRow("pending")]
-        public void CCKPendingScenarios(string scenarioName)
-        {
-            AddCucumberMessagePlugIn();
+            scenarioName = scenarioName.Replace("-", "_");
 
             AddFeatureFileFromResource($"{scenarioName}/{scenarioName}.feature", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
             AddBindingClassFromResource($"{scenarioName}/{scenarioName}.cs", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
 
             ExecuteTests();
 
-            ShouldAllScenariosPend();
+            ConfirmAllTestsRan(null);
         }
+
 
     }
 }
