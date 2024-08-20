@@ -10,6 +10,27 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CCK\minimal\minimal.cs" />
+    <Compile Remove="CCK\pending\pending.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="CCK\minimal\minimal.feature" />
+    <None Remove="CCK\minimal\minimal.feature.ndjson" />
+    <None Remove="CCK\pending\pending.feature" />
+    <None Remove="CCK\pending\pending.feature.ndjson" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="CCK\minimal\minimal.cs" />
+    <EmbeddedResource Include="CCK\minimal\minimal.feature" />
+    <EmbeddedResource Include="CCK\minimal\minimal.feature.ndjson" />
+    <EmbeddedResource Include="CCK\pending\pending.cs" />
+    <EmbeddedResource Include="CCK\pending\pending.feature" />
+    <EmbeddedResource Include="CCK\pending\pending.feature.ndjson" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.9.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.1.1" />
@@ -17,11 +38,16 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
     <ProjectReference Include="..\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>

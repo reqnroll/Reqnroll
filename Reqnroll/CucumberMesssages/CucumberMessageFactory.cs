@@ -90,7 +90,7 @@ namespace Reqnroll.CucumberMesssages
         {
             return new StepMatchArgument(
                 new Group(
-                    null,
+                    new List<Group>(),
                     null,
                     argument.Value
                     ),
