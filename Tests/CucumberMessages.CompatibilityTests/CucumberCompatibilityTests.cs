@@ -25,10 +25,12 @@ namespace CucumberMessages.CompatibilityTests
         }
 
         [TestMethod]
+        //[DataRow("attachments")]
         [DataRow("minimal")]
         [DataRow("cdata")]
         [DataRow("pending")]
         [DataRow("examples-tables")]
+        [DataRow("hooks")]
         [DataRow("data-tables")]
         [DataRow("parameter-types")]
         [DataRow("skipped")]
@@ -43,12 +45,15 @@ namespace CucumberMessages.CompatibilityTests
 
             AddFeatureFileFromResource($"{scenarioName}/{scenarioName}.feature", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
             AddBindingClassFromResource($"{scenarioName}/{scenarioName}.cs", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+            AddBinaryFilesFromResource($"{scenarioName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
 
             ExecuteTests();
 
             ConfirmAllTestsRan(null);
+            if (scenarioName == "attachments")
+            {
+                ShouldAllScenariosPass();
+            }
         }
-
-
     }
 }

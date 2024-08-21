@@ -10,9 +10,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CCK\attachments\attachments.cs" />
     <Compile Remove="CCK\cdata\cdata.cs" />
     <Compile Remove="CCK\data-tables\data_tables.cs" />
     <Compile Remove="CCK\examples-tables\examples_tables.cs" />
+    <Compile Remove="CCK\hooks\hooks.cs" />
     <Compile Remove="CCK\minimal\minimal.cs" />
     <Compile Remove="CCK\parameter-types\parameter_types.cs" />
     <Compile Remove="CCK\pending\pending.cs" />
@@ -54,6 +56,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="CCK\attachments\attachments.cs" />
     <EmbeddedResource Include="CCK\attachments\attachments.feature" />
     <EmbeddedResource Include="CCK\attachments\attachments.feature.ndjson" />
     <EmbeddedResource Include="CCK\attachments\cucumber.jpeg" />
@@ -69,6 +72,7 @@
     <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature" />
     <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature.ndjson" />
     <EmbeddedResource Include="CCK\hooks\cucumber.svg" />
+    <EmbeddedResource Include="CCK\hooks\hooks.cs" />
     <EmbeddedResource Include="CCK\hooks\hooks.feature" />
     <EmbeddedResource Include="CCK\hooks\hooks.feature.ndjson" />
     <EmbeddedResource Include="CCK\minimal\minimal.cs" />
