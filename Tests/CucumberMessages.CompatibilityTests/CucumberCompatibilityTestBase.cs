@@ -28,5 +28,23 @@ namespace CucumberMessages.CompatibilityTests
             int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
             _vsTestExecutionDriver.LastTestExecutionResult.Pending.Should().Be(expectedNrOfTests, "all tests should pend");
         }
+
+        protected void AddBinaryFilesFromResource(string scenarioName, string prefix, Assembly assembly)
+        {
+            foreach (var fileName in GetTestBinaryFileNames(scenarioName, prefix, assembly))
+            {
+                var content = _testFileManager.GetTestFileContent(fileName, $"{prefix}.{scenarioName}", assembly);
+                _projectsDriver.AddFile(fileName, content);
+            }
+        }
+
+        protected IEnumerable<string> GetTestBinaryFileNames(string scenarioName, string prefix, Assembly? assembly)
+        {
+            var testAssembly = assembly ?? Assembly.GetExecutingAssembly();
+            string prefixToRemove = $"{prefix}.{scenarioName}.";
+            return testAssembly.GetManifestResourceNames()
+                           .Where(rn => !rn.EndsWith(".feature") && !rn.EndsWith(".cs") && !rn.EndsWith(".feature.ndjson")  && rn.StartsWith(prefixToRemove))
+                           .Select(rn => rn.Substring(prefixToRemove.Length));
+        }
     }
 }
