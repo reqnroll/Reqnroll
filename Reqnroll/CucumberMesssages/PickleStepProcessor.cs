@@ -2,7 +2,6 @@
 using Reqnroll.Assist;
 using Reqnroll.Bindings;
 using Reqnroll.Events;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,20 +13,14 @@ namespace Reqnroll.CucumberMesssages
         public string Type;
     }
 
-    public class StepState
+    public class PickleStepProcessor : StepProcessorBase
     {
-        private ScenarioState scenarioState;
         private StepStartedEvent stepStartedEvent;
 
-        public StepState(ScenarioState parentScenarioState, StepStartedEvent stepStartedEvent)
+        public PickleStepProcessor(ScenarioEventProcessor parentScenarioState) : base(parentScenarioState)
         {
-            scenarioState = parentScenarioState;
-            this.stepStartedEvent = stepStartedEvent;
-
         }
 
-        public string TestStepID { get; set; }
-        public string TestCaseStartedID => scenarioState.TestCaseStartedID;
         public string PickleStepID { get; set; }
         public bool Bound { get; set; }
         public string CanonicalizedStepPattern { get; set; }
@@ -35,25 +28,22 @@ namespace Reqnroll.CucumberMesssages
         public IStepDefinitionBinding StepDefinition { get; set; }
 
         public StepArgument[] StepArguments { get; set; }
-        public TimeSpan Duration { get; set; }
-        public ScenarioExecutionStatus Status { get; set; }
-
-
 
         internal IEnumerable<Envelope> ProcessEvent(StepStartedEvent stepStartedEvent)
         {
-            TestStepID = scenarioState.IdGenerator.GetNewId();
+            this.stepStartedEvent = stepStartedEvent;
+            TestStepID = parentScenario.IdGenerator.GetNewId();
             return Enumerable.Empty<Envelope>();
         }
 
         private string FindStepDefIDByStepPattern(string canonicalizedStepPattern)
         {
-            return scenarioState.FeatureState.StepDefinitionsByPattern[canonicalizedStepPattern];
+            return parentScenario.FeatureState.StepDefinitionsByPattern[canonicalizedStepPattern];
         }
 
         private string FindPickleStepIDByStepText(string stepText)
         {
-            return scenarioState.FeatureState.PicklesByScenarioName[scenarioState.Name].Steps.Where(st => st.Text == stepText).First().Id;
+            return parentScenario.FeatureState.PicklesByScenarioName[parentScenario.Name].Steps.Where(st => st.Text == stepText).First().Id;
         }
 
         internal IEnumerable<Envelope> ProcessEvent(StepFinishedEvent stepFinishedEvent)
@@ -81,4 +71,6 @@ namespace Reqnroll.CucumberMesssages
         }
 
     }
+
+  
 }

@@ -32,10 +32,15 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooks
 
         // Hook implementations
         [BeforeScenario]
-        [AfterScenario]
-        public void ScenarioHook() { }
+        public void BeforeScenarioHook() { }
 
-        [AfterScenario(new string[] { "some-tag", "some-other-tag" })]
+        [BeforeScenario()]
+        public void NamedBeforeHook() { }
+
+        [AfterScenario]
+        public void AfterScenarioHook() { }
+
+        [AfterScenario("some-tag or some-other-tag")]
         public void FailingAfterHook()
         {
             throw new Exception("Exception in conditional hook");
