@@ -1,10 +1,13 @@
 
+using Cucumber.Messages;
+using Io.Cucumber.Messages.Types;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using System.Reflection;
 
 namespace CucumberMessages.CompatibilityTests
 {
     [TestClass]
-    public class CucumberCompatibilitySmokeTest : CucumberCompatibilityTestBase
+    public class CucumberCompatibilityTests : CucumberCompatibilityTestBase
     {
         [TestMethod]
         public void SmokeTest()
@@ -54,6 +57,14 @@ namespace CucumberMessages.CompatibilityTests
             {
                 ShouldAllScenariosPass();
             }
+        }
+
+        private IEnumerable<Envelope> GetExpectedResults(string scenarioName)
+        {
+            var workingDirectory = Assembly.GetExecutingAssembly().GetAssemblyLocation();
+            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, $"{scenarioName}.feature.ndjson"));
+
+            foreach(var json in expectedJsonText) yield return NdjsonSerializer.Deserialize(json);
         }
     }
 }

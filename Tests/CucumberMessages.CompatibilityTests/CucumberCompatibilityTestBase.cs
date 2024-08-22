@@ -46,5 +46,11 @@ namespace CucumberMessages.CompatibilityTests
                            .Where(rn => !rn.EndsWith(".feature") && !rn.EndsWith(".cs") && !rn.EndsWith(".feature.ndjson")  && rn.StartsWith(prefixToRemove))
                            .Select(rn => rn.Substring(prefixToRemove.Length));
         }
+
+        protected string GetExpectedNDJSONFileContent(string scenarioName, string prefix, Assembly? assembly)
+        {
+            var testAssembly = assembly ?? Assembly.GetExecutingAssembly();
+            return _testFileManager.GetTestFileContent($"{scenarioName}.feature.ndjson", $"{prefix}.{scenarioName}", testAssembly);
+        }
     }
 }
