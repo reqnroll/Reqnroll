@@ -58,44 +58,68 @@
   <ItemGroup>
     <EmbeddedResource Include="CCK\attachments\attachments.cs" />
     <EmbeddedResource Include="CCK\attachments\attachments.feature" />
-    <EmbeddedResource Include="CCK\attachments\attachments.feature.ndjson" />
+    <Content Include="CCK\attachments\attachments.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\attachments\cucumber.jpeg" />
     <EmbeddedResource Include="CCK\attachments\cucumber.png" />
     <EmbeddedResource Include="CCK\attachments\document.pdf" />
     <EmbeddedResource Include="CCK\cdata\cdata.cs" />
     <EmbeddedResource Include="CCK\cdata\cdata.feature" />
-    <EmbeddedResource Include="CCK\cdata\cdata.feature.ndjson" />
+    <Content Include="CCK\cdata\cdata.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\data-tables\data_tables.feature" />
-    <EmbeddedResource Include="CCK\data-tables\data_tables.feature.ndjson" />
+    <Content Include="CCK\data-tables\data_tables.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\data-tables\data_tables.cs" />
     <EmbeddedResource Include="CCK\examples-tables\examples_tables.cs" />
     <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature" />
-    <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature.ndjson" />
+    <Content Include="CCK\examples-tables\examples_tables.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\hooks\cucumber.svg" />
     <EmbeddedResource Include="CCK\hooks\hooks.cs" />
     <EmbeddedResource Include="CCK\hooks\hooks.feature" />
-    <EmbeddedResource Include="CCK\hooks\hooks.feature.ndjson" />
+    <Content Include="CCK\hooks\hooks.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\minimal\minimal.cs" />
     <EmbeddedResource Include="CCK\minimal\minimal.feature" />
-    <EmbeddedResource Include="CCK\minimal\minimal.feature.ndjson" />
+    <Content Include="CCK\minimal\minimal.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\parameter-types\parameter_types.cs" />
     <EmbeddedResource Include="CCK\pending\pending.cs" />
     <EmbeddedResource Include="CCK\pending\pending.feature" />
-    <EmbeddedResource Include="CCK\pending\pending.feature.ndjson" />
+    <Content Include="CCK\pending\pending.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\parameter-types\parameter_types.feature" />
-    <EmbeddedResource Include="CCK\parameter-types\parameter_types.feature.ndjson" />
+    <Content Include="CCK\parameter-types\parameter_types.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\rules\rules.cs" />
     <EmbeddedResource Include="CCK\rules\rules.feature" />
-    <EmbeddedResource Include="CCK\rules\rules.feature.ndjson" />
+    <Content Include="CCK\rules\rules.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\skipped\skipped.cs" />
     <EmbeddedResource Include="CCK\skipped\skipped.feature" />
-    <EmbeddedResource Include="CCK\skipped\skipped.feature.ndjson" />
+    <Content Include="CCK\skipped\skipped.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\undefined\undefined.cs" />
     <EmbeddedResource Include="CCK\undefined\undefined.feature" />
-    <EmbeddedResource Include="CCK\undefined\undefined.feature.ndjson" />
+    <Content Include="CCK\undefined\undefined.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
     <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
-    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
+    <Content Include="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup>
