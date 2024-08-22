@@ -27,7 +27,7 @@ namespace Reqnroll.CucumberMesssages
         public string StepDefinitionId { get; private set; }
         public IStepDefinitionBinding StepDefinition { get; set; }
 
-        public StepArgument[] StepArguments { get; set; }
+        public List<StepArgument> StepArguments { get; set; }
 
         internal IEnumerable<Envelope> ProcessEvent(StepStartedEvent stepStartedEvent)
         {
@@ -48,29 +48,31 @@ namespace Reqnroll.CucumberMesssages
 
         internal IEnumerable<Envelope> ProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
-            StepDefinition = stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding;
-            Bound = !(StepDefinition == null || StepDefinition == BindingMatch.NonMatching);
+            var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
+            Bound = !(bindingMatch == null || bindingMatch == BindingMatch.NonMatching);
 
-            if (Bound)
-            {
-                CanonicalizedStepPattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(StepDefinition);
-                StepDefinitionId = FindStepDefIDByStepPattern(CanonicalizedStepPattern);
+            StepDefinition = Bound ? bindingMatch.StepBinding : null;
+            CanonicalizedStepPattern = Bound ? CucumberMessageFactory.CanonicalizeStepDefinitionPattern(StepDefinition) : "";
+            StepDefinitionId = Bound ? FindStepDefIDByStepPattern(CanonicalizedStepPattern) : null;
 
-                PickleStepID = FindPickleStepIDByStepText(stepFinishedEvent.StepContext.StepInfo.Text);
+            PickleStepID = FindPickleStepIDByStepText(stepFinishedEvent.StepContext.StepInfo.Text);
 
-                Duration = stepFinishedEvent.Timestamp - stepStartedEvent.Timestamp;
-                Status = stepFinishedEvent.StepContext.Status;
+            Duration = stepFinishedEvent.Timestamp - stepStartedEvent.Timestamp;
+            Status = stepFinishedEvent.StepContext.Status;
 
-                StepArguments = stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => new StepArgument
+            StepArguments = Bound ?
+                stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => new StepArgument
                 {
                     Value = arg.ToString(),
                     Type = arg.GetType().Name
-                }).ToArray();
-            }
+                }).ToList<StepArgument>()
+                : Enumerable.Empty<StepArgument>().ToList<StepArgument>();
+
+
             return Enumerable.Empty<Envelope>();
         }
 
     }
 
-  
+
 }
