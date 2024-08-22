@@ -85,7 +85,7 @@ namespace Reqnroll.CucumberMesssages
 
         internal static TestStep ToTestStep(ScenarioEventProcessor scenarioState, PickleStepProcessor stepState)
         {
-            //TODO: This only works if the step is properly bound. Need to determine what to do otherwise
+            bool bound = stepState.StepDefinitionId != null;
 
             var args = stepState.StepArguments
                .Select(arg => CucumberMessageFactory.ToStepMatchArgument(arg))
@@ -95,9 +95,9 @@ namespace Reqnroll.CucumberMesssages
                  null,
                  stepState.TestStepID,
                  stepState.PickleStepID,
-                 new List<string> { stepState.StepDefinitionId },
-                 new List<StepMatchArgumentsList> { new StepMatchArgumentsList(args) }
-                 );
+                 bound ? new List<string> { stepState.StepDefinitionId } : new List<string>(),
+                 bound ? new List<StepMatchArgumentsList> { new StepMatchArgumentsList(args) } : new List<StepMatchArgumentsList>()
+                 ); 
 
             return result;
         }
@@ -149,7 +149,12 @@ namespace Reqnroll.CucumberMesssages
             var hookCacheKey = CanonicalizeHookBinding(hookStepState.HookBindingFinishedEvent.HookBinding);
             var hookId = hookStepState.parentScenario.FeatureState.HookDefinitionsByPattern[hookCacheKey];
 
-            return new TestStep(hookId, hookStepState.TestStepID, null, new List<string>(), new List<StepMatchArgumentsList>());
+            return new TestStep(
+                hookId, 
+                hookStepState.TestStepID, 
+                null, 
+                new List<string>(), 
+                new List<StepMatchArgumentsList>());
         }
         internal static TestStepStarted ToTestStepStarted(HookStepProcessor hookStepProcessor, HookBindingFinishedEvent hookBindingFinishedEvent)
         {

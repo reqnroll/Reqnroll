@@ -15,6 +15,7 @@ using Reqnroll.Bindings;
 using System.Reflection;
 using System.Collections.Concurrent;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Reqnroll.CucumberMesssages
 {
@@ -30,6 +31,7 @@ namespace Reqnroll.CucumberMesssages
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
+            //Debugger.Launch();
             runtimePluginEvents.CustomizeFeatureDependencies += (sender, args) =>
             {
                 objectContainer = args.ObjectContainer;

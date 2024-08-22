@@ -37,7 +37,7 @@ namespace CucumberMessages.CompatibilityTests
         [DataRow("undefined")]
         [DataRow("unknown-parameter-type")]
         [DataRow("rules")]
-        public void CCKPassingScenarios(string scenarioName)
+        public void CCKScenarios(string scenarioName)
         {
             AddCucumberMessagePlugIn();
 
