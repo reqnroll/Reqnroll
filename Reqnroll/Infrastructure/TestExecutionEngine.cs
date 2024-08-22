@@ -362,7 +362,7 @@ namespace Reqnroll.Infrastructure
             }
             finally
             {
-                _testThreadExecutionEventPublisher.PublishEvent(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration));
+                _testThreadExecutionEventPublisher.PublishEvent(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager));
             }
         }
 

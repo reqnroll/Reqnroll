@@ -1,5 +1,6 @@
 using System;
 using Reqnroll.Bindings;
+using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Events
 {
@@ -182,11 +183,17 @@ namespace Reqnroll.Events
         public IHookBinding HookBinding { get; }
 
         public TimeSpan Duration { get; }
+        public IContextManager ContextManager { get; private set; }
 
         public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration)
         {
             HookBinding = hookBinding;
             Duration = duration;
+        }
+
+        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager) : this(hookBinding, duration)
+        {
+            ContextManager = contextManager;
         }
     }
 

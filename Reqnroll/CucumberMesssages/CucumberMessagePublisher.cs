@@ -22,7 +22,7 @@ namespace Reqnroll.CucumberMesssages
     {
         private ICucumberMessageBroker broker;
         private IObjectContainer objectContainer;
-        private ConcurrentDictionary<string, FeatureState> featureStatesByFeatureName = new();
+        private ConcurrentDictionary<string, FeatureEventProcessor> featureProcessorsByFeatureName = new();
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         {
@@ -50,22 +50,24 @@ namespace Reqnroll.CucumberMesssages
             testThreadEventPublisher.AddHandler<ScenarioFinishedEvent>(ScenarioFinishedEventHandler);
             testThreadEventPublisher.AddHandler<StepStartedEvent>(StepStartedEventHandler);
             testThreadEventPublisher.AddHandler<StepFinishedEvent>(StepFinishedEventHandler);
+            testThreadEventPublisher.AddHandler<HookBindingFinishedEvent>(HookBindingFinishedEventHandler);
         }
+
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var enabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source == null ? false : true;
 
-            var featureState = new FeatureState
+            var featureProc = new FeatureEventProcessor
             {
                 Name = featureName,
                 Enabled = enabled
             };
 
-            if (!featureStatesByFeatureName.TryAdd(featureName, featureState))
+            if (!featureProcessorsByFeatureName.TryAdd(featureName, featureProc))
             {
                 // This feature has already been started by another thread (executing a different scenario)
-                var featureState_alreadyrunning = featureStatesByFeatureName[featureName];
+                var featureState_alreadyrunning = featureProcessorsByFeatureName[featureName];
                 featureState_alreadyrunning.workerThreadMarkers.Push(1); // add a marker that this thread is active as well
 
                 // None of the rest of this method should be executed
@@ -78,41 +80,35 @@ namespace Reqnroll.CucumberMesssages
             if (!enabled)
                 return;
 
-            foreach (Envelope e in featureState.ProcessEvent(featureStartedEvent))
-            {
-                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
-            }
+            ProcessEvent(featureStartedEvent, featureName);
         }
 
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
-            var featureState = featureStatesByFeatureName[featureName];
+            var featureProcessor = featureProcessorsByFeatureName[featureName];
 
-            lock (featureState)
+            lock (featureProcessor)
             {
                 // Remove the worker thread marker for this thread
-                featureState.workerThreadMarkers.TryPop(out int result);
+                featureProcessor.workerThreadMarkers.TryPop(out int result);
 
                 // Check if there are other threads still working on this feature
-                if (featureState.workerThreadMarkers.TryPeek(out result))
+                if (featureProcessor.workerThreadMarkers.TryPeek(out result))
                 {
                     // There are other threads still working on this feature, so we won't publish the TestRunFinished message just yet
                     return;
                 }
-                featureState.Finished = true;
+                featureProcessor.Finished = true;
             }
 
 
-            if (!featureState.Enabled)
+            if (!featureProcessor.Enabled)
                 return;
 
-            foreach (Envelope e in featureState.ProcessEvent(featureFinishedEvent))
-            {
-                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
-            }
+            ProcessEvent(featureFinishedEvent, featureName);
 
-            foreach (var message in featureState.Messages)
+            foreach (var message in featureProcessor.Messages)
             {
                 broker.Publish(message);
             }
@@ -123,43 +119,37 @@ namespace Reqnroll.CucumberMesssages
         private void ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
         {
             var featureName = scenarioStartedEvent.FeatureContext.FeatureInfo.Title;
-            var featureState = featureStatesByFeatureName[featureName];
-
-            foreach (Envelope e in featureState.ProcessEvent(scenarioStartedEvent))
-            {
-                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
-            }
+            ProcessEvent(scenarioStartedEvent, featureName);
         }
+
         private void ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             var featureName = scenarioFinishedEvent.FeatureContext.FeatureInfo.Title;
-            var featureState = featureStatesByFeatureName[featureName];
-            foreach (Envelope e in featureState.ProcessEvent(scenarioFinishedEvent))
-            {
-                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
-            }
+            ProcessEvent(scenarioFinishedEvent, featureName);
         }
 
         private void StepStartedEventHandler(StepStartedEvent stepStartedEvent)
         {
             var featureName = stepStartedEvent.FeatureContext.FeatureInfo.Title;
-            var featureState = featureStatesByFeatureName[featureName];
-            foreach (Envelope e in featureState.ProcessEvent(stepStartedEvent))
-            {
-                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
-            }
+            ProcessEvent(stepStartedEvent, featureName);
         }
 
         private void StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
         {
             var featureName = stepFinishedEvent.FeatureContext.FeatureInfo.Title;
-            var featureState = featureStatesByFeatureName[featureName];
-            foreach (Envelope e in featureState.ProcessEvent(stepFinishedEvent))
-            {
-                featureState.Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = featureName, Envelope = e });
-            }
+            ProcessEvent(stepFinishedEvent, featureName);
         }
 
+        private void HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingEvent)
+        {
+            var featureName = hookBindingEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
+            ProcessEvent(hookBindingEvent, featureName);
+        }
+        private void ProcessEvent(ExecutionEvent anEvent, string featureName)
+        {
+            var featureProcessor = featureProcessorsByFeatureName[featureName];
 
+            featureProcessor.ProcessEvent(anEvent);
+        }
     }
 }

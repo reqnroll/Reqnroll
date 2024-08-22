@@ -12,7 +12,7 @@ using System.Linq;
 
 namespace Reqnroll.CucumberMesssages
 {
-    public class FeatureState
+    public class FeatureEventProcessor
     {
         public string Name { get; set; }
         public bool Enabled { get; set; } //This will be false if the feature could not be pickled
@@ -26,23 +26,55 @@ namespace Reqnroll.CucumberMesssages
         {
             get
             {
-                return Enabled && Finished && ScenarioName2StateMap.Values.All(s => s.ScenarioExecutionStatus == ScenarioExecutionStatus.OK) ;
+                return Enabled && Finished && ScenarioName2ScenarioProcessorMap.Values.All(s => s.ScenarioExecutionStatus == ScenarioExecutionStatus.OK);
             }
         }
 
-        //ID Generator to use when generating IDs for TestCase messages and beyond
+        // ID Generator to use when generating IDs for TestCase messages and beyond
         // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
-        // otherwise we'll use a GUID ID generator
+        // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
         public IIdGenerator IDGenerator { get; set; }
 
         //Lookup tables
-        public Dictionary<string, string> StepDefinitionsByPattern = new();
-        public Dictionary<string, Io.Cucumber.Messages.Types.Pickle> PicklesByScenarioName = new();
+        //
+        // These three dictionaries hold the mapping of steps, hooks, and pickles to their IDs
+        // These should only be produced by the first FeatureStartedEvent that this FeatureEventProcessor receives (it might receive multiple if the scenario is run concurrently)
+        // therefore these are ConcurrentDictionary and we us the TryAdd method on them to only add each mapping once
+        public ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
+        public ConcurrentDictionary<string, string> HookDefinitionsByPattern = new();
+        public ConcurrentDictionary<string, Io.Cucumber.Messages.Types.Pickle> PicklesByScenarioName = new();
 
-        public Dictionary<string, ScenarioState> ScenarioName2StateMap = new();
+        // Scenario event processors by scenario name; 
+        public Dictionary<string, ScenarioEventProcessor> ScenarioName2ScenarioProcessorMap = new();
 
+        // The list of Cucumber Messages that are ready to be sent to the broker for distribution to consumers
         public ConcurrentQueue<ReqnrollCucumberMessage> Messages = new();
+
+        // A set of markers that represent the worker threads that are currently processing events for this feature.
+        // Once the last worker thread marker is removed, the Messages are then sent to the broker
         public ConcurrentStack<int> workerThreadMarkers = new();
+
+        internal void ProcessEvent(ExecutionEvent anEvent)
+        {
+            foreach (Envelope e in DispatchEvent(anEvent))
+            {
+                Messages.Enqueue(new ReqnrollCucumberMessage { CucumberMessageSource = Name, Envelope = e });
+            }
+        }
+        private IEnumerable<Envelope> DispatchEvent(ExecutionEvent anEvent)
+        {
+            return anEvent switch
+            {
+                FeatureStartedEvent featureStartedEvent => ProcessEvent(featureStartedEvent),
+                FeatureFinishedEvent featureFinishedEvent => ProcessEvent(featureFinishedEvent),
+                ScenarioStartedEvent scenarioStartedEvent => ProcessEvent(scenarioStartedEvent),
+                ScenarioFinishedEvent scenarioFinishedEvent => ProcessEvent(scenarioFinishedEvent),
+                StepStartedEvent stepStartedEvent => ProcessEvent(stepStartedEvent),
+                StepFinishedEvent stepFinishedEvent => ProcessEvent(stepFinishedEvent),
+                HookBindingFinishedEvent hookFinishedEvent => ProcessEvent(hookFinishedEvent),
+                _ => throw new NotImplementedException(),
+            };
+        }
 
         internal IEnumerable<Envelope> ProcessEvent(FeatureStartedEvent featureStartedEvent)
         {
@@ -72,7 +104,7 @@ namespace Reqnroll.CucumberMesssages
 
             foreach (var pickle in pickles)
             {
-                PicklesByScenarioName.Add(pickle.Name, pickle);
+                PicklesByScenarioName.TryAdd(pickle.Name, pickle);
                 yield return Envelope.Create(pickle);
             }
 
@@ -83,16 +115,23 @@ namespace Reqnroll.CucumberMesssages
                 {
                     var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
                     var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
-                    StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
+                    StepDefinitionsByPattern.TryAdd(pattern, stepDefinition.Id);
 
                     yield return Envelope.Create(stepDefinition);
+                }
+
+                foreach (var hookBinding in bindingRegistry.GetHooks())
+                {
+                    var hook = CucumberMessageFactory.ToHook(hookBinding, IDGenerator);
+                    var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
+                    HookDefinitionsByPattern.TryAdd(hookId, hook.Id);
+                    yield return Envelope.Create(hook);
                 }
             }
 
             yield return Envelope.Create(CucumberMessageFactory.ToTestRunStarted(this, featureStartedEvent));
 
         }
-
 
         internal IEnumerable<Envelope> ProcessEvent(FeatureFinishedEvent featureFinishedEvent)
         {
@@ -102,26 +141,21 @@ namespace Reqnroll.CucumberMesssages
         internal IEnumerable<Envelope> ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
             var scenarioName = scenarioStartedEvent.ScenarioContext.ScenarioInfo.Title;
-            var scenarioState = new ScenarioState(scenarioStartedEvent.ScenarioContext, this);
-            ScenarioName2StateMap.Add(scenarioName, scenarioState);
+            var scenarioEP = new ScenarioEventProcessor(scenarioStartedEvent.ScenarioContext, this);
+            ScenarioName2ScenarioProcessorMap.Add(scenarioName, scenarioEP);
 
-            foreach (var e in scenarioState.ProcessEvent(scenarioStartedEvent))
+            foreach (var e in scenarioEP.ProcessEvent(scenarioStartedEvent))
             {
                 yield return e;
             }
         }
 
-        private string ExtractLastID(List<Pickle> pickles)
-        {
-            return pickles.Last().Id;
-        }
-
         internal IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             var scenarioName = scenarioFinishedEvent.ScenarioContext.ScenarioInfo.Title;
-            var scenarioState = ScenarioName2StateMap[scenarioName];
+            var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
 
-            foreach (var e in scenarioState.ProcessEvent(scenarioFinishedEvent))
+            foreach (var e in scenarioEP.ProcessEvent(scenarioFinishedEvent))
             {
                 yield return e;
             }
@@ -130,9 +164,9 @@ namespace Reqnroll.CucumberMesssages
         internal IEnumerable<Envelope> ProcessEvent(StepStartedEvent stepStartedEvent)
         {
             var scenarioName = stepStartedEvent.ScenarioContext.ScenarioInfo.Title;
-            var scenarioState = ScenarioName2StateMap[scenarioName];
+            var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
 
-            foreach (var e in scenarioState.ProcessEvent(stepStartedEvent))
+            foreach (var e in scenarioEP.ProcessEvent(stepStartedEvent))
             {
                 yield return e;
             }
@@ -141,12 +175,30 @@ namespace Reqnroll.CucumberMesssages
         internal IEnumerable<Envelope> ProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
             var scenarioName = stepFinishedEvent.ScenarioContext.ScenarioInfo.Title;
-            var scenarioState = ScenarioName2StateMap[scenarioName];
+            var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
 
-            foreach (var e in scenarioState.ProcessEvent(stepFinishedEvent))
+            foreach (var e in scenarioEP.ProcessEvent(stepFinishedEvent))
             {
                 yield return e;
             }
         }
+
+        internal IEnumerable<Envelope> ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
+        {
+            var scenarioName = hookFinishedEvent.ContextManager?.ScenarioContext?.ScenarioInfo?.Title;
+            var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
+
+            foreach (var e in scenarioEP.ProcessEvent(hookFinishedEvent))
+            {
+                yield return e;
+            }
+
+        }
+
+        private string ExtractLastID(List<Pickle> pickles)
+        {
+            return pickles.Last().Id;
+        }
+
     }
 }
