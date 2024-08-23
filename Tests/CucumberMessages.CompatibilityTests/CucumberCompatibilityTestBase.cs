@@ -52,5 +52,11 @@ namespace CucumberMessages.CompatibilityTests
             var testAssembly = assembly ?? Assembly.GetExecutingAssembly();
             return _testFileManager.GetTestFileContent($"{scenarioName}.feature.ndjson", $"{prefix}.{scenarioName}", testAssembly);
         }
+
+        protected void CucumberMessagesAddConfigurationFile(string configFileName)
+        {
+            var configFileContent = File.ReadAllText(configFileName);
+            _projectsDriver.AddFile(configFileName, configFileContent);
+        }
     }
 }

@@ -9,31 +9,38 @@ using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
 using System.Diagnostics;
 using Reqnroll.Events;
 using System.Collections.Concurrent;
+using System.Text.Json;
 
 [assembly: RuntimePlugin(typeof(FileSinkPlugin))]
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 {
-    //TODO: Add support for Reqnroll Configuration to initialize the FileSinkPlugin by specifying the path to the base directory.
-
     public class FileSinkPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
+        private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configuration.json";
         private Task? fileWritingTask;
 
         //Thread safe collections to hold:
         // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
         // 2. Dictionary of Feature Streams (Key: Feature Name, Value: StreamWriter)
-
+        private object _lock = new();
         private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
         private readonly ConcurrentDictionary<string, StreamWriter> fileStreams = new();
+        private FileSinkConfiguration? configuration;
+        private string baseDirectory = "";
 
         public FileSinkPlugin()
         {
-            //Debugger.Launch();
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
+
+            configuration = JsonSerializer.Deserialize<FileSinkConfiguration>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
+            if (!configuration!.FileSinkEnabled)
+                return;
+
+            baseDirectory = ProcessConfiguration(configuration);
 
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) => args.ObjectContainer.RegisterInstanceAs<ICucumberMessageSink>(this);
 
@@ -45,6 +52,30 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             };
         }
 
+        private string ProcessConfiguration(FileSinkConfiguration configuration)
+        {
+            var activeDestination = configuration.Destinations.Where(d => d.Enabled).FirstOrDefault();
+
+            if (activeDestination != null)
+            {
+                var basePath = Path.Combine(activeDestination.BasePath, activeDestination.OutputDirectory);
+                if (!Directory.Exists(basePath))
+                {
+                    lock(_lock)
+                    {
+                        if (!Directory.Exists(basePath))
+                            Directory.CreateDirectory(basePath);
+                    }
+                }
+
+                return basePath;
+            }
+            else
+            {
+                return Assembly.GetExecutingAssembly().Location;
+            }
+        }
+
         private void CloseFileSink(TestRunFinishedEvent @event)
         {
             postedMessages.CompleteAdding();
@@ -54,13 +85,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
-            Console.WriteLine("LaunchFileSink called");
-
-            if (!Directory.Exists(baseDirectory))
-            {
-                Directory.CreateDirectory(baseDirectory);
-            }
-
             fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
         }
 
@@ -71,17 +95,13 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private async Task ConsumeAndWriteToFiles()
         {
-            Console.WriteLine("ConsumeAndWriteToFiles called");
-
             foreach (var message in postedMessages.GetConsumingEnumerable())
             {
                 var featureName = message.CucumberMessageSource;
 
-                Console.WriteLine("ConsumeAndWriteToFiles: " + featureName);
                 if (message.Envelope != null)
                 {
                     var cm = Serialize(message.Envelope);
-                    Console.WriteLine("ConsumeAndWriteToFiles: " + cm);
                     await Write(featureName, cm);
                 }
                 else
@@ -91,7 +111,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             }
         }
 
-        private string baseDirectory = Path.Combine("C:\\Users\\clrud\\source\\repos\\scratch", "CucumberMessages");
         private bool disposedValue;
 
         private string Serialize(Envelope message)
@@ -103,7 +122,13 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
             if (!fileStreams.ContainsKey(featureName))
             {
-                fileStreams[featureName] = File.CreateText(Path.Combine(baseDirectory, $"{featureName}.ndjson"));
+                lock (_lock)
+                {
+                    if (!fileStreams.ContainsKey(featureName))
+                    {
+                        fileStreams[featureName] = File.CreateText(Path.Combine(baseDirectory, $"{featureName}.ndjson"));
+                    }
+                }
             }
             await fileStreams[featureName].WriteLineAsync(cucumberMessage);
         }

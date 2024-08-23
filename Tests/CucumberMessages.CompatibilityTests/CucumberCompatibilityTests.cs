@@ -13,6 +13,7 @@ namespace CucumberMessages.CompatibilityTests
         public void SmokeTest()
         {
             AddCucumberMessagePlugIn();
+            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Test
@@ -43,6 +44,7 @@ namespace CucumberMessages.CompatibilityTests
         public void CCKScenarios(string scenarioName)
         {
             AddCucumberMessagePlugIn();
+            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
 
             scenarioName = scenarioName.Replace("-", "_");
 
