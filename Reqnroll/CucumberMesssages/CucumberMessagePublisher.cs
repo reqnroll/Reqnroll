@@ -42,10 +42,6 @@ namespace Reqnroll.CucumberMesssages
 
         public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
         {
-
-            var traceListener = objectContainer.Resolve<ITraceListener>();
-            traceListener.WriteTestOutput("HookIntoTestThreadExecutionEventPublisher");
-
             testThreadEventPublisher.AddHandler<FeatureStartedEvent>(FeatureStartedEventHandler);
             testThreadEventPublisher.AddHandler<FeatureFinishedEvent>(FeatureFinishedEventHandler);
             testThreadEventPublisher.AddHandler<ScenarioStartedEvent>(ScenarioStartedEventHandler);
@@ -77,7 +73,7 @@ namespace Reqnroll.CucumberMesssages
             }
 
             var traceListener = objectContainer.Resolve<ITraceListener>();
-            traceListener.WriteTestOutput($"FeatureStartedEventHandler: {featureName}");
+            traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: {featureName}");
 
             if (!enabled)
                 return;

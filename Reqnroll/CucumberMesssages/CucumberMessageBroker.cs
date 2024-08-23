@@ -33,7 +33,6 @@ namespace Reqnroll.CucumberMesssages
 
             //TODO: find a way to populate this list a single time
             var registeredSinks = _objectContainer.ResolveAll<ICucumberMessageSink>().ToList();
-            _traceListener.WriteTestOutput("Broker publishing to " + registeredSinks.Count + " sinks");
 
             foreach (var sink in registeredSinks)
             {   
@@ -49,7 +48,6 @@ namespace Reqnroll.CucumberMesssages
             var registeredSinks = _objectContainer.ResolveAll<ICucumberMessageSink>().ToList();
 
             var _traceListener = _objectContainer.Resolve<ITraceListener>();
-            _traceListener.WriteTestOutput("Broker completing publishing to " + registeredSinks.Count + " sinks");
 
             var completionMessage = new ReqnrollCucumberMessage
             {
