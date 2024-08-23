@@ -1,0 +1,10 @@
+﻿{
+    "fileSinkEnabled": true,
+    "destinations": [
+        {
+            "enabled": true,
+            "basePath": "C:\\Users\\clrud\\source\\repos\\scratch",
+            "outputDirectory": "CucumberMessages"
+        }
+    ]
+}
