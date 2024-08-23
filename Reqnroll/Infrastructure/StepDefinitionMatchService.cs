@@ -38,9 +38,9 @@ namespace Reqnroll.Infrastructure
             _errorProvider = errorProvider;
         }
 
-        private object[] CalculateArguments(Match match, StepInstance stepInstance)
+        private object[] CalculateArguments(Match match, StepInstance stepInstance, bool isRegularExpression)
         {
-            var regexArgs = match.Groups.Cast<Group>().Skip(1).Where(g => g.Success).Select(g => g.Value);
+            var regexArgs = match.Groups.Cast<Group>().Skip(1).Where(g => g.Success || isRegularExpression).Select(g => g.Value);
             var arguments = regexArgs.Cast<object>().ToList();
             if (stepInstance.MultilineTextArgument != null)
                 arguments.Add(stepInstance.MultilineTextArgument);
@@ -85,7 +85,7 @@ namespace Reqnroll.Infrastructure
             if (useScopeMatching && stepDefinitionBinding.IsScoped && stepInstance.StepContext != null && !stepDefinitionBinding.BindingScope.Match(stepInstance.StepContext, out scopeMatches))
                 return BindingMatch.NonMatching;
 
-            var arguments = match == null ? Array.Empty<object>() : CalculateArguments(match, stepInstance);
+            var arguments = match == null ? Array.Empty<object>() : CalculateArguments(match, stepInstance, stepDefinitionBinding.ExpressionType == StepDefinitionExpressionTypes.RegularExpression);
 
             if (useParamMatching)
             {
