@@ -68,11 +68,7 @@ namespace Reqnroll.CucumberMesssages
                 }).ToList<StepArgument>()
                 : Enumerable.Empty<StepArgument>().ToList<StepArgument>();
 
-
             return Enumerable.Empty<Envelope>();
         }
-
     }
-
-
 }

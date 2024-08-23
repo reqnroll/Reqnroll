@@ -192,7 +192,7 @@ namespace Reqnroll.CucumberMesssages
         }
 
 
-        // utility methods
+        #region utility methods
         public static string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition)
         {
             string signature = GenerateSignature(stepDefinition);
@@ -210,6 +210,6 @@ namespace Reqnroll.CucumberMesssages
         {
             return stepDefinition.Method != null ? String.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
         }
-
+        #endregion
     }
 }

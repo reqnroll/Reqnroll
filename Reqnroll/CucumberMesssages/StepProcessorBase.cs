@@ -9,8 +9,6 @@ namespace Reqnroll.CucumberMesssages
         public ScenarioExecutionStatus Status { get; set; }
         public TimeSpan Duration { get; set; }
 
-
-
         public ScenarioEventProcessor parentScenario;
 
         public StepProcessorBase(ScenarioEventProcessor parentScenario)
@@ -18,6 +16,4 @@ namespace Reqnroll.CucumberMesssages
             this.parentScenario = parentScenario;
         }
     }
-
-  
 }
