@@ -348,18 +348,18 @@ public abstract class GenerationTestBase : SystemTestBase
         var results = _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults;
 
         results.Should().ContainSingle(tr => tr.TestName == "Background Scenario Steps" || tr.TestName == "BackgroundScenarioSteps")
-            .Which.Steps.Should().BeEquivalentTo(
+            .Which.Steps.Select(result => result.Step).Should().BeEquivalentTo(
             [
-                new TestStepResult { Step = "Given background step 1 is called" },
-                new TestStepResult { Step = "When scenario step is called" }
+                "Given background step 1 is called",
+                "When scenario step is called"
             ]);
 
         results.Should().ContainSingle(tr => tr.TestName == "Rule Background Scenario Steps" || tr.TestName == "RuleBackgroundScenarioSteps")
-            .Which.Steps.Should().BeEquivalentTo(
+            .Which.Steps.Select(result => result.Step).Should().BeEquivalentTo(
             [
-                new TestStepResult { Step = "Given background step 1 is called" },
-                new TestStepResult { Step = "Given background step 2 is called" },
-                new TestStepResult { Step = "When scenario step is called" }
+                "Given background step 1 is called",
+                "Given background step 2 is called",
+                "When scenario step is called"
             ]);
 
         ShouldAllScenariosPass();
