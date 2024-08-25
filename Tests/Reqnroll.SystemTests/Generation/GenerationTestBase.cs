@@ -2,6 +2,9 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 using Reqnroll.TestProjectGenerator;
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Reqnroll.SystemTests.Generation;
 
@@ -345,21 +348,85 @@ public abstract class GenerationTestBase : SystemTestBase
         var results = _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults;
 
         results.Should().ContainSingle(tr => tr.TestName == "Background Scenario Steps" || tr.TestName == "BackgroundScenarioSteps")
-            .Which.Steps.Should().BeEquivalentTo(
+            .Which.Steps.Select(result => result.Step).Should().BeEquivalentTo(
             [
-                new TestStepResult { Step = "Given background step 1 is called" },
-                new TestStepResult { Step = "When scenario step is called" }
+                "Given background step 1 is called",
+                "When scenario step is called"
             ]);
 
         results.Should().ContainSingle(tr => tr.TestName == "Rule Background Scenario Steps" || tr.TestName == "RuleBackgroundScenarioSteps")
-            .Which.Steps.Should().BeEquivalentTo(
+            .Which.Steps.Select(result => result.Step).Should().BeEquivalentTo(
             [
-                new TestStepResult { Step = "Given background step 1 is called" },
-                new TestStepResult { Step = "Given background step 2 is called" },
-                new TestStepResult { Step = "When scenario step is called" }
+                "Given background step 1 is called",
+                "Given background step 2 is called",
+                "When scenario step is called"
             ]);
 
         ShouldAllScenariosPass();
+    }
+
+    #endregion
+
+    #region Test tables arguments are processed
+
+    [TestMethod]
+    public void Table_arguments_are_passed_to_steps()
+    {
+        AddScenario(
+            """
+            Scenario: Using tables with steps
+                When this table is processed
+                | Example |
+                | A       |
+                | B       |
+                | C       |
+            """);
+
+        AddBindingClass(
+            """
+            namespace TableArguments.StepDefinitions
+            {
+                [Binding]
+                public class TableArgumentSteps
+                {
+                    [When("this table is processed")]
+                    public async Task WhenThisTableIsProcessed(DataTable table)
+                    {
+                        var tableData = new
+                        {
+                            headings = table.Header.ToList(),
+                            rows = table.Rows.Select(row => row.Select(kvp => kvp.Value)).ToList()
+                        };
+
+                        Log.LogCustom("argument", $"table = {System.Text.Json.JsonSerializer.Serialize(tableData)}");
+                    }
+                }
+            }
+            """);
+
+        ExecuteTests();
+
+        var arguments = _bindingDriver.GetActualLogLines("argument").ToList();
+
+        arguments.Should().NotBeEmpty();
+
+        arguments[0].Should().StartWith("-> argument: table = ");
+        var tableSource = arguments[0];
+        var tableJson = tableSource[tableSource.IndexOf('{')..(tableSource.LastIndexOf('}')+1)];
+        var tableData = JsonSerializer.Deserialize<JsonElement>(tableJson);
+
+        var actualHeadings = tableData
+            .GetProperty("headings")
+            .EnumerateArray()
+            .Select(item => item.ToString());
+
+        var actualRows = tableData
+            .GetProperty("rows")
+            .EnumerateArray()
+            .Select(item => item.EnumerateArray().Select(data => data.ToString()).ToList());
+
+        actualHeadings.Should().BeEquivalentTo(["Example"]);
+        actualRows.Should().BeEquivalentTo(new List<List<string>> { new() { "A" }, new() { "B" }, new() { "C" } });
     }
 
     #endregion
