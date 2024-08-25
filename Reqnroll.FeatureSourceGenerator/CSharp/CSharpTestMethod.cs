@@ -123,10 +123,11 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
         writer.WriteLine();
         writer.WriteLine("// start: invocation of scenario steps");
 
-        foreach (var invocation in StepInvocations)
+        for (var i = 0; i < StepInvocations.Length; i++)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            RenderScenarioStepInvocationTo(invocation, writer, renderingOptions, cancellationToken);
+            var invocation = StepInvocations[i];
+            RenderScenarioStepInvocationTo(invocation, i, writer, renderingOptions, cancellationToken);
         }
 
         writer.WriteLine("// end: invocation of scenario steps");
@@ -144,10 +145,86 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
 
     protected virtual void RenderScenarioStepInvocationTo(
         StepInvocation invocation,
+        int index,
         CSharpSourceTextWriter writer,
         CSharpRenderingOptions renderingOptions,
         CancellationToken cancellationToken)
     {
+        var tableArgName = invocation.DataTableArgument is null ? "null" : $"step{index}DataTableArg";
+        var docStringArgName = invocation.DocStringArgument is null ? "null" : $"step{index}DocStringArg";
+
+        if (invocation.DataTableArgument is not null)
+        {
+            writer.WriteLine($"var {tableArgName} = new global::Reqnroll.DataTable(");
+            writer.BeginBlock();
+            var firstHeading = true;
+            foreach (var heading in invocation.DataTableArgument.Headings)
+            {
+                if (firstHeading)
+                {
+                    firstHeading = false;
+                }
+                else
+                {
+                    writer.WriteLine(",");
+                }
+
+                writer.WriteLiteral(heading);
+            }
+            writer.WriteLine(");");
+            writer.EndBlock();
+
+            foreach (var row in invocation.DataTableArgument.Rows)
+            {
+                writer.Write(tableArgName).WriteLine(".AddRow(");
+                writer.BeginBlock();
+                var firstColumn = true;
+                foreach (var cell in row)
+                {
+                    if (firstColumn)
+                    {
+                        firstColumn = false;
+                    }
+                    else
+                    {
+                        writer.WriteLine(",");
+                    }
+
+                    writer.WriteLiteral(cell);
+                }
+                writer.WriteLine(");");
+                writer.EndBlock();
+            }
+        }
+
+        if (invocation.DocStringArgument is not null)
+        {
+            writer.WriteLine($"var {tableArgName} = ");
+            writer.BeginBlock();
+
+            var firstLine = true;
+
+            foreach (var line in invocation.DocStringArgument.Split())
+            {
+                if (firstLine)
+                {
+                    firstLine = false;
+                }
+                else
+                {
+                    writer.WriteLine(" +");
+                }
+
+                writer.Write('"');
+                writer.WriteLiteral(line);
+                writer.Write('"');
+            }
+
+            writer.WriteLine(";");
+
+            writer.EndBlock();
+        }
+
         var position = invocation.Position;
 
         if (position.Path != null && renderingOptions.EnableLineMapping)
@@ -189,7 +266,9 @@ public class CSharpTestMethod : TestMethod, IEquatable<CSharpTestMethod?>
         }
 
         writer
-            .Write(", null, null, ")
+            .Write(", null, ")
+            .Write(tableArgName)
+            .Write(", ")
             .WriteLiteral(invocation.Keyword)
             .WriteLine(");");
 

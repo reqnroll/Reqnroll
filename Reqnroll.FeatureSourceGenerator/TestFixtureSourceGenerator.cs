@@ -451,6 +451,25 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             var endPosition = new LinePosition(startPosition.Line, startPosition.Character + step.Keyword.Length + step.Text.Length + 1);
             var position = new FileLinePositionSpan(sourceFilePath, new LinePositionSpan(startPosition, endPosition));
 
+            string? docStringArgument = null;
+            SourceModel.DataTable? dataTableArgument = null;
+
+            if (step.Argument is DocString docString)
+            {
+                docStringArgument = docString.Content;
+            }
+            else if (step.Argument is global::Gherkin.Ast.DataTable dataTable)
+            {
+                var headings = dataTable.Rows.First().Cells
+                    .Select(cell => cell.Value)
+                    .ToImmutableArray();
+                var rows = dataTable.Rows.Skip(1)
+                    .Select(row => row.Cells.Select(cell => cell.Value).ToImmutableArray())
+                    .ToImmutableArray();
+
+                dataTableArgument = new SourceModel.DataTable(headings, rows);
+            }
+
             var scenarioStep = new SourceModel.Step(
                 step.KeywordType switch
                 {
@@ -462,7 +481,9 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
                 },
                 step.Keyword,
                 step.Text,
-                position);
+                position,
+                dataTableArgument,
+                docStringArgument);
 
             steps.Add(scenarioStep);
         }

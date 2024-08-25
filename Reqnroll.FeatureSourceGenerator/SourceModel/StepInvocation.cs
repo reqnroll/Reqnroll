@@ -6,7 +6,9 @@ public sealed class StepInvocation(
     FileLinePositionSpan position,
     string keyword,
     string text,
-    ImmutableArray<IdentifierString> arguments = default) : IEquatable<StepInvocation?>
+    ImmutableArray<IdentifierString> arguments = default,
+    DataTable? dataTableArgument = default,
+    string? docStringArgument = default) : IEquatable<StepInvocation?>
 {
     public StepType Type { get; } = type;
 
@@ -18,6 +20,10 @@ public sealed class StepInvocation(
 
     public ImmutableArray<IdentifierString> Arguments { get; } = 
         arguments.IsDefault ? ImmutableArray<IdentifierString>.Empty : arguments;
+
+    public DataTable? DataTableArgument { get; } = dataTableArgument;
+
+    public string? DocStringArgument { get; } = docStringArgument;
 
     public bool Equals(StepInvocation? other)
     {
@@ -35,7 +41,10 @@ public sealed class StepInvocation(
             Position.Equals(other.Position) &&
             Keyword.Equals(other.Keyword) &&
             Text.Equals(other.Text) &&
-            (Arguments.Equals(other.Arguments) || Arguments.SequenceEqual(other.Arguments));
+            (Arguments.Equals(other.Arguments) || Arguments.SequenceEqual(other.Arguments)) &&
+            (DataTableArgument is null && other.DataTableArgument is null || 
+                DataTableArgument is not null && DataTableArgument.Equals(other.DataTableArgument)) &&
+            string.Equals(DocStringArgument, other.DocStringArgument);
     }
 
     public override int GetHashCode()
@@ -49,6 +58,16 @@ public sealed class StepInvocation(
             hash *= 47886541 + Keyword.GetHashCode();
             hash *= 47886541 + Text.GetHashCode();
             hash *= 47886541 + Arguments.GetSequenceHashCode();
+
+            if (DataTableArgument != null)
+            {
+                hash *= 47886541 + DataTableArgument.GetHashCode();
+            }
+
+            if (DocStringArgument != null)
+            {
+                hash *= 47886541 + DocStringArgument.GetHashCode();
+            }
 
             return hash;
         }

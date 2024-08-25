@@ -81,7 +81,13 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
         if (scenario.Examples.IsEmpty)
         {
             return scenario.Steps
-                .Select(step => new StepInvocation(step.StepType, step.Position, step.Keyword, step.Text))
+                .Select(step => new StepInvocation(
+                    step.StepType,
+                    step.Position,
+                    step.Keyword,
+                    step.Text,
+                    dataTableArgument: step.DataTableArgument,
+                    docStringArgument: step.DocStringArgument))
                 .ToImmutableArray();
         }
 
@@ -109,7 +115,15 @@ public abstract class CSharpTestFixtureGenerator<TTestFixtureClass, TTestMethod>
                 }
             }
 
-            invocations.Add(new StepInvocation(step.StepType, step.Position, step.Keyword, text, arguments.ToImmutableArray()));
+            invocations.Add(
+                new StepInvocation(
+                    step.StepType,
+                    step.Position,
+                    step.Keyword,
+                    text,
+                    arguments.ToImmutableArray(),
+                    step.DataTableArgument,
+                    step.DocStringArgument));
         }
 
         return invocations.ToImmutableArray();
