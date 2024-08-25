@@ -10,7 +10,8 @@ public class NUnitHandler : ITestFrameworkHandler
 {
     public string TestFrameworkName => "NUnit";
 
-    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>() 
+    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>(
+        TCompilationInformation compilation) 
         where TCompilationInformation : CompilationInformation
     {
         if (typeof(TCompilationInformation).IsAssignableFrom(typeof(CSharpCompilationInformation)))

@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Reqnroll.FeatureSourceGenerator.CSharp;
+﻿using Reqnroll.FeatureSourceGenerator.CSharp;
 using Reqnroll.FeatureSourceGenerator.CSharp.MSTest;
 
 namespace Reqnroll.FeatureSourceGenerator.MSTest;
@@ -17,12 +16,22 @@ public class MSTestHandler : ITestFrameworkHandler
             .Any(assembly => assembly.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework");
     }
 
-    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>() 
+    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>(
+        TCompilationInformation compilation) 
         where TCompilationInformation : CompilationInformation
     {
         if (typeof(TCompilationInformation).IsAssignableFrom(typeof(CSharpCompilationInformation)))
         {
-            return (ITestFixtureGenerator<TCompilationInformation>)new MSTestCSharpTestFixtureGenerator(this);
+            var version = compilation.ReferencedAssemblies
+                .Where(assembly => assembly.Name == "Microsoft.VisualStudio.TestPlatform.TestFramework")
+                .Max(assembly => assembly.Version);
+
+            if (version >= new Version(3, 0))
+            {
+                return (ITestFixtureGenerator<TCompilationInformation>)new MSTest3CSharpTestFixtureGenerator(this);
+            }
+
+            return (ITestFixtureGenerator<TCompilationInformation>)new MSTest2CSharpTestFixtureGenerator(this);
         }
 
         return null;

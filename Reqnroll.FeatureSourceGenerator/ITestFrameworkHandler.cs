@@ -22,7 +22,8 @@ public interface ITestFrameworkHandler
     /// Gets a test-fixture generator for the test framework.
     /// </summary>
     /// <typeparam name="TCompilationInformation">The type of compilation to obtain a generator for.</typeparam>
+    /// <param name="compilation">The compilation to examine.</param>
     /// <returns>A test-fixture generator if one can be produced for the compilation type; otherwise <c>null</c>.</returns>
-    ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>()
+    ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>(TCompilationInformation compilation)
         where TCompilationInformation : CompilationInformation;
 }

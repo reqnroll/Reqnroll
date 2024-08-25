@@ -5,9 +5,9 @@ using System.Collections.Immutable;
 namespace Reqnroll.FeatureSourceGenerator.CSharp.MSTest;
 
 /// <summary>
-/// Performs generation of MSTest test fixtures in the C# language.
+/// Performs generation of MSTest 2.x test fixtures in the C# language.
 /// </summary>
-internal class MSTestCSharpTestFixtureGenerator(MSTestHandler frameworkHandler) : 
+internal class MSTest2CSharpTestFixtureGenerator(MSTestHandler frameworkHandler) : 
     CSharpTestFixtureGenerator<MSTestCSharpTestFixtureClass, MSTestCSharpTestMethod>(frameworkHandler)
 {
     protected override MSTestCSharpTestFixtureClass CreateTestFixtureClass(

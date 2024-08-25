@@ -57,7 +57,7 @@ public abstract class TestFixtureSourceGenerator<TCompilationInformation>(
             .Select((compilationInfo, cancellationToken) =>
             {
                 var compatibleGenerators = _testFrameworkHandlers
-                    .Select(handler => handler.GetTestFixtureGenerator<TCompilationInformation>()!)
+                    .Select(handler => handler.GetTestFixtureGenerator(compilationInfo)!)
                     .Where(generator => generator != null)
                     .ToImmutableArray();
 

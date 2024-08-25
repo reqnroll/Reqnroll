@@ -12,7 +12,8 @@ public class XUnitHandler : ITestFrameworkHandler
 
     public string TestFrameworkName => "xUnit";
 
-    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>()
+    public ITestFixtureGenerator<TCompilationInformation>? GetTestFixtureGenerator<TCompilationInformation>(
+        TCompilationInformation compilation)
         where TCompilationInformation : CompilationInformation
     {
         if (typeof(TCompilationInformation).IsAssignableFrom(typeof(CSharpCompilationInformation)))
