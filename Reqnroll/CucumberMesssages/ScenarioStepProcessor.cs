@@ -13,11 +13,11 @@ namespace Reqnroll.CucumberMesssages
         public string Type;
     }
 
-    public class PickleStepProcessor : StepProcessorBase
+    public class ScenarioStepProcessor : StepProcessorBase
     {
         private StepStartedEvent stepStartedEvent;
 
-        public PickleStepProcessor(ScenarioEventProcessor parentScenarioState) : base(parentScenarioState)
+        public ScenarioStepProcessor(ScenarioEventProcessor parentScenarioState) : base(parentScenarioState)
         {
         }
 

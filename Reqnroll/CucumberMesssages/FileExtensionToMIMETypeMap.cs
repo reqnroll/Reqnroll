@@ -8,7 +8,7 @@ namespace Reqnroll.CucumberMesssages
     {
         public static string GetMimeType(string extension)
         {
-            if (ExtensionToMimeType.TryGetValue(extension, out var mimeType))
+            if (ExtensionToMimeType.TryGetValue(extension.ToLower(), out var mimeType))
                 return mimeType;
 
             return "application/octet-stream";

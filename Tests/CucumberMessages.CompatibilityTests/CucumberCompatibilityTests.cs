@@ -17,11 +17,14 @@ namespace CucumberMessages.CompatibilityTests
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Test
-                Scenario: Smoke Test
-                    Given I have a passing step
+                  Scenario: Log JSON
+                     When the following string is attached as "application/json":
+                       ```
+                       {"message": "The <b>big</b> question", "foo": "bar"}
+                       ```
                 """);
 
-            AddPassingStepBinding("Given");
+            AddPassingStepBinding("When");
 
             ExecuteTests();
 
@@ -29,7 +32,7 @@ namespace CucumberMessages.CompatibilityTests
         }
 
         [TestMethod]
-        //[DataRow("attachments")]
+        [DataRow("attachments")]
         [DataRow("minimal")]
         [DataRow("cdata")]
         [DataRow("pending")]
@@ -45,6 +48,7 @@ namespace CucumberMessages.CompatibilityTests
         {
             AddCucumberMessagePlugIn();
             CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            AddUtilClassWithFileSystemPath();
 
             scenarioName = scenarioName.Replace("-", "_");
 
@@ -55,10 +59,13 @@ namespace CucumberMessages.CompatibilityTests
             ExecuteTests();
 
             ConfirmAllTestsRan(null);
-            if (scenarioName == "attachments")
-            {
-                ShouldAllScenariosPass();
-            }
+        }
+
+        private void AddUtilClassWithFileSystemPath()
+        {
+            string location = AppContext.BaseDirectory;
+            AddBindingClass(
+                $"public class FileSystemPath {{  public static string GetFilePathForAttachments()  {{  return @\"{location}\\CCK\"; }}  }} ");
         }
 
         private IEnumerable<Envelope> GetExpectedResults(string scenarioName)

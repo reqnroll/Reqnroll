@@ -37,8 +37,9 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             _testThreadExecutionEventPublisher = new Mock<ITestThreadExecutionEventPublisher>();
             var traceListenerMock = new Mock<ITraceListener>();
             var attachmentHandlerMock = new Mock<IReqnrollAttachmentHandler>();
+            var contextManager = new Mock<IContextManager>();
 
-            return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher.Object, traceListenerMock.Object, attachmentHandlerMock.Object);
+            return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher.Object, traceListenerMock.Object, attachmentHandlerMock.Object, contextManager.Object);
         }
     }
 }

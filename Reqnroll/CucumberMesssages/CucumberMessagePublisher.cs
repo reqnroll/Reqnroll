@@ -31,7 +31,6 @@ namespace Reqnroll.CucumberMesssages
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
-            //Debugger.Launch();
             runtimePluginEvents.CustomizeFeatureDependencies += (sender, args) =>
             {
                 objectContainer = args.ObjectContainer;
@@ -49,8 +48,9 @@ namespace Reqnroll.CucumberMesssages
             testThreadEventPublisher.AddHandler<StepStartedEvent>(StepStartedEventHandler);
             testThreadEventPublisher.AddHandler<StepFinishedEvent>(StepFinishedEventHandler);
             testThreadEventPublisher.AddHandler<HookBindingFinishedEvent>(HookBindingFinishedEventHandler);
+            testThreadEventPublisher.AddHandler<AttachmentAddedEvent>(AttachmentAddedEventHandler);
+            testThreadEventPublisher.AddHandler<OutputAddedEvent>(OutputAddedEventHandler);
         }
-
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
@@ -143,6 +143,19 @@ namespace Reqnroll.CucumberMesssages
             var featureName = hookBindingEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             ProcessEvent(hookBindingEvent, featureName);
         }
+
+        private void AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
+        {
+            var featureName = attachmentAddedEvent.FeatureName;
+            ProcessEvent(attachmentAddedEvent, featureName);
+        }
+
+        private void OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
+        {
+           ProcessEvent(outputAddedEvent, outputAddedEvent.FeatureName);
+        }
+
+
         private void ProcessEvent(ExecutionEvent anEvent, string featureName)
         {
             var featureProcessor = featureProcessorsByFeatureName[featureName];

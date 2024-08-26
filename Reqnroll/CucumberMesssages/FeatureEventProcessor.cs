@@ -8,6 +8,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Reqnroll.CucumberMesssages
@@ -42,8 +43,11 @@ namespace Reqnroll.CucumberMesssages
         // therefore these are ConcurrentDictionary and we us the TryAdd method on them to only add each mapping once
         public ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
         public ConcurrentDictionary<string, string> HookDefinitionsByPattern = new();
+
+        //TODO: fix this; there will be multiple  Pickles with the same scenario name when executing Example table rows 
         public ConcurrentDictionary<string, Io.Cucumber.Messages.Types.Pickle> PicklesByScenarioName = new();
 
+        //TODO: Fix this for thread-safety; there will be multiple active Scenarios with the same name when executing Example table rows in parallel
         // Scenario event processors by scenario name; 
         public Dictionary<string, ScenarioEventProcessor> ScenarioName2ScenarioProcessorMap = new();
 
@@ -72,6 +76,8 @@ namespace Reqnroll.CucumberMesssages
                 StepStartedEvent stepStartedEvent => ProcessEvent(stepStartedEvent),
                 StepFinishedEvent stepFinishedEvent => ProcessEvent(stepFinishedEvent),
                 HookBindingFinishedEvent hookFinishedEvent => ProcessEvent(hookFinishedEvent),
+                AttachmentAddedEvent attachmentAddedEvent => ProcessEvent(attachmentAddedEvent),
+                OutputAddedEvent outputAddedEvent => ProcessEvent(outputAddedEvent),
                 _ => throw new NotImplementedException(),
             };
         }
@@ -192,7 +198,27 @@ namespace Reqnroll.CucumberMesssages
             {
                 yield return e;
             }
+        }
 
+        internal IEnumerable<Envelope> ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
+        {
+            var scenarioName = attachmentAddedEvent.ScenarioName;
+            var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
+
+            foreach (var e in scenarioEP.ProcessEvent(attachmentAddedEvent))
+            {
+                yield return e;
+            }
+        }
+
+        internal IEnumerable<Envelope> ProcessEvent(OutputAddedEvent outputAddedEvent)
+        {
+            var scenarioName = outputAddedEvent.ScenarioName;
+            var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
+            foreach (var e in scenarioEP.ProcessEvent(outputAddedEvent))
+            {
+                yield return e;
+            }
         }
 
         private string ExtractLastID(List<Pickle> pickles)

@@ -8,17 +8,23 @@ namespace Reqnroll.Infrastructure
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
         private readonly ITraceListener _traceListener;
         private readonly IReqnrollAttachmentHandler _reqnrollAttachmentHandler;
+        private readonly IContextManager contextManager;
 
-        public ReqnrollOutputHelper(ITestThreadExecutionEventPublisher testThreadExecutionEventPublisher, ITraceListener traceListener, IReqnrollAttachmentHandler reqnrollAttachmentHandler)
+        public ReqnrollOutputHelper(ITestThreadExecutionEventPublisher testThreadExecutionEventPublisher, ITraceListener traceListener, IReqnrollAttachmentHandler reqnrollAttachmentHandler, IContextManager contextManager)
         {
             _testThreadExecutionEventPublisher = testThreadExecutionEventPublisher;
             _traceListener = traceListener;
             _reqnrollAttachmentHandler = reqnrollAttachmentHandler;
+            this.contextManager = contextManager;
         }
 
         public void WriteLine(string message)
         {
-            _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message));
+            var featureName = contextManager.FeatureContext.FeatureInfo?.Title;
+            var scenarioName = contextManager.ScenarioContext.ScenarioInfo?.Title;
+            var stepText = contextManager.StepContext.StepInfo?.Text;
+
+            _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message, featureName, scenarioName, stepText));
             _traceListener.WriteToolOutput(message);
         }
 
@@ -29,7 +35,10 @@ namespace Reqnroll.Infrastructure
 
         public void AddAttachment(string filePath)
         {
-            _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath));
+            var featureName = contextManager.FeatureContext.FeatureInfo?.Title;
+            var scenarioName = contextManager.ScenarioContext.ScenarioInfo?.Title;
+            var stepText = contextManager.StepContext.StepInfo?.Text;
+            _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath, featureName, scenarioName, stepText));
             _reqnrollAttachmentHandler.AddAttachment(filePath);
         }
     }
