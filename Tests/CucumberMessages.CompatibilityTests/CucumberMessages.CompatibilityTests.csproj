@@ -27,9 +27,6 @@
   <ItemGroup>
     <None Remove="CCK\attachments\attachments.feature" />
     <None Remove="CCK\attachments\attachments.feature.ndjson" />
-    <None Remove="CCK\attachments\cucumber.jpeg" />
-    <None Remove="CCK\attachments\cucumber.png" />
-    <None Remove="CCK\attachments\document.pdf" />
     <None Remove="CCK\cdata\cdata.feature" />
     <None Remove="CCK\cdata\cdata.feature.ndjson" />
     <None Remove="CCK\data-tables\data_tables.feature" />
@@ -61,9 +58,6 @@
     <Content Include="CCK\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\attachments\cucumber.jpeg" />
-    <EmbeddedResource Include="CCK\attachments\cucumber.png" />
-    <EmbeddedResource Include="CCK\attachments\document.pdf" />
     <EmbeddedResource Include="CCK\cdata\cdata.cs" />
     <EmbeddedResource Include="CCK\cdata\cdata.feature" />
     <Content Include="CCK\cdata\cdata.feature.ndjson">
@@ -143,6 +137,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="CCK\attachments\cucumber.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CCK\attachments\cucumber.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="CucumberMessages.configuration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

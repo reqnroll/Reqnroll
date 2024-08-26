@@ -5,7 +5,10 @@ using Reqnroll.Bindings;
 using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Reqnroll.CucumberMesssages
 {
@@ -28,12 +31,12 @@ namespace Reqnroll.CucumberMesssages
             {
                 switch (stepState)
                 {
-                    case PickleStepProcessor _:
-                        var testStep = CucumberMessageFactory.ToTestStep(scenarioState, stepState as PickleStepProcessor);
+                    case ScenarioStepProcessor _:
+                        var testStep = CucumberMessageFactory.ToTestStep(scenarioState, stepState as ScenarioStepProcessor);
                         testSteps.Add(testStep);
                         break;
                     case HookStepProcessor _:
-                        var hookTestStep = CucumberMessageFactory.ToHookTestStep( stepState as HookStepProcessor);
+                        var hookTestStep = CucumberMessageFactory.ToHookTestStep(stepState as HookStepProcessor);
                         testSteps.Add(hookTestStep);
                         break;
                     default:
@@ -83,7 +86,7 @@ namespace Reqnroll.CucumberMesssages
             return sourceRef;
         }
 
-        internal static TestStep ToTestStep(ScenarioEventProcessor scenarioState, PickleStepProcessor stepState)
+        internal static TestStep ToTestStep(ScenarioEventProcessor scenarioState, ScenarioStepProcessor stepState)
         {
             bool bound = stepState.StepDefinitionId != null;
 
@@ -97,7 +100,7 @@ namespace Reqnroll.CucumberMesssages
                  stepState.PickleStepID,
                  bound ? new List<string> { stepState.StepDefinitionId } : new List<string>(),
                  bound ? new List<StepMatchArgumentsList> { new StepMatchArgumentsList(args) } : new List<StepMatchArgumentsList>()
-                 ); 
+                 );
 
             return result;
         }
@@ -112,7 +115,7 @@ namespace Reqnroll.CucumberMesssages
                     ),
                 argument.Type);
         }
-        internal static TestStepStarted ToTestStepStarted(PickleStepProcessor stepState, StepStartedEvent stepStartedEvent)
+        internal static TestStepStarted ToTestStepStarted(ScenarioStepProcessor stepState, StepStartedEvent stepStartedEvent)
         {
             return new TestStepStarted(
                 stepState.TestCaseStartedID,
@@ -120,7 +123,7 @@ namespace Reqnroll.CucumberMesssages
                 Converters.ToTimestamp(stepStartedEvent.Timestamp));
         }
 
-        internal static TestStepFinished ToTestStepFinished(PickleStepProcessor stepState, StepFinishedEvent stepFinishedEvent)
+        internal static TestStepFinished ToTestStepFinished(ScenarioStepProcessor stepState, StepFinishedEvent stepFinishedEvent)
         {
             return new TestStepFinished(
                 stepState.TestCaseStartedID,
@@ -150,15 +153,15 @@ namespace Reqnroll.CucumberMesssages
             var hookId = hookStepState.parentScenario.FeatureState.HookDefinitionsByPattern[hookCacheKey];
 
             return new TestStep(
-                hookId, 
-                hookStepState.TestStepID, 
-                null, 
-                new List<string>(), 
+                hookId,
+                hookStepState.TestStepID,
+                null,
+                new List<string>(),
                 new List<StepMatchArgumentsList>());
         }
-        internal static TestStepStarted ToTestStepStarted(HookStepProcessor hookStepProcessor, HookBindingFinishedEvent hookBindingFinishedEvent)
+        internal static TestStepStarted ToTestStepStarted(HookStepProcessor hookStepProcessor, HookBindingStartedEvent hookBindingStartedEvent)
         {
-            return new TestStepStarted(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, Converters.ToTimestamp(hookBindingFinishedEvent.Timestamp));
+            return new TestStepStarted(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, Converters.ToTimestamp(hookBindingStartedEvent.Timestamp));
         }
 
         internal static TestStepFinished ToTestStepFinished(HookStepProcessor hookStepProcessor, HookBindingFinishedEvent hookBindingFinishedEvent)
@@ -166,6 +169,30 @@ namespace Reqnroll.CucumberMesssages
             return new TestStepFinished(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookBindingFinishedEvent.Timestamp));
         }
 
+        internal static Attachment ToAttachment(ScenarioEventProcessor scenarioEventProcessor, AttachmentAddedEventWrapper attachmentAddedEventWrapper)
+        {
+            return new Attachment(
+                Base64EncodeFile(attachmentAddedEventWrapper.AttachmentAddedEvent.FilePath),
+                AttachmentContentEncoding.BASE64,
+                Path.GetFileName(attachmentAddedEventWrapper.AttachmentAddedEvent.FilePath),
+                FileExtensionToMIMETypeMap.GetMimeType(Path.GetExtension(attachmentAddedEventWrapper.AttachmentAddedEvent.FilePath)),
+                null,
+                attachmentAddedEventWrapper.TestCaseStartedID,
+                attachmentAddedEventWrapper.TestCaseStepID,
+                null);
+        }
+        internal static Attachment ToAttachment(ScenarioEventProcessor scenarioEventProcessor, OutputAddedEventWrapper outputAddedEventWrapper)
+        {
+            return new Attachment(
+                outputAddedEventWrapper.OutputAddedEvent.Text,
+                AttachmentContentEncoding.IDENTITY,
+                null,
+                "text/x.cucumber.log+plain",
+                null,
+                outputAddedEventWrapper.TestCaseStartedID,
+                outputAddedEventWrapper.TestCaseStepID,
+                null);
+        }
 
         private static TestStepResult ToTestStepResult(StepProcessorBase stepState)
         {
@@ -209,6 +236,11 @@ namespace Reqnroll.CucumberMesssages
         private static string GenerateSignature(IBinding stepDefinition)
         {
             return stepDefinition.Method != null ? String.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
+        }
+        public static string Base64EncodeFile(string filePath)
+        {
+            byte[] fileBytes = File.ReadAllBytes(filePath);
+            return Convert.ToBase64String(fileBytes);
         }
         #endregion
     }

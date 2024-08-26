@@ -314,8 +314,8 @@ namespace Reqnroll.CucumberMesssages
                 return null;
             }
             return new Io.Cucumber.Messages.Types.PickleDocString(
-                pickleDocString.Content,
-                pickleDocString.MediaType
+                pickleDocString.MediaType,
+                pickleDocString.Content
             );
         }
 
