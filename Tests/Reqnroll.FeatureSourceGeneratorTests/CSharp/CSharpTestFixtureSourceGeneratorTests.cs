@@ -19,7 +19,7 @@ public class CSharpTestFixtureSourceGeneratorTests
         _mockHandler.SetupGet(handler => handler.TestFrameworkName).Returns("Mock");
 
         _mockHandler
-            .Setup(handler => handler.GetTestFixtureGenerator<CSharpCompilationInformation>())
+            .Setup(handler => handler.GetTestFixtureGenerator(It.IsAny<CSharpCompilationInformation>()))
             .Returns(_mockGenerator.Object);
 
 

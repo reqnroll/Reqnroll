@@ -1,5 +1,4 @@
 ﻿using Microsoft.CodeAnalysis;
-using Reqnroll.FeatureSourceGenerator.MSTest;
 using System.Collections.Immutable;
 
 namespace Reqnroll.FeatureSourceGenerator.CSharp;
@@ -17,7 +16,7 @@ public abstract class CSharpTestFixtureGeneratorTestBase<THandler> where THandle
             Microsoft.CodeAnalysis.CSharp.LanguageVersion.CSharp11,
         true);
 
-        Generator = handler.GetTestFixtureGenerator<CSharpCompilationInformation>() ?? 
+        Generator = handler.GetTestFixtureGenerator(Compilation) ?? 
             throw new InvalidOperationException($"Handler for {handler.TestFrameworkName} does not support C# generation.");
     }
 
