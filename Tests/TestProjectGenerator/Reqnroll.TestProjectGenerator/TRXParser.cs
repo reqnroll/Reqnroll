@@ -154,7 +154,7 @@ namespace Reqnroll.TestProjectGenerator
                     TestName = testNameAttribute.Value,
                     Outcome = outcomeAttribute.Value,
                     StdOut = stdOutElement?.Value,
-                    Steps = steps,
+                    Steps = steps.ToList(),
                     ErrorMessage = errorMessage?.Value,
                     InnerResults = GetTestResultsInternal(innerResultsElement, xmlns)
                 };
@@ -162,11 +162,11 @@ namespace Reqnroll.TestProjectGenerator
             return testResults.ToList();
         }
 
-        private static List<TestStepResult> ParseTestOutput(XElement stdOutElement)
+        private static IEnumerable<TestStepResult> ParseTestOutput(XElement stdOutElement)
         {
             if (stdOutElement == null)
             {
-                return null;
+                yield break;
             }
 
             var stdOutText = stdOutElement.Value;
@@ -175,13 +175,32 @@ namespace Reqnroll.TestProjectGenerator
 
             var primaryOutput = logLines.TakeWhile(line => line != "TestContext Messages:");
 
-            var steps = primaryOutput
-                .Where(line => line.StartsWith("Given ") || 
-                    line.StartsWith("When ") || 
-                    line.StartsWith("Then ") || 
-                    line.StartsWith("And "));
+            TestStepResult step = null;
 
-            return steps.Select(step => new TestStepResult { Step = step }).ToList();
+            foreach (var line in primaryOutput)
+            {
+                if (line.StartsWith("Given ") ||
+                    line.StartsWith("When ") ||
+                    line.StartsWith("Then ") ||
+                    line.StartsWith("And "))
+                {
+                    if (step != null)
+                    {
+                        yield return step;
+                    }
+
+                    step = new TestStepResult { Step = line };
+                }
+                else
+                {
+                    step?.Output.Add(line);
+                }
+            }
+
+            if (step != null)
+            {
+                yield return step;
+            }
         }
 
         private int GetNUnitIgnoredCount(TestExecutionResult testExecutionResult)
