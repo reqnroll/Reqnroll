@@ -75,13 +75,13 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.IntegrationTest.StepDefinitions
         [Then(@"the basket price should be greater than zero")]
         public void ThenTheBasketPriceShouldBeGreaterThanZero()
         {
-            Assert.Greater(_calculatedPrice, 0);
+            Assert.That(_calculatedPrice > 0);
         }
 
         [Then(@"the basket price should be €(.*)")]
         public void ThenTheBasketPriceShouldBe(decimal expectedPrice)
         {
-            Assert.AreEqual(expectedPrice, _calculatedPrice);
+            Assert.That(expectedPrice == _calculatedPrice);
         }
 
     }
