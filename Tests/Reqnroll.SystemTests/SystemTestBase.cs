@@ -59,30 +59,33 @@ public abstract class SystemTestBase
         return services;
     }
 
+    protected TService GetServiceSafe<TService>() => 
+        _testContainer.GetService<TService>() ?? throw new InvalidOperationException($"Unable to get service '{typeof(TService).FullName}'");
+
     protected virtual void TestInitialize()
     {
         var services = ConfigureServices();
         _testContainer = services.BuildServiceProvider();
 
-        _testRunConfiguration = _testContainer.GetService<TestRunConfiguration>();
+        _testRunConfiguration = GetServiceSafe<TestRunConfiguration>();
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.CSharp;
         _testRunConfiguration.ProjectFormat = ProjectFormat.New;
         _testRunConfiguration.ConfigurationFormat = ConfigurationFormat.Json;
         _testRunConfiguration.TargetFramework = TargetFramework.Net80;
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.MSTest;
 
-        _currentVersionDriver = _testContainer.GetService<CurrentVersionDriver>();
+        _currentVersionDriver = GetServiceSafe<CurrentVersionDriver>();
         _currentVersionDriver.ReqnrollNuGetVersion = NuGetPackageVersion.Version;
 
-        _folderCleaner = _testContainer.GetService<FolderCleaner>();
+        _folderCleaner = GetServiceSafe<FolderCleaner>();
         _folderCleaner.EnsureOldRunFoldersCleaned();
 
-        _projectsDriver = _testContainer.GetService<ProjectsDriver>();
-        _executionDriver = _testContainer.GetService<ExecutionDriver>();
-        _vsTestExecutionDriver = _testContainer.GetService<VSTestExecutionDriver>();
-        _compilationDriver = _testContainer.GetService<CompilationDriver>();
-        _testProjectFolders = _testContainer.GetService<TestProjectFolders>();
-        _bindingDriver = _testContainer.GetService<BindingsDriver>();
+        _projectsDriver = GetServiceSafe<ProjectsDriver>();
+        _executionDriver = GetServiceSafe<ExecutionDriver>();
+        _vsTestExecutionDriver = GetServiceSafe<VSTestExecutionDriver>();
+        _compilationDriver = GetServiceSafe<CompilationDriver>();
+        _testProjectFolders = GetServiceSafe<TestProjectFolders>();
+        _bindingDriver = GetServiceSafe<BindingsDriver>();
     }
 
 

@@ -57,7 +57,7 @@ namespace Reqnroll.TestProjectGenerator
 
         protected virtual string GetPathToNuGetExe()
         {
-            return Path.Combine(_folders.SystemGlobalNuGetPackages, "NuGet.CommandLine".ToLower(), "6.9.1", "tools", "NuGet.exe");
+            return Path.Combine(_folders.SystemGlobalNuGetPackages, "NuGet.CommandLine".ToLower(), "6.11.0", "tools", "NuGet.exe");
         }
     }
 }

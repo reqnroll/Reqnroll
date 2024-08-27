@@ -113,7 +113,7 @@ jobs:
         Write-Output "main_build_params=$mainBuildParams" >> $env:GITHUB_OUTPUT
         
         $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
-        $testParams = "--no-build --verbosity normal -c $productConfig --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true"
+        $testParams = "--no-build --verbosity normal -c $productConfig --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true RunConfiguration.TreatNoTestsAsError=true"
         Write-Output "test_params=$testParams" >> $env:GITHUB_OUTPUT
         Write-Output "Test Params: $testParams"
 

@@ -240,7 +240,7 @@ namespace Reqnroll.TestProjectGenerator
                 _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
 
                 _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.4", new NuGetPackageAssembly("System.Threading.Tasks.Extensions", "netstandard2.0\\System.Threading.Tasks.Extensions.dll"));
-                _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "6.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "netstandard2.0\\Microsoft.Bcl.AsyncInterfaces.dll"));
+                _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "8.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "netstandard2.0\\Microsoft.Bcl.AsyncInterfaces.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(_testProjectFolders.LogFilePath));
