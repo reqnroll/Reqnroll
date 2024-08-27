@@ -7,13 +7,14 @@
 * Support DateTimeOffset in value comparer (#180)
 * Support 'Order' parameter for `StepArgumentTransformationAttribute` to prioritize execution (#185)
 * Upgrade to Gherkin v28 from v19 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#205)
+* Added registration of `ReqnrollFeatureFiles` for Rider/ReSharper Build (#231)
 
 ## Bug fixes:
 
 * Fix: Reqnroll.Autofac: Objects registered in the global container cannot be relsolved in BeforeTestRun/AfterTestRun hooks (#183)
 * Fix: Process cannot access the file when building a multi-target project (#197)
 
-*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @gasparnagy, @obligaron, @stbychkov
+*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @gasparnagy, @obligaron, @runnerok, @stbychkov
 
 # v2.0.3 - 2024-06-10
 
