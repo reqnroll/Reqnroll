@@ -14,6 +14,7 @@
 
 * Fix: Reqnroll.Autofac: Objects registered in the global container cannot be relsolved in BeforeTestRun/AfterTestRun hooks (#183)
 * Fix: Process cannot access the file when building a multi-target project (#197)
+* Fix: Project dependencies transiently refer to System.Net.Http <= v4.3.0 that has high severity security vulnerability (#240)
 
 *Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @gasparnagy, @obligaron, @runnerok, @stbychkov
 
