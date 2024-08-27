@@ -7,7 +7,7 @@
 * Optimize creation of test-thread context using test framework independent resource pooling (#144)
 * Support DateTimeOffset in value comparer (#180)
 * Support 'Order' parameter for `StepArgumentTransformationAttribute` to prioritize execution (#185)
-* Upgrade to Gherkin v28 from v19 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#205)
+* Upgrade to Gherkin v29 from v19 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#205, #240)
 * Added registration of `ReqnrollFeatureFiles` for Rider/ReSharper Build (#231)
 
 ## Bug fixes:
