@@ -30,24 +30,14 @@ namespace Reqnroll.Infrastructure
         private readonly IBindingRegistry _bindingRegistry;
         private readonly IStepArgumentTypeConverter _stepArgumentTypeConverter;
         private readonly IErrorProvider _errorProvider;
+        private readonly IMatchArgumentCalculator _matchArgumentCalculator;
 
-        public StepDefinitionMatchService(IBindingRegistry bindingRegistry, IStepArgumentTypeConverter stepArgumentTypeConverter, IErrorProvider errorProvider)
+        public StepDefinitionMatchService(IBindingRegistry bindingRegistry, IStepArgumentTypeConverter stepArgumentTypeConverter, IErrorProvider errorProvider, IMatchArgumentCalculator matchArgumentCalculator )
         {
             _bindingRegistry = bindingRegistry;
             _stepArgumentTypeConverter = stepArgumentTypeConverter;
             _errorProvider = errorProvider;
-        }
-
-        private object[] CalculateArguments(Match match, StepInstance stepInstance)
-        {
-            var regexArgs = match.Groups.Cast<Group>().Skip(1).Where(g => g.Success).Select(g => g.Value);
-            var arguments = regexArgs.Cast<object>().ToList();
-            if (stepInstance.MultilineTextArgument != null)
-                arguments.Add(stepInstance.MultilineTextArgument);
-            if (stepInstance.TableArgument != null)
-                arguments.Add(stepInstance.TableArgument);
-
-            return arguments.ToArray();
+            _matchArgumentCalculator = matchArgumentCalculator;
         }
 
         private bool CanConvertArg(object value, IBindingType typeToConvertTo, CultureInfo bindingCulture)
@@ -85,7 +75,7 @@ namespace Reqnroll.Infrastructure
             if (useScopeMatching && stepDefinitionBinding.IsScoped && stepInstance.StepContext != null && !stepDefinitionBinding.BindingScope.Match(stepInstance.StepContext, out scopeMatches))
                 return BindingMatch.NonMatching;
 
-            var arguments = match == null ? Array.Empty<object>() : CalculateArguments(match, stepInstance);
+            var arguments = match == null ? Array.Empty<object>() : _matchArgumentCalculator.CalculateArguments(match, stepInstance, stepDefinitionBinding);
 
             if (useParamMatching)
             {

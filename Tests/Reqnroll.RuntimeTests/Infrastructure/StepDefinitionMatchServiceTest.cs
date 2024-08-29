@@ -31,7 +31,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
         private StepDefinitionMatchService CreateSUT()
         {
-            return new StepDefinitionMatchService(bindingRegistryMock.Object, stepArgumentTypeConverterMock.Object, new StubErrorProvider());
+            return new StepDefinitionMatchService(bindingRegistryMock.Object, stepArgumentTypeConverterMock.Object, new StubErrorProvider(), new MatchArgumentCalculator());
         }
 
         private static BindingMethod CreateBindingMethod(string name = "dummy")

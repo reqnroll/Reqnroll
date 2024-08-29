@@ -47,6 +47,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<CucumberExpressionStepDefinitionBindingBuilderFactory, ICucumberExpressionStepDefinitionBindingBuilderFactory>();
             container.RegisterTypeAs<CucumberExpressionDetector, ICucumberExpressionDetector>();
             container.RegisterTypeAs<StepDefinitionRegexCalculator, IStepDefinitionRegexCalculator>();
+            container.RegisterTypeAs<MatchArgumentCalculator, IMatchArgumentCalculator>();
 #pragma warning disable CS0618
             container.RegisterTypeAs<BindingInvoker, IBindingInvoker>();
 #pragma warning restore CS0618
