@@ -47,10 +47,12 @@ namespace Reqnroll.CucumberMesssages
             testThreadEventPublisher.AddHandler<ScenarioFinishedEvent>(ScenarioFinishedEventHandler);
             testThreadEventPublisher.AddHandler<StepStartedEvent>(StepStartedEventHandler);
             testThreadEventPublisher.AddHandler<StepFinishedEvent>(StepFinishedEventHandler);
+            testThreadEventPublisher.AddHandler<HookBindingStartedEvent>(HookBindingStartedEventHandler);
             testThreadEventPublisher.AddHandler<HookBindingFinishedEvent>(HookBindingFinishedEventHandler);
             testThreadEventPublisher.AddHandler<AttachmentAddedEvent>(AttachmentAddedEventHandler);
             testThreadEventPublisher.AddHandler<OutputAddedEvent>(OutputAddedEventHandler);
         }
+
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
@@ -136,6 +138,12 @@ namespace Reqnroll.CucumberMesssages
         {
             var featureName = stepFinishedEvent.FeatureContext.FeatureInfo.Title;
             ProcessEvent(stepFinishedEvent, featureName);
+        }
+
+        private void HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
+        {
+            var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
+            ProcessEvent(hookBindingStartedEvent, featureName);
         }
 
         private void HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingEvent)

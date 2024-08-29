@@ -353,7 +353,7 @@ namespace Reqnroll.Infrastructure
             var currentContainer = GetHookContainer(hookType);
             var arguments = ResolveArguments(hookBinding, currentContainer);
 
-            _testThreadExecutionEventPublisher.PublishEvent(new HookBindingStartedEvent(hookBinding));
+            _testThreadExecutionEventPublisher.PublishEvent(new HookBindingStartedEvent(hookBinding, _contextManager));
             var durationHolder = new DurationHolder();
 
             try

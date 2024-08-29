@@ -171,10 +171,16 @@ namespace Reqnroll.Events
     public class HookBindingStartedEvent : ExecutionEvent
     {
         public IHookBinding HookBinding { get; }
+        public IContextManager ContextManager { get; private set; }
 
         public HookBindingStartedEvent(IHookBinding hookBinding)
         {
             HookBinding = hookBinding;
+        }
+
+        public HookBindingStartedEvent(IHookBinding hookBinding, IContextManager contextManager) : this(hookBinding)
+        {
+            ContextManager = contextManager;
         }
     }
 
