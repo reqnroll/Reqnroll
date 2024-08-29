@@ -10,7 +10,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.parameter_types
     [Binding]
     internal class Parameter_types
     {
-        [StepArgumentTransformation(@"([A-Z]{3})-([A-Z]{3})")]
+        [StepArgumentTransformation(Name ="flight", Regex = @"([A-Z]{3})-([A-Z]{3})")]
         public Flight FlightConverter(string from, string to)
         {
             return new Flight

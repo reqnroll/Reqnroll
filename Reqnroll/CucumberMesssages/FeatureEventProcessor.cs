@@ -117,6 +117,11 @@ namespace Reqnroll.CucumberMesssages
             var bindingRegistry = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IBindingRegistry>();
             if (bindingRegistry.IsValid)
             {
+                foreach (var stepTransform in bindingRegistry.GetStepTransformations())
+                {
+                    var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, IDGenerator);
+                    yield return Envelope.Create(parameterType);
+                }
                 foreach (var binding in bindingRegistry.GetStepDefinitions())
                 {
                     var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
@@ -144,6 +149,17 @@ namespace Reqnroll.CucumberMesssages
             yield return Envelope.Create(CucumberMessageFactory.ToTestRunFinished(this, featureFinishedEvent));
         }
 
+        private string GenerateScenarioKey(ScenarioInfo scenarioInfo)
+        {
+            var scenarioArguments = new List<string>();
+            foreach (string v in scenarioInfo.Arguments.Values)
+            {
+                scenarioArguments.Add(v);
+            }
+            return scenarioInfo.Title
+                 + scenarioArguments
+                 + scenarioInfo.CombinedTags;
+        }
         internal IEnumerable<Envelope> ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
             var scenarioName = scenarioStartedEvent.ScenarioContext.ScenarioInfo.Title;

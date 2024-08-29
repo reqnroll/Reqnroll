@@ -76,6 +76,26 @@ namespace Reqnroll.CucumberMesssages
             return result;
         }
 
+
+        internal static ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator iDGenerator)
+        {
+            var regex = stepTransform.Regex.ToString();
+            var name = stepTransform.Name;
+            var result = new ParameterType
+            (
+                name,
+                new List<string>
+                {
+                    regex
+                },
+                true,
+                true,
+                iDGenerator.GetNewId(),
+                ToSourceRef(stepTransform)
+            );
+            return result;
+        }
+
         private static SourceReference ToSourceRef(IBinding binding)
         {
             var methodName = binding.Method.Name;

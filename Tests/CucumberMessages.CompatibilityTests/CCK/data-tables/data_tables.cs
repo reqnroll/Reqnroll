@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection.PortableExecutable;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -27,6 +28,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.data_tables
 
         private void TablesEqual(Table expected, Table transposedTable)
         {
+            expected = MakeHeaderLess(expected);
             var ExpectednumRows = expected.Rows.Count;
             var ExpectednumCols = expected.Rows[0].Count;
 
@@ -49,8 +51,9 @@ namespace CucumberMessages.CompatibilityTests.CCK.data_tables
 
         private Table Transpose(Table table)
         {
+            Table tempTable = MakeHeaderLess(table);
 
-            string[][] matrix = GetStringArray(table.Rows);
+            string[][] matrix = GetStringArray(tempTable.Rows);
             var t = TransposeMatrix(matrix);
             return CreateTable(t);
 
@@ -96,7 +99,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.data_tables
             {
                 var columnCount = matrix[0].Length;
                 var headers = Enumerable.Range(0, columnCount).Select(i => $"").ToArray();
-                var table = new Table();
+                var table = new Table(headers);
 
                 foreach (var row in matrix)
                 {
@@ -105,6 +108,20 @@ namespace CucumberMessages.CompatibilityTests.CCK.data_tables
 
                 return table;
             }
+        }
+
+        private static Table MakeHeaderLess(Table table)
+        {
+            // push the header into a new Table as the first row of that table
+            var header = table.Header;
+            var tempTable = new Table(Enumerable.Range(0, header.Count).Select(i => $"").ToArray());
+            tempTable.AddRow(header.ToArray());
+            foreach (var row in table.Rows)
+            {
+                tempTable.AddRow(row.Select(kvp => kvp.Value).ToArray());
+            }
+
+            return tempTable;
         }
     }
 }
