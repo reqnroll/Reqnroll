@@ -6,6 +6,7 @@ using Reqnroll.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Reqnroll.CucumberMesssages
@@ -71,6 +72,12 @@ namespace Reqnroll.CucumberMesssages
 
         internal IEnumerable<Envelope> ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
+
+            // At this point we only care about hooks that wrap scenarios or steps
+            if (hookBindingFinishedEvent.HookBinding.HookType == HookType.AfterFeature || hookBindingFinishedEvent.HookBinding.HookType == HookType.BeforeFeature
+                || hookBindingFinishedEvent.HookBinding.HookType == HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == HookType.AfterTestRun)
+                return Enumerable.Empty<Envelope>();
+
             _events.Enqueue(hookBindingFinishedEvent);
             var step = FindMatchingHookStartedEvent(hookBindingFinishedEvent);
             step.ProcessEvent(hookBindingFinishedEvent);
@@ -105,8 +112,8 @@ namespace Reqnroll.CucumberMesssages
         }
         internal IEnumerable<Envelope> ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
         {
-            var matchingPickleStep = Pickle.Steps.Where(st => st.Text == attachmentAddedEvent.StepText).ToList().LastOrDefault();
-            var pickleStepId = matchingPickleStep.Id;
+            //var matchingPickleStep = Pickle.Steps.Where(st => st.Text == attachmentAddedEvent.StepText).ToList().LastOrDefault();
+            var pickleStepId = "";
    
             var attachmentExecutionEventWrapper = new AttachmentAddedEventWrapper(attachmentAddedEvent, pickleStepId);
             _events.Enqueue(attachmentExecutionEventWrapper);
@@ -116,9 +123,10 @@ namespace Reqnroll.CucumberMesssages
 
         internal IEnumerable<Envelope> ProcessEvent(OutputAddedEvent outputAddedEvent)
         {
-            var matchingPickleStep = Pickle.Steps.Where(st => st.Text == outputAddedEvent.StepText).ToList().LastOrDefault();
-            var pickleStepId = matchingPickleStep.Id;
+            //var matchingPickleStep = Pickle.Steps.Where(st => st.Text == outputAddedEvent.StepText).ToList().LastOrDefault();
+            //var pickleStepId = matchingPickleStep.Id;
 
+            var pickleStepId = "";
             var outputExecutionEventWrapper = new OutputAddedEventWrapper(outputAddedEvent, pickleStepId);
             _events.Enqueue(outputExecutionEventWrapper);
 
@@ -133,6 +141,7 @@ namespace Reqnroll.CucumberMesssages
         internal IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             _events.Enqueue(scenarioFinishedEvent);
+            TestStepStarted mostRecentTestStepStarted = null;
 
             while (_events.Count > 0)
             {
@@ -152,7 +161,9 @@ namespace Reqnroll.CucumberMesssages
                         break;
                     case StepStartedEvent stepStartedEvent:
                         var stepState = StepsByEvent[stepStartedEvent];
-                        yield return Envelope.Create(CucumberMessageFactory.ToTestStepStarted(stepState as ScenarioStepProcessor, stepStartedEvent));
+                        var stepStarted = CucumberMessageFactory.ToTestStepStarted(stepState as ScenarioStepProcessor, stepStartedEvent);
+                        mostRecentTestStepStarted = stepStarted;
+                        yield return Envelope.Create(stepStarted);
                         break;
                     case StepFinishedEvent stepFinishedEvent:
                         var stepFinishedState = StepsByEvent[stepFinishedEvent];
@@ -161,7 +172,9 @@ namespace Reqnroll.CucumberMesssages
                     //TODO: this isn't right; shouuld be one hook processor per hook that ran
                     case HookBindingStartedEvent hookBindingStartedEvent:
                         var hookStepStartState = StepsByEvent[hookBindingStartedEvent];
-                        yield return Envelope.Create(CucumberMessageFactory.ToTestStepStarted(hookStepStartState as HookStepProcessor, hookBindingStartedEvent));
+                        var hookStepStarted = CucumberMessageFactory.ToTestStepStarted(hookStepStartState as HookStepProcessor, hookBindingStartedEvent);
+                        mostRecentTestStepStarted = hookStepStarted;
+                        yield return Envelope.Create(hookStepStarted);
                         break;
                     case HookBindingFinishedEvent hookBindingFinishedEvent:
                         var hookStepFinishedState = StepsByEvent[hookBindingFinishedEvent];
@@ -169,7 +182,7 @@ namespace Reqnroll.CucumberMesssages
                         break;
                     case AttachmentAddedEventWrapper attachmentAddedEventWrapper:
                         // find the TestCaseStepId and testCaseStartedId
-                        var testStepID = TestCase.TestSteps.Where(ts => ts.PickleStepId == attachmentAddedEventWrapper.PickleStepID).FirstOrDefault().Id;
+                        var testStepID = mostRecentTestStepStarted.TestStepId;
                         var testCaseStartedId = TestCaseStarted.Id;
                         attachmentAddedEventWrapper.TestCaseStepID = testStepID;
                         attachmentAddedEventWrapper.TestCaseStartedID = testCaseStartedId;
@@ -177,7 +190,7 @@ namespace Reqnroll.CucumberMesssages
                         break;
                     case OutputAddedEventWrapper outputAddedEventWrapper:
                         // find the TestCaseStepId and testCaseStartedId
-                        testStepID = TestCase.TestSteps.Where(ts => ts.PickleStepId == outputAddedEventWrapper.PickleStepID).FirstOrDefault().Id;
+                        testStepID = mostRecentTestStepStarted.TestStepId;
                         testCaseStartedId = TestCaseStarted.Id;
                         outputAddedEventWrapper.TestCaseStepID = testStepID;
                         outputAddedEventWrapper.TestCaseStartedID = testCaseStartedId;

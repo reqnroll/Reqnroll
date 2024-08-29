@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace CucumberMessages.CompatibilityTests.CCK.hooks
 {
@@ -49,8 +50,12 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooks
         [AfterScenario("with-attachment")]
         public void PassingAfterHook()
         {
-            reqnrollOutputHelper.AddAttachment("cucumber.svg");
-        }
+            Debugger.Launch();
+            var ext = "svg";
+            var path = FileSystemPath.GetFilePathForAttachments();
+            var attachment = Path.Combine(path, "hooks", $"cucumber.{ext}");
 
+            reqnrollOutputHelper.AddAttachment(attachment);
+        }
     }
 }

@@ -75,6 +75,7 @@ namespace Reqnroll.CucumberMesssages
                 ScenarioFinishedEvent scenarioFinishedEvent => ProcessEvent(scenarioFinishedEvent),
                 StepStartedEvent stepStartedEvent => ProcessEvent(stepStartedEvent),
                 StepFinishedEvent stepFinishedEvent => ProcessEvent(stepFinishedEvent),
+                HookBindingStartedEvent hookBindingStartedEvent => ProcessEvent(hookBindingStartedEvent),
                 HookBindingFinishedEvent hookFinishedEvent => ProcessEvent(hookFinishedEvent),
                 AttachmentAddedEvent attachmentAddedEvent => ProcessEvent(attachmentAddedEvent),
                 OutputAddedEvent outputAddedEvent => ProcessEvent(outputAddedEvent),
@@ -200,6 +201,17 @@ namespace Reqnroll.CucumberMesssages
             var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
 
             foreach (var e in scenarioEP.ProcessEvent(stepFinishedEvent))
+            {
+                yield return e;
+            }
+        }
+
+        internal IEnumerable<Envelope> ProcessEvent(HookBindingStartedEvent hookStartedEvent)
+        {
+            var scenarioName = hookStartedEvent.ContextManager?.ScenarioContext?.ScenarioInfo?.Title;
+            var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
+
+            foreach (var e in scenarioEP.ProcessEvent(hookStartedEvent))
             {
                 yield return e;
             }

@@ -33,7 +33,6 @@
     <None Remove="CCK\data-tables\data_tables.feature.ndjson" />
     <None Remove="CCK\examples-tables\examples_tables.feature" />
     <None Remove="CCK\examples-tables\examples_tables.feature.ndjson" />
-    <None Remove="CCK\hooks\cucumber.svg" />
     <None Remove="CCK\hooks\hooks.feature" />
     <None Remove="CCK\hooks\hooks.feature.ndjson" />
     <None Remove="CCK\minimal\minimal.feature" />
@@ -73,7 +72,6 @@
     <Content Include="CCK\examples-tables\examples_tables.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\hooks\cucumber.svg" />
     <EmbeddedResource Include="CCK\hooks\hooks.cs" />
     <EmbeddedResource Include="CCK\hooks\hooks.feature" />
     <Content Include="CCK\hooks\hooks.feature.ndjson">
@@ -141,6 +139,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="CCK\attachments\cucumber.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CCK\hooks\cucumber.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="CucumberMessages.configuration.json">

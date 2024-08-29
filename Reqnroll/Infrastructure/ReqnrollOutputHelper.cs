@@ -22,7 +22,7 @@ namespace Reqnroll.Infrastructure
         {
             var featureName = contextManager.FeatureContext.FeatureInfo?.Title;
             var scenarioName = contextManager.ScenarioContext.ScenarioInfo?.Title;
-            var stepText = contextManager.StepContext.StepInfo?.Text;
+            var stepText = contextManager.StepContext?.StepInfo?.Text;
 
             _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message, featureName, scenarioName, stepText));
             _traceListener.WriteToolOutput(message);
@@ -37,7 +37,7 @@ namespace Reqnroll.Infrastructure
         {
             var featureName = contextManager.FeatureContext.FeatureInfo?.Title;
             var scenarioName = contextManager.ScenarioContext.ScenarioInfo?.Title;
-            var stepText = contextManager.StepContext.StepInfo?.Text;
+            var stepText = contextManager.StepContext?.StepInfo?.Text;
             _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath, featureName, scenarioName, stepText));
             _reqnrollAttachmentHandler.AddAttachment(filePath);
         }
