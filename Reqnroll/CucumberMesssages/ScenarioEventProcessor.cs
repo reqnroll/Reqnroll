@@ -85,6 +85,18 @@ namespace Reqnroll.CucumberMesssages
             return Enumerable.Empty<Envelope>();
         }
 
+        internal IEnumerable<Envelope> ProcessEvent(HookFinishedEvent hookFinishedEvent)
+        {
+            // At this point we only care about hooks that wrap scenarios or steps
+            if (hookFinishedEvent.HookType == HookType.AfterFeature || hookFinishedEvent.HookType == HookType.BeforeFeature
+                || hookFinishedEvent.HookType == HookType.BeforeTestRun || hookFinishedEvent.HookType == HookType.AfterTestRun)
+                return Enumerable.Empty<Envelope>();
+
+            // The HookFinishedEvent does not tell us which hook(binding) was finished. We'll find out later during replay by tracking the last HookBindingFinishedEvent
+            _events.Enqueue(hookFinishedEvent);
+            return Enumerable.Empty<Envelope>();
+        }
+
         private HookStepProcessor FindMatchingHookStartedEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
             return StepsByEvent.Where(kvp => kvp.Key is HookBindingStartedEvent && ((HookBindingStartedEvent)kvp.Key).HookBinding == hookBindingFinishedEvent.HookBinding).Select(kvp => kvp.Value as HookStepProcessor).LastOrDefault();
@@ -142,6 +154,7 @@ namespace Reqnroll.CucumberMesssages
         {
             _events.Enqueue(scenarioFinishedEvent);
             TestStepStarted mostRecentTestStepStarted = null;
+            StepProcessorBase mostRecentHookStep = null;
 
             while (_events.Count > 0)
             {
@@ -169,7 +182,6 @@ namespace Reqnroll.CucumberMesssages
                         var stepFinishedState = StepsByEvent[stepFinishedEvent];
                         yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(stepFinishedState as ScenarioStepProcessor, stepFinishedEvent));
                         break;
-                    //TODO: this isn't right; shouuld be one hook processor per hook that ran
                     case HookBindingStartedEvent hookBindingStartedEvent:
                         var hookStepStartState = StepsByEvent[hookBindingStartedEvent];
                         var hookStepStarted = CucumberMessageFactory.ToTestStepStarted(hookStepStartState as HookStepProcessor, hookBindingStartedEvent);
@@ -177,8 +189,20 @@ namespace Reqnroll.CucumberMesssages
                         yield return Envelope.Create(hookStepStarted);
                         break;
                     case HookBindingFinishedEvent hookBindingFinishedEvent:
-                        var hookStepFinishedState = StepsByEvent[hookBindingFinishedEvent];
-                        yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(hookStepFinishedState as HookStepProcessor, hookBindingFinishedEvent));
+                        // Find the hookStep that matches the hookBinding and store it temporarily; to be processed when the hook finished event is processed
+                        mostRecentHookStep = StepsByEvent[hookBindingFinishedEvent];
+                        break;
+                    case HookFinishedEvent hookFinishedEvent:
+                        // mostRecentHookStep will be null when we've already created a TestStepFinished for the hookBinding as there may be multiple HookFinishedEvents for a Step or Block or Scenario
+                        if (mostRecentHookStep == null)
+                            break;
+                        if (mostRecentHookStep != null && hookFinishedEvent.HookException != null)
+                        {
+                            mostRecentHookStep.Exception = hookFinishedEvent.HookException;
+                        }
+                        var hookStepProcessor = mostRecentHookStep as HookStepProcessor;
+                        yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(hookStepProcessor, hookStepProcessor.HookBindingFinishedEvent));
+                        mostRecentHookStep = null;
                         break;
                     case AttachmentAddedEventWrapper attachmentAddedEventWrapper:
                         // find the TestCaseStepId and testCaseStartedId

@@ -27,6 +27,7 @@ namespace Reqnroll.CucumberMesssages
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         {
+            //Debugger.Launch();
             broker = CucumberMessageBroker;
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
@@ -49,6 +50,7 @@ namespace Reqnroll.CucumberMesssages
             testThreadEventPublisher.AddHandler<StepFinishedEvent>(StepFinishedEventHandler);
             testThreadEventPublisher.AddHandler<HookBindingStartedEvent>(HookBindingStartedEventHandler);
             testThreadEventPublisher.AddHandler<HookBindingFinishedEvent>(HookBindingFinishedEventHandler);
+            testThreadEventPublisher.AddHandler<HookFinishedEvent>(HookFinishedEventHandler);
             testThreadEventPublisher.AddHandler<AttachmentAddedEvent>(AttachmentAddedEventHandler);
             testThreadEventPublisher.AddHandler<OutputAddedEvent>(OutputAddedEventHandler);
         }
@@ -150,6 +152,12 @@ namespace Reqnroll.CucumberMesssages
         {
             var featureName = hookBindingEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             ProcessEvent(hookBindingEvent, featureName);
+        }
+
+        private void HookFinishedEventHandler(HookFinishedEvent hookFinishedEvent)
+        {
+            var featureName = hookFinishedEvent.FeatureContext?.FeatureInfo?.Title;
+            ProcessEvent(hookFinishedEvent, featureName);
         }
 
         private void AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)

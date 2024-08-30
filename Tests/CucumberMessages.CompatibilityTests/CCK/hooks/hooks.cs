@@ -15,6 +15,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooks
 
         public Hooks(IReqnrollOutputHelper reqnrollOutputHelper)
         {
+            //Debugger.Launch();
             this.reqnrollOutputHelper = reqnrollOutputHelper;
         }
 
@@ -50,7 +51,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooks
         [AfterScenario("with-attachment")]
         public void PassingAfterHook()
         {
-            Debugger.Launch();
+
             var ext = "svg";
             var path = FileSystemPath.GetFilePathForAttachments();
             var attachment = Path.Combine(path, "hooks", $"cucumber.{ext}");
