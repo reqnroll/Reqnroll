@@ -9,6 +9,7 @@
 * Support 'Order' parameter for `StepArgumentTransformationAttribute` to prioritize execution (#185)
 * Upgrade to Gherkin v29 from v19 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#205, #240)
 * Added registration of `ReqnrollFeatureFiles` for Rider/ReSharper Build (#231)
+* Added option to override regex group matching behavior (#243)
 
 ## Bug fixes:
 
@@ -16,7 +17,7 @@
 * Fix: Process cannot access the file when building a multi-target project (#197)
 * Fix: Project dependencies transiently refer to System.Net.Http <= v4.3.0 that has high severity security vulnerability (#240)
 
-*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @gasparnagy, @obligaron, @runnerok, @stbychkov
+*Contributors of this release (in alphabetical order):* @ajeckmans, @cimnine, @gasparnagy, @obligaron, @olegKoshmeliuk, @runnerok, @stbychkov
 
 # v2.0.3 - 2024-06-10
 
