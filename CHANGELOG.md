@@ -6,9 +6,9 @@
 * Reqnroll.Windsor: Support for Castle.Windsor v6.0.0. For earlier versions of Castle.Windsor, use the latest 2.0.3 version of the plugin that is compatible with Reqnroll v2.*. (#240)
 * Optimize creation of test-thread context using test framework independent resource pooling (#144)
 * Support DateTimeOffset in value comparer (#180)
-* Support 'Order' parameter for `StepArgumentTransformationAttribute` to prioritize execution (#185)
+* Support `Order` parameter for `StepArgumentTransformationAttribute` to prioritize execution (#185)
 * Upgrade to Gherkin v29 from v19 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#205, #240)
-* Added registration of `ReqnrollFeatureFiles` for Rider/ReSharper Build (#231)
+* Rider: Avoid requirement to define `ReqnrollFeatureFiles` MsBuild item group to show feature files in Rider (#231)
 * Added option to override regex group matching behavior (#243)
 
 ## Bug fixes:
