@@ -8,6 +8,7 @@ namespace Reqnroll.CucumberMesssages
         public string TestCaseStartedID => parentScenario.TestCaseStartedID;
         public ScenarioExecutionStatus Status { get; set; }
         public TimeSpan Duration { get; set; }
+        public Exception Exception { get; set; }
 
         public ScenarioEventProcessor parentScenario;
 

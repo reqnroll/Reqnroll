@@ -60,6 +60,11 @@ namespace Reqnroll.CucumberMesssages
             Duration = stepFinishedEvent.Timestamp - stepStartedEvent.Timestamp;
             Status = stepFinishedEvent.StepContext.Status;
 
+            if (Status == ScenarioExecutionStatus.TestError && stepFinishedEvent.ScenarioContext.TestError != null)
+            {
+                Exception = stepFinishedEvent.ScenarioContext.TestError;
+            }
+
             StepArguments = Bound ?
                 stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => new StepArgument
                 {

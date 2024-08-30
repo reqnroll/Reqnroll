@@ -26,6 +26,7 @@ namespace CucumberMessages.CompatibilityTests
 
             AddPassingStepBinding("When");
 
+
             ExecuteTests();
 
             ShouldAllScenariosPass();
@@ -54,7 +55,7 @@ namespace CucumberMessages.CompatibilityTests
 
             AddFeatureFileFromResource($"{scenarioName}/{scenarioName}.feature", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
             AddBindingClassFromResource($"{scenarioName}/{scenarioName}.cs", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
-            AddBinaryFilesFromResource($"{scenarioName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+            //AddBinaryFilesFromResource($"{scenarioName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
 
             ExecuteTests();
 

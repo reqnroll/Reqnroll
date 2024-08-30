@@ -188,9 +188,9 @@ namespace Reqnroll.CucumberMesssages
             return new TestStepStarted(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, Converters.ToTimestamp(hookBindingStartedEvent.Timestamp));
         }
 
-        internal static TestStepFinished ToTestStepFinished(HookStepProcessor hookStepProcessor, HookBindingFinishedEvent hookBindingFinishedEvent)
+        internal static TestStepFinished ToTestStepFinished(HookStepProcessor hookStepProcessor, HookBindingFinishedEvent hookFinishedEvent)
         {
-            return new TestStepFinished(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookBindingFinishedEvent.Timestamp));
+            return new TestStepFinished(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookFinishedEvent.Timestamp));
         }
 
         internal static Attachment ToAttachment(ScenarioEventProcessor scenarioEventProcessor, AttachmentAddedEventWrapper attachmentAddedEventWrapper)
@@ -224,8 +224,20 @@ namespace Reqnroll.CucumberMesssages
                 Converters.ToDuration(stepState.Duration),
                 "",
                 ToTestStepResultStatus(stepState.Status),
-                null);
+                ToException(stepState.Exception)
+                );
 
+        }
+
+        private static Io.Cucumber.Messages.Types.Exception ToException(System.Exception exception)
+        {
+            if (exception == null) return null;
+
+            return new Io.Cucumber.Messages.Types.Exception(
+                exception.GetType().Name,
+                exception.Message,
+                exception.StackTrace
+                );
         }
 
         private static TestStepResultStatus ToTestStepResultStatus(ScenarioExecutionStatus status)
