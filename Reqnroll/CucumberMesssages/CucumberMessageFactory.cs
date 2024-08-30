@@ -88,8 +88,8 @@ namespace Reqnroll.CucumberMesssages
                 {
                     regex
                 },
-                true,
-                true,
+                false,
+                false,
                 iDGenerator.GetNewId(),
                 ToSourceRef(stepTransform)
             );
