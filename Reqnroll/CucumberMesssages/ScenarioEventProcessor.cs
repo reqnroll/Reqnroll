@@ -34,7 +34,7 @@ namespace Reqnroll.CucumberMesssages
         {
             get
             {
-                return StepsByEvent.Where(kvp => kvp.Key is StepStartedEvent || kvp.Key is HookBindingFinishedEvent).Select(kvp => kvp.Value ).ToList();
+                return StepsByEvent.Where(kvp => kvp.Key is StepStartedEvent || kvp.Key is HookBindingFinishedEvent).Select(kvp => kvp.Value).ToList();
             }
         }
         public ScenarioExecutionStatus ScenarioExecutionStatus { get; private set; }
@@ -85,18 +85,6 @@ namespace Reqnroll.CucumberMesssages
             return Enumerable.Empty<Envelope>();
         }
 
-        internal IEnumerable<Envelope> ProcessEvent(HookFinishedEvent hookFinishedEvent)
-        {
-            // At this point we only care about hooks that wrap scenarios or steps
-            if (hookFinishedEvent.HookType == HookType.AfterFeature || hookFinishedEvent.HookType == HookType.BeforeFeature
-                || hookFinishedEvent.HookType == HookType.BeforeTestRun || hookFinishedEvent.HookType == HookType.AfterTestRun)
-                return Enumerable.Empty<Envelope>();
-
-            // The HookFinishedEvent does not tell us which hook(binding) was finished. We'll find out later during replay by tracking the last HookBindingFinishedEvent
-            _events.Enqueue(hookFinishedEvent);
-            return Enumerable.Empty<Envelope>();
-        }
-
         private HookStepProcessor FindMatchingHookStartedEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
             return StepsByEvent.Where(kvp => kvp.Key is HookBindingStartedEvent && ((HookBindingStartedEvent)kvp.Key).HookBinding == hookBindingFinishedEvent.HookBinding).Select(kvp => kvp.Value as HookStepProcessor).LastOrDefault();
@@ -126,7 +114,7 @@ namespace Reqnroll.CucumberMesssages
         {
             //var matchingPickleStep = Pickle.Steps.Where(st => st.Text == attachmentAddedEvent.StepText).ToList().LastOrDefault();
             var pickleStepId = "";
-   
+
             var attachmentExecutionEventWrapper = new AttachmentAddedEventWrapper(attachmentAddedEvent, pickleStepId);
             _events.Enqueue(attachmentExecutionEventWrapper);
 
@@ -147,14 +135,13 @@ namespace Reqnroll.CucumberMesssages
 
         private ScenarioStepProcessor FindMatchingStepStartEvent(StepFinishedEvent stepFinishedEvent)
         {
-            return StepsByEvent.Where(kvp => kvp.Key is StepStartedEvent).Where(kvp => ((StepStartedEvent) (kvp.Key)).StepContext == stepFinishedEvent.StepContext).OrderBy(kvp => ((StepStartedEvent)(kvp.Key)).Timestamp).Select(kvp => kvp.Value as ScenarioStepProcessor).LastOrDefault();
+            return StepsByEvent.Where(kvp => kvp.Key is StepStartedEvent).Where(kvp => ((StepStartedEvent)(kvp.Key)).StepContext == stepFinishedEvent.StepContext).OrderBy(kvp => ((StepStartedEvent)(kvp.Key)).Timestamp).Select(kvp => kvp.Value as ScenarioStepProcessor).LastOrDefault();
         }
 
         internal IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             _events.Enqueue(scenarioFinishedEvent);
             TestStepStarted mostRecentTestStepStarted = null;
-            StepProcessorBase mostRecentHookStep = null;
 
             while (_events.Count > 0)
             {
@@ -189,20 +176,8 @@ namespace Reqnroll.CucumberMesssages
                         yield return Envelope.Create(hookStepStarted);
                         break;
                     case HookBindingFinishedEvent hookBindingFinishedEvent:
-                        // Find the hookStep that matches the hookBinding and store it temporarily; to be processed when the hook finished event is processed
-                        mostRecentHookStep = StepsByEvent[hookBindingFinishedEvent];
-                        break;
-                    case HookFinishedEvent hookFinishedEvent:
-                        // mostRecentHookStep will be null when we've already created a TestStepFinished for the hookBinding as there may be multiple HookFinishedEvents for a Step or Block or Scenario
-                        if (mostRecentHookStep == null)
-                            break;
-                        if (mostRecentHookStep != null && hookFinishedEvent.HookException != null)
-                        {
-                            mostRecentHookStep.Exception = hookFinishedEvent.HookException;
-                        }
-                        var hookStepProcessor = mostRecentHookStep as HookStepProcessor;
-                        yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(hookStepProcessor, hookStepProcessor.HookBindingFinishedEvent));
-                        mostRecentHookStep = null;
+                        var hookStepProcessor = StepsByEvent[hookBindingFinishedEvent];
+                        yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(hookStepProcessor as HookStepProcessor, hookBindingFinishedEvent));
                         break;
                     case AttachmentAddedEventWrapper attachmentAddedEventWrapper:
                         // find the TestCaseStepId and testCaseStartedId

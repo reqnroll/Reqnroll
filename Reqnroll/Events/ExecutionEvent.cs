@@ -190,6 +190,7 @@ namespace Reqnroll.Events
 
         public TimeSpan Duration { get; }
         public IContextManager ContextManager { get; private set; }
+        public Exception HookException { get; private set; }
 
         public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration)
         {
@@ -197,9 +198,10 @@ namespace Reqnroll.Events
             Duration = duration;
         }
 
-        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager) : this(hookBinding, duration)
+        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager, Exception hookException = null) : this(hookBinding, duration)
         {
             ContextManager = contextManager;
+            HookException = hookException;
         }
     }
 

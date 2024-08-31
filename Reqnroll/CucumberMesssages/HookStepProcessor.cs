@@ -23,6 +23,7 @@ namespace Reqnroll.CucumberMesssages
         public IEnumerable<Envelope> ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
         {
             HookBindingFinishedEvent  = hookFinishedEvent;
+            Exception = hookFinishedEvent.HookException;
             return Enumerable.Empty<Envelope>();
         }
     }

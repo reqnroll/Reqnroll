@@ -42,7 +42,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooks
         [AfterScenario]
         public void AfterScenarioHook() { }
 
-        [AfterScenario("some-tag or some-other-tag")]
+        [AfterScenario(), Scope(Tag = "some-tag or some-other-tag")]
         public void FailingAfterHook()
         {
             throw new Exception("Exception in conditional hook");

@@ -79,7 +79,6 @@ namespace Reqnroll.CucumberMesssages
                 StepFinishedEvent stepFinishedEvent => ProcessEvent(stepFinishedEvent),
                 HookBindingStartedEvent hookBindingStartedEvent => ProcessEvent(hookBindingStartedEvent),
                 HookBindingFinishedEvent hookBindingFinishedEvent => ProcessEvent(hookBindingFinishedEvent),
-                HookFinishedEvent hookFinishedEvent => ProcessEvent(hookFinishedEvent),
                 AttachmentAddedEvent attachmentAddedEvent => ProcessEvent(attachmentAddedEvent),
                 OutputAddedEvent outputAddedEvent => ProcessEvent(outputAddedEvent),
                 _ => throw new NotImplementedException(),
@@ -222,27 +221,6 @@ namespace Reqnroll.CucumberMesssages
             foreach (var e in scenarioEP.ProcessEvent(hookBindingFinishedEvent))
             {
                 yield return e;
-            }
-        }
-
-        internal IEnumerable<Envelope> ProcessEvent(HookFinishedEvent hookFinishedEvent)
-        {
-            // At this point we only care about hooks that wrap scenarios or steps
-            if (hookFinishedEvent.HookType == HookType.AfterFeature || hookFinishedEvent.HookType == HookType.BeforeFeature
-                || hookFinishedEvent.HookType == HookType.BeforeTestRun || hookFinishedEvent.HookType == HookType.AfterTestRun)
-               foreach(var e in Enumerable.Empty<Envelope>())
-                {
-                    yield return e;
-                }
-            else
-            {
-                var scenarioName = hookFinishedEvent.ScenarioContext?.ScenarioInfo?.Title;
-                var scenarioEP = ScenarioName2ScenarioProcessorMap[scenarioName];
-
-                foreach (var e in scenarioEP.ProcessEvent(hookFinishedEvent))
-                {
-                    yield return e;
-                }
             }
         }
 
