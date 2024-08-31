@@ -355,14 +355,22 @@ namespace Reqnroll.Infrastructure
 
             _testThreadExecutionEventPublisher.PublishEvent(new HookBindingStartedEvent(hookBinding, _contextManager));
             var durationHolder = new DurationHolder();
-
+            Exception exceptionthrown = null;
             try
             {
                 await invoker.InvokeBindingAsync(hookBinding, _contextManager, arguments, _testTracer, durationHolder);
             }
+            catch (Exception exception)
+            {
+                // This exception is caught in order to be able to inform consumers of the HookBindingFinishedEvent;
+                // This is used by CucumberMessages to include information about the exception in the hook TestStepResult
+                // The throw; statement ensures that the exception is propagated up to the FireEventsAsync method
+                exceptionthrown = exception;
+                throw;
+            }
             finally
             {
-                _testThreadExecutionEventPublisher.PublishEvent(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager));
+                _testThreadExecutionEventPublisher.PublishEvent(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager, exceptionthrown));
             }
         }
 
