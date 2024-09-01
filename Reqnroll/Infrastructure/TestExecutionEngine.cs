@@ -231,10 +231,11 @@ namespace Reqnroll.Infrastructure
                 {
                     await FireScenarioEventsAsync(HookType.AfterScenario);
                 }
-                _testThreadExecutionEventPublisher.PublishEvent(new ScenarioFinishedEvent(FeatureContext, ScenarioContext));
             }
             finally
             {
+                _testThreadExecutionEventPublisher.PublishEvent(new ScenarioFinishedEvent(FeatureContext, ScenarioContext));
+
                 _contextManager.CleanupScenarioContext();
             }
         }

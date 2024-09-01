@@ -72,7 +72,6 @@ namespace Reqnroll.CucumberMesssages
 
         internal IEnumerable<Envelope> ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
-
             // At this point we only care about hooks that wrap scenarios or steps
             if (hookBindingFinishedEvent.HookBinding.HookType == HookType.AfterFeature || hookBindingFinishedEvent.HookBinding.HookType == HookType.BeforeFeature
                 || hookBindingFinishedEvent.HookBinding.HookType == HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == HookType.AfterTestRun)

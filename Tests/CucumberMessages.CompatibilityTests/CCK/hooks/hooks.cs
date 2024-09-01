@@ -15,7 +15,6 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooks
 
         public Hooks(IReqnrollOutputHelper reqnrollOutputHelper)
         {
-            //Debugger.Launch();
             this.reqnrollOutputHelper = reqnrollOutputHelper;
         }
 
@@ -42,7 +41,9 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooks
         [AfterScenario]
         public void AfterScenarioHook() { }
 
-        [AfterScenario(), Scope(Tag = "some-tag or some-other-tag")]
+        [AfterScenario()]
+        [Scope(Tag = "some-tag")]
+        [Scope(Tag = "some-other-tag")]
         public void FailingAfterHook()
         {
             throw new Exception("Exception in conditional hook");

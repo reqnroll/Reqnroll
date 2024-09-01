@@ -24,6 +24,8 @@ namespace Reqnroll.CucumberMesssages
         {
             HookBindingFinishedEvent  = hookFinishedEvent;
             Exception = hookFinishedEvent.HookException;
+            Status = Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
+
             return Enumerable.Empty<Envelope>();
         }
     }
