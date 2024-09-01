@@ -85,7 +85,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Transformation
         {
             var exampleRecords = specification.GetExampleRecords(examplesHeaderNames);
             var exampleRows = exampleRecords.Items
-                                            .Select(rec => new Gherkin.Ast.TableRow(null, exampleRecords.Header.Select(h => new TableCell(null, rec.Fields[h].AsString(_featureCultureInfo))).ToArray()))
+                                            .Select(rec => new Gherkin.Ast.TableRow(new Location(0, 0), exampleRecords.Header.Select(h => new TableCell(new Location(0, 0), rec.Fields[h].AsString(_featureCultureInfo))).ToArray()))
                                             .ToArray();
 
             var examplesBlock = CreateExamplesBlock(exampleRecords.Header, exampleRows, examplesKeyword);
@@ -108,8 +108,8 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Transformation
         {
             keyword ??= "External Examples";
             var name = "External Examples";
-            var tableHeader = new Gherkin.Ast.TableRow(null, headerNames.Select(h => new TableCell(null, h)).ToArray());
-            return new Examples(new Tag[0], null, keyword, name, "", tableHeader, exampleRows);
+            var tableHeader = new Gherkin.Ast.TableRow(new Location(0, 0), headerNames.Select(h => new TableCell(new Location(0, 0), h)).ToArray());
+            return new Examples(new Tag[0], new Location(0, 0), keyword, name, "", tableHeader, exampleRows);
         }
     }
 }
