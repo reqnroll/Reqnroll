@@ -17,6 +17,7 @@ namespace CucumberMessages.CompatibilityTests
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Test
+                  @some-tag
                   Scenario: Log JSON
                      When the following string is attached as "application/json":
                        ```
@@ -25,7 +26,18 @@ namespace CucumberMessages.CompatibilityTests
                 """);
 
             AddPassingStepBinding("When");
-
+            AddBindingClass("""
+                [Binding]
+                public class TaggedScenario
+                {
+                    [AfterScenario()]
+                    [Scope(Tag = "some-tag")]
+                    public void FailingAfterHook()
+                    {
+                        throw new Exception("Exception in conditional hook");
+                    }
+                }
+                """);
 
             ExecuteTests();
 
