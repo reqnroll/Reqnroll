@@ -49,6 +49,7 @@
     <None Remove="CCK\undefined\undefined.feature.ndjson" />
     <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
     <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
+    <None Remove="products.csv" />
   </ItemGroup>
 
   <ItemGroup>
@@ -109,6 +110,9 @@
     </Content>
     <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
     <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
+    <EmbeddedResource Include="products.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
