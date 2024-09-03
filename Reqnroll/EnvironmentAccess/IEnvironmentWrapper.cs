@@ -13,5 +13,15 @@ namespace Reqnroll.EnvironmentAccess
         void SetEnvironmentVariable(string name, string value);
 
         string GetCurrentDirectory();
+
+        string GetOSPlatform();
+
+        string GetBuildServerName();
+
+        bool IsRunningInDockerContainer();
+
+        string GetReqnrollVersion();
+
+        string GetNetCoreVersion();
     }
 }

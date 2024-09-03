@@ -1,12 +1,16 @@
 ﻿using Cucumber.Messages;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.Analytics;
 using Reqnroll.Bindings;
+using Reqnroll.CommonModels;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -261,6 +265,68 @@ namespace Reqnroll.CucumberMesssages
         {
             byte[] fileBytes = File.ReadAllBytes(filePath);
             return Convert.ToBase64String(fileBytes);
+        }
+
+        public static Envelope ToMeta(FeatureStartedEvent featureStartedEvent)
+        {
+            var environmentWrapper = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IEnvironmentWrapper>();
+
+            var implementation = new Product("Reqnroll", environmentWrapper.GetReqnrollVersion());
+            string targetFramework = environmentWrapper.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
+
+            var runTime = new Product("dotNet", targetFramework);
+            var os = new Product(environmentWrapper.GetOSPlatform(), RuntimeInformation.OSDescription);
+
+            var cpu = RuntimeInformation.ProcessArchitecture switch
+            {
+                Architecture.Arm => new Product("arm", null),
+                Architecture.Arm64 => new Product("arm64", null),
+                Architecture.X86 => new Product("x86", null),
+                Architecture.X64 => new Product("x64", null),
+                _ => new Product(null, null),
+            };
+
+            var ci_name = environmentWrapper.GetBuildServerName();
+
+            var ci = ToCi(ci_name, environmentWrapper);
+
+            return Envelope.Create(new Meta(
+                    (Cucumber.Messages.ProtocolVersion.Version).Split('+')[0],
+                    implementation,
+                    runTime,
+                    os,
+                    cpu,
+                    ci));
+        }
+
+        private static Ci ToCi(string ci_name, IEnvironmentWrapper environmentWrapper)
+        {
+            //TODO: Find a way to abstract how various CI systems convey links to builds and build numbers.
+            //      Until then, these will be hard coded as null
+            if (String.IsNullOrEmpty(ci_name)) return null;
+            
+            var git = ToGit(environmentWrapper);
+
+            return new Ci(ci_name, null, null, git);
+        }
+
+        private static Git ToGit(IEnvironmentWrapper environmentWrapper)
+        {
+            Git git;
+            var git_url = environmentWrapper.GetEnvironmentVariable("GIT_URL");
+            var git_branch = environmentWrapper.GetEnvironmentVariable("GIT_BRANCH");
+            var git_commit = environmentWrapper.GetEnvironmentVariable("GIT_COMMIT");
+            var git_tag = environmentWrapper.GetEnvironmentVariable("GIT_TAG");
+            if (git_url is not ISuccess<string>) git = null;
+            else
+                git = new Git
+                (
+                    (git_url as ISuccess<string>).Result,
+                    git_branch is ISuccess<string> ? (git_branch as ISuccess<string>).Result : null,
+                    git_commit is ISuccess<string> ? (git_commit as ISuccess<string>).Result : null,
+                    git_tag is ISuccess<string> ? (git_tag as ISuccess<string>).Result : null
+                );
+            return git;
         }
         #endregion
     }

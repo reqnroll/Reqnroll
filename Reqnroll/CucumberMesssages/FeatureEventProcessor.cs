@@ -87,28 +87,7 @@ namespace Reqnroll.CucumberMesssages
 
         internal IEnumerable<Envelope> ProcessEvent(FeatureStartedEvent featureStartedEvent)
         {
-            //HACK: temporary implementation to obtain information for the Meta message
-            var analtyicsEventProcessor = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IAnalyticsEventProvider>();
-            var envInfo = analtyicsEventProcessor.CreateProjectRunningEvent("");
-            var implementation = new Product("Reqnroll", envInfo.ReqnrollVersion);
-            var runTime = new Product("dotNet", envInfo.TargetFramework);
-            var os = new Product(envInfo.Platform, envInfo.PlatformDescription);
-
-            var cpu = RuntimeInformation.ProcessArchitecture switch {
-                Architecture.Arm => new Product("arm", null),
-                Architecture.Arm64 => new Product("arm64", null),
-                Architecture.X86 => new Product("x86", null),
-                Architecture.X64 => new Product("x64", null),
-                _ => new Product(null, null),
-            };
- 
-            yield return Envelope.Create(new Meta(
-                    (Cucumber.Messages.ProtocolVersion.Version).Split('+')[0],
-                    implementation,
-                    runTime,
-                    os,
-                    cpu,
-                    null));
+            yield return CucumberMessageFactory.ToMeta(featureStartedEvent);
 
             Gherkin.CucumberMessages.Types.Source gherkinSource = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
             Io.Cucumber.Messages.Types.Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
