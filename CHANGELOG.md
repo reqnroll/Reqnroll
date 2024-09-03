@@ -1,10 +1,10 @@
 # [vNext]
 
-## Improvements:
-
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Reqnroll.CustomPlugin NuGet package has a version mismatch for the System.CodeDom dependency (#244)
+
+*Contributors of this release (in alphabetical order):* @UL-ChrisGlew
 
 # v2.1.0 - 2024-08-30
 
