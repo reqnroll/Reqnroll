@@ -11,7 +11,7 @@ internal class VersionInfo
 
     static VersionInfo()
     {
-        var assembly = Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly();
+        var assembly = Assembly.GetExecutingAssembly();
         AssemblyVersion = assembly.GetName().Version.ToString();
         AssemblyFileVersion = assembly.GetCustomAttribute<AssemblyFileVersionAttribute>()?.Version;
         AssemblyInformationalVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion;
