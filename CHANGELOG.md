@@ -3,8 +3,10 @@
 ## Improvements:
 
 ## Bug fixes:
+* Modified VersionInfo class to force it to pull version information from the Reqnroll assembly
 
 *Contributors of this release (in alphabetical order):* 
+* clrudolphi
 
 # v2.1.0 - 2024-08-30
 
