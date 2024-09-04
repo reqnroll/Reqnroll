@@ -18,7 +18,7 @@
     <copyright>$copyright$</copyright>
     <dependencies>
       <dependency id="Reqnroll" version="[$version$]" />
-      <dependency id="System.CodeDom" version="4.4.0" />
+      <dependency id="System.CodeDom" version="8.0.0" />
     </dependencies>
   </metadata>
 
