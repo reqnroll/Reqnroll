@@ -181,6 +181,7 @@ jobs:
       run: |
         dotnet --list-sdks
         dotnet --list-runtimes
+        dotnet --version
     - name: Restore dependencies
       run: dotnet restore
     - name: Install Test Report Dependencies
