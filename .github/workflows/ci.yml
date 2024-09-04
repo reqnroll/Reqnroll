@@ -177,6 +177,13 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0 # avoid shallow clone so nbgv can do its work.
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: | 
+          8.0.303
+    - name: Set .NET 8.0.303 SDK
+      run: dotnet new globaljson --sdk-version 8.0.303
     - name: .NET Information
       run: |
         dotnet --list-sdks
