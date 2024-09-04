@@ -13,13 +13,13 @@ namespace Reqnroll.Analytics
     public class AnalyticsEventProvider : IAnalyticsEventProvider
     {
         private readonly IUserUniqueIdStore _userUniqueIdStore;
-        private readonly IEnvironmentWrapper _environmentWrapper;
+        private readonly IEnvironmentInfoProvider _environmentInfoProvider;
         private readonly string _unitTestProvider;
 
-        public AnalyticsEventProvider(IUserUniqueIdStore userUniqueIdStore, UnitTestProviderConfiguration unitTestProviderConfiguration, IEnvironmentWrapper environmentWrapper)
+        public AnalyticsEventProvider(IUserUniqueIdStore userUniqueIdStore, UnitTestProviderConfiguration unitTestProviderConfiguration, IEnvironmentInfoProvider environmentInfoProvider)
         {
             _userUniqueIdStore = userUniqueIdStore;
-            _environmentWrapper = environmentWrapper;
+            _environmentInfoProvider = environmentInfoProvider;
             _unitTestProvider = unitTestProviderConfiguration.UnitTestProvider;
         }
 
@@ -27,11 +27,11 @@ namespace Reqnroll.Analytics
         {
             string userId = _userUniqueIdStore.GetUserId();
             string unitTestProvider = _unitTestProvider;
-            string reqnrollVersion = _environmentWrapper.GetReqnrollVersion();
-            string buildServerName = _environmentWrapper.GetBuildServerName();
-            bool isDockerContainer = _environmentWrapper.IsRunningInDockerContainer();
+            string reqnrollVersion = _environmentInfoProvider.GetReqnrollVersion();
+            string buildServerName = _environmentInfoProvider.GetBuildServerName();
+            bool isDockerContainer = _environmentInfoProvider.IsRunningInDockerContainer();
             string hashedAssemblyName = ToSha256(assemblyName);
-            string platform = _environmentWrapper.GetOSPlatform();
+            string platform = _environmentInfoProvider.GetOSPlatform();
             string platformDescription = RuntimeInformation.OSDescription;
 
             var compiledEvent = new ReqnrollProjectCompilingEvent(
@@ -56,13 +56,13 @@ namespace Reqnroll.Analytics
         {
             string userId = _userUniqueIdStore.GetUserId();
             string unitTestProvider = _unitTestProvider;
-            string reqnrollVersion = _environmentWrapper.GetReqnrollVersion();
-            string targetFramework = _environmentWrapper.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
-            bool isDockerContainer = _environmentWrapper.IsRunningInDockerContainer();
-            string buildServerName = _environmentWrapper.GetBuildServerName();
+            string reqnrollVersion = _environmentInfoProvider.GetReqnrollVersion();
+            string targetFramework = _environmentInfoProvider.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
+            bool isDockerContainer = _environmentInfoProvider.IsRunningInDockerContainer();
+            string buildServerName = _environmentInfoProvider.GetBuildServerName();
 
             string hashedAssemblyName = ToSha256(testAssemblyName);
-            string platform = _environmentWrapper.GetOSPlatform();
+            string platform = _environmentInfoProvider.GetOSPlatform();
             string platformDescription = RuntimeInformation.OSDescription;
 
             var runningEvent = new ReqnrollProjectRunningEvent(

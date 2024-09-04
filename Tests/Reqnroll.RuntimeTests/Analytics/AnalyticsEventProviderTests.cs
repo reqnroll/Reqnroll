@@ -20,7 +20,9 @@ namespace Reqnroll.RuntimeTests.Analytics
         {
             var userUniqueIdStoreMock = new Mock<IUserUniqueIdStore>();
             var environmentMock = new Mock<IEnvironmentWrapper>();
-            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock.Object);
+            var environmentInfoMock = new Mock<IEnvironmentInfoProvider>(environmentMock.Object);
+
+            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentInfoMock.Object);
 
             environmentMock
                 .Setup(m => m.GetEnvironmentVariable("TF_BUILD"))
@@ -36,7 +38,9 @@ namespace Reqnroll.RuntimeTests.Analytics
         {
             var userUniqueIdStoreMock = new Mock<IUserUniqueIdStore>();
             var environmentMock = new Mock<IEnvironmentWrapper>();
-            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock.Object);
+            var environmentInfoMock = new Mock<IEnvironmentInfoProvider>(environmentMock.Object);
+
+            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentInfoMock.Object);
 
             environmentMock
                 .Setup(m => m.GetEnvironmentVariable("TEAMCITY_VERSION"))
@@ -52,7 +56,9 @@ namespace Reqnroll.RuntimeTests.Analytics
         {
             var userUniqueIdStoreMock = new Mock<IUserUniqueIdStore>();
             var environmentMock = new Mock<IEnvironmentWrapper>();
-            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock.Object);
+            var environmentInfoMock = new Mock<IEnvironmentInfoProvider>(environmentMock.Object);
+
+            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentInfoMock.Object);
 
             var compilingEvent = sut.CreateProjectRunningEvent(null);
             
