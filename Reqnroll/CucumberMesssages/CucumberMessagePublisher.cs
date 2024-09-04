@@ -24,6 +24,7 @@ namespace Reqnroll.CucumberMesssages
         private ICucumberMessageBroker broker;
         private IObjectContainer objectContainer;
         private ConcurrentDictionary<string, FeatureEventProcessor> featureProcessorsByFeatureName = new();
+        bool Enabled = false;
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         {
@@ -57,14 +58,23 @@ namespace Reqnroll.CucumberMesssages
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-            var enabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source == null ? false : true;
+
+            // This checks to confirm that the Feature was successfully serialized into the required GherkinDocument and Pickles;
+            // if not, then this is disabled for this feature
+            // if true, then it checks with the broker to confirm that a listener/sink has been registered
+            Enabled = broker.Enabled;
+            if (!Enabled)
+                return;
+
+            var featureEnabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source == null ? false : true;
 
             var featureProc = new FeatureEventProcessor
             {
                 Name = featureName,
-                Enabled = enabled
+                Enabled = featureEnabled
             };
 
+            // todo: need a lock around this
             if (!featureProcessorsByFeatureName.TryAdd(featureName, featureProc))
             {
                 // This feature has already been started by another thread (executing a different scenario)
@@ -78,7 +88,7 @@ namespace Reqnroll.CucumberMesssages
             var traceListener = objectContainer.Resolve<ITraceListener>();
             traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: {featureName}");
 
-            if (!enabled)
+            if (!featureEnabled)
                 return;
 
             ProcessEvent(featureStartedEvent, featureName);
@@ -86,6 +96,10 @@ namespace Reqnroll.CucumberMesssages
 
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
             var featureProcessor = featureProcessorsByFeatureName[featureName];
 
@@ -119,55 +133,93 @@ namespace Reqnroll.CucumberMesssages
 
         private void ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = scenarioStartedEvent.FeatureContext.FeatureInfo.Title;
             ProcessEvent(scenarioStartedEvent, featureName);
         }
 
         private void ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = scenarioFinishedEvent.FeatureContext.FeatureInfo.Title;
             ProcessEvent(scenarioFinishedEvent, featureName);
         }
 
         private void StepStartedEventHandler(StepStartedEvent stepStartedEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = stepStartedEvent.FeatureContext.FeatureInfo.Title;
             ProcessEvent(stepStartedEvent, featureName);
         }
 
         private void StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = stepFinishedEvent.FeatureContext.FeatureInfo.Title;
             ProcessEvent(stepFinishedEvent, featureName);
         }
 
         private void HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             ProcessEvent(hookBindingStartedEvent, featureName);
         }
 
         private void HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = hookBindingEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             ProcessEvent(hookBindingEvent, featureName);
         }
 
         private void AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
         {
+            if (!Enabled)
+                return;
+
+
             var featureName = attachmentAddedEvent.FeatureName;
             ProcessEvent(attachmentAddedEvent, featureName);
         }
 
         private void OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
         {
-           ProcessEvent(outputAddedEvent, outputAddedEvent.FeatureName);
+            if (!Enabled)
+                return;
+
+
+            ProcessEvent(outputAddedEvent, outputAddedEvent.FeatureName);
         }
 
 
         private void ProcessEvent(ExecutionEvent anEvent, string featureName)
         {
+            if (!Enabled)
+                return;
+
+
             var featureProcessor = featureProcessorsByFeatureName[featureName];
+            if (!featureProcessor.Enabled) 
+                return;
 
             featureProcessor.ProcessEvent(anEvent);
         }

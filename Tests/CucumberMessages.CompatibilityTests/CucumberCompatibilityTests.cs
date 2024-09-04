@@ -2,6 +2,7 @@
 using Cucumber.Messages;
 using Io.Cucumber.Messages.Types;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
+using Newtonsoft.Json.Bson;
 using Reqnroll;
 using System.Reflection;
 
@@ -10,6 +11,23 @@ namespace CucumberMessages.CompatibilityTests
     [TestClass]
     public class CucumberCompatibilityTests : CucumberCompatibilityTestBase
     {
+        [TestMethod]
+        public void NullTest()
+        {
+            // The purpose of this test is to confirm that when Cucumber Messages are turned off, the Cucumber Messages ecosystem does not cause any interference anywhere else
+
+            AddFeatureFile("""
+                Feature: Cucumber Messages Null Test
+                  Scenario: Eating Cukes
+                     When I eat 5 cukes
+                """);
+
+            AddPassingStepBinding("When");
+
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+        }
         [TestMethod]
         public void SmokeTest()
         {

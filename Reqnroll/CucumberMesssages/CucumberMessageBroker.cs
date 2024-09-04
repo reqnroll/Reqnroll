@@ -14,6 +14,7 @@ namespace Reqnroll.CucumberMesssages
 
     public interface ICucumberMessageBroker
     {
+        bool Enabled { get; }
         void Complete(string cucumberMessageSource);
         void Publish(ReqnrollCucumberMessage message);
     }
@@ -21,6 +22,9 @@ namespace Reqnroll.CucumberMesssages
     public class CucumberMessageBroker : ICucumberMessageBroker
     {
         private IObjectContainer _objectContainer;
+
+        public bool Enabled => _objectContainer.ResolveAll<ICucumberMessageSink>().ToList().Count > 0;
+
         //private ITraceListener _traceListener;
 
         public CucumberMessageBroker(IObjectContainer objectContainer)
