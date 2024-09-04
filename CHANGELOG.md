@@ -1,10 +1,10 @@
 # [vNext]
 
 ## Bug fixes:
-
+* Modified VersionInfo class to force it to pull version information from the Reqnroll assembly
 * Fix: Reqnroll.CustomPlugin NuGet package has a version mismatch for the System.CodeDom dependency (#244)
 
-*Contributors of this release (in alphabetical order):* @UL-ChrisGlew
+*Contributors of this release (in alphabetical order):* @clrudolphi, @UL-ChrisGlew
 
 # v2.1.0 - 2024-08-30
 
