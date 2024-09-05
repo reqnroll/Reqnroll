@@ -5,6 +5,8 @@ using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Newtonsoft.Json.Bson;
 using Reqnroll;
 using System.Reflection;
+using FluentAssertions;
+using System.Text.Json;
 
 namespace CucumberMessages.CompatibilityTests
 {
@@ -209,6 +211,9 @@ namespace CucumberMessages.CompatibilityTests
 
             ExecuteTests();
 
+            var validator = new CucumberMessagesValidator(GetActualResults(scenarioName).ToList(), GetExpectedResults(scenarioName).ToList());
+            validator.ResultShouldPassAllComparisonTests();
+
             ConfirmAllTestsRan(null);
         }
 
@@ -221,10 +226,49 @@ namespace CucumberMessages.CompatibilityTests
 
         private IEnumerable<Envelope> GetExpectedResults(string scenarioName)
         {
-            var workingDirectory = Assembly.GetExecutingAssembly().GetAssemblyLocation();
-            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, $"{scenarioName}.feature.ndjson"));
+            var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..\\..\\..");
+            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "CCK", $"{scenarioName}\\{scenarioName}.feature.ndjson"));
 
             foreach(var json in expectedJsonText) yield return NdjsonSerializer.Deserialize(json);
         }
+
+        private IEnumerable<Envelope> GetActualResults(string scenarioName)
+        {
+            var configFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "CucumberMessages.configuration.json");
+            var config = System.Text.Json.JsonSerializer.Deserialize<FileSinkConfiguration>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            var resultLocation = config!.Destinations.Where(d => d.Enabled).First().OutputDirectory;
+            var basePath = config!.Destinations.Where(d => d.Enabled).First().BasePath;
+            var actualJsonText = File.ReadAllLines(Path.Combine(basePath, resultLocation, $"{scenarioName}.ndjson"));
+
+            foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json); 
+        }
     }
+    internal class FileSinkConfiguration
+    {
+        public bool FileSinkEnabled { get; set; }
+        public List<Destination> Destinations { get; set; }
+
+        public FileSinkConfiguration() : this(true) { }
+        public FileSinkConfiguration(bool fileSinkEnabled) : this(fileSinkEnabled, new List<Destination>()) { }
+        public FileSinkConfiguration(bool fileSinkEnabled, List<Destination> destinations)
+        {
+            FileSinkEnabled = fileSinkEnabled;
+            Destinations = destinations;
+        }
+    }
+
+    public class Destination
+    {
+        public bool Enabled { get; set; }
+        public string BasePath { get; set; }
+        public string OutputDirectory { get; set; }
+
+        public Destination(bool enabled, string basePath, string outputDirectory)
+        {
+            Enabled = true;
+            BasePath = basePath;
+            OutputDirectory = outputDirectory;
+        }
+    }
+
 }
