@@ -28,16 +28,20 @@ namespace CucumberMessages.CompatibilityTests
         }
         private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> IDsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, HashSet<object>> elementsByID)
         {
+            var xrefBuilder = new CrossReferenceBuilder( msg =>
+                {
+                    InsertIntoElementsByType(msg, elementsByType);
+
+                    if (msg.HasId())
+                    {
+                        InsertIntoElementsById(msg, elementsByID);
+                        InsertIntoIDsByType(msg, IDsByType);
+                    }
+                });
             foreach (var message in messages)
             {
                 var msg = message.Content();
-                InsertIntoElementsByType(msg, elementsByType);
-
-                if (msg.HasId())
-                {
-                    InsertIntoElementsById(msg, elementsByID);
-                    InsertIntoIDsByType(msg, IDsByType);
-                }
+                CucumberMessageVisitor.Accept(xrefBuilder, msg);
             }
         }
         private static void InsertIntoIDsByType(object msg, Dictionary<Type, HashSet<string>> IDsByType)
@@ -82,7 +86,7 @@ namespace CucumberMessages.CompatibilityTests
 
             foreach (var messageType in CucumberMessageExtensions.EnvelopeContentTypes)
             {
-                if ( actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))
+                if (actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))
                 {
                     throw new System.Exception($"{messageType} present in the actual but not in the expected.");
                 }
@@ -91,7 +95,7 @@ namespace CucumberMessages.CompatibilityTests
                     throw new System.Exception($"{messageType} present in the expected but not in the actual.");
                 }
                 if (messageType != typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
-                { 
+                {
                     actuals_elementsByType[messageType].Count().Should().Be(expecteds_elementsByType[messageType].Count());
                 }
                 if (messageType == typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
