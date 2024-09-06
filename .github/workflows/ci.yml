@@ -189,6 +189,10 @@ jobs:
         dotnet --list-sdks
         dotnet --list-runtimes
         dotnet --version
+    - name: List ENV vars
+      shell: pwsh
+      run: |
+        dir env:
     - name: Restore dependencies
       run: dotnet restore
     - name: Install Test Report Dependencies
