@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     /// <summary>
     /// The purpose of this class is to transform Cucumber messages from the Gherkin.CucumberMessages.Types namespace to the Io.Cucumber.Messages.Types namespace

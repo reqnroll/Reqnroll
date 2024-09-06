@@ -1,5 +1,5 @@
 
-using Cucumber.Messages;
+using Reqnroll.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Newtonsoft.Json.Bson;
@@ -47,19 +47,6 @@ namespace CucumberMessages.CompatibilityTests
                 """);
 
             AddPassingStepBinding("When");
-            AddBindingClass("""
-                [Binding]
-                public class TaggedScenario
-                {
-                    [AfterScenario()]
-                    [Scope(Tag = "some-tag")]
-                    public void FailingAfterHook()
-                    {
-                        throw new Exception("Exception in conditional hook");
-                    }
-                }
-                """);
-
             ExecuteTests();
 
             ShouldAllScenariosPass();

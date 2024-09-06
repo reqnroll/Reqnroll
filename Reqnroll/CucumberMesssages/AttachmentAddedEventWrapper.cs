@@ -1,6 +1,6 @@
 ﻿using Reqnroll.Events;
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     internal class AttachmentAddedEventWrapper : ExecutionEvent
     {

@@ -14,7 +14,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     internal class CucumberMessageFactory
     {

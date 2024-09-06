@@ -1,4 +1,4 @@
-﻿namespace Reqnroll.CucumberMesssages
+﻿namespace Reqnroll.CucumberMessages
 {
     public interface IStepProcessor
     {

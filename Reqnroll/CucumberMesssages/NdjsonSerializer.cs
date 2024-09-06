@@ -2,7 +2,7 @@
 using System;
 using System.Text.Json;
 
-namespace Cucumber.Messages
+namespace Reqnroll.CucumberMessages
 {
     /// <summary>
     /// When using System.Text.Json to serialize a Cucumber Message Envelope, the following serialization options are used.
