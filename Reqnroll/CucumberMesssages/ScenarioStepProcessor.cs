@@ -5,7 +5,7 @@ using Reqnroll.Events;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     public class StepArgument
     {

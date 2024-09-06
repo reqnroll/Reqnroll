@@ -16,7 +16,7 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
-using Reqnroll.CucumberMesssages;
+using Reqnroll.CucumberMessages;
 
 namespace Reqnroll.Infrastructure
 {

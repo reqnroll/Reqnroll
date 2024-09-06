@@ -17,7 +17,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Diagnostics;
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin
     {

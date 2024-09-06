@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
 
     public interface ICucumberMessageBroker

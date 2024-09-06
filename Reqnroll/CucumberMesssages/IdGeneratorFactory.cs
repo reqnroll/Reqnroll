@@ -1,7 +1,7 @@
 ﻿using Gherkin.CucumberMessages;
 using System;
 using System.Threading;
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     public class IdGeneratorFactory
     {

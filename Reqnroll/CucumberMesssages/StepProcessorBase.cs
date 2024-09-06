@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     public class StepProcessorBase : IStepProcessor
     {

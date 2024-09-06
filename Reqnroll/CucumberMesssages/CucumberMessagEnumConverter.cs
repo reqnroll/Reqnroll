@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace Cucumber.Messages
+namespace Reqnroll.CucumberMessages
 {
     internal class CucumberMessageEnumConverter<T> : JsonConverter<T> where T : struct, Enum
     {

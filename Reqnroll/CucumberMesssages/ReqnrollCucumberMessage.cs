@@ -1,7 +1,7 @@
 ﻿using Io.Cucumber.Messages.Types;
 
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     public class ReqnrollCucumberMessage
     {
