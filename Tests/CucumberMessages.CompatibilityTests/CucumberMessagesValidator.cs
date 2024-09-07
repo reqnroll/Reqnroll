@@ -4,7 +4,7 @@ using Io.Cucumber.Messages.Types;
 
 namespace CucumberMessages.CompatibilityTests
 {
-    internal class CucumberMessagesValidator
+    public class CucumberMessagesValidator
     {
         private IEnumerable<Envelope> actualEnvelopes;
         private IEnumerable<Envelope> expectedEnvelopes;
@@ -71,19 +71,84 @@ namespace CucumberMessages.CompatibilityTests
             elementsByType[msg.GetType()].Add(msg);
         }
 
-        internal void ResultShouldPassAllComparisonTests()
+        public void ResultShouldPassAllComparisonTests()
         {
-            ShouldPassBasicStructuralChecks(actualEnvelopes, actualEnvelopes);
+            SourceContentShouldBeIdentical();
+            GherkinDocumentShouldBeComparable( );
+            PicklesShouldBeComparable();
+            StepDefinitionsShouldBeComparable( );
+            // Hooks are not comparable
+            TestCasesShouldBeComparable( );
         }
 
-        internal void ResultShouldPassBasicSanityChecks()
+        private void TestCasesShouldBeComparable()
         {
-            throw new NotImplementedException();
         }
-        internal void ShouldPassBasicStructuralChecks(IEnumerable<Envelope> actual, IEnumerable<Envelope> expected)
+
+        private void StepDefinitionsShouldBeComparable()
         {
+        }
+
+        private void PicklesShouldBeComparable()
+        {
+        }
+
+        private void GherkinDocumentShouldBeComparable()
+        {
+            var actualGherkinDocument = actuals_elementsByType[typeof(GherkinDocument)].First().As<GherkinDocument>();
+            var expectedGherkinDocument = expecteds_elementsByType[typeof(GherkinDocument)].First().As<GherkinDocument>();
+
+            //check top-level items first
+            // ignore Uri
+            // comments should be present in the same order; so a simple list comparison should work
+            actualGherkinDocument.Comments.Should().BeEquivalentTo(expectedGherkinDocument.Comments, options => options.Including(c => c.Text));
+            FeatureShouldBeComparable(actualGherkinDocument.Feature, expectedGherkinDocument.Feature);
+        }
+
+        private void FeatureShouldBeComparable(Feature actual, Feature expected)
+        {
+            // ingore Location elements and Id values
+            actual.Tags.Should().BeEquivalentTo(expected.Tags, options => options.Including(t => t.Name));
+
+            // CCK expects only the language code, not the language and culture codes
+            actual.Language.Split('-')[0].Should().Be(expected.Language);
+            actual.Name.Should().Be(expected.Name);
+            actual.Description.Replace("\r\n", "\n").Should().Be(expected.Description.Replace("\r\n", "\n"));
+            actual.Keyword.Should().Be(expected.Keyword);
+            // expecting that the children are in the same order
+            
+
+        }
+
+        private void SourceContentShouldBeIdentical()
+        {
+            var actualSource = actuals_elementsByType[typeof(Source)].First().As<Source>();
+            var expectedSource = expecteds_elementsByType[typeof(Source)].First().As<Source>();
+            actualSource.Data.Replace("\r\n", "\n").Should().Be(expectedSource.Data.Replace("\r\n", "\n"));
+            actualSource.MediaType.Should().Be(expectedSource.MediaType);
+        }
+
+        public void ResultShouldPassBasicSanityChecks()
+        {
+            EachTestStepShouldProperlyReferToAPickleAndStepDefinitionOrHook();
+            EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce();
+        }
+
+        private void EachTestStepShouldProperlyReferToAPickleAndStepDefinitionOrHook()
+        {
+        }
+
+        private void EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce()
+        {
+        }
+
+        public void ShouldPassBasicStructuralChecks()
+        {
+            var actual = actualEnvelopes;
+            var expected = expectedEnvelopes;
             actual.Count().Should().BeGreaterThanOrEqualTo(expected.Count());
 
+            // This checks that each top level Envelope content type present in the actual is present in the expected in the same number (except for hooks)
             foreach (var messageType in CucumberMessageExtensions.EnvelopeContentTypes)
             {
                 if (actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))

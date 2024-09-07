@@ -199,6 +199,8 @@ namespace CucumberMessages.CompatibilityTests
             ExecuteTests();
 
             var validator = new CucumberMessagesValidator(GetActualResults(scenarioName).ToList(), GetExpectedResults(scenarioName).ToList());
+            validator.ShouldPassBasicStructuralChecks();
+            validator.ResultShouldPassBasicSanityChecks();
             validator.ResultShouldPassAllComparisonTests();
 
             ConfirmAllTestsRan(null);
