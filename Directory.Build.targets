@@ -30,4 +30,11 @@
     </ItemGroup>
     <Copy SourceFiles="@(GeneratedNupkgs)" DestinationFolder="$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)" />
   </Target>
+
+  <Target Name="DeleteLocalNuGetCache" BeforeTargets="Pack" Condition="$(VersionSuffix)=='local'">
+    <!--Clears the NuGet cache manually until https://github.com/NuGet/Home/issues/5713 is fixed.-->
+    <!--Implementation based on https://www.nyckel.com/blog/nuget-packages/.-->
+    <Message Text="Cleaning local nuget cache $(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)"/>
+    <RemoveDir Directories="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)"/>
+  </Target>
 </Project>
