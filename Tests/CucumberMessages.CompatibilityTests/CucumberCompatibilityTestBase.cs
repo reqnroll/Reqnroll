@@ -14,7 +14,7 @@ namespace CucumberMessages.CompatibilityTests
 
         protected void AddCucumberMessagePlugIn()
         {
-            _projectsDriver.AddNuGetPackage("Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin", "2.1.0-local");
+            _projectsDriver.AddNuGetPackage("Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin", "2.1.1-local");
         }
 
         protected void AddBindingClassFromResource(string fileName, string? prefix = null, Assembly? assemblyToLoadFrom = null)
