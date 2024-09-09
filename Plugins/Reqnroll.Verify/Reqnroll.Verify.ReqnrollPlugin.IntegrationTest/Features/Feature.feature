@@ -1,3 +1,4 @@
+@DoNotParallelize
 Feature: Verify Test
 
     Scenario: Check if Verify is working
