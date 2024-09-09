@@ -218,7 +218,11 @@ namespace CucumberMessages.CompatibilityTests
             var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..\\..\\..");
             var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "CCK", $"{scenarioName}\\{scenarioName}.feature.ndjson"));
 
-            foreach(var json in expectedJsonText) yield return NdjsonSerializer.Deserialize(json);
+            foreach (var json in expectedJsonText)
+            {
+                var e = NdjsonSerializer.Deserialize(json);
+                yield return e;
+            };
         }
 
         private IEnumerable<Envelope> GetActualResults(string scenarioName)
@@ -229,7 +233,7 @@ namespace CucumberMessages.CompatibilityTests
             var basePath = config!.Destinations.Where(d => d.Enabled).First().BasePath;
             var actualJsonText = File.ReadAllLines(Path.Combine(basePath, resultLocation, $"{scenarioName}.ndjson"));
 
-            foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json); 
+            foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json);
         }
     }
     internal class FileSinkConfiguration

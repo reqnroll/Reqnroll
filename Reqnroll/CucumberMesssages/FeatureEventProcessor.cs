@@ -1,17 +1,11 @@
-﻿using Cucumber.Messages;
-using Gherkin.CucumberMessages;
+﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
-using Reqnroll.BoDi;
 using Reqnroll.Events;
-using Reqnroll.Analytics;
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace Reqnroll.CucumberMessages
 {
