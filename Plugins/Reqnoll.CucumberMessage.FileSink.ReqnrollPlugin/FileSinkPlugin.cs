@@ -1,4 +1,4 @@
-﻿using Reqnroll.CucumberMesssages;
+﻿using Reqnroll.CucumberMessages;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using Io.Cucumber.Messages;
