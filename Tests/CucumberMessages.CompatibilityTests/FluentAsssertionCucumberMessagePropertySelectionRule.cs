@@ -17,16 +17,21 @@ namespace CucumberMessages.CompatibilityTests
     {
         // Properties to skip - this is the default set of properties that are not comparable across platforms
         // Id: Ids are not assigned in the same order across platforms.
-        // AstNodeIds, PickleId, HookId, PickleStepId, StepDefinitionIds: Ids are not assigned in the same order across platforms.
+        // AstNodeIds, PickleId, HookId, PickleStepId, StepDefinitionIds, TestStepId, TestCaseStartedId, TestCaseId, WorkerId: Ids are not assigned in the same order across platforms.
         // Location, Line and Column (in Location elements) are not always comparable (eg, CCK refers to source line #s in typescript)
         // Uri is not always comparable (eg, CCK refers to source file paths in typescript)
         // JavaMethod and JavaStackTraceElement contents are specific to the platform. CCK does not include these as it generates Uri references to source rather than Method references
-        // Seconds and Nanos: time values are not comparable
+        // Duration: time values are not comparable
         // Start: Start refers to a column position in source code, which may not be comparable across platforms.
+        // FileName: CCK does not provide the file name of attachments but Reqnroll does
+        // ProtocolVersion, Implementation, Runtime, Cpu, Os, Ci: These properties of the Meta message are not comparable across platforms.
 
         // Line, Column, Seconds and Nanos are skipped, rather than their container types (Location and TimeStamp & Duration, respectively), 
         // because that way we can assert that those container types exist in the actual CucumberMessage (without requiring that the details match the expected CucumberMessage)
-        private List<string> PropertiesToSkip = new List<string>() { "Id", "Location", "Line", "Column", "Uri", "JavaMethod", "JavaStackTraceElement", "Seconds", "Nanos", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", "Start" };
+        private List<string> PropertiesToSkip = new List<string>() {    "Location", "Line", "Column", "Uri", "JavaMethod", "JavaStackTraceElement", 
+                                                                        "Duration", "Start", "FileName", "Message", "Type", "StackTrace",
+                                                                        "Id", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", "TestCaseStartedId","TestStepId", "TestCaseId", "WorkerId",
+                                                                        "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci"};
 
         public FluentAsssertionCucumberMessagePropertySelectionRule(IEnumerable<Type> CucumberMessageTypes, IEnumerable<string>? proportiesToSkip = null)
         { 

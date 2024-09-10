@@ -3,6 +3,7 @@ using Reqnroll.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using System.ComponentModel.Design;
 using FluentAssertions.Execution;
+using System.Reflection;
 
 namespace CucumberMessages.CompatibilityTests
 {
@@ -20,6 +21,12 @@ namespace CucumberMessages.CompatibilityTests
         private Dictionary<string, HashSet<object>> expecteds_elementsByID = new();
         private readonly FluentAsssertionCucumberMessagePropertySelectionRule FA_CustomCucumberMessagesPropertySelector;
 
+        // Envelope types - these are the top level types in CucumberMessages
+        // Meta is excluded from the list as there is nothing there for us to compare
+        private readonly IEnumerable<Type> EnvelopeTypes = new Type[] { typeof(Attachment), typeof(GherkinDocument), typeof(Hook), typeof(ParameterType), typeof(Source),
+                                                                        typeof(StepDefinition), typeof(TestCase), typeof(TestCaseFinished), typeof(TestCaseStarted), typeof(TestRunFinished),
+                                                                        typeof(TestRunStarted), typeof(TestStepFinished), typeof(TestStepStarted), typeof(UndefinedParameterType) };
+
         public CucumberMessagesValidator(IEnumerable<Envelope> actual, IEnumerable<Envelope> expected)
         {
             actualEnvelopes = actual;
@@ -30,7 +37,7 @@ namespace CucumberMessages.CompatibilityTests
 
             FA_CustomCucumberMessagesPropertySelector = new FluentAsssertionCucumberMessagePropertySelectionRule(expecteds_elementsByType.Keys.ToList());
             AssertionOptions.AssertEquivalencyUsing(options => options
-                            // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal wwhen comparing instances
+                                                                    // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal wwhen comparing instances
                                                                     .ComparingByValue<Attachment>()
                                                                     .ComparingByMembers<Background>()
                                                                     .ComparingByMembers<Ci>()
@@ -80,12 +87,30 @@ namespace CucumberMessages.CompatibilityTests
                                                                     .ComparingByMembers<TestStepResult>()
                                                                     .ComparingByMembers<TestStepStarted>()
                                                                     .ComparingByMembers<UndefinedParameterType>()
-                                       // Using a custom Property Selector so that we can ignore the  properties that are not comparable
+
+                                                                    // Using a custom Property Selector so that we can ignore the  properties that are not comparable
                                                                     .Using(FA_CustomCucumberMessagesPropertySelector)
-                                       // Using a custom string comparison to ignore the differences in platform line endings
-                                                                    .Using<string>(new FluentAssertionsCustomStringComparisons())
+
+                                                                   // Using a custom string comparison to ignore the differences in platform line endings
+                                                                   .Using<string>((ctx) =>
+                                                                       {
+                                                                           var subject = ctx.Subject ?? string.Empty;
+                                                                           var expectation = ctx.Expectation ?? string.Empty;
+                                                                           subject = subject.Replace("\r\n", "\n");
+                                                                           expectation = expectation.Replace("\r\n", "\n");
+                                                                           subject.Should().Be(expectation);
+                                                                       })
+                                                                    .WhenTypeIs<string>()
+
+                                                                    // A bit of trickery here to tell FluentAssertions that Timestamps are always equal
+                                                                    // We can't simply omit Timestamp from comparison because then TestRunStarted has nothing else to compare (which causes an error)
+                                                                    .Using<Timestamp>(ctx => 1.Should().Be(1))
+                                                                    .WhenTypeIs<Timestamp>()
+
                                                                     .AllowingInfiniteRecursion()
-                                                                    .RespectingRuntimeTypes()
+                                                                    //.RespectingRuntimeTypes()
+                                                                    .ExcludingFields()
+                                                                    .WithStrictOrdering()
                                                                     );
         }
         private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> IDsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, HashSet<object>> elementsByID)
@@ -135,16 +160,17 @@ namespace CucumberMessages.CompatibilityTests
 
         public void ResultShouldPassAllComparisonTests()
         {
+            var method = typeof(CucumberMessagesValidator).GetMethod(nameof(CompareMessageType), BindingFlags.NonPublic | BindingFlags.Instance);
             using (new AssertionScope())
             {
-                SourceContentShouldBeIdentical();
-                GherkinDocumentShouldBeComparable();
-                PicklesShouldBeComparable();
-                StepDefinitionsShouldBeComparable();
-                // Hooks are not comparable
-                TestCasesShouldBeComparable();
+                foreach (Type t in EnvelopeTypes)
+                {
+                    var genMethod = method!.MakeGenericMethod(t);
+                    genMethod.Invoke(this, null);
+                }
             }
         }
+
 
         private void TestCasesShouldBeComparable()
         {
@@ -169,18 +195,57 @@ namespace CucumberMessages.CompatibilityTests
 
         private void CompareMessageType<T>()
         {
-            var actual = actuals_elementsByType[typeof(T)].First().As<T>();
-            var expected = expecteds_elementsByType[typeof(T)].First().As<T>();
+            if (!expecteds_elementsByType.ContainsKey(typeof(T)))
+                return;
+
+            HashSet<object>? actuals;
+            List<T> actual;
+            List<T> expected;
+
+            if (actuals_elementsByType.TryGetValue(typeof(T), out actuals))
+            {
+                actual = actuals.OfType<T>().ToList();
+            }
+            else
+                actual = new List<T>();
+
+            expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList<T>(); ;
 
             actual.Should().BeEquivalentTo(expected, options => options
-            .Using<string>(ctx =>
-            {
-                var actual = ctx.Subject.Split("-")[0];
-                var expected = ctx.Expectation.Split("-")[0];
-                actual.Should().Be(expected);
-            })
-            .When(inf => inf.Path.EndsWith("Language"))
-            .WithTracing());
+                                                                .Using<List<Hook>>(ctx =>
+                                                                {
+                                                                    if (ctx.SelectedNode.IsRoot)
+                                                                    {
+                                                                        var actualList = ctx.Subject;
+                                                                        var expectedList = ctx.Expectation;
+
+                                                                        if (expectedList == null || !expectedList.Any())
+                                                                        {
+                                                                            return; // If expected is null or empty, we don't need to check anything
+                                                                        }
+
+                                                                        actualList.Should().NotBeNull();
+                                                                        actualList.Should().HaveCountGreaterThanOrEqualTo(expectedList.Count,
+                                                                            "actual collection should have at least as many items as expected");
+
+                                                                        foreach (var expectedItem in expectedList)
+                                                                        {
+                                                                            actualList.Should().Contain(actualItem =>
+                                                                                AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
+                                                                                "actual collection should contain an item equivalent to {0}", expectedItem);
+                                                                        }
+                                                                    }
+                                                                })
+                                                                .WhenTypeIs<List<Hook>>()
+                                                                // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
+                                                                    .Using<string>(ctx =>
+                                                                        {
+                                                                            var actual = ctx.Subject.Split("-")[0];
+                                                                            var expected = ctx.Expectation.Split("-")[0];
+                                                                            actual.Should().Be(expected);
+                                                                        })
+                                                                    .When(inf => inf.Path.EndsWith("Language"))
+                                                                    .WithTracing());
         }
 
         private void SourceContentShouldBeIdentical()

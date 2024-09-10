@@ -236,17 +236,6 @@ namespace CucumberMessages.CompatibilityTests
 
             foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json);
         }
-
-        [TestMethod]
-        public void tempTest()
-        {
-            var d1 = new Destination(true, "A", "AO");
-            var d2 = new Destination(false, "B", "AO");
-
-            var a = new List<Destination>() { d1, d2, d2 };
-            var b = new List<Destination>() { d2, d1 };
-            a.Should().BeEquivalentTo(b);
-        }
     }
     internal class FileSinkConfiguration
     {
