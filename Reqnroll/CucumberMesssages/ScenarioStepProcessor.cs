@@ -2,6 +2,7 @@
 using Reqnroll.Assist;
 using Reqnroll.Bindings;
 using Reqnroll.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -65,15 +66,26 @@ namespace Reqnroll.CucumberMessages
                 Exception = stepFinishedEvent.ScenarioContext.TestError;
             }
 
+            var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();
+            var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => SimplifyTypeNames(p.Type.Name)).ToList() : new List<string>();
             StepArguments = Bound ?
-                stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => new StepArgument
-                {
-                    Value = arg.ToString(),
-                    Type = arg.GetType().Name
-                }).ToList<StepArgument>()
+                argumentValues.Zip(argumentTypes, (x, y) => new StepArgument { Value = x, Type = y }).ToList<StepArgument>()
                 : Enumerable.Empty<StepArgument>().ToList<StepArgument>();
 
             return Enumerable.Empty<Envelope>();
+        }
+
+        private string SimplifyTypeNames(string name)
+        {
+            return name switch
+            {
+                "Int32" => "int",
+                "Long" => "long",
+                "Double" => "float",
+                "String" => "string",
+                "Boolean" => "bool",
+                _ => name
+            };
         }
     }
 }

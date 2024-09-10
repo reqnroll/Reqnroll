@@ -2,6 +2,7 @@
 using Reqnroll.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using System.ComponentModel.Design;
+using FluentAssertions.Execution;
 
 namespace CucumberMessages.CompatibilityTests
 {
@@ -79,7 +80,7 @@ namespace CucumberMessages.CompatibilityTests
                                                                     .ComparingByMembers<TestStepResult>()
                                                                     .ComparingByMembers<TestStepStarted>()
                                                                     .ComparingByMembers<UndefinedParameterType>()
-                                     // Using a custom Property Selector so that we can ignore the following properties (Id, Uri, and Location); these will always be different
+                                       // Using a custom Property Selector so that we can ignore the  properties that are not comparable
                                                                     .Using(FA_CustomCucumberMessagesPropertySelector)
                                        // Using a custom string comparison to ignore the differences in platform line endings
                                                                     .Using<string>(new FluentAssertionsCustomStringComparisons())
@@ -134,32 +135,44 @@ namespace CucumberMessages.CompatibilityTests
 
         public void ResultShouldPassAllComparisonTests()
         {
-            SourceContentShouldBeIdentical();
-            GherkinDocumentShouldBeComparable();
-            PicklesShouldBeComparable();
-            StepDefinitionsShouldBeComparable();
-            // Hooks are not comparable
-            TestCasesShouldBeComparable();
+            using (new AssertionScope())
+            {
+                SourceContentShouldBeIdentical();
+                GherkinDocumentShouldBeComparable();
+                PicklesShouldBeComparable();
+                StepDefinitionsShouldBeComparable();
+                // Hooks are not comparable
+                TestCasesShouldBeComparable();
+            }
         }
 
         private void TestCasesShouldBeComparable()
         {
+            CompareMessageType<TestCase>();
         }
 
         private void StepDefinitionsShouldBeComparable()
         {
+            CompareMessageType<StepDefinition>();
         }
 
         private void PicklesShouldBeComparable()
         {
+            CompareMessageType<Pickle>();
         }
 
         private void GherkinDocumentShouldBeComparable()
         {
-            var actualGherkinDocument = actuals_elementsByType[typeof(GherkinDocument)].First().As<GherkinDocument>();
-            var expectedGherkinDocument = expecteds_elementsByType[typeof(GherkinDocument)].First().As<GherkinDocument>();
+            CompareMessageType<GherkinDocument>();
 
-            actualGherkinDocument.Should().BeEquivalentTo(expectedGherkinDocument, options => options
+        }
+
+        private void CompareMessageType<T>()
+        {
+            var actual = actuals_elementsByType[typeof(T)].First().As<T>();
+            var expected = expecteds_elementsByType[typeof(T)].First().As<T>();
+
+            actual.Should().BeEquivalentTo(expected, options => options
             .Using<string>(ctx =>
             {
                 var actual = ctx.Subject.Split("-")[0];
@@ -168,16 +181,11 @@ namespace CucumberMessages.CompatibilityTests
             })
             .When(inf => inf.Path.EndsWith("Language"))
             .WithTracing());
-
         }
-
 
         private void SourceContentShouldBeIdentical()
         {
-            var actualSource = actuals_elementsByType[typeof(Source)].First() as Source;
-            var expectedSource = expecteds_elementsByType[typeof(Source)].First() as Source;
-
-            actualSource.Should().BeEquivalentTo(expectedSource, options => options.WithTracing()        );
+            CompareMessageType<Source>();
         }
 
         public void ResultShouldPassBasicSanityChecks()

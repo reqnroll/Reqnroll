@@ -8,10 +8,35 @@ using FluentAssertions.Equivalency;
 
 namespace CucumberMessages.CompatibilityTests
 {
+    /// <summary>
+    /// Fluent Asssertion Cucumber Message Property Selection Rule
+    /// This class is used by Fluent Assertions to override which properties will be compared. 
+    /// These properties will be skipped because they are not comparable across platforms
+    /// </summary>
     public class FluentAsssertionCucumberMessagePropertySelectionRule : IMemberSelectionRule
     {
-        public FluentAsssertionCucumberMessagePropertySelectionRule(IEnumerable<Type> CucumberMessageTypes) 
-        { this.CucumberMessageTypes = CucumberMessageTypes; }
+        // Properties to skip - this is the default set of properties that are not comparable across platforms
+        // Id: Ids are not assigned in the same order across platforms.
+        // AstNodeIds, PickleId, HookId, PickleStepId, StepDefinitionIds: Ids are not assigned in the same order across platforms.
+        // Location, Line and Column (in Location elements) are not always comparable (eg, CCK refers to source line #s in typescript)
+        // Uri is not always comparable (eg, CCK refers to source file paths in typescript)
+        // JavaMethod and JavaStackTraceElement contents are specific to the platform. CCK does not include these as it generates Uri references to source rather than Method references
+        // Seconds and Nanos: time values are not comparable
+        // Start: Start refers to a column position in source code, which may not be comparable across platforms.
+
+        // Line, Column, Seconds and Nanos are skipped, rather than their container types (Location and TimeStamp & Duration, respectively), 
+        // because that way we can assert that those container types exist in the actual CucumberMessage (without requiring that the details match the expected CucumberMessage)
+        private List<string> PropertiesToSkip = new List<string>() { "Id", "Location", "Line", "Column", "Uri", "JavaMethod", "JavaStackTraceElement", "Seconds", "Nanos", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", "Start" };
+
+        public FluentAsssertionCucumberMessagePropertySelectionRule(IEnumerable<Type> CucumberMessageTypes, IEnumerable<string>? proportiesToSkip = null)
+        { 
+            this.CucumberMessageTypes = CucumberMessageTypes; 
+
+            if (proportiesToSkip != null)
+            {
+                PropertiesToSkip = proportiesToSkip.ToList();
+            }
+        }
 
         public IEnumerable<Type> CucumberMessageTypes { get; }
 
@@ -24,7 +49,7 @@ namespace CucumberMessages.CompatibilityTests
                 var propertiesToSelect = new List<IMember>();
                 foreach (var prop in selectedMembers)
                 {
-                    if (prop.Name != "Id" && prop.Name != "Location" && prop.Name != "Uri" )
+                    if (!PropertiesToSkip.Contains(prop.Name))
                         propertiesToSelect.Add(prop);
                 }
                 return propertiesToSelect;

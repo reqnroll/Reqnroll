@@ -7,6 +7,7 @@ using Reqnroll;
 using System.Reflection;
 using FluentAssertions;
 using System.Text.Json;
+using System.ComponentModel;
 
 namespace CucumberMessages.CompatibilityTests
 {
@@ -234,6 +235,17 @@ namespace CucumberMessages.CompatibilityTests
             var actualJsonText = File.ReadAllLines(Path.Combine(basePath, resultLocation, $"{scenarioName}.ndjson"));
 
             foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json);
+        }
+
+        [TestMethod]
+        public void tempTest()
+        {
+            var d1 = new Destination(true, "A", "AO");
+            var d2 = new Destination(false, "B", "AO");
+
+            var a = new List<Destination>() { d1, d2, d2 };
+            var b = new List<Destination>() { d2, d1 };
+            a.Should().BeEquivalentTo(b);
         }
     }
     internal class FileSinkConfiguration
