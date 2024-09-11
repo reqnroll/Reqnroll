@@ -8,6 +8,7 @@ using System.Reflection;
 using FluentAssertions;
 using System.Text.Json;
 using System.ComponentModel;
+using Reqnroll.TestProjectGenerator;
 
 namespace CucumberMessages.CompatibilityTests
 {
@@ -173,33 +174,33 @@ namespace CucumberMessages.CompatibilityTests
         }
 
         [TestMethod]
-        [DataRow("attachments")]
-        [DataRow("minimal")]
-        [DataRow("cdata")]
-        [DataRow("pending")]
-        [DataRow("examples-tables")]
-        [DataRow("hooks")]
-        [DataRow("data-tables")]
-        [DataRow("parameter-types")]
-        [DataRow("skipped")]
-        [DataRow("undefined")]
-        [DataRow("unknown-parameter-type")]
-        [DataRow("rules")]
-        public void CCKScenarios(string scenarioName)
+        [DataRow("attachments", "Attachments")]
+        [DataRow("minimal", "minimal")]
+        [DataRow("cdata","cdata")]
+        [DataRow("pending", "Pending steps")]
+        [DataRow("examples-tables", "Examples Tables")]
+        [DataRow("hooks", "Hooks")]
+        [DataRow("data-tables", "Data Tables")]
+        [DataRow("parameter-types", "Parameter Types")]
+        [DataRow("skipped", "Skipping scenarios")]
+        [DataRow("undefined", "Undefined steps")]
+        [DataRow("unknown-parameter-type", "Parameter Types")]
+        [DataRow("rules", "Usage of a 'Rule'")]
+        public void CCKScenarios(string testName, string featureNameText)
         {
             AddCucumberMessagePlugIn();
             CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
             AddUtilClassWithFileSystemPath();
 
-            scenarioName = scenarioName.Replace("-", "_");
+            var featureFileName = testName.Replace("-", "_");
 
-            AddFeatureFileFromResource($"{scenarioName}/{scenarioName}.feature", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
-            AddBindingClassFromResource($"{scenarioName}/{scenarioName}.cs", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
-            //AddBinaryFilesFromResource($"{scenarioName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+            AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+            AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+            //AddBinaryFilesFromResource($"{testName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
 
             ExecuteTests();
 
-            var validator = new CucumberMessagesValidator(GetActualResults(scenarioName).ToList(), GetExpectedResults(scenarioName).ToList());
+            var validator = new CucumberMessagesValidator(GetActualResults(testName, featureNameText).ToList(), GetExpectedResults(testName, featureFileName).ToList());
             validator.ShouldPassBasicStructuralChecks();
             validator.ResultShouldPassBasicSanityChecks();
             validator.ResultShouldPassAllComparisonTests();
@@ -214,10 +215,10 @@ namespace CucumberMessages.CompatibilityTests
                 $"public class FileSystemPath {{  public static string GetFilePathForAttachments()  {{  return @\"{location}\\CCK\"; }}  }} ");
         }
 
-        private IEnumerable<Envelope> GetExpectedResults(string scenarioName)
+        private IEnumerable<Envelope> GetExpectedResults(string testName, string featureFileName)
         {
             var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..\\..\\..");
-            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "CCK", $"{scenarioName}\\{scenarioName}.feature.ndjson"));
+            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "CCK", $"{testName}\\{featureFileName}.feature.ndjson"));
 
             foreach (var json in expectedJsonText)
             {
@@ -226,13 +227,16 @@ namespace CucumberMessages.CompatibilityTests
             };
         }
 
-        private IEnumerable<Envelope> GetActualResults(string scenarioName)
+        private IEnumerable<Envelope> GetActualResults(string testName, string fileName)
         {
             var configFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "CucumberMessages.configuration.json");
             var config = System.Text.Json.JsonSerializer.Deserialize<FileSinkConfiguration>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
             var resultLocation = config!.Destinations.Where(d => d.Enabled).First().OutputDirectory;
             var basePath = config!.Destinations.Where(d => d.Enabled).First().BasePath;
-            var actualJsonText = File.ReadAllLines(Path.Combine(basePath, resultLocation, $"{scenarioName}.ndjson"));
+
+            // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
+
+            var actualJsonText = File.ReadAllLines(Path.Combine(basePath, resultLocation, $"{fileName}.ndjson"));
 
             foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json);
         }

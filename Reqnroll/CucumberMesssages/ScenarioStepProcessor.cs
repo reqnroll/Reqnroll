@@ -67,25 +67,12 @@ namespace Reqnroll.CucumberMessages
             }
 
             var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();
-            var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => SimplifyTypeNames(p.Type.Name)).ToList() : new List<string>();
+            var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
             StepArguments = Bound ?
                 argumentValues.Zip(argumentTypes, (x, y) => new StepArgument { Value = x, Type = y }).ToList<StepArgument>()
                 : Enumerable.Empty<StepArgument>().ToList<StepArgument>();
 
             return Enumerable.Empty<Envelope>();
-        }
-
-        private string SimplifyTypeNames(string name)
-        {
-            return name switch
-            {
-                "Int32" => "int",
-                "Long" => "long",
-                "Double" => "float",
-                "String" => "string",
-                "Boolean" => "bool",
-                _ => name
-            };
         }
     }
 }
