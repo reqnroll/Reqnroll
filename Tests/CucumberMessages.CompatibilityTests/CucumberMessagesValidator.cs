@@ -38,7 +38,7 @@ namespace CucumberMessages.CompatibilityTests
             FA_CustomCucumberMessagesPropertySelector = new FluentAsssertionCucumberMessagePropertySelectionRule(expecteds_elementsByType.Keys.ToList());
             AssertionOptions.AssertEquivalencyUsing(options => options
                                                                     // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal wwhen comparing instances
-                                                                    .ComparingByValue<Attachment>()
+                                                                    .ComparingByMembers<Attachment>()
                                                                     .ComparingByMembers<Background>()
                                                                     .ComparingByMembers<Ci>()
                                                                     .ComparingByMembers<Comment>()
@@ -91,6 +91,56 @@ namespace CucumberMessages.CompatibilityTests
                                                                     // Using a custom Property Selector so that we can ignore the  properties that are not comparable
                                                                     .Using(FA_CustomCucumberMessagesPropertySelector)
 
+                                                                    // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
+                                                                    .Using<string>(ctx =>
+                                                                    {
+                                                                        var actual = ctx.Subject.Split("-")[0];
+                                                                        var expected = ctx.Expectation.Split("-")[0];
+                                                                        actual.Should().Be(expected);
+                                                                    })
+                                                                    .When(info => info.Path.EndsWith("Language"))
+
+                                                                    // Using special logic to compare regular expression strings (ignoring the differences of the regex anchor characters)
+                                                                    .Using<List<string>>(ctx =>
+                                                                    {
+                                                                        var subjects = ctx.Subject;
+                                                                        var expectations = ctx.Expectation;
+                                                                        subjects.Should().HaveSameCount(expectations);
+                                                                        int count = subjects.Count;
+                                                                        for (int i = 0; i < count; i++)
+                                                                        {
+                                                                            string subject = subjects[i];
+                                                                            string expectation = expectations[i];
+                                                                            if ((subject.Length > 0 && subject[0] == '^') || (expectation.Length > 0 && expectation[0] == '^') ||
+                                                                                (subject.Length > 0 && subject[subject.Length - 1] == '$') || (expectation.Length > 0 && expectation[expectation.Length - 1] == '$'))
+                                                                            {
+                                                                                // If the first or last character is '^' or '$', remove it before comparing
+                                                                                subject = subject.Length > 0 && subject[0] == '^' ? subject.Substring(1) : subject;
+                                                                                subject = subject.Length > 0 && subject[subject.Length - 1] == '$' ? subject.Substring(0, subject.Length - 1) : subject;
+                                                                                expectation = expectation.Length > 0 && expectation[0] == '^' ? expectation.Substring(1) : expectation;
+                                                                                expectation = expectation.Length > 0 && expectation[expectation.Length - 1] == '$' ? expectation.Substring(0, expectation.Length - 1) : expectation;
+                                                                            }
+                                                                            subject.Should().Be(expectation);
+                                                                        }
+                                                                    })
+                                                                    .When(info => info.Path.EndsWith("RegularExpressions"))
+
+                                                                   // Using special logic to ignore ParameterTypeName except when the value is one of the basic types
+                                                                   .Using<string>((ctx) =>
+                                                                   {
+                                                                       if (ctx.Expectation == "string" || ctx.Expectation == "int" || ctx.Expectation == "long" || ctx.Expectation == "double" || ctx.Expectation == "float"
+                                                                            || ctx.Expectation == "short" || ctx.Expectation == "byte" || ctx.Expectation == "biginteger")
+                                                                       {
+                                                                           ctx.Subject.Should().Be(ctx.Expectation);
+                                                                       }
+                                                                       // Any other ParameterTypeName should be ignored, including {word} (no .NET equivalent) and custom type names
+                                                                       else
+                                                                       {
+                                                                           1.Should().Be(1);
+                                                                       }
+                                                                   })
+                                                                   .When(info => info.Path.EndsWith("ParameterTypeName"))
+
                                                                    // Using a custom string comparison to ignore the differences in platform line endings
                                                                    .Using<string>((ctx) =>
                                                                        {
@@ -100,7 +150,39 @@ namespace CucumberMessages.CompatibilityTests
                                                                            expectation = expectation.Replace("\r\n", "\n");
                                                                            subject.Should().Be(expectation);
                                                                        })
-                                                                    .WhenTypeIs<string>()
+                                                                    .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data"))
+
+                                                                    // The list of hooks should contain at least as many items as the list of expected hooks
+                                                                    // Because Reqnroll does not support Tag Expressions, these are represented in RnR as multiple Hooks or multiple Tags on Hooks Binding methods
+                                                                    // which result in multiple Hook messages.
+                                                                    .Using<List<Hook>>(ctx =>
+                                                                    {
+                                                                        if (ctx.SelectedNode.IsRoot)
+                                                                        {
+                                                                            var actualList = ctx.Subject;
+                                                                            var expectedList = ctx.Expectation;
+
+                                                                            if (expectedList == null || !expectedList.Any())
+                                                                            {
+                                                                                return; // If expected is null or empty, we don't need to check anything
+                                                                            }
+
+                                                                            actualList.Should().NotBeNull();
+                                                                            actualList.Should().HaveCountGreaterThanOrEqualTo(expectedList.Count,
+                                                                                "actual collection should have at least as many items as expected");
+
+                                                                            // Impossible to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
+                                                                            // and the Scope tags won't line up because the CCK uses tag expressions and RnR does not support them)
+/*
+                                                                            foreach (var expectedItem in expectedList)
+                                                                            {
+                                                                                actualList.Should().Contain(actualItem =>
+                                                                                    AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
+                                                                                    "actual collection should contain an item equivalent to {0}", expectedItem);
+                                                                            }
+*/                                                                        }
+                                                                    })
+                                                                    .WhenTypeIs<List<Hook>>()
 
                                                                     // A bit of trickery here to tell FluentAssertions that Timestamps are always equal
                                                                     // We can't simply omit Timestamp from comparison because then TestRunStarted has nothing else to compare (which causes an error)
@@ -171,28 +253,6 @@ namespace CucumberMessages.CompatibilityTests
             }
         }
 
-
-        private void TestCasesShouldBeComparable()
-        {
-            CompareMessageType<TestCase>();
-        }
-
-        private void StepDefinitionsShouldBeComparable()
-        {
-            CompareMessageType<StepDefinition>();
-        }
-
-        private void PicklesShouldBeComparable()
-        {
-            CompareMessageType<Pickle>();
-        }
-
-        private void GherkinDocumentShouldBeComparable()
-        {
-            CompareMessageType<GherkinDocument>();
-
-        }
-
         private void CompareMessageType<T>()
         {
             if (!expecteds_elementsByType.ContainsKey(typeof(T)))
@@ -212,45 +272,7 @@ namespace CucumberMessages.CompatibilityTests
             expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList<T>(); ;
 
             actual.Should().BeEquivalentTo(expected, options => options
-                                                                .Using<List<Hook>>(ctx =>
-                                                                {
-                                                                    if (ctx.SelectedNode.IsRoot)
-                                                                    {
-                                                                        var actualList = ctx.Subject;
-                                                                        var expectedList = ctx.Expectation;
-
-                                                                        if (expectedList == null || !expectedList.Any())
-                                                                        {
-                                                                            return; // If expected is null or empty, we don't need to check anything
-                                                                        }
-
-                                                                        actualList.Should().NotBeNull();
-                                                                        actualList.Should().HaveCountGreaterThanOrEqualTo(expectedList.Count,
-                                                                            "actual collection should have at least as many items as expected");
-
-                                                                        foreach (var expectedItem in expectedList)
-                                                                        {
-                                                                            actualList.Should().Contain(actualItem =>
-                                                                                AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
-                                                                                "actual collection should contain an item equivalent to {0}", expectedItem);
-                                                                        }
-                                                                    }
-                                                                })
-                                                                .WhenTypeIs<List<Hook>>()
-                                                                // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
-                                                                    .Using<string>(ctx =>
-                                                                        {
-                                                                            var actual = ctx.Subject.Split("-")[0];
-                                                                            var expected = ctx.Expectation.Split("-")[0];
-                                                                            actual.Should().Be(expected);
-                                                                        })
-                                                                    .When(inf => inf.Path.EndsWith("Language"))
                                                                     .WithTracing());
-        }
-
-        private void SourceContentShouldBeIdentical()
-        {
-            CompareMessageType<Source>();
         }
 
         public void ResultShouldPassBasicSanityChecks()
@@ -271,25 +293,29 @@ namespace CucumberMessages.CompatibilityTests
         {
             var actual = actualEnvelopes;
             var expected = expectedEnvelopes;
-            actual.Count().Should().BeGreaterThanOrEqualTo(expected.Count());
 
-            // This checks that each top level Envelope content type present in the actual is present in the expected in the same number (except for hooks)
-            foreach (var messageType in CucumberMessageExtensions.EnvelopeContentTypes)
+            using (new AssertionScope())
             {
-                if (actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))
+                actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
+
+                // This checks that each top level Envelope content type present in the actual is present in the expected in the same number (except for hooks)
+                foreach (var messageType in CucumberMessageExtensions.EnvelopeContentTypes)
                 {
-                    throw new System.Exception($"{messageType} present in the actual but not in the expected.");
+                    if (actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))
+                    {
+                        throw new System.Exception($"{messageType} present in the actual but not in the expected.");
+                    }
+                    if (!actuals_elementsByType.ContainsKey(messageType) && expecteds_elementsByType.ContainsKey(messageType))
+                    {
+                        throw new System.Exception($"{messageType} present in the expected but not in the actual.");
+                    }
+                    if (messageType != typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
+                    {
+                        actuals_elementsByType[messageType].Should().HaveCount(expecteds_elementsByType[messageType].Count());
+                    }
+                    if (messageType == typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
+                        actuals_elementsByType[messageType].Should().HaveCountGreaterThanOrEqualTo(expecteds_elementsByType[messageType].Count());
                 }
-                if (!actuals_elementsByType.ContainsKey(messageType) && expecteds_elementsByType.ContainsKey(messageType))
-                {
-                    throw new System.Exception($"{messageType} present in the expected but not in the actual.");
-                }
-                if (messageType != typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
-                {
-                    actuals_elementsByType[messageType].Count().Should().Be(expecteds_elementsByType[messageType].Count());
-                }
-                if (messageType == typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
-                    actuals_elementsByType[messageType].Count().Should().BeGreaterThanOrEqualTo(expecteds_elementsByType[messageType].Count());
             }
         }
     }

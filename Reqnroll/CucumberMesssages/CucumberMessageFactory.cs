@@ -36,7 +36,7 @@ namespace Reqnroll.CucumberMessages
                 switch (stepState)
                 {
                     case ScenarioStepProcessor _:
-                        var testStep = CucumberMessageFactory.ToTestStep(scenarioState, stepState as ScenarioStepProcessor);
+                        var testStep = CucumberMessageFactory.ToPickleTestStep(scenarioState, stepState as ScenarioStepProcessor);
                         testSteps.Add(testStep);
                         break;
                     case HookStepProcessor _:
@@ -65,10 +65,7 @@ namespace Reqnroll.CucumberMessages
         }
         internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
         {
-            var bindingSourceText = binding.SourceExpression;
-            var expressionType = binding.ExpressionType;
-            var stepDefinitionPatternType = expressionType switch { StepDefinitionExpressionTypes.CucumberExpression => StepDefinitionPatternType.CUCUMBER_EXPRESSION, _ => StepDefinitionPatternType.REGULAR_EXPRESSION };
-            var stepDefinitionPattern = new StepDefinitionPattern(bindingSourceText, stepDefinitionPatternType);
+            StepDefinitionPattern stepDefinitionPattern = ToStepDefinitionPattern(binding);
             SourceReference sourceRef = ToSourceRef(binding);
 
             var result = new StepDefinition
@@ -80,6 +77,14 @@ namespace Reqnroll.CucumberMessages
             return result;
         }
 
+        internal static StepDefinitionPattern ToStepDefinitionPattern(IStepDefinitionBinding binding)
+        {
+            var bindingSourceText = binding.SourceExpression;
+            var expressionType = binding.ExpressionType;
+            var stepDefinitionPatternType = expressionType switch { StepDefinitionExpressionTypes.CucumberExpression => StepDefinitionPatternType.CUCUMBER_EXPRESSION, _ => StepDefinitionPatternType.REGULAR_EXPRESSION };
+            var stepDefinitionPattern = new StepDefinitionPattern(bindingSourceText, stepDefinitionPatternType);
+            return stepDefinitionPattern;
+        }
 
         internal static ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator iDGenerator)
         {
@@ -110,7 +115,7 @@ namespace Reqnroll.CucumberMessages
             return sourceRef;
         }
 
-        internal static TestStep ToTestStep(ScenarioEventProcessor scenarioState, ScenarioStepProcessor stepState)
+        internal static TestStep ToPickleTestStep(ScenarioEventProcessor scenarioState, ScenarioStepProcessor stepState)
         {
             bool bound = stepState.StepDefinitionId != null;
 
@@ -137,7 +142,7 @@ namespace Reqnroll.CucumberMessages
                     null,
                     argument.Value
                     ),
-                argument.Type);
+                NormalizePrimitiveTypeNamesToCucumberTypeNames(argument.Type));
         }
         internal static TestStepStarted ToTestStepStarted(ScenarioStepProcessor stepState, StepStartedEvent stepStartedEvent)
         {
@@ -165,7 +170,7 @@ namespace Reqnroll.CucumberMessages
                 iDGenerator.GetNewId(),
                 null,
                 sourceRef,
-                hookBinding.IsScoped ? hookBinding.BindingScope.Tag : null
+                hookBinding.IsScoped ? $"@{hookBinding.BindingScope.Tag}" : null
             );
             return result;
         }
@@ -342,7 +347,25 @@ namespace Reqnroll.CucumberMessages
             return Convert.ToBase64String(fileBytes);
         }
 
- 
+
+        private static string NormalizePrimitiveTypeNamesToCucumberTypeNames(string name)
+        {
+            return name switch
+            {
+                "Int16" => "short",
+                "Int32" => "int",
+                "Int64" => "long",
+                "Single" => "float",
+                "Double" => "double",
+                "Byte" => "byte",
+                "String" => "string",
+                "Boolean" => "bool",
+                "Decimal" => "decimal",
+                "BigInteger" => "biginteger",
+                _ => name
+            };
+        }
+
         #endregion
     }
 }
