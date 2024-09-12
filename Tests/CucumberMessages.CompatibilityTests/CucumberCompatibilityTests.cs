@@ -184,7 +184,8 @@ namespace CucumberMessages.CompatibilityTests
         [DataRow("parameter-types", "Parameter Types")]
         [DataRow("skipped", "Skipping scenarios")]
         [DataRow("undefined", "Undefined steps")]
-        [DataRow("unknown-parameter-type", "Parameter Types")]
+        [DataRow("unknown-parameter-type", "Unknown Parameter Types")]
+        [DataRow("stack-traces", "Stack traces")]
         [DataRow("rules", "Usage of a 'Rule'")]
         public void CCKScenarios(string testName, string featureNameText)
         {

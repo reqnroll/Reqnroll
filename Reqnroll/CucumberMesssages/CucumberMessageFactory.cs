@@ -86,6 +86,10 @@ namespace Reqnroll.CucumberMessages
             var stepDefinitionPattern = new StepDefinitionPattern(bindingSourceText, stepDefinitionPatternType);
             return stepDefinitionPattern;
         }
+        internal static UndefinedParameterType ToUndefinedParameterType(string expression, string paramName, IIdGenerator iDGenerator)
+        {
+            return new UndefinedParameterType(expression, paramName);
+        }
 
         internal static ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator iDGenerator)
         {
@@ -251,7 +255,7 @@ namespace Reqnroll.CucumberMessages
             return status switch
             {
                 ScenarioExecutionStatus.OK => TestStepResultStatus.PASSED,
-                ScenarioExecutionStatus.BindingError => TestStepResultStatus.AMBIGUOUS,
+                ScenarioExecutionStatus.BindingError => TestStepResultStatus.UNDEFINED,
                 ScenarioExecutionStatus.TestError => TestStepResultStatus.FAILED,
                 ScenarioExecutionStatus.Skipped => TestStepResultStatus.SKIPPED,
                 ScenarioExecutionStatus.UndefinedStep => TestStepResultStatus.UNDEFINED,

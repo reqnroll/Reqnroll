@@ -173,6 +173,7 @@ namespace CucumberMessages.CompatibilityTests
 
                                                                             // Impossible to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
                                                                             // and the Scope tags won't line up because the CCK uses tag expressions and RnR does not support them)
+                                                                            // and After Hook execution ordering is different between Reqnroll and CCK.
                                                                             /*
                                                                                                                                                         foreach (var expectedItem in expectedList)
                                                                                                                                                         {
@@ -184,6 +185,15 @@ namespace CucumberMessages.CompatibilityTests
                                                                         }
                                                                     })
                                                                     .WhenTypeIs<List<Hook>>()
+
+                                                                    // Groups are nested self-referential objects inside of StepMatchArgument(s). Other Cucumber implementations support a more sophisticated
+                                                                    // version of this structure in which multiple regex capture groups are conveyed inside of a single StepMatchArgument
+                                                                    // For Reqnroll, we will only compare the outermost Group; the only property we care about is the Value.
+                                                                    .Using<Group>((ctx) =>
+                                                                    {
+                                                                        ctx.Subject.Value.Should().Be(ctx.Expectation.Value);
+                                                                    })
+                                                                    .WhenTypeIs<Group>()
 
                                                                     // A bit of trickery here to tell FluentAssertions that Timestamps are always equal
                                                                     // We can't simply omit Timestamp from comparison because then TestRunStarted has nothing else to compare (which causes an error)
