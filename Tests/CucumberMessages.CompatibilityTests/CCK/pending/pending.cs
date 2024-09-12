@@ -10,12 +10,6 @@ namespace CucumberMessages.CompatibilityTests.CCK.pending
     [Binding]
     internal class Pending
     {
-        [Given("an unimplemented pending step")]
-        public void GivenAnUnimplementedPendingStep()
-        {
-            throw new PendingStepException();
-        }
-
         [Given("an implemented non-pending step")]
         public void GivenAnImplementedNonPendingStep()
         {
@@ -26,6 +20,12 @@ namespace CucumberMessages.CompatibilityTests.CCK.pending
         public void GivenAnImplementedStepThatIsSkipped()
         {
             throw new ApplicationException("This step should not have been executed");
+        }
+
+        [Given("an unimplemented pending step")]
+        public void GivenAnUnimplementedPendingStep()
+        {
+            throw new PendingStepException();
         }
     }
 }

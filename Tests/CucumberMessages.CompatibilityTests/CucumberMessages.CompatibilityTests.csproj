@@ -20,6 +20,7 @@
     <Compile Remove="CCK\pending\pending.cs" />
     <Compile Remove="CCK\rules\rules.cs" />
     <Compile Remove="CCK\skipped\skipped.cs" />
+    <Compile Remove="CCK\stack-traces\stack_traces.cs" />
     <Compile Remove="CCK\undefined\undefined.cs" />
     <Compile Remove="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
   </ItemGroup>
@@ -45,6 +46,8 @@
     <None Remove="CCK\rules\rules.feature.ndjson" />
     <None Remove="CCK\skipped\skipped.feature" />
     <None Remove="CCK\skipped\skipped.feature.ndjson" />
+    <None Remove="CCK\stack-traces\stack_traces.feature" />
+    <None Remove="CCK\stack-traces\stack_traces.feature.ndjson" />
     <None Remove="CCK\undefined\undefined.feature" />
     <None Remove="CCK\undefined\undefined.feature.ndjson" />
     <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
@@ -103,6 +106,9 @@
     <Content Include="CCK\skipped\skipped.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="CCK\stack-traces\stack_traces.cs" />
+    <EmbeddedResource Include="CCK\stack-traces\stack_traces.feature" />
+    <Content Include="CCK\stack-traces\stack_traces.feature.ndjson" />
     <EmbeddedResource Include="CCK\undefined\undefined.cs" />
     <EmbeddedResource Include="CCK\undefined\undefined.feature" />
     <Content Include="CCK\undefined\undefined.feature.ndjson">

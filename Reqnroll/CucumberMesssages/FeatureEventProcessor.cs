@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Reqnroll.CucumberMessages
 {
@@ -106,29 +107,39 @@ namespace Reqnroll.CucumberMessages
             }
 
             var bindingRegistry = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IBindingRegistry>();
-            if (bindingRegistry.IsValid)
+
+            foreach (var stepTransform in bindingRegistry.GetStepTransformations())
             {
-                foreach (var stepTransform in bindingRegistry.GetStepTransformations())
-                {
-                    var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, IDGenerator);
-                    yield return Envelope.Create(parameterType);
-                }
-                foreach (var binding in bindingRegistry.GetStepDefinitions())
-                {
-                    var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
-                    var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
-                    StepDefinitionsByPattern.TryAdd(pattern, stepDefinition.Id);
+                var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, IDGenerator);
+                yield return Envelope.Create(parameterType);
+            }
 
-                    yield return Envelope.Create(stepDefinition);
-                }
-
-                foreach (var hookBinding in bindingRegistry.GetHooks())
+            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => !sd.IsValid))
+            {
+                var errmsg = binding.ErrorMessage;
+                if (errmsg.Contains("Undefined parameter type"))
                 {
-                    var hook = CucumberMessageFactory.ToHook(hookBinding, IDGenerator);
-                    var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
-                    HookDefinitionsByPattern.TryAdd(hookId, hook.Id);
-                    yield return Envelope.Create(hook);
+                    var paramName = Regex.Match(errmsg, "Undefined parameter type '(.*)'").Groups[1].Value;
+                    var undefinedParameterType = CucumberMessageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, IDGenerator);
+                    yield return Envelope.Create(undefinedParameterType);
                 }
+            }
+
+            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
+            {
+                var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
+                var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
+                StepDefinitionsByPattern.TryAdd(pattern, stepDefinition.Id);
+
+                yield return Envelope.Create(stepDefinition);
+            }
+
+            foreach (var hookBinding in bindingRegistry.GetHooks())
+            {
+                var hook = CucumberMessageFactory.ToHook(hookBinding, IDGenerator);
+                var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
+                HookDefinitionsByPattern.TryAdd(hookId, hook.Id);
+                yield return Envelope.Create(hook);
             }
 
             yield return Envelope.Create(CucumberMessageFactory.ToTestRunStarted(this, featureStartedEvent));
