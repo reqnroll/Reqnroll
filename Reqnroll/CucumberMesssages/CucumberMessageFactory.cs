@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -89,7 +90,7 @@ namespace Reqnroll.CucumberMessages
         internal static ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator iDGenerator)
         {
             var regex = stepTransform.Regex.ToString();
-            var name = stepTransform.Name;
+            var name = stepTransform.Name ?? stepTransform.Method.ReturnType.Name;
             var result = new ParameterType
             (
                 name,
@@ -343,8 +344,15 @@ namespace Reqnroll.CucumberMessages
         }
         public static string Base64EncodeFile(string filePath)
         {
-            byte[] fileBytes = File.ReadAllBytes(filePath);
-            return Convert.ToBase64String(fileBytes);
+            if (Path.GetExtension(filePath) == ".png" || Path.GetExtension(filePath) == ".jpg")
+            {
+                byte[] fileBytes = File.ReadAllBytes(filePath);
+                return Convert.ToBase64String(fileBytes);
+            }
+            // else assume its a text file
+            string text = File.ReadAllText(filePath);
+            text = text.Replace("\r\n", "\n");
+            return Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
         }
 
 

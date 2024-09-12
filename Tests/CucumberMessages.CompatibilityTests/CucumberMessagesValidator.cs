@@ -17,8 +17,8 @@ namespace CucumberMessages.CompatibilityTests
         private Dictionary<Type, HashSet<string>> expecteds_IDsByType = new();
         private Dictionary<Type, HashSet<object>> actuals_elementsByType = new();
         private Dictionary<Type, HashSet<object>> expecteds_elementsByType = new();
-        private Dictionary<string, HashSet<object>> actuals_elementsByID = new();
-        private Dictionary<string, HashSet<object>> expecteds_elementsByID = new();
+        private Dictionary<string, object> actuals_elementsByID = new();
+        private Dictionary<string, object> expecteds_elementsByID = new();
         private readonly FluentAsssertionCucumberMessagePropertySelectionRule FA_CustomCucumberMessagesPropertySelector;
 
         // Envelope types - these are the top level types in CucumberMessages
@@ -173,14 +173,15 @@ namespace CucumberMessages.CompatibilityTests
 
                                                                             // Impossible to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
                                                                             // and the Scope tags won't line up because the CCK uses tag expressions and RnR does not support them)
-/*
-                                                                            foreach (var expectedItem in expectedList)
-                                                                            {
-                                                                                actualList.Should().Contain(actualItem =>
-                                                                                    AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
-                                                                                    "actual collection should contain an item equivalent to {0}", expectedItem);
-                                                                            }
-*/                                                                        }
+                                                                            /*
+                                                                                                                                                        foreach (var expectedItem in expectedList)
+                                                                                                                                                        {
+                                                                                                                                                            actualList.Should().Contain(actualItem =>
+                                                                                                                                                                AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
+                                                                                                                                                                "actual collection should contain an item equivalent to {0}", expectedItem);
+                                                                                                                                                        }
+                                                                            */
+                                                                        }
                                                                     })
                                                                     .WhenTypeIs<List<Hook>>()
 
@@ -195,7 +196,7 @@ namespace CucumberMessages.CompatibilityTests
                                                                     .WithStrictOrdering()
                                                                     );
         }
-        private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> IDsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, HashSet<object>> elementsByID)
+        private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> IDsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, object> elementsByID)
         {
             var xrefBuilder = new CrossReferenceBuilder(msg =>
                 {
@@ -222,13 +223,9 @@ namespace CucumberMessages.CompatibilityTests
             IDsByType[msg.GetType()].Add(msg.Id());
         }
 
-        private static void InsertIntoElementsById(object msg, Dictionary<string, HashSet<object>> elementsByID)
+        private static void InsertIntoElementsById(object msg, Dictionary<string, object> elementsByID)
         {
-            if (!elementsByID.ContainsKey(msg.Id()))
-            {
-                elementsByID.Add(msg.Id(), new HashSet<object>());
-            }
-            elementsByID[msg.Id()].Add(msg);
+            elementsByID.Add(msg.Id(), msg);
         }
 
         private static void InsertIntoElementsByType(object msg, Dictionary<Type, HashSet<object>> elementsByType)
@@ -271,8 +268,27 @@ namespace CucumberMessages.CompatibilityTests
 
             expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList<T>(); ;
 
-            actual.Should().BeEquivalentTo(expected, options => options
-                                                                    .WithTracing());
+            if (!(typeof(T) == typeof(TestStepFinished)))
+            {
+                actual.Should().BeEquivalentTo(expected, options => options.WithTracing());
+            }
+            else
+            {
+                // For TestStepFinished, we will separate out those related to hooks; 
+                // the regular comparison will be done for TestStepFinished related to PickleSteps/StepDefinitions
+                // Hook related TestStepFinished - the order is indetermant, so we will check quantity, and count of Statuses
+                // Hook related TestSteps are found by following the testStepId of the Finished message to the related TestStep. If the TestStep has a value for pickleStepId, then it is a regular step.
+                // if it has a hookId, it is a hook step
+
+                var actual_hookRelatedTestStepFinished = actual.OfType<TestStepFinished>().Where(tsf => actuals_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
+                var actual_stepRelatedTestStepFinished = actual.OfType<TestStepFinished>().Where(tsf => actuals_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
+                var expected_hookRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
+                var expected_stepRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
+
+                actual_stepRelatedTestStepFinished.Should().BeEquivalentTo(expected_stepRelatedTestStepFinished, options => options.WithTracing());
+
+                actual_hookRelatedTestStepFinished.Should().BeEquivalentTo(expected_hookRelatedTestStepFinished, options => options.WithoutStrictOrdering().WithTracing());
+            }
         }
 
         public void ResultShouldPassBasicSanityChecks()
