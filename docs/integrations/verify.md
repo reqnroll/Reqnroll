@@ -11,8 +11,7 @@ Documentation for Verify can be found [here](https://github.com/VerifyTests/Veri
 
 ## How it works
 
-The plugin works by calling the global Verifier.DerivePathInfo method to set the correct path for the tests' verified files. For tests that are ran in sequence this is sufficient.
-For parallel tests a VerifySettings instance is also registered in Reqnroll's scenario container. This instance is can then be used to set the correct path for the tests' verified files.
+This plugin adds a VerifySettings instance to Reqnroll's scenario container, which can be used to set the correct path for the tests' verified files.
 
 ### Example
 
@@ -23,26 +22,6 @@ Feature: Verify feature
         When I calculate 1 + 2
         Then I expect the result is correct
 ```
-
-Example **without** support for parallelization:
-```csharp
-[Binding]
-internal class StepDefinitions
-{
-    [When("I calculate (\d+) + (\d+)")]
-    public void WhenICalculate(int value, int value2)
-    {
-        _settings.Verify(value + value);
-    }
-    
-    [Then("I expect the result is correct")]
-    public void ThenIExpectTheResultIsCorrect()
-    {
-    }
-}
-```
-
-Example **with** support for parallelization:
 ```csharp
 [Binding]
 internal class StepDefinitions
@@ -67,3 +46,5 @@ internal class StepDefinitions
 }
 
 ```
+
+**Note:** in a single-threaded environment, the plugin will work without the injected VerifySettings instance. However, in a multithreaded environment, the VerifySettings instance must be injected into the step definition class for a deterministic outcome.

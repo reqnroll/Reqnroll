@@ -19,22 +19,36 @@ public class VerifyRuntimePlugin : IRuntimePlugin
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
         runtimePluginEvents.CustomizeGlobalDependencies += RuntimePluginEvents_CustomizeGlobalDependencies;
+        runtimePluginEvents.CustomizeScenarioDependencies += RuntimePluginEvents_CustomizeScenarioDependencies;
     }
 
     private void RuntimePluginEvents_CustomizeGlobalDependencies(object sender, CustomizeGlobalDependenciesEventArgs e)
     {
         var runtimePluginTestExecutionLifecycleEvents = e.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
-        runtimePluginTestExecutionLifecycleEvents.BeforeScenario += RuntimePluginTestExecutionLifecycleEvents_BeforeScenario;
+        runtimePluginTestExecutionLifecycleEvents.BeforeScenario += (_, runtimePluginBeforeScenarioEventArgs) =>
+        {
+            var scenarioContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<ScenarioContext>();
+            var featureContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<FeatureContext>();
+
+            Verifier.DerivePathInfo(
+                (_, projectDirectory, _, _) =>
+                {
+                    string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
+
+                    foreach (DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
+                    {
+                        scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
+                    }
+
+                    return new PathInfo(
+                        Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
+                        featureContext.FeatureInfo.Title,
+                        scenarioInfoTitle);
+                });
+        };
     }
 
-    private void RuntimePluginTestExecutionLifecycleEvents_BeforeScenario(object sender, RuntimePluginBeforeScenarioEventArgs e)
-    {
-        RegisterGlobal(e);
-
-        RegisterPerScenario(e);
-    }
-
-    private static void RegisterPerScenario(RuntimePluginBeforeScenarioEventArgs e)
+    private void RuntimePluginEvents_CustomizeScenarioDependencies(object sender, CustomizeScenarioDependenciesEventArgs e)
     {
         e.ObjectContainer.RegisterFactoryAs(
             container =>
@@ -58,28 +72,6 @@ public class VerifyRuntimePlugin : IRuntimePlugin
                 settings.UseMethodName(methodNameBuilder.ToString());
 
                 return settings;
-            });
-    }
-
-    private static void RegisterGlobal(RuntimePluginBeforeScenarioEventArgs e)
-    {
-        var scenarioContext = e.ObjectContainer.Resolve<ScenarioContext>();
-        var featureContext = e.ObjectContainer.Resolve<FeatureContext>();
-
-        Verifier.DerivePathInfo(
-            (_, projectDirectory, _, _) =>
-            {
-                string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
-
-                foreach (DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
-                {
-                    scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
-                }
-
-                return new PathInfo(
-                    Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
-                    featureContext.FeatureInfo.Title,
-                    scenarioInfoTitle);
             });
     }
 }
