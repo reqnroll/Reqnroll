@@ -1,20 +1,9 @@
 ﻿using Reqnroll.BoDi;
 using Reqnroll.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Threading.Tasks;
-using Io.Cucumber.Messages;
-using Io.Cucumber.Messages.Types;
 using Reqnroll.Tracing;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
-using Reqnroll.Time;
-using Cucumber.Messages;
-using Reqnroll.Bindings;
-using System.Reflection;
 using System.Collections.Concurrent;
-using System.Linq;
 using System.Diagnostics;
 
 namespace Reqnroll.CucumberMessages
@@ -28,7 +17,7 @@ namespace Reqnroll.CucumberMessages
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         {
- //           Debugger.Launch();
+            Debugger.Launch();
             broker = CucumberMessageBroker;
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
