@@ -136,15 +136,48 @@ namespace CucumberMessages.CompatibilityTests
 
         public void ResultShouldPassSanityChecks()
         {
-            EachTestCaseAndStepsShouldProperlyReferToAPickleAndStepDefinitionOrHook();
-            EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce();
-            TestExecutionStepsShouldProperlyReferenceTestCases();
-            TestExecutionMessagesShouldProperlyNest();
-            ActualTestExecutionMessagesShouldReferBackToTheSameStepTextAsExpected();
+            using (new AssertionScope())
+            {
+                EachTestCaseAndStepsShouldProperlyReferToAPickleAndStepDefinitionOrHook();
+                EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce();
+                TestExecutionStepsShouldProperlyReferenceTestCases();
+                TestExecutionMessagesShouldProperlyNest();
+                ActualTestExecutionMessagesShouldReferBackToTheSameStepTextAsExpected();
+            }
         }
 
         private void ActualTestExecutionMessagesShouldReferBackToTheSameStepTextAsExpected()
         {
+            // For each TestStepStarted message, ensure that the pickle step referred to is the same in Actual and Expected for the corresponding testStepStarted message
+
+            var actualTestStepStarted_TestStepIds = actuals_elementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Select(tss => tss.TestStepId).ToList();
+            var expectedTestStepStarteds_TestStepIds = expecteds_elementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Select(tss => tss.TestStepId).ToList();
+
+            // Making the assumption here that the order of TestStepStarted messages is the same in both Actual and Expected
+            // pair these up, and walk back to the pickle step text and compare
+
+            actualTestStepStarted_TestStepIds
+                .Zip(expectedTestStepStarteds_TestStepIds, (a, e) => (a, e))
+                .ToList()
+                .ForEach(t =>
+                {
+                    actuals_elementsByID[t.a].Should().BeAssignableTo<TestStep>(); ;
+                    var actualTS = actuals_elementsByID[t.a] as TestStep;
+                    expecteds_elementsByID[t.e].Should().BeAssignableTo<TestStep>(); ;
+                    var expectedTS = expecteds_elementsByID[t.e] as TestStep;
+                    if (actualTS!.PickleStepId != null && expectedTS!.PickleStepId != null)
+                    {
+                        actuals_elementsByID[actualTS.PickleStepId].Should().BeAssignableTo<PickleStep>(); ;
+                        var actualPickleStep = actuals_elementsByID[actualTS.PickleStepId] as PickleStep;
+                        expecteds_elementsByID[expectedTS.PickleStepId].Should().BeAssignableTo<PickleStep>(); ;
+                        var expectedPickleStep = expecteds_elementsByID[expectedTS.PickleStepId] as PickleStep;
+                        actualPickleStep!.Text.Should().Be(expectedPickleStep!.Text, $"expecting the text of the pickle step {actualPickleStep.Id} to match that of {expectedPickleStep.Id}");
+                    }
+                    else
+                    { // confirm that both are null or not null, if one is null, throw an exception
+                        actualTS.PickleStepId.Should().Be(expectedTS!.PickleStepId, "expecting both PickleStepIds to be null or not null");
+                    }
+                });
         }
 
         private void TestExecutionStepsShouldProperlyReferenceTestCases()
@@ -167,7 +200,68 @@ namespace CucumberMessages.CompatibilityTests
 
         private void TestExecutionMessagesShouldProperlyNest()
         {
-            //walk sequence of messages, using stacks/lists/sets to keep track of nesting
+            var ClosedIDs = new List<string>();
+            var OpenTestCaseStartedIDs = new List<string>();
+            var OpenTestStepIds = new List<string>();
+            var numberOfEnvelopes = actualEnvelopes.Count();
+            var testRunStartedSeenAtEnvelopeIndex = numberOfEnvelopes + 1;
+            var testRunFinishedSeenAtEnvelopeIndex = -1;
+            int currentIndex = 0;
+            foreach (object msg in actualEnvelopes.Select(e => e.Content()))
+            {
+                switch (msg)
+                {
+                    case TestRunStarted testRunStarted:
+                        testRunStartedSeenAtEnvelopeIndex = currentIndex;
+                        if (testRunFinishedSeenAtEnvelopeIndex != -1)
+                            testRunStartedSeenAtEnvelopeIndex.Should().BeLessThan(testRunFinishedSeenAtEnvelopeIndex, "TestRunStarted events must be before TestRunFinished event");
+                        break;
+                    case TestRunFinished testRunFinished:
+                        testRunFinishedSeenAtEnvelopeIndex = currentIndex;
+                        testRunFinishedSeenAtEnvelopeIndex.Should().BeGreaterThan(testRunStartedSeenAtEnvelopeIndex, "TestRunFinished events must be after TestRunStarted event");
+                        testRunFinishedSeenAtEnvelopeIndex.Should().Be(numberOfEnvelopes - 1, "TestRunFinished events must be the last event");
+                        break;
+                    case TestCaseStarted testCaseStarted:
+                        currentIndex.Should().BeGreaterThan(testRunStartedSeenAtEnvelopeIndex, "TestCaseStarted events must be after TestRunStarted event");
+                        if (testRunFinishedSeenAtEnvelopeIndex != -1)
+                            currentIndex.Should().BeLessThan(testRunFinishedSeenAtEnvelopeIndex, "TestCaseStarted events must be before TestRunFinished event");
+                        ClosedIDs.Should().NotContain(testCaseStarted.Id, "a test case should not be Started twice");
+                        OpenTestCaseStartedIDs.Add(testCaseStarted.Id);
+                        break;
+                    case TestCaseFinished testCaseFinished:
+                        currentIndex.Should().BeGreaterThan(testRunStartedSeenAtEnvelopeIndex, "TestCaseFinished events must be after TestRunStarted event");
+                        if (testRunFinishedSeenAtEnvelopeIndex != -1)
+                            currentIndex.Should().BeLessThan(testRunFinishedSeenAtEnvelopeIndex, "TestCaseFinished events must be before TestRunFinished event");
+                        ClosedIDs.Should().NotContain(testCaseFinished.TestCaseStartedId, "a test case should not be Finished twice");
+                        OpenTestCaseStartedIDs.Should().Contain(testCaseFinished.TestCaseStartedId, "a test case should be Started and active before it is Finished");
+                        OpenTestCaseStartedIDs.Remove(testCaseFinished.TestCaseStartedId);
+                        ClosedIDs.Add(testCaseFinished.TestCaseStartedId);
+                        OpenTestCaseStartedIDs.Remove(testCaseFinished.TestCaseStartedId);
+                        break;
+                    case TestStepStarted testStepStarted:
+                        currentIndex.Should().BeGreaterThan(testRunStartedSeenAtEnvelopeIndex, "TestStepStarted events must be after TestRunStarted event");
+                        if (testRunFinishedSeenAtEnvelopeIndex != -1)
+                            currentIndex.Should().BeLessThan(testRunFinishedSeenAtEnvelopeIndex, "TestStepStarted events must be before TestRunFinished event");
+                        ClosedIDs.Should().NotContain(testStepStarted.TestCaseStartedId, "a TestStepStarted event must refer to an active test case");
+                        OpenTestCaseStartedIDs.Should().Contain(testStepStarted.TestCaseStartedId, "a TestStepStarted event must refer to an active test case");
+                        OpenTestStepIds.Add(testStepStarted.TestStepId);
+                        break;
+                    case TestStepFinished testStepFinished:
+                        currentIndex.Should().BeGreaterThan(testRunStartedSeenAtEnvelopeIndex, "TestStepFinished events must be after TestRunStarted event");
+                        if (testRunFinishedSeenAtEnvelopeIndex != -1)
+                            currentIndex.Should().BeLessThan(testRunFinishedSeenAtEnvelopeIndex, "TestStepFinished events must be before TestRunFinished event");
+                        ClosedIDs.Should().NotContain(testStepFinished.TestCaseStartedId, "a TestStepFinished event must refer to an active test case");
+                        ClosedIDs.Should().NotContain(testStepFinished.TestStepId, "a TestStepFinished event must refer to an active test step");
+                        OpenTestCaseStartedIDs.Should().Contain(testStepFinished.TestCaseStartedId, "a TestStepFinished event must refer to an active test case");
+                        OpenTestStepIds.Should().Contain(testStepFinished.TestStepId, "a TestStepFinished event must refer to an active test step");
+                        ClosedIDs.Add(testStepFinished.TestStepId);
+                        OpenTestStepIds.Remove(testStepFinished.TestStepId);
+                        break;
+                    default:
+                        break;
+                }
+                currentIndex++;
+            }
         }
 
         private void EachTestCaseAndStepsShouldProperlyReferToAPickleAndStepDefinitionOrHook()
@@ -182,15 +276,15 @@ namespace CucumberMessages.CompatibilityTests
                 foreach (var step in steps)
                 {
                     if (step.HookId != null)
-                    actuals_elementsByID.Should().ContainKey(step.HookId, "a step references a hook that doesn't exist");
+                        actuals_elementsByID.Should().ContainKey(step.HookId, "a step references a hook that doesn't exist");
 
                     if (step.PickleStepId != null)
-                    actuals_elementsByID.Should().ContainKey(step.PickleStepId, "a step references a pickle step that doesn't exist");
+                        actuals_elementsByID.Should().ContainKey(step.PickleStepId, "a step references a pickle step that doesn't exist");
 
                     if (step.StepDefinitionIds != null && step.StepDefinitionIds.Count > 0)
                     {
                         foreach (var stepDefinitionId in step.StepDefinitionIds)
-                        actuals_elementsByID.Should().ContainKey(stepDefinitionId, "a step references a step definition that doesn't exist");
+                            actuals_elementsByID.Should().ContainKey(stepDefinitionId, "a step references a step definition that doesn't exist");
                     }
                 }
             }
