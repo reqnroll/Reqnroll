@@ -255,7 +255,7 @@ namespace Reqnroll.CucumberMessages
             return status switch
             {
                 ScenarioExecutionStatus.OK => TestStepResultStatus.PASSED,
-                ScenarioExecutionStatus.BindingError => TestStepResultStatus.UNDEFINED,
+                ScenarioExecutionStatus.BindingError => TestStepResultStatus.AMBIGUOUS,
                 ScenarioExecutionStatus.TestError => TestStepResultStatus.FAILED,
                 ScenarioExecutionStatus.Skipped => TestStepResultStatus.SKIPPED,
                 ScenarioExecutionStatus.UndefinedStep => TestStepResultStatus.UNDEFINED,
