@@ -203,8 +203,8 @@ namespace CucumberMessages.CompatibilityTests
 
             var validator = new CucumberMessagesValidator(GetActualResults(testName, featureNameText).ToList(), GetExpectedResults(testName, featureFileName).ToList());
             validator.ShouldPassBasicStructuralChecks();
-            validator.ResultShouldPassBasicSanityChecks();
             validator.ResultShouldPassAllComparisonTests();
+            validator.ResultShouldPassSanityChecks();
 
             ConfirmAllTestsRan(null);
         }

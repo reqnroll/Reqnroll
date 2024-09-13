@@ -36,6 +36,215 @@ namespace CucumberMessages.CompatibilityTests
             SetupCrossReferences(expected, expecteds_IDsByType, expecteds_elementsByType, expecteds_elementsByID);
 
             FA_CustomCucumberMessagesPropertySelector = new FluentAsssertionCucumberMessagePropertySelectionRule(expecteds_elementsByType.Keys.ToList());
+            ArrangeGlobalFluentAssertionOptions();
+        }
+
+        private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> IDsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, object> elementsByID)
+        {
+            var xrefBuilder = new CrossReferenceBuilder(msg =>
+                {
+                    InsertIntoElementsByType(msg, elementsByType);
+
+                    if (msg.HasId())
+                    {
+                        InsertIntoElementsById(msg, elementsByID);
+                        InsertIntoIDsByType(msg, IDsByType);
+                    }
+                });
+            foreach (var message in messages)
+            {
+                var msg = message.Content();
+                CucumberMessageVisitor.Accept(xrefBuilder, msg);
+            }
+        }
+        private static void InsertIntoIDsByType(object msg, Dictionary<Type, HashSet<string>> IDsByType)
+        {
+            if (!IDsByType.ContainsKey(msg.GetType()))
+            {
+                IDsByType.Add(msg.GetType(), new HashSet<string>());
+            }
+            IDsByType[msg.GetType()].Add(msg.Id());
+        }
+
+        private static void InsertIntoElementsById(object msg, Dictionary<string, object> elementsByID)
+        {
+            elementsByID.Add(msg.Id(), msg);
+        }
+
+        private static void InsertIntoElementsByType(object msg, Dictionary<Type, HashSet<object>> elementsByType)
+        {
+            if (!elementsByType.ContainsKey(msg.GetType()))
+            {
+                elementsByType.Add(msg.GetType(), new HashSet<object>());
+            }
+            elementsByType[msg.GetType()].Add(msg);
+        }
+
+        public void ResultShouldPassAllComparisonTests()
+        {
+            var method = typeof(CucumberMessagesValidator).GetMethod(nameof(CompareMessageType), BindingFlags.NonPublic | BindingFlags.Instance);
+            using (new AssertionScope())
+            {
+                foreach (Type t in EnvelopeTypes)
+                {
+                    var genMethod = method!.MakeGenericMethod(t);
+                    genMethod.Invoke(this, null);
+                }
+            }
+        }
+
+        private void CompareMessageType<T>()
+        {
+            if (!expecteds_elementsByType.ContainsKey(typeof(T)))
+                return;
+
+            HashSet<object>? actuals;
+            List<T> actual;
+            List<T> expected;
+
+            if (actuals_elementsByType.TryGetValue(typeof(T), out actuals))
+            {
+                actual = actuals.OfType<T>().ToList();
+            }
+            else
+                actual = new List<T>();
+
+            expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList<T>(); ;
+
+            if (!(typeof(T) == typeof(TestStepFinished)))
+            {
+                actual.Should().BeEquivalentTo(expected, options => options.WithTracing());
+            }
+            else
+            {
+                // For TestStepFinished, we will separate out those related to hooks; 
+                // the regular comparison will be done for TestStepFinished related to PickleSteps/StepDefinitions
+                // Hook related TestStepFinished - the order is indetermant, so we will check quantity, and count of Statuses
+                // Hook related TestSteps are found by following the testStepId of the Finished message to the related TestStep. If the TestStep has a value for pickleStepId, then it is a regular step.
+                // if it has a hookId, it is a hook step
+
+                var actual_hookRelatedTestStepFinished = actual.OfType<TestStepFinished>().Where(tsf => actuals_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
+                var actual_stepRelatedTestStepFinished = actual.OfType<TestStepFinished>().Where(tsf => actuals_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
+                var expected_hookRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
+                var expected_stepRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
+
+                actual_stepRelatedTestStepFinished.Should().BeEquivalentTo(expected_stepRelatedTestStepFinished, options => options.WithTracing());
+
+                actual_hookRelatedTestStepFinished.Should().BeEquivalentTo(expected_hookRelatedTestStepFinished, options => options.WithoutStrictOrdering().WithTracing());
+            }
+        }
+
+        public void ResultShouldPassSanityChecks()
+        {
+            EachTestCaseAndStepsShouldProperlyReferToAPickleAndStepDefinitionOrHook();
+            EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce();
+            TestExecutionStepsShouldProperlyReferenceTestCases();
+            TestExecutionMessagesShouldProperlyNest();
+            ActualTestExecutionMessagesShouldReferBackToTheSameStepTextAsExpected();
+        }
+
+        private void ActualTestExecutionMessagesShouldReferBackToTheSameStepTextAsExpected()
+        {
+        }
+
+        private void TestExecutionStepsShouldProperlyReferenceTestCases()
+        {
+            var testCaseIds = actuals_elementsByType[typeof(TestCase)].OfType<TestCase>().Select(tc => tc.Id).ToList();
+
+            var testCaseStarteds = actuals_elementsByType[typeof(TestCaseStarted)].OfType<TestCaseStarted>().ToList();
+            testCaseIds.Should().Contain(id => testCaseStarteds.Any(tcs => tcs.TestCaseId == id), "a test case should be referenced by a test case started message");
+
+            var testCaseStartedIds = testCaseStarteds.Select(tcs => tcs.Id).ToList();
+
+            var testCaseFinisheds = actuals_elementsByType[typeof(TestCaseFinished)].OfType<TestCaseFinished>().ToList();
+            var testStepStarteds = actuals_elementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().ToList();
+            var testStepFinisheds = actuals_elementsByType[typeof(TestStepFinished)].OfType<TestStepFinished>().ToList();
+
+            testCaseStartedIds.Should().Contain(id => testStepStarteds.Any(tss => tss.TestCaseStartedId == id), "a test case started should be referenced by at least one test step started message");
+            testCaseStartedIds.Should().Contain(id => testStepFinisheds.Any(tsf => tsf.TestCaseStartedId == id), "a test case started should be referenced by at least one test step finished message");
+            testCaseStartedIds.Should().Contain(id => testCaseFinisheds.Any(tcf => tcf.TestCaseStartedId == id), "a test case started should be referenced by a test case finished message");
+        }
+
+        private void TestExecutionMessagesShouldProperlyNest()
+        {
+            //walk sequence of messages, using stacks/lists/sets to keep track of nesting
+        }
+
+        private void EachTestCaseAndStepsShouldProperlyReferToAPickleAndStepDefinitionOrHook()
+        {
+            var testCases = actuals_elementsByType[typeof(TestCase)].OfType<TestCase>();
+            foreach (var testCase in testCases)
+            {
+                var pickle = testCase.PickleId;
+                actuals_elementsByID.Should().ContainKey(pickle, "a pickle should be referenced by the test case");
+
+                var steps = testCase.TestSteps.OfType<TestStep>();
+                foreach (var step in steps)
+                {
+                    if (step.HookId != null)
+                    actuals_elementsByID.Should().ContainKey(step.HookId, "a step references a hook that doesn't exist");
+
+                    if (step.PickleStepId != null)
+                    actuals_elementsByID.Should().ContainKey(step.PickleStepId, "a step references a pickle step that doesn't exist");
+
+                    if (step.StepDefinitionIds != null && step.StepDefinitionIds.Count > 0)
+                    {
+                        foreach (var stepDefinitionId in step.StepDefinitionIds)
+                        actuals_elementsByID.Should().ContainKey(stepDefinitionId, "a step references a step definition that doesn't exist");
+                    }
+                }
+            }
+        }
+
+        private void EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce()
+        {
+            var pickles = actuals_elementsByType[typeof(Pickle)].OfType<Pickle>();
+            foreach (var pickle in pickles)
+            {
+                var testCases = actuals_elementsByType[typeof(TestCase)].OfType<TestCase>();
+                testCases.Should().Contain(tc => tc.PickleId == pickle.Id, "a pickle should be referenced by a test case");
+
+                var pickleSteps = pickle.Steps.OfType<PickleStep>();
+                foreach (var pickleStep in pickleSteps)
+                {
+                    var testSteps = actuals_elementsByType[typeof(TestStep)].OfType<TestStep>();
+                    testSteps.Should().Contain(ts => ts.PickleStepId == pickleStep.Id, "a pickle step should be referenced by a test step");
+                }
+            }
+        }
+
+        public void ShouldPassBasicStructuralChecks()
+        {
+            var actual = actualEnvelopes;
+            var expected = expectedEnvelopes;
+
+            using (new AssertionScope())
+            {
+                actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
+
+                // This checks that each top level Envelope content type present in the actual is present in the expected in the same number (except for hooks)
+                foreach (var messageType in CucumberMessageExtensions.EnvelopeContentTypes)
+                {
+                    if (actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))
+                    {
+                        throw new System.Exception($"{messageType} present in the actual but not in the expected.");
+                    }
+                    if (!actuals_elementsByType.ContainsKey(messageType) && expecteds_elementsByType.ContainsKey(messageType))
+                    {
+                        throw new System.Exception($"{messageType} present in the expected but not in the actual.");
+                    }
+                    if (messageType != typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
+                    {
+                        actuals_elementsByType[messageType].Should().HaveCount(expecteds_elementsByType[messageType].Count());
+                    }
+                    if (messageType == typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
+                        actuals_elementsByType[messageType].Should().HaveCountGreaterThanOrEqualTo(expecteds_elementsByType[messageType].Count());
+                }
+            }
+        }
+
+        private void ArrangeGlobalFluentAssertionOptions()
+        {
             AssertionOptions.AssertEquivalencyUsing(options => options
                                                                     // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal wwhen comparing instances
                                                                     .ComparingByMembers<Attachment>()
@@ -143,13 +352,13 @@ namespace CucumberMessages.CompatibilityTests
 
                                                                    // Using a custom string comparison to ignore the differences in platform line endings
                                                                    .Using<string>((ctx) =>
-                                                                       {
-                                                                           var subject = ctx.Subject ?? string.Empty;
-                                                                           var expectation = ctx.Expectation ?? string.Empty;
-                                                                           subject = subject.Replace("\r\n", "\n");
-                                                                           expectation = expectation.Replace("\r\n", "\n");
-                                                                           subject.Should().Be(expectation);
-                                                                       })
+                                                                   {
+                                                                       var subject = ctx.Subject ?? string.Empty;
+                                                                       var expectation = ctx.Expectation ?? string.Empty;
+                                                                       subject = subject.Replace("\r\n", "\n");
+                                                                       expectation = expectation.Replace("\r\n", "\n");
+                                                                       subject.Should().Be(expectation);
+                                                                   })
                                                                     .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data"))
 
                                                                     // The list of hooks should contain at least as many items as the list of expected hooks
@@ -206,143 +415,6 @@ namespace CucumberMessages.CompatibilityTests
                                                                     .WithStrictOrdering()
                                                                     );
         }
-        private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> IDsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, object> elementsByID)
-        {
-            var xrefBuilder = new CrossReferenceBuilder(msg =>
-                {
-                    InsertIntoElementsByType(msg, elementsByType);
 
-                    if (msg.HasId())
-                    {
-                        InsertIntoElementsById(msg, elementsByID);
-                        InsertIntoIDsByType(msg, IDsByType);
-                    }
-                });
-            foreach (var message in messages)
-            {
-                var msg = message.Content();
-                CucumberMessageVisitor.Accept(xrefBuilder, msg);
-            }
-        }
-        private static void InsertIntoIDsByType(object msg, Dictionary<Type, HashSet<string>> IDsByType)
-        {
-            if (!IDsByType.ContainsKey(msg.GetType()))
-            {
-                IDsByType.Add(msg.GetType(), new HashSet<string>());
-            }
-            IDsByType[msg.GetType()].Add(msg.Id());
-        }
-
-        private static void InsertIntoElementsById(object msg, Dictionary<string, object> elementsByID)
-        {
-            elementsByID.Add(msg.Id(), msg);
-        }
-
-        private static void InsertIntoElementsByType(object msg, Dictionary<Type, HashSet<object>> elementsByType)
-        {
-            if (!elementsByType.ContainsKey(msg.GetType()))
-            {
-                elementsByType.Add(msg.GetType(), new HashSet<object>());
-            }
-            elementsByType[msg.GetType()].Add(msg);
-        }
-
-        public void ResultShouldPassAllComparisonTests()
-        {
-            var method = typeof(CucumberMessagesValidator).GetMethod(nameof(CompareMessageType), BindingFlags.NonPublic | BindingFlags.Instance);
-            using (new AssertionScope())
-            {
-                foreach (Type t in EnvelopeTypes)
-                {
-                    var genMethod = method!.MakeGenericMethod(t);
-                    genMethod.Invoke(this, null);
-                }
-            }
-        }
-
-        private void CompareMessageType<T>()
-        {
-            if (!expecteds_elementsByType.ContainsKey(typeof(T)))
-                return;
-
-            HashSet<object>? actuals;
-            List<T> actual;
-            List<T> expected;
-
-            if (actuals_elementsByType.TryGetValue(typeof(T), out actuals))
-            {
-                actual = actuals.OfType<T>().ToList();
-            }
-            else
-                actual = new List<T>();
-
-            expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList<T>(); ;
-
-            if (!(typeof(T) == typeof(TestStepFinished)))
-            {
-                actual.Should().BeEquivalentTo(expected, options => options.WithTracing());
-            }
-            else
-            {
-                // For TestStepFinished, we will separate out those related to hooks; 
-                // the regular comparison will be done for TestStepFinished related to PickleSteps/StepDefinitions
-                // Hook related TestStepFinished - the order is indetermant, so we will check quantity, and count of Statuses
-                // Hook related TestSteps are found by following the testStepId of the Finished message to the related TestStep. If the TestStep has a value for pickleStepId, then it is a regular step.
-                // if it has a hookId, it is a hook step
-
-                var actual_hookRelatedTestStepFinished = actual.OfType<TestStepFinished>().Where(tsf => actuals_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
-                var actual_stepRelatedTestStepFinished = actual.OfType<TestStepFinished>().Where(tsf => actuals_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
-                var expected_hookRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
-                var expected_stepRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
-
-                actual_stepRelatedTestStepFinished.Should().BeEquivalentTo(expected_stepRelatedTestStepFinished, options => options.WithTracing());
-
-                actual_hookRelatedTestStepFinished.Should().BeEquivalentTo(expected_hookRelatedTestStepFinished, options => options.WithoutStrictOrdering().WithTracing());
-            }
-        }
-
-        public void ResultShouldPassBasicSanityChecks()
-        {
-            EachTestStepShouldProperlyReferToAPickleAndStepDefinitionOrHook();
-            EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce();
-        }
-
-        private void EachTestStepShouldProperlyReferToAPickleAndStepDefinitionOrHook()
-        {
-        }
-
-        private void EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce()
-        {
-        }
-
-        public void ShouldPassBasicStructuralChecks()
-        {
-            var actual = actualEnvelopes;
-            var expected = expectedEnvelopes;
-
-            using (new AssertionScope())
-            {
-                actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
-
-                // This checks that each top level Envelope content type present in the actual is present in the expected in the same number (except for hooks)
-                foreach (var messageType in CucumberMessageExtensions.EnvelopeContentTypes)
-                {
-                    if (actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))
-                    {
-                        throw new System.Exception($"{messageType} present in the actual but not in the expected.");
-                    }
-                    if (!actuals_elementsByType.ContainsKey(messageType) && expecteds_elementsByType.ContainsKey(messageType))
-                    {
-                        throw new System.Exception($"{messageType} present in the expected but not in the actual.");
-                    }
-                    if (messageType != typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
-                    {
-                        actuals_elementsByType[messageType].Should().HaveCount(expecteds_elementsByType[messageType].Count());
-                    }
-                    if (messageType == typeof(Hook) && actuals_elementsByType.ContainsKey(messageType))
-                        actuals_elementsByType[messageType].Should().HaveCountGreaterThanOrEqualTo(expecteds_elementsByType[messageType].Count());
-                }
-            }
-        }
     }
 }
