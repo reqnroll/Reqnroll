@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="CCK\ambiguous\Ambiguous.cs" />
     <Compile Remove="CCK\attachments\attachments.cs" />
     <Compile Remove="CCK\cdata\cdata.cs" />
     <Compile Remove="CCK\data-tables\data_tables.cs" />
@@ -26,6 +27,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="CCK\ambiguous\ambiguous.feature" />
+    <None Remove="CCK\ambiguous\ambiguous.feature.ndjson" />
     <None Remove="CCK\attachments\attachments.feature" />
     <None Remove="CCK\attachments\attachments.feature.ndjson" />
     <None Remove="CCK\cdata\cdata.feature" />
@@ -56,8 +59,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="CCK\ambiguous\ambiguous.feature" />
+    <EmbeddedResource Include="CCK\ambiguous\ambiguous.cs" />
     <EmbeddedResource Include="CCK\attachments\attachments.cs" />
     <EmbeddedResource Include="CCK\attachments\attachments.feature" />
+    <Content Include="CCK\ambiguous\ambiguous.feature.ndjson" />
     <Content Include="CCK\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

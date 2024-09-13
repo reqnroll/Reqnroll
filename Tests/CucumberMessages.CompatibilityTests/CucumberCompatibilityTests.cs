@@ -176,7 +176,7 @@ namespace CucumberMessages.CompatibilityTests
         [TestMethod]
         [DataRow("attachments", "Attachments")]
         [DataRow("minimal", "minimal")]
-        [DataRow("cdata","cdata")]
+        [DataRow("cdata", "cdata")]
         [DataRow("pending", "Pending steps")]
         [DataRow("examples-tables", "Examples Tables")]
         [DataRow("hooks", "Hooks")]
@@ -208,6 +208,14 @@ namespace CucumberMessages.CompatibilityTests
 
             ConfirmAllTestsRan(null);
         }
+
+        [TestMethod]
+        [DataRow("ambiguous", "ambiguous")]
+        public void NonCCKScenarios(string testName, string featureNameText)
+        {
+            CCKScenarios(testName, featureNameText);
+        }
+
 
         private void AddUtilClassWithFileSystemPath()
         {
