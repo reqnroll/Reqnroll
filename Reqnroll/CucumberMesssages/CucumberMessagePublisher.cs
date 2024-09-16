@@ -17,7 +17,7 @@ namespace Reqnroll.CucumberMessages
 
         public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
         {
-            Debugger.Launch();
+            //Debugger.Launch();
             broker = CucumberMessageBroker;
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)

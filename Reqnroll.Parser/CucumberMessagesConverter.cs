@@ -15,9 +15,11 @@ namespace Reqnroll.Parser
         }
         public GherkinDocument ConvertToCucumberMessagesGherkinDocument(ReqnrollDocument gherkinDocument)
         {
+            var NullLocationPatcher = new PatchMissingLocationElementsTransformation();
+            var gherkinDocumentWithLocation = NullLocationPatcher.TransformDocument(gherkinDocument);
             var converter = new AstMessagesConverter(_idGenerator);
             var location = Path.Combine(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath));
-            return converter.ConvertGherkinDocumentToEventArgs(gherkinDocument, location);
+            return converter.ConvertGherkinDocumentToEventArgs(gherkinDocumentWithLocation, location);
         }
 
         public Source ConvertToCucumberMessagesSource(ReqnrollDocument gherkinDocument)
