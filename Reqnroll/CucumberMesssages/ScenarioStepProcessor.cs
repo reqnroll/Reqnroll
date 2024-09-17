@@ -5,6 +5,7 @@ using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Reqnroll.CucumberMessages
 {
@@ -26,6 +27,8 @@ namespace Reqnroll.CucumberMessages
         public bool Bound { get; set; }
         public string CanonicalizedStepPattern { get; set; }
         public string StepDefinitionId { get; private set; }
+        public IEnumerable<string> AmbiguousStepDefinitions { get; set; }
+        public bool Ambiguous {  get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0;} }
         public IStepDefinitionBinding StepDefinition { get; set; }
 
         public List<StepArgument> StepArguments { get; set; }
@@ -64,6 +67,11 @@ namespace Reqnroll.CucumberMessages
             if (Status == ScenarioExecutionStatus.TestError && stepFinishedEvent.ScenarioContext.TestError != null)
             {
                 Exception = stepFinishedEvent.ScenarioContext.TestError;
+                if (Exception is AmbiguousBindingException)
+                {
+                    AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches.Select(m => 
+                                                    FindStepDefIDByStepPattern(CucumberMessageFactory.CanonicalizeStepDefinitionPattern(m.StepBinding))));
+                }
             }
 
             var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();

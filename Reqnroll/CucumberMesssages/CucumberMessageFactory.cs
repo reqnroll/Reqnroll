@@ -122,7 +122,8 @@ namespace Reqnroll.CucumberMessages
 
         internal static TestStep ToPickleTestStep(ScenarioEventProcessor scenarioState, ScenarioStepProcessor stepState)
         {
-            bool bound = stepState.StepDefinitionId != null;
+            bool bound = stepState.Bound;
+            bool ambiguous = stepState.Ambiguous;
 
             var args = stepState.StepArguments
                .Select(arg => CucumberMessageFactory.ToStepMatchArgument(arg))
@@ -132,7 +133,7 @@ namespace Reqnroll.CucumberMessages
                  null,
                  stepState.TestStepID,
                  stepState.PickleStepID,
-                 bound ? new List<string> { stepState.StepDefinitionId } : new List<string>(),
+                 bound ? new List<string> { stepState.StepDefinitionId } : ambiguous ? new List<string>(stepState.AmbiguousStepDefinitions) : new List<string>(),
                  bound ? new List<StepMatchArgumentsList> { new StepMatchArgumentsList(args) } : new List<StepMatchArgumentsList>()
                  );
 
