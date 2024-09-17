@@ -190,8 +190,8 @@ namespace Reqnroll.CucumberMessages
                 hookId,
                 hookStepState.TestStepID,
                 null,
-                new List<string>(),
-                new List<StepMatchArgumentsList>());
+                null,
+                null);
         }
         internal static TestStepStarted ToTestStepStarted(HookStepProcessor hookStepProcessor, HookBindingStartedEvent hookBindingStartedEvent)
         {
