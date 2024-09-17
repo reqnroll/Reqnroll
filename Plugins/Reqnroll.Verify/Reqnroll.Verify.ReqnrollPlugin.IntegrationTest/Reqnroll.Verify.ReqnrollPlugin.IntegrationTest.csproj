@@ -34,10 +34,6 @@
     <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Reqnroll.xUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Features\" />
-  </ItemGroup>
-
   <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
   <!-- has to be before the PropertyGroup change-->
   <PropertyGroup>
