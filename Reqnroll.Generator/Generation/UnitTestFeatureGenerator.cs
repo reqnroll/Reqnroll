@@ -1,11 +1,13 @@
 using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages;
+using Reqnroll.CucumberMesssages;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
@@ -16,6 +18,9 @@ namespace Reqnroll.Generator.Generation
 {
     public class UnitTestFeatureGenerator : IFeatureGenerator
     {
+        private const string PICKLES = "Pickles";
+        private const string PICKLEJAR = "PICKLEJAR";
+
         private readonly CodeDomHelper _codeDomHelper;
         private readonly IDecoratorRegistry _decoratorRegistry;
         private readonly ScenarioPartHelper _scenarioPartHelper;
@@ -232,10 +237,17 @@ namespace Reqnroll.Generator.Generation
                 featureSourceMessageString = System.Text.Json.JsonSerializer.Serialize(featureSourceMessage);
                 featureGherkinDocumentMessageString = System.Text.Json.JsonSerializer.Serialize(featureGherkinDocumentMessage);
                 featurePickleMessagesString = System.Text.Json.JsonSerializer.Serialize(featurePickleMessages);
+
+                // Save the Pickles to the GenerationContext so that the Pickle and Step Ids can be injected as arguments into the Scenario and Step method signatures
+                //TODO: Confirm whether the Pickles are nessessary as the PickleJar already includes them
+                generationContext.CustomData.Add(PICKLES, featurePickleMessages);
+                generationContext.CustomData.Add(PICKLEJAR, new PickleJar(featurePickleMessages));
             }
             catch
             {
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
+                generationContext.CustomData.Add(PICKLES, null);
+                generationContext.CustomData.Add(PICKLEJAR, new PickleJar(new List<Gherkin.CucumberMessages.Types.Pickle>()));
                 return;            
             }
             // Create a new method that will be added to the test class. It will be called to initialize the FeatureCucumberMessages property of the FeatureInfo object
@@ -245,16 +257,19 @@ namespace Reqnroll.Generator.Generation
             CucumberMessagesInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), "featureInfo"));
             generationContext.TestClass.Members.Add(CucumberMessagesInitializeMethod);
 
-
             // Create a FeatureLevelCucumberMessages object and add it to featureInfo
             var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureLevelCucumberMessages)),
                 new CodePrimitiveExpression(featureSourceMessageString),
                 new CodePrimitiveExpression(featureGherkinDocumentMessageString),
                 new CodePrimitiveExpression(featurePickleMessagesString));
+
             CucumberMessagesInitializeMethod.Statements.Add(
                 new CodeAssignStatement(
                     new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("featureInfo"), "FeatureCucumberMessages"),
                     featureLevelCucumberMessagesExpression));
+
+            ///At runtime, pull the PickleStepIds from the pickleJar for the given runtime pickleID; partition them out by Background, RuleBackground, and Scenario steps
+            ///keep an index of which step is being generated and use that to index in to the PickleStepIds at runtime ... eg "stepIds[codeprimitive(stepIndex)]"
 
             // Create a CodeMethodInvokeExpression to invoke the CucumberMessagesInitializeMethod
             var invokeCucumberMessagesInitializeMethod = new CodeMethodInvokeExpression(

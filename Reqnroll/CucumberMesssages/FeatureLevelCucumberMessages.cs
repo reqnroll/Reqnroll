@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Reqnroll.CucumberMesssages;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -11,10 +12,12 @@ namespace Reqnroll.CucumberMessages
             Source = source;
             GherkinDocument = gkerkinDocument;
             Pickles = pickles;
+            PickleJar = new PickleJar(pickles);
         }
 
-        public string Source { get; set; }
-        public string GherkinDocument { get; set; }
-        public string Pickles { get; set; }
+        public string Source { get;  }
+        public string GherkinDocument { get;  }
+        public string Pickles { get; }
+        public PickleJar PickleJar { get; }
     }
 }

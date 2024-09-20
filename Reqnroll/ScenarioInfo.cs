@@ -36,13 +36,19 @@ namespace Reqnroll
         /// </summary>
         public string Description { get; }
 
-        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null)
+        /// <summary>
+        /// The PickleId of the Scenario when exported as a Cucumber Message "pickle".
+        /// </summary>
+        public string PickleId { get; }
+
+        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleId = null)
         {
             Title = title;
             Description = description;
             Tags = tags ?? Array.Empty<string>();
             Arguments = arguments;
             CombinedTags = Tags.Concat(inheritedTags ?? Array.Empty<string>()).ToArray();
+            PickleId = pickleId;
         }
     }
 }

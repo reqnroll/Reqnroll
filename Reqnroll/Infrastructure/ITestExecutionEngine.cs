@@ -22,7 +22,7 @@ namespace Reqnroll.Infrastructure
 
         void OnScenarioSkipped();
 
-        Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg);
+        Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg, string pickleStepId);
 
         void Pending();
     }

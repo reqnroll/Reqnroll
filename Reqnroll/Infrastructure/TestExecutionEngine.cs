@@ -622,12 +622,12 @@ namespace Reqnroll.Infrastructure
 
         #region Given-When-Then
 
-        public virtual async Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg)
+        public virtual async Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg, string pickleStepId = null)
         {
             StepDefinitionType stepDefinitionType = stepDefinitionKeyword == StepDefinitionKeyword.And || stepDefinitionKeyword == StepDefinitionKeyword.But
                 ? GetCurrentBindingType()
                 : (StepDefinitionType) stepDefinitionKeyword;
-            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg));
+            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg, pickleStepId));
             _testThreadExecutionEventPublisher.PublishEvent(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
             try

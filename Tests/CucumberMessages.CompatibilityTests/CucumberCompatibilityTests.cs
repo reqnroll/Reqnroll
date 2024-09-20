@@ -9,6 +9,8 @@ using FluentAssertions;
 using System.Text.Json;
 using System.ComponentModel;
 using Reqnroll.TestProjectGenerator;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Reqnroll.TestProjectGenerator.Driver;
 
 namespace CucumberMessages.CompatibilityTests
 {
@@ -53,6 +55,57 @@ namespace CucumberMessages.CompatibilityTests
 
             ShouldAllScenariosPass();
         }
+
+        [TestMethod]
+        public void SmokeOutlineTest()
+        {
+            AddCucumberMessagePlugIn();
+            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Outline Test
+                  @some-tag
+                  Scenario Outline: Log JSON
+                     When the following string is attached as <color>:
+                  Examples:
+                    | color |
+                    | "red" |
+                    | "green" |
+                    | "blue" |
+                """);
+
+            AddPassingStepBinding("When");
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+        }
+        [TestMethod]
+        public void SmokeOutlineTestAsMethods()
+        {
+            var _configurationFileDriver = GetServiceSafe<ConfigurationFileDriver>();
+            _configurationFileDriver.SetIsRowTestsAllowed(false);
+
+            AddCucumberMessagePlugIn();
+            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Outline Test As Methods
+                  @some-tag
+                  Scenario Outline: Log JSON
+                     When the following string is attached as <color>:
+                  Examples:
+                    | color |
+                    | "red" |
+                    | "green" |
+                    | "blue" |
+                """);
+
+            AddPassingStepBinding("When");
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+        }
+
 
         [TestMethod]
         public void CucumberMessagesInteropWithExternalData()
