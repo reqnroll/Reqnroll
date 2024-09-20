@@ -5,6 +5,8 @@ using System.Collections.Specialized;
 using System.Linq;
 using Gherkin.Ast;
 using Reqnroll.Configuration;
+using Reqnroll.CucumberMesssages;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
@@ -15,6 +17,9 @@ namespace Reqnroll.Generator.Generation
 {
     public class UnitTestMethodGenerator
     {
+        private const string PICKLEJAR = "PICKLEJAR";
+        private const string PICKLEID_PARAMETER_NAME = "@pickleId";
+        private const string PICKLEID_VARIABLE_NAME = "m_pickleId";
         private const string IGNORE_TAG = "@Ignore";
         private const string TESTRUNNER_FIELD = "testRunner";
         private readonly CodeDomHelper _codeDomHelper;
@@ -22,6 +27,8 @@ namespace Reqnroll.Generator.Generation
         private readonly ScenarioPartHelper _scenarioPartHelper;
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
         private readonly IUnitTestGeneratorProvider _unitTestGeneratorProvider;
+        private PickleJar _pickleJar;
+
 
         public UnitTestMethodGenerator(IUnitTestGeneratorProvider unitTestGeneratorProvider, IDecoratorRegistry decoratorRegistry, CodeDomHelper codeDomHelper, ScenarioPartHelper scenarioPartHelper, ReqnrollConfiguration reqnrollConfiguration)
         {
@@ -39,13 +46,14 @@ namespace Reqnroll.Generator.Generation
                         .Where(child => child is not Background)
                         .Select(sd => new ScenarioDefinitionInFeatureFile(sd, feature, rule));
 
-            return 
+            return
                 GetScenarioDefinitionsOfRule(feature.Children, null)
                     .Concat(feature.Children.OfType<Rule>().SelectMany(rule => GetScenarioDefinitionsOfRule(rule.Children, rule)));
         }
 
         public void CreateUnitTests(ReqnrollFeature feature, TestClassGenerationContext generationContext)
         {
+            _pickleJar = generationContext.CustomData[PICKLEJAR] as PickleJar;
             foreach (var scenarioDefinition in GetScenarioDefinitions(feature))
             {
                 CreateUnitTest(generationContext, scenarioDefinition);
@@ -66,6 +74,7 @@ namespace Reqnroll.Generator.Generation
             else
             {
                 GenerateTest(generationContext, scenarioDefinitionInFeatureFile);
+                _pickleJar.NextPickle();
             }
         }
 
@@ -87,7 +96,7 @@ namespace Reqnroll.Generator.Generation
                 GenerateScenarioOutlineExamplesAsIndividualMethods(scenarioOutline, generationContext, scenarioOutlineTestMethod, paramToIdentifier);
             }
 
-            GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, scenarioOutlineTestMethod, exampleTagsParam, paramToIdentifier);
+            GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, scenarioOutlineTestMethod, exampleTagsParam, paramToIdentifier, true);
         }
 
         private void GenerateTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile)
@@ -129,7 +138,9 @@ namespace Reqnroll.Generator.Generation
             TestClassGenerationContext generationContext,
             ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile,
             CodeMemberMethod testMethod,
-            CodeExpression additionalTagsExpression = null, ParameterSubstitution paramToIdentifier = null)
+            CodeExpression additionalTagsExpression = null,
+            ParameterSubstitution paramToIdentifier = null,
+            bool pickleIdIncludedInParameters = false)
         {
             var scenarioDefinition = scenarioDefinitionInFeatureFile.ScenarioDefinition;
             var feature = scenarioDefinitionInFeatureFile.Feature;
@@ -190,6 +201,9 @@ namespace Reqnroll.Generator.Generation
 
             AddVariableForArguments(testMethod, paramToIdentifier);
 
+            AddVariableForPickleId(testMethod, pickleIdIncludedInParameters, generationContext.CustomData[PICKLEJAR] as PickleJar);
+            AddVariableForPickleStepSequence(testMethod);
+
             testMethod.Statements.Add(
                 new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)), "scenarioInfo",
                     new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)),
@@ -197,7 +211,8 @@ namespace Reqnroll.Generator.Generation
                         new CodePrimitiveExpression(scenarioDefinition.Description),
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME),
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_ARGUMENTS_VARIABLE_NAME),
-                        inheritedTagsExpression)));
+                        inheritedTagsExpression,
+                        new CodeVariableReferenceExpression(PICKLEID_VARIABLE_NAME))));
 
             GenerateScenarioInitializeCall(generationContext, scenarioDefinition, testMethod);
 
@@ -206,6 +221,41 @@ namespace Reqnroll.Generator.Generation
             GenerateScenarioCleanupMethodCall(generationContext, testMethod);
         }
 
+        private void AddVariableForPickleId(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, PickleJar pickleJar)
+        {
+            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), PICKLEID_VARIABLE_NAME,
+                pickleIdIncludedInParameters ?
+                    new CodeVariableReferenceExpression(PICKLEID_PARAMETER_NAME) :
+                    new CodePrimitiveExpression(pickleJar.CurrentPickleId));
+            testMethod.Statements.Add(pickleIdVariable);
+        }
+
+        private void AddVariableForPickleStepSequence(CodeMemberMethod testMethod)
+        {
+            // m_pickleStepSequence = testRunner.FeatureContext.FeatureInfo.FeatureCucumberMessages.PickleJar.PickleStepSequenceFor(m_pickleId);
+            var pickleStepSequence = new CodeVariableDeclarationStatement(typeof(PickleStepSequence), PickleStepSequence.PICKLESTEPSEQUENCE_VARIABLE_NAME,
+                // Right side of the assignment (property access chain)
+
+                new CodeMethodInvokeExpression(
+                    new CodePropertyReferenceExpression(
+                        new CodePropertyReferenceExpression(
+                            new CodePropertyReferenceExpression(
+                                new CodePropertyReferenceExpression(
+                                    new CodeVariableReferenceExpression(TESTRUNNER_FIELD),
+                                    "FeatureContext"
+                                ),
+                                "FeatureInfo"
+                            ),
+                            "FeatureCucumberMessages"
+                        ),
+                        "PickleJar"
+                    ),
+                    "PickleStepSequenceFor",
+                    new CodeVariableReferenceExpression(PICKLEID_VARIABLE_NAME))
+                );
+
+            testMethod.Statements.Add(pickleStepSequence);
+        }
         private void AddVariableForTags(CodeMemberMethod testMethod, CodeExpression tagsExpression)
         {
             var tagVariable = new CodeVariableDeclarationStatement(typeof(string[]), GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME, tagsExpression);
@@ -272,6 +322,9 @@ namespace Reqnroll.Generator.Generation
             foreach (var scenarioStep in scenario.Steps)
             {
                 _scenarioPartHelper.GenerateStep(generationContext, statementsWhenScenarioIsExecuted, scenarioStep, paramToIdentifier);
+                statementsWhenScenarioIsExecuted.Add(new CodeExpressionStatement(new CodeMethodInvokeExpression(
+                                                                                new CodeVariableReferenceExpression(PickleStepSequence.PICKLESTEPSEQUENCE_VARIABLE_NAME),
+                                                                                "NextStep")));
             }
 
             var tagsOfScenarioVariableReferenceExpression = new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME);
@@ -322,7 +375,7 @@ namespace Reqnroll.Generator.Generation
 
             testMethod.Statements.Add(expression);
         }
-        
+
         private CodeMethodInvokeExpression CreateTestRunnerSkipScenarioCall()
         {
             return new CodeMethodInvokeExpression(
@@ -362,7 +415,9 @@ namespace Reqnroll.Generator.Generation
                 foreach (var example in exampleSet.TableBody.Select((r, i) => new { Row = r, Index = i }))
                 {
                     var variantName = useFirstColumnAsName ? example.Row.Cells.First().Value : string.Format("Variant {0}", example.Index);
-                    GenerateScenarioOutlineTestVariant(generationContext, scenarioOutline, scenarioOutlineTestMethod, paramToIdentifier, exampleSet.Name ?? "", exampleSetIdentifier, example.Row, exampleSet.Tags.ToArray(), variantName);
+                    var currentPickleId = _pickleJar.CurrentPickleId;
+                    GenerateScenarioOutlineTestVariant(generationContext, scenarioOutline, scenarioOutlineTestMethod, paramToIdentifier, exampleSet.Name ?? "", exampleSetIdentifier, example.Row, currentPickleId, exampleSet.Tags.ToArray(), variantName);
+                    _pickleJar.NextPickle();
                 }
 
                 exampleSetIndex++;
@@ -377,8 +432,11 @@ namespace Reqnroll.Generator.Generation
             {
                 foreach (var row in examples.TableBody)
                 {
-                    var arguments = row.Cells.Select(c => c.Value);
+                    var arguments = row.Cells.Select(c => c.Value).Concat<string>(new[] { _pickleJar.CurrentPickleId });
+                    
                     _unitTestGeneratorProvider.SetRow(generationContext, scenatioOutlineTestMethod, arguments, GetNonIgnoreTags(examples.Tags), HasIgnoreTag(examples.Tags));
+
+                    _pickleJar.NextPickle();
                 }
             }
         }
@@ -434,12 +492,12 @@ namespace Reqnroll.Generator.Generation
             testMethod.Name = string.Format(GeneratorConstants.TEST_NAME_FORMAT, scenarioOutline.Name.ToIdentifier());
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testMethod);
-            
+
             foreach (var pair in paramToIdentifier)
             {
                 testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), pair.Value));
             }
-
+            testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), @"@pickleId"));
             testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string[]), GeneratorConstants.SCENARIO_OUTLINE_EXAMPLE_TAGS_PARAMETER));
             return testMethod;
         }
@@ -452,16 +510,17 @@ namespace Reqnroll.Generator.Generation
             string exampleSetTitle,
             string exampleSetIdentifier,
             Gherkin.Ast.TableRow row,
+            string pickleId,
             Tag[] exampleSetTags,
             string variantName)
         {
             var testMethod = CreateTestMethod(generationContext, scenarioOutline, exampleSetTags, variantName, exampleSetIdentifier);
-            
+
             //call test implementation with the params
             var argumentExpressions = row.Cells.Select(paramCell => new CodePrimitiveExpression(paramCell.Value)).Cast<CodeExpression>().ToList();
-
+            argumentExpressions.Add(new CodePrimitiveExpression(pickleId));
             argumentExpressions.Add(_scenarioPartHelper.GetStringArrayExpression(exampleSetTags));
-            
+
             var statements = new List<CodeStatement>();
 
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, scenarioOutline.Location))
@@ -475,7 +534,7 @@ namespace Reqnroll.Generator.Generation
 
                 statements.Add(new CodeExpressionStatement(callTestMethodExpression));
             }
-            
+
             testMethod.Statements.AddRange(statements.ToArray());
 
             //_linePragmaHandler.AddLineDirectiveHidden(testMethod.Statements);

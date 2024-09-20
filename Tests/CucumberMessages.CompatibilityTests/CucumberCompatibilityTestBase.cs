@@ -11,6 +11,10 @@ namespace CucumberMessages.CompatibilityTests
 {
     public class CucumberCompatibilityTestBase : SystemTestBase
     {
+        protected override void TestCleanup()
+        {
+            // TEMPORARY: this is in place so that SystemTestBase.TestCleanup does not run (which deletes the generated code)
+        }
 
         protected void AddCucumberMessagePlugIn()
         {
@@ -45,12 +49,6 @@ namespace CucumberMessages.CompatibilityTests
             return testAssembly.GetManifestResourceNames()
                            .Where(rn => !rn.EndsWith(".feature") && !rn.EndsWith(".cs") && !rn.EndsWith(".feature.ndjson")  && rn.StartsWith(prefixToRemove))
                            .Select(rn => rn.Substring(prefixToRemove.Length));
-        }
-
-        protected string GetExpectedNDJSONFileContent(string scenarioName, string prefix, Assembly? assembly)
-        {
-            var testAssembly = assembly ?? Assembly.GetExecutingAssembly();
-            return _testFileManager.GetTestFileContent($"{scenarioName}.feature.ndjson", $"{prefix}.{scenarioName}", testAssembly);
         }
 
         protected void CucumberMessagesAddConfigurationFile(string configFileName)

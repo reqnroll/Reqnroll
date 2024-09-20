@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Gherkin.Ast;
 using Reqnroll.Configuration;
+using Reqnroll.CucumberMesssages;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Parser;
 
@@ -11,6 +12,8 @@ namespace Reqnroll.Generator.Generation
 {
     public class ScenarioPartHelper
     {
+        private const string BRINE = "PickleJar";
+
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
         private readonly CodeDomHelper _codeDomHelper;
         private int _tableCounter;
@@ -92,7 +95,8 @@ namespace Reqnroll.Generator.Generation
                 GetSubstitutedString(scenarioStep.Text, paramToIdentifier),
                 GetDocStringArgExpression(scenarioStep.Argument as DocString, paramToIdentifier),
                 GetTableArgExpression(scenarioStep.Argument as Gherkin.Ast.DataTable, statements, paramToIdentifier),
-                new CodePrimitiveExpression(scenarioStep.Keyword)
+                new CodePrimitiveExpression(scenarioStep.Keyword),
+                new CodePropertyReferenceExpression(new CodeVariableReferenceExpression(PickleStepSequence.PICKLESTEPSEQUENCE_VARIABLE_NAME), "CurrentPickleStepId")
             };
             
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, gherkinStep.Location))
