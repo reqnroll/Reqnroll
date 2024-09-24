@@ -42,12 +42,8 @@ namespace CucumberMessages.CompatibilityTests
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Test
-                  @some-tag
-                  Scenario: Log JSON
-                     When the following string is attached as "application/json":
-                       ```
-                       {"message": "The <b>big</b> question", "foo": "bar"}
-                       ```
+                  Scenario: Eating Cukes
+                     When I eat 5 cukes
                 """);
 
             AddPassingStepBinding("When");

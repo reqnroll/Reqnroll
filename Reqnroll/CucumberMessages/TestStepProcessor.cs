@@ -15,11 +15,11 @@ namespace Reqnroll.CucumberMessages
         public string Type;
     }
 
-    public class ScenarioStepProcessor : StepProcessorBase
+    public class TestStepProcessor : StepProcessorBase
     {
         private StepStartedEvent stepStartedEvent;
 
-        public ScenarioStepProcessor(ScenarioEventProcessor parentScenarioState) : base(parentScenarioState)
+        public TestStepProcessor(TestCaseCucumberMessageTracker parentTracker) : base(parentTracker)
         {
         }
 
@@ -33,24 +33,19 @@ namespace Reqnroll.CucumberMessages
 
         public List<StepArgument> StepArguments { get; set; }
 
-        internal IEnumerable<Envelope> ProcessEvent(StepStartedEvent stepStartedEvent)
+        internal void ProcessEvent(StepStartedEvent stepStartedEvent)
         {
             this.stepStartedEvent = stepStartedEvent;
-            TestStepID = parentScenario.IdGenerator.GetNewId();
-            return Enumerable.Empty<Envelope>();
+            TestStepID = ParentTestCase.IDGenerator.GetNewId();
+            PickleStepID = stepStartedEvent.StepContext.StepInfo.PickleStepId;
         }
 
         private string FindStepDefIDByStepPattern(string canonicalizedStepPattern)
         {
-            return parentScenario.FeatureState.StepDefinitionsByPattern[canonicalizedStepPattern];
+            return ParentTestCase.StepDefinitionsByPattern[canonicalizedStepPattern];
         }
 
-        private string FindPickleStepIDByStepText(string stepText)
-        {
-            return parentScenario.FeatureState.PicklesByScenarioName[parentScenario.Name].Steps.Where(st => st.Text == stepText).First().Id;
-        }
-
-        internal IEnumerable<Envelope> ProcessEvent(StepFinishedEvent stepFinishedEvent)
+        internal void ProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
             var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
             Bound = !(bindingMatch == null || bindingMatch == BindingMatch.NonMatching);
@@ -58,8 +53,6 @@ namespace Reqnroll.CucumberMessages
             StepDefinition = Bound ? bindingMatch.StepBinding : null;
             CanonicalizedStepPattern = Bound ? CucumberMessageFactory.CanonicalizeStepDefinitionPattern(StepDefinition) : "";
             StepDefinitionId = Bound ? FindStepDefIDByStepPattern(CanonicalizedStepPattern) : null;
-
-            PickleStepID = FindPickleStepIDByStepText(stepFinishedEvent.StepContext.StepInfo.Text);
 
             Duration = stepFinishedEvent.Timestamp - stepStartedEvent.Timestamp;
             Status = stepFinishedEvent.StepContext.Status;
@@ -81,7 +74,6 @@ namespace Reqnroll.CucumberMessages
                 argumentValues.Zip(argumentTypes, (x, y) => new StepArgument { Value = x, Type = y }).ToList<StepArgument>()
                 : Enumerable.Empty<StepArgument>().ToList<StepArgument>();
 
-            return Enumerable.Empty<Envelope>();
         }
     }
 }

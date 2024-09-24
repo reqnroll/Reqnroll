@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Reqnroll.CucumberMesssages
+namespace Reqnroll.CucumberMessages
 {
     public class PickleJar
     {
