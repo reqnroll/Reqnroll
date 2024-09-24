@@ -80,7 +80,7 @@ namespace Reqnroll.CucumberMessages
             {
                 var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
                 var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
-                StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
+                if (!StepDefinitionsByPattern.ContainsKey(pattern)) StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
 
                 yield return Envelope.Create(stepDefinition);
             }
@@ -89,7 +89,7 @@ namespace Reqnroll.CucumberMessages
             {
                 var hook = CucumberMessageFactory.ToHook(hookBinding, IDGenerator);
                 var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
-                StepDefinitionsByPattern.Add(hookId, hook.Id);
+                if (!StepDefinitionsByPattern.ContainsKey(hookId)) StepDefinitionsByPattern.Add(hookId, hook.Id);
                 yield return Envelope.Create(hook);
             }
 

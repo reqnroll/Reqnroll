@@ -235,7 +235,7 @@ namespace CucumberMessages.CompatibilityTests
         [DataRow("undefined", "Undefined steps")]
         [DataRow("unknown-parameter-type", "Unknown Parameter Types")]
         [DataRow("stack-traces", "Stack traces")]
-        [DataRow("rules", "Usage of a 'Rule'")]
+        [DataRow("rules", "Usage of a `Rule`")]
         public void CCKScenarios(string testName, string featureNameText)
         {
             AddCucumberMessagePlugIn();
@@ -255,7 +255,9 @@ namespace CucumberMessages.CompatibilityTests
             validator.ResultShouldPassAllComparisonTests();
             validator.ResultShouldPassSanityChecks();
 
-            ConfirmAllTestsRan(null);
+
+            // This is necessary b/c the System Test framework doesn't understand Rules and can't determine the number of expected tests
+            ConfirmAllTestsRan(testName == "rules" ? 3 : null);
         }
 
         [TestMethod]

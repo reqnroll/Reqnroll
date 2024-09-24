@@ -31,7 +31,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
             _count -= p0;
         }
 
-        [Then("I should have {int} cuc umbers")]
+        [Then("I should have {int} cucumbers")]
         public void ThenIShouldHaveCucumbers(int p0)
         {
            if (_count != p0)

@@ -40,7 +40,7 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(Feature feature)
         {
             OnVisiting(feature);
-            foreach (var featureChild in feature.Children)
+            foreach (var featureChild in feature.Children ?? new List<FeatureChild>())
             {
                 Accept(featureChild);
             }
@@ -62,11 +62,11 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(Rule rule)
         {
             OnVisiting(rule);
-            foreach (var ruleChild in rule.Children)
+            foreach (var ruleChild in rule.Children ?? new List<RuleChild>())
             {
                 Accept(ruleChild);
             }
-            foreach (var tag in rule.Tags)
+            foreach (var tag in rule.Tags ?? new List<Tag>())
             {
                 Accept(tag);
             }
@@ -87,7 +87,7 @@ namespace Reqnroll.CucumberMessages
         {
             OnVisiting(background);
             Accept(background.Location);
-            foreach (var step in background.Steps)
+            foreach (var step in background.Steps ?? new List<Step>())
             {
                 Accept(step);
             }
@@ -98,15 +98,15 @@ namespace Reqnroll.CucumberMessages
         {
             OnVisiting(scenario);
             Accept(scenario.Location);
-            foreach (var tag in scenario.Tags)
+            foreach (var tag in scenario.Tags ?? new List<Tag>())
             {
                 Accept(tag);
             }
-            foreach (var step in scenario.Steps)
+            foreach (var step in scenario.Steps ?? new List<Step>())
             {
                 Accept(step);
             }
-            foreach (var example in scenario.Examples)
+            foreach (var example in scenario.Examples ?? new List<Examples>())
             {
                 Accept(example);
             }
@@ -117,12 +117,12 @@ namespace Reqnroll.CucumberMessages
         {
             OnVisiting(examples);
             Accept(examples.Location);
-            foreach (var tag in examples.Tags)
+            foreach (var tag in examples.Tags ?? new List<Tag>())
             {
                 Accept(tag);
             }
             Accept(examples.TableHeader);
-            foreach (var tableRow in examples.TableBody)
+            foreach (var tableRow in examples.TableBody ?? new List<TableRow>())
             {
                 Accept(tableRow);
             }
@@ -142,7 +142,7 @@ namespace Reqnroll.CucumberMessages
         {
             OnVisiting(tableRow);
             Accept(tableRow.Location);
-            foreach (var tableCell in tableRow.Cells)
+            foreach (var tableCell in tableRow.Cells ?? new List<TableCell>())
             {
                 Accept(tableCell);
             }
@@ -166,11 +166,11 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(Pickle pickle)
         {
             OnVisiting(pickle);
-            foreach (var pickleStep in pickle.Steps)
+            foreach (var pickleStep in pickle.Steps ?? new List<PickleStep>())
             {
                 Accept(pickleStep);
             }
-            foreach (var tag in pickle.Tags)
+            foreach (var tag in pickle.Tags ?? new List<PickleTag>())
             {
                 Accept(tag);
             }
@@ -197,7 +197,7 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(PickleTable pickleTable)
         {
             OnVisiting(pickleTable);
-            foreach (var pickleTableRow in pickleTable.Rows)
+            foreach (var pickleTableRow in pickleTable.Rows ?? new List<PickleTableRow>())
             {
                 Accept(pickleTableRow);
             }
@@ -207,7 +207,7 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(PickleTableRow pickleTableRow)
         {
             OnVisiting(pickleTableRow);
-            foreach (var pickleTableCell in pickleTableRow.Cells)
+            foreach (var pickleTableCell in pickleTableRow.Cells ?? new List<PickleTableCell>())
             {
                 Accept(pickleTableCell);
             }
@@ -229,7 +229,7 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(TestCase testCase)
         {
             OnVisiting(testCase);
-            foreach (var step in testCase.TestSteps)
+            foreach (var step in testCase.TestSteps ?? new List<TestStep>())
             {
                 Accept(step);
             }
@@ -253,7 +253,7 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(TestStep testStep)
         {
             OnVisiting(testStep);
-            foreach (var argumentList in testStep.StepMatchArgumentsLists)
+            foreach (var argumentList in testStep.StepMatchArgumentsLists ?? new List<StepMatchArgumentsList>())
             {
                 Accept(argumentList);
             }
@@ -385,7 +385,7 @@ namespace Reqnroll.CucumberMessages
         {
             OnVisiting(dataTable);
             Accept(dataTable.Location);
-            foreach (var row in dataTable.Rows)
+            foreach (var row in dataTable.Rows ?? new List<Io.Cucumber.Messages.Types.TableRow>())
             {
                 Accept(row);
             }
@@ -402,7 +402,7 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(Group group)
         {
             OnVisiting(group);
-            foreach (var child in group.Children)
+            foreach (var child in group.Children ?? new List<Group>())
             {
                 Accept(child);
             }
@@ -456,7 +456,7 @@ namespace Reqnroll.CucumberMessages
         public virtual void Visit(StepMatchArgumentsList stepMatchArgumentsList)
         {
             OnVisiting(stepMatchArgumentsList);
-            foreach (var stepMatchArgument in stepMatchArgumentsList.StepMatchArguments)
+            foreach (var stepMatchArgument in stepMatchArgumentsList.StepMatchArguments ?? new List<StepMatchArgument>())
             {
                 Accept(stepMatchArgument);
             }
