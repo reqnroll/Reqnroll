@@ -9,24 +9,21 @@ namespace Reqnroll.CucumberMessages
     {
         public string HookBindingSignature { get; private set; }
         public HookBindingFinishedEvent HookBindingFinishedEvent { get; private set; }
-        public HookStepProcessor(ScenarioEventProcessor parentScenarioState) : base(parentScenarioState)
+        public HookStepProcessor(TestCaseCucumberMessageTracker tracker) : base(tracker)
         {
         }
 
-        public IEnumerable<Envelope> ProcessEvent(HookBindingStartedEvent stepFinishedEvent)
+        public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
         {
-            TestStepID = parentScenario.IdGenerator.GetNewId();
-            HookBindingSignature = CucumberMessageFactory.CanonicalizeHookBinding(stepFinishedEvent.HookBinding);
-            return Enumerable.Empty<Envelope>();
+            TestStepID = ParentTestCase.IDGenerator.GetNewId();
+            HookBindingSignature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
         }
 
-        public IEnumerable<Envelope> ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
+        public void ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
         {
             HookBindingFinishedEvent  = hookFinishedEvent;
             Exception = hookFinishedEvent.HookException;
             Status = Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
-
-            return Enumerable.Empty<Envelope>();
         }
     }
 

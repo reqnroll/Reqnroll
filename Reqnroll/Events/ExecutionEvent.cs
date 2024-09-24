@@ -211,7 +211,7 @@ namespace Reqnroll.Events
     public class OutputAddedEvent : ExecutionEvent, IExecutionOutputEvent
     {
         public string Text { get; }
-        public string FeatureName { get; }
+        public FeatureInfo FeatureInfo { get; }
         public string ScenarioName { get; }
         public string StepText { get; }
 
@@ -220,31 +220,24 @@ namespace Reqnroll.Events
             Text = text;
         }
 
-        public OutputAddedEvent(string text, string featureName, string scenarioName, string stepText) : this(text)
+        public OutputAddedEvent(string text, FeatureInfo featureInfo) : this(text)
         {
-            FeatureName = featureName;
-            ScenarioName = scenarioName;
-            StepText = stepText;
+            FeatureInfo = featureInfo;
         }
     }
 
     public class AttachmentAddedEvent : ExecutionEvent, IExecutionOutputEvent
     {
         public string FilePath { get; }
-        public string FeatureName { get; }
-        public string ScenarioName { get; }
-        public string StepText { get; }
-
+        public FeatureInfo FeatureInfo { get; }
         public AttachmentAddedEvent(string filePath)
         {
             FilePath = filePath;
         }
 
-        public AttachmentAddedEvent(string filePath, string featureName, string scenarioName, string stepText) : this(filePath)
+        public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo) : this(filePath)
         {
-            FeatureName = featureName;
-            ScenarioName = scenarioName;
-            StepText = stepText;
+            FeatureInfo = featureInfo;
         }
     }
 }

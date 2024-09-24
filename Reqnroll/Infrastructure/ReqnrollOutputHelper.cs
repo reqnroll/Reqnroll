@@ -20,11 +20,9 @@ namespace Reqnroll.Infrastructure
 
         public void WriteLine(string message)
         {
-            var featureName = contextManager.FeatureContext.FeatureInfo?.Title;
-            var scenarioName = contextManager.ScenarioContext.ScenarioInfo?.Title;
-            var stepText = contextManager.StepContext?.StepInfo?.Text;
+            var featureInfo = contextManager.FeatureContext.FeatureInfo;
 
-            _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message, featureName, scenarioName, stepText));
+            _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message, featureInfo));
             _traceListener.WriteToolOutput(message);
         }
 
@@ -35,10 +33,8 @@ namespace Reqnroll.Infrastructure
 
         public void AddAttachment(string filePath)
         {
-            var featureName = contextManager.FeatureContext.FeatureInfo?.Title;
-            var scenarioName = contextManager.ScenarioContext.ScenarioInfo?.Title;
-            var stepText = contextManager.StepContext?.StepInfo?.Text;
-            _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath, featureName, scenarioName, stepText));
+            var featureInfo = contextManager.FeatureContext.FeatureInfo;
+            _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath, featureInfo));
             _reqnrollAttachmentHandler.AddAttachment(filePath);
         }
     }

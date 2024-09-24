@@ -7,7 +7,6 @@ using System.Reflection;
 using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages;
-using Reqnroll.CucumberMesssages;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;

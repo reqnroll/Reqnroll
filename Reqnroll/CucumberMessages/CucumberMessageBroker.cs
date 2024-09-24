@@ -16,7 +16,7 @@ namespace Reqnroll.CucumberMessages
     {
         bool Enabled { get; }
         void Complete(string cucumberMessageSource);
-        void Publish(ReqnrollCucumberMessage message);
+        void Publish(ReqnrollCucumberMessage featureMessages);
     }
 
     public class CucumberMessageBroker : ICucumberMessageBroker
@@ -25,22 +25,20 @@ namespace Reqnroll.CucumberMessages
 
         public bool Enabled => _objectContainer.ResolveAll<ICucumberMessageSink>().ToList().Count > 0;
 
-        //private ITraceListener _traceListener;
+        private Lazy<IEnumerable<ICucumberMessageSink>> RegisteredSinks; 
 
         public CucumberMessageBroker(IObjectContainer objectContainer)
         { 
             _objectContainer = objectContainer;
+            RegisteredSinks = new Lazy<IEnumerable<ICucumberMessageSink>>(() => _objectContainer.ResolveAll<ICucumberMessageSink>());
         }
         public void Publish(ReqnrollCucumberMessage message)
         {
             var _traceListener = _objectContainer.Resolve<ITraceListener>();
 
-            //TODO: find a way to populate this list a single time
-            var registeredSinks = _objectContainer.ResolveAll<ICucumberMessageSink>().ToList();
-
-            foreach (var sink in registeredSinks)
+            foreach (var sink in RegisteredSinks.Value)
             {   
-                _traceListener.WriteTestOutput($"Broker publishing {message.CucumberMessageSource}");
+                _traceListener.WriteTestOutput($"Broker publishing {message.CucumberMessageSource}: {message.Envelope.Content()}");
 
                 sink.Publish(message);
             }
@@ -49,8 +47,6 @@ namespace Reqnroll.CucumberMessages
         // using an empty CucumberMessage to indicate completion
         public  void Complete(string cucumberMessageSource)
         {
-            var registeredSinks = _objectContainer.ResolveAll<ICucumberMessageSink>().ToList();
-
             var _traceListener = _objectContainer.Resolve<ITraceListener>();
 
             var completionMessage = new ReqnrollCucumberMessage
@@ -58,7 +54,7 @@ namespace Reqnroll.CucumberMessages
                 CucumberMessageSource = cucumberMessageSource
             };
 
-            foreach (var sink in registeredSinks)
+            foreach (var sink in RegisteredSinks.Value)
             {
                 _traceListener.WriteTestOutput($"Broker publishing completion for {cucumberMessageSource}");
 

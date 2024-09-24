@@ -5,16 +5,16 @@ namespace Reqnroll.CucumberMessages
     public class StepProcessorBase : IStepProcessor
     {
         public string TestStepID { get; set; }
-        public string TestCaseStartedID => parentScenario.TestCaseStartedID;
+        public string TestCaseStartedID => ParentTestCase.TestCaseStartedId;
         public ScenarioExecutionStatus Status { get; set; }
         public TimeSpan Duration { get; set; }
         public Exception Exception { get; set; }
 
-        public ScenarioEventProcessor parentScenario;
+        public TestCaseCucumberMessageTracker ParentTestCase;
 
-        public StepProcessorBase(ScenarioEventProcessor parentScenario)
+        public StepProcessorBase(TestCaseCucumberMessageTracker parentScenario)
         {
-            this.parentScenario = parentScenario;
+            ParentTestCase = parentScenario;
         }
     }
 }
