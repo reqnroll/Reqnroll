@@ -186,7 +186,7 @@ public class CucumberExpressionIntegrationTests
         await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo("en-US"), ".", "Sample feature", null, ProgrammingLanguage.CSharp));
         await engine.OnScenarioStartAsync();
         engine.OnScenarioInitialize(new ScenarioInfo("Sample scenario", null, null, null));
-        await engine.StepAsync(StepDefinitionKeyword.Given, "Given ", stepText, null, null);
+        await engine.StepAsync(StepDefinitionKeyword.Given, "Given ", stepText, null, null, "stubPickleStepId");
 
         var contextManager = testThreadContainer.Resolve<IContextManager>();
         contextManager.ScenarioContext.ScenarioExecutionStatus.Should().Be(ScenarioExecutionStatus.OK, $"should not fail with '{contextManager.ScenarioContext.TestError?.Message}'");

@@ -18,5 +18,9 @@ namespace Reqnroll.Generator.Generation
         public const string SCENARIO_TAGS_VARIABLE_NAME = "tagsOfScenario";
         public const string SCENARIO_ARGUMENTS_VARIABLE_NAME = "argumentsOfScenario";
         public const string FEATURE_TAGS_VARIABLE_NAME = "featureTags";
+        public const string PICKLEID_PARAMETER_NAME = "@pickleId";
+        public const string PICKLEID_VARIABLE_NAME = "m_pickleId";
+        public const string PICKLESTEPSEQUENCE_VARIABLE_NAME = "m_pickleStepSequence";
+        public const string PICKLESTEPSEQUENCE_PARAMETER_NAME = "pickleStepSequence";
     }
 }

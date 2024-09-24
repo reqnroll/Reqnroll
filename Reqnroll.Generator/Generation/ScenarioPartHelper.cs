@@ -12,8 +12,6 @@ namespace Reqnroll.Generator.Generation
 {
     public class ScenarioPartHelper
     {
-        private const string BRINE = "PickleJar";
-
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
         private readonly CodeDomHelper _codeDomHelper;
         private int _tableCounter;
@@ -37,6 +35,7 @@ namespace Reqnroll.Generator.Generation
 
             backgroundMethod.Attributes = MemberAttributes.Public;
             backgroundMethod.Name = GeneratorConstants.BACKGROUND_NAME;
+            backgroundMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(PickleStepSequence), GeneratorConstants.PICKLESTEPSEQUENCE_PARAMETER_NAME));
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(backgroundMethod);
 
@@ -44,13 +43,14 @@ namespace Reqnroll.Generator.Generation
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, background.Location))
             {
             }
+            AddVariableForPickleStepSequenceFromMethodParameter(backgroundMethod);
 
             foreach (var step in background.Steps)
             {
                 GenerateStep(generationContext, statements, step, null);
             }
             backgroundMethod.Statements.AddRange(statements.ToArray());
-            
+
         }
         #region Rule Background Support
 
@@ -96,9 +96,9 @@ namespace Reqnroll.Generator.Generation
                 GetDocStringArgExpression(scenarioStep.Argument as DocString, paramToIdentifier),
                 GetTableArgExpression(scenarioStep.Argument as Gherkin.Ast.DataTable, statements, paramToIdentifier),
                 new CodePrimitiveExpression(scenarioStep.Keyword),
-                new CodePropertyReferenceExpression(new CodeVariableReferenceExpression(PickleStepSequence.PICKLESTEPSEQUENCE_VARIABLE_NAME), "CurrentPickleStepId")
+                new CodePropertyReferenceExpression(new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME), "CurrentPickleStepId")
             };
-            
+
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, gherkinStep.Location))
             {
                 var expression = new CodeMethodInvokeExpression(
@@ -109,6 +109,10 @@ namespace Reqnroll.Generator.Generation
                 _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
                 statements.Add(new CodeExpressionStatement(expression));
+                statements.Add(new CodeExpressionStatement(new CodeMethodInvokeExpression(
+                                                                new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME),
+                                                                "NextStep")));
+
             }
         }
 
@@ -222,13 +226,58 @@ namespace Reqnroll.Generator.Generation
                 return new CodePrimitiveExpression(text);
             }
 
-            var formatArguments = new List<CodeExpression> {new CodePrimitiveExpression(formatText)};
+            var formatArguments = new List<CodeExpression> { new CodePrimitiveExpression(formatText) };
             formatArguments.AddRange(arguments.Select(id => new CodeVariableReferenceExpression(id)));
 
             return new CodeMethodInvokeExpression(
                 new CodeTypeReferenceExpression(typeof(string)),
                 "Format",
                 formatArguments.ToArray());
+        }
+        public void AddVariableForPickleId(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, PickleJar pickleJar)
+        {
+            // string m_pickleId = pickleJar.CurrentPickleId; or
+            // string m_pickleId = @pickleId;
+            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), GeneratorConstants.PICKLEID_VARIABLE_NAME,
+                pickleIdIncludedInParameters ?
+                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEID_PARAMETER_NAME) :
+                    new CodePrimitiveExpression(pickleJar.CurrentPickleId));
+            testMethod.Statements.Add(pickleIdVariable);
+        }
+
+        public void AddVariableForPickleStepSequenceFromMethodParameter(CodeMemberMethod testMethod)
+        {
+            var pickleStepSequence = new CodeVariableDeclarationStatement(typeof(PickleStepSequence), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
+                new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_PARAMETER_NAME));
+
+            testMethod.Statements.Add(pickleStepSequence);
+        }
+
+        public void AddVariableForPickleStepSequenceForPickleId(CodeMemberMethod testMethod)
+        {
+            // m_pickleStepSequence = testRunner.FeatureContext.FeatureInfo.FeatureCucumberMessages.PickleJar.PickleStepSequenceFor(m_pickleId);
+            var pickleStepSequence = new CodeVariableDeclarationStatement(typeof(PickleStepSequence), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
+                // Right side of the assignment (property access chain)
+                
+                new CodeMethodInvokeExpression(
+                    new CodePropertyReferenceExpression(
+                        new CodePropertyReferenceExpression(
+                            new CodePropertyReferenceExpression(
+                                new CodePropertyReferenceExpression(
+                                    new CodeVariableReferenceExpression(GeneratorConstants.TESTRUNNER_FIELD),
+                                    "FeatureContext"
+                                ),
+                                "FeatureInfo"
+                            ),
+                            "FeatureCucumberMessages"
+                        ),
+                        "PickleJar"
+                    ),
+                    "PickleStepSequenceFor",
+                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEID_VARIABLE_NAME))
+                );
+
+            testMethod.Statements.Add(pickleStepSequence);
         }
     }
 }
