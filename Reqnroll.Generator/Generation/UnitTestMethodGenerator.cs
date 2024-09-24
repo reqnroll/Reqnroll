@@ -18,8 +18,6 @@ namespace Reqnroll.Generator.Generation
     public class UnitTestMethodGenerator
     {
         private const string PICKLEJAR = "PICKLEJAR";
-        private const string PICKLEID_PARAMETER_NAME = "@pickleId";
-        private const string PICKLEID_VARIABLE_NAME = "m_pickleId";
         private const string IGNORE_TAG = "@Ignore";
         private const string TESTRUNNER_FIELD = "testRunner";
         private readonly CodeDomHelper _codeDomHelper;
@@ -212,7 +210,7 @@ namespace Reqnroll.Generator.Generation
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME),
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_ARGUMENTS_VARIABLE_NAME),
                         inheritedTagsExpression,
-                        new CodeVariableReferenceExpression(PICKLEID_VARIABLE_NAME))));
+                        new CodeVariableReferenceExpression(GeneratorConstants.PICKLEID_VARIABLE_NAME))));
 
             GenerateScenarioInitializeCall(generationContext, scenarioDefinition, testMethod);
 
@@ -221,40 +219,14 @@ namespace Reqnroll.Generator.Generation
             GenerateScenarioCleanupMethodCall(generationContext, testMethod);
         }
 
-        private void AddVariableForPickleId(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, PickleJar pickleJar)
+        internal void AddVariableForPickleId(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, PickleJar pickleJar)
         {
-            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), PICKLEID_VARIABLE_NAME,
-                pickleIdIncludedInParameters ?
-                    new CodeVariableReferenceExpression(PICKLEID_PARAMETER_NAME) :
-                    new CodePrimitiveExpression(pickleJar.CurrentPickleId));
-            testMethod.Statements.Add(pickleIdVariable);
+            _scenarioPartHelper.AddVariableForPickleId(testMethod, pickleIdIncludedInParameters, pickleJar);
         }
 
-        private void AddVariableForPickleStepSequence(CodeMemberMethod testMethod)
+        internal void AddVariableForPickleStepSequence(CodeMemberMethod testMethod)
         {
-            // m_pickleStepSequence = testRunner.FeatureContext.FeatureInfo.FeatureCucumberMessages.PickleJar.PickleStepSequenceFor(m_pickleId);
-            var pickleStepSequence = new CodeVariableDeclarationStatement(typeof(PickleStepSequence), PickleStepSequence.PICKLESTEPSEQUENCE_VARIABLE_NAME,
-                // Right side of the assignment (property access chain)
-
-                new CodeMethodInvokeExpression(
-                    new CodePropertyReferenceExpression(
-                        new CodePropertyReferenceExpression(
-                            new CodePropertyReferenceExpression(
-                                new CodePropertyReferenceExpression(
-                                    new CodeVariableReferenceExpression(TESTRUNNER_FIELD),
-                                    "FeatureContext"
-                                ),
-                                "FeatureInfo"
-                            ),
-                            "FeatureCucumberMessages"
-                        ),
-                        "PickleJar"
-                    ),
-                    "PickleStepSequenceFor",
-                    new CodeVariableReferenceExpression(PICKLEID_VARIABLE_NAME))
-                );
-
-            testMethod.Statements.Add(pickleStepSequence);
+            _scenarioPartHelper.AddVariableForPickleStepSequenceForPickleId(testMethod);
         }
         private void AddVariableForTags(CodeMemberMethod testMethod, CodeExpression tagsExpression)
         {
@@ -310,7 +282,8 @@ namespace Reqnroll.Generator.Generation
                 {
                     var backgroundMethodCallExpression = new CodeMethodInvokeExpression(
                         new CodeThisReferenceExpression(),
-                        generationContext.FeatureBackgroundMethod.Name);
+                        generationContext.FeatureBackgroundMethod.Name,
+                        new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME));
 
                     _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(backgroundMethodCallExpression);
                     statementsWhenScenarioIsExecuted.Add(new CodeExpressionStatement(backgroundMethodCallExpression));
@@ -322,9 +295,6 @@ namespace Reqnroll.Generator.Generation
             foreach (var scenarioStep in scenario.Steps)
             {
                 _scenarioPartHelper.GenerateStep(generationContext, statementsWhenScenarioIsExecuted, scenarioStep, paramToIdentifier);
-                statementsWhenScenarioIsExecuted.Add(new CodeExpressionStatement(new CodeMethodInvokeExpression(
-                                                                                new CodeVariableReferenceExpression(PickleStepSequence.PICKLESTEPSEQUENCE_VARIABLE_NAME),
-                                                                                "NextStep")));
             }
 
             var tagsOfScenarioVariableReferenceExpression = new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME);
@@ -433,7 +403,7 @@ namespace Reqnroll.Generator.Generation
                 foreach (var row in examples.TableBody)
                 {
                     var arguments = row.Cells.Select(c => c.Value).Concat<string>(new[] { _pickleJar.CurrentPickleId });
-                    
+
                     _unitTestGeneratorProvider.SetRow(generationContext, scenatioOutlineTestMethod, arguments, GetNonIgnoreTags(examples.Tags), HasIgnoreTag(examples.Tags));
 
                     _pickleJar.NextPickle();
@@ -497,7 +467,7 @@ namespace Reqnroll.Generator.Generation
             {
                 testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), pair.Value));
             }
-            testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), @"@pickleId"));
+            testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), GeneratorConstants.PICKLEID_PARAMETER_NAME));
             testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string[]), GeneratorConstants.SCENARIO_OUTLINE_EXAMPLE_TAGS_PARAMETER));
             return testMethod;
         }

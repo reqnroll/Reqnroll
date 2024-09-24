@@ -45,7 +45,6 @@ namespace Reqnroll.CucumberMessages
 
     public class PickleStepSequence
     {
-        public static string PICKLESTEPSEQUENCE_VARIABLE_NAME = "m_pickleStepSequence";
         public Pickle CurrentPickle { get; }
 
         private int _PickleStepCounter;

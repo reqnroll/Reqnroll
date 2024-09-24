@@ -262,6 +262,7 @@ namespace CucumberMessages.CompatibilityTests
 
         [TestMethod]
         [DataRow("ambiguous", "ambiguous")]
+        [DataRow("background", "background")]
         public void NonCCKScenarios(string testName, string featureNameText)
         {
             CCKScenarios(testName, featureNameText);

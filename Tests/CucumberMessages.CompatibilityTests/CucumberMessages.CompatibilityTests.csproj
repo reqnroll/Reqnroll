@@ -12,6 +12,7 @@
   <ItemGroup>
     <Compile Remove="CCK\ambiguous\Ambiguous.cs" />
     <Compile Remove="CCK\attachments\attachments.cs" />
+    <Compile Remove="CCK\background\background.cs" />
     <Compile Remove="CCK\cdata\cdata.cs" />
     <Compile Remove="CCK\data-tables\data_tables.cs" />
     <Compile Remove="CCK\examples-tables\examples_tables.cs" />
@@ -31,6 +32,8 @@
     <None Remove="CCK\ambiguous\ambiguous.feature.ndjson" />
     <None Remove="CCK\attachments\attachments.feature" />
     <None Remove="CCK\attachments\attachments.feature.ndjson" />
+    <None Remove="CCK\background\background.feature" />
+    <None Remove="CCK\background\background.feature.ndjson" />
     <None Remove="CCK\cdata\cdata.feature" />
     <None Remove="CCK\cdata\cdata.feature.ndjson" />
     <None Remove="CCK\data-tables\data_tables.feature" />
@@ -67,6 +70,9 @@
     <Content Include="CCK\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="CCK\background\background.cs" />
+    <EmbeddedResource Include="CCK\background\background.feature" />
+    <EmbeddedResource Include="CCK\background\background.feature.ndjson" />
     <EmbeddedResource Include="CCK\cdata\cdata.cs" />
     <EmbeddedResource Include="CCK\cdata\cdata.feature" />
     <Content Include="CCK\cdata\cdata.feature.ndjson">
