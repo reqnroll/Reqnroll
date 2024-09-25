@@ -34,22 +34,20 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         private string baseDirectory = "";
         private Lazy<ITraceListener>? traceListener;
         private ITraceListener? trace => traceListener?.Value;
-        private IObjectContainer? objectContainer;
+        private IObjectContainer? testThreadObjectContainer;
 
         public FileSinkPlugin()
         {
-            traceListener = new Lazy<ITraceListener>(() => objectContainer!.Resolve<ITraceListener>());
+            traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
 
-            runtimePluginEvents.RegisterGlobalDependencies += (sender, args) => args.ObjectContainer.RegisterInstanceAs<ICucumberMessageSink>(this);
-
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
                 var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                objectContainer = args.ObjectContainer;
+                testThreadObjectContainer = args.ObjectContainer;
                 testThreadExecutionEventPublisher.AddHandler<TestRunStartedEvent>(LaunchFileSink);
                 testThreadExecutionEventPublisher.AddHandler<TestRunFinishedEvent>(CloseFileSink);
             };
@@ -83,6 +81,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
             trace?.WriteTestOutput("FileSinkPlugin Starting File Sink long running thread.");
             fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
+            testThreadObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this);
         }
 
         public void Publish(ReqnrollCucumberMessage message)
