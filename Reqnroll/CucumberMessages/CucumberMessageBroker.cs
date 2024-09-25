@@ -23,7 +23,7 @@ namespace Reqnroll.CucumberMessages
     {
         private IObjectContainer _objectContainer;
 
-        public bool Enabled => _objectContainer.ResolveAll<ICucumberMessageSink>().ToList().Count > 0;
+        public bool Enabled => RegisteredSinks.Value.ToList().Count > 0;
 
         private Lazy<IEnumerable<ICucumberMessageSink>> RegisteredSinks; 
 
