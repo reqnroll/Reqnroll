@@ -17,6 +17,7 @@ using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.CucumberMessages;
+using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
 
 namespace Reqnroll.Infrastructure
 {
@@ -104,6 +105,7 @@ namespace Reqnroll.Infrastructure
             //Support for publishing Cucumber Messages
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
+            container.RegisterTypeAs<FileSinkPlugin, IRuntimePlugin>("FileSinkPlugin");
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
