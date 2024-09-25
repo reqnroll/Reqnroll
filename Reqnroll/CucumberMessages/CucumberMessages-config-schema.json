@@ -1,0 +1,34 @@
+﻿{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+        "filSinkEnabled": {
+            "type": "boolean",
+            "description": "Indicates whether the program is enabled or not"
+        },
+        "destinations": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "enabled": {
+                        "type": "boolean",
+                        "description": "Indicates whether this destination setting is enabled"
+                    },
+                    "basePath": {
+                        "type": "string",
+                        "description": "The base path for output files"
+                    },
+                    "outputDirectory": {
+                        "type": "string",
+                        "description": "The directory path where output should go"
+                    }
+                },
+                "required": [ "enabled", "basePath", "outputDirectory" ]
+            },
+            "minItems": 1,
+            "description": "Array of destination settings"
+        }
+    },
+    "required": [ "programEnabled", "destinations" ]
+}
