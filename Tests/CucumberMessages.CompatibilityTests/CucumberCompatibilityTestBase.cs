@@ -16,11 +16,15 @@ namespace CucumberMessages.CompatibilityTests
             // TEMPORARY: this is in place so that SystemTestBase.TestCleanup does not run (which deletes the generated code)
         }
 
-        protected void AddCucumberMessagePlugIn()
+        protected void EnableCucumberMessages()
         {
-            _projectsDriver.AddNuGetPackage("Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin", "2.1.1-local");
+            Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ENABLED", "true");
         }
 
+        protected void DisableCucumberMessages()
+        {
+            Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ENABLED", "false");
+        }
         protected void AddBindingClassFromResource(string fileName, string? prefix = null, Assembly? assemblyToLoadFrom = null)
         {
             var bindingCLassFileContent = _testFileManager.GetTestFileContent(fileName, prefix, assemblyToLoadFrom);

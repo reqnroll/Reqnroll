@@ -21,12 +21,13 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
     public class FileSinkPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configuration.json";
+        private const string CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE = "REQNROLL_CUCUMBER_MESSAGES_ENABLED";
         private Task? fileWritingTask;
+        private object _lock = new();
 
         //Thread safe collections to hold:
         // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
         // 2. Dictionary of Feature Streams (Key: Feature Name, Value: StreamWriter)
-        private object _lock = new();
         private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
         private readonly ConcurrentDictionary<string, StreamWriter> fileStreams = new();
         private FileSinkConfiguration? configuration;
@@ -53,33 +54,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 testThreadExecutionEventPublisher.AddHandler<TestRunFinishedEvent>(CloseFileSink);
             };
         }
-
-        private string ProcessConfiguration(FileSinkConfiguration configuration)
-        {
-            var activeDestination = configuration.Destinations.Where(d => d.Enabled).FirstOrDefault();
-
-            if (activeDestination != null)
-            {
-                var basePath = Path.Combine(activeDestination.BasePath, activeDestination.OutputDirectory);
-                if (!Directory.Exists(basePath))
-                {
-                    lock (_lock)
-                    {
-                        if (!Directory.Exists(basePath))
-                            Directory.CreateDirectory(basePath);
-                    }
-                }
-                trace?.WriteTestOutput($"FileSinkPlugin Initialized. BasePath: {basePath}");
-                return basePath;
-            }
-            else
-            {
-                var location = Assembly.GetExecutingAssembly().Location;
-                trace?.WriteTestOutput($"FileSinkPlugin Initialized from Assembly Location. BasePath: {location}");
-                return location;
-            }
-        }
-
         private void CloseFileSink(TestRunFinishedEvent @event)
         {
             trace?.WriteTestOutput("FileSinkPlugin Closing File Sink long running thread.");
@@ -90,16 +64,24 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
-            trace?.WriteTestOutput("FileSinkPlugin Starting File Sink long running thread.");
-            configuration = JsonSerializer.Deserialize<FileSinkConfiguration>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
-            if (!configuration!.FileSinkEnabled)
+            bool environmentEnabled = "true".Equals(Environment.GetEnvironmentVariable(CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE), StringComparison.InvariantCultureIgnoreCase);
+            bool environmentLocationSpecified = !String.IsNullOrEmpty(FileSinkConfiguration.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_DIRECTORY_ENVIRONMENT_VARIABLE);
+            if (File.Exists(CUCUMBERMESSAGESCONFIGURATIONFILENAME))
             {
-                trace?.WriteTestOutput("FileSinkPlugin LaunchFileSink. FileSinkEnabled = false. Returning");
+                configuration = JsonSerializer.Deserialize<FileSinkConfiguration>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
+            }
+            else if (environmentEnabled && environmentLocationSpecified)
+                configuration = new FileSinkConfiguration(true);
+            else configuration = new FileSinkConfiguration(false);
+            if (!configuration.FileSinkEnabled)
+            {
+                trace?.WriteTestOutput("FileSinkPlugin LaunchFileSink. Cucumber Messages is DISABLED.");
                 return;
             }
 
-            baseDirectory = ProcessConfiguration(configuration);
+            baseDirectory = configuration.ConfiguredOutputDirectory(trace);
 
+            trace?.WriteTestOutput("FileSinkPlugin Starting File Sink long running thread.");
             fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
         }
 
