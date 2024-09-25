@@ -1,7 +1,9 @@
 using Moq;
+using Reqnroll.Configuration;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using System;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
@@ -38,10 +40,10 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var traceListenerMock = new Mock<ITraceListener>();
             var attachmentHandlerMock = new Mock<IReqnrollAttachmentHandler>();
             var contextManager = new Mock<IContextManager>();
-            var featureContext = new Mock<IFeatureContext>();
             var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "test feature", null);
-            featureContext.SetupGet(fc => fc.FeatureInfo).Returns(featureInfo);
-            contextManager.SetupGet(c => c.FeatureContext).Returns(featureContext.Object as FeatureContext);
+            var config = new ReqnrollConfiguration(ConfigSource.Json, null, null, null, null, false, MissingOrPendingStepsOutcome.Error, false, false, TimeSpan.FromSeconds(10), Reqnroll.BindingSkeletons.StepDefinitionSkeletonStyle.CucumberExpressionAttribute, null, false, false, new string[] { }, ObsoleteBehavior.Error, false);
+            var featureContext = new FeatureContext(null, featureInfo, config);
+            contextManager.SetupGet(c => c.FeatureContext).Returns(featureContext);
 
             return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher.Object, traceListenerMock.Object, attachmentHandlerMock.Object, contextManager.Object);
         }

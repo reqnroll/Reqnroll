@@ -23,7 +23,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
     public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configurationDTO.json";
-        private const string CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE = "REQNROLL_CUCUMBER_MESSAGES_ENABLED";
         private Task? fileWritingTask;
         private object _lock = new();
 
@@ -64,8 +63,8 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
             var environment = testThreadObjectContainer!.Resolve<IEnvironmentWrapper>();
-            var enabledResult = environment.GetEnvironmentVariable(CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
-            var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "false";
+            var enabledResult = environment.GetEnvironmentVariable(CucumberConfiguration.REQNROLL_CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
+            var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "TRUE";
             bool environmentEnabled = "true".Equals(enabled, StringComparison.InvariantCultureIgnoreCase);
 
             bool environmentLocationSpecified = environment.GetEnvironmentVariable(CucumberConfiguration.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_DIRECTORY_ENVIRONMENT_VARIABLE) is Success<string>;
