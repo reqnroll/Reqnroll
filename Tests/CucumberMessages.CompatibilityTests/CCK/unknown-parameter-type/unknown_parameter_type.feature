@@ -1,4 +1,4 @@
-Feature: Parameter Types
+Feature: Unknown Parameter Types
   Cucumber will generate an error message if a step definition registers
   an unknown parameter type, but the suite will run.
 
