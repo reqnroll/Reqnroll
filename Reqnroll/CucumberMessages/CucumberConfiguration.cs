@@ -11,6 +11,8 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
     {
         internal const string REQNROLL_CUCUMBER_MESSAGES_OUTPUT_DIRECTORY_ENVIRONMENT_VARIABLE = "REQNROLL_CUCUMBER_MESSAGES_OUTPUT_DIRECTORY";
         internal const string REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE = "REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE";
+        public const string REQNROLL_CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE = "REQNROLL_CUCUMBER_MESSAGES_ENABLED";
+
         private ITraceListener _trace;
         private IEnvironmentWrapper _environmentWrapper;
         private object _lock = new();
