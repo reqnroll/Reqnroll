@@ -12,6 +12,10 @@ using Reqnroll.TestProjectGenerator;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Reqnroll.TestProjectGenerator.Driver;
 using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
+using Moq;
+using Reqnroll.Tracing;
+using Reqnroll.EnvironmentAccess;
+using SpecFlow.Internal.Json;
 
 namespace CucumberMessages.CompatibilityTests
 {
@@ -315,9 +319,12 @@ namespace CucumberMessages.CompatibilityTests
         {
             var configFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "CucumberMessages.configuration.json");
 
-            var config = System.Text.Json.JsonSerializer.Deserialize<FileSinkConfiguration>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            var config = System.Text.Json.JsonSerializer.Deserialize<CucumberOutputConfiguration>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-            var resultLocation = config!.ConfiguredOutputDirectory(null);
+            var tracerMock = new Mock<ITraceListener>();
+            var env = new EnvironmentWrapper();
+            CucumberConfiguration configuration = new CucumberConfiguration(tracerMock.Object, env);
+            var resultLocation = configuration.ConfigureOutputDirectory(config);
 
             // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
 

@@ -38,6 +38,10 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var traceListenerMock = new Mock<ITraceListener>();
             var attachmentHandlerMock = new Mock<IReqnrollAttachmentHandler>();
             var contextManager = new Mock<IContextManager>();
+            var featureContext = new Mock<IFeatureContext>();
+            var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "test feature", null);
+            featureContext.SetupGet(fc => fc.FeatureInfo).Returns(featureInfo);
+            contextManager.SetupGet(c => c.FeatureContext).Returns(featureContext.Object as FeatureContext);
 
             return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher.Object, traceListenerMock.Object, attachmentHandlerMock.Object, contextManager.Object);
         }

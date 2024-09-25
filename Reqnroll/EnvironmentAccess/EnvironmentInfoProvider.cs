@@ -9,11 +9,11 @@ namespace Reqnroll.EnvironmentAccess
 {
     public class EnvironmentInfoProvider : IEnvironmentInfoProvider
     {
-        private readonly IEnvironmentWrapper environmentWrapper;
+        private IEnvironmentWrapper EnvironmentWrapper { get;  set; }
 
         public EnvironmentInfoProvider(IEnvironmentWrapper environmentWrapper)
         {
-            this.environmentWrapper = environmentWrapper;
+            EnvironmentWrapper = environmentWrapper;
         }
 
         public string GetOSPlatform()
@@ -60,11 +60,12 @@ namespace Reqnroll.EnvironmentAccess
                 { "CI_NAME", "CodeShip" }
             };
 
+
         public string GetBuildServerName()
         {
             foreach (var buildServerType in buildServerTypes)
             {
-                var envVariable = environmentWrapper.GetEnvironmentVariable(buildServerType.Key);
+                var envVariable = EnvironmentWrapper.GetEnvironmentVariable(buildServerType.Key);
                 if (envVariable is ISuccess<string>)
                     return buildServerType.Value;
             }
@@ -73,7 +74,7 @@ namespace Reqnroll.EnvironmentAccess
 
         public bool IsRunningInDockerContainer()
         {
-            return environmentWrapper.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") is ISuccess<string>;
+            return EnvironmentWrapper.GetEnvironmentVariable("DOTNET_RUNNING_IN_CONTAINER") is ISuccess<string>;
         }
 
         public string GetReqnrollVersion()
