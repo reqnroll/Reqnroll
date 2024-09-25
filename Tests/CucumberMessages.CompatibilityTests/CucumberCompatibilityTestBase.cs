@@ -19,6 +19,7 @@ namespace CucumberMessages.CompatibilityTests
         protected void EnableCucumberMessages()
         {
             Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ENABLED", "true");
+            Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE", "LOCAL");
         }
 
         protected void DisableCucumberMessages()

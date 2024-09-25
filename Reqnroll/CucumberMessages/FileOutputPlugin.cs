@@ -14,13 +14,15 @@ using System;
 using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
+using Reqnroll.EnvironmentAccess;
+using Reqnroll.CommonModels;
 
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 {
-    public class FileSinkPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
+    public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
-        private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configuration.json";
+        private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configurationDTO.json";
         private const string CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE = "REQNROLL_CUCUMBER_MESSAGES_ENABLED";
         private Task? fileWritingTask;
         private object _lock = new();
@@ -30,13 +32,12 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         // 2. Dictionary of Feature Streams (Key: Feature Name, Value: StreamWriter)
         private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
         private readonly ConcurrentDictionary<string, StreamWriter> fileStreams = new();
-        private FileSinkConfiguration? configuration;
         private string baseDirectory = "";
         private Lazy<ITraceListener>? traceListener;
         private ITraceListener? trace => traceListener?.Value;
         private IObjectContainer? testThreadObjectContainer;
 
-        public FileSinkPlugin()
+        public FileOutputPlugin()
         {
             traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
         }
@@ -54,7 +55,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         }
         private void CloseFileSink(TestRunFinishedEvent @event)
         {
-            trace?.WriteTestOutput("FileSinkPlugin Closing File Sink long running thread.");
+            trace?.WriteTestOutput("FileOutputPlugin Closing File Sink long running thread.");
             postedMessages.CompleteAdding();
             fileWritingTask?.Wait();
             fileWritingTask = null;
@@ -62,24 +63,32 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
-            bool environmentEnabled = "true".Equals(Environment.GetEnvironmentVariable(CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE), StringComparison.InvariantCultureIgnoreCase);
-            bool environmentLocationSpecified = !String.IsNullOrEmpty(FileSinkConfiguration.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_DIRECTORY_ENVIRONMENT_VARIABLE);
+            var environment = testThreadObjectContainer!.Resolve<IEnvironmentWrapper>();
+            var enabledResult = environment.GetEnvironmentVariable(CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
+            var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "false";
+            bool environmentEnabled = "true".Equals(enabled, StringComparison.InvariantCultureIgnoreCase);
+
+            bool environmentLocationSpecified = environment.GetEnvironmentVariable(CucumberConfiguration.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_DIRECTORY_ENVIRONMENT_VARIABLE) is Success<string>;
+            
+            CucumberOutputConfiguration configurationDTO;
             if (File.Exists(CUCUMBERMESSAGESCONFIGURATIONFILENAME))
             {
-                configuration = JsonSerializer.Deserialize<FileSinkConfiguration>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
+                configurationDTO = JsonSerializer.Deserialize<CucumberOutputConfiguration>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
             }
             else if (environmentEnabled && environmentLocationSpecified)
-                configuration = new FileSinkConfiguration(true);
-            else configuration = new FileSinkConfiguration(false);
-            if (!configuration.FileSinkEnabled)
+                configurationDTO = new CucumberOutputConfiguration(true);
+            else configurationDTO = new CucumberOutputConfiguration(false);
+            var configuration = new CucumberConfiguration(trace, environment);
+
+            if (!configurationDTO.FileOutputEnabled)
             {
-                trace?.WriteTestOutput("FileSinkPlugin LaunchFileSink. Cucumber Messages is DISABLED.");
+                trace?.WriteTestOutput("FileOutputPlugin LaunchFileSink. Cucumber Messages is DISABLED.");
                 return;
             }
 
-            baseDirectory = configuration.ConfiguredOutputDirectory(trace);
+            baseDirectory = configuration.ConfigureOutputDirectory(configurationDTO);
 
-            trace?.WriteTestOutput("FileSinkPlugin Starting File Sink long running thread.");
+            trace?.WriteTestOutput("FileOutputPlugin Starting File Sink long running thread.");
             fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
             testThreadObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this);
         }
@@ -87,7 +96,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         public void Publish(ReqnrollCucumberMessage message)
         {
             var contentType = message.Envelope == null ? "End of Messages Marker" : message.Envelope.Content().GetType().Name;
-            trace?.WriteTestOutput($"FileSinkPlugin Publish. Cucumber Message: {message.CucumberMessageSource}: {contentType}");
+            trace?.WriteTestOutput($"FileOutputPlugin Publish. Cucumber Message: {message.CucumberMessageSource}: {contentType}");
             postedMessages.Add(message);
         }
 
@@ -100,12 +109,12 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 if (message.Envelope != null)
                 {
                     var cm = Serialize(message.Envelope);
-                    trace?.WriteTestOutput($"FileSinkPlugin ConsumeAndWriteToFiles. Cucumber Message: {message.CucumberMessageSource}: {cm.Substring(0, 20)}");
+                    trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. Cucumber Message: {message.CucumberMessageSource}: {cm.Substring(0, 20)}");
                     await Write(featureName, cm);
                 }
                 else
                 {
-                    trace?.WriteTestOutput($"FileSinkPlugin ConsumeAndWriteToFiles. End of Messages Marker Received.");
+                    trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. End of Messages Marker Received.");
                     CloseFeatureStream(featureName);
                 }
             }
@@ -130,18 +139,18 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                         }
                     }
                 }
-                trace?.WriteTestOutput($"FileSinkPlugin Write. Writing to: {featureName}. Cucumber Message: {featureName}: {cucumberMessage.Substring(0, 20)}");
+                trace?.WriteTestOutput($"FileOutputPlugin Write. Writing to: {featureName}. Cucumber Message: {featureName}: {cucumberMessage.Substring(0, 20)}");
                 await fileStreams[featureName].WriteLineAsync(cucumberMessage);
             }
             catch (System.Exception ex)
             {
-                trace?.WriteTestOutput($"FileSinkPlugin Write. Exception: {ex.Message}");
+                trace?.WriteTestOutput($"FileOutputPlugin Write. Exception: {ex.Message}");
             }
         }
 
         private void CloseFeatureStream(string featureName)
         {
-            trace?.WriteTestOutput($"FileSinkPlugin CloseFeatureStream. Closing: {featureName}.");
+            trace?.WriteTestOutput($"FileOutputPlugin CloseFeatureStream. Closing: {featureName}.");
             fileStreams[featureName].Close();
             fileStreams.TryRemove(featureName, out var _);
         }
