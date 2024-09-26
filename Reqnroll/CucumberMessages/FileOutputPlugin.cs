@@ -16,13 +16,14 @@ using System.IO;
 using System.Linq;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.CommonModels;
+using System.Diagnostics;
 
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 {
     public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
-        private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configurationDTO.json";
+        private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configuration.json";
         private Task? fileWritingTask;
         private object _lock = new();
 
@@ -32,17 +33,24 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
         private readonly ConcurrentDictionary<string, StreamWriter> fileStreams = new();
         private string baseDirectory = "";
-        private Lazy<ITraceListener>? traceListener;
-        private ITraceListener? trace => traceListener?.Value;
+        private Lazy<ITraceListener> traceListener;
+        private ITraceListener? trace => traceListener.Value;
         private IObjectContainer? testThreadObjectContainer;
+        private IObjectContainer? globalObjectContainer;
+
 
         public FileOutputPlugin()
         {
             traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
+            //Debugger.Launch();
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
+            runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
+            {
+                globalObjectContainer = args.ObjectContainer;
+            };
 
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
@@ -65,19 +73,15 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             var environment = testThreadObjectContainer!.Resolve<IEnvironmentWrapper>();
             var enabledResult = environment.GetEnvironmentVariable(CucumberConfiguration.REQNROLL_CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
             var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "TRUE";
-            bool environmentEnabled = "true".Equals(enabled, StringComparison.InvariantCultureIgnoreCase);
+            bool isMessagesEnabled = "true".Equals(enabled, StringComparison.InvariantCultureIgnoreCase);
 
-            bool environmentLocationSpecified = environment.GetEnvironmentVariable(CucumberConfiguration.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_DIRECTORY_ENVIRONMENT_VARIABLE) is Success<string>;
-            
             CucumberOutputConfiguration configurationDTO;
             if (File.Exists(CUCUMBERMESSAGESCONFIGURATIONFILENAME))
             {
                 configurationDTO = JsonSerializer.Deserialize<CucumberOutputConfiguration>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
             }
-            else if (environmentEnabled && environmentLocationSpecified)
-                configurationDTO = new CucumberOutputConfiguration(true);
-            else configurationDTO = new CucumberOutputConfiguration(false);
-            var configuration = new CucumberConfiguration(trace, environment);
+            else 
+                configurationDTO = new CucumberOutputConfiguration(isMessagesEnabled);
 
             if (!configurationDTO.FileOutputEnabled)
             {
@@ -85,11 +89,12 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 return;
             }
 
+            var configuration = new CucumberConfiguration(trace, environment);
             baseDirectory = configuration.ConfigureOutputDirectory(configurationDTO);
 
             trace?.WriteTestOutput("FileOutputPlugin Starting File Sink long running thread.");
             fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
-            testThreadObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this);
+            globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
 
         public void Publish(ReqnrollCucumberMessage message)
@@ -154,6 +159,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             fileStreams.TryRemove(featureName, out var _);
         }
         private bool disposedValue;
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposedValue)

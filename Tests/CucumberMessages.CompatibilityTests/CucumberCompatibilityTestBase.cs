@@ -1,10 +1,15 @@
 ﻿using FluentAssertions;
+using Moq;
+using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.SystemTests;
+using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CucumberMessages.CompatibilityTests
@@ -61,5 +66,19 @@ namespace CucumberMessages.CompatibilityTests
             var configFileContent = File.ReadAllText(configFileName);
             _projectsDriver.AddFile(configFileName, configFileContent);
         }
+
+        protected static string ActualsResultLocationDirectory()
+        {
+            var configFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "CucumberMessages.configuration.json");
+
+            var config = System.Text.Json.JsonSerializer.Deserialize<CucumberOutputConfiguration>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+            var tracerMock = new Mock<ITraceListener>();
+            var env = new EnvironmentWrapper();
+            CucumberConfiguration configuration = new CucumberConfiguration(tracerMock.Object, env);
+            var resultLocation = configuration.ConfigureOutputDirectory(config);
+            return resultLocation;
+        }
+
     }
 }
