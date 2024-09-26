@@ -35,7 +35,7 @@ namespace Reqnroll.Generator.Generation
 
             backgroundMethod.Attributes = MemberAttributes.Public;
             backgroundMethod.Name = GeneratorConstants.BACKGROUND_NAME;
-            backgroundMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(PickleStepSequence), GeneratorConstants.PICKLESTEPSEQUENCE_PARAMETER_NAME));
+            backgroundMethod.Parameters.Add(new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(PickleStepSequence)), GeneratorConstants.PICKLESTEPSEQUENCE_PARAMETER_NAME));
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(backgroundMethod);
 
@@ -247,7 +247,7 @@ namespace Reqnroll.Generator.Generation
 
         public void AddVariableForPickleStepSequenceFromMethodParameter(CodeMemberMethod testMethod)
         {
-            var pickleStepSequence = new CodeVariableDeclarationStatement(typeof(PickleStepSequence), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
+            var pickleStepSequence = new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(PickleStepSequence)), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
                 new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_PARAMETER_NAME));
 
             testMethod.Statements.Add(pickleStepSequence);
@@ -256,7 +256,7 @@ namespace Reqnroll.Generator.Generation
         public void AddVariableForPickleStepSequenceForPickleId(CodeMemberMethod testMethod)
         {
             // m_pickleStepSequence = testRunner.FeatureContext.FeatureInfo.FeatureCucumberMessages.PickleJar.PickleStepSequenceFor(m_pickleId);
-            var pickleStepSequence = new CodeVariableDeclarationStatement(typeof(PickleStepSequence), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
+            var pickleStepSequence = new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(PickleStepSequence)), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
                 // Right side of the assignment (property access chain)
                 
                 new CodeMethodInvokeExpression(
