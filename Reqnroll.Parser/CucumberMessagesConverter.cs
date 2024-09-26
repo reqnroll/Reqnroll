@@ -24,7 +24,9 @@ namespace Reqnroll.Parser
 
         public Source ConvertToCucumberMessagesSource(ReqnrollDocument gherkinDocument)
         {
-            var sourceText = File.ReadAllText(gherkinDocument.SourceFilePath);
+            string sourceText = $"Source Document: {gherkinDocument.SourceFilePath} not found.";
+            if (File.Exists(gherkinDocument.SourceFilePath))
+                sourceText = File.ReadAllText(gherkinDocument.SourceFilePath);
             return new Source
             {
                 Uri = Path.Combine(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath)),

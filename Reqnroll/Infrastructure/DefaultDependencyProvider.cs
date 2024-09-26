@@ -103,9 +103,9 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
 
             //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<FileOutputPlugin, IRuntimePlugin>("FileOutputPlugin");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
-            container.RegisterTypeAs<FileOutputPlugin, IRuntimePlugin>("FileOutputPlugin");
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)

@@ -2,7 +2,7 @@
     "fileOutputEnabled": true,
     "destinations": [
         {
-            "profileName": "DEV",
+            "profileName": "LOCAL",
             "basePath": "C:\\Users\\clrud\\source\\repos\\scratch",
             "outputDirectory": "CucumberMessages"
         }

@@ -13,16 +13,16 @@ namespace Reqnroll.CucumberMessages
 {
     public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin
     {
-        private ICucumberMessageBroker broker;
+        private Lazy<ICucumberMessageBroker> _brokerFactory;
+        private ICucumberMessageBroker _broker;
         private IObjectContainer objectContainer;
         private ConcurrentDictionary<string, FeatureTracker> StartedFeatures = new();
         private ConcurrentDictionary<string, TestCaseCucumberMessageTracker> testCaseTrackersById = new();
         bool Enabled = false;
 
-        public CucumberMessagePublisher(ICucumberMessageBroker CucumberMessageBroker, IObjectContainer objectContainer)
+        public CucumberMessagePublisher()
         {
-            //Debugger.Launch();
-            broker = CucumberMessageBroker;
+            _brokerFactory = new Lazy<ICucumberMessageBroker>(() => objectContainer.Resolve<ICucumberMessageBroker>());
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
@@ -50,13 +50,14 @@ namespace Reqnroll.CucumberMessages
 
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
+            _broker = _brokerFactory.Value;
             var traceListener = objectContainer.Resolve<ITraceListener>();
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
 
             // This checks to confirm that the Feature was successfully serialized into the required GherkinDocument and Pickles;
             // if not, then this is disabled for this feature
-            // if true, then it checks with the broker to confirm that a listener/sink has been registered
-            Enabled = broker.Enabled;
+            // if true, then it checks with the _broker to confirm that a listener/sink has been registered
+            Enabled = _broker.Enabled;
             if (!Enabled)
             {
                 traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: Broker is disabled for {featureName}.");
@@ -75,7 +76,7 @@ namespace Reqnroll.CucumberMessages
             {
                 foreach (var msg in ft.StaticMessages)
                 {
-                    broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                    _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
                 }
             }
         }
@@ -96,8 +97,8 @@ namespace Reqnroll.CucumberMessages
             {
                 var testRunStatus = featureTestCases.All(tc => tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK);
                 var msg = Io.Cucumber.Messages.Types.Envelope.Create(CucumberMessageFactory.ToTestRunFinished(testRunStatus, featureFinishedEvent));
-                broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
-                broker.Complete(featureName);
+                _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                _broker.Complete(featureName);
             }
             else
             {
@@ -139,7 +140,7 @@ namespace Reqnroll.CucumberMessages
 
             foreach (var msg in tccmt.TestCaseCucumberMessages())
             {
-                broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = tccmt.FeatureName, Envelope = msg });
+                _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = tccmt.FeatureName, Envelope = msg });
             }
         }
 
