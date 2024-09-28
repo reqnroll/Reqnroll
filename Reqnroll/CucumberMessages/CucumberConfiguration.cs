@@ -55,7 +55,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             else if (outputDirectory == configuredOutputDirectory) logEntry = $"FileOutputPlugin Initialized from Configuration File. BasePath: {configuredOutputDirectory}";
             else logEntry = $"FileOutputPlugin Initialized from Environment Variable. BasePath: {environmentVariableOutputDirectory}";
 
-            _trace?.WriteTestOutput(logEntry);
+            _trace!.WriteTestOutput(logEntry);
             if (!Directory.Exists(outputDirectory))
             {
                 lock (_lock)

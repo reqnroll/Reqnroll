@@ -12,7 +12,7 @@ namespace Reqnroll.Parser
         {
             var patchedFeatureLocation = PatchLocation(feature.Location);
             var patchedFeature = new Feature(
-                feature.Tags.ToArray(),
+                feature.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(),
                 patchedFeatureLocation,
                 feature.Language,
                 feature.Keyword,
@@ -25,12 +25,12 @@ namespace Reqnroll.Parser
         protected override Scenario GetTransformedScenario(Scenario scenario)
         {
             return new Scenario(
-                scenario.Tags.ToArray(),
+                scenario.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(),
                 PatchLocation(scenario.Location),
                 scenario.Keyword,
                 scenario.Name,
                 scenario.Description,
-                scenario.Steps.ToArray(),
+                scenario.Steps.Select( s => new Step(PatchLocation(s.Location), s.Keyword, s.KeywordType, s.Text, s.Argument)).ToArray(),
                 scenario.Examples.ToArray());
         }
 
@@ -42,23 +42,23 @@ namespace Reqnroll.Parser
             var exampleTables = scenarioOutline.Examples;
             List<Examples> transformedExamples = new List<Examples>();
 
-            transformedExamples.AddRange(exampleTables.Select(e => PatchLocations(e)));
+            transformedExamples.AddRange(exampleTables.Select(e => PatchExamplesLocations(e)));
             return new ScenarioOutline(
-                scenarioOutline.Tags.ToArray(),
+                scenarioOutline.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(),
                 PatchLocation(scenarioOutline.Location),
                 scenarioOutline.Keyword,
                 scenarioOutline.Name,
                 scenarioOutline.Description,
-                scenarioOutline.Steps.ToArray(),
+                scenarioOutline.Steps.Select(s => new Step(PatchLocation(s.Location), s.Keyword, s.KeywordType, s.Text, s.Argument)).ToArray(),
                 transformedExamples.ToArray());
         }
 
-        private Examples PatchLocations(Examples e)
+        private Examples PatchExamplesLocations(Examples e)
         {
             var headerCells = e.TableHeader.Cells;
             var tableHeader = new Gherkin.Ast.TableRow(PatchLocation(e.TableHeader.Location), headerCells.Select(hc => new Gherkin.Ast.TableCell(PatchLocation(hc.Location), hc.Value)).ToArray());
             var rows = e.TableBody.Select(r => new Gherkin.Ast.TableRow(PatchLocation(r.Location), r.Cells.Select(c => new Gherkin.Ast.TableCell(PatchLocation(c.Location), c.Value)).ToArray())).ToArray();
-            return new Examples(e.Tags.ToArray(), PatchLocation(e.Location), e.Keyword, e.Name, e.Description, tableHeader, rows);
+            return new Examples(e.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(), PatchLocation(e.Location), e.Keyword, e.Name, e.Description, tableHeader, rows);
         }
 
         private static Location PatchLocation(Location l)

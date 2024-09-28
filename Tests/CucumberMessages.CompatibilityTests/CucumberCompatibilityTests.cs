@@ -79,6 +79,31 @@ namespace CucumberMessages.CompatibilityTests
 
             ShouldAllScenariosPass();
         }
+        [TestMethod]
+        public void SmokeTestMultipleFeatures()
+        {
+            ResetCucumberMessages("Cucumber Messages Smoke Test.ndjson");
+            ResetCucumberMessages("Cucumber Messages Smoke Test Second Smoke Test.ndjson");
+            EnableCucumberMessages();
+            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Test
+                  Scenario: Eating Cukes
+                     When I eat 5 cukes
+                """);
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Test Second Smoke Test
+                  Scenario: Eating Other Cukes
+                     When I eat 6 cukes
+                """);
+
+            AddPassingStepBinding("When");
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+        }
+
 
         [TestMethod]
         public void SmokeOutlineTest()

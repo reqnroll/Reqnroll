@@ -46,8 +46,8 @@ namespace Reqnroll.CucumberMessages
         // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
         public IIdGenerator IDGenerator { get; set; }
 
-        public Dictionary<string, StepProcessorBase> StepsById { get; private set; } = new();
-        public Dictionary<ExecutionEvent, StepProcessorBase> StepsByEvent { get; private set; } = new();
+        private Dictionary<string, StepProcessorBase> StepsById { get; set; } = new();
+        private Dictionary<ExecutionEvent, StepProcessorBase> StepsByEvent { get; set; } = new();
         public List<StepProcessorBase> Steps
         {
             get

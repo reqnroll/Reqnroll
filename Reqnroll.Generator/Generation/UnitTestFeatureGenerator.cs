@@ -48,7 +48,6 @@ namespace Reqnroll.Generator.Generation
 
         public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
         {
-            Debugger.Launch();
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
 
