@@ -26,7 +26,7 @@ namespace Reqnroll.CucumberMessages
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
-            runtimePluginEvents.CustomizeFeatureDependencies += (sender, args) =>
+            runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
                 objectContainer = args.ObjectContainer;
                 _brokerFactory = new Lazy<ICucumberMessageBroker>(() => objectContainer.Resolve<ICucumberMessageBroker>());
@@ -184,7 +184,9 @@ namespace Reqnroll.CucumberMessages
             if (!Enabled)
                 return;
 
-            var testCaseTrackerId = hookBindingStartedEvent.ContextManager.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            // FeatureContext and FeatureInfo will not be available for BeforeTestRun, AfterTestRun, BeforeFeature, AfterFeature hooks. 
+            // Bypass them by checking for null
+            var testCaseTrackerId = hookBindingStartedEvent.ContextManager.FeatureContext?.FeatureInfo?.CucumberMessages_TestCaseTrackerId;
             if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
                 tccmt.ProcessEvent(hookBindingStartedEvent);
         }
@@ -194,7 +196,9 @@ namespace Reqnroll.CucumberMessages
             if (!Enabled)
                 return;
 
-            var testCaseTrackerId = hookBindingFinishedEvent.ContextManager.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            // FeatureContext and FeatureInfo will not be available for BeforeTestRun, AfterTestRun, BeforeFeature, AfterFeature hooks. 
+            // Bypass them by checking for null
+            var testCaseTrackerId = hookBindingFinishedEvent.ContextManager.FeatureContext?.FeatureInfo?.CucumberMessages_TestCaseTrackerId;
             if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
                 tccmt.ProcessEvent(hookBindingFinishedEvent);
         }
