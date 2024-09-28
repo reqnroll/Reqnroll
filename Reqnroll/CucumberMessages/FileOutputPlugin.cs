@@ -85,13 +85,13 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
             if (!configurationDTO.FileOutputEnabled)
             {
-                trace?.WriteTestOutput("FileOutputPlugin LaunchFileSink. Cucumber Messages is DISABLED.");
+                trace!.WriteTestOutput("FileOutputPlugin LaunchFileSink. Cucumber Messages is DISABLED.");
                 return;
             }
 
             var configuration = new CucumberConfiguration(trace, environment);
             baseDirectory = configuration.ConfigureOutputDirectory(configurationDTO);
-
+            trace!.WriteTestOutput($"FileOutputPlugin LaunchFileSink. Cucumber Messages is ENABLED. Base Directory: {baseDirectory}");
             trace?.WriteTestOutput("FileOutputPlugin Starting File Sink long running thread.");
             fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
@@ -100,7 +100,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         public void Publish(ReqnrollCucumberMessage message)
         {
             var contentType = message.Envelope == null ? "End of Messages Marker" : message.Envelope.Content().GetType().Name;
-            trace?.WriteTestOutput($"FileOutputPlugin Publish. Cucumber Message: {message.CucumberMessageSource}: {contentType}");
+            //trace?.WriteTestOutput($"FileOutputPlugin Publish. Cucumber Message: {message.CucumberMessageSource}: {contentType}");
             postedMessages.Add(message);
         }
 
@@ -113,12 +113,12 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 if (message.Envelope != null)
                 {
                     var cm = Serialize(message.Envelope);
-                    trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. Cucumber Message: {message.CucumberMessageSource}: {cm.Substring(0, 20)}");
+                    //trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. Cucumber Message: {message.CucumberMessageSource}: {cm.Substring(0, 20)}");
                     await Write(featureName, cm);
                 }
                 else
                 {
-                    trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. End of Messages Marker Received.");
+                    //trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. End of Messages Marker Received.");
                     CloseFeatureStream(featureName);
                 }
             }
@@ -139,11 +139,11 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                     {
                         if (!fileStreams.ContainsKey(featureName))
                         {
-                            fileStreams[featureName] = File.CreateText(Path.Combine(baseDirectory, $"{featureName}.ndjson"));
+                            fileStreams[featureName] = File.CreateText(Path.Combine(baseDirectory, SanitizeFileName($"{featureName}.ndjson")));
                         }
                     }
                 }
-                trace?.WriteTestOutput($"FileOutputPlugin Write. Writing to: {featureName}. Cucumber Message: {featureName}: {cucumberMessage.Substring(0, 20)}");
+                trace?.WriteTestOutput($"FileOutputPlugin Write. Writing to: {SanitizeFileName($"{featureName}.ndjson")}. Cucumber Message: {featureName}: {cucumberMessage.Substring(0, 20)}");
                 await fileStreams[featureName].WriteLineAsync(cucumberMessage);
             }
             catch (System.Exception ex)
@@ -186,5 +186,31 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
+        public static string SanitizeFileName(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            // Get the invalid characters for file names
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+
+            // Replace invalid characters with underscores
+            string sanitized = new string(input.Select(c => invalidChars.Contains(c) ? '_' : c).ToArray());
+
+            // Remove leading and trailing spaces and dots
+            sanitized = sanitized.Trim().Trim('.');
+
+            // Ensure the filename is not empty after sanitization
+            if (string.IsNullOrEmpty(sanitized))
+                return "_";
+
+            // Truncate the filename if it's too long (255 characters is a common limit)
+            const int maxLength = 255;
+            if (sanitized.Length > maxLength)
+                sanitized = sanitized.Substring(0, maxLength);
+
+            return sanitized;
+        }
+
     }
 }

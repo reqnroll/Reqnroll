@@ -70,9 +70,11 @@
     <Content Include="CCK\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="CCK\background\background.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\background\background.cs" />
     <EmbeddedResource Include="CCK\background\background.feature" />
-    <EmbeddedResource Include="CCK\background\background.feature.ndjson" />
     <EmbeddedResource Include="CCK\cdata\cdata.cs" />
     <EmbeddedResource Include="CCK\cdata\cdata.feature" />
     <Content Include="CCK\cdata\cdata.feature.ndjson">

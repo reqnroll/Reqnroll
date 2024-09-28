@@ -22,7 +22,7 @@ namespace Reqnroll.CucumberMessages
 
         public CucumberMessagePublisher()
         {
-            Debugger.Launch();
+            //Debugger.Launch();
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
@@ -127,9 +127,9 @@ namespace Reqnroll.CucumberMessages
                 {
                     var id = featureName + scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId;
                     var tccmt = new TestCaseCucumberMessageTracker(featureTracker);
+                    tccmt.ProcessEvent(scenarioStartedEvent);
                     traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} {id} started");
                     testCaseTrackersById.TryAdd(id, tccmt);
-                    tccmt.ProcessEvent(scenarioStartedEvent);
                 }
                 else
                 {
