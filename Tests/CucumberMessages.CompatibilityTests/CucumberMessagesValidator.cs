@@ -148,8 +148,11 @@ namespace CucumberMessages.CompatibilityTests
 
         private void ActualTestExecutionMessagesShouldReferBackToTheSameStepTextAsExpected()
         {
-            // For each TestStepStarted message, ensure that the pickle step referred to is the same in Actual and Expected for the corresponding testStepStarted message
+            // IF the expected results contains no TestStepStarted messages, then there is nothing to check
+            if (!expecteds_elementsByType.Keys.Contains(typeof(TestStepStarted)))
+                return;
 
+            // For each TestStepStarted message, ensure that the pickle step referred to is the same in Actual and Expected for the corresponding testStepStarted message
             var actualTestStepStarted_TestStepIds = actuals_elementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Select(tss => tss.TestStepId).ToList();
             var expectedTestStepStarteds_TestStepIds = expecteds_elementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Select(tss => tss.TestStepId).ToList();
 
@@ -190,12 +193,16 @@ namespace CucumberMessages.CompatibilityTests
             var testCaseStartedIds = testCaseStarteds.Select(tcs => tcs.Id).ToList();
 
             var testCaseFinisheds = actuals_elementsByType[typeof(TestCaseFinished)].OfType<TestCaseFinished>().ToList();
+            testCaseStartedIds.Should().Contain(id => testCaseFinisheds.Any(tcf => tcf.TestCaseStartedId == id), "a test case started should be referenced by a test case finished message");
+
+            // IF the Scenario has no steps, return early.
+            if (!actuals_elementsByType.Keys.Contains(typeof(TestStepStarted)))
+                return;
             var testStepStarteds = actuals_elementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().ToList();
             var testStepFinisheds = actuals_elementsByType[typeof(TestStepFinished)].OfType<TestStepFinished>().ToList();
-
+            
             testCaseStartedIds.Should().Contain(id => testStepStarteds.Any(tss => tss.TestCaseStartedId == id), "a test case started should be referenced by at least one test step started message");
             testCaseStartedIds.Should().Contain(id => testStepFinisheds.Any(tsf => tsf.TestCaseStartedId == id), "a test case started should be referenced by at least one test step finished message");
-            testCaseStartedIds.Should().Contain(id => testCaseFinisheds.Any(tcf => tcf.TestCaseStartedId == id), "a test case started should be referenced by a test case finished message");
         }
 
         private void TestExecutionMessagesShouldProperlyNest()

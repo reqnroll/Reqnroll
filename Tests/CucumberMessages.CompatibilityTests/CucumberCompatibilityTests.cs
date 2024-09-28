@@ -282,6 +282,7 @@ namespace CucumberMessages.CompatibilityTests
         [DataRow("minimal", "minimal")]
         [DataRow("cdata", "cdata")]
         [DataRow("pending", "Pending steps")]
+        [DataRow("empty", "Empty Scenarios")]
         [DataRow("examples-tables", "Examples Tables")]
         [DataRow("data-tables", "Data Tables")]
         [DataRow("hooks", "Hooks")]
