@@ -15,6 +15,7 @@
     <Compile Remove="CCK\background\background.cs" />
     <Compile Remove="CCK\cdata\cdata.cs" />
     <Compile Remove="CCK\data-tables\data_tables.cs" />
+    <Compile Remove="CCK\empty\empty.cs" />
     <Compile Remove="CCK\examples-tables\examples_tables.cs" />
     <Compile Remove="CCK\hooks\hooks.cs" />
     <Compile Remove="CCK\minimal\minimal.cs" />
@@ -38,6 +39,8 @@
     <None Remove="CCK\cdata\cdata.feature.ndjson" />
     <None Remove="CCK\data-tables\data_tables.feature" />
     <None Remove="CCK\data-tables\data_tables.feature.ndjson" />
+    <None Remove="CCK\empty\empty.feature" />
+    <None Remove="CCK\empty\empty.feature.ndjson" />
     <None Remove="CCK\examples-tables\examples_tables.feature" />
     <None Remove="CCK\examples-tables\examples_tables.feature.ndjson" />
     <None Remove="CCK\hooks\hooks.feature" />
@@ -73,6 +76,9 @@
     <Content Include="CCK\background\background.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="CCK\empty\empty.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="CCK\background\background.cs" />
     <EmbeddedResource Include="CCK\background\background.feature" />
     <EmbeddedResource Include="CCK\cdata\cdata.cs" />
@@ -85,6 +91,8 @@
     <Content Include="CCK\data-tables\data_tables.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="CCK\empty\empty.cs" />
+    <EmbeddedResource Include="CCK\empty\empty.feature" />
     <EmbeddedResource Include="CCK\examples-tables\examples_tables.cs" />
     <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature" />
     <Content Include="CCK\examples-tables\examples_tables.feature.ndjson">
