@@ -15,3 +15,11 @@ Scenario: Transfer Money
 	When I transfer $150 from savings to checking
 	Then My checking account has a balance of $650
 	And My savings account has a balance of $50
+
+Rule: A rule with a background
+	Background: First Transfer Money
+		When I transfer $50 from savings to checking
+		Then My savings account has a balance of $150
+	Scenario: total balance unchanged
+		When the accounts are combined
+		Then I have $700

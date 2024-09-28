@@ -5,7 +5,7 @@ using Gherkin.Ast;
 
 namespace Reqnroll.Parser
 {
-    abstract class ScenarioTransformation : GherkinDocumentVisitor
+    abstract class ScenarioTransformationVisitor : GherkinDocumentVisitor
     {
         protected ReqnrollDocument _sourceDocument;
         private ReqnrollDocument _transformedDocument;

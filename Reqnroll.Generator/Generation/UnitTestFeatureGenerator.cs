@@ -1,6 +1,7 @@
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -47,6 +48,7 @@ namespace Reqnroll.Generator.Generation
 
         public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
         {
+            Debugger.Launch();
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
 
@@ -227,6 +229,7 @@ namespace Reqnroll.Generator.Generation
             try 
             {
                 //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
+                //TODO: make the type of IDGenerator configurable
                 var messageConverter = new CucumberMessagesConverter(new IncrementingIdGenerator());
                 var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
                 var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);

@@ -6,11 +6,32 @@ using System.Text;
 
 namespace Reqnroll.Parser
 {
-    internal class PatchMissingLocationElementsTransformation : ScenarioTransformation
+    internal class PatchMissingLocationElementsTransformation : ScenarioTransformationVisitor
     {
+        protected override void OnFeatureVisited(Feature feature)
+        {
+            var patchedFeatureLocation = PatchLocation(feature.Location);
+            var patchedFeature = new Feature(
+                feature.Tags.ToArray(),
+                patchedFeatureLocation,
+                feature.Language,
+                feature.Keyword,
+                feature.Name,
+                feature.Description,
+                feature.Children.ToArray());
+            base.OnFeatureVisited(patchedFeature);
+
+        }
         protected override Scenario GetTransformedScenario(Scenario scenario)
         {
-            return null;
+            return new Scenario(
+                scenario.Tags.ToArray(),
+                PatchLocation(scenario.Location),
+                scenario.Keyword,
+                scenario.Name,
+                scenario.Description,
+                scenario.Steps.ToArray(),
+                scenario.Examples.ToArray());
         }
 
         protected override Scenario GetTransformedScenarioOutline(ScenarioOutline scenarioOutline)
