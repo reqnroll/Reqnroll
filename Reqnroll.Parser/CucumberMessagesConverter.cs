@@ -24,15 +24,26 @@ namespace Reqnroll.Parser
 
         public Source ConvertToCucumberMessagesSource(ReqnrollDocument gherkinDocument)
         {
-            string sourceText = $"Source Document: {gherkinDocument.SourceFilePath} not found.";
             if (File.Exists(gherkinDocument.SourceFilePath))
-                sourceText = File.ReadAllText(gherkinDocument.SourceFilePath);
-            return new Source
             {
-                Uri = Path.Combine(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath)),
-                Data = sourceText,
-                MediaType = "text/x.cucumber.gherkin+plain"
-            };
+                var sourceText = File.ReadAllText(gherkinDocument.SourceFilePath);
+                return new Source
+                {
+                    Uri = Path.Combine(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath)),
+                    Data = sourceText,
+                    MediaType = "text/x.cucumber.gherkin+plain"
+                };
+            }
+            else
+            {
+                return new Source
+                {
+                    Uri = "Unknown",
+                    Data = $"Source Document: {gherkinDocument.SourceFilePath} not found.",
+                    MediaType = "text/x.cucumber.gherkin+plain"
+                };
+
+            }
         }
 
         public IEnumerable<Pickle> ConvertToCucumberMessagesPickles(GherkinDocument gherkinDocument)

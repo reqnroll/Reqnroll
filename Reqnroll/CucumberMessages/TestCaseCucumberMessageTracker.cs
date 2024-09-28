@@ -120,6 +120,7 @@ namespace Reqnroll.CucumberMessages
 
         public IEnumerable<Envelope> TestCaseCucumberMessages()
         {
+            if (!Enabled) return Enumerable.Empty<Envelope>();
             // Stage 2
             return _events.Select(e => InvokePostProcessEvent(e)).SelectMany(x => x);
         }

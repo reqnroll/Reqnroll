@@ -24,11 +24,13 @@ namespace Reqnroll.CucumberMessages
         public FeatureTracker(FeatureStartedEvent featureStartedEvent)
         {
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-            Enabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles == null ? false : true;
+            var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
+            Enabled = (featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null) ? true : false;
             PreProcessEvent(featureStartedEvent);
         }
         internal void PreProcessEvent(FeatureStartedEvent featureStartedEvent)
         {
+            if (!Enabled) return;
             // This has side-effects needed for proper execution of subsequent events; eg, the Ids of the static messages get generated and then subsequent events generate Ids that follow
             StaticMessages = GenerateStaticMessages(featureStartedEvent).ToList();
         }

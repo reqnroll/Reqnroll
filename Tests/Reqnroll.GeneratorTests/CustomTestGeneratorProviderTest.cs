@@ -66,7 +66,7 @@ namespace Reqnroll.GeneratorTests
             var parser = new ReqnrollGherkinParser(new CultureInfo("en-US"));
             using (var reader = new StringReader(SampleFeatureFile))
             {
-                var feature = parser.Parse(reader, null);
+                var feature = parser.Parse(reader, new ReqnrollDocumentLocation($"dummy_location_for_{nameof(GenerateScenarioExampleTests)}"));
                 feature.Should().NotBeNull();
                 
                 var sampleTestGeneratorProvider = new SimpleTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));

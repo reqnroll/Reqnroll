@@ -22,13 +22,14 @@ namespace Reqnroll.CucumberMessages
 
         public CucumberMessagePublisher()
         {
-            _brokerFactory = new Lazy<ICucumberMessageBroker>(() => objectContainer.Resolve<ICucumberMessageBroker>());
+            Debugger.Launch();
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
             runtimePluginEvents.CustomizeFeatureDependencies += (sender, args) =>
             {
                 objectContainer = args.ObjectContainer;
+                _brokerFactory = new Lazy<ICucumberMessageBroker>(() => objectContainer.Resolve<ICucumberMessageBroker>());
                 var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
                 HookIntoTestThreadExecutionEventPublisher(testThreadExecutionEventPublisher);
             };
@@ -72,7 +73,7 @@ namespace Reqnroll.CucumberMessages
 
             traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: {featureName}");
             var ft = new FeatureTracker(featureStartedEvent);
-            if (StartedFeatures.TryAdd(featureName, ft))
+            if (StartedFeatures.TryAdd(featureName, ft) && ft.Enabled)
             {
                 foreach (var msg in ft.StaticMessages)
                 {
@@ -90,6 +91,11 @@ namespace Reqnroll.CucumberMessages
                 return;
             }
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
+            if (!StartedFeatures.ContainsKey(featureName) || !StartedFeatures[featureName].Enabled)
+            {
+                traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureFinishedEventHandler: {featureName} was not started or is Disabled.");
+                return;
+            }
             var featureTestCases = testCaseTrackersById.Values.Where(tc => tc.FeatureName == featureName).ToList();
 
             // IF all TestCaseCucumberMessageTrackers are done, then send the messages to the CucumberMessageBroker
@@ -115,13 +121,21 @@ namespace Reqnroll.CucumberMessages
                 return;
             var traceListener = objectContainer.Resolve<ITraceListener>();
             var featureName = scenarioStartedEvent.FeatureContext.FeatureInfo.Title;
-            var id = featureName + scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                var tccmt = new TestCaseCucumberMessageTracker(featureTracker);
-                traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} {id} started");
-                testCaseTrackersById.TryAdd(id, tccmt);
-                tccmt.ProcessEvent(scenarioStartedEvent);
+                if (featureTracker.Enabled)
+                {
+                    var id = featureName + scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId;
+                    var tccmt = new TestCaseCucumberMessageTracker(featureTracker);
+                    traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} {id} started");
+                    testCaseTrackersById.TryAdd(id, tccmt);
+                    tccmt.ProcessEvent(scenarioStartedEvent);
+                }
+                else
+                {
+                    traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} FeatureTracker is disabled");
+                    return;
+                }
             }
             else
             {
@@ -134,13 +148,15 @@ namespace Reqnroll.CucumberMessages
         {
             if (!Enabled)
                 return;
-
-            var tccmt = testCaseTrackersById[scenarioFinishedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId];
-            tccmt.ProcessEvent(scenarioFinishedEvent);
-
-            foreach (var msg in tccmt.TestCaseCucumberMessages())
+            var testCaseTrackerId = scenarioFinishedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
             {
-                _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = tccmt.FeatureName, Envelope = msg });
+                tccmt.ProcessEvent(scenarioFinishedEvent);
+
+                foreach (var msg in tccmt.TestCaseCucumberMessages())
+                {
+                    _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = tccmt.FeatureName, Envelope = msg });
+                }
             }
         }
 
@@ -148,9 +164,9 @@ namespace Reqnroll.CucumberMessages
         {
             if (!Enabled)
                 return;
-
-            var tccmt = testCaseTrackersById[stepStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId];
-            tccmt.ProcessEvent(stepStartedEvent);
+            var testCaseTrackerId = stepStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
+                tccmt.ProcessEvent(stepStartedEvent);
         }
 
         private void StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
@@ -158,8 +174,9 @@ namespace Reqnroll.CucumberMessages
             if (!Enabled)
                 return;
 
-            var tccmt = testCaseTrackersById[stepFinishedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId];
-            tccmt.ProcessEvent(stepFinishedEvent);
+            var testCaseTrackerId = stepFinishedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
+                tccmt.ProcessEvent(stepFinishedEvent);
         }
 
         private void HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
@@ -167,8 +184,9 @@ namespace Reqnroll.CucumberMessages
             if (!Enabled)
                 return;
 
-            var tccmt = testCaseTrackersById[hookBindingStartedEvent.ContextManager.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId];
-            tccmt.ProcessEvent(hookBindingStartedEvent);
+            var testCaseTrackerId = hookBindingStartedEvent.ContextManager.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
+                tccmt.ProcessEvent(hookBindingStartedEvent);
         }
 
         private void HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
@@ -176,8 +194,9 @@ namespace Reqnroll.CucumberMessages
             if (!Enabled)
                 return;
 
-            var tccmt = testCaseTrackersById[hookBindingFinishedEvent.ContextManager.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId];
-            tccmt.ProcessEvent(hookBindingFinishedEvent);
+            var testCaseTrackerId = hookBindingFinishedEvent.ContextManager.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
+                tccmt.ProcessEvent(hookBindingFinishedEvent);
         }
 
         private void AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
@@ -185,8 +204,9 @@ namespace Reqnroll.CucumberMessages
             if (!Enabled)
                 return;
 
-            var tccmt = testCaseTrackersById[attachmentAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId];
-            tccmt.ProcessEvent(attachmentAddedEvent);
+            var testCaseTrackerId = attachmentAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
+                tccmt.ProcessEvent(attachmentAddedEvent);
         }
 
         private void OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
@@ -194,8 +214,9 @@ namespace Reqnroll.CucumberMessages
             if (!Enabled)
                 return;
 
-            var tccmt = testCaseTrackersById[outputAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId];
-            tccmt.ProcessEvent(outputAddedEvent);
+            var testCaseTrackerId = outputAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId;
+            if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
+                tccmt.ProcessEvent(outputAddedEvent);
         }
     }
 }
