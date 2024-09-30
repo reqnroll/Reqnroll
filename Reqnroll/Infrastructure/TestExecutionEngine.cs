@@ -622,11 +622,14 @@ namespace Reqnroll.Infrastructure
 
         #region Given-When-Then
 
-        public virtual async Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg, string pickleStepId = null)
+        public virtual async Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg)
         {
             StepDefinitionType stepDefinitionType = stepDefinitionKeyword == StepDefinitionKeyword.And || stepDefinitionKeyword == StepDefinitionKeyword.But
                 ? GetCurrentBindingType()
                 : (StepDefinitionType) stepDefinitionKeyword;
+            var stepSequenceIdentifiers = ScenarioContext.ScenarioInfo.PickleStepSequence;
+            var pickleStepId = stepSequenceIdentifiers?.CurrentPickleStepId ?? "";
+
             _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg, pickleStepId));
             _testThreadExecutionEventPublisher.PublishEvent(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
@@ -638,6 +641,7 @@ namespace Reqnroll.Infrastructure
             finally
             {
                 _testThreadExecutionEventPublisher.PublishEvent(new StepFinishedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
+                stepSequenceIdentifiers?.NextStep();
                 _contextManager.CleanupStepContext();
             }
         }

@@ -95,8 +95,7 @@ namespace Reqnroll.Generator.Generation
                 GetSubstitutedString(scenarioStep.Text, paramToIdentifier),
                 GetDocStringArgExpression(scenarioStep.Argument as DocString, paramToIdentifier),
                 GetTableArgExpression(scenarioStep.Argument as Gherkin.Ast.DataTable, statements, paramToIdentifier),
-                new CodePrimitiveExpression(scenarioStep.Keyword),
-                new CodePropertyReferenceExpression(new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME), "CurrentPickleStepId")
+                new CodePrimitiveExpression(scenarioStep.Keyword)
             };
 
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, gherkinStep.Location))
@@ -109,9 +108,6 @@ namespace Reqnroll.Generator.Generation
                 _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
                 statements.Add(new CodeExpressionStatement(expression));
-                statements.Add(new CodeExpressionStatement(new CodeMethodInvokeExpression(
-                                                                new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME),
-                                                                "NextStep")));
 
             }
         }
