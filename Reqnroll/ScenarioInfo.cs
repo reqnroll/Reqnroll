@@ -1,3 +1,4 @@
+using Reqnroll.CucumberMessages;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -40,8 +41,10 @@ namespace Reqnroll
         /// The PickleId of the Scenario when exported as a Cucumber Message "pickle".
         /// </summary>
         public string PickleId { get; }
+        // The list of step PickleIds in the step sequence for this test case.
+        public PickleStepSequence PickleStepSequence { get; private set; }
 
-        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleId = null)
+        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleId = null, PickleStepSequence stepSequence = null)
         {
             Title = title;
             Description = description;
@@ -49,6 +52,7 @@ namespace Reqnroll
             Arguments = arguments;
             CombinedTags = Tags.Concat(inheritedTags ?? Array.Empty<string>()).ToArray();
             PickleId = pickleId;
+            PickleStepSequence = stepSequence;
         }
     }
 }

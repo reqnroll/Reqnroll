@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Reqnroll.Bindings;
+using Reqnroll.CucumberMessages;
 
 namespace Reqnroll.Infrastructure
 {
@@ -22,7 +23,7 @@ namespace Reqnroll.Infrastructure
 
         void OnScenarioSkipped();
 
-        Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg, string pickleStepId);
+        Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg);
 
         void Pending();
     }

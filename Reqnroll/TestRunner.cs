@@ -73,29 +73,29 @@ namespace Reqnroll
             await _executionEngine.OnTestRunEndAsync();
         }
 
-        public async Task GivenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null, string pickleStepId = null)
+        public async Task GivenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null)
         {
-            await _executionEngine.StepAsync(StepDefinitionKeyword.Given, keyword, text, multilineTextArg, tableArg, pickleStepId);
+            await _executionEngine.StepAsync(StepDefinitionKeyword.Given, keyword, text, multilineTextArg, tableArg);
         }
 
-        public async Task WhenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null, string pickleStepId = null)
+        public async Task WhenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null)
         {
-            await _executionEngine.StepAsync(StepDefinitionKeyword.When, keyword, text, multilineTextArg, tableArg, pickleStepId);
+            await _executionEngine.StepAsync(StepDefinitionKeyword.When, keyword, text, multilineTextArg, tableArg);
         }
 
-        public async Task ThenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null, string pickleStepId = null)
+        public async Task ThenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null)
         {
-            await _executionEngine.StepAsync(StepDefinitionKeyword.Then, keyword, text, multilineTextArg, tableArg, pickleStepId);
+            await _executionEngine.StepAsync(StepDefinitionKeyword.Then, keyword, text, multilineTextArg, tableArg);
         }
 
-        public async Task AndAsync(string text, string multilineTextArg, Table tableArg, string keyword = null, string pickleStepId = null)
+        public async Task AndAsync(string text, string multilineTextArg, Table tableArg, string keyword = null)
         {
-            await _executionEngine.StepAsync(StepDefinitionKeyword.And, keyword, text, multilineTextArg, tableArg, pickleStepId);
+            await _executionEngine.StepAsync(StepDefinitionKeyword.And, keyword, text, multilineTextArg, tableArg);
         }
 
-        public async Task ButAsync(string text, string multilineTextArg, Table tableArg, string keyword = null, string pickleStepId = null)
+        public async Task ButAsync(string text, string multilineTextArg, Table tableArg, string keyword = null)
         {
-            await _executionEngine.StepAsync(StepDefinitionKeyword.But, keyword, text, multilineTextArg, tableArg, pickleStepId);
+            await _executionEngine.StepAsync(StepDefinitionKeyword.But, keyword, text, multilineTextArg, tableArg);
         }
 
         public void Pending()

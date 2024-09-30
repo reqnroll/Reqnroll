@@ -210,7 +210,8 @@ namespace Reqnroll.Generator.Generation
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME),
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_ARGUMENTS_VARIABLE_NAME),
                         inheritedTagsExpression,
-                        new CodeVariableReferenceExpression(GeneratorConstants.PICKLEID_VARIABLE_NAME))));
+                        new CodeVariableReferenceExpression(GeneratorConstants.PICKLEID_VARIABLE_NAME),
+                        new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME))));
 
             GenerateScenarioInitializeCall(generationContext, scenarioDefinition, testMethod);
 
