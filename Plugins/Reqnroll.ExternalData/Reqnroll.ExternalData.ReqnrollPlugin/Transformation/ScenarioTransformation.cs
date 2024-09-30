@@ -66,7 +66,7 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Transformation
 
         protected override void OnBackgroundVisited(Background background)
         {
-            _featureChildren.Add(background);
+            _currentChildren.Add(background);
         }
 
         protected override void OnRuleVisiting(Rule rule)
