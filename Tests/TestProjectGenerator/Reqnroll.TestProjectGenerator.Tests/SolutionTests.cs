@@ -27,26 +27,33 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
 
-        [Theory]
+        [SkippableTheory]
         [InlineData(ProgrammingLanguage.CSharp, "csproj")]
         [InlineData(ProgrammingLanguage.FSharp, "fsproj")]
         [InlineData(ProgrammingLanguage.VB, "vbproj")]
 
         public void CreateSolutionWithProject(ProgrammingLanguage programmingLanguage, string expectedEnding)
         {
-            string folder = Path.Combine(Path.GetTempPath(), "Reqnroll.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
+            try
+            {
+                string folder = Path.Combine(Path.GetTempPath(), "Reqnroll.TestProjectGenerator.Tests", Guid.NewGuid().ToString("N"));
 
-            var solution = new Solution("SolutionName");
-            var project = new Project("ProjectName", Guid.NewGuid(), programmingLanguage, TargetFramework.Net462, ProjectFormat.New);
+                var solution = new Solution("SolutionName");
+                var project = new Project("ProjectName", Guid.NewGuid(), programmingLanguage, TargetFramework.Net462, ProjectFormat.New);
 
-            solution.AddProject(project);
+                solution.AddProject(project);
 
-            var solutionWriter = CreateSolutionWriter();
+                var solutionWriter = CreateSolutionWriter();
 
-            solutionWriter.WriteToFileSystem(solution, folder);
+                solutionWriter.WriteToFileSystem(solution, folder);
 
-            File.Exists(Path.Combine(folder, "SolutionName.sln")).Should().BeTrue();
-            File.Exists(Path.Combine(folder, "ProjectName", $"ProjectName.{expectedEnding}")).Should().BeTrue();
+                File.Exists(Path.Combine(folder, "SolutionName.sln")).Should().BeTrue();
+                File.Exists(Path.Combine(folder, "ProjectName", $"ProjectName.{expectedEnding}")).Should().BeTrue();
+            }
+            catch (DotNetSdkNotInstalledException ex)
+            {
+                Skip.IfNot(new ConfigurationDriver().PipelineMode, ex.ToString());
+            }
         }
     }
 }
