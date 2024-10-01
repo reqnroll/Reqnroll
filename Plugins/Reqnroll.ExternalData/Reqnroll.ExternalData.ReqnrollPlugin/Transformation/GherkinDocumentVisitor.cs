@@ -69,7 +69,8 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin.Transformation
             OnRuleVisiting(rule);
             foreach (var ruleChild in rule.Children)
             {
-                if (ruleChild is ScenarioOutline scenarioOutline) AcceptScenarioOutline(scenarioOutline);
+                if (ruleChild is Background background) AcceptBackground(background);
+                else if (ruleChild is ScenarioOutline scenarioOutline) AcceptScenarioOutline(scenarioOutline);
                 else if (ruleChild is Scenario scenario) AcceptScenario(scenario);
             }
             OnRuleVisited(rule);
