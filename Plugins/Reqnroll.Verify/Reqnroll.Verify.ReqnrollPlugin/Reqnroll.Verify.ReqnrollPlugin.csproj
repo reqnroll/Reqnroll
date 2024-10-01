@@ -5,6 +5,7 @@
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
 
+    <PackageId>Reqnroll.Verify</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Verify.nuspec</NuspecFile>
 

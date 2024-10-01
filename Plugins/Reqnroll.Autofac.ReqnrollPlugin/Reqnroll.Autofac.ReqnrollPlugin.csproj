@@ -5,6 +5,7 @@
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
 
+    <PackageId>Reqnroll.Autofac</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Autofac.nuspec</NuspecFile>
     
