@@ -1,5 +1,5 @@
-# [vNext]
-* Fix: Rule Backgounds cause External Data Plugin to fail (#271) @clrudolphi
+# v2.1.0-local - 2024-08-09
+
 ## Bug fixes:
 * Modified VersionInfo class to force it to pull version information from the Reqnroll assembly
 * Fix: Reqnroll.CustomPlugin NuGet package has a version mismatch for the System.CodeDom dependency (#244)
