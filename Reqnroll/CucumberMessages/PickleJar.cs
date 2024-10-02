@@ -11,6 +11,8 @@ namespace Reqnroll.CucumberMessages
         public const string PICKLEJAR_VARIABLE_NAME = "m_pickleJar";
 
         public int _PickleCounter = 0;
+
+        public bool HasPickles { get; }
         public IEnumerable<Gherkin.CucumberMessages.Types.Pickle> Pickles { get; set; }
 
         //public PickleJar(IEnumerable<string> picklesJSON) : this(picklesJSON.Select(s => System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Pickle>(s)).ToList())
@@ -22,18 +24,22 @@ namespace Reqnroll.CucumberMessages
         {
             Pickles = pickles;
             _PickleCounter = pickleCounter;
+            HasPickles = pickles != null && pickles.Count() > 0;
         }
 
-        public string CurrentPickleId { get { return Pickles.ElementAt(_PickleCounter).Id; } }
+        public string CurrentPickleId
+        {
+            get
+            {
+                if (!HasPickles) return null;
+                return Pickles.ElementAt(_PickleCounter).Id;
+            }
+        }
         public Gherkin.CucumberMessages.Types.Pickle CurrentPickle { get { return Pickles.ElementAt(_PickleCounter); } }
 
-        public IEnumerable<string> PickleStepIdsFor(string pickleId)
-        {
-            return Pickles.Where(p => p.Id == pickleId).SelectMany(p => p.Steps.Select(s => s.Id)).ToArray();
-        }
         public PickleStepSequence PickleStepSequenceFor(string pickleId)
         {
-            return new PickleStepSequence(Pickles.Where(p => p.Id == pickleId).First());
+            return new PickleStepSequence(HasPickles, Pickles.Where(p => p.Id == pickleId).First());
         }
 
         public void NextPickle()
@@ -45,12 +51,14 @@ namespace Reqnroll.CucumberMessages
 
     public class PickleStepSequence
     {
+        public bool HasPickles { get; }
         public Pickle CurrentPickle { get; }
 
         private int _PickleStepCounter;
 
-        public PickleStepSequence(Gherkin.CucumberMessages.Types.Pickle pickle)
+        public PickleStepSequence(bool hasPickles, Gherkin.CucumberMessages.Types.Pickle pickle)
         {
+            HasPickles = hasPickles;
             CurrentPickle = pickle;
             _PickleStepCounter = 0;
         }
@@ -58,7 +66,14 @@ namespace Reqnroll.CucumberMessages
         {
             _PickleStepCounter++;
         }
-        public string CurrentPickleStepId { get { return CurrentPickle.Steps.ElementAt(_PickleStepCounter).Id; } }
+        public string CurrentPickleStepId
+        {
+            get
+            {
+                if (!HasPickles) return null;
+                return CurrentPickle.Steps.ElementAt(_PickleStepCounter).Id;
+            }
+        }
 
     }
 }

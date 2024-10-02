@@ -18,11 +18,11 @@ namespace Reqnroll.Generator.Generation
 {
     public class UnitTestFeatureGenerator : IFeatureGenerator
     {
-        private const string PICKLES = "Pickles";
         private const string PICKLEJAR = "PICKLEJAR";
 
         private readonly CodeDomHelper _codeDomHelper;
         private readonly IDecoratorRegistry _decoratorRegistry;
+        private readonly ITraceListener _traceListener;
         private readonly ScenarioPartHelper _scenarioPartHelper;
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
@@ -33,12 +33,14 @@ namespace Reqnroll.Generator.Generation
             IUnitTestGeneratorProvider testGeneratorProvider,
             CodeDomHelper codeDomHelper,
             ReqnrollConfiguration reqnrollConfiguration,
-            IDecoratorRegistry decoratorRegistry)
+            IDecoratorRegistry decoratorRegistry,
+            ITraceListener traceListener)
         {
             _testGeneratorProvider = testGeneratorProvider;
             _codeDomHelper = codeDomHelper;
             _reqnrollConfiguration = reqnrollConfiguration;
             _decoratorRegistry = decoratorRegistry;
+            _traceListener = traceListener;
             _linePragmaHandler = new LinePragmaHandler(_reqnrollConfiguration, _codeDomHelper);
             _scenarioPartHelper = new ScenarioPartHelper(_reqnrollConfiguration, _codeDomHelper);
             _unitTestMethodGenerator = new UnitTestMethodGenerator(testGeneratorProvider, decoratorRegistry, _codeDomHelper, _scenarioPartHelper, _reqnrollConfiguration);
@@ -240,14 +242,12 @@ namespace Reqnroll.Generator.Generation
                 featurePickleMessagesString = System.Text.Json.JsonSerializer.Serialize(featurePickleMessages);
 
                 // Save the Pickles to the GenerationContext so that the Pickle and Step Ids can be injected as arguments into the Scenario and Step method signatures
-                //TODO: Confirm whether the Pickles are nessessary as the PickleJar already includes them
-                generationContext.CustomData.Add(PICKLES, featurePickleMessages);
                 generationContext.CustomData.Add(PICKLEJAR, new PickleJar(featurePickleMessages));
             }
-            catch
+            catch(Exception e)
             {
+                _traceListener.WriteToolOutput($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
-                generationContext.CustomData.Add(PICKLES, null);
                 generationContext.CustomData.Add(PICKLEJAR, new PickleJar(new List<Gherkin.CucumberMessages.Types.Pickle>()));
                 return;            
             }
