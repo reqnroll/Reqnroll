@@ -1,0 +1,32 @@
+﻿{
+    "description": "This class holds configuration information from a configuration source.\nEach configuration source may provide one or more Profiles (such as Dev or Prod). \nThe default profile is always named \u0027DEFAULT\u0027.",
+    "type": "object",
+    "properties": {
+        "FileOutputEnabled": {
+            "type": "boolean"
+        },
+        "ActiveProfileName": {
+            "type": "string"
+        },
+        "Profiles": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "ProfileName": {
+                        "type": "string"
+                    },
+                    "BasePath": {
+                        "type": "string"
+                    },
+                    "OutputDirectory": {
+                        "type": "string"
+                    },
+                    "OutputFileName": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

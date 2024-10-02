@@ -1,6 +1,6 @@
 ﻿using FluentAssertions;
 using Moq;
-using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
+using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.SystemTests;
 using Reqnroll.Tracing;
@@ -23,8 +23,8 @@ namespace CucumberMessages.CompatibilityTests
 
         protected void EnableCucumberMessages()
         {
-            Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ENABLED", "true");
-            Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE", "LOCAL");
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE, "true");
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE, "LOCAL");
         }
 
         protected void DisableCucumberMessages()
@@ -69,14 +69,15 @@ namespace CucumberMessages.CompatibilityTests
 
         protected static string ActualsResultLocationDirectory()
         {
-            var configFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "CucumberMessages.configuration.json");
+            //var configFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "CucumberMessages.configuration.json");
 
-            var config = System.Text.Json.JsonSerializer.Deserialize<CucumberOutputConfiguration>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            //var config = System.Text.Json.JsonSerializer.Deserialize<ConfigurationDTO>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
             var tracerMock = new Mock<ITraceListener>();
             var env = new EnvironmentWrapper();
             CucumberConfiguration configuration = new CucumberConfiguration(tracerMock.Object, env);
-            var resultLocation = configuration.ConfigureOutputDirectory(config);
+            var resolvedconfiguration = configuration.ResolveConfiguration();
+            var resultLocation = Path.Combine(resolvedconfiguration.BaseDirectory, resolvedconfiguration.OutputDirectory);
             return resultLocation;
         }
 

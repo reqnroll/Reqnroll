@@ -17,13 +17,13 @@ using System.Linq;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.CommonModels;
 using System.Diagnostics;
+using Reqnroll.CucumberMessages.Configuration;
 
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 {
     public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
-        private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "CucumberMessages.configuration.json";
         private Task? fileWritingTask;
         private object _lock = new();
 
@@ -33,16 +33,18 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
         private readonly ConcurrentDictionary<string, StreamWriter> fileStreams = new();
         private string baseDirectory = "";
+        private ICucumberConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
         private ITraceListener? trace => traceListener.Value;
         private IObjectContainer? testThreadObjectContainer;
         private IObjectContainer? globalObjectContainer;
 
 
-        public FileOutputPlugin()
+        public FileOutputPlugin(ICucumberConfiguration configuration)
         {
+            _configuration = configuration;
             traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
-            //Debugger.Launch();
+            Debugger.Launch();
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
@@ -70,29 +72,18 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
-            var environment = testThreadObjectContainer!.Resolve<IEnvironmentWrapper>();
-            var enabledResult = environment.GetEnvironmentVariable(CucumberConfiguration.REQNROLL_CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
-            var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "TRUE";
-            bool isMessagesEnabled = "true".Equals(enabled, StringComparison.InvariantCultureIgnoreCase);
+            ResolvedConfiguration config = _configuration.ResolveConfiguration();
 
-            CucumberOutputConfiguration configurationDTO;
-            if (File.Exists(CUCUMBERMESSAGESCONFIGURATIONFILENAME))
+            if (!config.Enabled)
             {
-                configurationDTO = JsonSerializer.Deserialize<CucumberOutputConfiguration>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
-            }
-            else 
-                configurationDTO = new CucumberOutputConfiguration(isMessagesEnabled);
-
-            if (!configurationDTO.FileOutputEnabled)
-            {
-                trace!.WriteTestOutput("FileOutputPlugin LaunchFileSink. Cucumber Messages is DISABLED.");
+                trace!.WriteTestOutput("Cucumber Messages is DISABLED.");
+                // By returning here, we don't launch the File writing thread,
+                // and this class is not registered as a CucumberMessageSink, which indicates to the Broker that Messages are disabled.
                 return;
             }
+            baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
 
-            var configuration = new CucumberConfiguration(trace, environment);
-            baseDirectory = configuration.ConfigureOutputDirectory(configurationDTO);
-            trace!.WriteTestOutput($"FileOutputPlugin LaunchFileSink. Cucumber Messages is ENABLED. Base Directory: {baseDirectory}");
-            trace?.WriteTestOutput("FileOutputPlugin Starting File Sink long running thread.");
+            trace?.WriteToolOutput("Cuccumber Messages: Starting File Sink long running thread.");
             fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
