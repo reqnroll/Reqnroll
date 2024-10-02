@@ -11,6 +11,7 @@ using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
+using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {
@@ -51,7 +52,7 @@ namespace Reqnroll.GeneratorTests
             runtimeConfiguration.AllowRowTests = true;
             runtimeConfiguration.AllowDebugGeneratedFiles = true;
 
-            return new UnitTestFeatureGenerator(testGeneratorProvider, codeDomHelper, runtimeConfiguration, new DecoratorRegistryStub());
+            return new UnitTestFeatureGenerator(testGeneratorProvider, codeDomHelper, runtimeConfiguration, new DecoratorRegistryStub(), new DefaultListener());
         }
 
         /// <summary>

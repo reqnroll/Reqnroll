@@ -9,6 +9,7 @@ using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
+using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {
@@ -84,7 +85,7 @@ Scenario: Add two numbers
         {
             Configuration.ReqnrollConfiguration generatorReqnrollConfiguration = ConfigurationLoader.GetDefault();
             CodeDomHelper codeDomHelper = new CodeDomHelper(CodeDomProviderLanguage.CSharp);
-            UnitTestFeatureGenerator unitTestFeatureGenerator = new UnitTestFeatureGenerator(new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub());
+            UnitTestFeatureGenerator unitTestFeatureGenerator = new UnitTestFeatureGenerator(new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub(), new DefaultListener());
 
             var gherkinParserFactory = new ReqnrollGherkinParserFactory();
 

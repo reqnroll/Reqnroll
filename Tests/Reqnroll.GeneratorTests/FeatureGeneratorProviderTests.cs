@@ -6,6 +6,7 @@ using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.UnitTestProvider;
+using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {
@@ -17,7 +18,7 @@ namespace Reqnroll.GeneratorTests
             Configuration.ReqnrollConfiguration generatorReqnrollConfiguration = ConfigurationLoader.GetDefault();
             CodeDomHelper codeDomHelper = new CodeDomHelper(CodeDomProviderLanguage.CSharp);
             UnitTestFeatureGenerator unitTestFeatureGenerator = new UnitTestFeatureGenerator(
-                new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub());
+                new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub(), new DefaultListener());
 
             return new UnitTestFeatureGeneratorProvider(unitTestFeatureGenerator);
         }
