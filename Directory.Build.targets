@@ -35,6 +35,7 @@
     <!--Clears the NuGet cache manually until https://github.com/NuGet/Home/issues/5713 is fixed.-->
     <!--Implementation based on https://www.nyckel.com/blog/nuget-packages/.-->
     <Message Text="Cleaning local nuget cache $(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)"/>
-    <RemoveDir Directories="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)"/>
+    <RemoveDir Directories="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)" ContinueOnError="false" Condition="'$(REQNROLL_ENSURE_NUGET_CACHE_CLEARED)' != 'false'"/>
+    <RemoveDir Directories="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)" ContinueOnError="true"  Condition="'$(REQNROLL_ENSURE_NUGET_CACHE_CLEARED)' == 'false'"/>
   </Target>
 </Project>
