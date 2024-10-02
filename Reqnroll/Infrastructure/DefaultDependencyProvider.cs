@@ -18,6 +18,7 @@ using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.CucumberMessages;
 using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
+using Reqnroll.CucumberMessages.Configuration;
 
 namespace Reqnroll.Infrastructure
 {
@@ -103,6 +104,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
 
             //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<CucumberConfiguration, ICucumberConfiguration>();
             container.RegisterTypeAs<FileOutputPlugin, IRuntimePlugin>("FileOutputPlugin");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");

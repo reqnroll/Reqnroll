@@ -1,6 +1,7 @@
 ﻿{
     "fileOutputEnabled": true,
-    "destinations": [
+    "activeProfileName": "LOCAL",
+    "profiles": [
         {
             "profileName": "LOCAL",
             "basePath": "C:\\Users\\clrud\\source\\repos\\scratch",
