@@ -5,7 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using Gherkin.Ast;
 using Reqnroll.Configuration;
-using Reqnroll.CucumberMessages;
+using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;

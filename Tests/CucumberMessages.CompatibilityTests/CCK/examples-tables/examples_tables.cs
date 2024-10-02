@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
 {
     [Binding]
-    internal class example_tables
+    internal class Example_tables
     {
         private int _count;
         private int _friends;

@@ -27,10 +27,43 @@ namespace CucumberMessages.CompatibilityTests
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE, "LOCAL");
         }
 
+        protected void SetCucumberMessagesOutputFileName(string fileName)
+        {
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE, fileName);
+        }
+
         protected void DisableCucumberMessages()
         {
             Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ENABLED", "false");
         }
+
+        protected void ResetCucumberMessages(string? fileToDelete = null)
+        {
+            DisableCucumberMessages();
+            DeletePreviousMessagesOutput(fileToDelete);
+            ResetCucumberMessagesOutputFileName();
+        }
+
+        protected void ResetCucumberMessagesOutputFileName()
+        {
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE, null);
+        }
+
+        protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
+        {
+            var directory = ActualsResultLocationDirectory();
+
+            if (fileToDelete != null)
+            {
+                var fileToDeletePath = Path.Combine(directory, fileToDelete);
+
+                if (File.Exists(fileToDeletePath))
+                {
+                    File.Delete(fileToDeletePath);
+                }
+            }
+        }
+
         protected void AddBindingClassFromResource(string fileName, string? prefix = null, Assembly? assemblyToLoadFrom = null)
         {
             var bindingCLassFileContent = _testFileManager.GetTestFileContent(fileName, prefix, assemblyToLoadFrom);

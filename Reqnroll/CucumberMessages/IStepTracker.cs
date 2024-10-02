@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.CucumberMessages
 {
-    public interface IStepProcessor
+    public interface IStepTracker
     {
         public string TestStepID { get; set; }
 

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PayloadProcessing
 {
     public static class FileExtensionToMIMETypeMap
     {

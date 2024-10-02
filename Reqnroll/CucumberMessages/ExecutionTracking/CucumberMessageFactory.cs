@@ -4,6 +4,8 @@ using Io.Cucumber.Messages.Types;
 using Reqnroll.Analytics;
 using Reqnroll.Bindings;
 using Reqnroll.CommonModels;
+using Reqnroll.CucumberMessages.PayloadProcessing;
+using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Events;
 using System;
@@ -15,7 +17,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     internal class CucumberMessageFactory
     {
@@ -36,12 +38,12 @@ namespace Reqnroll.CucumberMessages
             {
                 switch (stepState)
                 {
-                    case TestStepProcessor _:
-                        var testStep = CucumberMessageFactory.ToPickleTestStep(testCaseTracker, stepState as TestStepProcessor);
+                    case TestStepTracker _:
+                        var testStep = ToPickleTestStep(testCaseTracker, stepState as TestStepTracker);
                         testSteps.Add(testStep);
                         break;
-                    case HookStepProcessor _:
-                        var hookTestStep = CucumberMessageFactory.ToHookTestStep(stepState as HookStepProcessor);
+                    case HookStepTracker _:
+                        var hookTestStep = ToHookTestStep(stepState as HookStepTracker);
                         testSteps.Add(hookTestStep);
                         break;
                     default:
@@ -120,13 +122,13 @@ namespace Reqnroll.CucumberMessages
             return sourceRef;
         }
 
-        internal static TestStep ToPickleTestStep(TestCaseCucumberMessageTracker tracker, TestStepProcessor stepState)
+        internal static TestStep ToPickleTestStep(TestCaseCucumberMessageTracker tracker, TestStepTracker stepState)
         {
             bool bound = stepState.Bound;
             bool ambiguous = stepState.Ambiguous;
 
             var args = stepState.StepArguments
-               .Select(arg => CucumberMessageFactory.ToStepMatchArgument(arg))
+               .Select(arg => ToStepMatchArgument(arg))
                .ToList();
 
             var result = new TestStep(
@@ -150,7 +152,7 @@ namespace Reqnroll.CucumberMessages
                     ),
                 NormalizePrimitiveTypeNamesToCucumberTypeNames(argument.Type));
         }
-        internal static TestStepStarted ToTestStepStarted(TestStepProcessor stepState, StepStartedEvent stepStartedEvent)
+        internal static TestStepStarted ToTestStepStarted(TestStepTracker stepState, StepStartedEvent stepStartedEvent)
         {
             return new TestStepStarted(
                 stepState.TestCaseStartedID,
@@ -158,7 +160,7 @@ namespace Reqnroll.CucumberMessages
                 Converters.ToTimestamp(stepStartedEvent.Timestamp));
         }
 
-        internal static TestStepFinished ToTestStepFinished(TestStepProcessor stepState, StepFinishedEvent stepFinishedEvent)
+        internal static TestStepFinished ToTestStepFinished(TestStepTracker stepState, StepFinishedEvent stepFinishedEvent)
         {
             return new TestStepFinished(
                 stepState.TestCaseStartedID,
@@ -181,7 +183,7 @@ namespace Reqnroll.CucumberMessages
             return result;
         }
 
-        internal static TestStep ToHookTestStep(HookStepProcessor hookStepState)
+        internal static TestStep ToHookTestStep(HookStepTracker hookStepState)
         {
             // find the Hook message at the Feature level
             var hookCacheKey = CanonicalizeHookBinding(hookStepState.HookBindingFinishedEvent.HookBinding);
@@ -194,12 +196,12 @@ namespace Reqnroll.CucumberMessages
                 null,
                 null);
         }
-        internal static TestStepStarted ToTestStepStarted(HookStepProcessor hookStepProcessor, HookBindingStartedEvent hookBindingStartedEvent)
+        internal static TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor, HookBindingStartedEvent hookBindingStartedEvent)
         {
             return new TestStepStarted(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, Converters.ToTimestamp(hookBindingStartedEvent.Timestamp));
         }
 
-        internal static TestStepFinished ToTestStepFinished(HookStepProcessor hookStepProcessor, HookBindingFinishedEvent hookFinishedEvent)
+        internal static TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor, HookBindingFinishedEvent hookFinishedEvent)
         {
             return new TestStepFinished(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookFinishedEvent.Timestamp));
         }
@@ -229,7 +231,7 @@ namespace Reqnroll.CucumberMessages
                 null);
         }
 
-        private static TestStepResult ToTestStepResult(StepProcessorBase stepState)
+        private static TestStepResult ToTestStepResult(StepExecutionTrackerBase stepState)
         {
             return new TestStepResult(
                 Converters.ToDuration(stepState.Duration),
@@ -291,7 +293,7 @@ namespace Reqnroll.CucumberMessages
             var ci = ToCi(ci_name, environmentInfoProvider, environmentWrapper);
 
             return Envelope.Create(new Meta(
-                    (Cucumber.Messages.ProtocolVersion.Version).Split('+')[0],
+                    ProtocolVersion.Version.Split('+')[0],
                     implementation,
                     runTime,
                     os,
@@ -303,7 +305,7 @@ namespace Reqnroll.CucumberMessages
         {
             //TODO: Find a way to abstract how various CI systems convey links to builds and build numbers.
             //      Until then, these will be hard coded as null
-            if (String.IsNullOrEmpty(ci_name)) return null;
+            if (string.IsNullOrEmpty(ci_name)) return null;
 
             var git = ToGit(environmentWrapper);
 
@@ -345,7 +347,7 @@ namespace Reqnroll.CucumberMessages
 
         private static string GenerateSignature(IBinding stepDefinition)
         {
-            return stepDefinition.Method != null ? String.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
+            return stepDefinition.Method != null ? string.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
         }
         public static string Base64EncodeFile(string filePath)
         {

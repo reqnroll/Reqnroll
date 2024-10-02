@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
-    public class StepProcessorBase : IStepProcessor
+    public class StepExecutionTrackerBase : IStepTracker
     {
         public string TestStepID { get; set; }
         public string TestCaseStartedID => ParentTestCase.TestCaseStartedId;
@@ -12,7 +12,7 @@ namespace Reqnroll.CucumberMessages
 
         public TestCaseCucumberMessageTracker ParentTestCase;
 
-        public StepProcessorBase(TestCaseCucumberMessageTracker parentScenario)
+        public StepExecutionTrackerBase(TestCaseCucumberMessageTracker parentScenario)
         {
             ParentTestCase = parentScenario;
         }

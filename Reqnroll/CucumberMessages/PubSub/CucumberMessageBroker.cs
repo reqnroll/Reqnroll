@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PubSub
 {
 
     public interface ICucumberMessageBroker
@@ -25,10 +25,10 @@ namespace Reqnroll.CucumberMessages
 
         public bool Enabled => RegisteredSinks.Value.ToList().Count > 0;
 
-        private Lazy<IEnumerable<ICucumberMessageSink>> RegisteredSinks; 
+        private Lazy<IEnumerable<ICucumberMessageSink>> RegisteredSinks;
 
         public CucumberMessageBroker(IObjectContainer objectContainer)
-        { 
+        {
             _objectContainer = objectContainer;
             RegisteredSinks = new Lazy<IEnumerable<ICucumberMessageSink>>(() => _objectContainer.ResolveAll<ICucumberMessageSink>());
         }
@@ -37,7 +37,7 @@ namespace Reqnroll.CucumberMessages
             var _traceListener = _objectContainer.Resolve<ITraceListener>();
 
             foreach (var sink in RegisteredSinks.Value)
-            {   
+            {
                 _traceListener.WriteTestOutput($"Broker publishing {message.CucumberMessageSource}: {message.Envelope.Content()}");
 
                 sink.Publish(message);
@@ -45,7 +45,7 @@ namespace Reqnroll.CucumberMessages
         }
 
         // using an empty CucumberMessage to indicate completion
-        public  void Complete(string cucumberMessageSource)
+        public void Complete(string cucumberMessageSource)
         {
             var _traceListener = _objectContainer.Resolve<ITraceListener>();
 

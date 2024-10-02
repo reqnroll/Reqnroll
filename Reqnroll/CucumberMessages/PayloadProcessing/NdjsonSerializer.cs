@@ -2,7 +2,7 @@
 using System;
 using System.Text.Json;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PayloadProcessing
 {
     /// <summary>
     /// When using System.Text.Json to serialize a Cucumber Message Envelope, the following serialization options are used.
@@ -27,15 +27,17 @@ namespace Reqnroll.CucumberMessages
             return options;
         });
 
-        private static JsonSerializerOptions JsonOptions { get 
-            { 
+        private static JsonSerializerOptions JsonOptions
+        {
+            get
+            {
                 return _jsonOptions.Value;
             }
-        } 
+        }
 
         public static string Serialize(Envelope message)
         {
-            return NdjsonSerializer.Serialize<Envelope>(message);
+            return Serialize<Envelope>(message);
         }
 
         internal static string Serialize<T>(T message)
@@ -45,7 +47,7 @@ namespace Reqnroll.CucumberMessages
 
         public static Envelope Deserialize(string json)
         {
-            return NdjsonSerializer.Deserialize<Envelope>(json);
+            return Deserialize<Envelope>(json);
         }
 
         internal static T Deserialize<T>(string json)

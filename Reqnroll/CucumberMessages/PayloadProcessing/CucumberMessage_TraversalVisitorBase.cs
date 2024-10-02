@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PayloadPatching
 {
     public abstract class CucumberMessage_TraversalVisitorBase : ICucumberMessageVisitor
     {
@@ -385,7 +385,7 @@ namespace Reqnroll.CucumberMessages
         {
             OnVisiting(dataTable);
             Accept(dataTable.Location);
-            foreach (var row in dataTable.Rows ?? new List<Io.Cucumber.Messages.Types.TableRow>())
+            foreach (var row in dataTable.Rows ?? new List<TableRow>())
             {
                 Accept(row);
             }

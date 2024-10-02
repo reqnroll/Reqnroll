@@ -1,9 +1,8 @@
-﻿using Reqnroll.CucumberMessages;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
     public class FeatureLevelCucumberMessages
     {
@@ -15,8 +14,8 @@ namespace Reqnroll.CucumberMessages
             PickleJar = new PickleJar(pickles);
         }
 
-        public string Source { get;  }
-        public string GherkinDocument { get;  }
+        public string Source { get; }
+        public string GherkinDocument { get; }
         public string Pickles { get; }
         public PickleJar PickleJar { get; }
     }

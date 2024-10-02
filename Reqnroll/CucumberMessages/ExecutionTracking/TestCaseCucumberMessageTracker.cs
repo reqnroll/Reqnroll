@@ -1,6 +1,7 @@
 ﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
+using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using System;
 using System.Collections.Concurrent;
@@ -8,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     /// <summary>
     /// This class is used to track the execution of Test Cases
@@ -26,7 +27,7 @@ namespace Reqnroll.CucumberMessages
 
         // Feature FeatureInfo and Pickle ID make up a unique identifier for tracking execution of Test Cases
         public string FeatureName { get; set; }
-        public string PickleId { get; set; } = String.Empty;
+        public string PickleId { get; set; } = string.Empty;
         public string TestCaseTrackerId { get { return FeatureName + PickleId; } }
         public string TestCaseId { get; set; }
         public string TestCaseStartedId { get; private set; }
@@ -34,7 +35,7 @@ namespace Reqnroll.CucumberMessages
         // When this class is first created (on FeatureStarted), it will not yet be assigned a Scenario/Pickle; 
         // When a Scenario is started, the Publisher will assign the Scenario to the first UnAssigned TestCaseCucumberMessageTracker it finds
         // This property will indicate that state
-        public bool IsUnassigned { get { return PickleId == String.Empty; } }
+        public bool IsUnassigned { get { return PickleId == string.Empty; } }
 
         public bool Enabled { get; set; } //This will be false if the feature could not be pickled
 
@@ -46,9 +47,9 @@ namespace Reqnroll.CucumberMessages
         // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
         public IIdGenerator IDGenerator { get; set; }
 
-        private Dictionary<string, StepProcessorBase> StepsById { get; set; } = new();
-        private Dictionary<ExecutionEvent, StepProcessorBase> StepsByEvent { get; set; } = new();
-        public List<StepProcessorBase> Steps
+        private Dictionary<string, StepExecutionTrackerBase> StepsById { get; set; } = new();
+        private Dictionary<ExecutionEvent, StepExecutionTrackerBase> StepsByEvent { get; set; } = new();
+        public List<StepExecutionTrackerBase> Steps
         {
             get
             {
@@ -153,7 +154,7 @@ namespace Reqnroll.CucumberMessages
             return Enumerable.Empty<Envelope>();
         }
 
-         internal void PreProcessEvent(FeatureFinishedEvent featureFinishedEvent)
+        internal void PreProcessEvent(FeatureFinishedEvent featureFinishedEvent)
         {
         }
         internal IEnumerable<Envelope> PostProcessEvent(FeatureFinishedEvent featureFinishedEvent)
@@ -188,7 +189,7 @@ namespace Reqnroll.CucumberMessages
 
         internal void PreProcessEvent(StepStartedEvent stepStartedEvent)
         {
-            var stepState = new TestStepProcessor(this);
+            var stepState = new TestStepTracker(this);
 
             stepState.ProcessEvent(stepStartedEvent);
             StepsById.Add(stepState.PickleStepID, stepState);
@@ -197,20 +198,20 @@ namespace Reqnroll.CucumberMessages
         internal IEnumerable<Envelope> PostProcessEvent(StepStartedEvent stepStartedEvent)
         {
             var stepState = StepsById[stepStartedEvent.StepContext.StepInfo.PickleStepId];
-            var stepStarted = CucumberMessageFactory.ToTestStepStarted(stepState as TestStepProcessor, stepStartedEvent);
+            var stepStarted = CucumberMessageFactory.ToTestStepStarted(stepState as TestStepTracker, stepStartedEvent);
             mostRecentTestStepStarted = stepStarted;
             yield return Envelope.Create(stepStarted);
         }
         internal void PreProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
-            var stepState = StepsById[stepFinishedEvent.StepContext.StepInfo.PickleStepId] as TestStepProcessor;
+            var stepState = StepsById[stepFinishedEvent.StepContext.StepInfo.PickleStepId] as TestStepTracker;
             stepState.ProcessEvent(stepFinishedEvent);
             StepsByEvent.Add(stepFinishedEvent, stepState);
         }
         internal IEnumerable<Envelope> PostProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
-            var stepState = StepsById[stepFinishedEvent.StepContext.StepInfo.PickleStepId] as TestStepProcessor;
-            yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(stepState as TestStepProcessor, stepFinishedEvent));
+            var stepState = StepsById[stepFinishedEvent.StepContext.StepInfo.PickleStepId] as TestStepTracker;
+            yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(stepState as TestStepTracker, stepFinishedEvent));
         }
 
         internal void PreProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
@@ -219,7 +220,7 @@ namespace Reqnroll.CucumberMessages
             if (hookBindingStartedEvent.HookBinding.HookType == HookType.AfterFeature || hookBindingStartedEvent.HookBinding.HookType == HookType.BeforeFeature
                 || hookBindingStartedEvent.HookBinding.HookType == HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == HookType.AfterTestRun)
                 return;
-            var step = new HookStepProcessor(this);
+            var step = new HookStepTracker(this);
             step.ProcessEvent(hookBindingStartedEvent);
             StepsByEvent.Add(hookBindingStartedEvent, step);
 
@@ -227,7 +228,7 @@ namespace Reqnroll.CucumberMessages
         internal IEnumerable<Envelope> PostProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
         {
             var hookStepStartState = StepsByEvent[hookBindingStartedEvent];
-            var hookStepStarted = CucumberMessageFactory.ToTestStepStarted(hookStepStartState as HookStepProcessor, hookBindingStartedEvent);
+            var hookStepStarted = CucumberMessageFactory.ToTestStepStarted(hookStepStartState as HookStepTracker, hookBindingStartedEvent);
             mostRecentTestStepStarted = hookStepStarted;
             yield return Envelope.Create(hookStepStarted);
         }
@@ -247,7 +248,7 @@ namespace Reqnroll.CucumberMessages
         {
             var hookStepProcessor = FindMatchingHookStartedEvent(hookBindingFinishedEvent);
 
-            yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(hookStepProcessor as HookStepProcessor, hookBindingFinishedEvent));
+            yield return Envelope.Create(CucumberMessageFactory.ToTestStepFinished(hookStepProcessor as HookStepTracker, hookBindingFinishedEvent));
         }
         internal void PreProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
         {
@@ -283,9 +284,9 @@ namespace Reqnroll.CucumberMessages
             outputAddedEventWrapper.TestCaseStartedID = mostRecentTestStepStarted.TestCaseStartedId;
             yield return Envelope.Create(CucumberMessageFactory.ToAttachment(this, outputAddedEventWrapper));
         }
-        private HookStepProcessor FindMatchingHookStartedEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
+        private HookStepTracker FindMatchingHookStartedEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
-            return StepsByEvent.Where(kvp => kvp.Key is HookBindingStartedEvent && ((HookBindingStartedEvent)kvp.Key).HookBinding == hookBindingFinishedEvent.HookBinding).Select(kvp => kvp.Value as HookStepProcessor).LastOrDefault();
+            return StepsByEvent.Where(kvp => kvp.Key is HookBindingStartedEvent && ((HookBindingStartedEvent)kvp.Key).HookBinding == hookBindingFinishedEvent.HookBinding).Select(kvp => kvp.Value as HookStepTracker).LastOrDefault();
         }
 
     }

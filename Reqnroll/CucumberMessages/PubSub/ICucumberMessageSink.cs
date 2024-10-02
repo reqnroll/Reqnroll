@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PubSub
 {
     public interface ICucumberMessageSink
     {

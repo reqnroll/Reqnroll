@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
     public class PickleJar
     {
@@ -13,14 +13,14 @@ namespace Reqnroll.CucumberMessages
         public int _PickleCounter = 0;
 
         public bool HasPickles { get; }
-        public IEnumerable<Gherkin.CucumberMessages.Types.Pickle> Pickles { get; set; }
+        public IEnumerable<Pickle> Pickles { get; set; }
 
         //public PickleJar(IEnumerable<string> picklesJSON) : this(picklesJSON.Select(s => System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Pickle>(s)).ToList())
         //{ }
-        public PickleJar(string picklesJSON) : this(System.Text.Json.JsonSerializer.Deserialize<List<Gherkin.CucumberMessages.Types.Pickle>>(picklesJSON)) { }
-        public PickleJar(IEnumerable<Gherkin.CucumberMessages.Types.Pickle> pickles) : this(pickles, 0, 0) { }
+        public PickleJar(string picklesJSON) : this(System.Text.Json.JsonSerializer.Deserialize<List<Pickle>>(picklesJSON)) { }
+        public PickleJar(IEnumerable<Pickle> pickles) : this(pickles, 0, 0) { }
 
-        public PickleJar(IEnumerable<Gherkin.CucumberMessages.Types.Pickle> pickles, int pickleCounter, int pickleStepCounter)
+        public PickleJar(IEnumerable<Pickle> pickles, int pickleCounter, int pickleStepCounter)
         {
             Pickles = pickles;
             _PickleCounter = pickleCounter;
@@ -35,7 +35,7 @@ namespace Reqnroll.CucumberMessages
                 return Pickles.ElementAt(_PickleCounter).Id;
             }
         }
-        public Gherkin.CucumberMessages.Types.Pickle CurrentPickle { get { return Pickles.ElementAt(_PickleCounter); } }
+        public Pickle CurrentPickle { get { return Pickles.ElementAt(_PickleCounter); } }
 
         public PickleStepSequence PickleStepSequenceFor(string pickleId)
         {
@@ -56,7 +56,7 @@ namespace Reqnroll.CucumberMessages
 
         private int _PickleStepCounter;
 
-        public PickleStepSequence(bool hasPickles, Gherkin.CucumberMessages.Types.Pickle pickle)
+        public PickleStepSequence(bool hasPickles, Pickle pickle)
         {
             HasPickles = hasPickles;
             CurrentPickle = pickle;

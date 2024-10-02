@@ -3,13 +3,13 @@ using Reqnroll.Events;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
-    public class HookStepProcessor : StepProcessorBase
+    public class HookStepTracker : StepExecutionTrackerBase
     {
         public string HookBindingSignature { get; private set; }
         public HookBindingFinishedEvent HookBindingFinishedEvent { get; private set; }
-        public HookStepProcessor(TestCaseCucumberMessageTracker tracker) : base(tracker)
+        public HookStepTracker(TestCaseCucumberMessageTracker tracker) : base(tracker)
         {
         }
 
@@ -21,11 +21,11 @@ namespace Reqnroll.CucumberMessages
 
         public void ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
         {
-            HookBindingFinishedEvent  = hookFinishedEvent;
+            HookBindingFinishedEvent = hookFinishedEvent;
             Exception = hookFinishedEvent.HookException;
             Status = Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
         }
     }
 
-  
+
 }

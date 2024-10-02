@@ -2,6 +2,7 @@
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Tracing;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -25,16 +26,26 @@ namespace Reqnroll.CucumberMessages.Configuration
             _trace = traceListener;
             _environmentWrapper = environmentWrapper;
         }
+
         #region Override API
         public void SetEnabled(bool value)
         {
             _enablementOverrideFlag = value;
         }
         #endregion
+        
+        
         public ResolvedConfiguration ResolveConfiguration()
         {
             var config = ApplyHierarchicalConfiguration();
             var resolved = ApplyEnvironmentOverrides(config);
+
+            // a final sanity check, the filename cannot be empty
+            if (string.IsNullOrEmpty(resolved.OutputFileName))
+            {
+                resolved.OutputFileName = "reqnroll_report.ndjson";
+                _trace!.WriteToolOutput($"WARNING: Cucumber Messages: Output filename was empty. Setting filename to {resolved.OutputFileName}");
+            }
             EnsureOutputDirectory(resolved);
 
             string logEntry;
@@ -92,23 +103,39 @@ namespace Reqnroll.CucumberMessages.Configuration
             return result;
         }
 
-        private ConfigurationDTO AddConfig(ConfigurationDTO config, ConfigurationDTO overridingConfig)
+        private ConfigurationDTO AddConfig(ConfigurationDTO rootConfig, ConfigurationDTO overridingConfig)
         {
             if (overridingConfig != null)
             {
-                config.Profiles.AddRange(overridingConfig.Profiles);
-                if (overridingConfig.ActiveProfileName != null && !config.Profiles.Any(p => p.ProfileName == overridingConfig.ActiveProfileName))
+                foreach (var overridingProfile in overridingConfig.Profiles)
+                {
+                    AddOrOverrideProfile(rootConfig.Profiles, overridingProfile);
+                }
+                if (overridingConfig.ActiveProfileName != null && !rootConfig.Profiles.Any(p => p.ProfileName == overridingConfig.ActiveProfileName))
                 {
                     // The incoming configuration DTO points to a profile that doesn't exist.
-                    _trace.WriteToolOutput($"WARNING: Configuration file specifies an active profile that doesn't exist: {overridingConfig.ActiveProfileName}. Using {config.ActiveProfileName} instead.");
+                    _trace.WriteToolOutput($"WARNING: Configuration file specifies an active profile that doesn't exist: {overridingConfig.ActiveProfileName}. Using {rootConfig.ActiveProfileName} instead.");
                 }
                 else if (overridingConfig.ActiveProfileName != null)
-                    config.ActiveProfileName = overridingConfig.ActiveProfileName;
+                    rootConfig.ActiveProfileName = overridingConfig.ActiveProfileName;
 
-                config.FileOutputEnabled = overridingConfig.FileOutputEnabled;
+                rootConfig.FileOutputEnabled = overridingConfig.FileOutputEnabled;
             }
 
-            return config;
+            return rootConfig;
+        }
+
+        private void AddOrOverrideProfile(List<Profile> masterList, Profile overridingProfile)
+        {
+            if (masterList.Any(p => p.ProfileName == overridingProfile.ProfileName))
+            {
+                var existingProfile = masterList.Where(p => p.ProfileName == overridingProfile.ProfileName).FirstOrDefault();
+
+                existingProfile.BasePath = overridingProfile.BasePath;
+                existingProfile.OutputDirectory = overridingProfile.OutputDirectory;
+                existingProfile.OutputFileName = overridingProfile.OutputFileName;
+            }
+            else masterList.Add(overridingProfile);
         }
 
         private void EnsureOutputDirectory(ResolvedConfiguration config)

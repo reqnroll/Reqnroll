@@ -4,6 +4,7 @@ using Io.Cucumber.Messages.Types;
 using System.ComponentModel.Design;
 using FluentAssertions.Execution;
 using System.Reflection;
+using Reqnroll.CucumberMessages.PayloadPatching;
 
 namespace CucumberMessages.CompatibilityTests
 {

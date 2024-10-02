@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     public class StepArgument
     {
@@ -15,11 +15,11 @@ namespace Reqnroll.CucumberMessages
         public string Type;
     }
 
-    public class TestStepProcessor : StepProcessorBase
+    public class TestStepTracker : StepExecutionTrackerBase
     {
         private StepStartedEvent stepStartedEvent;
 
-        public TestStepProcessor(TestCaseCucumberMessageTracker parentTracker) : base(parentTracker)
+        public TestStepTracker(TestCaseCucumberMessageTracker parentTracker) : base(parentTracker)
         {
         }
 
@@ -28,7 +28,7 @@ namespace Reqnroll.CucumberMessages
         public string CanonicalizedStepPattern { get; set; }
         public string StepDefinitionId { get; private set; }
         public IEnumerable<string> AmbiguousStepDefinitions { get; set; }
-        public bool Ambiguous {  get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0;} }
+        public bool Ambiguous { get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0; } }
         public IStepDefinitionBinding StepDefinition { get; set; }
 
         public List<StepArgument> StepArguments { get; set; }
@@ -62,7 +62,7 @@ namespace Reqnroll.CucumberMessages
                 Exception = stepFinishedEvent.ScenarioContext.TestError;
                 if (Exception is AmbiguousBindingException)
                 {
-                    AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches.Select(m => 
+                    AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches.Select(m =>
                                                     FindStepDefIDByStepPattern(CucumberMessageFactory.CanonicalizeStepDefinitionPattern(m.StepBinding))));
                 }
             }
@@ -71,8 +71,8 @@ namespace Reqnroll.CucumberMessages
             var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();
             var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
             StepArguments = Bound && !IsInputDataTableOrDocString ?
-                argumentValues.Zip(argumentTypes, (x, y) => new StepArgument { Value = x, Type = y }).ToList<StepArgument>()
-                : Enumerable.Empty<StepArgument>().ToList<StepArgument>();
+                argumentValues.Zip(argumentTypes, (x, y) => new StepArgument { Value = x, Type = y }).ToList()
+                : Enumerable.Empty<StepArgument>().ToList();
 
         }
     }

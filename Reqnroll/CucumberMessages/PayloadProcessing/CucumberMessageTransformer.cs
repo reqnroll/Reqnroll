@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PayloadProcessing
 {
     /// <summary>
     /// The purpose of this class is to transform Cucumber messages from the Gherkin.CucumberMessages.Types namespace to the Io.Cucumber.Messages.Types namespace
@@ -22,7 +22,7 @@ namespace Reqnroll.CucumberMessages
             (
                 gherkinSource.Uri,
                 gherkinSource.Data,
-                gherkinSource.MediaType == "text/x.cucumber.gherkin+plain" ? Io.Cucumber.Messages.Types.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN : Io.Cucumber.Messages.Types.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_MARKDOWN
+                gherkinSource.MediaType == "text/x.cucumber.gherkin+plain" ? SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN : SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_MARKDOWN
             );
             return result;
         }
@@ -32,8 +32,8 @@ namespace Reqnroll.CucumberMessages
             var result = new Io.Cucumber.Messages.Types.GherkinDocument
             (
                 gherkinDoc.Uri,
-                CucumberMessageTransformer.ToFeature(gherkinDoc.Feature),
-                CucumberMessageTransformer.ToComments(gherkinDoc.Comments)
+                ToFeature(gherkinDoc.Feature),
+                ToComments(gherkinDoc.Comments)
             );
             return result;
         }
@@ -217,17 +217,17 @@ namespace Reqnroll.CucumberMessages
                 comment.Text
             );
         }
-        private static Io.Cucumber.Messages.Types.StepKeywordType ToKeyWordType(Gherkin.StepKeywordType keywordType)
+        private static StepKeywordType ToKeyWordType(Gherkin.StepKeywordType keywordType)
         {
             return keywordType switch
             {
                 //case Gherkin.StepKeywordType.Unspecified:
                 //    return Io.Cucumber.Messages.Types.StepKeywordType.UNKNOWN;
-                Gherkin.StepKeywordType.Context => Io.Cucumber.Messages.Types.StepKeywordType.CONTEXT,
-                Gherkin.StepKeywordType.Conjunction => Io.Cucumber.Messages.Types.StepKeywordType.CONJUNCTION,
-                Gherkin.StepKeywordType.Action => Io.Cucumber.Messages.Types.StepKeywordType.ACTION,
-                Gherkin.StepKeywordType.Outcome => Io.Cucumber.Messages.Types.StepKeywordType.OUTCOME,
-                Gherkin.StepKeywordType.Unknown => Io.Cucumber.Messages.Types.StepKeywordType.UNKNOWN,
+                Gherkin.StepKeywordType.Context => StepKeywordType.CONTEXT,
+                Gherkin.StepKeywordType.Conjunction => StepKeywordType.CONJUNCTION,
+                Gherkin.StepKeywordType.Action => StepKeywordType.ACTION,
+                Gherkin.StepKeywordType.Outcome => StepKeywordType.OUTCOME,
+                Gherkin.StepKeywordType.Unknown => StepKeywordType.UNKNOWN,
                 _ => throw new ArgumentException($"Invalid keyword type: {keywordType}"),
             };
         }
@@ -296,14 +296,14 @@ namespace Reqnroll.CucumberMessages
             );
         }
 
-        private static Io.Cucumber.Messages.Types.PickleStepType ToPickleStepType(Gherkin.StepKeywordType pickleStepType)
+        private static PickleStepType ToPickleStepType(Gherkin.StepKeywordType pickleStepType)
         {
             return pickleStepType switch
             {
-                Gherkin.StepKeywordType.Unknown => Io.Cucumber.Messages.Types.PickleStepType.UNKNOWN,
-                Gherkin.StepKeywordType.Action => Io.Cucumber.Messages.Types.PickleStepType.ACTION,
-                Gherkin.StepKeywordType.Outcome => Io.Cucumber.Messages.Types.PickleStepType.OUTCOME,
-                Gherkin.StepKeywordType.Context => Io.Cucumber.Messages.Types.PickleStepType.CONTEXT,
+                Gherkin.StepKeywordType.Unknown => PickleStepType.UNKNOWN,
+                Gherkin.StepKeywordType.Action => PickleStepType.ACTION,
+                Gherkin.StepKeywordType.Outcome => PickleStepType.OUTCOME,
+                Gherkin.StepKeywordType.Context => PickleStepType.CONTEXT,
                 _ => throw new ArgumentException($"Invalid pickle step type: {pickleStepType}")
             };
         }

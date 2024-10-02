@@ -1,6 +1,6 @@
 ﻿using Reqnroll.Events;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
     internal class OutputAddedEventWrapper : ExecutionEvent
     {

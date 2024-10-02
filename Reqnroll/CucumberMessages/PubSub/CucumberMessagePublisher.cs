@@ -8,8 +8,9 @@ using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Reqnroll.CucumberMessages.ExecutionTracking;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PubSub
 {
     public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin
     {

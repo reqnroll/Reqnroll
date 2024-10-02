@@ -4,7 +4,7 @@ using System.Text;
 
 using Io.Cucumber.Messages.Types;
 
-namespace Reqnroll.CucumberMessages;
+namespace Reqnroll.CucumberMessages.PayloadPatching;
 
 public class CucumberMessageVisitor
 {

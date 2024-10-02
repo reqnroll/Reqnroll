@@ -1,12 +1,14 @@
 ﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
+using Reqnroll.CucumberMessages.PayloadProcessing;
+using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     public class FeatureTracker
     {
@@ -25,7 +27,7 @@ namespace Reqnroll.CucumberMessages
         {
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
-            Enabled = (featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null) ? true : false;
+            Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null ? true : false;
             PreProcessEvent(featureStartedEvent);
         }
         internal void PreProcessEvent(FeatureStartedEvent featureStartedEvent)
@@ -39,7 +41,7 @@ namespace Reqnroll.CucumberMessages
             yield return CucumberMessageFactory.ToMeta(featureStartedEvent);
 
             Gherkin.CucumberMessages.Types.Source gherkinSource = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
-            Io.Cucumber.Messages.Types.Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
+            Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
             yield return Envelope.Create(messageSource);
 
 

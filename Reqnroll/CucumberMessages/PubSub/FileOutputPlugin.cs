@@ -18,6 +18,9 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.CommonModels;
 using System.Diagnostics;
 using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.CucumberMessages.PubSub;
+using Reqnroll.CucumberMessages.PayloadProcessing;
+using System.Runtime.InteropServices.ComTypes;
 
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
@@ -25,14 +28,11 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
     public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private Task? fileWritingTask;
-        private object _lock = new();
 
         //Thread safe collections to hold:
         // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
-        // 2. Dictionary of Feature Streams (Key: Feature Name, Value: StreamWriter)
         private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
-        private readonly ConcurrentDictionary<string, StreamWriter> fileStreams = new();
-        private string baseDirectory = "";
+
         private ICucumberConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
         private ITraceListener? trace => traceListener.Value;
@@ -58,11 +58,20 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
                 testThreadObjectContainer = args.ObjectContainer;
                 testThreadExecutionEventPublisher.AddHandler<TestRunStartedEvent>(LaunchFileSink);
-                testThreadExecutionEventPublisher.AddHandler<TestRunFinishedEvent>(CloseFileSink);
+                testThreadExecutionEventPublisher.AddHandler<TestRunFinishedEvent>(Close);
             };
         }
-        private void CloseFileSink(TestRunFinishedEvent @event)
+
+        private void Close(TestRunFinishedEvent @event)
         {
+            // Dispose will call CloseFileSink and CloseStream.
+            // The former will shut down the message pipe and wait for the writer to complete.
+            // The latter will close down the file stream.
+            Dispose(true);
+        }
+        private void CloseFileSink()
+        {
+            if (disposedValue) return;
             trace?.WriteTestOutput("FileOutputPlugin Closing File Sink long running thread.");
             postedMessages.CompleteAdding();
             fileWritingTask?.Wait();
@@ -80,22 +89,26 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 // and this class is not registered as a CucumberMessageSink, which indicates to the Broker that Messages are disabled.
                 return;
             }
-            baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
+            string baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
+            string fileName = SanitizeFileName(config.OutputFileName);
 
-            trace?.WriteToolOutput("Cuccumber Messages: Starting File Sink long running thread.");
-            fileWritingTask = Task.Factory.StartNew(async () => await ConsumeAndWriteToFiles(), TaskCreationOptions.LongRunning);
+            trace?.WriteToolOutput($"Cuccumber Messages: Starting File Sink long running thread. Writing to: {baseDirectory}");
+            fileWritingTask = Task.Factory.StartNew( () =>  ConsumeAndWriteToFilesBackgroundTask(baseDirectory, fileName), TaskCreationOptions.LongRunning);
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
 
         public void Publish(ReqnrollCucumberMessage message)
         {
-            var contentType = message.Envelope == null ? "End of Messages Marker" : message.Envelope.Content().GetType().Name;
+            //var contentType = message.Envelope == null ? "End of Messages Marker" : message.Envelope.Content().GetType().Name;
             //trace?.WriteTestOutput($"FileOutputPlugin Publish. Cucumber Message: {message.CucumberMessageSource}: {contentType}");
             postedMessages.Add(message);
         }
 
-        private async Task ConsumeAndWriteToFiles()
+        private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
         {
+            var fileStream = File.CreateText(Path.Combine(baseDirectory, fileName));
+
+
             foreach (var message in postedMessages.GetConsumingEnumerable())
             {
                 var featureName = message.CucumberMessageSource;
@@ -103,15 +116,12 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 if (message.Envelope != null)
                 {
                     var cm = Serialize(message.Envelope);
-                    //trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. Cucumber Message: {message.CucumberMessageSource}: {cm.Substring(0, 20)}");
-                    await Write(featureName, cm);
-                }
-                else
-                {
-                    //trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. End of Messages Marker Received.");
-                    CloseFeatureStream(featureName);
+                    //trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. Cucumber Message: {featureName}: {cm.Substring(0, 20)}");
+                    Write(fileStream, cm);
                 }
             }
+
+            CloseStream(fileStream);
         }
 
 
@@ -119,22 +129,12 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         {
             return NdjsonSerializer.Serialize(message);
         }
-        private async Task Write(string featureName, string cucumberMessage)
+        private void Write(StreamWriter fileStream, string cucumberMessage)
         {
             try
             {
-                if (!fileStreams.ContainsKey(featureName))
-                {
-                    lock (_lock)
-                    {
-                        if (!fileStreams.ContainsKey(featureName))
-                        {
-                            fileStreams[featureName] = File.CreateText(Path.Combine(baseDirectory, SanitizeFileName($"{featureName}.ndjson")));
-                        }
-                    }
-                }
-                trace?.WriteTestOutput($"FileOutputPlugin Write. Writing to: {SanitizeFileName($"{featureName}.ndjson")}. Cucumber Message: {featureName}: {cucumberMessage.Substring(0, 20)}");
-                await fileStreams[featureName].WriteLineAsync(cucumberMessage);
+                trace?.WriteTestOutput($"FileOutputPlugin Write. Cucumber Message: {cucumberMessage.Substring(0, 20)}");
+                fileStream!.WriteLine(cucumberMessage);
             }
             catch (System.Exception ex)
             {
@@ -142,13 +142,14 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             }
         }
 
-        private void CloseFeatureStream(string featureName)
+        private void CloseStream(StreamWriter fileStream)
         {
-            trace?.WriteTestOutput($"FileOutputPlugin CloseFeatureStream. Closing: {featureName}.");
-            fileStreams[featureName].Close();
-            fileStreams.TryRemove(featureName, out var _);
+            trace?.WriteTestOutput($"FileOutputPlugin Closing File Stream.");
+            fileStream?.Flush();
+            fileStream?.Close();
+            fileStream?.Dispose();
         }
-        private bool disposedValue;
+        private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
         {
@@ -156,16 +157,9 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             {
                 if (disposing)
                 {
-                    CloseFileSink(new TestRunFinishedEvent());
+                    CloseFileSink();
                     postedMessages.Dispose();
-                    foreach (var stream in fileStreams.Values)
-                    {
-                        stream.Close();
-                        stream.Dispose();
-                    };
-                    fileStreams.Clear();
                 }
-
                 disposedValue = true;
             }
         }

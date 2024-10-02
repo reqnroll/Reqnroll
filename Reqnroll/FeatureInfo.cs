@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using Reqnroll.CucumberMessages;
+using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Tracing;
 
 namespace Reqnroll
