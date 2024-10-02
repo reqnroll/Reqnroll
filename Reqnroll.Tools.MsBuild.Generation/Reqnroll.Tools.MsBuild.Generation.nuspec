@@ -29,7 +29,13 @@
           exclude="bin\$config$\netstandard2.0\System.*;bin\$config$\netstandard2.0\Microsoft.*" 
           target="tasks\$Reqnroll_Core_Tools_TFM$" />
     <file src="bin\$config$\netstandard2.0\*.deps.json" target="tasks\$Reqnroll_Core_Tools_TFM$" />
-
+    
+    <!-- Ensure that the needed version of System.Text.Json and its dependencies are available for the generator. -->
+    <file src="bin\$config$\netstandard2.0\System.Text.Json.dll" target="tasks\$Reqnroll_Core_Tools_TFM$" />
+    <file src="bin\$config$\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" target="tasks\$Reqnroll_Core_Tools_TFM$" />
+    <file src="bin\$config$\netstandard2.0\System.Text.Encodings.Web.dll" target="tasks\$Reqnroll_Core_Tools_TFM$" />
+    
+    
     <file src="$SolutionDir$\Licenses\**\*" target="licenses" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
