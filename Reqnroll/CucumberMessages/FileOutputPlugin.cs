@@ -44,7 +44,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         {
             _configuration = configuration;
             traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
-            Debugger.Launch();
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
