@@ -233,7 +233,7 @@ namespace Reqnroll.Generator.Generation
 
             testClassCleanupMethod.Statements.Add(expression);
 
-            // 
+            // TestRunnerManager.ReleaseTestRunner(testRunner);
             testClassCleanupMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
                     new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),

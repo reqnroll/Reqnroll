@@ -128,7 +128,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         protected virtual void FixTestRunOrderingIssue(TestClassGenerationContext generationContext)
         {
-            //see https://github.com/reqnroll/Reqnroll/issues/96
+            //see https://github.com/SpecFlowOSS/SpecFlow/issues/96
 
             //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo.Title != "<current_feature_title>")
             //  <TestClass>.<TestClassInitialize>(null);
