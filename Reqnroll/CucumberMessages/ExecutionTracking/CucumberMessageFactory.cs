@@ -95,14 +95,15 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal static ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator iDGenerator)
         {
-            var regex = stepTransform.Regex.ToString();
+            var regex = stepTransform.Regex;
+            var regexPattern = regex == null ? null : regex.ToString();
             var name = stepTransform.Name ?? stepTransform.Method.ReturnType.Name;
             var result = new ParameterType
             (
                 name,
                 new List<string>
                 {
-                    regex
+                    regexPattern
                 },
                 false,
                 false,

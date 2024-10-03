@@ -4,6 +4,7 @@ using Reqnroll.Bindings;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -12,7 +13,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     public class FeatureTracker
     {
-        internal IEnumerable<Envelope> StaticMessages;
+        internal IEnumerable<Envelope> StaticMessages => _staticMessages.Value;
+        private Lazy<IEnumerable<Envelope>> _staticMessages; 
         // ID Generator to use when generating IDs for TestCase messages and beyond
         // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
         // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
@@ -34,7 +36,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             if (!Enabled) return;
             // This has side-effects needed for proper execution of subsequent events; eg, the Ids of the static messages get generated and then subsequent events generate Ids that follow
-            StaticMessages = GenerateStaticMessages(featureStartedEvent).ToList();
+            _staticMessages = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
         }
         private IEnumerable<Envelope> GenerateStaticMessages(FeatureStartedEvent featureStartedEvent)
         {

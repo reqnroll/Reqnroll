@@ -52,6 +52,7 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
+            //Debugger.Launch();
             _broker = _brokerFactory.Value;
             var traceListener = objectContainer.Resolve<ITraceListener>();
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
