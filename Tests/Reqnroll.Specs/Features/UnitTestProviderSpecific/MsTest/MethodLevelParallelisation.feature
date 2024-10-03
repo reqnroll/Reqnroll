@@ -66,6 +66,8 @@ public class TraceSteps
         featureData.Duration.ElapsedMilliseconds.Should().BeLessThan(9 * WaitTimeInMS, because: "Test should be processed (parallel) in time");
     }
 
+    public static int startIndex = 0;
+
     [When(@"I do something in Scenario '(.*)'")]
     void WhenIDoSomething(string scenario)
     {
@@ -82,6 +84,10 @@ public class TraceSteps
         featureData.BindingInstances.TryAdd(this, 1);
         var currentStartIndex = Interlocked.Increment(ref featureData.StepCount);
         _traceListener.WriteTestOutput($"Start index: {currentStartIndex}, Worker: {_testRunner.TestWorkerId}");
+        
+        var currentStartIndex2 = System.Threading.Interlocked.Increment(ref startIndex);
+        _traceListener.WriteTestOutput($"Start index2: {currentStartIndex2}, Worker: {_testRunner.TestWorkerId}");
+
         Thread.Sleep(WaitTimeInMS);
         var afterStartIndex = featureData.StepCount;
         if (afterStartIndex == currentStartIndex)
@@ -91,6 +97,16 @@ public class TraceSteps
         else
         {
             _traceListener.WriteTestOutput("Was parallel");
+        }
+
+        var afterStartIndex2 = startIndex;
+        if (afterStartIndex2 == currentStartIndex2)
+        {
+            _traceListener.WriteTestOutput("XWas not parallel");
+        }
+        else
+        {
+            _traceListener.WriteTestOutput("XWas parallel");
         }
     }
 }

@@ -103,12 +103,16 @@ namespace Reqnroll.Generator.UnitTestProvider
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
-            generationContext.TestRunnerField.Attributes |= MemberAttributes.Static;
+            // Step 1: make 'testRunner' instance field
+            //generationContext.TestRunnerField.Attributes |= MemberAttributes.Static;
 
             generationContext.TestClassInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(
                 TESTCONTEXT_TYPE, "testContext"));
 
             CodeDomHelper.AddAttribute(generationContext.TestClassInitializeMethod, TESTFIXTURESETUP_ATTR);
+
+            // Step 2: Remove TestClassInitializeMethod (not needed)
+            generationContext.TestClass.Members.Remove(generationContext.TestClassInitializeMethod);
         }
 
         public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -117,13 +121,18 @@ namespace Reqnroll.Generator.UnitTestProvider
             // [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior.EndOfClass)]
             var attribute = CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR);
             attribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(CLASSCLEANUPBEHAVIOR_ENUM), CLASSCLEANUPBEHAVIOR_ENDOFCLASS)));
+
+            // Step 3: Remove TestClassCleanupMethod (not needed)
+            generationContext.TestClass.Members.Remove(generationContext.TestClassCleanupMethod);
         }
 
 
         public virtual void SetTestInitializeMethod(TestClassGenerationContext generationContext)
         {
             CodeDomHelper.AddAttribute(generationContext.TestInitializeMethod, TESTSETUP_ATTR);
-            FixTestRunOrderingIssue(generationContext);
+
+            // Step 5 (part 2): remove feature handling from here as it is moved to UnitTestGenerator.SetupTestInitializeMethod
+            //FixTestRunOrderingIssue(generationContext);
         }
 
         protected virtual void FixTestRunOrderingIssue(TestClassGenerationContext generationContext)
@@ -146,7 +155,7 @@ namespace Reqnroll.Generator.UnitTestProvider
                 new CodePrimitiveExpression(null));
 
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callTestClassInitializeMethodExpression);
-            
+
             generationContext.TestInitializeMethod.Statements.Add(
                 new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(
