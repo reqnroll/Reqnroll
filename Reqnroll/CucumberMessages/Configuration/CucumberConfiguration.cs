@@ -95,7 +95,7 @@ namespace Reqnroll.CucumberMessages.Configuration
 
             if (fileNameValue is Success<string>)
                 result.OutputFileName = ((Success<string>)fileNameValue).Result;
-            var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
+            var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
             var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "TRUE";
 
             result.Enabled = Convert.ToBoolean(enabled);

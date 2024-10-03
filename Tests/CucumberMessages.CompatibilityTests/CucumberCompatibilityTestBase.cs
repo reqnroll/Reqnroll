@@ -23,7 +23,7 @@ namespace CucumberMessages.CompatibilityTests
 
         protected void EnableCucumberMessages()
         {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBERMESSAGES_ENABLE_ENVIRONMENT_VARIABLE, "true");
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, "true");
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE, "LOCAL");
         }
 
