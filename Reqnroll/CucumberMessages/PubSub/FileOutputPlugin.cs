@@ -80,7 +80,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
-            ResolvedConfiguration config = _configuration.ResolveConfiguration();
+            ICucumberConfiguration config = _configuration;
 
             if (!config.Enabled)
             {

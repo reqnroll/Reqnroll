@@ -10,21 +10,24 @@ namespace Reqnroll.CucumberMessages.Configuration
 {
     public class CucumberConfiguration : ICucumberConfiguration
     {
+        public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
+        public string BaseDirectory => _resolvedConfiguration.Value.BaseDirectory;
+        public string OutputDirectory => _resolvedConfiguration.Value.OutputDirectory;
+        public string OutputFileName => _resolvedConfiguration.Value.OutputFileName;
+        public IDGenerationStyle IDGenerationStyle => _resolvedConfiguration.Value.IDGenerationStyle;
+
+
         private ITraceListener _trace;
         private IEnvironmentWrapper _environmentWrapper;
 
-        private ResolvedConfiguration outputConfiguration = new();
+        private Lazy<ResolvedConfiguration> _resolvedConfiguration; 
         private bool _enablementOverrideFlag = true;
-
-        public bool Enabled => _enablementOverrideFlag && outputConfiguration.Enabled;
-        public string BaseDirectory => outputConfiguration.BaseDirectory;
-        public string OutputDirectory => outputConfiguration.OutputDirectory;
-        public string OutputFileName => outputConfiguration.OutputFileName;
 
         public CucumberConfiguration(ITraceListener traceListener, IEnvironmentWrapper environmentWrapper)
         {
             _trace = traceListener;
             _environmentWrapper = environmentWrapper;
+            _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
         }
 
         #region Override API
@@ -35,7 +38,7 @@ namespace Reqnroll.CucumberMessages.Configuration
         #endregion
         
         
-        public ResolvedConfiguration ResolveConfiguration()
+        private ResolvedConfiguration ResolveConfiguration()
         {
             var config = ApplyHierarchicalConfiguration();
             var resolved = ApplyEnvironmentOverrides(config);
@@ -52,7 +55,6 @@ namespace Reqnroll.CucumberMessages.Configuration
             logEntry = $"Cucumber Messages: FileOutput Initialized. Output Path: {Path.Combine(resolved.BaseDirectory, resolved.OutputDirectory, resolved.OutputFileName)}";
 
             _trace!.WriteTestOutput(logEntry);
-            outputConfiguration = resolved;
             return resolved;
         }
         private ConfigurationDTO ApplyHierarchicalConfiguration()
@@ -72,6 +74,7 @@ namespace Reqnroll.CucumberMessages.Configuration
             var fileNameValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE);
             var profileValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE);
             string profileName = profileValue is Success<string> ? ((Success<string>)profileValue).Result : "DEFAULT";
+            var idGenStyleValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE);
 
             var activeConfiguredDestination = config.Profiles.Where(d => d.ProfileName == profileName).FirstOrDefault();
 
@@ -84,7 +87,8 @@ namespace Reqnroll.CucumberMessages.Configuration
                 Enabled = config.FileOutputEnabled,
                 BaseDirectory = config.ActiveProfile.BasePath,
                 OutputDirectory = config.ActiveProfile.OutputDirectory,
-                OutputFileName = config.ActiveProfile.OutputFileName
+                OutputFileName = config.ActiveProfile.OutputFileName,
+                IDGenerationStyle = config.ActiveProfile.IDGenerationStyle
             };
 
             if (baseOutDirValue is Success<string>)
@@ -95,6 +99,10 @@ namespace Reqnroll.CucumberMessages.Configuration
 
             if (fileNameValue is Success<string>)
                 result.OutputFileName = ((Success<string>)fileNameValue).Result;
+
+            if (idGenStyleValue is Success<string>)
+                result.IDGenerationStyle = CucumberConfiguration.ParseIdGenerationStyle(((Success<string>)idGenStyleValue).Result);
+
             var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
             var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "TRUE";
 
@@ -134,6 +142,7 @@ namespace Reqnroll.CucumberMessages.Configuration
                 existingProfile.BasePath = overridingProfile.BasePath;
                 existingProfile.OutputDirectory = overridingProfile.OutputDirectory;
                 existingProfile.OutputFileName = overridingProfile.OutputFileName;
+                existingProfile.IDGenerationStyle = overridingProfile.IDGenerationStyle;
             }
             else masterList.Add(overridingProfile);
         }
@@ -150,6 +159,16 @@ namespace Reqnroll.CucumberMessages.Configuration
             {
                 Directory.CreateDirectory(Path.Combine(config.BaseDirectory, config.OutputDirectory));
             }
+        }
+        public static IDGenerationStyle ParseIdGenerationStyle(string idGenerationStyle)
+        {
+            if (string.IsNullOrEmpty(idGenerationStyle))
+                idGenerationStyle = "UUID";
+
+            if ("INCREMENTING".Equals(idGenerationStyle, StringComparison.OrdinalIgnoreCase))
+                return IDGenerationStyle.Incrementing;
+            else
+                return IDGenerationStyle.UUID;
         }
 
     }

@@ -109,8 +109,7 @@ namespace CucumberMessages.CompatibilityTests
             var tracerMock = new Mock<ITraceListener>();
             var env = new EnvironmentWrapper();
             CucumberConfiguration configuration = new CucumberConfiguration(tracerMock.Object, env);
-            var resolvedconfiguration = configuration.ResolveConfiguration();
-            var resultLocation = Path.Combine(resolvedconfiguration.BaseDirectory, resolvedconfiguration.OutputDirectory);
+            var resultLocation = Path.Combine(configuration.BaseDirectory, configuration.OutputDirectory);
             return resultLocation;
         }
 

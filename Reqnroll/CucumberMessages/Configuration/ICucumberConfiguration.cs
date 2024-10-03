@@ -2,6 +2,10 @@
 {
     public interface ICucumberConfiguration
     {
-        ResolvedConfiguration ResolveConfiguration();
+        bool Enabled { get; }
+        string BaseDirectory { get; }
+        public string OutputDirectory { get; }
+        public string OutputFileName { get; }
+        public IDGenerationStyle IDGenerationStyle { get; }
     }
 }
