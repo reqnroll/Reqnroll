@@ -17,7 +17,7 @@ namespace CucumberMessages.CompatibilityTests
     {
         // Properties to skip - this is the default set of properties that are not comparable across platforms
         // Id: Ids are not assigned in the same order across platforms.
-        // AstNodeIds, PickleId, HookId, PickleStepId, StepDefinitionIds, TestStepId, TestCaseStartedId, TestCaseId, WorkerId: Ids are not assigned in the same order across platforms.
+        // AstNodeIds, PickleIdIndex, HookId, PickleStepId, StepDefinitionIds, TestStepId, TestCaseStartedId, TestCaseId, WorkerId: Ids are not assigned in the same order across platforms.
         // Location, Line and Column (in Location elements) are not always comparable (eg, CCK refers to source line #s in typescript)
         // Uri is not always comparable (eg, CCK refers to source file paths in typescript)
         // JavaMethod and JavaStackTraceElement contents are specific to the platform. CCK does not include these as it generates Uri references to source rather than Method references

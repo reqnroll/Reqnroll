@@ -85,7 +85,7 @@ Scenario: Add two numbers
         {
             Configuration.ReqnrollConfiguration generatorReqnrollConfiguration = ConfigurationLoader.GetDefault();
             CodeDomHelper codeDomHelper = new CodeDomHelper(CodeDomProviderLanguage.CSharp);
-            UnitTestFeatureGenerator unitTestFeatureGenerator = new UnitTestFeatureGenerator(new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub(), new DefaultListener());
+            UnitTestFeatureGenerator unitTestFeatureGenerator = new UnitTestFeatureGenerator(new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub(), new DefaultListener(), new SimpleCucumberMessagesConfiguration());
 
             var gherkinParserFactory = new ReqnrollGherkinParserFactory();
 

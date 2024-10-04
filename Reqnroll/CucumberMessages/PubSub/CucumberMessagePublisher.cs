@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.CucumberMessages.ExecutionTracking;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -127,7 +128,8 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 if (featureTracker.Enabled)
                 {
-                    var id = featureName + scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId;
+                    var pickleId = featureTracker.PickleIds[scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+                    var id = featureName + @"/" + pickleId;
                     var tccmt = new TestCaseCucumberMessageTracker(featureTracker);
                     tccmt.ProcessEvent(scenarioStartedEvent);
                     traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} {id} started");

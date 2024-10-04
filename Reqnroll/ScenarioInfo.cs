@@ -38,20 +38,21 @@ namespace Reqnroll
         public string Description { get; }
 
         /// <summary>
-        /// The PickleId of the Scenario when exported as a Cucumber Message "pickle".
+        /// The PickleIdIndex of the test Scenario when exported as a Cucumber Message "pickle".
+        /// The index is the sequential number of the pickle in the list of pickles generated from the feature file.
         /// </summary>
-        public string PickleId { get; }
+        public string PickleIdIndex { get; }
         // The list of step PickleIds in the step sequence for this test case.
         public PickleStepSequence PickleStepSequence { get; private set; }
 
-        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleId = null, PickleStepSequence stepSequence = null)
+        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleIndex = null, PickleStepSequence stepSequence = null)
         {
             Title = title;
             Description = description;
             Tags = tags ?? Array.Empty<string>();
             Arguments = arguments;
             CombinedTags = Tags.Concat(inheritedTags ?? Array.Empty<string>()).ToArray();
-            PickleId = pickleId;
+            PickleIdIndex = pickleIndex;
             PickleStepSequence = stepSequence;
         }
     }

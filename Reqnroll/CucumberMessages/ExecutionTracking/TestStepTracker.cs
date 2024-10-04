@@ -1,6 +1,7 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.Assist;
 using Reqnroll.Bindings;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System;
 using System.Collections.Generic;

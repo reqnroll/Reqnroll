@@ -113,7 +113,7 @@ namespace CucumberMessages.CompatibilityTests
 
             if (!(typeof(T) == typeof(TestStepFinished)))
             {
-                actual.Should().BeEquivalentTo(expected, options => options.WithTracing());
+                actual.Should().BeEquivalentTo(expected, options => options.WithTracing(),"When comparing " + typeof(T).Name + "s");
             }
             else
             {
@@ -128,9 +128,9 @@ namespace CucumberMessages.CompatibilityTests
                 var expected_hookRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
                 var expected_stepRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
 
-                actual_stepRelatedTestStepFinished.Should().BeEquivalentTo(expected_stepRelatedTestStepFinished, options => options.WithTracing());
+                actual_stepRelatedTestStepFinished.Should().BeEquivalentTo(expected_stepRelatedTestStepFinished, options => options.WithTracing(), "when comparing TestStepFinished messages");
 
-                actual_hookRelatedTestStepFinished.Should().BeEquivalentTo(expected_hookRelatedTestStepFinished, options => options.WithoutStrictOrdering().WithTracing());
+                actual_hookRelatedTestStepFinished.Should().BeEquivalentTo(expected_hookRelatedTestStepFinished, options => options.WithoutStrictOrdering().WithTracing(), "when comparing Hook TestStepFinished messages");
             }
         }
 

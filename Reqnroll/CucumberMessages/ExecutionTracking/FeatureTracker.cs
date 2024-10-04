@@ -24,6 +24,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal Dictionary<string, string> StepDefinitionsByPattern = new();
         public string FeatureName { get; set; }
         public bool Enabled { get; private set; }
+        public Dictionary<string, string> PickleIds { get; } = new();
 
         public FeatureTracker(FeatureStartedEvent featureStartedEvent)
         {
@@ -57,6 +58,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             string lastID = ExtractLastID(pickles);
             IDGenerator = IdGeneratorFactory.Create(lastID);
+            for(int i = 0; i < pickles.Count; i++)
+            {
+                PickleIds.Add(i.ToString(), pickles[i].Id);
+            }
 
             foreach (var pickle in pickles)
             {

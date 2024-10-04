@@ -236,7 +236,6 @@ namespace Reqnroll.Generator.Generation
             {
                 sourceFileLocation = Path.Combine(generationContext.Document.DocumentLocation.FeatureFolderPath, generationContext.Document.DocumentLocation.SourceFilePath);
                 //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
-                //TODO: make the type of IDGenerator configurable
                 var IDGenStyle = _cucumberConfiguration.IDGenerationStyle;
                 var messageConverter = new CucumberMessagesConverter(IdGeneratorFactory.Create(IDGenStyle));
                 var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);

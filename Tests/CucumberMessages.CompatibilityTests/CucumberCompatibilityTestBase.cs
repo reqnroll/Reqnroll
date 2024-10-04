@@ -42,6 +42,7 @@ namespace CucumberMessages.CompatibilityTests
             DisableCucumberMessages();
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void ResetCucumberMessagesOutputFileName()
@@ -111,6 +112,11 @@ namespace CucumberMessages.CompatibilityTests
             CucumberConfiguration configuration = new CucumberConfiguration(tracerMock.Object, env);
             var resultLocation = Path.Combine(configuration.BaseDirectory, configuration.OutputDirectory);
             return resultLocation;
+        }
+
+        protected void SetEnvironmentVariableForGUIDIdGeneration()
+        {
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE, CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_UUID);
         }
 
     }

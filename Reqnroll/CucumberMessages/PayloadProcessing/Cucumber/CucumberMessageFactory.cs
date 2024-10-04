@@ -4,6 +4,7 @@ using Io.Cucumber.Messages.Types;
 using Reqnroll.Analytics;
 using Reqnroll.Bindings;
 using Reqnroll.CommonModels;
+using Reqnroll.CucumberMessages.ExecutionTracking;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.EnvironmentAccess;
@@ -17,8 +18,13 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
-namespace Reqnroll.CucumberMessages.ExecutionTracking
+namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
+    /// <summary>
+    /// This class provides functions to convert execution level detail (events) into Cucumber message elements
+    /// 
+    /// These are called after execution is completed for a Feature.
+    /// </summary>
     internal class CucumberMessageFactory
     {
         public static TestRunStarted ToTestRunStarted(FeatureStartedEvent featureStartedEvent)

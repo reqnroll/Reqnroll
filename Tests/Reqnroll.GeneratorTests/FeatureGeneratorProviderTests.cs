@@ -18,7 +18,7 @@ namespace Reqnroll.GeneratorTests
             Configuration.ReqnrollConfiguration generatorReqnrollConfiguration = ConfigurationLoader.GetDefault();
             CodeDomHelper codeDomHelper = new CodeDomHelper(CodeDomProviderLanguage.CSharp);
             UnitTestFeatureGenerator unitTestFeatureGenerator = new UnitTestFeatureGenerator(
-                new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub(), new DefaultListener());
+                new NUnit3TestGeneratorProvider(codeDomHelper), codeDomHelper, generatorReqnrollConfiguration, new DecoratorRegistryStub(), new DefaultListener(), new SimpleCucumberMessagesConfiguration());
 
             return new UnitTestFeatureGeneratorProvider(unitTestFeatureGenerator);
         }

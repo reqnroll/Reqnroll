@@ -1,6 +1,7 @@
 ﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using System;
@@ -23,14 +24,17 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             Enabled = featureTracker.Enabled;
             IDGenerator = featureTracker.IDGenerator;
             StepDefinitionsByPattern = featureTracker.StepDefinitionsByPattern;
+            PickleIdList = featureTracker.PickleIds;
         }
 
         // Feature FeatureInfo and Pickle ID make up a unique identifier for tracking execution of Test Cases
         public string FeatureName { get; set; }
         public string PickleId { get; set; } = string.Empty;
-        public string TestCaseTrackerId { get { return FeatureName + PickleId; } }
+        public string TestCaseTrackerId { get { return FeatureName +@"/" + PickleId; } }
         public string TestCaseId { get; set; }
         public string TestCaseStartedId { get; private set; }
+
+        private readonly Dictionary<string, string> PickleIdList;
 
         // When this class is first created (on FeatureStarted), it will not yet be assigned a Scenario/Pickle; 
         // When a Scenario is started, the Publisher will assign the Scenario to the first UnAssigned TestCaseCucumberMessageTracker it finds
@@ -164,7 +168,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void PreProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
-            PickleId = scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId;
+            PickleId = PickleIdList[scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
             scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId = TestCaseTrackerId;
             TestCaseId = IDGenerator.GetNewId();
             TestCaseStartedId = IDGenerator.GetNewId();

@@ -11,6 +11,7 @@ namespace Reqnroll.CucumberMessages.Configuration
 {
     public class CucumberConfiguration : ICucumberConfiguration
     {
+        public static CucumberConfiguration Current { get; private set; }
         public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
         public string BaseDirectory => _resolvedConfiguration.Value.BaseDirectory;
         public string OutputDirectory => _resolvedConfiguration.Value.OutputDirectory;
@@ -29,6 +30,7 @@ namespace Reqnroll.CucumberMessages.Configuration
             _trace = traceListener;
             _environmentWrapper = environmentWrapper;
             _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
+            Current = this;
         }
 
         #region Override API
