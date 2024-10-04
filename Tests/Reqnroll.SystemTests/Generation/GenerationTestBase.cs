@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 using Reqnroll.TestProjectGenerator;
@@ -431,5 +432,99 @@ public abstract class GenerationTestBase : SystemTestBase
 
     #endregion
 
-    //TODO: test parallel execution (details TBD) - maybe this should be in a separate test class
+    #region It is able to run tests parallel
+
+    // We need to verify
+    // Tests are run in parallel
+    // Each scenario execution has a feature context and scenario context that is matching to the feature/scenario
+    // For each scenario the before feature has been executed for that feature context
+
+    [TestMethod]
+    public void Tests_can_be_executed_parallel()
+    {
+        _projectsDriver.EnableTestParallelExecution();
+
+        var scenarioTemplate = 
+            """
+            Scenario: {0}
+              When executing '{0}' in '{1}'
+            """;
+
+        var scenarioOutlineTemplate = 
+            """
+            Scenario Outline: {0}
+              When executing '{0}' in '{1}'
+            Examples:
+            	| Count |
+            	| 1     |
+            	| 2     |
+                | 3     |
+            """;
+
+        const int scenariosPerFile = 3;
+        const int scenarioOutlinesPerFile = 3;
+        string[] features = ["A", "B"];
+        int scenarioIdCounter = 0;
+
+        foreach (string feature in features)
+        {
+            AddFeatureFile($"Feature: {feature}" + Environment.NewLine);
+            for (int i = 0; i < scenariosPerFile; i++)
+                AddScenario(string.Format(scenarioTemplate, $"S{++scenarioIdCounter}", feature));
+            for (int i = 0; i < scenarioOutlinesPerFile; i++)
+                AddScenario(string.Format(scenarioOutlineTemplate, $"S{++scenarioIdCounter}", feature));
+        }
+
+        AddBindingClass(
+            """
+            namespace ParallelExecution.StepDefinitions
+            {
+                [Binding]
+                public class ParallelExecutionSteps
+                {
+                    public static int startIndex = 0;
+                    
+                    private readonly FeatureContext _featureContext;
+                    private readonly ScenarioContext _scenarioContext;
+                    
+                    public ParallelExecutionSteps(FeatureContext featureContext, ScenarioContext scenarioContext)
+                    {
+                        _featureContext = featureContext;
+                        _scenarioContext = scenarioContext;
+                    }
+                    
+                    [BeforeFeature]
+                    public static void BeforeFeature(FeatureContext featureContext)
+                    {
+                        featureContext.Set(true, "before_feature");
+                    }
+                
+                    [When("executing {string} in {string}")]
+                    public void WhenExecuting(string scenarioName, string featureName)
+                    {
+                        var currentStartIndex = System.Threading.Interlocked.Increment(ref startIndex);
+                        global::Log.LogStep();
+                        if (_scenarioContext.ScenarioInfo.Title != scenarioName)
+                            throw new System.Exception($"Invalid scenario context: {_scenarioContext.ScenarioInfo.Title} should be {scenarioName}");
+                        if (_featureContext.FeatureInfo.Title != featureName)
+                            throw new System.Exception($"Invalid scenario context: {_featureContext.FeatureInfo.Title} should be {featureName}");
+                        if (!_featureContext.TryGetValue<bool>("before_feature", out var value) || !value)
+                            throw new System.Exception($"BeforeFeature hook was not executed!");
+                        
+                        var afterStartIndex = startIndex;
+                        if (afterStartIndex != currentStartIndex)
+                            Log.LogCustom("parallel", "true");
+                    }
+                }
+            }
+            """);
+
+        ExecuteTests();
+        ShouldAllScenariosPass();
+
+        var arguments = _bindingDriver.GetActualLogLines("parallel").ToList();
+        arguments.Should().NotBeEmpty("the scenarios should have run parallel");
+    }
+
+    #endregion
 }
