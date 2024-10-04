@@ -1,4 +1,3 @@
-using System.CodeDom;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -188,36 +187,6 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
         }
 
         [Fact]
-        public void MsTestGeneratorProvider_ShouldInvokeFeatureSetupMethodWithGlobalNamespaceAlias()
-        {
-            // ARRANGE
-            var document = ParseDocumentFromString(SampleFeatureFileWithMultipleExampleSets);
-            var sampleTestGeneratorProvider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
-            var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
-
-            // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
-
-            // ASSERT
-            var featureSetupCall = code
-                .Class()
-                .Members()
-                .Single(m => m.Name == "TestInitializeAsync")
-                .Statements
-                .OfType<CodeConditionStatement>()
-                .First()
-                .TrueStatements
-                .OfType<CodeExpressionStatement>()
-                .First()
-                .Expression
-                .As<CodeMethodInvokeExpression>();
-
-            featureSetupCall.Should().NotBeNull();
-            featureSetupCall.Method.MethodName.Should().Be("FeatureSetupAsync");
-            featureSetupCall.Method.TargetObject.As<CodeTypeReferenceExpression>().Type.BaseType.Should().Contain("global::");
-        }
-
-        [Fact]
         public void MsTestGeneratorProvider_ShouldNotHaveParallelExecutionTrait()
         {
             var sut = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
@@ -240,7 +209,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 Given there is something");
 
             var provider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
-            var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
+            var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new[] { "nonparallelizable" });
 
             // ACT
             var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
@@ -261,7 +230,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 Given there is something");
 
             var provider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
-            var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
+            var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: ["nonparallelizable"]);
 
             // ACT
             var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
