@@ -8,7 +8,6 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
         public FeatureLevelCucumberMessages(string serializedSourceMessage, string serializedgherkinDocument, string serializedPickles, string location)
         {
             GherkinDocument = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.GherkinDocument>(serializedgherkinDocument);
-            //TODO: make the type of IDGenerator configurable
             Source = JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(serializedSourceMessage);
             Pickles = JsonSerializer.Deserialize<IEnumerable<Gherkin.CucumberMessages.Types.Pickle>>(serializedPickles);
             Location = location;

@@ -1,4 +1,5 @@
 ﻿using Gherkin.CucumberMessages;
+using Reqnroll.CucumberMessages.Configuration;
 using System;
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
@@ -14,6 +15,13 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
             {
                 return new SeedableIncrementingIdGenerator(int.Parse(previousId));
             }
+        }
+        public static IIdGenerator Create(IDGenerationStyle style)
+        {
+            return style switch { 
+                IDGenerationStyle.Incrementing => new IncrementingIdGenerator(), 
+                IDGenerationStyle.UUID => new GuidIdGenerator(), 
+                _ => throw new NotImplementedException() };
         }
     }
 }

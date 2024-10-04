@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Gherkin.Ast;
+using Gherkin.CucumberMessages.Types;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
-    abstract class ScenarioTransformationVisitor : GherkinDocumentVisitor
+    abstract class ScenarioTransformationVisitor : GherkinTypesGherkinDocumentVisitor
     {
         protected GherkinDocument _sourceDocument;
         private GherkinDocument _transformedDocument;

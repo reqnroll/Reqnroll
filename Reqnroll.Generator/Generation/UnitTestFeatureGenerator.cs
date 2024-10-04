@@ -8,6 +8,7 @@ using System.Linq;
 using System.Reflection;
 using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
+using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
@@ -28,13 +29,15 @@ namespace Reqnroll.Generator.Generation
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
         private readonly UnitTestMethodGenerator _unitTestMethodGenerator;
         private readonly LinePragmaHandler _linePragmaHandler;
+        private readonly ICucumberConfiguration _cucumberConfiguration;
 
         public UnitTestFeatureGenerator(
             IUnitTestGeneratorProvider testGeneratorProvider,
             CodeDomHelper codeDomHelper,
             ReqnrollConfiguration reqnrollConfiguration,
             IDecoratorRegistry decoratorRegistry,
-            ITraceListener traceListener)
+            ITraceListener traceListener,
+            ICucumberConfiguration cucumberConfiguration)
         {
             _testGeneratorProvider = testGeneratorProvider;
             _codeDomHelper = codeDomHelper;
@@ -44,6 +47,7 @@ namespace Reqnroll.Generator.Generation
             _linePragmaHandler = new LinePragmaHandler(_reqnrollConfiguration, _codeDomHelper);
             _scenarioPartHelper = new ScenarioPartHelper(_reqnrollConfiguration, _codeDomHelper);
             _unitTestMethodGenerator = new UnitTestMethodGenerator(testGeneratorProvider, decoratorRegistry, _codeDomHelper, _scenarioPartHelper, _reqnrollConfiguration);
+            _cucumberConfiguration = cucumberConfiguration;
         }
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";
@@ -233,7 +237,8 @@ namespace Reqnroll.Generator.Generation
                 sourceFileLocation = Path.Combine(generationContext.Document.DocumentLocation.FeatureFolderPath, generationContext.Document.DocumentLocation.SourceFilePath);
                 //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
                 //TODO: make the type of IDGenerator configurable
-                var messageConverter = new CucumberMessagesConverter(new IncrementingIdGenerator());
+                var IDGenStyle = _cucumberConfiguration.IDGenerationStyle;
+                var messageConverter = new CucumberMessagesConverter(IdGeneratorFactory.Create(IDGenStyle));
                 var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
                 var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
                 var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocumentMessage);
