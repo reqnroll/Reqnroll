@@ -203,10 +203,26 @@ public class TestRunnerManager : ITestRunnerManager
         return testRunner;
     }
 
+    private async Task FireRemainingAfterFeatureHooks()
+    {
+        var testWorkerContainers = _availableTestWorkerContainers.Concat(_usedTestWorkerContainers).ToArray();
+        foreach (var testWorkerContainer in testWorkerContainers)
+        {
+            var contextManager = testWorkerContainer.Key.Resolve<IContextManager>();
+            if (contextManager.FeatureContext != null)
+            {
+                var testRunner = testWorkerContainer.Key.Resolve<ITestRunner>();
+                await testRunner.OnFeatureEndAsync();
+            }
+        }
+    }
+
     public virtual async Task DisposeAsync()
     {
         if (Interlocked.CompareExchange(ref _wasDisposed, 1, 0) == 0)
         {
+            await FireRemainingAfterFeatureHooks();
+
             await FireTestRunEndAsync();
 
             if (_globalTestRunner != null)
@@ -214,21 +230,21 @@ public class TestRunnerManager : ITestRunnerManager
                 ReleaseTestThreadContext(_globalTestRunner.TestThreadContext);
             }
 
-            var items = _availableTestWorkerContainers.ToArray();
-            while (items.Length > 0)
+            var testWorkerContainers = _availableTestWorkerContainers.ToArray();
+            while (testWorkerContainers.Length > 0)
             {
-                foreach (var item in items)
+                foreach (var item in testWorkerContainers)
                 {
                     item.Key.Dispose();
                     _availableTestWorkerContainers.TryRemove(item.Key, out _);
                 }
-                items = _availableTestWorkerContainers.ToArray();
+                testWorkerContainers = _availableTestWorkerContainers.ToArray();
             }
 
-            var notReleasedRunner = _usedTestWorkerContainers.ToArray();
-            if (notReleasedRunner.Length > 0)
+            var notReleasedTestWorkerContainers = _usedTestWorkerContainers.ToArray();
+            if (notReleasedTestWorkerContainers.Length > 0)
             {
-                var errorText = $"Found {notReleasedRunner.Length} not released TestRunners (ids: {string.Join(",", notReleasedRunner.Select(x => TestThreadContainerInfo.GetId(x.Key)))})";
+                var errorText = $"Found {notReleasedTestWorkerContainers.Length} not released TestRunners (ids: {string.Join(",", notReleasedTestWorkerContainers.Select(x => TestThreadContainerInfo.GetId(x.Key)))})";
                 _globalContainer.Resolve<ITestTracer>().TraceWarning(errorText);
             }
 

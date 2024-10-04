@@ -71,6 +71,39 @@ public class TestRunnerManagerTests : IAsyncLifetime
         TestRunnerManager.ReleaseTestRunner(testRunner3);
     }
 
+    [Fact]
+    public async Task Should_fire_remaining_AfterFeature_hooks_of_test_threads()
+    {
+        _testRunnerManager.Initialize(_anAssembly);
+
+        var testRunnerWithFeatureContext = _testRunnerManager.GetTestRunner();
+        var testRunnerWithoutFeatureContext = _testRunnerManager.GetTestRunner();
+
+        FeatureHookTracker.AfterFeatureCalled = false;
+        await testRunnerWithFeatureContext.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+        var disposableClass1 = new DisposableClass();
+        testRunnerWithFeatureContext.FeatureContext.FeatureContainer.RegisterInstanceAs(disposableClass1, dispose: true);
+
+        TestRunnerManager.ReleaseTestRunner(testRunnerWithFeatureContext);
+        TestRunnerManager.ReleaseTestRunner(testRunnerWithoutFeatureContext);
+
+        await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
+        FeatureHookTracker.AfterFeatureCalled.Should().BeTrue();
+        disposableClass1.IsDisposed.Should().BeTrue();
+    }
+
+    [Binding]
+    static class FeatureHookTracker
+    {
+        public static bool AfterFeatureCalled = false;
+
+        [AfterFeature]
+        public static void AfterFeature()
+        {
+            AfterFeatureCalled = true;
+        }
+    }
+
     class DisposableClass : IDisposable
     {
         public bool IsDisposed { get; private set; }
