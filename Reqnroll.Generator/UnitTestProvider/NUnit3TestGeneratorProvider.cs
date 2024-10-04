@@ -51,11 +51,17 @@ namespace Reqnroll.Generator.UnitTestProvider
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
             CodeDomHelper.AddAttribute(generationContext.TestClassInitializeMethod, TESTFIXTURESETUP_ATTR_NUNIT3);
+
+            // Step 2: Remove TestClassInitializeMethod (not needed)
+            generationContext.TestClass.Members.Remove(generationContext.TestClassInitializeMethod);
         }
 
         public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
             CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR_NUNIT3);
+
+            // Step 3: Remove TestClassCleanupMethod (not needed)
+            generationContext.TestClass.Members.Remove(generationContext.TestClassCleanupMethod);
         }
 
         public virtual void SetTestClassNonParallelizable(TestClassGenerationContext generationContext)

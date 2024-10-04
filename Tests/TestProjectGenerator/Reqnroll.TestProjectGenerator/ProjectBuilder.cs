@@ -367,7 +367,7 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
                     break;
                 case UnitTestProvider.NUnit3 when _parallelTestExecution:
-                    _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.Fixtures)]"));
+                    _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.All)]"));
                     break;
                 case UnitTestProvider.MSTest when _parallelTestExecution:
                     _project.AddFile(

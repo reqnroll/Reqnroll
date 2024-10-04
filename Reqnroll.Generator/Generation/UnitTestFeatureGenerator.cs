@@ -258,8 +258,9 @@ namespace Reqnroll.Generator.Generation
             
             _testGeneratorProvider.SetTestInitializeMethod(generationContext);
 
-            if (generationContext.UnitTestGeneratorProvider is not MsTestGeneratorProvider)
-                return; // only MsTest is implemented in this prototype
+            if (generationContext.UnitTestGeneratorProvider is not MsTestGeneratorProvider &&
+                generationContext.UnitTestGeneratorProvider is not NUnit3TestGeneratorProvider)
+                return; // only MsTest & NUnit is implemented in this prototype
 
             // Step 4: Obtain the test runner for executing a single test
 
@@ -372,8 +373,9 @@ namespace Reqnroll.Generator.Generation
 
             testCleanupMethod.Statements.Add(expression);
 
-            if (generationContext.UnitTestGeneratorProvider is not MsTestGeneratorProvider)
-                return; // only MsTest is implemented in this prototype
+            if (generationContext.UnitTestGeneratorProvider is not MsTestGeneratorProvider &&
+                generationContext.UnitTestGeneratorProvider is not NUnit3TestGeneratorProvider)
+                return; // only MsTest & NUnit is implemented in this prototype
 
             // Step 6: "Release" the TestRunner, so that other threads can pick it up (moved from TestClassCleanupMethod)
             // TestRunnerManager.ReleaseTestRunner(testRunner);
