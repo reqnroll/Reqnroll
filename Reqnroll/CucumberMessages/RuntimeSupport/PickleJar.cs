@@ -8,8 +8,6 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
     public class PickleJar
     {
-        public const string PICKLEJAR_VARIABLE_NAME = "m_pickleJar";
-
         public int _PickleCounter = 0;
 
         public bool HasPickles { get; }
@@ -37,9 +35,9 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
         }
         public Pickle CurrentPickle { get { return Pickles.ElementAt(_PickleCounter); } }
 
-        public PickleStepSequence PickleStepSequenceFor(string pickleId)
+        public PickleStepSequence PickleStepSequenceFor(string pickleIndex)
         {
-            return new PickleStepSequence(HasPickles, Pickles.Where(p => p.Id == pickleId).First());
+            return new PickleStepSequence(HasPickles, Pickles.ElementAt(int.Parse(pickleIndex)));
         }
 
         public void NextPickle()

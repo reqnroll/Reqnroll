@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Reqnroll.Parser
+namespace Reqnroll.Parser.CucmberMessageSupport
 {
     internal class PatchMissingLocationElementsTransformation : ScenarioTransformationVisitor
     {
@@ -30,7 +30,7 @@ namespace Reqnroll.Parser
                 scenario.Keyword,
                 scenario.Name,
                 scenario.Description,
-                scenario.Steps.Select( s => new Step(PatchLocation(s.Location), s.Keyword, s.KeywordType, s.Text, s.Argument)).ToArray(),
+                scenario.Steps.Select(s => new Step(PatchLocation(s.Location), s.Keyword, s.KeywordType, s.Text, s.Argument)).ToArray(),
                 scenario.Examples.ToArray());
         }
 
@@ -56,8 +56,8 @@ namespace Reqnroll.Parser
         private Examples PatchExamplesLocations(Examples e)
         {
             var headerCells = e.TableHeader.Cells;
-            var tableHeader = new Gherkin.Ast.TableRow(PatchLocation(e.TableHeader.Location), headerCells.Select(hc => new Gherkin.Ast.TableCell(PatchLocation(hc.Location), hc.Value)).ToArray());
-            var rows = e.TableBody.Select(r => new Gherkin.Ast.TableRow(PatchLocation(r.Location), r.Cells.Select(c => new Gherkin.Ast.TableCell(PatchLocation(c.Location), c.Value)).ToArray())).ToArray();
+            var tableHeader = new TableRow(PatchLocation(e.TableHeader.Location), headerCells.Select(hc => new TableCell(PatchLocation(hc.Location), hc.Value)).ToArray());
+            var rows = e.TableBody.Select(r => new TableRow(PatchLocation(r.Location), r.Cells.Select(c => new TableCell(PatchLocation(c.Location), c.Value)).ToArray())).ToArray();
             return new Examples(e.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(), PatchLocation(e.Location), e.Keyword, e.Name, e.Description, tableHeader, rows);
         }
 

@@ -230,14 +230,14 @@ namespace Reqnroll.Generator.Generation
                 "Format",
                 formatArguments.ToArray());
         }
-        public void AddVariableForPickleId(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, PickleJar pickleJar)
+        public void AddVariableForPickleIndex(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, int pickleIndex)
         {
             // string m_pickleId = pickleJar.CurrentPickleId; or
             // string m_pickleId = @pickleId;
-            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), GeneratorConstants.PICKLEID_VARIABLE_NAME,
+            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), GeneratorConstants.PICKLEINDEX_VARIABLE_NAME,
                 pickleIdIncludedInParameters ?
-                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEID_PARAMETER_NAME) :
-                    new CodePrimitiveExpression(pickleJar.CurrentPickleId));
+                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEINDEX_PARAMETER_NAME) :
+                    new CodePrimitiveExpression(pickleIndex.ToString()));
             testMethod.Statements.Add(pickleIdVariable);
         }
 
@@ -270,7 +270,7 @@ namespace Reqnroll.Generator.Generation
                         "PickleJar"
                     ),
                     "PickleStepSequenceFor",
-                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEID_VARIABLE_NAME))
+                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEINDEX_VARIABLE_NAME))
                 );
 
             testMethod.Statements.Add(pickleStepSequence);

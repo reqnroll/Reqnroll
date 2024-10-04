@@ -3,20 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Gherkin.Ast;
 
-namespace Reqnroll.Parser
+namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
     abstract class ScenarioTransformationVisitor : GherkinDocumentVisitor
     {
-        protected ReqnrollDocument _sourceDocument;
-        private ReqnrollDocument _transformedDocument;
-        private ReqnrollFeature _transformedFeature;
+        protected GherkinDocument _sourceDocument;
+        private GherkinDocument _transformedDocument;
+        private Feature _transformedFeature;
         private bool _hasTransformedScenarioInFeature = false;
         private bool _hasTransformedScenarioInCurrentRule = false;
         private readonly List<IHasLocation> _featureChildren = new();
         private readonly List<IHasLocation> _ruleChildren = new();
         private List<IHasLocation> _currentChildren;
 
-        public ReqnrollDocument TransformDocument(ReqnrollDocument document)
+        public GherkinDocument TransformDocument(GherkinDocument document)
         {
             Reset();
             AcceptDocument(document);
@@ -35,10 +35,10 @@ namespace Reqnroll.Parser
             _currentChildren = _featureChildren;
         }
 
-        protected abstract Scenario GetTransformedScenarioOutline(ScenarioOutline scenarioOutline);
+        protected abstract Scenario GetTransformedScenarioOutline(Scenario scenarioOutline);
         protected abstract Scenario GetTransformedScenario(Scenario scenario);
 
-        protected override void OnScenarioOutlineVisited(ScenarioOutline scenarioOutline)
+        protected override void OnScenarioOutlineVisited(Scenario scenarioOutline)
         {
             var transformedScenarioOutline = GetTransformedScenarioOutline(scenarioOutline);
             OnScenarioVisitedInternal(scenarioOutline, transformedScenarioOutline);
@@ -98,7 +98,7 @@ namespace Reqnroll.Parser
         protected override void OnFeatureVisited(Feature feature)
         {
             if (_hasTransformedScenarioInFeature)
-                _transformedFeature = new ReqnrollFeature(
+                _transformedFeature = new Feature(
                     feature.Tags?.ToArray() ?? Array.Empty<Tag>(),
                     feature.Location,
                     feature.Language,
@@ -108,15 +108,15 @@ namespace Reqnroll.Parser
                     _featureChildren.ToArray());
         }
 
-        protected override void OnDocumentVisiting(ReqnrollDocument document)
+        protected override void OnDocumentVisiting(GherkinDocument document)
         {
             _sourceDocument = document;
         }
 
-        protected override void OnDocumentVisited(ReqnrollDocument document)
+        protected override void OnDocumentVisited(GherkinDocument document)
         {
             if (_transformedFeature != null)
-                _transformedDocument = new ReqnrollDocument(_transformedFeature, document.Comments.ToArray(), document.DocumentLocation);
+                _transformedDocument = new GherkinDocument(_transformedFeature, document.Comments.ToArray());
         }
     }
 }

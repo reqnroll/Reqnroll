@@ -48,6 +48,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             testThreadEventPublisher.AddHandler<HookBindingFinishedEvent>(HookBindingFinishedEventHandler);
             testThreadEventPublisher.AddHandler<AttachmentAddedEvent>(AttachmentAddedEventHandler);
             testThreadEventPublisher.AddHandler<OutputAddedEvent>(OutputAddedEventHandler);
+            
         }
 
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
@@ -106,7 +107,6 @@ namespace Reqnroll.CucumberMessages.PubSub
                 var testRunStatus = featureTestCases.All(tc => tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK);
                 var msg = Io.Cucumber.Messages.Types.Envelope.Create(CucumberMessageFactory.ToTestRunFinished(testRunStatus, featureFinishedEvent));
                 _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
-                _broker.Complete(featureName);
             }
             else
             {

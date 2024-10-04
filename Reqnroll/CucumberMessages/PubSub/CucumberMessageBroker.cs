@@ -1,4 +1,5 @@
 ﻿using Reqnroll.BoDi;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.Tracing;
 using System;
 using System.Collections.Concurrent;
@@ -15,7 +16,6 @@ namespace Reqnroll.CucumberMessages.PubSub
     public interface ICucumberMessageBroker
     {
         bool Enabled { get; }
-        void Complete(string cucumberMessageSource);
         void Publish(ReqnrollCucumberMessage featureMessages);
     }
 
@@ -44,22 +44,5 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
         }
 
-        // using an empty CucumberMessage to indicate completion
-        public void Complete(string cucumberMessageSource)
-        {
-            var _traceListener = _objectContainer.Resolve<ITraceListener>();
-
-            var completionMessage = new ReqnrollCucumberMessage
-            {
-                CucumberMessageSource = cucumberMessageSource
-            };
-
-            foreach (var sink in RegisteredSinks.Value)
-            {
-                _traceListener.WriteTestOutput($"Broker publishing completion for {cucumberMessageSource}");
-
-                sink.Publish(completionMessage);
-            }
-        }
     }
 }

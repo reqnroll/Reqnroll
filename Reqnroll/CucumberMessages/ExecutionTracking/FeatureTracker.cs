@@ -1,7 +1,7 @@
 ﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
-using Reqnroll.CucumberMessages.PayloadProcessing;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using System;
@@ -42,17 +42,17 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             yield return CucumberMessageFactory.ToMeta(featureStartedEvent);
 
-            Gherkin.CucumberMessages.Types.Source gherkinSource = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
+            Gherkin.CucumberMessages.Types.Source gherkinSource = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source;
             Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
             yield return Envelope.Create(messageSource);
 
 
-            Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.GherkinDocument>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument);
+            Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument;
             GherkinDocument gherkinDocument = CucumberMessageTransformer.ToGherkinDocument(gherkinDoc);
             yield return Envelope.Create(gherkinDocument);
 
 
-            var gherkinPickles = System.Text.Json.JsonSerializer.Deserialize<List<Gherkin.CucumberMessages.Types.Pickle>>(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles);
+            var gherkinPickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles;
             var pickles = CucumberMessageTransformer.ToPickles(gherkinPickles);
 
             string lastID = ExtractLastID(pickles);

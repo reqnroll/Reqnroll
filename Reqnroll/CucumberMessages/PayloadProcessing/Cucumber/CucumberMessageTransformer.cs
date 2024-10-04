@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Reqnroll.CucumberMessages.PayloadProcessing
+namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
     /// <summary>
     /// The purpose of this class is to transform Cucumber messages from the Gherkin.CucumberMessages.Types namespace to the Io.Cucumber.Messages.Types namespace
@@ -16,7 +16,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
     /// </summary>
     internal class CucumberMessageTransformer
     {
-        internal static Io.Cucumber.Messages.Types.Source ToSource(Gherkin.CucumberMessages.Types.Source gherkinSource)
+        internal static Io.Cucumber.Messages.Types.Source ToSource(global::Gherkin.CucumberMessages.Types.Source gherkinSource)
         {
             var result = new Io.Cucumber.Messages.Types.Source
             (
@@ -27,7 +27,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             return result;
         }
 
-        internal static Io.Cucumber.Messages.Types.GherkinDocument ToGherkinDocument(Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc)
+        internal static Io.Cucumber.Messages.Types.GherkinDocument ToGherkinDocument(global::Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc)
         {
             var result = new Io.Cucumber.Messages.Types.GherkinDocument
             (
@@ -38,7 +38,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             return result;
         }
 
-        private static Io.Cucumber.Messages.Types.Feature ToFeature(Gherkin.CucumberMessages.Types.Feature feature)
+        private static Io.Cucumber.Messages.Types.Feature ToFeature(global::Gherkin.CucumberMessages.Types.Feature feature)
         {
             if (feature == null)
             {
@@ -59,7 +59,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             ;
         }
 
-        private static Io.Cucumber.Messages.Types.Location ToLocation(Gherkin.CucumberMessages.Types.Location location)
+        private static Io.Cucumber.Messages.Types.Location ToLocation(global::Gherkin.CucumberMessages.Types.Location location)
         {
             if (location == null)
             {
@@ -69,7 +69,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
         }
 
 
-        private static Io.Cucumber.Messages.Types.Tag ToTag(Gherkin.CucumberMessages.Types.Tag tag)
+        private static Io.Cucumber.Messages.Types.Tag ToTag(global::Gherkin.CucumberMessages.Types.Tag tag)
         {
             if (tag == null)
             {
@@ -78,7 +78,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             return new Io.Cucumber.Messages.Types.Tag(ToLocation(tag.Location), tag.Name, tag.Id);
         }
 
-        private static Io.Cucumber.Messages.Types.FeatureChild ToFeatureChild(Gherkin.CucumberMessages.Types.FeatureChild child)
+        private static Io.Cucumber.Messages.Types.FeatureChild ToFeatureChild(global::Gherkin.CucumberMessages.Types.FeatureChild child)
         {
             if (child == null)
             {
@@ -92,7 +92,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.Scenario ToScenario(Gherkin.CucumberMessages.Types.Scenario scenario)
+        private static Io.Cucumber.Messages.Types.Scenario ToScenario(global::Gherkin.CucumberMessages.Types.Scenario scenario)
         {
             if (scenario == null)
             {
@@ -112,7 +112,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.Examples ToExamples(Gherkin.CucumberMessages.Types.Examples examples)
+        private static Io.Cucumber.Messages.Types.Examples ToExamples(global::Gherkin.CucumberMessages.Types.Examples examples)
         {
             if (examples == null)
             {
@@ -130,7 +130,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
                 examples.Id
             );
         }
-        private static Io.Cucumber.Messages.Types.TableCell ToTableCell(Gherkin.CucumberMessages.Types.TableCell cell)
+        private static Io.Cucumber.Messages.Types.TableCell ToTableCell(global::Gherkin.CucumberMessages.Types.TableCell cell)
         {
             return new Io.Cucumber.Messages.Types.TableCell(
                 ToLocation(cell.Location),
@@ -138,7 +138,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.TableRow ToTableRow(Gherkin.CucumberMessages.Types.TableRow row)
+        private static Io.Cucumber.Messages.Types.TableRow ToTableRow(global::Gherkin.CucumberMessages.Types.TableRow row)
         {
             return new Io.Cucumber.Messages.Types.TableRow(
                 ToLocation(row.Location),
@@ -146,7 +146,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
                 row.Id
             );
         }
-        private static Io.Cucumber.Messages.Types.Step ToStep(Gherkin.CucumberMessages.Types.Step step)
+        private static Io.Cucumber.Messages.Types.Step ToStep(global::Gherkin.CucumberMessages.Types.Step step)
         {
             if (step == null)
             {
@@ -164,7 +164,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.Background ToBackground(Gherkin.CucumberMessages.Types.Background background)
+        private static Io.Cucumber.Messages.Types.Background ToBackground(global::Gherkin.CucumberMessages.Types.Background background)
         {
             if (background == null)
             {
@@ -180,7 +180,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.Rule ToRule(Gherkin.CucumberMessages.Types.Rule rule)
+        private static Io.Cucumber.Messages.Types.Rule ToRule(global::Gherkin.CucumberMessages.Types.Rule rule)
         {
             if (rule == null)
             {
@@ -197,7 +197,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.RuleChild ToRuleChild(Gherkin.CucumberMessages.Types.RuleChild child)
+        private static Io.Cucumber.Messages.Types.RuleChild ToRuleChild(global::Gherkin.CucumberMessages.Types.RuleChild child)
         {
             return new Io.Cucumber.Messages.Types.RuleChild(
                 ToBackground(child.Background),
@@ -205,34 +205,34 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static List<Io.Cucumber.Messages.Types.Comment> ToComments(IReadOnlyCollection<Gherkin.CucumberMessages.Types.Comment> comments)
+        private static List<Io.Cucumber.Messages.Types.Comment> ToComments(IReadOnlyCollection<global::Gherkin.CucumberMessages.Types.Comment> comments)
         {
             return comments.Select(ToComment).ToList();
         }
 
-        private static Io.Cucumber.Messages.Types.Comment ToComment(Gherkin.CucumberMessages.Types.Comment comment)
+        private static Io.Cucumber.Messages.Types.Comment ToComment(global::Gherkin.CucumberMessages.Types.Comment comment)
         {
             return new Io.Cucumber.Messages.Types.Comment(
                 ToLocation(comment.Location),
                 comment.Text
             );
         }
-        private static StepKeywordType ToKeyWordType(Gherkin.StepKeywordType keywordType)
+        private static StepKeywordType ToKeyWordType(global::Gherkin.StepKeywordType keywordType)
         {
             return keywordType switch
             {
                 //case Gherkin.StepKeywordType.Unspecified:
                 //    return Io.Cucumber.Messages.Types.StepKeywordType.UNKNOWN;
-                Gherkin.StepKeywordType.Context => StepKeywordType.CONTEXT,
-                Gherkin.StepKeywordType.Conjunction => StepKeywordType.CONJUNCTION,
-                Gherkin.StepKeywordType.Action => StepKeywordType.ACTION,
-                Gherkin.StepKeywordType.Outcome => StepKeywordType.OUTCOME,
-                Gherkin.StepKeywordType.Unknown => StepKeywordType.UNKNOWN,
+                global::Gherkin.StepKeywordType.Context => StepKeywordType.CONTEXT,
+                global::Gherkin.StepKeywordType.Conjunction => StepKeywordType.CONJUNCTION,
+                global::Gherkin.StepKeywordType.Action => StepKeywordType.ACTION,
+                global::Gherkin.StepKeywordType.Outcome => StepKeywordType.OUTCOME,
+                global::Gherkin.StepKeywordType.Unknown => StepKeywordType.UNKNOWN,
                 _ => throw new ArgumentException($"Invalid keyword type: {keywordType}"),
             };
         }
 
-        private static Io.Cucumber.Messages.Types.DocString ToDocString(Gherkin.CucumberMessages.Types.DocString docString)
+        private static Io.Cucumber.Messages.Types.DocString ToDocString(global::Gherkin.CucumberMessages.Types.DocString docString)
         {
             return new Io.Cucumber.Messages.Types.DocString(
                 ToLocation(docString.Location),
@@ -242,7 +242,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.DataTable ToDataTable(Gherkin.CucumberMessages.Types.DataTable dataTable)
+        private static Io.Cucumber.Messages.Types.DataTable ToDataTable(global::Gherkin.CucumberMessages.Types.DataTable dataTable)
         {
             return new Io.Cucumber.Messages.Types.DataTable(
                 ToLocation(dataTable.Location),
@@ -250,12 +250,12 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        internal static List<Io.Cucumber.Messages.Types.Pickle> ToPickles(IReadOnlyCollection<Gherkin.CucumberMessages.Types.Pickle> pickles)
+        internal static List<Io.Cucumber.Messages.Types.Pickle> ToPickles(IEnumerable<global::Gherkin.CucumberMessages.Types.Pickle> pickles)
         {
             return pickles.Select(ToPickle).ToList();
         }
 
-        private static Io.Cucumber.Messages.Types.Pickle ToPickle(Gherkin.CucumberMessages.Types.Pickle pickle)
+        private static Io.Cucumber.Messages.Types.Pickle ToPickle(global::Gherkin.CucumberMessages.Types.Pickle pickle)
         {
             return new Io.Cucumber.Messages.Types.Pickle(
                 pickle.Id,
@@ -267,14 +267,14 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
                 pickle.AstNodeIds.ToList()
             );
         }
-        private static Io.Cucumber.Messages.Types.PickleTag ToPickleTag(Gherkin.CucumberMessages.Types.PickleTag pickleTag)
+        private static Io.Cucumber.Messages.Types.PickleTag ToPickleTag(global::Gherkin.CucumberMessages.Types.PickleTag pickleTag)
         {
             return new Io.Cucumber.Messages.Types.PickleTag(
                 pickleTag.Name,
                 pickleTag.AstNodeId
             );
         }
-        private static Io.Cucumber.Messages.Types.PickleStep ToPickleStep(Gherkin.CucumberMessages.Types.PickleStep pickleStep)
+        private static Io.Cucumber.Messages.Types.PickleStep ToPickleStep(global::Gherkin.CucumberMessages.Types.PickleStep pickleStep)
         {
             return new Io.Cucumber.Messages.Types.PickleStep(
                 ToPickleStepArgument(pickleStep.Argument),
@@ -284,7 +284,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
                 pickleStep.Text
             );
         }
-        private static Io.Cucumber.Messages.Types.PickleStepArgument ToPickleStepArgument(Gherkin.CucumberMessages.Types.PickleStepArgument pickleStepArgument)
+        private static Io.Cucumber.Messages.Types.PickleStepArgument ToPickleStepArgument(global::Gherkin.CucumberMessages.Types.PickleStepArgument pickleStepArgument)
         {
             if (pickleStepArgument == null)
             {
@@ -296,18 +296,18 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static PickleStepType ToPickleStepType(Gherkin.StepKeywordType pickleStepType)
+        private static PickleStepType ToPickleStepType(global::Gherkin.StepKeywordType pickleStepType)
         {
             return pickleStepType switch
             {
-                Gherkin.StepKeywordType.Unknown => PickleStepType.UNKNOWN,
-                Gherkin.StepKeywordType.Action => PickleStepType.ACTION,
-                Gherkin.StepKeywordType.Outcome => PickleStepType.OUTCOME,
-                Gherkin.StepKeywordType.Context => PickleStepType.CONTEXT,
+                global::Gherkin.StepKeywordType.Unknown => PickleStepType.UNKNOWN,
+                global::Gherkin.StepKeywordType.Action => PickleStepType.ACTION,
+                global::Gherkin.StepKeywordType.Outcome => PickleStepType.OUTCOME,
+                global::Gherkin.StepKeywordType.Context => PickleStepType.CONTEXT,
                 _ => throw new ArgumentException($"Invalid pickle step type: {pickleStepType}")
             };
         }
-        private static Io.Cucumber.Messages.Types.PickleDocString ToPickleDocString(Gherkin.CucumberMessages.Types.PickleDocString pickleDocString)
+        private static Io.Cucumber.Messages.Types.PickleDocString ToPickleDocString(global::Gherkin.CucumberMessages.Types.PickleDocString pickleDocString)
         {
             if (pickleDocString == null)
             {
@@ -319,7 +319,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.PickleTable ToPickleTable(Gherkin.CucumberMessages.Types.PickleTable pickleTable)
+        private static Io.Cucumber.Messages.Types.PickleTable ToPickleTable(global::Gherkin.CucumberMessages.Types.PickleTable pickleTable)
         {
             if (pickleTable == null)
             {
@@ -330,14 +330,14 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             );
         }
 
-        private static Io.Cucumber.Messages.Types.PickleTableRow ToPickleTableRow(Gherkin.CucumberMessages.Types.PickleTableRow pickleTableRow)
+        private static Io.Cucumber.Messages.Types.PickleTableRow ToPickleTableRow(global::Gherkin.CucumberMessages.Types.PickleTableRow pickleTableRow)
         {
             return new Io.Cucumber.Messages.Types.PickleTableRow(
                 pickleTableRow.Cells.Select(ToPickleTableCell).ToList()
             );
         }
 
-        private static Io.Cucumber.Messages.Types.PickleTableCell ToPickleTableCell(Gherkin.CucumberMessages.Types.PickleTableCell pickleTableCell)
+        private static Io.Cucumber.Messages.Types.PickleTableCell ToPickleTableCell(global::Gherkin.CucumberMessages.Types.PickleTableCell pickleTableCell)
         {
             return new Io.Cucumber.Messages.Types.PickleTableCell(
                 pickleTableCell.Value

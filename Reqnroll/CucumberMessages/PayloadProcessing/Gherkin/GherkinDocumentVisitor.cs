@@ -1,11 +1,12 @@
 using System;
+using System.Linq;
 using Gherkin.Ast;
 
-namespace Reqnroll.Parser
+namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
     abstract class GherkinDocumentVisitor
     {
-        protected virtual void AcceptDocument(ReqnrollDocument document)
+        protected virtual void AcceptDocument(GherkinDocument document)
         {
             OnDocumentVisiting(document);
             if (document.Feature != null)
@@ -22,7 +23,7 @@ namespace Reqnroll.Parser
             {
                 if (featureChild is Rule rule) AcceptRule(rule);
                 else if (featureChild is Background background) AcceptBackground(background);
-                else if (featureChild is ScenarioOutline scenarioOutline) AcceptScenarioOutline(scenarioOutline);
+                else if (featureChild is Scenario scenarioOutline && scenarioOutline.Examples != null && scenarioOutline.Examples.Count() > 0) AcceptScenarioOutline(scenarioOutline);
                 else if (featureChild is Scenario scenario) AcceptScenario(scenario);
             }
             OnFeatureVisited(feature);
@@ -43,7 +44,7 @@ namespace Reqnroll.Parser
             OnScenarioVisited(scenario);
         }
 
-        protected virtual void AcceptScenarioOutline(ScenarioOutline scenarioOutline)
+        protected virtual void AcceptScenarioOutline(Scenario scenarioOutline)
         {
             OnScenarioOutlineVisiting(scenarioOutline);
             foreach (var step in scenarioOutline.Steps)
@@ -69,18 +70,18 @@ namespace Reqnroll.Parser
             foreach (var ruleChild in rule.Children)
             {
                 if (ruleChild is Background background) AcceptBackground(background);
-                else if (ruleChild is ScenarioOutline scenarioOutline) AcceptScenarioOutline(scenarioOutline);
+                else if (ruleChild is Scenario scenarioOutline && scenarioOutline.Examples != null && scenarioOutline.Examples.Count() > 0) AcceptScenarioOutline(scenarioOutline);
                 else if (ruleChild is Scenario scenario) AcceptScenario(scenario);
             }
             OnRuleVisited(rule);
         }
 
-        protected virtual void OnDocumentVisiting(ReqnrollDocument document)
+        protected virtual void OnDocumentVisiting(GherkinDocument document)
         {
             //nop
         }
 
-        protected virtual void OnDocumentVisited(ReqnrollDocument document)
+        protected virtual void OnDocumentVisited(GherkinDocument document)
         {
             //nop
         }
@@ -115,12 +116,12 @@ namespace Reqnroll.Parser
             //nop
         }
 
-        protected virtual void OnScenarioOutlineVisiting(ScenarioOutline scenarioOutline)
+        protected virtual void OnScenarioOutlineVisiting(Scenario scenarioOutline)
         {
             //nop
         }
 
-        protected virtual void OnScenarioOutlineVisited(ScenarioOutline scenarioOutline)
+        protected virtual void OnScenarioOutlineVisited(Scenario scenarioOutline)
         {
             //nop
         }

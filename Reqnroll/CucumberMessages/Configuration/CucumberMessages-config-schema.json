@@ -24,6 +24,9 @@
                     },
                     "OutputFileName": {
                         "type": "string"
+                    },
+                    "IDGenerationStyle": {
+                        "type": "string"
                     }
                 }
             }

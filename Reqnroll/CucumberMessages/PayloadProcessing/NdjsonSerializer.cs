@@ -1,4 +1,5 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using System;
 using System.Text.Json;
 
@@ -22,7 +23,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             options.Converters.Add(new CucumberMessageEnumConverter<StepKeywordType>());
             options.Converters.Add(new CucumberMessageEnumConverter<TestStepResultStatus>());
             options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
-            options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
+            options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.Default;
 
             return options;
         });

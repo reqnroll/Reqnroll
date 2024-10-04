@@ -19,7 +19,7 @@ namespace Reqnroll.CucumberMessages.Configuration
             string defaultOutputDirectory = _environmentWrapper.GetCurrentDirectory();
             string defaultOutputFileName = "reqnroll_report.ndjson";
 
-            var defaultProfile = new Profile("DEFAULT", defaultOutputDirectory, string.Empty, defaultOutputFileName, "UUID");
+            var defaultProfile = new Profile("DEFAULT", defaultOutputDirectory, string.Empty, defaultOutputFileName, IDGenerationStyle.UUID);
             res.FileOutputEnabled = false;
             res.Profiles.Add(defaultProfile);
             return res;

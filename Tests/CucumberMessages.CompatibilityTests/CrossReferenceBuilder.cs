@@ -1,6 +1,6 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Reqnroll.CucumberMessages.PayloadPatching;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using System;
 using System.Collections.Generic;
 using System.Linq;

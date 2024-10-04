@@ -1,4 +1,4 @@
-﻿namespace Reqnroll.CucumberMessages
+﻿namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     public interface IStepTracker
     {
@@ -6,5 +6,5 @@
 
     }
 
-  
+
 }

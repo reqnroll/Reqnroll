@@ -40,14 +40,13 @@ namespace Reqnroll.CucumberMessages.Configuration
         public string OutputFileName { get; set; }
         public IDGenerationStyle IDGenerationStyle { get; set; }
 
-        public Profile(string profileName, string basePath, string outputDirectory, string outputFileName, string idGenerationStyle = "UUID")
+        public Profile(string profileName, string basePath, string outputDirectory, string outputFileName, IDGenerationStyle idGenerationStyle )
         {
             ProfileName = string.IsNullOrEmpty(profileName) ? "DEFAULT" : profileName;
             BasePath = basePath ?? "";
             OutputDirectory = outputDirectory ?? "";
             OutputFileName = outputFileName ?? "";
-
-            IDGenerationStyle = CucumberConfiguration.ParseIdGenerationStyle(idGenerationStyle);
+            IDGenerationStyle = idGenerationStyle;
         }
 
     }

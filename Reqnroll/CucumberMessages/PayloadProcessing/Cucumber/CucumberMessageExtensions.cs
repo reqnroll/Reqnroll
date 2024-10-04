@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
     public static class CucumberMessageExtensions
     {
@@ -72,8 +72,8 @@ namespace Reqnroll.CucumberMessages
         public static object Content(this Envelope envelope)
         {
             object result = null;
-            if (envelope.Attachment != null) { result = envelope.Attachment; } 
-            else if (envelope.GherkinDocument != null) { result = envelope.GherkinDocument; } 
+            if (envelope.Attachment != null) { result = envelope.Attachment; }
+            else if (envelope.GherkinDocument != null) { result = envelope.GherkinDocument; }
             else if (envelope.Hook != null) { result = envelope.Hook; }
             else if (envelope.Meta != null) { result = envelope.Meta; }
             else if (envelope.ParameterType != null) { result = envelope.ParameterType; }

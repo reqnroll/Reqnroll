@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Gherkin.CucumberMessages.Types;
 
-namespace Reqnroll.Parser
+namespace Reqnroll.Parser.CucmberMessageSupport
 {
     public interface ICucumberMessagesConverters
     {

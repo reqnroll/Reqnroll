@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
 
-namespace Reqnroll.CucumberMessages.PayloadPatching
+namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
     public abstract class CucumberMessage_TraversalVisitorBase : ICucumberMessageVisitor
     {

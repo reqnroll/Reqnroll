@@ -1,6 +1,6 @@
 ﻿using Io.Cucumber.Messages.Types;
 
-namespace Reqnroll.CucumberMessages.PayloadPatching;
+namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 
 // This interface is used to support the implementation of an External Vistor pattern against the Cucumber Messages.
 // Visitors impmlement this interface and then invoke it using the helper class below.

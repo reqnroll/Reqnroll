@@ -1,6 +1,6 @@
 ﻿using Reqnroll.Events;
 
-namespace Reqnroll.CucumberMessages
+namespace Reqnroll.CucumberMessages.PubSub
 {
     public interface ICucumberMessagePublisher
     {

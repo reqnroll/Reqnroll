@@ -9,10 +9,14 @@ namespace Reqnroll.CucumberMessages.Configuration
 
         public ConfigurationDTO GetConfiguration()
         {
+            var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            jsonOptions.Converters.Add(new IdGenerationStyleEnumConverter());
+
             ConfigurationDTO configurationDTO = null;
             if (File.Exists(CUCUMBERMESSAGESCONFIGURATIONFILENAME))
             {
-                configurationDTO = JsonSerializer.Deserialize<ConfigurationDTO>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })!;
+                configurationDTO = JsonSerializer.Deserialize<ConfigurationDTO>(File.ReadAllText(CUCUMBERMESSAGESCONFIGURATIONFILENAME), 
+                                        jsonOptions);
             }
             return configurationDTO;
         }

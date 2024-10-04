@@ -5,7 +5,8 @@
         {
             "profileName": "LOCAL",
             "basePath": "C:\\Users\\clrud\\source\\repos\\scratch",
-            "outputDirectory": "CucumberMessages"
+            "outputDirectory": "CucumberMessages",
+            "IDGenerationStyle":  "INCREMENTING"
         }
     ]
 }

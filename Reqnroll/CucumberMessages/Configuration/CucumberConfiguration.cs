@@ -3,6 +3,7 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -40,6 +41,7 @@ namespace Reqnroll.CucumberMessages.Configuration
         
         private ResolvedConfiguration ResolveConfiguration()
         {
+            //Debugger.Launch();
             var config = ApplyHierarchicalConfiguration();
             var resolved = ApplyEnvironmentOverrides(config);
 
@@ -101,7 +103,7 @@ namespace Reqnroll.CucumberMessages.Configuration
                 result.OutputFileName = ((Success<string>)fileNameValue).Result;
 
             if (idGenStyleValue is Success<string>)
-                result.IDGenerationStyle = CucumberConfiguration.ParseIdGenerationStyle(((Success<string>)idGenStyleValue).Result);
+                result.IDGenerationStyle = IdGenerationStyleEnumConverter.ParseIdGenerationStyle(((Success<string>)idGenStyleValue).Result);
 
             var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
             var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "TRUE";
@@ -159,16 +161,6 @@ namespace Reqnroll.CucumberMessages.Configuration
             {
                 Directory.CreateDirectory(Path.Combine(config.BaseDirectory, config.OutputDirectory));
             }
-        }
-        public static IDGenerationStyle ParseIdGenerationStyle(string idGenerationStyle)
-        {
-            if (string.IsNullOrEmpty(idGenerationStyle))
-                idGenerationStyle = "UUID";
-
-            if ("INCREMENTING".Equals(idGenerationStyle, StringComparison.OrdinalIgnoreCase))
-                return IDGenerationStyle.Incrementing;
-            else
-                return IDGenerationStyle.UUID;
         }
 
     }
