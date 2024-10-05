@@ -31,11 +31,52 @@
     <Copy SourceFiles="@(GeneratedNupkgs)" DestinationFolder="$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)" />
   </Target>
 
+  <UsingTask
+    TaskName="ReqnrollClearNuGetCache"
+    TaskFactory="RoslynCodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
+    <ParameterGroup>
+      <NuGetCacheDirectory ParameterType="System.String" Required="true" />
+      <EnsureNugetCacheCleared ParameterType="System.String" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System"/>
+      <Using Namespace="System.IO"/>
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+string TmpDirectory = NuGetCacheDirectory + "-remove";
+
+Log.LogMessage("Cleaning local nuget cache " + NuGetCacheDirectory);
+
+if (Directory.Exists(TmpDirectory))
+    Directory.Delete(TmpDirectory, true);
+if (Directory.Exists(NuGetCacheDirectory))
+{
+    try
+    {
+        // If a file is locked, calling Directory.Delete can result in half-removed directories.
+        // This is bad for nuget caches, as dotnet restore may fail in these cases.
+        // That's why we first move the directory (which is only possible if no file is locked in the directory) and then delete the renamed directory.
+        Directory.Move(NuGetCacheDirectory, TmpDirectory);
+    }
+    catch
+    {
+        if (EnsureNugetCacheCleared != "false")
+            Log.LogError("Can't clean NuGet Cache Directory " + NuGetCacheDirectory);
+        else
+            Log.LogWarning("Can't clean NuGet Cache Directory " + NuGetCacheDirectory);
+    }
+}
+if (Directory.Exists(TmpDirectory))
+    Directory.Delete(TmpDirectory, true);
+]]>
+      </Code>
+    </Task>
+  </UsingTask>
+
   <Target Name="DeleteLocalNuGetCache" BeforeTargets="Pack" Condition="$(VersionSuffix)=='local'">
     <!--Clears the NuGet cache manually until https://github.com/NuGet/Home/issues/5713 is fixed.-->
     <!--Implementation based on https://www.nyckel.com/blog/nuget-packages/.-->
-    <Message Text="Cleaning local nuget cache $(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)"/>
-    <RemoveDir Directories="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)" ContinueOnError="false" Condition="'$(REQNROLL_ENSURE_NUGET_CACHE_CLEARED)' != 'false'"/>
-    <RemoveDir Directories="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)" ContinueOnError="true"  Condition="'$(REQNROLL_ENSURE_NUGET_CACHE_CLEARED)' == 'false'"/>
+    <ReqnrollClearNuGetCache NuGetCacheDirectory="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)" EnsureNugetCacheCleared="$(REQNROLL_ENSURE_NUGET_CACHE_CLEARED)"/>
   </Target>
 </Project>
