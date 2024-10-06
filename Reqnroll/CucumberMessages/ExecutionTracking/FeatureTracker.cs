@@ -11,21 +11,32 @@ using System.Text.RegularExpressions;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// FeatureTracker is responsible for tracking the execution of a Feature.
+    /// There will be one instance of this class per gherkin Feature.
+    /// </summary>
     public class FeatureTracker
     {
+        // Static Messages are those generated during code generation (Source, GherkinDocument & Pickles)
+        // and the StepTransformations, StepDefinitions and Hook messages which are global to the entire Solution.
         internal IEnumerable<Envelope> StaticMessages => _staticMessages.Value;
         private Lazy<IEnumerable<Envelope>> _staticMessages; 
         // ID Generator to use when generating IDs for TestCase messages and beyond
         // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
         // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
         public IIdGenerator IDGenerator { get; set; }
+
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
         internal Dictionary<string, string> StepDefinitionsByPattern = new();
         public string FeatureName { get; set; }
         public bool Enabled { get; private set; }
+
+        // This dictionary maps from (string) PickleIDIndex to (string) PickleID
         public Dictionary<string, string> PickleIds { get; } = new();
 
+
+        // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
         public FeatureTracker(FeatureStartedEvent featureStartedEvent)
         {
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
@@ -58,6 +69,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             string lastID = ExtractLastID(pickles);
             IDGenerator = IdGeneratorFactory.Create(lastID);
+
             for(int i = 0; i < pickles.Count; i++)
             {
                 PickleIds.Add(i.ToString(), pickles[i].Id);
@@ -106,6 +118,13 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             yield return Envelope.Create(CucumberMessageFactory.ToTestRunStarted(featureStartedEvent));
         }
+
+        // This method is used to identify the last ID generated from the set generated during code gen. 
+        // It takes advantage of the design assumption that Pickles are generated last, and that PickleSteps are generated before the ID of the Pickle itself.
+        // Therefore, the ID of the last Pickle is last ID generated.
+        // Subsequent Messages can be assigned IDs starting from that one (assuming incrementing integer IDs).
+        // 
+        // Note: Should the method of assigning IDs ever change (or their sequence of assignment) in the code generator, then this method may need to change as well.
         private string ExtractLastID(List<Pickle> pickles)
         {
             return pickles.Last().Id;

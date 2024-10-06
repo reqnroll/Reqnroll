@@ -19,6 +19,12 @@ namespace Reqnroll.CucumberMessages.PubSub
         void Publish(ReqnrollCucumberMessage featureMessages);
     }
 
+    /// <summary>
+    /// Cucumber Message implementation is a simple Pub/Sub implementation.
+    /// This broker mediates between the (singleton) CucumberMessagePublisher and (one or more) CucumberMessageSinks
+    /// 
+    /// The pub/sub mechanism is considered to be turned "OFF" if no sinks are registered
+    /// </summary>
     public class CucumberMessageBroker : ICucumberMessageBroker
     {
         private IObjectContainer _objectContainer;

@@ -6,6 +6,10 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
+    /// <summary>
+    /// These classes are used at runtime to track which Pickle and PickleStep is being executed
+    /// and to provide the appropriate PickleId and PickleStepId to the TestCaseTracker and StepTracker.
+    /// </summary>
     public class PickleJar
     {
         public int _PickleCounter = 0;
@@ -13,8 +17,6 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
         public bool HasPickles { get; }
         public IEnumerable<Pickle> Pickles { get; set; }
 
-        //public PickleJar(IEnumerable<string> picklesJSON) : this(picklesJSON.Select(s => System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Pickle>(s)).ToList())
-        //{ }
         public PickleJar(string picklesJSON) : this(System.Text.Json.JsonSerializer.Deserialize<List<Pickle>>(picklesJSON)) { }
         public PickleJar(IEnumerable<Pickle> pickles) : this(pickles, 0, 0) { }
 

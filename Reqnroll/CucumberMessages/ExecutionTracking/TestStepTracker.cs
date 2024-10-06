@@ -16,6 +16,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public string Type;
     }
 
+    /// <summary>
+    /// This class is used to track the execution of Test StepDefinition Methods
+    /// </summary>
     public class TestStepTracker : StepExecutionTrackerBase
     {
         private StepStartedEvent stepStartedEvent;

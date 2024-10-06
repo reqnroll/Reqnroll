@@ -6,6 +6,10 @@ using System.Text;
 
 namespace Reqnroll.Parser.CucmberMessageSupport
 {
+    /// <summary>
+    /// This class is used to patch missing location elements for features, scenarios and scenario outlines.
+    /// It is based upon the AST visitor implementation found in the External Data plugin. It may be worth finding a way to generalize the visitor base classes but this is sufficient for now.
+    /// </summary>
     internal class PatchMissingLocationElementsTransformation : ScenarioTransformationVisitor
     {
         protected override void OnFeatureVisited(Feature feature)

@@ -5,6 +5,12 @@ using Gherkin.CucumberMessages.Types;
 
 namespace Reqnroll.Parser.CucmberMessageSupport
 {
+     /// <summary>
+     /// Utility class that converts Reqnroll AST types in to CucumberMessages.Types types.
+     /// It uses two classes from the Gherking project: AstMessagesConverter and PickleCompiler
+     /// 
+     /// Once the Gherkin project implementation directly emits CucumberMessages (eliminating the use of the Gherkin.CucumberMessages.Types namespace), this class can be removed
+     /// </summary>
     public class CucumberMessagesConverter : ICucumberMessagesConverters
     {
         private IIdGenerator _idGenerator;
@@ -13,6 +19,10 @@ namespace Reqnroll.Parser.CucmberMessageSupport
         {
             _idGenerator = idGenerator;
         }
+
+        // This method transforms an AST ReqnrollDocument into a CucumberMessages.Types.GherkinDocument
+        // Before doing so, it patches any missing Location elements in the AST. These might be missing because our ExternalData Plugin does not emit Location elements for the Example table rows it generates
+        // 
         public GherkinDocument ConvertToCucumberMessagesGherkinDocument(ReqnrollDocument gherkinDocument)
         {
             var NullLocationPatcher = new PatchMissingLocationElementsTransformation();

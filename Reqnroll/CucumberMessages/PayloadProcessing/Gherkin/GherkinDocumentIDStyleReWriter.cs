@@ -9,6 +9,15 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
+    /// <summary>
+    /// The ID Generation Style is configurable (by either the config file or by Environment Variable override).
+    /// 
+    /// This class confirms that the ID Style that was used during code generation is consistent 
+    /// with that which is configured to be used during TEST execution.
+    /// While it's not likely they would be different, it's possible.
+    /// 
+    /// If they are possible, we use a visitor pattern to re-write the IDs to the test-time chosen style.
+    /// </summary>
     internal class GherkinDocumentIDStyleReWriter : GherkinTypesGherkinDocumentVisitor
     {
         private IIdGenerator _idGenerator;

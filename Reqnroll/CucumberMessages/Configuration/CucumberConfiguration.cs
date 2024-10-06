@@ -9,6 +9,17 @@ using System.Linq;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
+    /// <summary>
+    /// This class is responsible for determining the configuration of the Cucumber Messages subsystem.
+    /// It is wired into the object container as a singleton and is a dependency of the PubSub classes.
+    /// 
+    /// When any consumer of this class asks for one of the properties of ICucumberConfiguration,
+    /// the class will resolve the configuration (only once).
+    /// 
+    /// A default configuration is provided (by DefaultConfigurationSource). 
+    /// It is supplemented by one or more profiles from the configuration file. (RCM_ConfigFile_ConfigurationSource)
+    /// Then Environmment Variable Overrides are applied.
+    /// </summary>
     public class CucumberConfiguration : ICucumberConfiguration
     {
         public static CucumberConfiguration Current { get; private set; }
@@ -43,7 +54,6 @@ namespace Reqnroll.CucumberMessages.Configuration
         
         private ResolvedConfiguration ResolveConfiguration()
         {
-            //Debugger.Launch();
             var config = ApplyHierarchicalConfiguration();
             var resolved = ApplyEnvironmentOverrides(config);
 

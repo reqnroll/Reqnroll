@@ -25,6 +25,12 @@ using System.Runtime.InteropServices.ComTypes;
 
 namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 {
+    /// <summary>
+    /// The FileOutputPlugin is the subscriber to the CucumberMessageBroker. 
+    /// It receives Cucumber Messages and writes them to a file.
+    /// 
+    /// File writing is done on a background thread.
+    /// </summary>
     public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private Task? fileWritingTask;
@@ -99,13 +105,13 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         public void Publish(ReqnrollCucumberMessage message)
         {
-            //var contentType = message.Envelope == null ? "End of Messages Marker" : message.Envelope.Content().GetType().Name;
-            //trace?.WriteTestOutput($"FileOutputPlugin Publish. Cucumber Message: {message.CucumberMessageSource}: {contentType}");
             postedMessages.Add(message);
         }
 
         private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
         {
+            
+            // Consider refactoring this to a Using() block.
             var fileStream = File.CreateText(Path.Combine(baseDirectory, fileName));
 
 
@@ -116,7 +122,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
                 if (message.Envelope != null)
                 {
                     var cm = Serialize(message.Envelope);
-                    //trace?.WriteTestOutput($"FileOutputPlugin ConsumeAndWriteToFiles. Cucumber Message: {featureName}: {cm.Substring(0, 20)}");
                     Write(fileStream, cm);
                 }
             }

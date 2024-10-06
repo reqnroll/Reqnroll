@@ -2,6 +2,9 @@
 
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
+    /// <summary>
+    /// Wraps an <see cref="OutputAddedEvent"/> to provide a <see cref="PickleStepID"/>
+    /// </summary>
     internal class OutputAddedEventWrapper : ExecutionEvent
     {
         internal OutputAddedEvent OutputAddedEvent;

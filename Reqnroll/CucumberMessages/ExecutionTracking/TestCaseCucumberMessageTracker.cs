@@ -27,7 +27,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             PickleIdList = featureTracker.PickleIds;
         }
 
-        // Feature FeatureInfo and Pickle ID make up a unique identifier for tracking execution of Test Cases
+        // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
         public string FeatureName { get; set; }
         public string PickleId { get; set; } = string.Empty;
         public string TestCaseTrackerId { get { return FeatureName +@"/" + PickleId; } }
@@ -35,11 +35,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public string TestCaseStartedId { get; private set; }
 
         private readonly Dictionary<string, string> PickleIdList;
-
-        // When this class is first created (on FeatureStarted), it will not yet be assigned a Scenario/Pickle; 
-        // When a Scenario is started, the Publisher will assign the Scenario to the first UnAssigned TestCaseCucumberMessageTracker it finds
-        // This property will indicate that state
-        public bool IsUnassigned { get { return PickleId == string.Empty; } }
 
         public bool Enabled { get; set; } //This will be false if the feature could not be pickled
 
@@ -51,6 +46,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
         public IIdGenerator IDGenerator { get; set; }
 
+        // We keep two dictionaries to track the Test Steps and Hooks.
+        // The first dictionary tracks the Test Steps by their ID, the second will have two entries for each Test Step - one for the Started event and one for the Finished event
         private Dictionary<string, StepExecutionTrackerBase> StepsById { get; set; } = new();
         private Dictionary<ExecutionEvent, StepExecutionTrackerBase> StepsByEvent { get; set; } = new();
         public List<StepExecutionTrackerBase> Steps
@@ -62,7 +59,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         }
         public ScenarioExecutionStatus ScenarioExecutionStatus { get; private set; }
 
-
+        // Message generation is a two-stage process. We use these two stages with both the XXXStarted and XXXFinished Events.
+        // In the first stage (PreProcess) we capture what information we can about the step/hook that provides enough information to tie everything together.
+        // In the second stage (PostProcess) (run after all events have been executed for a TestCase) we generate the Cucumber Messages for the Test Case
         // This queue holds ExecutionEvents that will be processed in stage 2
         private Queue<ExecutionEvent> _events = new();
 

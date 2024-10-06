@@ -5,6 +5,13 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
+
+    /// <summary>
+    /// Defaults are:
+    /// - FileOutputEnabled = false
+    /// - ActiveProfileName = "DEFAULT"
+    /// - A default profile with a default output directory and file name and UUID ID generation
+    /// </summary>
     internal class DefaultConfigurationSource : IConfigurationSource
     {
         private IEnvironmentWrapper _environmentWrapper;

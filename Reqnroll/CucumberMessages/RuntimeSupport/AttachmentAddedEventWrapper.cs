@@ -2,6 +2,7 @@
 
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
+    // This class acts as an addendum to AttachmentAddedEvent and provides the ability to convey which Pickle, TestCase, and TestStep were responsible for the Attachment being added.
     internal class AttachmentAddedEventWrapper : ExecutionEvent
     {
         public AttachmentAddedEventWrapper(AttachmentAddedEvent attachmentAddedEvent, string pickleStepId)

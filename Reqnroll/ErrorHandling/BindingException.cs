@@ -1,6 +1,5 @@
 using Reqnroll.Bindings;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
@@ -29,6 +28,11 @@ namespace Reqnroll
         }
     }
 
+    /// <summary>
+    /// This subclass is added for support of Cucumber Messages.
+    /// When emitting the Cucumber Message that describes an ambigous matching situation, the Messsage will contain the list of possible matches.
+    /// We use this subclass of BindingException to convey that information.
+    /// </summary>
     [Serializable]
     public class AmbiguousBindingException : BindingException
     {

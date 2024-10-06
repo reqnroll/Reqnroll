@@ -13,18 +13,27 @@ using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
+    /// <summary>
+    /// Cucumber Message Publisher
+    /// This class is responsible for publishing CucumberMessages to the CucumberMessageBroker
+    /// 
+    /// It uses the set of ExecutionEvents to track overall execution of Features and steps and drive generation of messages
+    /// 
+    /// It uses the IRuntimePlugin interface to force the runtime to load it during startup (although it is not an external plugin per se).
+    /// </summary>
     public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin
     {
         private Lazy<ICucumberMessageBroker> _brokerFactory;
         private ICucumberMessageBroker _broker;
         private IObjectContainer objectContainer;
+
+        // Started Features by name
         private ConcurrentDictionary<string, FeatureTracker> StartedFeatures = new();
         private ConcurrentDictionary<string, TestCaseCucumberMessageTracker> testCaseTrackersById = new();
         bool Enabled = false;
 
         public CucumberMessagePublisher()
         {
-            //Debugger.Launch();
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
@@ -54,14 +63,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
-            //Debugger.Launch();
             _broker = _brokerFactory.Value;
             var traceListener = objectContainer.Resolve<ITraceListener>();
             var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
 
-            // This checks to confirm that the Feature was successfully serialized into the required GherkinDocument and Pickles;
-            // if not, then this is disabled for this feature
-            // if true, then it checks with the _broker to confirm that a listener/sink has been registered
             Enabled = _broker.Enabled;
             if (!Enabled)
             {
@@ -77,6 +82,8 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: {featureName}");
             var ft = new FeatureTracker(featureStartedEvent);
+
+            // This will add a FeatureTracker to the StartedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.
             if (StartedFeatures.TryAdd(featureName, ft) && ft.Enabled)
             {
                 foreach (var msg in ft.StaticMessages)
@@ -188,8 +195,6 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (!Enabled)
                 return;
 
-            // FeatureContext and FeatureInfo will not be available for BeforeTestRun, AfterTestRun, BeforeFeature, AfterFeature hooks. 
-            // Bypass them by checking for null
             var testCaseTrackerId = hookBindingStartedEvent.ContextManager.FeatureContext?.FeatureInfo?.CucumberMessages_TestCaseTrackerId;
             if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
                 tccmt.ProcessEvent(hookBindingStartedEvent);
@@ -200,8 +205,6 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (!Enabled)
                 return;
 
-            // FeatureContext and FeatureInfo will not be available for BeforeTestRun, AfterTestRun, BeforeFeature, AfterFeature hooks. 
-            // Bypass them by checking for null
             var testCaseTrackerId = hookBindingFinishedEvent.ContextManager.FeatureContext?.FeatureInfo?.CucumberMessages_TestCaseTrackerId;
             if (testCaseTrackerId != null && testCaseTrackersById.TryGetValue(testCaseTrackerId, out var tccmt))
                 tccmt.ProcessEvent(hookBindingFinishedEvent);

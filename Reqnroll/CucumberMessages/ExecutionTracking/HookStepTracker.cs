@@ -6,6 +6,10 @@ using System.Linq;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// This class is used to track execution of Hook Steps
+    /// 
+    /// </summary>
     public class HookStepTracker : StepExecutionTrackerBase
     {
         public string HookBindingSignature { get; private set; }

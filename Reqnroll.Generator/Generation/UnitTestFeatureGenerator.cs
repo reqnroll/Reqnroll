@@ -1,12 +1,9 @@
 using System;
 using System.CodeDom;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.RuntimeSupport;
@@ -37,6 +34,8 @@ namespace Reqnroll.Generator.Generation
             ReqnrollConfiguration reqnrollConfiguration,
             IDecoratorRegistry decoratorRegistry,
             ITraceListener traceListener,
+
+            // Adding a dependency on the Cucumber configuration subsystem. Eventually remove this as Cucumber Config is folded into overall Reqnroll Config.
             ICucumberConfiguration cucumberConfiguration)
         {
             _testGeneratorProvider = testGeneratorProvider;
@@ -226,6 +225,10 @@ namespace Reqnroll.Generator.Generation
             testClassInitializeMethod.Statements.Add(onFeatureStartExpression);
         }
 
+        // Generation of Cucumber Messages relies on access to the parsed AST. Parsing the AST is not practical (given its structure).
+        // So we generate the Cucumber messages that are shared across the feature (Source, GherkinDocument and Pickles) and serialize them to strings.
+        // These strings are generated into the test class as constructor arguments for a new runtime type (FeatureLevelCucumberMessages) which is attached to the FeatureInfo.
+        // The runtime will later rehydrate these Messages and emit them when the test is run.
         private void PersistStaticCucumberMessagesToFeatureInfo(TestClassGenerationContext generationContext, CodeMemberMethod testClassInitializeMethod)
         {
             string featureSourceMessageString = null; 
@@ -235,7 +238,8 @@ namespace Reqnroll.Generator.Generation
             try 
             {
                 sourceFileLocation = Path.Combine(generationContext.Document.DocumentLocation.FeatureFolderPath, generationContext.Document.DocumentLocation.SourceFilePath);
-                //Generate Feature level Cucumber Messages, serialize them to strings, create a FeatureLevelCucumberMessages object and add it to featureInfo
+
+                // Cucumber IDs can be UUIDs or stringified integers. This is configurable by the user.
                 var IDGenStyle = _cucumberConfiguration.IDGenerationStyle;
                 var messageConverter = new CucumberMessagesConverter(IdGeneratorFactory.Create(IDGenStyle));
                 var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
@@ -246,14 +250,12 @@ namespace Reqnroll.Generator.Generation
                 featureSourceMessageString = System.Text.Json.JsonSerializer.Serialize(featureSourceMessage);
                 featureGherkinDocumentMessageString = System.Text.Json.JsonSerializer.Serialize(featureGherkinDocumentMessage);
                 featurePickleMessagesString = System.Text.Json.JsonSerializer.Serialize(featurePickleMessages);
-                // Save the Pickles to the GenerationContext so that the Pickle and Step Ids can be injected as arguments into the Scenario and Step method signatures
-                //generationContext.CustomData.Add(PICKLEJAR, new PickleJar());
             }
             catch(Exception e)
             {
                 _traceListener.WriteToolOutput($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
-                //generationContext.CustomData.Add(PICKLEJAR, new PickleJar(new List<Gherkin.CucumberMessages.Types.Pickle>()));
+                // This effectively turns OFF the Cucumber Messages support for this feature.
                 return;            
             }
             // Create a new method that will be added to the test class. It will be called to initialize the FeatureCucumberMessages property of the FeatureInfo object
@@ -274,9 +276,6 @@ namespace Reqnroll.Generator.Generation
                 new CodeAssignStatement(
                     new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("featureInfo"), "FeatureCucumberMessages"),
                     featureLevelCucumberMessagesExpression));
-
-            ///At runtime, pull the PickleStepIds from the pickleJar for the given runtime pickleID; partition them out by Background, RuleBackground, and Scenario steps
-            ///keep an index of which step is being generated and use that to index in to the PickleStepIds at runtime ... eg "stepIds[codeprimitive(stepIndex)]"
 
             // Create a CodeMethodInvokeExpression to invoke the CucumberMessagesInitializeMethod
             var invokeCucumberMessagesInitializeMethod = new CodeMethodInvokeExpression(

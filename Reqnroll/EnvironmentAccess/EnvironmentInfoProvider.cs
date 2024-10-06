@@ -3,10 +3,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Reqnroll.EnvironmentAccess
 {
+     /// <summary>
+     /// This provides an abstraction for obtaining platform and runtime information. Used by Anaytics and Cucumber Messages
+     /// </summary>
     public class EnvironmentInfoProvider : IEnvironmentInfoProvider
     {
         private IEnvironmentWrapper EnvironmentWrapper { get;  set; }

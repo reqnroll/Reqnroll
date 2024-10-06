@@ -8,6 +8,5 @@ namespace Reqnroll.CucumberMessages.Configuration
     {
         Incrementing,
         UUID
-
     }
 }

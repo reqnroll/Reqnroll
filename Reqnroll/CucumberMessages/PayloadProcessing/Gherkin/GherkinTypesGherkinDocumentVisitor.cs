@@ -5,6 +5,9 @@ using Gherkin.CucumberMessages.Types;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
+    /// <summary>
+    /// Absstract base class for implementing a visitor for <see cref="GherkinDocument"/>
+    /// </summary>
     abstract class GherkinTypesGherkinDocumentVisitor
     {
         protected virtual void AcceptDocument(GherkinDocument document)

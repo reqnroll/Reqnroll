@@ -8,9 +8,10 @@ using System.Text;
 namespace Reqnroll.CucumberMessages.Configuration
 {
     /// <summary>
-    /// This class holds configuration information from a configuration source.
+    /// These classes holds configuration information from a configuration source.
     /// Each configuration source may provide one or more Profiles (such as Dev or Prod). 
     /// The default profile is always named 'DEFAULT'.
+    /// These are JSON serialized and correspond to the json schema in CucumberMessages-config-schema.json
     /// </summary>
     public class ConfigurationDTO
     {

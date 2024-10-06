@@ -6,6 +6,10 @@ using System.Text.Json;
 
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
+    /// <summary>
+    /// This class is used at Code Generation time to provide serialized representations of the Source, GherkinDocument, and Pickles 
+    /// to be used at runtime.
+    /// </summary>
     public class FeatureLevelCucumberMessages
     {
         public FeatureLevelCucumberMessages(string serializedSourceMessage, string serializedGherkinDocument, string serializedPickles, string location)

@@ -2,6 +2,9 @@
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// Base class for tracking execution of steps (StepDefinition Methods and Hooks)
+    /// </summary>
     public class StepExecutionTrackerBase : IStepTracker
     {
         public string TestStepID { get; set; }

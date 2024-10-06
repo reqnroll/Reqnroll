@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using Reqnroll.CommonModels;
 
 namespace Reqnroll.EnvironmentAccess
@@ -39,6 +36,5 @@ namespace Reqnroll.EnvironmentAccess
         }
 
         public string GetCurrentDirectory() => Environment.CurrentDirectory;
-
     }
 }

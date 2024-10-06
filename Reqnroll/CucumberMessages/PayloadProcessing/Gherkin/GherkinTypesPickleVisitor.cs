@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
+    /// <summary>
+    /// Abstract base class for visiting Gherkin Pickle (and nested types)
+    /// </summary>
     abstract class GherkinTypesPickleVisitor
     {
 

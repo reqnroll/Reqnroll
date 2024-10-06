@@ -10,6 +10,10 @@ using System.Xml.Linq;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
+    /// <summary>
+    /// If ID rewriting is required (see cref="GherkinDocumentIDStyleReWriter"), 
+    /// this class will re-write the IDs in the given <see cref="Pickle"/>s.
+    /// </summary>
     internal class PickleIDStyleReWriter : GherkinTypesPickleVisitor
     {
         private Dictionary<string, string> _idMap;

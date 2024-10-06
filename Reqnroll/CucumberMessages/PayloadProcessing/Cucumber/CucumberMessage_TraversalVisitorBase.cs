@@ -7,6 +7,11 @@ using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
+    /// <summary>
+    /// Base implementation of a visitor pattern over the Cucumber Message types
+    /// 
+    /// (consumer of this, for now, is within the Test class for Messages; but provided here for future use)
+    /// </summary>
     public abstract class CucumberMessage_TraversalVisitorBase : ICucumberMessageVisitor
     {
         private void Accept(object message)
