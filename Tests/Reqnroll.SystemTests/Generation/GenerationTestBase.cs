@@ -21,6 +21,18 @@ public abstract class GenerationTestBase : SystemTestBase
     }
 
     [TestMethod]
+    public void GeneratorAllIn_sample_can_be_handled_with_VisualBasic()
+    {
+        _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.VB;
+
+        PrepareGeneratorAllInSamples();
+
+        ExecuteTests();
+
+        ShouldAllScenariosPass();
+    }
+
+    [TestMethod]
     public void Handles_simple_scenarios_without_namespace_collisions()
     {
         _projectsDriver.CreateProject("CollidingNamespace.Reqnroll", "C#");
