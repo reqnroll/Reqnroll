@@ -2,7 +2,7 @@
 
 ## Improvements:
 
-* Support method-level parallel execution (#570)
+* Support scenario-level (method-level) parallel execution (#570)
 
 ## Bug fixes:
 
