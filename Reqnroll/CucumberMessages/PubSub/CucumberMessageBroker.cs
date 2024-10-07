@@ -40,12 +40,8 @@ namespace Reqnroll.CucumberMessages.PubSub
         }
         public void Publish(ReqnrollCucumberMessage message)
         {
-            var _traceListener = _objectContainer.Resolve<ITraceListener>();
-
             foreach (var sink in RegisteredSinks.Value)
             {
-                _traceListener.WriteTestOutput($"Broker publishing {message.CucumberMessageSource}: {message.Envelope.Content()}");
-
                 sink.Publish(message);
             }
         }

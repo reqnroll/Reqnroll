@@ -64,11 +64,6 @@ namespace Reqnroll.CucumberMessages.Configuration
                 _trace!.WriteToolOutput($"WARNING: Cucumber Messages: Output filename was empty. Setting filename to {resolved.OutputFileName}");
             }
             EnsureOutputDirectory(resolved);
-
-            string logEntry;
-            logEntry = $"Cucumber Messages: FileOutput Initialized. Output Path: {Path.Combine(resolved.BaseDirectory, resolved.OutputDirectory, resolved.OutputFileName)}";
-
-            _trace!.WriteTestOutput(logEntry);
             return resolved;
         }
         private ConfigurationDTO ApplyHierarchicalConfiguration()

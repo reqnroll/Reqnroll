@@ -78,7 +78,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         private void CloseFileSink()
         {
             if (disposedValue) return;
-            trace?.WriteTestOutput("FileOutputPlugin Closing File Sink long running thread.");
             postedMessages.CompleteAdding();
             fileWritingTask?.Wait();
             fileWritingTask = null;
@@ -90,7 +89,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
             if (!config.Enabled)
             {
-                trace!.WriteTestOutput("Cucumber Messages is DISABLED.");
                 // By returning here, we don't launch the File writing thread,
                 // and this class is not registered as a CucumberMessageSink, which indicates to the Broker that Messages are disabled.
                 return;
@@ -98,7 +96,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             string baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
             string fileName = SanitizeFileName(config.OutputFileName);
 
-            trace?.WriteToolOutput($"Cuccumber Messages: Starting File Sink long running thread. Writing to: {baseDirectory}");
             fileWritingTask = Task.Factory.StartNew( () =>  ConsumeAndWriteToFilesBackgroundTask(baseDirectory, fileName), TaskCreationOptions.LongRunning);
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
@@ -138,7 +135,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
         {
             try
             {
-                trace?.WriteTestOutput($"FileOutputPlugin Write. Cucumber Message: {cucumberMessage.Substring(0, 20)}");
                 fileStream!.WriteLine(cucumberMessage);
             }
             catch (System.Exception ex)
@@ -149,7 +145,6 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void CloseStream(StreamWriter fileStream)
         {
-            trace?.WriteTestOutput($"FileOutputPlugin Closing File Stream.");
             fileStream?.Flush();
             fileStream?.Close();
             fileStream?.Dispose();

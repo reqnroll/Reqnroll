@@ -70,17 +70,15 @@ namespace Reqnroll.CucumberMessages.PubSub
             Enabled = _broker.Enabled;
             if (!Enabled)
             {
-                traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: Broker is disabled for {featureName}.");
                 return;
             }
 
             if (StartedFeatures.ContainsKey(featureName))
             {
-                traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: {featureName} already started");
+                // Already started, don't repeat the following steps
                 return;
             }
 
-            traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureStartedEventHandler: {featureName}");
             var ft = new FeatureTracker(featureStartedEvent);
 
             // This will add a FeatureTracker to the StartedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.
@@ -95,16 +93,13 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
-            var traceListener = objectContainer.Resolve<ITraceListener>();
             if (!Enabled)
             {
-                traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureFinishedEventHandler: Broker is disabled for {featureFinishedEvent.FeatureContext.FeatureInfo.Title}.");
                 return;
             }
             var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
             if (!StartedFeatures.ContainsKey(featureName) || !StartedFeatures[featureName].Enabled)
             {
-                traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureFinishedEventHandler: {featureName} was not started or is Disabled.");
                 return;
             }
             var featureTestCases = testCaseTrackersById.Values.Where(tc => tc.FeatureName == featureName).ToList();
@@ -118,7 +113,14 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
             else
             {
-                traceListener.WriteTestOutput($"Cucumber Message Publisher: FeatureFinishedEventHandler: Error: {featureTestCases.Count(tc => !tc.Finished)} test cases not marked as finished for Feature {featureName}. TestRunFinished event will not be sent.");
+                // If the feature has no steps, then we should send the finished message;
+                if (featureTestCases.Count == 0)
+                {
+                    var msg = Io.Cucumber.Messages.Types.Envelope.Create(CucumberMessageFactory.ToTestRunFinished(true, featureFinishedEvent));
+                    _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                }
+
+                // else is an error of a nonsensical state; should we throw an exception?
             }
 
             // throw an exception if any of the TestCaseCucumberMessageTrackers are not done?
@@ -139,12 +141,10 @@ namespace Reqnroll.CucumberMessages.PubSub
                     var id = featureName + @"/" + pickleId;
                     var tccmt = new TestCaseCucumberMessageTracker(featureTracker);
                     tccmt.ProcessEvent(scenarioStartedEvent);
-                    traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} {id} started");
                     testCaseTrackersById.TryAdd(id, tccmt);
                 }
                 else
                 {
-                    traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} FeatureTracker is disabled");
                     return;
                 }
             }
