@@ -151,11 +151,8 @@ namespace Reqnroll.Generator.Generation
                 _testGeneratorProvider.SetTestClassCategories(generationContext, featureCategories);
             }
 
-            var featureTagsField = new CodeMemberField(typeof(string[]), GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME);
-            featureTagsField.Attributes |= MemberAttributes.Static;
-            featureTagsField.InitExpression = _scenarioPartHelper.GetStringArrayExpression(generationContext.Feature.Tags);
-
-            generationContext.TestClass.Members.Add(featureTagsField);
+            DeclareFeatureTagsField(generationContext);
+            DeclareFeatureInfoMember(generationContext);
         }
 
         private CodeMemberField DeclareTestRunnerMember(CodeTypeDeclaration type)
@@ -163,6 +160,33 @@ namespace Reqnroll.Generator.Generation
             var testRunnerField = new CodeMemberField(_codeDomHelper.GetGlobalizedTypeName(typeof(ITestRunner)), GeneratorConstants.TESTRUNNER_FIELD);
             type.Members.Add(testRunnerField);
             return testRunnerField;
+        }
+
+        private void DeclareFeatureTagsField(TestClassGenerationContext generationContext)
+        {
+            var featureTagsField = new CodeMemberField(typeof(string[]), GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME);
+            featureTagsField.Attributes |= MemberAttributes.Static;
+            featureTagsField.InitExpression = _scenarioPartHelper.GetStringArrayExpression(generationContext.Feature.Tags);
+            generationContext.TestClass.Members.Add(featureTagsField);
+        }
+
+        private void DeclareFeatureInfoMember(TestClassGenerationContext generationContext)
+        {
+            var featureInfoField = new CodeMemberField(
+                _codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), GeneratorConstants.FEATUREINFO_FIELD);
+            featureInfoField.Attributes |= MemberAttributes.Static;
+            featureInfoField.InitExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)),
+                new CodeObjectCreateExpression(typeof(CultureInfo),
+                                               new CodePrimitiveExpression(generationContext.Feature.Language)),
+                new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
+                new CodePrimitiveExpression(generationContext.Feature.Name),
+                new CodePrimitiveExpression(generationContext.Feature.Description),
+                new CodeFieldReferenceExpression(
+                    new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ProgrammingLanguage))),
+                    _codeDomHelper.TargetLanguage.ToString()),
+                new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME));
+
+            generationContext.TestClass.Members.Add(featureInfoField);
         }
 
         private void SetupTestClassInitializeMethod(TestClassGenerationContext generationContext)
@@ -229,7 +253,7 @@ namespace Reqnroll.Generator.Generation
                 nameof(ITestRunner.OnFeatureEndAsync));
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureEndAsyncExpression);
 
-            //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo.Title != "<current_feature_title>")
+            //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo != featureInfo)
             //  await testRunner.OnFeatureEndAsync(); // finish if different
             testInitializeMethod.Statements.Add(
                 new CodeConditionStatement(
@@ -241,12 +265,10 @@ namespace Reqnroll.Generator.Generation
                         CodeBinaryOperatorType.BooleanAnd,
                         new CodeBinaryOperatorExpression(
                             new CodePropertyReferenceExpression(
-                                new CodePropertyReferenceExpression(
-                                    featureContextExpression,
-                                    "FeatureInfo"),
-                                "Title"),
+                                featureContextExpression,
+                                "FeatureInfo"),
                             CodeBinaryOperatorType.IdentityInequality,
-                            new CodePrimitiveExpression(generationContext.Feature.Name))),
+                            new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD))),
                     new CodeExpressionStatement(
                         onFeatureEndAsyncExpression)));
 
@@ -254,27 +276,13 @@ namespace Reqnroll.Generator.Generation
             // "Start" the feature if needed
 
             //if (testRunner.FeatureContext == null) {
-            //  FeatureInfo featureInfo = new FeatureInfo("xxxx");
             //  await testRunner.OnFeatureStartAsync(featureInfo);
             //}
-
-            var featureInfoInitializeStatement = 
-                new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), "featureInfo",
-                    new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)),
-                        new CodeObjectCreateExpression(typeof(CultureInfo),
-                            new CodePrimitiveExpression(generationContext.Feature.Language)),
-                        new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
-                        new CodePrimitiveExpression(generationContext.Feature.Name),
-                        new CodePrimitiveExpression(generationContext.Feature.Description),
-                        new CodeFieldReferenceExpression(
-                            new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ProgrammingLanguage))),
-                            _codeDomHelper.TargetLanguage.ToString()),
-                        new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME)));
 
             var onFeatureStartExpression = new CodeMethodInvokeExpression(
                 testRunnerField,
                 nameof(ITestRunner.OnFeatureStartAsync),
-                new CodeVariableReferenceExpression("featureInfo"));
+                new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
 
             testInitializeMethod.Statements.Add(
@@ -283,7 +291,6 @@ namespace Reqnroll.Generator.Generation
                         featureContextExpression,
                         CodeBinaryOperatorType.IdentityEquality,
                         new CodePrimitiveExpression(null)),
-                    featureInfoInitializeStatement,
                     new CodeExpressionStatement(
                         onFeatureStartExpression)));
         }
