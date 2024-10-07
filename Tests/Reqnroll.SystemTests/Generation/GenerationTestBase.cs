@@ -2,8 +2,6 @@
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
-using Reqnroll.TestProjectGenerator;
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
 using System.Collections.Generic;
 

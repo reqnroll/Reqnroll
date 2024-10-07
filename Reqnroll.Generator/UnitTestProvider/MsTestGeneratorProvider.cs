@@ -3,9 +3,11 @@ using System.CodeDom;
 using System.Collections.Generic;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.BoDi;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Reqnroll.Generator.UnitTestProvider
 {
+    [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
     public class MsTestGeneratorProvider : IUnitTestGeneratorProvider
     {
         protected internal const string TESTFIXTURE_ATTR = "Microsoft.VisualStudio.TestTools.UnitTesting.TestClassAttribute";
@@ -103,16 +105,11 @@ namespace Reqnroll.Generator.UnitTestProvider
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
-            // Step 1: make 'testRunner' instance field
-            //generationContext.TestRunnerField.Attributes |= MemberAttributes.Static;
 
             generationContext.TestClassInitializeMethod.Parameters.Add(new CodeParameterDeclarationExpression(
                 TESTCONTEXT_TYPE, "testContext"));
 
             CodeDomHelper.AddAttribute(generationContext.TestClassInitializeMethod, TESTFIXTURESETUP_ATTR);
-
-            // Step 2: Remove TestClassInitializeMethod (not needed)
-            generationContext.TestClass.Members.Remove(generationContext.TestClassInitializeMethod);
         }
 
         public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -121,66 +118,18 @@ namespace Reqnroll.Generator.UnitTestProvider
             // [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior.EndOfClass)]
             var attribute = CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR);
             attribute.Arguments.Add(new CodeAttributeArgument(new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(CLASSCLEANUPBEHAVIOR_ENUM), CLASSCLEANUPBEHAVIOR_ENDOFCLASS)));
-
-            // Step 3: Remove TestClassCleanupMethod (not needed)
-            generationContext.TestClass.Members.Remove(generationContext.TestClassCleanupMethod);
         }
 
 
         public virtual void SetTestInitializeMethod(TestClassGenerationContext generationContext)
         {
             CodeDomHelper.AddAttribute(generationContext.TestInitializeMethod, TESTSETUP_ATTR);
-
-            // Step 5 (part 2): remove feature handling from here as it is moved to UnitTestGenerator.SetupTestInitializeMethod
-            //FixTestRunOrderingIssue(generationContext);
-        }
-
-        protected virtual void FixTestRunOrderingIssue(TestClassGenerationContext generationContext)
-        {
-            //see https://github.com/SpecFlowOSS/SpecFlow/issues/96
-
-            //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo.Title != "<current_feature_title>")
-            //  <TestClass>.<TestClassInitialize>(null);
-
-            var featureContextExpression = new CodePropertyReferenceExpression(
-                new CodeFieldReferenceExpression(null, generationContext.TestRunnerField.Name), 
-                "FeatureContext");
-
-            var callTestClassInitializeMethodExpression = new CodeMethodInvokeExpression(
-                new CodeTypeReferenceExpression(
-                    new CodeTypeReference(
-                        generationContext.Namespace.Name + "." + generationContext.TestClass.Name,
-                        CodeTypeReferenceOptions.GlobalReference)),
-                generationContext.TestClassInitializeMethod.Name,
-                new CodePrimitiveExpression(null));
-
-            CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callTestClassInitializeMethodExpression);
-
-            generationContext.TestInitializeMethod.Statements.Add(
-                new CodeConditionStatement(
-                    new CodeBinaryOperatorExpression(
-                        new CodeBinaryOperatorExpression(
-                            featureContextExpression,
-                            CodeBinaryOperatorType.IdentityInequality,
-                            new CodePrimitiveExpression(null)),
-                        CodeBinaryOperatorType.BooleanAnd,
-                        new CodeBinaryOperatorExpression(
-                            new CodePropertyReferenceExpression(
-                                new CodePropertyReferenceExpression(
-                                    featureContextExpression,
-                                    "FeatureInfo"),
-                                "Title"),
-                            CodeBinaryOperatorType.IdentityInequality,
-                            new CodePrimitiveExpression(generationContext.Feature.Name))),
-                    new CodeExpressionStatement(
-                        callTestClassInitializeMethodExpression)));
         }
 
         public void SetTestCleanupMethod(TestClassGenerationContext generationContext)
         {
             CodeDomHelper.AddAttribute(generationContext.TestCleanupMethod, TESTTEARDOWN_ATTR);
         }
-
 
         public virtual void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
         {

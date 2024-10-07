@@ -5,13 +5,15 @@ using System.Linq;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.BoDi;
 using System.Text.RegularExpressions;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Reqnroll.Generator.UnitTestProvider
 {
+    [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
     public class XUnit2TestGeneratorProvider : IUnitTestGeneratorProvider
     {
         private CodeTypeDeclaration _currentFixtureDataTypeDeclaration = null;
-        private readonly CodeTypeReference _objectCodeTypeReference = new CodeTypeReference(typeof(object));
+        private readonly CodeTypeReference _objectCodeTypeReference = new(typeof(object));
         protected internal const string THEORY_ATTRIBUTE = "Xunit.SkippableTheoryAttribute";
         protected internal const string INLINEDATA_ATTRIBUTE = "Xunit.InlineDataAttribute";
         protected internal const string ICLASSFIXTURE_INTERFACE = "Xunit.IClassFixture";
@@ -59,11 +61,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             return new CodeTypeReference(ICLASSFIXTURE_INTERFACE, fixtureDataType);
         }
 
-        public virtual bool ImplementInterfaceExplicit => false;
-
         protected CodeDomHelper CodeDomHelper { get; set; }
-
-        public bool GenerateParallelCodeForFeature { get; set; }
 
         public virtual void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
         {
@@ -85,7 +83,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
             args.Add(
                 new CodeAttributeArgument(
-                    new CodeArrayCreateExpression(typeof(string[]), tags.Select(t => new CodePrimitiveExpression(t)).ToArray())));
+                    new CodeArrayCreateExpression(typeof(string[]), tags.Select(t => (CodeExpression)new CodePrimitiveExpression(t)).ToArray())));
 
             CodeDomHelper.AddAttribute(testMethod, INLINEDATA_ATTRIBUTE, args.ToArray());
         }
@@ -133,15 +131,16 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestClassCategories(TestClassGenerationContext generationContext, IEnumerable<string> featureCategories)
         {
-            IEnumerable<string> collection = featureCategories.Where(f => f.StartsWith(COLLECTION_TAG, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            if (collection.Any())
+            var featureCategoriesArray = featureCategories.ToArray();
+            var collectionCategories = featureCategoriesArray.Where(f => f.StartsWith(COLLECTION_TAG, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            if (collectionCategories.Any())
             {
                 //Only one 'Xunit.Collection' can exist per class.
-                SetTestClassCollection(generationContext, collection.FirstOrDefault());
+                SetTestClassCollection(generationContext, collectionCategories.FirstOrDefault());
             }
 
             // Set Category trait which can be used with the /trait or /-trait xunit flags to include/exclude tests
-            foreach (string str in featureCategories)
+            foreach (string str in featureCategoriesArray)
             {
                 SetProperty(generationContext.TestClass, CATEGORY_PROPERTY_NAME, str);
             }
@@ -216,8 +215,6 @@ namespace Reqnroll.Generator.UnitTestProvider
         {
             // xUnit uses IUseFixture<T> on the class
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
-            // Step 1: make 'testRunner' instance field
-            // generationContext.TestRunnerField.Attributes |= MemberAttributes.Static;
 
             _currentFixtureDataTypeDeclaration = CodeDomHelper.CreateGeneratedTypeDeclaration("FixtureData");
             generationContext.TestClass.Members.Add(_currentFixtureDataTypeDeclaration);
@@ -246,11 +243,6 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
             initializeMethod.Statements.Add(expression);
-
-
-            // Step 2: Remove TestClassInitializeMethod (not needed)
-            generationContext.TestClassInitializeMethod.Statements.Clear();
-            //generationContext.TestClass.Members.Remove(generationContext.TestClassInitializeMethod);
         }
 
         public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -351,10 +343,6 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
             disposeMethod.Statements.Add(expression);
-
-            // Step 3: Remove TestClassCleanupMethod (not needed)
-            generationContext.TestClassCleanupMethod.Statements.Clear();
-            //generationContext.TestClass.Members.Remove(generationContext.TestClassCleanupMethod);
         }
 
         public void SetTestClassIgnore(TestClassGenerationContext generationContext)
@@ -408,11 +396,6 @@ namespace Reqnroll.Generator.UnitTestProvider
         public void MarkCodeMethodInvokeExpressionAsAwait(CodeMethodInvokeExpression expression)
         {
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
-        }
-
-        private string GlobalNamespaceIfCSharp(string typeName)
-        {
-            return CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.CSharp ? "global::" + typeName : typeName;
         }
     }
 }

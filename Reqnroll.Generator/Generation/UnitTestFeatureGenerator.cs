@@ -1,5 +1,6 @@
 using System;
 using System.CodeDom;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -12,6 +13,7 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Generator.Generation
 {
+    [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
     public class UnitTestFeatureGenerator : IFeatureGenerator
     {
         private readonly CodeDomHelper _codeDomHelper;
@@ -173,43 +175,6 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassInitializeMethod);
             
             _testGeneratorProvider.SetTestClassInitializeMethod(generationContext);
-
-            /*
-            //testRunner = TestRunnerManager.GetTestRunnerForAssembly(null, [test_worker_id]);
-            var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
-
-            var getTestRunnerExpression = new CodeMethodInvokeExpression(
-                new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
-                nameof(TestRunnerManager.GetTestRunnerForAssembly));
-
-            testClassInitializeMethod.Statements.Add(
-                new CodeAssignStatement(
-                    testRunnerField,
-                    getTestRunnerExpression));
-
-            //FeatureInfo featureInfo = new FeatureInfo("xxxx");
-            testClassInitializeMethod.Statements.Add(
-                new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), "featureInfo",
-                                                     new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)),
-                                                                                    new CodeObjectCreateExpression(typeof(CultureInfo),
-                                                                                                                   new CodePrimitiveExpression(generationContext.Feature.Language)),
-                                                                                    new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
-                                                                                    new CodePrimitiveExpression(generationContext.Feature.Name),
-                                                                                    new CodePrimitiveExpression(generationContext.Feature.Description),
-                                                                                    new CodeFieldReferenceExpression(
-                                                                                        new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Reqnroll.ProgrammingLanguage))),
-                                                                                        _codeDomHelper.TargetLanguage.ToString()),
-                                                                                    new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME))));
-
-            //await testRunner.OnFeatureStartAsync(featureInfo);
-            var onFeatureStartExpression = new CodeMethodInvokeExpression(
-                testRunnerField,
-                nameof(ITestRunner.OnFeatureStartAsync),
-                new CodeVariableReferenceExpression("featureInfo"));
-
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
-
-            testClassInitializeMethod.Statements.Add(onFeatureStartExpression);*/
         }
 
         private void SetupTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -222,30 +187,6 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
             
             _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);
-            /*
-            var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
-
-            // await testRunner.OnFeatureEndAsync();
-            var expression = new CodeMethodInvokeExpression(
-                testRunnerField,
-                nameof(ITestRunner.OnFeatureEndAsync));
-
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
-
-            testClassCleanupMethod.Statements.Add(expression);
-
-            // TestRunnerManager.ReleaseTestRunner(testRunner);
-            testClassCleanupMethod.Statements.Add(
-                new CodeMethodInvokeExpression(
-                    new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
-                    nameof(TestRunnerManager.ReleaseTestRunner),
-                    testRunnerField));
-
-            // testRunner = null;
-            testClassCleanupMethod.Statements.Add(
-                new CodeAssignStatement(
-                    testRunnerField,
-                    new CodePrimitiveExpression(null)));*/
         }
 
         private void SetupTestInitializeMethod(TestClassGenerationContext generationContext)
@@ -259,8 +200,7 @@ namespace Reqnroll.Generator.Generation
             
             _testGeneratorProvider.SetTestInitializeMethod(generationContext);
 
-            // Step 4: Obtain the test runner for executing a single test
-
+            // Obtain the test runner for executing a single test
             // testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();
 
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
@@ -275,9 +215,7 @@ namespace Reqnroll.Generator.Generation
                     getTestRunnerExpression));
 
 
-            // Step 5 (part 1): "Finish" current feature if needed & "Start" feature if needed
-            // The similar code in custom test runner codes is not needed
-            // The feature initialization steps are copied from TestClassInitializeMethod
+            // "Finish" current feature if needed
 
             //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo.Title != "<current_feature_title>")
             //  await testRunner.OnFeatureEndAsync(); // finish if different
@@ -313,6 +251,8 @@ namespace Reqnroll.Generator.Generation
                         onFeatureEndAsyncExpression)));
 
 
+            // "Start" the feature if needed
+
             //if (testRunner.FeatureContext == null) {
             //  FeatureInfo featureInfo = new FeatureInfo("xxxx");
             //  await testRunner.OnFeatureStartAsync(featureInfo);
@@ -327,7 +267,7 @@ namespace Reqnroll.Generator.Generation
                         new CodePrimitiveExpression(generationContext.Feature.Name),
                         new CodePrimitiveExpression(generationContext.Feature.Description),
                         new CodeFieldReferenceExpression(
-                            new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Reqnroll.ProgrammingLanguage))),
+                            new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ProgrammingLanguage))),
                             _codeDomHelper.TargetLanguage.ToString()),
                         new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME)));
 
@@ -370,7 +310,7 @@ namespace Reqnroll.Generator.Generation
 
             testCleanupMethod.Statements.Add(expression);
 
-            // Step 6: "Release" the TestRunner, so that other threads can pick it up (moved from TestClassCleanupMethod)
+            // "Release" the TestRunner, so that other threads can pick it up
             // TestRunnerManager.ReleaseTestRunner(testRunner);
             testCleanupMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
