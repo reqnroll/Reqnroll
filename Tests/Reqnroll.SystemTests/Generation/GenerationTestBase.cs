@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 using System.Text.Json;
 using System.Collections.Generic;
+using Reqnroll.TestProjectGenerator;
 
 namespace Reqnroll.SystemTests.Generation;
 

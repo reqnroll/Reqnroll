@@ -253,7 +253,7 @@ namespace Reqnroll.Generator.Generation
                 nameof(ITestRunner.OnFeatureEndAsync));
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureEndAsyncExpression);
 
-            //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo != featureInfo)
+            //if (testRunner.FeatureContext != null && !testRunner.FeatureContext.FeatureInfo.Equals(featureInfo))
             //  await testRunner.OnFeatureEndAsync(); // finish if different
             testInitializeMethod.Statements.Add(
                 new CodeConditionStatement(
@@ -264,11 +264,14 @@ namespace Reqnroll.Generator.Generation
                             new CodePrimitiveExpression(null)),
                         CodeBinaryOperatorType.BooleanAnd,
                         new CodeBinaryOperatorExpression(
-                            new CodePropertyReferenceExpression(
-                                featureContextExpression,
-                                "FeatureInfo"),
-                            CodeBinaryOperatorType.IdentityInequality,
-                            new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD))),
+                            new CodeMethodInvokeExpression(
+                                new CodePropertyReferenceExpression(
+                                    featureContextExpression,
+                                    "FeatureInfo"),
+                                nameof(object.Equals),
+                                new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD)),
+                            CodeBinaryOperatorType.ValueEquality,
+                            new CodePrimitiveExpression(false))),
                     new CodeExpressionStatement(
                         onFeatureEndAsyncExpression)));
 
