@@ -508,6 +508,8 @@ public abstract class GenerationTestBase : SystemTestBase
                             throw new System.Exception($"Invalid scenario context: {_featureContext.FeatureInfo.Title} should be {featureName}");
                         if (!_featureContext.TryGetValue<bool>("before_feature", out var value) || !value)
                             throw new System.Exception($"BeforeFeature hook was not executed!");
+                            
+                        System.Threading.Thread.Sleep(10);
                         
                         var afterStartIndex = startIndex;
                         if (afterStartIndex != currentStartIndex)
