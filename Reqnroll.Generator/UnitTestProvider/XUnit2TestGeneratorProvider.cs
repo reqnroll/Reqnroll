@@ -216,7 +216,8 @@ namespace Reqnroll.Generator.UnitTestProvider
         {
             // xUnit uses IUseFixture<T> on the class
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
-            generationContext.TestRunnerField.Attributes |= MemberAttributes.Static;
+            // Step 1: make 'testRunner' instance field
+            // generationContext.TestRunnerField.Attributes |= MemberAttributes.Static;
 
             _currentFixtureDataTypeDeclaration = CodeDomHelper.CreateGeneratedTypeDeclaration("FixtureData");
             generationContext.TestClass.Members.Add(_currentFixtureDataTypeDeclaration);
@@ -245,6 +246,11 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
             initializeMethod.Statements.Add(expression);
+
+
+            // Step 2: Remove TestClassInitializeMethod (not needed)
+            generationContext.TestClassInitializeMethod.Statements.Clear();
+            //generationContext.TestClass.Members.Remove(generationContext.TestClassInitializeMethod);
         }
 
         public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -345,6 +351,10 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
             disposeMethod.Statements.Add(expression);
+
+            // Step 3: Remove TestClassCleanupMethod (not needed)
+            generationContext.TestClassCleanupMethod.Statements.Clear();
+            //generationContext.TestClass.Members.Remove(generationContext.TestClassCleanupMethod);
         }
 
         public void SetTestClassIgnore(TestClassGenerationContext generationContext)

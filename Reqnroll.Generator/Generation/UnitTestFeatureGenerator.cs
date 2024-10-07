@@ -174,6 +174,7 @@ namespace Reqnroll.Generator.Generation
             
             _testGeneratorProvider.SetTestClassInitializeMethod(generationContext);
 
+            /*
             //testRunner = TestRunnerManager.GetTestRunnerForAssembly(null, [test_worker_id]);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
@@ -208,7 +209,7 @@ namespace Reqnroll.Generator.Generation
 
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
 
-            testClassInitializeMethod.Statements.Add(onFeatureStartExpression);
+            testClassInitializeMethod.Statements.Add(onFeatureStartExpression);*/
         }
 
         private void SetupTestClassCleanupMethod(TestClassGenerationContext generationContext)
@@ -221,7 +222,7 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
             
             _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);
-
+            /*
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
             // await testRunner.OnFeatureEndAsync();
@@ -244,7 +245,7 @@ namespace Reqnroll.Generator.Generation
             testClassCleanupMethod.Statements.Add(
                 new CodeAssignStatement(
                     testRunnerField,
-                    new CodePrimitiveExpression(null)));
+                    new CodePrimitiveExpression(null)));*/
         }
 
         private void SetupTestInitializeMethod(TestClassGenerationContext generationContext)
@@ -257,10 +258,6 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testInitializeMethod);
             
             _testGeneratorProvider.SetTestInitializeMethod(generationContext);
-
-            if (generationContext.UnitTestGeneratorProvider is not MsTestGeneratorProvider &&
-                generationContext.UnitTestGeneratorProvider is not NUnit3TestGeneratorProvider)
-                return; // only MsTest & NUnit is implemented in this prototype
 
             // Step 4: Obtain the test runner for executing a single test
 
@@ -372,10 +369,6 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
 
             testCleanupMethod.Statements.Add(expression);
-
-            if (generationContext.UnitTestGeneratorProvider is not MsTestGeneratorProvider &&
-                generationContext.UnitTestGeneratorProvider is not NUnit3TestGeneratorProvider)
-                return; // only MsTest & NUnit is implemented in this prototype
 
             // Step 6: "Release" the TestRunner, so that other threads can pick it up (moved from TestClassCleanupMethod)
             // TestRunnerManager.ReleaseTestRunner(testRunner);
