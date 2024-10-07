@@ -20,52 +20,66 @@ End Class";
 
         public override ProjectFile GenerateLoggerClass(string pathToLogFile)
         {
-            string fileContent = $@"
-Imports System
-Imports System.IO
-Imports System.Runtime.CompilerServices
-Imports System.Threading.Tasks
+            string fileContent = 
+                $$"""
+                Imports System
+                Imports System.IO
+                Imports System.Runtime.CompilerServices
+                Imports System.Threading.Tasks
 
-Friend Module Log
-    Private Const LogFileLocation As String = ""{pathToLogFile}""
+                Friend Module Log
+                   Private Const LogFileLocation As String = "{{pathToLogFile}}"
+                   
+                   Private Sub Retry(number As Integer, action As Action)
+                       Try
+                           action
+                       Catch ex As Exception
+                           Dim i = number - 1
+                           If (i = 0)
+                               Throw
+                           End If
+                           System.Threading.Thread.Sleep(500)
+                           Retry(i, action)
+                       End Try
+                   End Sub    
 
-    Friend Sub LogStep(<CallerMemberName()> Optional stepName As String = Nothing)
-        File.AppendAllText(LogFileLocation, $""-> step: {{stepName}}{{Environment.NewLine}}"")
-    End Sub
+                   Friend Sub LogStep(<CallerMemberName()> Optional stepName As String = Nothing)
+                       Retry(5, sub() File.AppendAllText(LogFileLocation, $"-> step: {stepName}{Environment.NewLine}"))
+                   End Sub
 
-    Friend Sub LogHook(<CallerMemberName()> Optional stepName As String = Nothing)
-        File.AppendAllText(LogFileLocation, $""-> hook: {{stepName}}{{Environment.NewLine}}"")
-    End Sub
-    
-    Friend Async Function LogHookIncludingLockingAsync(
-    <CallerMemberName> ByVal Optional stepName As String = Nothing) As Task
-        File.AppendAllText(LogFileLocation, $""->waiting for hook lock: {{stepName}}{{Environment.NewLine}}"")
-        Await WaitForLockAsync()
-        File.AppendAllText(LogFileLocation, $""-> hook: {{stepName}}{{Environment.NewLine}}"")
-    End Function
+                   Friend Sub LogHook(<CallerMemberName()> Optional stepName As String = Nothing)
+                       Retry(5, sub() File.AppendAllText(LogFileLocation, $"-> hook: {stepName}{Environment.NewLine}"))
+                   End Sub
+                   
+                   Friend Async Function LogHookIncludingLockingAsync(
+                   <CallerMemberName> ByVal Optional stepName As String = Nothing) As Task
+                       File.AppendAllText(LogFileLocation, $"->waiting for hook lock: {stepName}{Environment.NewLine}")
+                       Await WaitForLockAsync()
+                       File.AppendAllText(LogFileLocation, $"-> hook: {stepName}{Environment.NewLine}")
+                   End Function
 
-    Private Async Function WaitForLockAsync() As Task
-        Dim lockFile = LogFileLocation & "".lock""
+                   Private Async Function WaitForLockAsync() As Task
+                       Dim lockFile = LogFileLocation & ".lock"
 
-        While True
+                       While True
 
-            Dim succeeded = True
-            Try
-                Using File.Open(lockFile, FileMode.CreateNew)
-                End Using
-                Exit While
-            Catch __unusedIOException1__ As IOException
-                succeeded = False
-            End Try
-            If Not succeeded Then
-                Await Task.Delay(1000)
-            End If
-        End While
+                           Dim succeeded = True
+                           Try
+                               Using File.Open(lockFile, FileMode.CreateNew)
+                               End Using
+                               Exit While
+                           Catch __unusedIOException1__ As IOException
+                               succeeded = False
+                           End Try
+                           If Not succeeded Then
+                               Await Task.Delay(1000)
+                           End If
+                       End While
 
-        File.Delete(lockFile)
-    End Function
-End Module
-";
+                       File.Delete(lockFile)
+                   End Function
+                End Module
+                """;
             return new ProjectFile("Log.vb", "Compile", fileContent);
         }
 
