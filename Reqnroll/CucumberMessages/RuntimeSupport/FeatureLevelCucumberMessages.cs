@@ -1,6 +1,7 @@
-﻿using Gherkin.CucumberMessages.Types;
+﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing.Gherkin;
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -12,23 +13,26 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
     /// </summary>
     public class FeatureLevelCucumberMessages
     {
-        public FeatureLevelCucumberMessages(string serializedSourceMessage, string serializedGherkinDocument, string serializedPickles, string location)
+        public FeatureLevelCucumberMessages(Func<Source> source, Func<GherkinDocument> gherkinDocument, Func<IEnumerable<Pickle>> pickles, string location)
         {
-            Source = JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.Source>(serializedSourceMessage);
-            var gherkinDocument = System.Text.Json.JsonSerializer.Deserialize<Gherkin.CucumberMessages.Types.GherkinDocument>(serializedGherkinDocument);
-            var pickles = JsonSerializer.Deserialize<IEnumerable<Gherkin.CucumberMessages.Types.Pickle>>(serializedPickles);
-            ReWriteIds(gherkinDocument, pickles, out var newGherkinDocument, out var newPickles);
+            if (CucumberConfiguration.Current.Enabled)
+            {
+                Source = source();
 
-            GherkinDocument = newGherkinDocument;
-            Pickles = newPickles;
-            Location = location;
+                ReWriteIds(gherkinDocument(), pickles(), out var newGherkinDocument, out var newPickles);
+
+                GherkinDocument = newGherkinDocument;
+                Pickles = newPickles;
+                Location = location;
+            }
             PickleJar = new PickleJar(Pickles);
+
         }
 
         public string Location { get; }
-        public Gherkin.CucumberMessages.Types.Source Source { get; }
-        public Gherkin.CucumberMessages.Types.GherkinDocument GherkinDocument { get; }
-        public IEnumerable<Gherkin.CucumberMessages.Types.Pickle> Pickles { get; }
+        public Io.Cucumber.Messages.Types.Source Source { get; }
+        public Io.Cucumber.Messages.Types.GherkinDocument GherkinDocument { get; }
+        public IEnumerable<Io.Cucumber.Messages.Types.Pickle> Pickles { get; }
         public PickleJar PickleJar { get; }
 
         private void ReWriteIds(GherkinDocument gherkinDocument, IEnumerable<Pickle> pickles, out GherkinDocument newGherkinDocument, out IEnumerable<Pickle> newPickles)

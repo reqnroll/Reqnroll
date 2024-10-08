@@ -14,7 +14,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
     /// </summary>
     public abstract class CucumberMessage_TraversalVisitorBase : ICucumberMessageVisitor
     {
-        private void Accept(object message)
+        public void Accept(object message)
         {
             if (message != null) CucumberMessageVisitor.Accept(this, message);
         }
@@ -36,6 +36,13 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             OnVisiting(gherkinDocument);
 
+            if (gherkinDocument.Comments != null)
+            {
+                foreach (var comment in gherkinDocument.Comments)
+                {
+                    Accept(comment);
+                }
+            }
             if (gherkinDocument.Feature != null)
                 Accept(gherkinDocument.Feature);
 
@@ -45,6 +52,11 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         public virtual void Visit(Feature feature)
         {
             OnVisiting(feature);
+            Accept(feature.Location);
+            foreach (var tag in feature.Tags ?? new List<Tag>()) 
+            {
+                Accept(tag);
+            }
             foreach (var featureChild in feature.Children ?? new List<FeatureChild>())
             {
                 Accept(featureChild);
@@ -67,6 +79,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         public virtual void Visit(Rule rule)
         {
             OnVisiting(rule);
+            Accept(rule.Location);
             foreach (var ruleChild in rule.Children ?? new List<RuleChild>())
             {
                 Accept(ruleChild);

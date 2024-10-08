@@ -1,4 +1,4 @@
-﻿using Gherkin.CucumberMessages.Types;
+﻿using Io.Cucumber.Messages.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,7 +39,7 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
 
         public PickleStepSequence PickleStepSequenceFor(string pickleIndex)
         {
-            return new PickleStepSequence(HasPickles, Pickles.ElementAt(int.Parse(pickleIndex)));
+            return new PickleStepSequence(HasPickles, HasPickles ? Pickles.ElementAt(int.Parse(pickleIndex)): null);
         }
 
         public void NextPickle()

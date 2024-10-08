@@ -6,6 +6,7 @@ using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -54,18 +55,18 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             yield return CucumberMessageFactory.ToMeta(featureStartedEvent);
 
-            Gherkin.CucumberMessages.Types.Source gherkinSource = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source;
-            Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
-            yield return Envelope.Create(messageSource);
+            //Gherkin.CucumberMessages.Types.Source gherkinSource = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source;
+            //Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
+            yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
 
 
-            Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument;
-            GherkinDocument gherkinDocument = CucumberMessageTransformer.ToGherkinDocument(gherkinDoc);
-            yield return Envelope.Create(gherkinDocument);
+            //Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument;
+            //GherkinDocument gherkinDocument = CucumberMessageTransformer.ToGherkinDocument(gherkinDoc);
+            yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument);
 
 
-            var gherkinPickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles;
-            var pickles = CucumberMessageTransformer.ToPickles(gherkinPickles);
+            var pickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles.ToList();
+            //var pickles = CucumberMessageTransformer.ToPickles(gherkinPickles);
 
             string lastID = ExtractLastID(pickles);
             IDGenerator = IdGeneratorFactory.Create(lastID);

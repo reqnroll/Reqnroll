@@ -14,9 +14,9 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
     /// 
     /// once the Gherkin project is updated to directly consume and produce Cucumber messages, this class can be removed
     /// </summary>
-    internal class CucumberMessageTransformer
+    public class CucumberMessageTransformer
     {
-        internal static Io.Cucumber.Messages.Types.Source ToSource(global::Gherkin.CucumberMessages.Types.Source gherkinSource)
+        public static Io.Cucumber.Messages.Types.Source ToSource(global::Gherkin.CucumberMessages.Types.Source gherkinSource)
         {
             var result = new Io.Cucumber.Messages.Types.Source
             (
@@ -27,7 +27,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return result;
         }
 
-        internal static Io.Cucumber.Messages.Types.GherkinDocument ToGherkinDocument(global::Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc)
+        public static Io.Cucumber.Messages.Types.GherkinDocument ToGherkinDocument(global::Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc)
         {
             var result = new Io.Cucumber.Messages.Types.GherkinDocument
             (
@@ -250,7 +250,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             );
         }
 
-        internal static List<Io.Cucumber.Messages.Types.Pickle> ToPickles(IEnumerable<global::Gherkin.CucumberMessages.Types.Pickle> pickles)
+        public static List<Io.Cucumber.Messages.Types.Pickle> ToPickles(IEnumerable<global::Gherkin.CucumberMessages.Types.Pickle> pickles)
         {
             return pickles.Select(ToPickle).ToList();
         }

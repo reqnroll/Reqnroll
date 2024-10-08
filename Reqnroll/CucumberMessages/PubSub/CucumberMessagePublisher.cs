@@ -4,7 +4,6 @@ using Reqnroll.Tracing;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using System.Collections.Concurrent;
-using System.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Linq;

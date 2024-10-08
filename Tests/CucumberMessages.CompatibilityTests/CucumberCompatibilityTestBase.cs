@@ -34,7 +34,7 @@ namespace CucumberMessages.CompatibilityTests
 
         protected void DisableCucumberMessages()
         {
-            Environment.SetEnvironmentVariable("REQNROLL_CUCUMBER_MESSAGES_ENABLED", "false");
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, "false");
         }
 
         protected void ResetCucumberMessages(string? fileToDelete = null)

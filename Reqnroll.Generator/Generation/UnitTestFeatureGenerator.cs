@@ -128,7 +128,7 @@ namespace Reqnroll.Generator.Generation
             var scenarioCleanupMethod = generationContext.ScenarioCleanupMethod;
 
             scenarioCleanupMethod.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            scenarioCleanupMethod.Name = GeneratorConstants.SCENARIO_CLEANUP_NAME; 
+            scenarioCleanupMethod.Name = GeneratorConstants.SCENARIO_CLEANUP_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(scenarioCleanupMethod);
 
@@ -225,38 +225,75 @@ namespace Reqnroll.Generator.Generation
             testClassInitializeMethod.Statements.Add(onFeatureStartExpression);
         }
 
-        // Generation of Cucumber Messages relies on access to the parsed AST. Parsing the AST is not practical (given its structure).
-        // So we generate the Cucumber messages that are shared across the feature (Source, GherkinDocument and Pickles) and serialize them to strings.
-        // These strings are generated into the test class as constructor arguments for a new runtime type (FeatureLevelCucumberMessages) which is attached to the FeatureInfo.
-        // The runtime will later rehydrate these Messages and emit them when the test is run.
+        // Generation of Cucumber Messages relies on access to the parsed AST. 
         private void PersistStaticCucumberMessagesToFeatureInfo(TestClassGenerationContext generationContext, CodeMemberMethod testClassInitializeMethod)
         {
-            string featureSourceMessageString = null; 
-            string featureGherkinDocumentMessageString = null;
-            string featurePickleMessagesString = null;
-            string sourceFileLocation = null;
-            try 
+            CodeObjectCreateExpression sourceExpression;
+            CodeExpression gherkinDocumentExpression;
+            CodeExpression picklesExpression;
+            CodeDelegateCreateExpression sourceFunc;
+            CodeDelegateCreateExpression gherkinDocumentFunc;
+            CodeDelegateCreateExpression picklesFunc;
+
+            string sourceFileLocation;
+            try
             {
                 sourceFileLocation = Path.Combine(generationContext.Document.DocumentLocation.FeatureFolderPath, generationContext.Document.DocumentLocation.SourceFilePath);
 
                 // Cucumber IDs can be UUIDs or stringified integers. This is configurable by the user.
                 var IDGenStyle = _cucumberConfiguration.IDGenerationStyle;
                 var messageConverter = new CucumberMessagesConverter(IdGeneratorFactory.Create(IDGenStyle));
-                var featureSourceMessage = messageConverter.ConvertToCucumberMessagesSource(generationContext.Document);
-                var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
-                var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocumentMessage);
+                var featureSource = Reqnroll.CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(messageConverter.ConvertToCucumberMessagesSource(generationContext.Document));
+                var featureGherkinDocument = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
+                var featurePickles = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocument);
+                var featureGherkinDocumentMessage = CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToGherkinDocument(featureGherkinDocument);
+                var featurePickleMessages = CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToPickles(featurePickles);
 
-                // Serialize the Cucumber Messages to strings
-                featureSourceMessageString = System.Text.Json.JsonSerializer.Serialize(featureSourceMessage);
-                featureGherkinDocumentMessageString = System.Text.Json.JsonSerializer.Serialize(featureGherkinDocumentMessage);
-                featurePickleMessagesString = System.Text.Json.JsonSerializer.Serialize(featurePickleMessages);
+                // generate a CodeDom expression to create the Source object from the featureSourceMessage
+                sourceExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Io.Cucumber.Messages.Types.Source)),
+                    new CodePrimitiveExpression(featureSource.Uri),
+                    new CodePrimitiveExpression(featureSource.Data),
+                    new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(Io.Cucumber.Messages.Types.SourceMediaType)), featureSource.MediaType.ToString()));
+
+                // generate a CodeDom expression to create the GherkinDocument object from the featureGherkinDocumentMessage
+                var gherkinDocumentExpressionGenerator = new CucumberGherkinDocumentExpressionGenerator(_codeDomHelper);
+                gherkinDocumentExpression = gherkinDocumentExpressionGenerator.GenerateGherkinDocumentExpression(featureGherkinDocumentMessage);
+
+                // generate a CodeDom expression to create the Pickles object from the featurePickleMessages
+                var pickleExpressionGenerator = new CucumberPicklesExpressionGenerator(_codeDomHelper);
+                picklesExpression = pickleExpressionGenerator.GeneratePicklesExpression(featurePickleMessages);
+
+                // wrap these expressions in Func<T>
+                sourceFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<Io.Cucumber.Messages.Types.Source>)), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "SourceFunc");
+                var sourceFuncBody = new CodeMemberMethod();
+                sourceFuncBody.Attributes = MemberAttributes.Private | MemberAttributes.Static;
+                sourceFuncBody.ReturnType = new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.Source));
+                sourceFuncBody.Statements.Add(new CodeMethodReturnStatement(sourceExpression));
+                sourceFuncBody.Name = sourceFunc.MethodName;
+                generationContext.TestClass.Members.Add(sourceFuncBody);
+
+                gherkinDocumentFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<Io.Cucumber.Messages.Types.GherkinDocument>)), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "GherkinDocumentFunc");
+                var gherkinDocumentFuncBody = new CodeMemberMethod();
+                gherkinDocumentFuncBody.Attributes = MemberAttributes.Private | MemberAttributes.Static;
+                gherkinDocumentFuncBody.ReturnType = new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.GherkinDocument));
+                gherkinDocumentFuncBody.Statements.Add(new CodeMethodReturnStatement(gherkinDocumentExpression));
+                gherkinDocumentFuncBody.Name = gherkinDocumentFunc.MethodName;
+                generationContext.TestClass.Members.Add(gherkinDocumentFuncBody);
+
+                picklesFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<System.Collections.Generic.IEnumerable<Io.Cucumber.Messages.Types.Pickle>>)), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "PicklesFunc");
+                var picklesFuncBody = new CodeMemberMethod();
+                picklesFuncBody.Attributes = MemberAttributes.Private | MemberAttributes.Static;
+                picklesFuncBody.ReturnType = new CodeTypeReference(typeof(System.Collections.Generic.IEnumerable<Io.Cucumber.Messages.Types.Pickle>));
+                picklesFuncBody.Statements.Add(new CodeMethodReturnStatement(picklesExpression));
+                picklesFuncBody.Name = picklesFunc.MethodName;
+                generationContext.TestClass.Members.Add(picklesFuncBody);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 _traceListener.WriteToolOutput($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
                 // This effectively turns OFF the Cucumber Messages support for this feature.
-                return;            
+                return;
             }
             // Create a new method that will be added to the test class. It will be called to initialize the FeatureCucumberMessages property of the FeatureInfo object
             var CucumberMessagesInitializeMethod = new CodeMemberMethod();
@@ -267,9 +304,9 @@ namespace Reqnroll.Generator.Generation
 
             // Create a FeatureLevelCucumberMessages object and add it to featureInfo
             var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureLevelCucumberMessages)),
-                new CodePrimitiveExpression(featureSourceMessageString),
-                new CodePrimitiveExpression(featureGherkinDocumentMessageString),
-                new CodePrimitiveExpression(featurePickleMessagesString),
+                sourceFunc,
+                gherkinDocumentFunc,
+                picklesFunc,
                 new CodePrimitiveExpression(sourceFileLocation));
 
             CucumberMessagesInitializeMethod.Statements.Add(
@@ -296,7 +333,7 @@ namespace Reqnroll.Generator.Generation
             testClassCleanupMethod.Name = GeneratorConstants.TESTCLASS_CLEANUP_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
-            
+
             _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);
 
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
@@ -332,7 +369,7 @@ namespace Reqnroll.Generator.Generation
             testInitializeMethod.Name = GeneratorConstants.TEST_INITIALIZE_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testInitializeMethod);
-            
+
             _testGeneratorProvider.SetTestInitializeMethod(generationContext);
         }
 
@@ -344,11 +381,11 @@ namespace Reqnroll.Generator.Generation
             testCleanupMethod.Name = GeneratorConstants.TEST_CLEANUP_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testCleanupMethod);
-            
+
             _testGeneratorProvider.SetTestCleanupMethod(generationContext);
 
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
-            
+
             //await testRunner.OnScenarioEndAsync();
             var expression = new CodeMethodInvokeExpression(
                 testRunnerField,
@@ -383,7 +420,7 @@ namespace Reqnroll.Generator.Generation
 
             scenarioStartMethod.Attributes = MemberAttributes.Public | MemberAttributes.Final;
             scenarioStartMethod.Name = GeneratorConstants.SCENARIO_START_NAME;
-            
+
             _codeDomHelper.MarkCodeMemberMethodAsAsync(scenarioStartMethod);
 
             //await testRunner.OnScenarioStartAsync();

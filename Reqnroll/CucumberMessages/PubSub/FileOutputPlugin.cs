@@ -16,7 +16,6 @@ using System.IO;
 using System.Linq;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.CommonModels;
-using System.Diagnostics;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PubSub;
 using Reqnroll.CucumberMessages.PayloadProcessing;

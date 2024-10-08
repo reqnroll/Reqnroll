@@ -1,10 +1,12 @@
 ﻿using Gherkin.CucumberMessages;
-using Gherkin.CucumberMessages.Types;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
@@ -16,9 +18,9 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
     /// with that which is configured to be used during TEST execution.
     /// While it's not likely they would be different, it's possible.
     /// 
-    /// If they are possible, we use a visitor pattern to re-write the IDs to the test-time chosen style.
+    /// If they are different, we use a visitor pattern to re-write the IDs to the run-time chosen style.
     /// </summary>
-    internal class GherkinDocumentIDStyleReWriter : GherkinTypesGherkinDocumentVisitor
+    internal class GherkinDocumentIDStyleReWriter : CucumberMessage_TraversalVisitorBase
     {
         private IIdGenerator _idGenerator;
         public Dictionary<string, string> IdMap = new();
@@ -32,7 +34,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 
             _idGenerator = IdGeneratorFactory.Create(targetStyle);
 
-            AcceptDocument(document);
+            Visit(document);
             return document;
         }
 
@@ -62,80 +64,98 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             return IDGenerationStyle.Incrementing;
         }
 
-        protected override void OnTagVisited(Tag tag)
+        public override void OnVisited(Tag tag)
         {
-            base.OnTagVisited(tag);
+            base.OnVisited(tag);
             var oldId = tag.Id;
             var newId = _idGenerator.GetNewId();
             IdMap[oldId] = newId;
-            tag.Id = newId;
-        }
-        protected override void OnScenarioOutlineVisited(Scenario scenarioOutline)
-        {
-            base.OnScenarioOutlineVisited(scenarioOutline);
-            var oldId = scenarioOutline.Id;
-            var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            scenarioOutline.Id = newId;
+            //tag.Id = newId;
+            SetPrivateProperty<Tag>(tag, "Id", newId);
         }
 
-        protected override void OnScenarioVisited(Scenario scenario)
+        public override void OnVisited(Scenario scenario)
         {
-            base.OnScenarioVisited(scenario);
+            base.OnVisited(scenario);
             var oldId = scenario.Id;
             var newId = _idGenerator.GetNewId();
             IdMap[oldId] = newId;
-            scenario.Id = newId;
+            //scenario.Id = newId;
+
+            SetPrivateProperty<Scenario>(scenario, "Id", newId);
         }
 
-        protected override void OnRuleVisited(Rule rule)
+        public override void OnVisited(Rule rule)
         {
-            base.OnRuleVisited(rule);
+            base.OnVisited(rule);
             var oldId = rule.Id;
             var newId = _idGenerator.GetNewId();
             IdMap[oldId] = newId;
-            rule.Id = newId;
+            //rule.Id = newId;
+            SetPrivateProperty<Rule>(rule, "Id", newId);
         }
-        protected override void OnBackgroundVisited(Background background)
+        public override void OnVisited(Background background)
         {
-            base.OnBackgroundVisited(background);
+            base.OnVisited(background);
             var oldId = background.Id;
             var newId = _idGenerator.GetNewId();
             IdMap[oldId] = newId;
-            background.Id = newId;
+            //background.Id = newId;
+
+            SetPrivateProperty<Background>(background, "Id", newId);
 
         }
-        protected override void OnStepVisited(Step step)
+        public override void OnVisited(Step step)
         {
-            base.OnStepVisited(step);
+            base.OnVisited(step);
             var oldId = step.Id;
             var newId = _idGenerator.GetNewId();
             IdMap[oldId] = newId;
-            step.Id = newId;
+            //step.Id = newId;
+
+            SetPrivateProperty<Step>(step, "Id", newId);
         }
-        protected override void OnExamplesVisited(Examples examples)
+        public override void OnVisited(Examples examples)
         {
-            base.OnExamplesVisited(examples);
+            base.OnVisited(examples);
             var oldId = examples.Id;
             var newId = _idGenerator.GetNewId();
             IdMap[oldId] = newId;
-            examples.Id = newId;
+            //examples.Id = newId;
+
+            SetPrivateProperty<Examples>(examples, "Id", newId);
         }
-        protected override void OnTableHeaderVisited(TableRow header)
+        public override void OnVisited(TableRow row)
         {
-            base.OnTableHeaderVisited(header);
-            var oldId = header.Id;
-            var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            header.Id = newId;
-        }
-        protected override void OnTableRowVisited(TableRow row)
-        {
-            base.OnTableRowVisited(row);
+            base.OnVisited(row);
             var oldId = row.Id;
             var newId = _idGenerator.GetNewId();
             IdMap[oldId] = newId;
-            row.Id = newId;
+            //row.Id = newId;
+
+            SetPrivateProperty<TableRow>(row, "Id", newId);
+        }
+        public static void SetPrivateProperty<T>(T instance, string propertyName, string newValue)
+        {
+            // Get the PropertyInfo object for the property
+            PropertyInfo propInfo = typeof(T).GetProperty(propertyName,
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (propInfo == null)
+            {
+                throw new ArgumentException($"Property {propertyName} not found.");
+            }
+
+            // Get the SetMethod (setter) of the property
+            MethodInfo setMethod = propInfo.GetSetMethod(true);
+
+            if (setMethod == null)
+            {
+                throw new ArgumentException($"Property {propertyName} does not have a setter.");
+            }
+
+            // Invoke the setter method to set the new value
+            setMethod.Invoke(instance, new object[] { newValue });
         }
     }
 }

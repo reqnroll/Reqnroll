@@ -3,7 +3,6 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -22,7 +21,7 @@ namespace Reqnroll.CucumberMessages.Configuration
     /// </summary>
     public class CucumberConfiguration : ICucumberConfiguration
     {
-        public static CucumberConfiguration Current { get; private set; }
+        public static ICucumberConfiguration Current { get; private set; }
         public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
         public string BaseDirectory => _resolvedConfiguration.Value.BaseDirectory;
         public string OutputDirectory => _resolvedConfiguration.Value.OutputDirectory;
