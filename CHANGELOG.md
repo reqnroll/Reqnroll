@@ -1,5 +1,13 @@
 # [vNext]
 
+## Improvements:
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v2.1.1 - 2024-10-08
+
 ## Bug fixes:
 
 * Fix: Rule Backgounds cause External Data Plugin to fail (#271)
