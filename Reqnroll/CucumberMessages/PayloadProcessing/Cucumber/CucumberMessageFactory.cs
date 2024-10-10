@@ -27,9 +27,9 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
     /// </summary>
     internal class CucumberMessageFactory
     {
-        public static TestRunStarted ToTestRunStarted(FeatureStartedEvent featureStartedEvent)
+        public static TestRunStarted ToTestRunStarted(DateTime timestamp)
         {
-            return new TestRunStarted(Converters.ToTimestamp(featureStartedEvent.Timestamp));
+            return new TestRunStarted(Converters.ToTimestamp(timestamp));
         }
 
         public static TestRunFinished ToTestRunFinished(bool testRunStatus, FeatureFinishedEvent testRunFinishedEvent)

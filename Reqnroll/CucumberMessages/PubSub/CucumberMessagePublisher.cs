@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.CucumberMessages.ExecutionTracking;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
+using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -36,13 +37,18 @@ namespace Reqnroll.CucumberMessages.PubSub
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
-            runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
+            runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
             {
-                objectContainer = args.ObjectContainer;
-                _brokerFactory = new Lazy<ICucumberMessageBroker>(() => objectContainer.Resolve<ICucumberMessageBroker>());
-                var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                HookIntoTestThreadExecutionEventPublisher(testThreadExecutionEventPublisher);
+                var pluginLifecycleEvents = args.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
+                pluginLifecycleEvents.BeforeTestRun += PublisherStartup;
             };
+            runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
+              {
+                  objectContainer = args.ObjectContainer;
+                  _brokerFactory = new Lazy<ICucumberMessageBroker>(() => objectContainer.Resolve<ICucumberMessageBroker>());
+                  var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
+                  HookIntoTestThreadExecutionEventPublisher(testThreadExecutionEventPublisher);
+              };
         }
 
         public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
@@ -57,7 +63,23 @@ namespace Reqnroll.CucumberMessages.PubSub
             testThreadEventPublisher.AddHandler<HookBindingFinishedEvent>(HookBindingFinishedEventHandler);
             testThreadEventPublisher.AddHandler<AttachmentAddedEvent>(AttachmentAddedEventHandler);
             testThreadEventPublisher.AddHandler<OutputAddedEvent>(OutputAddedEventHandler);
-            
+
+        }
+
+        // This method will get called after TestRunStartedEvent has been published and after any BeforeTestRun hooks have been called
+        // The TestRunStartedEvent will be used by the FileOutputPlugin to launch the File writing thread and establish Messages configuration
+        // Running this after the BeforeTestRun hooks will allow them to programmatically configure CucumberMessages
+        private void PublisherStartup(object sender, RuntimePluginBeforeTestRunEventArgs args)
+        {
+            _broker = _brokerFactory.Value;
+
+            Enabled = _broker.Enabled;
+
+            if (!Enabled)
+            {
+                return;
+            }
+            _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now)) });
         }
 
         private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)

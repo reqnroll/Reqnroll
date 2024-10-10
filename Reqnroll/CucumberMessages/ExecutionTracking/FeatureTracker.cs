@@ -116,8 +116,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 if (!StepDefinitionsByPattern.ContainsKey(hookId)) StepDefinitionsByPattern.Add(hookId, hook.Id);
                 yield return Envelope.Create(hook);
             }
-
-            yield return Envelope.Create(CucumberMessageFactory.ToTestRunStarted(featureStartedEvent));
         }
 
         // This method is used to identify the last ID generated from the set generated during code gen. 
