@@ -13,15 +13,21 @@ using System.Xml.Linq;
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 {
     /// <summary>
-    /// If ID rewriting is required (see cref="GherkinDocumentIDStyleReWriter"), 
+    /// If ID rewriting is required (see cref="GherkinDocumentIDReWriter"), 
     /// this class will re-write the IDs in the given <see cref="Pickle"/>s.
     /// </summary>
-    internal class PickleIDStyleReWriter : CucumberMessage_TraversalVisitorBase
+    internal class PickleIDReWriter : CucumberMessage_TraversalVisitorBase
     {
         private Dictionary<string, string> _idMap;
         private IEnumerable<Pickle> _originalPickles;
-        private IDGenerationStyle _idStyle;
+        private IDGenerationStyle _targetIdStyle;
+        private IDGenerationStyle _existingIdStyle;
         private IIdGenerator _idGenerator;
+
+        public PickleIDReWriter(IIdGenerator idGenerator)
+        {
+            _idGenerator = idGenerator;
+        }
 
         public IEnumerable<Pickle> ReWriteIds(IEnumerable<Pickle> pickles, Dictionary<string, string> idMap, IDGenerationStyle targetStyle)
         {
@@ -29,15 +35,13 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 
             _idMap = idMap;
             _originalPickles = pickles;
-            _idStyle = targetStyle;
-            var existingIdStyle = ProbeForIdGenerationStyle(pickles.First());
+            _targetIdStyle = targetStyle;
+            _existingIdStyle = ProbeForIdGenerationStyle(pickles.First());
 
-            if (existingIdStyle == targetStyle)
+            if (_existingIdStyle == IDGenerationStyle.UUID && targetStyle == IDGenerationStyle.UUID)
                 return pickles;
 
-            _idGenerator = IdGeneratorFactory.Create(targetStyle);
-
-
+            //re-write the IDs (either int->UUID or UUID->int or int->int starting at a new seed)
             foreach (var pickle in _originalPickles)
             {
                 Accept(pickle);
@@ -58,8 +62,11 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
         {
             base.OnVisited(pickle);
 
-            if (_idMap.TryGetValue(pickle.Id, out var newId))
-                SetPrivateProperty(pickle, "Id", newId); //pickle.Id = newId;
+            
+            SetPrivateProperty(pickle, "Id", _idGenerator.GetNewId()); //pickle.Id = newId;
+
+            // if the AstNodeIds are in the idMap, that means they were rewrittten by the GerkinDocumentIDReWriter
+            // otherwise, we can continue to use the ID we already have
             var mappedAstIds = pickle.AstNodeIds.Select(id => _idMap.TryGetValue(id, out var newId2) ? newId2 : id).ToList();
             pickle.AstNodeIds.Clear();
             pickle.AstNodeIds.AddRange(mappedAstIds);
@@ -68,8 +75,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
         public override void OnVisited(PickleStep step)
         {
             base.OnVisited(step);
-            if (_idMap.TryGetValue(step.Id, out var newId))
-                SetPrivateProperty(step, "Id", newId); //step.Id = newId;
+            SetPrivateProperty(step, "Id", _idGenerator.GetNewId()); //step.Id = newId;y
             var mappedAstIds = step.AstNodeIds.Select(id => _idMap.TryGetValue(id, out var newId2) ? newId2 : id).ToList();
             step.AstNodeIds.Clear();
             step.AstNodeIds.AddRange(mappedAstIds);

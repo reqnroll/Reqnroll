@@ -18,11 +18,8 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
             if (CucumberConfiguration.Current.Enabled)
             {
                 Source = source();
-
-                ReWriteIds(gherkinDocument(), pickles(), out var newGherkinDocument, out var newPickles);
-
-                GherkinDocument = newGherkinDocument;
-                Pickles = newPickles;
+                GherkinDocument = gherkinDocument();
+                Pickles = pickles();
                 Location = location;
             }
             PickleJar = new PickleJar(Pickles);
@@ -34,17 +31,5 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
         public Io.Cucumber.Messages.Types.GherkinDocument GherkinDocument { get; }
         public IEnumerable<Io.Cucumber.Messages.Types.Pickle> Pickles { get; }
         public PickleJar PickleJar { get; }
-
-        private void ReWriteIds(GherkinDocument gherkinDocument, IEnumerable<Pickle> pickles, out GherkinDocument newGherkinDocument, out IEnumerable<Pickle> newPickles)
-        {
-            var targetIdStyle = CucumberConfiguration.Current.IDGenerationStyle;
-            var gherkinDocumentIDStyleReWriter = new GherkinDocumentIDStyleReWriter();
-            newGherkinDocument = gherkinDocumentIDStyleReWriter.ReWriteIds(gherkinDocument, targetIdStyle);
-            var idMap = gherkinDocumentIDStyleReWriter.IdMap;
-
-            var pickleIDStyleReWriter = new PickleIDStyleReWriter();
-            newPickles = pickleIDStyleReWriter.ReWriteIds(pickles, idMap, targetIdStyle);
-        }
-
     }
 }

@@ -2,11 +2,10 @@
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
-using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -21,7 +20,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // Static Messages are those generated during code generation (Source, GherkinDocument & Pickles)
         // and the StepTransformations, StepDefinitions and Hook messages which are global to the entire Solution.
         internal IEnumerable<Envelope> StaticMessages => _staticMessages.Value;
-        private Lazy<IEnumerable<Envelope>> _staticMessages; 
+        private Lazy<IEnumerable<Envelope>> _staticMessages;
+
         // ID Generator to use when generating IDs for TestCase messages and beyond
         // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
         // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
@@ -29,23 +29,36 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
-        internal Dictionary<string, string> StepDefinitionsByPattern = new();
+        // This dictionary is shared across all Features (via the Publisher)
+        // The same is true of hte StepTransformations and StepDefinitionBindings used for Undefined Parameter Types
+        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
+        private ConcurrentBag<IStepArgumentTransformationBinding> StepTransformRegistry;
+        private ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypes;
+
+        // This dictionary maps from (string) PickkleID to the TestCase tracker
+        private ConcurrentDictionary<string, TestCaseCucumberMessageTracker> testCaseTrackersById = new();
+
         public string FeatureName { get; set; }
         public bool Enabled { get; private set; }
 
         // This dictionary maps from (string) PickleIDIndex to (string) PickleID
         public Dictionary<string, string> PickleIds { get; } = new();
 
+        public bool FeatureExecutionSuccess { get; private set; }
 
         // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
-        public FeatureTracker(FeatureStartedEvent featureStartedEvent)
+        public FeatureTracker(FeatureStartedEvent featureStartedEvent, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns, ConcurrentBag<IStepArgumentTransformationBinding> stepTransformRegistry, ConcurrentBag<IStepDefinitionBinding> undefinedParameterTypes)
         {
+            StepDefinitionsByPattern = stepDefinitionPatterns;
+            StepTransformRegistry = stepTransformRegistry;
+            UndefinedParameterTypes = undefinedParameterTypes;
+            IDGenerator = idGenerator;
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
             Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null ? true : false;
-            PreProcessEvent(featureStartedEvent);
+            ProcessEvent(featureStartedEvent);
         }
-        internal void PreProcessEvent(FeatureStartedEvent featureStartedEvent)
+        internal void ProcessEvent(FeatureStartedEvent featureStartedEvent)
         {
             if (!Enabled) return;
             // This has side-effects needed for proper execution of subsequent events; eg, the Ids of the static messages get generated and then subsequent events generate Ids that follow
@@ -53,29 +66,23 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         }
         private IEnumerable<Envelope> GenerateStaticMessages(FeatureStartedEvent featureStartedEvent)
         {
-            yield return CucumberMessageFactory.ToMeta(featureStartedEvent);
 
-            //Gherkin.CucumberMessages.Types.Source gherkinSource = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source;
-            //Source messageSource = CucumberMessageTransformer.ToSource(gherkinSource);
             yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
 
-
-            //Gherkin.CucumberMessages.Types.GherkinDocument gherkinDoc = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument;
-            //GherkinDocument gherkinDocument = CucumberMessageTransformer.ToGherkinDocument(gherkinDoc);
-            yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument);
-
+            var gd = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument;
 
             var pickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles.ToList();
-            //var pickles = CucumberMessageTransformer.ToPickles(gherkinPickles);
 
-            string lastID = ExtractLastID(pickles);
-            IDGenerator = IdGeneratorFactory.Create(lastID);
+            var idReWriter = new CucumberMessages.RuntimeSupport.IdReWriter();
+            idReWriter.ReWriteIds(gd, pickles, IDGenerator, out var reWrittenGherkinDocument, out var reWrittenPickles);
+            gd = reWrittenGherkinDocument;
+            pickles = reWrittenPickles.ToList();
 
-            for(int i = 0; i < pickles.Count; i++)
+            for (int i = 0; i < pickles.Count; i++)
             {
                 PickleIds.Add(i.ToString(), pickles[i].Id);
             }
-
+            yield return Envelope.Create(gd);
             foreach (var pickle in pickles)
             {
                 yield return Envelope.Create(pickle);
@@ -85,6 +92,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             foreach (var stepTransform in bindingRegistry.GetStepTransformations())
             {
+                if (StepTransformRegistry.Contains(stepTransform)) 
+                    continue;
+                StepTransformRegistry.Add(stepTransform);
                 var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, IDGenerator);
                 yield return Envelope.Create(parameterType);
             }
@@ -95,6 +105,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 if (errmsg.Contains("Undefined parameter type"))
                 {
                     var paramName = Regex.Match(errmsg, "Undefined parameter type '(.*)'").Groups[1].Value;
+                    if (UndefinedParameterTypes.Contains(binding))
+                        continue;
+                    UndefinedParameterTypes.Add(binding);
                     var undefinedParameterType = CucumberMessageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, IDGenerator);
                     yield return Envelope.Create(undefinedParameterType);
                 }
@@ -102,19 +115,26 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
             {
-                var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
                 var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
-                if (!StepDefinitionsByPattern.ContainsKey(pattern)) StepDefinitionsByPattern.Add(pattern, stepDefinition.Id);
-
-                yield return Envelope.Create(stepDefinition);
+                if (StepDefinitionsByPattern.ContainsKey(pattern))
+                    continue;
+                var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
+                if (StepDefinitionsByPattern.TryAdd(pattern, stepDefinition.Id))
+                {
+                    yield return Envelope.Create(stepDefinition);
+                }
             }
 
             foreach (var hookBinding in bindingRegistry.GetHooks())
             {
-                var hook = CucumberMessageFactory.ToHook(hookBinding, IDGenerator);
                 var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
-                if (!StepDefinitionsByPattern.ContainsKey(hookId)) StepDefinitionsByPattern.Add(hookId, hook.Id);
-                yield return Envelope.Create(hook);
+                if (StepDefinitionsByPattern.ContainsKey(hookId))
+                    continue;
+                var hook = CucumberMessageFactory.ToHook(hookBinding, IDGenerator);
+                if (StepDefinitionsByPattern.TryAdd(hookId, hook.Id))
+                {
+                    yield return Envelope.Create(hook);
+                };
             }
         }
 
@@ -129,5 +149,92 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             return pickles.Last().Id;
         }
 
+        // When the FeatureFinished event fires, we calculate the Feature-level Execution Status
+        public void ProcessEvent(FeatureFinishedEvent featureFinishedEvent)
+        {
+            var testCases = testCaseTrackersById.Values.ToList();
+
+            // Calculate the Feature-level Execution Status
+            FeatureExecutionSuccess = testCases.All(tc => tc.Finished) switch
+            {
+                true => testCases.All(tc => tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK),
+                _ => true
+            };
+        }
+
+        public void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
+        {
+            var pickleId = PickleIds[scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+            var tccmt = new TestCaseCucumberMessageTracker(this, pickleId);
+            tccmt.ProcessEvent(scenarioStartedEvent);
+            testCaseTrackersById.TryAdd(pickleId, tccmt);
+        }
+
+        public IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
+        {
+            var pickleId = PickleIds[scenarioFinishedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+
+            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            {
+                tccmt.ProcessEvent(scenarioFinishedEvent);
+
+                return tccmt.TestCaseCucumberMessages();
+            }
+            return Enumerable.Empty<Envelope>();
+        }
+
+        public void ProcessEvent(StepStartedEvent stepStartedEvent)
+        {
+            var pickleId = PickleIds[stepStartedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+
+            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            {
+                tccmt.ProcessEvent(stepStartedEvent);
+            }
+        }
+        public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
+        {
+            var pickleId = PickleIds[stepFinishedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+
+            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            {
+                tccmt.ProcessEvent(stepFinishedEvent);
+            }
+        }
+
+        public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
+        {
+            var pickleId = PickleIds[hookBindingStartedEvent.ContextManager.ScenarioContext.ScenarioInfo.PickleIdIndex];
+
+            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                tccmt.ProcessEvent(hookBindingStartedEvent);
+        }
+        public void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
+        {
+            var pickleId = PickleIds[hookBindingFinishedEvent.ContextManager.ScenarioContext.ScenarioInfo.PickleIdIndex];
+
+            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                tccmt.ProcessEvent(hookBindingFinishedEvent);
+        }
+        public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
+        {
+            var pickleId = PickleIds[attachmentAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId];
+
+            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            {
+                tccmt.ProcessEvent(attachmentAddedEvent);
+            }
+        }
+
+        public void ProcessEvent(OutputAddedEvent outputAddedEvent)
+        {
+            var pickleId = PickleIds[outputAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId];
+
+            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            {
+                tccmt.ProcessEvent(outputAddedEvent);
+            }
+
+        }
     }
 }

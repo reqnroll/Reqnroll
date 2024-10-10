@@ -18,8 +18,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// </summary>
     public class TestCaseCucumberMessageTracker
     {
-        public TestCaseCucumberMessageTracker(FeatureTracker featureTracker)
+        public TestCaseCucumberMessageTracker(FeatureTracker featureTracker, string pickleId)
         {
+            PickleId = pickleId;
             FeatureName = featureTracker.FeatureName;
             Enabled = featureTracker.Enabled;
             IDGenerator = featureTracker.IDGenerator;
@@ -30,7 +31,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
         public string FeatureName { get; set; }
         public string PickleId { get; set; } = string.Empty;
-        public string TestCaseTrackerId { get { return FeatureName +@"/" + PickleId; } }
         public string TestCaseId { get; set; }
         public string TestCaseStartedId { get; private set; }
 
@@ -72,7 +72,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
-        internal Dictionary<string, string> StepDefinitionsByPattern = new();
+        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern ;
 
         // Processing of events is handled in two stages.
         // Stage 1: As events are recieved, critical information needed right away is extracted and stored in the TestCaseCucumberMessageTracker
@@ -167,8 +167,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void PreProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
-            PickleId = PickleIdList[scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
-            scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId = TestCaseTrackerId;
+            scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId = PickleId;
             TestCaseId = IDGenerator.GetNewId();
             TestCaseStartedId = IDGenerator.GetNewId();
         }

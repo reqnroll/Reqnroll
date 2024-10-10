@@ -19,7 +19,7 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
         public static IIdGenerator Create(IDGenerationStyle style)
         {
             return style switch { 
-                IDGenerationStyle.Incrementing => new IncrementingIdGenerator(), 
+                IDGenerationStyle.Incrementing => new SeedableIncrementingIdGenerator(0),
                 IDGenerationStyle.UUID => new GuidIdGenerator(), 
                 _ => throw new NotImplementedException() };
         }

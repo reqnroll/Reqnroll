@@ -3,6 +3,7 @@ using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Analytics;
 using Reqnroll.Bindings;
+using Reqnroll.BoDi;
 using Reqnroll.CommonModels;
 using Reqnroll.CucumberMessages.ExecutionTracking;
 using Reqnroll.CucumberMessages.PayloadProcessing;
@@ -15,8 +16,6 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
@@ -32,9 +31,9 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return new TestRunStarted(Converters.ToTimestamp(timestamp));
         }
 
-        public static TestRunFinished ToTestRunFinished(bool testRunStatus, FeatureFinishedEvent testRunFinishedEvent)
+        public static TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp)
         {
-            return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(testRunFinishedEvent.Timestamp), null);
+            return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp), null);
         }
         internal static TestCase ToTestCase(TestCaseCucumberMessageTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
         {
@@ -122,7 +121,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         private static SourceReference ToSourceRef(IBinding binding)
         {
             var methodName = binding.Method.Name;
-            var className = binding.Method.Type.Name;
+            var className = binding.Method.Type.AssemblyName + "." + binding.Method.Type.FullName;
             var paramTypes = binding.Method.Parameters.Select(x => x.Type.Name).ToList();
             var methodDescription = new JavaMethod(className, methodName, paramTypes);
             var sourceRef = SourceReference.Create(methodDescription);
@@ -274,11 +273,10 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             };
         }
 
-        public static Envelope ToMeta(FeatureStartedEvent featureStartedEvent)
+        public static Envelope ToMeta(IObjectContainer container)
         {
-            var featureContainer = featureStartedEvent.FeatureContext.FeatureContainer;
-            var environmentInfoProvider = featureContainer.Resolve<IEnvironmentInfoProvider>();
-            var environmentWrapper = featureContainer.Resolve<IEnvironmentWrapper>();
+            var environmentInfoProvider = container.Resolve<IEnvironmentInfoProvider>();
+            var environmentWrapper = container.Resolve<IEnvironmentWrapper>();
 
             var implementation = new Product("Reqnroll", environmentInfoProvider.GetReqnrollVersion());
             string targetFramework = environmentInfoProvider.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
@@ -349,7 +347,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         public static string CanonicalizeHookBinding(IHookBinding hookBinding)
         {
             string signature = GenerateSignature(hookBinding);
-            return $"{hookBinding.Method.Type.FullName}.{hookBinding.Method.Name}({signature})";
+            return $"{hookBinding.Method.Type.AssemblyName}.{hookBinding.Method.Type.FullName}.{hookBinding.Method.Name}({signature})";
         }
 
         private static string GenerateSignature(IBinding stepDefinition)

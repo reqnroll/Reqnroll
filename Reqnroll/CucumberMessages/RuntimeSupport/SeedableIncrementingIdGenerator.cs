@@ -11,6 +11,13 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
 
         private int _counter = 0;
 
+        public void SetSeed(int seed)
+        {
+            _counter = seed;
+        }
+
+        public bool HasBeenUsed { get { return _counter > 0; } }
+
         public string GetNewId()
         {
             // Using thread-safe incrementing in case scenarios are running in parallel

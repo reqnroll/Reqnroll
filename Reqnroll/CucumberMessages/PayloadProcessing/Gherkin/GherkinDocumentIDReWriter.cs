@@ -19,25 +19,72 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
     /// While it's not likely they would be different, it's possible.
     /// 
     /// If they are different, we use a visitor pattern to re-write the IDs to the run-time chosen style.
+    /// 
+    /// If the styles are the same AND we're using an incrementing generator, then we need to regenerate with the next series of IDs.
+    /// 
     /// </summary>
-    internal class GherkinDocumentIDStyleReWriter : CucumberMessage_TraversalVisitorBase
+    internal class GherkinDocumentIDReWriter : CucumberMessage_TraversalVisitorBase
     {
         private IIdGenerator _idGenerator;
         public Dictionary<string, string> IdMap = new();
-
+        public GherkinDocumentIDReWriter(IIdGenerator idGenerator)
+        {
+            _idGenerator = idGenerator;
+        }
         public GherkinDocument ReWriteIds(GherkinDocument document, IDGenerationStyle targetStyle)
         {
             var existingIdStyle = ProbeForIdGenerationStyle(document);
 
-            if (existingIdStyle == targetStyle)
+            if (targetStyle == IDGenerationStyle.Incrementing)
+            {
+                switch ((((SeedableIncrementingIdGenerator)_idGenerator).HasBeenUsed, existingIdStyle))
+                {
+                    case (true, IDGenerationStyle.Incrementing):
+                    case (true, IDGenerationStyle.UUID):
+                    case (false, IDGenerationStyle.UUID):
+                        return ReWrite(document);
+
+                    case (false, IDGenerationStyle.Incrementing):
+                        var lastId = ProbeForLastUsedId(document);
+                        ((SeedableIncrementingIdGenerator)_idGenerator).SetSeed(lastId);
+                        return document;
+                }
+            }
+            // else targetStyle is IDGenerationStyle.UUID
+            if (existingIdStyle == IDGenerationStyle.UUID)
                 return document;
 
-            _idGenerator = IdGeneratorFactory.Create(targetStyle);
+            // else existingIdStyle is IDGenerationStyle.Incrementing
+            return ReWrite(document);
+        }
 
+        private GherkinDocument ReWrite(GherkinDocument document)
+        {
             Visit(document);
             return document;
         }
 
+        private int ProbeForLastUsedId(GherkinDocument document)
+        {
+            if (document.Feature == null) return 0;
+
+            var child = document.Feature.Children.LastOrDefault();
+            var tags = document.Feature.Tags;
+            var highestTagId = tags.Count > 0 ? tags.Max(t => int.Parse(t.Id)) : 0;
+
+            if (child == null) return highestTagId;
+
+            if (child.Rule != null)
+                highestTagId = Math.Max(highestTagId, int.Parse(child.Rule.Id));
+
+            if (child.Background != null)
+                highestTagId = Math.Max(highestTagId, int.Parse(child.Background.Id));
+
+            if (child.Scenario != null)
+                highestTagId = Math.Max(highestTagId, int.Parse(child.Scenario.Id));
+
+            return highestTagId;
+        }
         private IDGenerationStyle ProbeForIdGenerationStyle(GherkinDocument document)
         {
             if (document.Feature == null) return IDGenerationStyle.UUID;
@@ -58,7 +105,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 
         private IDGenerationStyle ParseStyle(string id)
         {
-            if (Guid.TryParse(id, out var _)) 
+            if (Guid.TryParse(id, out var _))
                 return IDGenerationStyle.UUID;
 
             return IDGenerationStyle.Incrementing;
