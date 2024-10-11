@@ -23,7 +23,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     {
         private StepStartedEvent stepStartedEvent;
 
-        public TestStepTracker(TestCaseCucumberMessageTracker parentTracker) : base(parentTracker)
+        public TestStepTracker(TestCaseTracker parentTracker) : base(parentTracker)
         {
         }
 

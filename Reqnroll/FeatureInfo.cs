@@ -20,7 +20,7 @@ namespace Reqnroll
         // This holds the cucumber messages at the feature level created by the test class generator; populated when the FeatureStartedEvent is fired
         public FeatureLevelCucumberMessages FeatureCucumberMessages { get; set; }
         // This holds the unique identifier for the tracker instance that is being used to generate cucumber messages for this Test Case
-        public string CucumberMessages_TestCaseTrackerId { get; set; }
+        public string CucumberMessages_PickleId { get; set; }
 
         public FeatureInfo(CultureInfo language, string folderPath, string title, string description, params string[] tags)
             : this(language, folderPath, title, description, ProgrammingLanguage.CSharp, tags)

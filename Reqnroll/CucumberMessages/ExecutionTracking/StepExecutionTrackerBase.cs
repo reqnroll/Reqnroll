@@ -13,9 +13,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public TimeSpan Duration { get; set; }
         public Exception Exception { get; set; }
 
-        public TestCaseCucumberMessageTracker ParentTestCase;
+        public TestCaseTracker ParentTestCase;
 
-        public StepExecutionTrackerBase(TestCaseCucumberMessageTracker parentScenario)
+        public StepExecutionTrackerBase(TestCaseTracker parentScenario)
         {
             ParentTestCase = parentScenario;
         }

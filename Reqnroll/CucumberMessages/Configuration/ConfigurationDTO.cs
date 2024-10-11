@@ -22,7 +22,7 @@ namespace Reqnroll.CucumberMessages.Configuration
 
         public Profile ActiveProfile => Profiles.Where(p => p.ProfileName == ActiveProfileName).FirstOrDefault();
 
-        public ConfigurationDTO() : this(true) { }
+        public ConfigurationDTO() : this(false) { }
         public ConfigurationDTO(bool enabled) : this(enabled, "DEFAULT", new List<Profile>()) { }
         public ConfigurationDTO(bool enabled, string activeProfile, List<Profile> profiles)
         {

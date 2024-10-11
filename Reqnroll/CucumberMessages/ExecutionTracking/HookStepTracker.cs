@@ -14,7 +14,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     {
         public string HookBindingSignature { get; private set; }
         public HookBindingFinishedEvent HookBindingFinishedEvent { get; private set; }
-        public HookStepTracker(TestCaseCucumberMessageTracker tracker) : base(tracker)
+        public HookStepTracker(TestCaseTracker tracker) : base(tracker)
         {
         }
 

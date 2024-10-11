@@ -16,9 +16,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// This class is used to track the execution of Test Cases
     /// There will be one instance of this class per gherkin Pickle/TestCase. It will track info from both Feature-level and Scenario-level Execution Events for a single Test Case
     /// </summary>
-    public class TestCaseCucumberMessageTracker
+    public class TestCaseTracker
     {
-        public TestCaseCucumberMessageTracker(FeatureTracker featureTracker, string pickleId)
+        public TestCaseTracker(FeatureTracker featureTracker, string pickleId)
         {
             PickleId = pickleId;
             FeatureName = featureTracker.FeatureName;
@@ -75,7 +75,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal ConcurrentDictionary<string, string> StepDefinitionsByPattern ;
 
         // Processing of events is handled in two stages.
-        // Stage 1: As events are recieved, critical information needed right away is extracted and stored in the TestCaseCucumberMessageTracker
+        // Stage 1: As events are recieved, critical information needed right away is extracted and stored in the TestCaseTracker
         //          The event is then stored in a queue for processing in stage 2
         // Stage 2: When TestRunFinished is recieved, the messages are processed to generate Cucumber Messages and then sent in a single batch to the broker
         internal void ProcessEvent(ExecutionEvent anEvent)
@@ -167,7 +167,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void PreProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
-            scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_TestCaseTrackerId = PickleId;
+            scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_PickleId = PickleId;
             TestCaseId = IDGenerator.GetNewId();
             TestCaseStartedId = IDGenerator.GetNewId();
         }

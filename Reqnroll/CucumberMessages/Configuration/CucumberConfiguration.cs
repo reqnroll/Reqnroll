@@ -112,7 +112,7 @@ namespace Reqnroll.CucumberMessages.Configuration
                 result.IDGenerationStyle = IdGenerationStyleEnumConverter.ParseIdGenerationStyle(((Success<string>)idGenStyleValue).Result);
 
             var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
-            var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "TRUE";
+            var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "FALSE";
 
             result.Enabled = Convert.ToBoolean(enabled);
 

@@ -35,7 +35,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp), null);
         }
-        internal static TestCase ToTestCase(TestCaseCucumberMessageTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
+        internal static TestCase ToTestCase(TestCaseTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
         {
             var testSteps = new List<TestStep>();
 
@@ -63,11 +63,11 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             );
             return testCase;
         }
-        internal static TestCaseStarted ToTestCaseStarted(TestCaseCucumberMessageTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
+        internal static TestCaseStarted ToTestCaseStarted(TestCaseTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
         {
             return new TestCaseStarted(0, testCaseTracker.TestCaseStartedId, testCaseTracker.TestCaseId, null, Converters.ToTimestamp(scenarioStartedEvent.Timestamp));
         }
-        internal static TestCaseFinished ToTestCaseFinished(TestCaseCucumberMessageTracker testCaseTracker, ScenarioFinishedEvent scenarioFinishedEvent)
+        internal static TestCaseFinished ToTestCaseFinished(TestCaseTracker testCaseTracker, ScenarioFinishedEvent scenarioFinishedEvent)
         {
             return new TestCaseFinished(testCaseTracker.TestCaseStartedId, Converters.ToTimestamp(scenarioFinishedEvent.Timestamp), false);
         }
@@ -128,7 +128,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return sourceRef;
         }
 
-        internal static TestStep ToPickleTestStep(TestCaseCucumberMessageTracker tracker, TestStepTracker stepState)
+        internal static TestStep ToPickleTestStep(TestCaseTracker tracker, TestStepTracker stepState)
         {
             bool bound = stepState.Bound;
             bool ambiguous = stepState.Ambiguous;
@@ -212,7 +212,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return new TestStepFinished(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookFinishedEvent.Timestamp));
         }
 
-        internal static Attachment ToAttachment(TestCaseCucumberMessageTracker tracker, AttachmentAddedEventWrapper attachmentAddedEventWrapper)
+        internal static Attachment ToAttachment(TestCaseTracker tracker, AttachmentAddedEventWrapper attachmentAddedEventWrapper)
         {
             return new Attachment(
                 Base64EncodeFile(attachmentAddedEventWrapper.AttachmentAddedEvent.FilePath),
@@ -224,7 +224,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 attachmentAddedEventWrapper.TestCaseStepID,
                 null);
         }
-        internal static Attachment ToAttachment(TestCaseCucumberMessageTracker tracker, OutputAddedEventWrapper outputAddedEventWrapper)
+        internal static Attachment ToAttachment(TestCaseTracker tracker, OutputAddedEventWrapper outputAddedEventWrapper)
         {
             return new Attachment(
                 outputAddedEventWrapper.OutputAddedEvent.Text,
@@ -341,7 +341,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             string signature = GenerateSignature(stepDefinition);
 
-            return $"{stepDefinition.SourceExpression}({signature})";
+            return $"{stepDefinition.Method.Type.AssemblyName}.{stepDefinition.Method.Type.FullName}.{stepDefinition.Method.Name}({signature})";
         }
 
         public static string CanonicalizeHookBinding(IHookBinding hookBinding)

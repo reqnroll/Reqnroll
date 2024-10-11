@@ -112,10 +112,11 @@ namespace Reqnroll.CucumberMessages.PubSub
         {
             _broker = _brokerFactory.Value;
             var traceListener = objectContainer.Resolve<ITraceListener>();
-            var featureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
+
+            var featureName = featureStartedEvent.FeatureContext?.FeatureInfo?.Title;
 
             Enabled = _broker.Enabled;
-            if (!Enabled)
+            if (!Enabled || String.IsNullOrEmpty(featureName))
             {
                 return;
             }
@@ -140,11 +141,13 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
-            if (!Enabled)
+            // For this and subsequent events, we pull up the FeatureTracker by feature name.
+            // If the feature name is not avaiable (such as might be the case in certain test setups), we ignore the event.
+            var featureName = featureFinishedEvent.FeatureContext?.FeatureInfo?.Title;
+            if (!Enabled || String.IsNullOrEmpty(featureName))
             {
                 return;
             }
-            var featureName = featureFinishedEvent.FeatureContext.FeatureInfo.Title;
             if (!StartedFeatures.ContainsKey(featureName) || !StartedFeatures[featureName].Enabled)
             {
                 return;
@@ -158,10 +161,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
         {
-            if (!Enabled)
+            var featureName = scenarioStartedEvent.FeatureContext?.FeatureInfo?.Title;
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
             var traceListener = objectContainer.Resolve<ITraceListener>();
-            var featureName = scenarioStartedEvent.FeatureContext.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 if (featureTracker.Enabled)
@@ -182,9 +185,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
         {
-            if (!Enabled)
+            var featureName = scenarioFinishedEvent.FeatureContext?.FeatureInfo?.Title;
+
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
-            var featureName = scenarioFinishedEvent.FeatureContext.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 foreach (var msg in featureTracker.ProcessEvent(scenarioFinishedEvent))
@@ -196,10 +200,11 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void StepStartedEventHandler(StepStartedEvent stepStartedEvent)
         {
-            if (!Enabled)
+            var featureName = stepStartedEvent.FeatureContext?.FeatureInfo?.Title;
+
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
 
-            var featureName = stepStartedEvent.FeatureContext.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(stepStartedEvent);
@@ -208,10 +213,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
         {
-            if (!Enabled)
+            var featureName = stepFinishedEvent.FeatureContext?.FeatureInfo?.Title;
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
 
-            var featureName = stepFinishedEvent.FeatureContext.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(stepFinishedEvent);
@@ -220,10 +225,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
         {
-            if (!Enabled)
+            var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
 
-            var featureName = hookBindingStartedEvent.ContextManager.FeatureContext.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(hookBindingStartedEvent);
@@ -232,10 +237,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
-            if (!Enabled)
+            var featureName = hookBindingFinishedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
 
-            var featureName = hookBindingFinishedEvent.ContextManager.FeatureContext.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(hookBindingFinishedEvent);
@@ -244,10 +249,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
         {
-            if (!Enabled)
+            var featureName = attachmentAddedEvent.FeatureInfo?.Title;
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
 
-            var featureName = attachmentAddedEvent.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(attachmentAddedEvent);
@@ -256,10 +261,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private void OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
         {
-            if (!Enabled)
+            var featureName = outputAddedEvent.FeatureInfo?.Title;
+            if (!Enabled || String.IsNullOrEmpty(featureName))
                 return;
 
-            var featureName = outputAddedEvent.FeatureInfo.Title;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(outputAddedEvent);

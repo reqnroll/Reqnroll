@@ -6,6 +6,7 @@ using Reqnroll.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -36,7 +37,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         private ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypes;
 
         // This dictionary maps from (string) PickkleID to the TestCase tracker
-        private ConcurrentDictionary<string, TestCaseCucumberMessageTracker> testCaseTrackersById = new();
+        private ConcurrentDictionary<string, TestCaseTracker> testCaseTrackersById = new();
 
         public string FeatureName { get; set; }
         public bool Enabled { get; private set; }
@@ -92,7 +93,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             foreach (var stepTransform in bindingRegistry.GetStepTransformations())
             {
-                if (StepTransformRegistry.Contains(stepTransform)) 
+                if (StepTransformRegistry.Contains(stepTransform))
                     continue;
                 StepTransformRegistry.Add(stepTransform);
                 var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, IDGenerator);
@@ -164,61 +165,95 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         public void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
-            var pickleId = PickleIds[scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
-            var tccmt = new TestCaseCucumberMessageTracker(this, pickleId);
-            tccmt.ProcessEvent(scenarioStartedEvent);
-            testCaseTrackersById.TryAdd(pickleId, tccmt);
+            // as in the Publisher, we're using defensive coding here b/c some test setups might not have complete info
+            var pickleIndex = scenarioStartedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
+            if (String.IsNullOrEmpty(pickleIndex)) return;
+
+            if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
+            {
+                var tccmt = new TestCaseTracker(this, pickleId);
+                tccmt.ProcessEvent(scenarioStartedEvent);
+                testCaseTrackersById.TryAdd(pickleId, tccmt);
+            }
         }
 
         public IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
-            var pickleId = PickleIds[scenarioFinishedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+            var pickleIndex = scenarioFinishedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
+            if (String.IsNullOrEmpty(pickleIndex)) return Enumerable.Empty<Envelope>();
 
-            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                tccmt.ProcessEvent(scenarioFinishedEvent);
+                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                {
+                    tccmt.ProcessEvent(scenarioFinishedEvent);
 
-                return tccmt.TestCaseCucumberMessages();
+                    return tccmt.TestCaseCucumberMessages();
+                }
             }
             return Enumerable.Empty<Envelope>();
         }
 
         public void ProcessEvent(StepStartedEvent stepStartedEvent)
         {
-            var pickleId = PickleIds[stepStartedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+            var pickleIndex = stepStartedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
 
-            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            if (String.IsNullOrEmpty(pickleIndex)) return;
+
+            if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                tccmt.ProcessEvent(stepStartedEvent);
+                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                {
+                    tccmt.ProcessEvent(stepStartedEvent);
+                }
             }
         }
+
         public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
-            var pickleId = PickleIds[stepFinishedEvent.ScenarioContext.ScenarioInfo.PickleIdIndex];
+            var pickleIndex = stepFinishedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
 
-            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            if (String.IsNullOrEmpty(pickleIndex)) return;
+            if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                tccmt.ProcessEvent(stepFinishedEvent);
+                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                {
+                    tccmt.ProcessEvent(stepFinishedEvent);
+                }
             }
         }
 
         public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
         {
-            var pickleId = PickleIds[hookBindingStartedEvent.ContextManager.ScenarioContext.ScenarioInfo.PickleIdIndex];
+            var pickleIndex = hookBindingStartedEvent.ContextManager?.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
 
-            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
-                tccmt.ProcessEvent(hookBindingStartedEvent);
+            if (String.IsNullOrEmpty(pickleIndex)) return;
+
+            if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
+            {
+                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                    tccmt.ProcessEvent(hookBindingStartedEvent);
+            }
         }
+
         public void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
-            var pickleId = PickleIds[hookBindingFinishedEvent.ContextManager.ScenarioContext.ScenarioInfo.PickleIdIndex];
+            var pickleIndex = hookBindingFinishedEvent.ContextManager?.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
 
-            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
-                tccmt.ProcessEvent(hookBindingFinishedEvent);
+            if (String.IsNullOrEmpty(pickleIndex)) return;
+
+            if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
+            {
+                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                    tccmt.ProcessEvent(hookBindingFinishedEvent);
+            }
         }
+
         public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
         {
-            var pickleId = PickleIds[attachmentAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId];
+            var pickleId = attachmentAddedEvent.FeatureInfo?.CucumberMessages_PickleId;
+
+            if (String.IsNullOrEmpty(pickleId)) return;
 
             if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
             {
@@ -228,7 +263,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         public void ProcessEvent(OutputAddedEvent outputAddedEvent)
         {
-            var pickleId = PickleIds[outputAddedEvent.FeatureInfo.CucumberMessages_TestCaseTrackerId];
+            var pickleId = outputAddedEvent.FeatureInfo?.CucumberMessages_PickleId;
+
+            if (String.IsNullOrEmpty(pickleId)) return;
 
             if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
             {
