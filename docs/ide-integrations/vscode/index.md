@@ -1,4 +1,4 @@
-# Reqnroll Visual Studio integration
+# Reqnroll Visual Studio Code integration
 
 For setting up Reqnroll Visual Studio Code integration using the VSCode Cucumber plugin, please check the related [Setup Visual Studio Code](../../installation/setup-ide.md#setup-vscode) section of our IDE setup guide.
 

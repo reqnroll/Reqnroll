@@ -71,12 +71,9 @@ namespace Reqnroll.Generator.Generation
             if (background == null) return new List<CodeStatement>();
 
             var statements = new List<CodeStatement>();
-            using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, context.Document.SourceFilePath, background.Location))
+            foreach (var step in background.Steps)
             {
-                foreach (var step in background.Steps)
-                {
-                    GenerateStep(context, statements, step, null);
-                }
+                GenerateStep(context, statements, step, null);
             }
 
             return statements;
