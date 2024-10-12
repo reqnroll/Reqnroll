@@ -1,0 +1,113 @@
+# Cucumber Messages Configuration
+
+There are two ways to configure Cucumber Messages support within Reqnroll.
+
+* [](#config-file)
+* [](#environment-variable)
+
+## Defaults
+Unless overriden by the use of a configuration file and/or environment variable, Reqnroll will use the following defaults to configure support for Cucumber Messages.
+```{list-table}
+:header-rows: 1
+
+* - Setting
+  - Value
+  - Description
+* - Enable
+  - true/false
+  - Controls whether Cucumber Messages will be created during the execution of the test. <br/> *Default:* `false`
+* - Base Path
+  - relative or absolute file storage path
+  - Specifies the root location for storage of Cucumber Messages result files. <br/> *Default:* `.` (i.e., current folder)
+* - Output Directory
+  - folder(/path) relative to the BasePath
+  - Folder relative to the Base Path for storage of Cucumber Messages results files. <br/> *Default:* `` (none)
+* - Output FileName
+  - filename(.ndjson)
+  - The file name in which Cucumber Messages will be stored. By convention, these files use the `.ndjson` extension. <br/> *Default:* `reqnroll_report.ndjson`
+* - ID Generation Style
+  - UUID/INCREMENTING
+  - Message elements within the .ndjson will be given IDs according to this style directive. Incrementing IDs are integers that start at 1. <br/> *Default:* `UUID`
+```
+
+{#config-file}
+## Configuration File
+Reqnroll will use the values from a configuration file to control the above settings. To use a configuration file, add a json file to your project called `cucumbermessages.config.json'
+An example configuration file looks like this:
+
+```{code-block} json
+:caption: cucumbermessages.config.json
+{
+    "fileOutputEnabled": true,
+    "activeProfileName": "LOCAL",
+    "profiles": [
+        {
+            "profileName": "LOCAL",
+            "basePath": "C:\\Users\\dev\\source\\repos\\reqnroll_project",
+            "outputDirectory": "CucumberMessages",
+            "IDGenerationStyle":  "INCREMENTING"
+        }
+    ]
+}
+```
+
+In the above example, the configuration file instructs Reqnroll to turn Cucumber Message support ON, store the file in an absolute path (C:\\Users\\dev\\source\\repos\\reqnroll_project\\CucumberMessages\\reqnroll_report.ndjson). Note that the Output Filename setting was omitted from the configuration file, thus using the default value.
+
+Configuration files may specify multiple groups of settings, called Profiles. Only a single profile is used at a time (designated the "active" Profile). Profiles allow you to configure Cucumber Messages for multiple situations and then switch between easily (by overriding the active profile via an Environment Variable). For example, one profile might be used while developing Reqnroll tests locally on a developer/tester workstation, while another Profile would be used when executing those tests on a build server.
+
+The json schema for the configuration file is:
+```{code-block} json
+:caption: cucumbermessages.config-schema.json
+{
+    "description": "This class holds configuration information from a configuration source.\nEach configuration source may provide one or more Profiles (such as Dev or Prod). \nThe default profile is always named \u0027DEFAULT\u0027.",
+    "type": "object",
+    "properties": {
+        "FileOutputEnabled": {
+            "type": "boolean"
+        },
+        "ActiveProfileName": {
+            "type": "string"
+        },
+        "Profiles": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "ProfileName": {
+                        "type": "string"
+                    },
+                    "BasePath": {
+                        "type": "string"
+                    },
+                    "OutputDirectory": {
+                        "type": "string"
+                    },
+                    "OutputFileName": {
+                        "type": "string"
+                    },
+                    "IDGenerationStyle": {
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+{#environment-variable}
+## Environment Variables
+
+Any of the settings discussed above, including the Active Profile Name, can be overriden by setting an Environment Variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overriden by an evironment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used.
+If an environment variable is used to override the Active Profile Name, that profile must be documented in the configuration file. If it is not, the Active Profile as set in the configuration file will continue to be used.
+You may selectively override only portions of the configuration by environment variable. Reqnroll will first establish which Profile to use, load those values, then override them with other settings from environment variables.
+
+The available Environment Variables are:
+
+* REQNROLL__CUCUMBER_MESSAGES__ENABLED
+* REQNROLL__CUCUMBER_MESSAGES__ACTIVE_OUTPUT_PROFILE
+* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_BASE_DIRECTORY
+* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_RELATIVE_PATH
+* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_FILENAME
+* REQNROLL__CUCUMBER_MESSAGES__ID_GENERATION_STYLE
+
