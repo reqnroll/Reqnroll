@@ -3,6 +3,7 @@
 ## Improvements:
 
 ## Bug fixes:
+Update Microsoft.Extensions.DependencyModel to fix security voulnerable System.Text.Json 8.0.4 as dependency
 
 *Contributors of this release (in alphabetical order): @obligaron* 
 
