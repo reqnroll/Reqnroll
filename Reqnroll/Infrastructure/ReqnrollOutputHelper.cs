@@ -8,17 +8,21 @@ namespace Reqnroll.Infrastructure
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
         private readonly ITraceListener _traceListener;
         private readonly IReqnrollAttachmentHandler _reqnrollAttachmentHandler;
+        private readonly IContextManager contextManager;
 
-        public ReqnrollOutputHelper(ITestThreadExecutionEventPublisher testThreadExecutionEventPublisher, ITraceListener traceListener, IReqnrollAttachmentHandler reqnrollAttachmentHandler)
+        public ReqnrollOutputHelper(ITestThreadExecutionEventPublisher testThreadExecutionEventPublisher, ITraceListener traceListener, IReqnrollAttachmentHandler reqnrollAttachmentHandler, IContextManager contextManager)
         {
             _testThreadExecutionEventPublisher = testThreadExecutionEventPublisher;
             _traceListener = traceListener;
             _reqnrollAttachmentHandler = reqnrollAttachmentHandler;
+            this.contextManager = contextManager;
         }
 
         public void WriteLine(string message)
         {
-            _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message));
+            var featureInfo = contextManager.FeatureContext.FeatureInfo;
+
+            _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message, featureInfo));
             _traceListener.WriteToolOutput(message);
         }
 
@@ -29,7 +33,8 @@ namespace Reqnroll.Infrastructure
 
         public void AddAttachment(string filePath)
         {
-            _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath));
+            var featureInfo = contextManager.FeatureContext.FeatureInfo;
+            _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath, featureInfo));
             _reqnrollAttachmentHandler.AddAttachment(filePath);
         }
     }

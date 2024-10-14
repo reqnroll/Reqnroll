@@ -14,12 +14,14 @@ public class TestFileManager
     private const string TestFileFolder = "Resources";
     private readonly string _prefix = $"{RootNamespace}.{TestFileFolder}";
 
-    public string GetTestFileContent(string testFileName)
+    public string GetTestFileContent(string testFileName, string? prefixOverride = null, Assembly? assemblyToLoadFrom = null)
     {
+
+        var prefix = prefixOverride ?? _prefix;
+        var assembly = assemblyToLoadFrom ?? Assembly.GetExecutingAssembly();
         var testFileResourceName = testFileName.Replace('/', '.');
-        var resourceName = $"{_prefix}.{testFileResourceName}";
-        var projectTemplateStream = Assembly
-                                    .GetExecutingAssembly()
+        var resourceName = $"{prefix}.{testFileResourceName}";
+        var projectTemplateStream = assembly
                                     .GetManifestResourceStream(resourceName);
         projectTemplateStream.Should().NotBeNull($"Resource with name '{resourceName}' should be an embedded resource");
         Debug.Assert(projectTemplateStream != null);

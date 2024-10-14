@@ -1,0 +1,186 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="CCK\ambiguous\Ambiguous.cs" />
+    <Compile Remove="CCK\attachments\attachments.cs" />
+    <Compile Remove="CCK\background\background.cs" />
+    <Compile Remove="CCK\cdata\cdata.cs" />
+    <Compile Remove="CCK\data-tables\data_tables.cs" />
+    <Compile Remove="CCK\empty\empty.cs" />
+    <Compile Remove="CCK\examples-tables\examples_tables.cs" />
+    <Compile Remove="CCK\hooks\hooks.cs" />
+    <Compile Remove="CCK\minimal\minimal.cs" />
+    <Compile Remove="CCK\parameter-types\parameter_types.cs" />
+    <Compile Remove="CCK\pending\pending.cs" />
+    <Compile Remove="CCK\rules\rules.cs" />
+    <Compile Remove="CCK\skipped\skipped.cs" />
+    <Compile Remove="CCK\stack-traces\stack_traces.cs" />
+    <Compile Remove="CCK\undefined\undefined.cs" />
+    <Compile Remove="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="CCK\ambiguous\ambiguous.feature" />
+    <None Remove="CCK\ambiguous\ambiguous.feature.ndjson" />
+    <None Remove="CCK\attachments\attachments.feature" />
+    <None Remove="CCK\attachments\attachments.feature.ndjson" />
+    <None Remove="CCK\background\background.feature" />
+    <None Remove="CCK\background\background.feature.ndjson" />
+    <None Remove="CCK\cdata\cdata.feature" />
+    <None Remove="CCK\cdata\cdata.feature.ndjson" />
+    <None Remove="CCK\data-tables\data_tables.feature" />
+    <None Remove="CCK\data-tables\data_tables.feature.ndjson" />
+    <None Remove="CCK\empty\empty.feature" />
+    <None Remove="CCK\empty\empty.feature.ndjson" />
+    <None Remove="CCK\examples-tables\examples_tables.feature" />
+    <None Remove="CCK\examples-tables\examples_tables.feature.ndjson" />
+    <None Remove="CCK\hooks\hooks.feature" />
+    <None Remove="CCK\hooks\hooks.feature.ndjson" />
+    <None Remove="CCK\minimal\minimal.feature" />
+    <None Remove="CCK\minimal\minimal.feature.ndjson" />
+    <None Remove="CCK\pending\pending.feature" />
+    <None Remove="CCK\pending\pending.feature.ndjson" />
+    <None Remove="CCK\rules\parameter-types.feature" />
+    <None Remove="CCK\rules\parameter-types.feature.ndjson" />
+    <None Remove="CCK\rules\rules.feature" />
+    <None Remove="CCK\rules\rules.feature.ndjson" />
+    <None Remove="CCK\skipped\skipped.feature" />
+    <None Remove="CCK\skipped\skipped.feature.ndjson" />
+    <None Remove="CCK\stack-traces\stack_traces.feature" />
+    <None Remove="CCK\stack-traces\stack_traces.feature.ndjson" />
+    <None Remove="CCK\undefined\undefined.feature" />
+    <None Remove="CCK\undefined\undefined.feature.ndjson" />
+    <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
+    <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
+    <None Remove="products.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="CCK\ambiguous\ambiguous.feature" />
+    <EmbeddedResource Include="CCK\ambiguous\ambiguous.cs" />
+    <EmbeddedResource Include="CCK\attachments\attachments.cs" />
+    <EmbeddedResource Include="CCK\attachments\attachments.feature" />
+    <Content Include="CCK\ambiguous\ambiguous.feature.ndjson" />
+    <Content Include="CCK\attachments\attachments.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="CCK\background\background.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="CCK\empty\empty.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\background\background.cs" />
+    <EmbeddedResource Include="CCK\background\background.feature" />
+    <EmbeddedResource Include="CCK\cdata\cdata.cs" />
+    <EmbeddedResource Include="CCK\cdata\cdata.feature" />
+    <Content Include="CCK\cdata\cdata.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\data-tables\data_tables.cs" />
+    <EmbeddedResource Include="CCK\data-tables\data_tables.feature" />
+    <Content Include="CCK\data-tables\data_tables.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\empty\empty.cs" />
+    <EmbeddedResource Include="CCK\empty\empty.feature" />
+    <EmbeddedResource Include="CCK\examples-tables\examples_tables.cs" />
+    <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature" />
+    <Content Include="CCK\examples-tables\examples_tables.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\hooks\hooks.cs" />
+    <EmbeddedResource Include="CCK\hooks\hooks.feature" />
+    <Content Include="CCK\hooks\hooks.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\minimal\minimal.cs" />
+    <EmbeddedResource Include="CCK\minimal\minimal.feature" />
+    <Content Include="CCK\minimal\minimal.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\parameter-types\parameter_types.cs" />
+    <EmbeddedResource Include="CCK\pending\pending.cs" />
+    <EmbeddedResource Include="CCK\pending\pending.feature" />
+    <Content Include="CCK\pending\pending.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\parameter-types\parameter_types.feature" />
+    <Content Include="CCK\parameter-types\parameter_types.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\rules\rules.cs" />
+    <EmbeddedResource Include="CCK\rules\rules.feature" />
+    <Content Include="CCK\rules\rules.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\skipped\skipped.cs" />
+    <EmbeddedResource Include="CCK\skipped\skipped.feature" />
+    <Content Include="CCK\skipped\skipped.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\stack-traces\stack_traces.cs" />
+    <EmbeddedResource Include="CCK\stack-traces\stack_traces.feature" />
+    <Content Include="CCK\stack-traces\stack_traces.feature.ndjson" />
+    <EmbeddedResource Include="CCK\undefined\undefined.cs" />
+    <EmbeddedResource Include="CCK\undefined\undefined.feature" />
+    <Content Include="CCK\undefined\undefined.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
+    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
+    <EmbeddedResource Include="products.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <Content Include="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Cucumber.Messages" Version="26.0.1" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.5.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference Include="..\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="CCK\attachments\cucumber.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CCK\attachments\cucumber.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CCK\hooks\cucumber.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="CucumberMessages.configuration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

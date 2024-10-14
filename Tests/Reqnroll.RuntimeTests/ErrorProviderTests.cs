@@ -131,7 +131,7 @@ namespace Reqnroll.RuntimeTests
             var result = GetMatchErrorFunc(errorProvider, bindingMatch, null);
 
             result.Should().NotBeNull();
-            result.Should().BeOfType<BindingException>();
+            result.Should().BeAssignableTo<BindingException>();
             result.Message.Should().Be($"{expectedPrefixMessage} '{stepInstanceDescription}': {methodBindingAssemblyName}:{method1BindingTypeFullName}.{methodName}({parameter1Type}), {methodBindingAssemblyName}:{method2BindingTypeFullName}.{methodName}({parameter1Type})");
         }
 

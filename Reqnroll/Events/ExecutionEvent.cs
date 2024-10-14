@@ -1,10 +1,18 @@
 using System;
 using Reqnroll.Bindings;
+using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Events
 {
+    // Cucumber Messages implementation note: Added various forms of context information to 
+    // many of the ExecutionEvents. This allows the CucumberMessages implementation to
+    // align events with the Scenarios and Features to which they belong.
+
     public class ExecutionEvent : IExecutionEvent
     {
+        public DateTime Timestamp { get; }
+
+        public ExecutionEvent() => Timestamp = DateTime.Now;
     }
 
     public class TestRunStartedEvent : ExecutionEvent
@@ -167,10 +175,16 @@ namespace Reqnroll.Events
     public class HookBindingStartedEvent : ExecutionEvent
     {
         public IHookBinding HookBinding { get; }
+        public IContextManager ContextManager { get; private set; }
 
         public HookBindingStartedEvent(IHookBinding hookBinding)
         {
             HookBinding = hookBinding;
+        }
+
+        public HookBindingStartedEvent(IHookBinding hookBinding, IContextManager contextManager) : this(hookBinding)
+        {
+            ContextManager = contextManager;
         }
     }
 
@@ -179,11 +193,19 @@ namespace Reqnroll.Events
         public IHookBinding HookBinding { get; }
 
         public TimeSpan Duration { get; }
+        public IContextManager ContextManager { get; private set; }
+        public Exception HookException { get; private set; }
 
         public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration)
         {
             HookBinding = hookBinding;
             Duration = duration;
+        }
+
+        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager, Exception hookException = null) : this(hookBinding, duration)
+        {
+            ContextManager = contextManager;
+            HookException = hookException;
         }
     }
 
@@ -193,20 +215,33 @@ namespace Reqnroll.Events
     public class OutputAddedEvent : ExecutionEvent, IExecutionOutputEvent
     {
         public string Text { get; }
+        public FeatureInfo FeatureInfo { get; }
+        public string ScenarioName { get; }
+        public string StepText { get; }
 
         public OutputAddedEvent(string text)
         {
             Text = text;
+        }
+
+        public OutputAddedEvent(string text, FeatureInfo featureInfo) : this(text)
+        {
+            FeatureInfo = featureInfo;
         }
     }
 
     public class AttachmentAddedEvent : ExecutionEvent, IExecutionOutputEvent
     {
         public string FilePath { get; }
-
+        public FeatureInfo FeatureInfo { get; }
         public AttachmentAddedEvent(string filePath)
         {
             FilePath = filePath;
+        }
+
+        public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo) : this(filePath)
+        {
+            FeatureInfo = featureInfo;
         }
     }
 }

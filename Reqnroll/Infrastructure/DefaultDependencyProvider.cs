@@ -16,6 +16,9 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
+using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
+using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.CucumberMessages.PubSub;
 
 namespace Reqnroll.Infrastructure
 {
@@ -71,6 +74,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<ObsoleteStepHandler, IObsoleteStepHandler>();
 
             container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
+            container.RegisterTypeAs<EnvironmentInfoProvider, IEnvironmentInfoProvider>();
             container.RegisterTypeAs<BinaryFileAccessor, IBinaryFileAccessor>();
             container.RegisterTypeAs<TestPendingMessageFactory, ITestPendingMessageFactory>();
             container.RegisterTypeAs<TestUndefinedMessageFactory, ITestUndefinedMessageFactory>();
@@ -98,6 +102,12 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEventEmitter, IRuntimePluginTestExecutionLifecycleEventEmitter>();
 
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
+
+            //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<CucumberConfiguration, ICucumberConfiguration>();
+            container.RegisterTypeAs<FileOutputPlugin, IRuntimePlugin>("FileOutputPlugin");
+            container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
+            container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
