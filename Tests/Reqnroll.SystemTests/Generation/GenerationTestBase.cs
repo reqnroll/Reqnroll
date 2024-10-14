@@ -494,6 +494,8 @@ public abstract class GenerationTestBase : SystemTestBase
                 public class ParallelExecutionSteps
                 {
                     public static int startIndex = 0;
+                    public static int featureAStartIndex = 0;
+                    public static int featureBStartIndex = 0;
                     
                     private readonly FeatureContext _featureContext;
                     private readonly ScenarioContext _scenarioContext;
@@ -514,6 +516,9 @@ public abstract class GenerationTestBase : SystemTestBase
                     public void WhenExecuting(string scenarioName, string featureName)
                     {
                         var currentStartIndex = System.Threading.Interlocked.Increment(ref startIndex);
+                        var currentFeatureStartIndex = featureName == "A" 
+                            ? System.Threading.Interlocked.Increment(ref featureAStartIndex)
+                            : System.Threading.Interlocked.Increment(ref featureBStartIndex);
                         global::Log.LogStep();
                         if (_scenarioContext.ScenarioInfo.Title != scenarioName)
                             throw new System.Exception($"Invalid scenario context: {_scenarioContext.ScenarioInfo.Title} should be {scenarioName}");
@@ -527,6 +532,9 @@ public abstract class GenerationTestBase : SystemTestBase
                         var afterStartIndex = startIndex;
                         if (afterStartIndex != currentStartIndex)
                             Log.LogCustom("parallel", "true");
+                        var afterFeatureStartIndex = featureName == "A" ? featureAStartIndex : featureBStartIndex;
+                        if (afterFeatureStartIndex != currentFeatureStartIndex)
+                            Log.LogCustom("scenario-parallel", "true");
                     }
                 }
             }
@@ -535,8 +543,16 @@ public abstract class GenerationTestBase : SystemTestBase
         ExecuteTests();
         ShouldAllScenariosPass();
 
-        var arguments = _bindingDriver.GetActualLogLines("parallel").ToList();
-        arguments.Should().NotBeEmpty("the scenarios should have run parallel");
+        var parallelLogs = _bindingDriver.GetActualLogLines("parallel").ToList();
+        parallelLogs.Should().NotBeEmpty("the scenarios should have run parallel");
+
+        AssertScenarioLevelParallelExecution();
+    }
+
+    protected virtual void AssertScenarioLevelParallelExecution()
+    {
+        var scenarioParallelLogs = _bindingDriver.GetActualLogLines("scenario-parallel").ToList();
+        scenarioParallelLogs.Should().NotBeEmpty("the scenarios should have run parallel using scenario-level parallelization");
     }
 
     #endregion
