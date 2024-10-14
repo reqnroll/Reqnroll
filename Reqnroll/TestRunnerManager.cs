@@ -24,7 +24,28 @@ public class TestRunnerManager : ITestRunnerManager
     protected readonly IRuntimeBindingRegistryBuilder _bindingRegistryBuilder;
     protected readonly ITestTracer _testTracer;
 
-    private readonly ConcurrentDictionary<IObjectContainer, object> _availableTestWorkerContainers = new();
+    /// <summary>
+    /// Contains hints to for the test runner manager to choose the test runners from multiple available
+    /// ones in a more optimal way. Our goal is to keep the test runner "sticky" to the test framework workers
+    /// so that no unnecessary feature context switches occur.
+    /// Currently, we remember the managed thread ID, and we try to give back the same test runner for the
+    /// same managed thread (if possible).
+    /// </summary>
+    class TestWorkerContainerHint
+    {
+        private int ReleasedOnManagedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
+
+        /// <summary>
+        /// Returns information about how optimal the provided hint for the current situation. Smaller number means more optimal.
+        /// </summary>
+        public static int GetDistance(TestWorkerContainerHint hint)
+        {
+            return hint?.ReleasedOnManagedThreadId == null || hint.ReleasedOnManagedThreadId != Thread.CurrentThread.ManagedThreadId ? 
+                1 : 0;
+        }
+    }
+
+    private readonly ConcurrentDictionary<IObjectContainer, TestWorkerContainerHint> _availableTestWorkerContainers = new();
     private readonly ConcurrentDictionary<IObjectContainer, object> _usedTestWorkerContainers = new();
     private int _nextTestWorkerContainerId;
 
@@ -79,7 +100,7 @@ public class TestRunnerManager : ITestRunnerManager
         var testThreadContainer = testThreadContext.TestThreadContainer;
         if (!_usedTestWorkerContainers.TryRemove(testThreadContainer, out _))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was already released");
-        if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, null))
+        if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, new TestWorkerContainerHint()))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was released twice");
     }
 
@@ -143,16 +164,21 @@ public class TestRunnerManager : ITestRunnerManager
     protected virtual ITestRunner CreateTestRunnerInstance()
     {
         IObjectContainer testThreadContainer = null;
-        for (int i = 0; i < 5 && testThreadContainer == null; i++) // Try to get a available Container max 5 times
+        for (int i = 0; i < 5 && testThreadContainer == null; i++) // Try to get an available Container max 5 times
         {
             var items = _availableTestWorkerContainers.ToArray();
             if (items.Length == 0)
                 break; // No Containers are available
-            foreach (var item in items)
+
+            var prioritizedContainers = items
+                .OrderBy(it => TestWorkerContainerHint.GetDistance(it.Value))
+                .Select(it => it.Key);
+
+            foreach (var container in prioritizedContainers)
             {
-                if (!_availableTestWorkerContainers.TryRemove(item.Key, out _))
+                if (!_availableTestWorkerContainers.TryRemove(container, out _))
                     continue; // Container was already taken by another thread
-                testThreadContainer = item.Key;
+                testThreadContainer = container;
                 break;
             }
         }
@@ -205,13 +231,13 @@ public class TestRunnerManager : ITestRunnerManager
 
     private async Task FireRemainingAfterFeatureHooks()
     {
-        var testWorkerContainers = _availableTestWorkerContainers.Concat(_usedTestWorkerContainers).ToArray();
+        var testWorkerContainers = _availableTestWorkerContainers.Keys.Concat(_usedTestWorkerContainers.Keys).ToArray();
         foreach (var testWorkerContainer in testWorkerContainers)
         {
-            var contextManager = testWorkerContainer.Key.Resolve<IContextManager>();
+            var contextManager = testWorkerContainer.Resolve<IContextManager>();
             if (contextManager.FeatureContext != null)
             {
-                var testRunner = testWorkerContainer.Key.Resolve<ITestRunner>();
+                var testRunner = testWorkerContainer.Resolve<ITestRunner>();
                 await testRunner.OnFeatureEndAsync();
             }
         }

@@ -1,5 +1,6 @@
 using System;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using FluentAssertions;
@@ -69,6 +70,37 @@ public class TestRunnerManagerTests : IAsyncLifetime
         testRunner3.TestWorkerId.Should().Match(x => x == "1" || x == "2");
 
         TestRunnerManager.ReleaseTestRunner(testRunner3);
+    }
+
+    [Fact]
+    public void Should_use_test_runner_that_was_active_last_time_on_the_same_thread_if_possible()
+    {
+        // Use an explicit new ITestRunnerManager to make sure that the Ids are created in a new way.
+        var container = new RuntimeTestsContainerBuilder().CreateGlobalContainer(_anAssembly);
+        var testRunnerManager = container.Resolve<ITestRunnerManager>();
+        testRunnerManager.Initialize(_anAssembly);
+
+        var otherRunners1 = Enumerable.Range(0, 5).Select(_ => testRunnerManager.GetTestRunner()).ToList();
+        var otherRunners2 = Enumerable.Range(0, 5).Select(_ => testRunnerManager.GetTestRunner()).ToList();
+        var ourRunner = testRunnerManager.GetTestRunner();
+
+        // release otherRunners1 on a different thread
+        Task.Run(() => otherRunners1.ForEach(TestRunnerManager.ReleaseTestRunner)).Wait();
+        // release ourRunner on our thread
+        TestRunnerManager.ReleaseTestRunner(ourRunner);
+        // release otherRunners2 on a different thread
+        Task.Run(() => otherRunners2.ForEach(TestRunnerManager.ReleaseTestRunner)).Wait();
+
+        // from the same thread, we should get our test runner
+        var ourRunnerAgain = testRunnerManager.GetTestRunner();
+        ourRunnerAgain.TestWorkerId.Should().Be(ourRunner.TestWorkerId);
+
+        // if there is no from the same thread, just provide one of the others
+        var otherRunnerWithoutHint = testRunnerManager.GetTestRunner();
+        otherRunnerWithoutHint.TestWorkerId.Should().NotBe(ourRunner.TestWorkerId);
+
+        TestRunnerManager.ReleaseTestRunner(ourRunnerAgain);
+        TestRunnerManager.ReleaseTestRunner(otherRunnerWithoutHint);
     }
 
     [Fact]
