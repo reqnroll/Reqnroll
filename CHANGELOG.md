@@ -6,6 +6,12 @@
 
 ## Bug fixes:
 
+*Contributors of this release (in alphabetical order):* @gasparnagy, @obligaron
+
+# v2.1.1 - 2024-10-08
+
+## Bug fixes:
+
 * Fix: Rule Backgounds cause External Data Plugin to fail (#119, #271)
 * Fix: VersionInfo class might provide the version of the runner instead of the version of Reqnroll (#248)
 * Fix: Reqnroll.CustomPlugin NuGet package has a version mismatch for the System.CodeDom dependency (#244)
