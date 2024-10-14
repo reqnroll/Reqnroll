@@ -280,38 +280,6 @@ namespace Reqnroll.TestProjectGenerator.Tests
         }
 
         [SkippableFact]
-        public void CreateEmptyCSharpCore3_1ProjectInNewFormat()
-        {
-            RunSkippableTest(() =>
-            {
-                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp, TargetFramework.Netcoreapp31);
-
-                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-                string projectFileContent = GetProjectFileContent(solutionFolder, project);
-
-                projectFileContent.Should()
-                    .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>netcoreapp3.1</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
-            });
-        }
-
-        [SkippableFact]
-        public void CreateEmptyCSharpNet50ProjectInNewFormat()
-        {
-            RunSkippableTest(() =>
-            {
-                var (solution, project, solutionFolder) = CreateEmptySolutionAndProject(ProjectFormat.New, ProgrammingLanguage.CSharp73, TargetFramework.Net50);
-
-                CreateSolutionWriter().WriteToFileSystem(solution, solutionFolder);
-
-                string projectFileContent = GetProjectFileContent(solutionFolder, project);
-
-                projectFileContent.Should()
-                    .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net5.0</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
-            });
-        }
-
-        [SkippableFact]
         public void CreateEmptyCSharpNet60ProjectInNewFormat()
         {
             RunSkippableTest(() =>

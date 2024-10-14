@@ -11,6 +11,7 @@ public class ConfigurationDriver
     public string VSTestPath => GetConfigSetting("vstestPath", "Common7\\IDE\\CommonExtensions\\Microsoft\\TestWindow");
     public string MsBuildPath => GetConfigSetting(nameof(MsBuildPath));
     public bool PipelineMode => GetConfigSwitch(nameof(PipelineMode));
+    public bool PerRunNuGetPackages => GetConfigSwitch(nameof(PerRunNuGetPackages));
     public string GlobalNuGetPackages => GetConfigSetting(nameof(GlobalNuGetPackages));
 
     public bool GetConfigSwitch(string key, bool defaultValue = false)

@@ -47,7 +47,7 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
 
             protected override string BuildArguments()
             {
-                var arguments = AddArgument($"new {_templateName}", "-o", "\"" + _folder + "\"");
+                var arguments = AddArgument($"new {_templateName} --no-update-check", "-o", "\"" + _folder + "\"");
                 arguments = AddArgument(
                     arguments,
                     "-lang",
