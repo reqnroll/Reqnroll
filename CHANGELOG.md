@@ -4,7 +4,7 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order): @obligaron* 
 
 # v2.1.1 - 2024-10-08
 

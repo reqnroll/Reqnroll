@@ -6,7 +6,7 @@ namespace Reqnroll.TestProjectGenerator.Helpers;
 public class FolderCleaner
 {
     private const int MaxTestRunAgeMinutes = 60;
-    private const int MaxTestRunsToKeep = 4;
+    private const int MaxTestRunsToKeep = 6;
 
     private static int _oldFoldersCleaned = 0;
     private readonly Folders _folders;
