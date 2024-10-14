@@ -84,12 +84,17 @@ public class TestRunnerManagerTests : IAsyncLifetime
         var otherRunners2 = Enumerable.Range(0, 5).Select(_ => testRunnerManager.GetTestRunner()).ToList();
         var ourRunner = testRunnerManager.GetTestRunner();
 
+        void RunOnOtherThreadAndWait(Action action)
+        {
+            Task.Run(action).Wait(500);
+        }
+
         // release otherRunners1 on a different thread
-        Task.Run(() => otherRunners1.ForEach(TestRunnerManager.ReleaseTestRunner)).Wait();
+        RunOnOtherThreadAndWait(() => otherRunners1.ForEach(TestRunnerManager.ReleaseTestRunner));
         // release ourRunner on our thread
         TestRunnerManager.ReleaseTestRunner(ourRunner);
         // release otherRunners2 on a different thread
-        Task.Run(() => otherRunners2.ForEach(TestRunnerManager.ReleaseTestRunner)).Wait();
+        RunOnOtherThreadAndWait(() => otherRunners2.ForEach(TestRunnerManager.ReleaseTestRunner));
 
         // from the same thread, we should get our test runner
         var ourRunnerAgain = testRunnerManager.GetTestRunner();
