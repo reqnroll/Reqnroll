@@ -8,10 +8,10 @@ This part contains details of the following topics.
 available-plugins
 autofac
 dependency-injection
-windsor
-fsharp
 externaldata
+fsharp
 mstest
 nunit
+windsor
 xunit
 ```

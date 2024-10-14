@@ -2,7 +2,7 @@
 
 Reqnroll supports NUnit 3.13.1 or later.  
 
-Documentation for NUnit can be found [here](https://github.com/nunit/docs/wiki/NUnit-Documentation).
+Documentation for NUnit can be found [here](https://docs.nunit.org/articles/nunit/intro.html).
 
 ## Needed NuGet Packages
 
