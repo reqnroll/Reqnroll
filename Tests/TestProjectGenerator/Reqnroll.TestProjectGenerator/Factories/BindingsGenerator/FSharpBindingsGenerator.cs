@@ -118,11 +118,5 @@ type internal Log =
         {
             throw new NotImplementedException();
         }
-
-        protected override string GetAsyncHookIncludingLockingBindingClass(string hookType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,
-            IList<string> classScopeAttributeTags = null)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
