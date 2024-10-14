@@ -32,6 +32,8 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                 Friend Module Log
                     Private Const RetryCount As Integer = 5
                     Private Const LogFileLocation As String = "{{pathToLogFile}}"
+                    Private ReadOnly Rnd As Random = New Random()
+                    Private ReadOnly LockObj As Object = New Object()
                    
                     Private Sub Retry(number As Integer, action As Action)
                         Try
@@ -41,7 +43,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                             If (i = 0)
                                 Throw
                             End If
-                            System.Threading.Thread.Sleep(500)
+                            System.Threading.Thread.Sleep(50 + Rnd.Next(50))
                             Retry(i, action)
                         End Try
                     End Sub    
@@ -59,7 +61,9 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                     End Sub
                    
                     Private Sub WriteToFile(line As String)
-                        File.AppendAllText(LogFileLocation, line)
+                        SyncLock LockObj
+                            File.AppendAllText(LogFileLocation, line)
+                        End SyncLock
                     End Sub
                 End Module
                 """;

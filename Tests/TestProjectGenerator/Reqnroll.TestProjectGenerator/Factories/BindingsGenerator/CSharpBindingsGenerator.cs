@@ -82,6 +82,8 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                 {
                     private const int RetryCount = 5;
                     private const string LogFileLocation = @"{{pathToLogFile}}";
+                    private static readonly Random Rnd = new Random();
+                    private static readonly object LockObj = new object();
 
                     private static void Retry(int number, Action action)
                     {
@@ -96,7 +98,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                             if (i == 0)
                                 throw;
 
-                            Thread.Sleep(500);
+                            Thread.Sleep(50 + Rnd.Next(50));
                             Retry(i, action);
                         }
                     }
@@ -118,12 +120,8 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                    
                     static void WriteToFile(string line)
                     {
-                        using (FileStream fs = File.Open(LogFileLocation, FileMode.Append, FileAccess.Write, FileShare.None))
-                        {
-                            byte[] bytes = System.Text.Encoding.UTF8.GetBytes(line);
-                            fs.Write(bytes, 0, bytes.Length);
-                            fs.Close();
-                        }
+                        lock(LockObj)
+                            File.AppendAllText(LogFileLocation, line);
                     }
                 }
                 """;
