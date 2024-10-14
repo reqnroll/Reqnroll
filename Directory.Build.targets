@@ -48,8 +48,17 @@ string TmpDirectory = NuGetCacheDirectory + "-remove";
 
 Log.LogMessage("Cleaning local nuget cache " + NuGetCacheDirectory);
 
-if (Directory.Exists(TmpDirectory))
-    Directory.Delete(TmpDirectory, true);
+if (Directory.Exists(TmpDirectory)) 
+{
+    try 
+    {
+        Directory.Delete(TmpDirectory, true);
+    }
+    catch 
+    {
+        Log.LogError("Can't start cleaning NuGet Cache Directory, deleting temporary directory failed: " + NuGetCacheDirectory);
+    }
+}    
 if (Directory.Exists(NuGetCacheDirectory))
 {
     try
@@ -59,16 +68,25 @@ if (Directory.Exists(NuGetCacheDirectory))
         // That's why we first move the directory (which is only possible if no file is locked in the directory) and then delete the renamed directory.
         Directory.Move(NuGetCacheDirectory, TmpDirectory);
     }
-    catch
+    catch (Exception ex)
     {
         if (EnsureNugetCacheCleared != "false")
-            Log.LogError("Can't clean NuGet Cache Directory " + NuGetCacheDirectory);
+            Log.LogError("Can't clean NuGet Cache Directory " + NuGetCacheDirectory + ". Set REQNROLL_ENSURE_NUGET_CACHE_CLEARED to false to handle this error as a warning. " + ex.Message);
         else
             Log.LogWarning("Can't clean NuGet Cache Directory " + NuGetCacheDirectory);
     }
 }
-if (Directory.Exists(TmpDirectory))
-    Directory.Delete(TmpDirectory, true);
+if (Directory.Exists(TmpDirectory)) 
+{
+    try 
+    {
+        Directory.Delete(TmpDirectory, true);
+    }
+    catch 
+    {
+        Log.LogWarning("Can't finish cleaning NuGet Cache Directory, deleting temporary directory failed: " + NuGetCacheDirectory);
+    }
+}    
 ]]>
       </Code>
     </Task>
