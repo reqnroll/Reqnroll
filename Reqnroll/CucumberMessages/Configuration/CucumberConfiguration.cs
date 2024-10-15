@@ -68,7 +68,7 @@ namespace Reqnroll.CucumberMessages.Configuration
         private ConfigurationDTO ApplyHierarchicalConfiguration()
         {
             var defaultConfigurationProvider = new DefaultConfigurationSource(_environmentWrapper);
-            var fileBasedConfigurationProvider = new RCM_ConfigFile_ConfigurationSource();
+            var fileBasedConfigurationProvider = new RCM_ConfigFile_ConfigurationSource(_environmentWrapper);
 
             ConfigurationDTO config = defaultConfigurationProvider.GetConfiguration();
             config = AddConfig(config, fileBasedConfigurationProvider.GetConfiguration());
@@ -81,7 +81,10 @@ namespace Reqnroll.CucumberMessages.Configuration
             var relativePathValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_RELATIVE_PATH_ENVIRONMENT_VARIABLE);
             var fileNameValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE);
             var profileValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE);
-            string profileName = profileValue is Success<string> ? ((Success<string>)profileValue).Result : "DEFAULT";
+            string profileName = profileValue is Success<string> ? 
+                                    ((Success<string>)profileValue).Result : 
+                                    !string.IsNullOrEmpty(config.ActiveProfileName) ? config.ActiveProfileName :
+                                    "DEFAULT";
             var idGenStyleValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE);
 
             var activeConfiguredDestination = config.Profiles.Where(d => d.ProfileName == profileName).FirstOrDefault();
@@ -127,12 +130,12 @@ namespace Reqnroll.CucumberMessages.Configuration
                 {
                     AddOrOverrideProfile(rootConfig.Profiles, overridingProfile);
                 }
-                if (overridingConfig.ActiveProfileName != null && !rootConfig.Profiles.Any(p => p.ProfileName == overridingConfig.ActiveProfileName))
+                if (!String.IsNullOrEmpty(overridingConfig.ActiveProfileName)  && !rootConfig.Profiles.Any(p => p.ProfileName == overridingConfig.ActiveProfileName))
                 {
                     // The incoming configuration DTO points to a profile that doesn't exist.
                     _trace.WriteToolOutput($"WARNING: Configuration file specifies an active profile that doesn't exist: {overridingConfig.ActiveProfileName}. Using {rootConfig.ActiveProfileName} instead.");
                 }
-                else if (overridingConfig.ActiveProfileName != null)
+                else if (!String.IsNullOrEmpty(overridingConfig.ActiveProfileName))
                     rootConfig.ActiveProfileName = overridingConfig.ActiveProfileName;
 
                 rootConfig.FileOutputEnabled = overridingConfig.FileOutputEnabled;

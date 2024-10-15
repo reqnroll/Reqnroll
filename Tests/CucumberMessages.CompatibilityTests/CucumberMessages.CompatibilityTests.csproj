@@ -178,7 +178,10 @@
     <None Update="CCK\hooks\cucumber.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="CucumberMessages.configuration.json">
+    <None Update="partialConfiguration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="cucumberMessages.configuration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

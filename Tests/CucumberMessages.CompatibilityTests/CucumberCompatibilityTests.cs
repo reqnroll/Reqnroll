@@ -16,12 +16,27 @@ using Reqnroll.EnvironmentAccess;
 using SpecFlow.Internal.Json;
 using Microsoft.VisualBasic.FileIO;
 using Reqnroll.CucumberMessages.PayloadProcessing;
+using Reqnroll.CommonModels;
+using Reqnroll.CucumberMessages.Configuration;
 
 namespace CucumberMessages.CompatibilityTests
 {
     [TestClass]
     public class CucumberCompatibilityTests : CucumberCompatibilityTestBase
     {
+        [TestMethod]
+        public void Unit_PartialConfiguration()
+        {
+            var envWrapper = new Moq.Mock<IEnvironmentWrapper>();
+            var envVariable = new Success<string>("partialConfiguration.json");
+
+            envWrapper.Setup(x => x.GetEnvironmentVariable(It.IsAny<string>())).Returns(envVariable);
+
+            var configReader = new RCM_ConfigFile_ConfigurationSource(envWrapper.Object);
+            var config = configReader.GetConfiguration();
+
+            config.FileOutputEnabled.Should().BeTrue();
+        }
 
         [TestMethod]
         public void NullTest()
@@ -302,7 +317,7 @@ namespace CucumberMessages.CompatibilityTests
         // (located in the CucumberMessagesValidator class)
         public void CCKScenarios(string testName, string featureNameText)
         {
-            ResetCucumberMessages(featureNameText+".ndjson");
+            ResetCucumberMessages(featureNameText + ".ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
             CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
