@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order): @obligaron* 
+* Fix: Visual Studio locks Reqnroll.Tools.MsBuild.Generation task files. Using `TaskHostFactory` for our tasks on Windows. (#293)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy, @obligaron, @Tiberriver256
 
 # v2.1.1 - 2024-10-08
 
