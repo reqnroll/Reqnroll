@@ -243,9 +243,6 @@ namespace Reqnroll.Generator.Generation
 
             // "Finish" current feature if needed
 
-            //if (testRunner.FeatureContext != null && testRunner.FeatureContext.FeatureInfo.Title != "<current_feature_title>")
-            //  await testRunner.OnFeatureEndAsync(); // finish if different
-
             var featureContextExpression = new CodePropertyReferenceExpression(
                 testRunnerField,
                 "FeatureContext");
