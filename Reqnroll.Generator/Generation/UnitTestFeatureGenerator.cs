@@ -225,13 +225,15 @@ namespace Reqnroll.Generator.Generation
             _testGeneratorProvider.SetTestInitializeMethod(generationContext);
 
             // Obtain the test runner for executing a single test
-            // testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly();
+            // testRunner = global::Reqnroll.TestRunnerManager.GetTestRunnerForAssembly(featureHint: featureInfo);
 
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
             var getTestRunnerExpression = new CodeMethodInvokeExpression(
                 new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
-                nameof(TestRunnerManager.GetTestRunnerForAssembly));
+                nameof(TestRunnerManager.GetTestRunnerForAssembly),
+                _codeDomHelper.CreateOptionalArgumentExpression("featureHint", 
+                    new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD)));
 
             testInitializeMethod.Statements.Add(
                 new CodeAssignStatement(

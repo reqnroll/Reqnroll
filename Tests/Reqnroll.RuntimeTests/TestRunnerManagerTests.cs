@@ -28,7 +28,7 @@ public class TestRunnerManagerTests : IAsyncLifetime
     [Fact]
     public void CreateTestRunner_should_be_able_to_create_a_TestRunner()
     {
-        var testRunner = _testRunnerManager.CreateTestRunner();
+        var testRunner = _testRunnerManager.GetOrCreateTestRunner();
 
         testRunner.Should().NotBeNull();
         testRunner.Should().BeOfType<TestRunner>();
@@ -75,14 +75,14 @@ public class TestRunnerManagerTests : IAsyncLifetime
     [Fact]
     public void Should_use_test_runner_that_was_active_last_time_on_the_same_thread_if_possible()
     {
-        // Use an explicit new ITestRunnerManager to make sure that the Ids are created in a new way.
-        var container = new RuntimeTestsContainerBuilder().CreateGlobalContainer(_anAssembly);
-        var testRunnerManager = container.Resolve<ITestRunnerManager>();
-        testRunnerManager.Initialize(_anAssembly);
+        var ourFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "F1", null);
+        var otherFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "F2", null);
 
-        var otherRunners1 = Enumerable.Range(0, 5).Select(_ => testRunnerManager.GetTestRunner()).ToList();
-        var otherRunners2 = Enumerable.Range(0, 5).Select(_ => testRunnerManager.GetTestRunner()).ToList();
-        var ourRunner = testRunnerManager.GetTestRunner();
+        var otherRunners1 = Enumerable.Range(0, 5).Select(_ => TestRunnerManager.GetTestRunnerForAssembly(featureHint: otherFeatureInfo)).ToList();
+        var otherRunners2 = Enumerable.Range(0, 5).Select(_ => TestRunnerManager.GetTestRunnerForAssembly(featureHint: otherFeatureInfo)).ToList();
+        var runnerOnDifferentFeatureSameThread = TestRunnerManager.GetTestRunnerForAssembly(featureHint: otherFeatureInfo);
+        var runnerOnSameFeatureDifferentThread = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
+        var ourRunner = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
 
         void RunOnOtherThreadAndWait(Action action)
         {
@@ -91,20 +91,40 @@ public class TestRunnerManagerTests : IAsyncLifetime
 
         // release otherRunners1 on a different thread
         RunOnOtherThreadAndWait(() => otherRunners1.ForEach(TestRunnerManager.ReleaseTestRunner));
-        // release ourRunner on our thread
+        
+        // release the selected runners
         TestRunnerManager.ReleaseTestRunner(ourRunner);
+        TestRunnerManager.ReleaseTestRunner(runnerOnDifferentFeatureSameThread);
+        RunOnOtherThreadAndWait(() => TestRunnerManager.ReleaseTestRunner(runnerOnSameFeatureDifferentThread));
+
         // release otherRunners2 on a different thread
         RunOnOtherThreadAndWait(() => otherRunners2.ForEach(TestRunnerManager.ReleaseTestRunner));
 
-        // from the same thread, we should get our test runner
-        var ourRunnerAgain = testRunnerManager.GetTestRunner();
+        // Priority:
+        // 1. Same feature, same thread
+        // 2. Same feature, different thread
+        // 3. Other feature, same thread
+        // 4. Other feature, other thread
+
+        // Priority 1: from the same feature & same thread, we should get our test runner first
+        var ourRunnerAgain = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
         ourRunnerAgain.TestWorkerId.Should().Be(ourRunner.TestWorkerId);
 
-        // if there is no from the same thread, just provide one of the others
-        var otherRunnerWithoutHint = testRunnerManager.GetTestRunner();
+        // Priority 2: from the same feature & different thread
+        var runnerOnSameFeatureDifferentThreadAgain = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
+        runnerOnSameFeatureDifferentThreadAgain.TestWorkerId.Should().Be(runnerOnSameFeatureDifferentThread.TestWorkerId);
+
+        // Priority 3: from the different feature & same thread
+        var runnerOnDifferentFeatureSameThreadAgain = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
+        runnerOnDifferentFeatureSameThreadAgain.TestWorkerId.Should().Be(runnerOnDifferentFeatureSameThread.TestWorkerId);
+
+        // Priority 4: if there is no from the same thread, just provide one of the others
+        var otherRunnerWithoutHint = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
         otherRunnerWithoutHint.TestWorkerId.Should().NotBe(ourRunner.TestWorkerId);
 
         TestRunnerManager.ReleaseTestRunner(ourRunnerAgain);
+        TestRunnerManager.ReleaseTestRunner(runnerOnSameFeatureDifferentThreadAgain);
+        TestRunnerManager.ReleaseTestRunner(runnerOnDifferentFeatureSameThreadAgain);
         TestRunnerManager.ReleaseTestRunner(otherRunnerWithoutHint);
     }
 
@@ -176,7 +196,7 @@ public class TestRunnerManagerTests : IAsyncLifetime
     {
         _testRunnerManager.IsTestRunInitialized.Should().BeFalse("binding registry should not be initialized initially");
 
-        _testRunnerManager.CreateTestRunner();
+        _testRunnerManager.GetOrCreateTestRunner();
 
         _testRunnerManager.IsTestRunInitialized.Should().BeTrue("binding registry be initialized");
     }
