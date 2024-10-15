@@ -13,6 +13,6 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
 
         public NewSolutionCommandBuilder Solution() => new NewSolutionCommandBuilder(_outputWriter);
 
-        public NewProjectCommandBuilder Project() => new NewProjectCommandBuilder(_outputWriter);
+        public NewProjectCommandBuilder Project() => new StubNewProjectCommandBuilder(_outputWriter);
     }
 }
