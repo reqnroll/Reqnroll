@@ -19,4 +19,9 @@ public class XUnitGenerationTest : GenerationTestBase
 
     protected override string GetExpectedPendingOutcome() => "Failed";
     protected override string GetExpectedUndefinedOutcome() => "Failed";
+
+    protected override void AssertScenarioLevelParallelExecution()
+    {
+        //nop - xUnit currently does not support method-level parallelization
+    }
 }

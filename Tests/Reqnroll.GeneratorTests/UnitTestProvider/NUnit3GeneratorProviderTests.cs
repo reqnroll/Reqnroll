@@ -212,60 +212,6 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
         }
 
         [Fact]
-        public void NUnit3TestGeneratorProvider_ShouldNotGenerateObsoleteTestFixtureSetUpAttribute()
-        {
-            var code = GenerateCodeNamespaceFromFeature(SampleFeatureFile);
-
-            var featureSetupMethod = code.Class().Members().Single(m => m.Name == "FeatureSetupAsync");
-
-            featureSetupMethod.CustomAttributes()
-                .FirstOrDefault(a => a.Name == "NUnit.Framework.TestFixtureSetUpAttribute")
-                .Should()
-                .BeNull();
-        }
-
-        [Fact]
-        public void NUnit3TestGeneratorProvider_ShouldGenerateNewOneTimeSetUpAttribute()
-        {
-            var code = GenerateCodeNamespaceFromFeature(SampleFeatureFile);
-
-            var featureSetupMethod = code.Class().Members().Single(m => m.Name == "FeatureSetupAsync");
-
-            // Assert that we do use the NUnit3 attribute
-            featureSetupMethod.CustomAttributes()
-                .FirstOrDefault(a => a.Name == "NUnit.Framework.OneTimeSetUpAttribute")
-                .Should()
-                .NotBeNull();
-        }
-
-        [Fact]
-        public void NUnit3TestGeneratorProvider_ShouldNotGenerateObsoleteTestFixtureTearDownAttribute()
-        {
-            var code = GenerateCodeNamespaceFromFeature(SampleFeatureFile);
-
-            var featureSetupMethod = code.Class().Members().Single(m => m.Name == "FeatureTearDownAsync");
-
-            featureSetupMethod.CustomAttributes()
-                .FirstOrDefault(a => a.Name == "NUnit.Framework.TestFixtureTearDownAttribute")
-                .Should()
-                .BeNull();
-        }
-
-        [Fact]
-        public void NUnit3TestGeneratorProvider_ShouldGenerateNewOneTimeTearDownAttribute()
-        {
-            var code = GenerateCodeNamespaceFromFeature(SampleFeatureFile);
-
-            var featureSetupMethod = code.Class().Members().Single(m => m.Name == "FeatureTearDownAsync");
-
-            // Assert that we do use the NUnit3 attribute
-            featureSetupMethod.CustomAttributes()
-                .FirstOrDefault(a => a.Name == "NUnit.Framework.OneTimeTearDownAttribute")
-                .Should()
-                .NotBeNull();
-        }
-
-        [Fact]
         public void NUnit3TestGeneratorProvider_ShouldHaveRowTestsTrait()
         {
             var nUnit3TestGeneratorProvider = CreateTestGeneratorProvider();

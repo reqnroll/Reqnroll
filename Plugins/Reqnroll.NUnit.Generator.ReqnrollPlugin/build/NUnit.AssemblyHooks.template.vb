@@ -7,19 +7,21 @@ Imports System.CodeDom.Compiler
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
 
+<assembly: NUnit.Framework.FixtureLifeCycle(NUnit.Framework.LifeCycle.InstancePerTestCase)>
+
 <GeneratedCode("Reqnroll", "REQNROLL_VERSION")>
 <SetUpFixture>
 Public NotInheritable Class PROJECT_ROOT_NAMESPACE_NUnitAssemblyHooks
     <OneTimeSetUp>
     <MethodImpl(MethodImplOptions.NoInlining)>
-    Public Async Function AssemblyInitializeAsync() As Task
+    Public Shared Async Function AssemblyInitializeAsync() As Task
         Dim currentAssembly As Assembly = GetType(PROJECT_ROOT_NAMESPACE_NUnitAssemblyHooks).Assembly
         Await Global.Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly)
     End Function
 
     <OneTimeTearDown>
     <MethodImpl(MethodImplOptions.NoInlining)>
-    Public Async Function AssemblyCleanupAsync() As Task
+    Public Shared Async Function AssemblyCleanupAsync() As Task
         Dim currentAssembly As Assembly = GetType(PROJECT_ROOT_NAMESPACE_NUnitAssemblyHooks).Assembly
         Await Global.Reqnroll.TestRunnerManager.OnTestRunEndAsync(currentAssembly)
     End Function

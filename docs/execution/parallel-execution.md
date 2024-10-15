@@ -19,7 +19,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 | Scheduling unit  | Description          | Runner support       |
 | ---------------- | -------------------- | -------------------- |
-| Scenario         | Scenarios can run in parallel with each other (also from different features) | N/A     |
+| Scenario         | Scenarios can run in parallel with each other (also from different features) | NUnit, MsTest     |
 | Feature          | Features can run in parallel with each other. Scenarios from the same feature are running on the same test thread. | NUnit, MsTest, xUnit |
 | Test assembly    | Different test assemblies can run in parallel with each other | e.g. VSTest |
 
@@ -36,7 +36,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 
 ### Requirements
 
-* You have to use a test runner that supports in-process parallel execution (currently NUnit v3, xUnit v2 and MSTest)
+* You have to use a test runner that supports in-process parallel execution (NUnit and MsTest supports scenario-level, xUnit supports feature-level)
 * You have to ensure that your code does not conflict on static state.
 * You must not use the static context properties of Reqnroll `ScenarioContext.Current`, `FeatureContext.Current` or `ScenarioStepContext.Current` (see further information below).
 * You have to configure the test runner to execute the Reqnroll features in parallel with each other (see configuration details below).
@@ -44,7 +44,7 @@ When using Reqnroll we can consider the parallel scheduling on the level of scen
 ### Execution Behavior
 
 * `[BeforeTestRun]` and `[AfterTestRun]` hooks (events) are executed only once on the first thread that initializes the framework. Executing tests in the other threads is blocked until the hooks have been fully executed on the first thread.
-* All scenarios in a feature must be executed on the **same thread**. See the configuration of the test runners below. This ensures that the `[BeforeFeature]` and `[AfterFeature]` hooks are executed only once for each feature and that the thread has a separate (and isolated) `FeatureContext`.
+* As a general guideline, **we do not suggest using `[BeforeFeature]` and `[AfterFeature]` hooks and the `FeatureContext` when running the tests parallel**, because in that case it is not guaranteed that these hooks will be executed only once and there will be only one instance of `FeatureContext` per feature. The lifetime of the `FeatureContext` (that starts and finishes by invoking the `[BeforeFeature]` and `[AfterFeature]` hooks) is the consecutive execution of scenarios of a feature on the same parallel execution worker thread. In case of running the scenarios parallel, the scenarios of a feature might be distributed to multiple workers and therefore might have their onw non-unique `FeatureContext`. Because of this behavior the `FeatureContext` is never shared between parallel threads so it does not have to be handled in a thread-safe way. If you wish to have a singleton `FeatureContext` and `[BeforeFeature]` and `[AfterFeature]` hook execution, scenarios in a feature must be executed on the **same thread**. 
 * Scenarios and their related hooks (Before/After scenario, scenario block, step) are isolated in the different threads during execution and do not block each other. Each thread has a separate (and isolated) `ScenarioContext`.
 * The test trace listener (that outputs the scenario execution trace to the console by default) is invoked asynchronously from the multiple threads and the trace messages are queued and passed to the listener in serialized form. If the test trace listener implements `Reqnroll.Tracing.IThreadSafeTraceListener`, the messages are sent directly from the threads.
 
@@ -54,14 +54,17 @@ By default, [NUnit does not run the tests in parallel](https://docs.nunit.org/ar
 Parallelization must be configured by setting an assembly-level attribute in the Reqnroll project.
 
 ```{code-block} csharp
-:caption: C# File
+:caption: C# file for configuring feature-level parallelization
 
 using NUnit.Framework;
 [assembly: Parallelizable(ParallelScope.Fixtures)]
 ```
 
-```{note}
-Reqnroll does not support scenario level parallelization with NUnit (when scenarios from the same feature execute in parallel). If you configure a higher level NUnit parallelization than "Fixtures" your tests will fail with runtime errors.
+```{code-block} csharp
+:caption: C# file for configuring scenario-level parallelization
+
+using NUnit.Framework;
+[assembly: Parallelizable(ParallelScope.Children)]
 ```
 
 ### MSTest Configuration
@@ -70,14 +73,17 @@ By default, [MsTest does not run the tests in parallel](https://devblogs.microso
 Parallelisation must be configured by setting an assembly-level attribute in the Reqnroll project.
 
 ```{code-block} csharp
-:caption: C# File
+:caption: C# file for configuring feature-level parallelization
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 [assembly: Parallelize(Scope = ExecutionScope.ClassLevel)]
 ```
 
-```{note}
-Reqnroll does not support scenario level parallelization with MsTest (when scenarios from the same feature execute in parallel). If you configure a higher level MsTest parallelization than "ClassLevel" your tests will fail with runtime errors.
+```{code-block} csharp
+:caption: C# file for configuring scenario-level parallelization
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+[assembly: Parallelize(Scope = ExecutionScope.MethodLevel)]
 ```
 
 ### xUnit Configuration
