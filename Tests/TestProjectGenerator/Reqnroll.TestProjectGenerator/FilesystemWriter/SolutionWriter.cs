@@ -43,14 +43,6 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 ? new NetCoreSdkInfo(solution.SdkVersion) 
                 : _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
 
-            if (targetFramework != 0 && sdk != null)
-            {
-                var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
-
-                var globalJsonFile = globalJsonBuilder.ToProjectFile();
-                _fileWriter.Write(globalJsonFile, outputPath);
-            }
-
             DisableUsingSdkFromEnvironmentVariable();
 
             var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
@@ -72,6 +64,14 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             foreach (var file in solution.Files)
             {
                 _fileWriter.Write(file, outputPath);
+            }
+
+            if (targetFramework != 0 && sdk != null)
+            {
+                var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
+
+                var globalJsonFile = globalJsonBuilder.ToProjectFile();
+                _fileWriter.Write(globalJsonFile, outputPath);
             }
 
             return solutionFilePath;
