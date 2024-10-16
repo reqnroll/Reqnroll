@@ -39,15 +39,26 @@ namespace CucumberMessages.CompatibilityTests
 
         protected void ResetCucumberMessages(string? fileToDelete = null)
         {
-            DisableCucumberMessages();
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
+            ResetCucumberMessagesConfigurationFileName();
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, null);
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE, null);
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void ResetCucumberMessagesOutputFileName()
         {
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE, null);
+        }
+
+        protected void SetCucumberMessagesConfigurationFileName(string fileName)
+        {
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_CONFIGURATION_FILE_OVERRIDE_ENVIRONMENT_VARIABLE, fileName);
+        }
+        protected void ResetCucumberMessagesConfigurationFileName()
+        {
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_CONFIGURATION_FILE_OVERRIDE_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
@@ -99,6 +110,7 @@ namespace CucumberMessages.CompatibilityTests
         {
             var configFileContent = File.ReadAllText(configFileName);
             _projectsDriver.AddFile(configFileName, configFileContent);
+            SetCucumberMessagesConfigurationFileName(configFileName);
         }
 
         protected static string ActualsResultLocationDirectory()
@@ -117,6 +129,15 @@ namespace CucumberMessages.CompatibilityTests
         protected void SetEnvironmentVariableForGUIDIdGeneration()
         {
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE, CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_UUID);
+        }
+
+        protected void FileShouldExist(string v)
+        {
+            var directory = ActualsResultLocationDirectory();
+
+            var file = Path.Combine(directory, v);
+
+            File.Exists(file).Should().BeTrue(file, $"File {v} should exist");
         }
 
     }

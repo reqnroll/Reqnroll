@@ -24,17 +24,22 @@ namespace CucumberMessages.CompatibilityTests
     public class CucumberCompatibilityTests : CucumberCompatibilityTestBase
     {
         [TestMethod]
-        public void Unit_PartialConfiguration()
+        public void PartialConfigurationIsCorrectlyHandled()
         {
-            var envWrapper = new Moq.Mock<IEnvironmentWrapper>();
-            var envVariable = new Success<string>("partialConfiguration.json");
+            ResetCucumberMessages("reqnoll_report.ndjson");
+            CucumberMessagesAddConfigurationFile("partialConfiguration.json");
 
-            envWrapper.Setup(x => x.GetEnvironmentVariable(It.IsAny<string>())).Returns(envVariable);
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Test
+                  Scenario: Eating Cukes
+                     When I eat 5 cukes
+                """);
 
-            var configReader = new RCM_ConfigFile_ConfigurationSource(envWrapper.Object);
-            var config = configReader.GetConfiguration();
+            AddPassingStepBinding("When");
 
-            config.FileOutputEnabled.Should().BeTrue();
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
         }
 
         [TestMethod]

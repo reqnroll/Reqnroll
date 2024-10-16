@@ -3,6 +3,7 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -115,10 +116,8 @@ namespace Reqnroll.CucumberMessages.Configuration
                 result.IDGenerationStyle = IdGenerationStyleEnumConverter.ParseIdGenerationStyle(((Success<string>)idGenStyleValue).Result);
 
             var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
-            var enabled = enabledResult is Success<string> ? ((Success<string>)enabledResult).Result : "FALSE";
-
-            result.Enabled = Convert.ToBoolean(enabled);
-
+            result.Enabled = enabledResult is Success<string> ? Convert.ToBoolean(((Success<string>)enabledResult).Result) : result.Enabled;
+            
             return result;
         }
 
