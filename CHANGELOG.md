@@ -3,9 +3,10 @@
 ## Improvements:
 
 ## Bug fixes:
-* Fix: Update Microsoft.Extensions.DependencyModel to fix security voulnerable System.Text.Json 8.0.4 as dependency (#291)
 
-*Contributors of this release (in alphabetical order): @obligaron, @Romfos
+* Fix: Project dependencies transiently refer to System.Text.Json 8.0.4 that has security vulnerability. Microsoft.Extensions.DependencyModel updated to v8.0.2. (#291)
+
+*Contributors of this release (in alphabetical order):* @obligaron, @Romfos
 
 # v2.1.1 - 2024-10-08
 
