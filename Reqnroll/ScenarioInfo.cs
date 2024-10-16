@@ -43,9 +43,9 @@ namespace Reqnroll
         /// </summary>
         public string PickleIdIndex { get; }
         // The list of step PickleIds in the step sequence for this test case.
-        public PickleStepSequence PickleStepSequence { get; private set; }
+        public PickleStepSequence PickleStepSequence { get; set; }
 
-        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleIndex = null, PickleStepSequence stepSequence = null)
+        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleIndex = null)
         {
             Title = title;
             Description = description;
@@ -53,7 +53,6 @@ namespace Reqnroll
             Arguments = arguments;
             CombinedTags = Tags.Concat(inheritedTags ?? Array.Empty<string>()).ToArray();
             PickleIdIndex = pickleIndex;
-            PickleStepSequence = stepSequence;
         }
     }
 }

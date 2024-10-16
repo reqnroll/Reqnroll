@@ -2,6 +2,7 @@
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
+using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using System;
 using System.Collections.Concurrent;
@@ -44,6 +45,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // This dictionary maps from (string) PickleIDIndex to (string) PickleID
         public Dictionary<string, string> PickleIds { get; } = new();
+        public PickleJar PickleJar { get; set; }
 
         public bool FeatureExecutionSuccess { get; private set; }
 
@@ -68,11 +70,11 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         private IEnumerable<Envelope> GenerateStaticMessages(FeatureStartedEvent featureStartedEvent)
         {
 
-            yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source);
+            yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source());
 
-            var gd = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument;
+            var gd = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument();
 
-            var pickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles.ToList();
+            var pickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles().ToList();
 
             var idReWriter = new CucumberMessages.RuntimeSupport.IdReWriter();
             idReWriter.ReWriteIds(gd, pickles, IDGenerator, out var reWrittenGherkinDocument, out var reWrittenPickles);
@@ -83,6 +85,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             {
                 PickleIds.Add(i.ToString(), pickles[i].Id);
             }
+
+            PickleJar = new PickleJar(pickles);
+
             yield return Envelope.Create(gd);
             foreach (var pickle in pickles)
             {
@@ -171,6 +176,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
+                // Fetch the PickleStepSequence for this Pickle and give to the ScenarioInfo
+                var pickleStepSequence = PickleJar.PickleStepSequenceFor(pickleIndex);
+                scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence; ;
+
                 var tccmt = new TestCaseTracker(this, pickleId);
                 tccmt.ProcessEvent(scenarioStartedEvent);
                 testCaseTrackersById.TryAdd(pickleId, tccmt);

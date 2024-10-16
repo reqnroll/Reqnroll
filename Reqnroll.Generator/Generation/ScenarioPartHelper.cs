@@ -35,7 +35,6 @@ namespace Reqnroll.Generator.Generation
 
             backgroundMethod.Attributes = MemberAttributes.Public;
             backgroundMethod.Name = GeneratorConstants.BACKGROUND_NAME;
-            backgroundMethod.Parameters.Add(new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(PickleStepSequence)), GeneratorConstants.PICKLESTEPSEQUENCE_PARAMETER_NAME));
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(backgroundMethod);
 
@@ -43,7 +42,6 @@ namespace Reqnroll.Generator.Generation
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, background.Location))
             {
             }
-            AddVariableForPickleStepSequenceFromMethodParameter(backgroundMethod);
 
             foreach (var step in background.Steps)
             {
@@ -235,41 +233,6 @@ namespace Reqnroll.Generator.Generation
                     new CodeVariableReferenceExpression(GeneratorConstants.PICKLEINDEX_PARAMETER_NAME) :
                     new CodePrimitiveExpression(pickleIndex.ToString()));
             testMethod.Statements.Add(pickleIdVariable);
-        }
-
-        public void AddVariableForPickleStepSequenceFromMethodParameter(CodeMemberMethod testMethod)
-        {
-            var pickleStepSequence = new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(PickleStepSequence)), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
-                new CodeVariableReferenceExpression(GeneratorConstants.PICKLESTEPSEQUENCE_PARAMETER_NAME));
-
-            testMethod.Statements.Add(pickleStepSequence);
-        }
-
-        public void AddVariableForPickleStepSequenceForPickleId(CodeMemberMethod testMethod)
-        {
-            // m_pickleStepSequence = testRunner.FeatureContext.FeatureInfo.FeatureCucumberMessages.PickleJar.PickleStepSequenceFor(m_pickleId);
-            var pickleStepSequence = new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(PickleStepSequence)), GeneratorConstants.PICKLESTEPSEQUENCE_VARIABLE_NAME,
-                // Right side of the assignment (property access chain)
-                
-                new CodeMethodInvokeExpression(
-                    new CodePropertyReferenceExpression(
-                        new CodePropertyReferenceExpression(
-                            new CodePropertyReferenceExpression(
-                                new CodePropertyReferenceExpression(
-                                    new CodeVariableReferenceExpression(GeneratorConstants.TESTRUNNER_FIELD),
-                                    "FeatureContext"
-                                ),
-                                "FeatureInfo"
-                            ),
-                            "FeatureCucumberMessages"
-                        ),
-                        "PickleJar"
-                    ),
-                    "PickleStepSequenceFor",
-                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEINDEX_VARIABLE_NAME))
-                );
-
-            testMethod.Statements.Add(pickleStepSequence);
         }
     }
 }

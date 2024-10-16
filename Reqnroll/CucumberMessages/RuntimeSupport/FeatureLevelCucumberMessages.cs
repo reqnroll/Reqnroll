@@ -17,19 +17,16 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
         {
             if (CucumberConfiguration.Current.Enabled)
             {
-                Source = source();
-                GherkinDocument = gherkinDocument();
-                Pickles = pickles();
+                Source = source;
+                GherkinDocument = gherkinDocument;
+                Pickles = pickles;
                 Location = location;
             }
-            PickleJar = new PickleJar(Pickles);
-
         }
 
         public string Location { get; }
-        public Io.Cucumber.Messages.Types.Source Source { get; }
-        public Io.Cucumber.Messages.Types.GherkinDocument GherkinDocument { get; }
-        public IEnumerable<Io.Cucumber.Messages.Types.Pickle> Pickles { get; }
-        public PickleJar PickleJar { get; }
+        public Func<Io.Cucumber.Messages.Types.Source> Source { get; }
+        public Func<Io.Cucumber.Messages.Types.GherkinDocument> GherkinDocument { get; }
+        public Func<IEnumerable<Io.Cucumber.Messages.Types.Pickle>> Pickles { get; }
     }
 }
