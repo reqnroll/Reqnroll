@@ -24,6 +24,9 @@ namespace Reqnroll.Generator.Generation
         private List<CodeExpression> _TableRows;
         private List<CodeExpression> _PickleCells;
 
+        private static readonly string GENERICLIST = typeof(List<>).FullName;
+
+
         public CucumberPicklesExpressionGenerator(CodeDomHelper codeDomHelper)
         {
             _codeDomHelper = codeDomHelper;
@@ -46,8 +49,10 @@ namespace Reqnroll.Generator.Generation
             {
                 Visit(pickle);
             }
-            var commentsListExpr = new CodeTypeReference(typeof(List<Pickle>));
-            var initializer = new CodeArrayCreateExpression(typeof(Pickle), _PickleList.ToArray());
+
+            var pickleCodeTypeRef = new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference);
+            var commentsListExpr = new CodeTypeReference(GENERICLIST, pickleCodeTypeRef);
+            var initializer = new CodeArrayCreateExpression(pickleCodeTypeRef, _PickleList.ToArray());
 
             return new CodeObjectCreateExpression(commentsListExpr, initializer);
         }
@@ -62,16 +67,18 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(pickle);
 
-            var stepsExpr = new CodeTypeReference(typeof(List<PickleStep>));
-            var stepsinitializer = new CodeArrayCreateExpression(typeof(PickleStep), _PickleSteps.ToArray());
+            var pStepTypeRef = new CodeTypeReference(typeof(PickleStep), CodeTypeReferenceOptions.GlobalReference);
+            var stepsExpr = new CodeTypeReference(GENERICLIST, pStepTypeRef);
+            var stepsinitializer = new CodeArrayCreateExpression(pStepTypeRef, _PickleSteps.ToArray());
 
-            var tagsExpr = new CodeTypeReference(typeof(List<PickleTag>));
-            var tagsinitializer = new CodeArrayCreateExpression(typeof(PickleTag), _PickleTags.ToArray());
+            var tagsTypeRef = new CodeTypeReference(typeof(PickleTag), CodeTypeReferenceOptions.GlobalReference);
+            var tagsExpr = new CodeTypeReference(GENERICLIST, tagsTypeRef);
+            var tagsinitializer = new CodeArrayCreateExpression(tagsTypeRef, _PickleTags.ToArray());
 
             var astIdsExpr = new CodeTypeReference(typeof(List<string>));
             var astIdsInitializer = new CodeArrayCreateExpression(typeof(string), pickle.AstNodeIds.Select(s => new CodePrimitiveExpression(s)).ToArray());
 
-            _PickleList.Add(new CodeObjectCreateExpression(typeof(Pickle),
+            _PickleList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference),
                             new CodePrimitiveExpression(pickle.Id),
                             new CodePrimitiveExpression(pickle.Uri),
                             new CodePrimitiveExpression(pickle.Name),
@@ -95,11 +102,11 @@ namespace Reqnroll.Generator.Generation
             var astIdsExpr = new CodeTypeReference(typeof(List<string>));
             var astIdsInitializer = new CodeArrayCreateExpression(typeof(string), step.AstNodeIds.Select(s => new CodePrimitiveExpression(s)).ToArray());
 
-            _PickleSteps.Add(new CodeObjectCreateExpression(typeof(PickleStep),
+            _PickleSteps.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleStep), CodeTypeReferenceOptions.GlobalReference),
                 _PickleStepArgument ?? new CodePrimitiveExpression(null),
                 new CodeObjectCreateExpression(astIdsExpr, astIdsInitializer),
                 new CodePrimitiveExpression(step.Id),
-                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(PickleStepType)), step.Type.ToString()),
+                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(PickleStepType), CodeTypeReferenceOptions.GlobalReference)), step.Type.ToString()),
                 new CodePrimitiveExpression(step.Text)));
 
             _PickleStepArgument = arg;
@@ -107,7 +114,7 @@ namespace Reqnroll.Generator.Generation
 
         public override void Visit(PickleDocString docString)
         {
-            _PickleDocString = new CodeObjectCreateExpression(typeof(PickleDocString),
+            _PickleDocString = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleDocString), CodeTypeReferenceOptions.GlobalReference),
                 new CodePrimitiveExpression(docString.MediaType),
                 new CodePrimitiveExpression(docString.Content));
         }
@@ -122,7 +129,7 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(argument);
 
-            _PickleStepArgument = new CodeObjectCreateExpression(typeof(PickleStepArgument),
+            _PickleStepArgument = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleStepArgument), CodeTypeReferenceOptions.GlobalReference),
                 _PickleDocString ?? new CodePrimitiveExpression(null),
                 _PickleTable ?? new CodePrimitiveExpression(null));
 
@@ -137,10 +144,11 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(pickleTable);
 
-            var rowsExpr = new CodeTypeReference(typeof(List<PickleTableRow>));
-            var rowsInitializer = new CodeArrayCreateExpression(typeof(PickleTableRow), _TableRows.ToArray());
+            var pickleTableRowTypeRef = new CodeTypeReference(typeof(PickleTableRow), CodeTypeReferenceOptions.GlobalReference);
+            var rowsExpr = new CodeTypeReference(GENERICLIST, pickleTableRowTypeRef);
+            var rowsInitializer = new CodeArrayCreateExpression(pickleTableRowTypeRef, _TableRows.ToArray());
 
-            _PickleTable = new CodeObjectCreateExpression(typeof(PickleTable),
+            _PickleTable = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTable), CodeTypeReferenceOptions.GlobalReference),
                 new CodeObjectCreateExpression(rowsExpr, rowsInitializer));
 
             _TableRows = rows;
@@ -153,10 +161,11 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(row);
 
-            var cellsExpr = new CodeTypeReference(typeof(List<PickleTableCell>));
-            var cellsInitializer = new CodeArrayCreateExpression(typeof(PickleTableCell), _PickleCells.ToArray());
+            var pickleTableCellTypeRef = new CodeTypeReference(typeof(PickleTableCell), CodeTypeReferenceOptions.GlobalReference);
+            var cellsExpr = new CodeTypeReference(GENERICLIST, pickleTableCellTypeRef);
+            var cellsInitializer = new CodeArrayCreateExpression(pickleTableCellTypeRef, _PickleCells.ToArray());
 
-            _TableRows.Add(new CodeObjectCreateExpression(typeof(PickleTableRow),
+            _TableRows.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTableRow), CodeTypeReferenceOptions.GlobalReference),
                 new CodeObjectCreateExpression(cellsExpr, cellsInitializer)));
 
             _PickleCells = cells;
@@ -164,13 +173,13 @@ namespace Reqnroll.Generator.Generation
 
         public override void Visit(PickleTableCell cell)
         {
-            _PickleCells.Add(new CodeObjectCreateExpression(typeof(PickleTableCell),
+            _PickleCells.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTableCell), CodeTypeReferenceOptions.GlobalReference),
                 new CodePrimitiveExpression(cell.Value)));
         }
 
         public override void Visit(PickleTag tag)
         {
-            _PickleTags.Add(new CodeObjectCreateExpression(typeof(PickleTag), 
+            _PickleTags.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTag), CodeTypeReferenceOptions.GlobalReference),
                 new CodePrimitiveExpression(tag.Name),
                 new CodePrimitiveExpression(tag.AstNodeId)));
         }

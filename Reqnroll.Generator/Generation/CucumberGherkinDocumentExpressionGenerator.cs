@@ -35,6 +35,8 @@ namespace Reqnroll.Generator.Generation
         List<CodeExpression> _TableRowsList;
         List<CodeExpression> _TableCellsList;
 
+        private static readonly string GENERICLIST = typeof(List<>).FullName;
+
         public CucumberGherkinDocumentExpressionGenerator(CodeDomHelper codeDomHelper)
         {
             _codeDomHelper = codeDomHelper;
@@ -68,10 +70,11 @@ namespace Reqnroll.Generator.Generation
 
             Visit(gherkinDocument);
 
-            var commentsListExpr = new CodeTypeReference(typeof(List<Comment>));
-            var initializer = new CodeArrayCreateExpression(typeof(Comment), _CommentsList.ToArray());
+            var commentTypeRef = new CodeTypeReference(typeof(Comment), CodeTypeReferenceOptions.GlobalReference);
+            var commentsListExpr = new CodeTypeReference(GENERICLIST, commentTypeRef);
+            var initializer = new CodeArrayCreateExpression(commentTypeRef, _CommentsList.ToArray());
 
-            _gherkinDocumentExpression = new CodeObjectCreateExpression(typeof(GherkinDocument),
+            _gherkinDocumentExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(GherkinDocument), CodeTypeReferenceOptions.GlobalReference),
                 new CodePrimitiveExpression(_gherkinDocument.Uri),
                 _feature,
                 new CodeObjectCreateExpression(commentsListExpr, initializer));
@@ -90,13 +93,15 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(feature);
 
-            var tagsListExpr = new CodeTypeReference(typeof(List<Tag>));
-            var tagsinitializer = new CodeArrayCreateExpression(typeof(Tag), _TagsList.ToArray());
+            var tagCodeDomTypeRef = new CodeTypeReference(typeof(Tag), CodeTypeReferenceOptions.GlobalReference);
+            var tagsListExpr = new CodeTypeReference(GENERICLIST, tagCodeDomTypeRef);
+            var tagsinitializer = new CodeArrayCreateExpression(tagCodeDomTypeRef, _TagsList.ToArray());
 
-            var FClistExpr = new CodeTypeReference(typeof(List<FeatureChild>));
-            var initializer = new CodeArrayCreateExpression(typeof(FeatureChild), _FeatureChildrenList.ToArray());
+            var fcCodeDomTypeRef = new CodeTypeReference(typeof(FeatureChild), CodeTypeReferenceOptions.GlobalReference);
+            var FClistExpr = new CodeTypeReference(GENERICLIST, fcCodeDomTypeRef);
+            var initializer = new CodeArrayCreateExpression(fcCodeDomTypeRef, _FeatureChildrenList.ToArray());
 
-            _feature = new CodeObjectCreateExpression(typeof(Feature),
+            _feature = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Feature), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodeObjectCreateExpression(tagsListExpr, tagsinitializer),
                 new CodePrimitiveExpression(feature.Language),
@@ -116,7 +121,7 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(comment);
 
-            _CommentsList.Add(new CodeObjectCreateExpression(typeof(Comment),
+            _CommentsList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(Comment), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodePrimitiveExpression(comment.Text)));
 
@@ -129,7 +134,7 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(tag);
 
-            _TagsList.Add(new CodeObjectCreateExpression(typeof(Tag),
+            _TagsList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(Tag), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodePrimitiveExpression(tag.Name),
                 new CodePrimitiveExpression(tag.Id)));
@@ -144,7 +149,7 @@ namespace Reqnroll.Generator.Generation
             var columnExprTypeExpr = new CodeTypeReference(typeof(Nullable<>));
             columnExprTypeExpr.TypeArguments.Add(typeof(long));
 
-            _location = new CodeObjectCreateExpression(typeof(Location),
+            _location = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Location), CodeTypeReferenceOptions.GlobalReference),
                 new CodePrimitiveExpression(location.Line),
                 location.Column == null ? new CodeObjectCreateExpression(columnExprTypeExpr) :new CodeObjectCreateExpression(columnExprTypeExpr, new CodePrimitiveExpression(location.Column)));
 
@@ -162,7 +167,7 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(featureChild);
 
-            _FeatureChildrenList.Add(new CodeObjectCreateExpression(typeof(FeatureChild),
+            _FeatureChildrenList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(FeatureChild), CodeTypeReferenceOptions.GlobalReference),
                 _rule ?? new CodePrimitiveExpression(null),
                 _background ?? new CodePrimitiveExpression(null),
                 _scenario ?? new CodePrimitiveExpression(null)));
@@ -182,13 +187,15 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(rule);
 
-            var tagsListExpr = new CodeTypeReference(typeof(List<Tag>));
-            var tagsinitializer = new CodeArrayCreateExpression(typeof(Tag), _TagsList.ToArray());
+            var tagCodeDomTypeRef = new CodeTypeReference(typeof(Tag), CodeTypeReferenceOptions.GlobalReference);
+            var tagsListExpr = new CodeTypeReference(GENERICLIST, tagCodeDomTypeRef);
+            var tagsinitializer = new CodeArrayCreateExpression(tagCodeDomTypeRef, _TagsList.ToArray());
 
-            var ruleChildrenListExpr = new CodeTypeReference(typeof(List<RuleChild>));
-            var ruleChildrenInitializer = new CodeArrayCreateExpression(typeof(RuleChild), _RuleChildrenList.ToArray());
+            var ruleChildCodeDomTypeRef = new CodeTypeReference(typeof(RuleChild), CodeTypeReferenceOptions.GlobalReference);
+            var ruleChildrenListExpr = new CodeTypeReference(GENERICLIST, ruleChildCodeDomTypeRef);
+            var ruleChildrenInitializer = new CodeArrayCreateExpression(ruleChildCodeDomTypeRef, _RuleChildrenList.ToArray());
 
-            _rule = new CodeObjectCreateExpression(typeof(Io.Cucumber.Messages.Types.Rule),
+            _rule = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.Rule), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodeObjectCreateExpression(tagsListExpr, tagsinitializer),
                 new CodePrimitiveExpression(rule.Keyword),
@@ -212,7 +219,7 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(ruleChild);
 
-            _RuleChildrenList.Add(new CodeObjectCreateExpression(typeof(RuleChild),
+            _RuleChildrenList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(RuleChild), CodeTypeReferenceOptions.GlobalReference),
                 _background ?? new CodePrimitiveExpression(null),
                 _scenario ?? new CodePrimitiveExpression(null)));
 
@@ -232,16 +239,19 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(scenario);
 
-            var tagsListExpr = new CodeTypeReference(typeof(List<Tag>));
-            var tagsinitializer = new CodeArrayCreateExpression(typeof(Tag), _TagsList.ToArray());
+            var tagCodeDomTypeRef = new CodeTypeReference(typeof(Tag), CodeTypeReferenceOptions.GlobalReference);
+            var tagsListExpr = new CodeTypeReference(GENERICLIST, tagCodeDomTypeRef);
+            var tagsinitializer = new CodeArrayCreateExpression(tagCodeDomTypeRef, _TagsList.ToArray());
 
-            var stepsListExpr = new CodeTypeReference(typeof(List<Step>));
-            var stepsinitializer = new CodeArrayCreateExpression(typeof(Step), _StepsList.ToArray());
+            var stepCodeDomTypeRef = new CodeTypeReference(typeof(Step), CodeTypeReferenceOptions.GlobalReference);
+            var stepsListExpr = new CodeTypeReference(GENERICLIST, stepCodeDomTypeRef);
+            var stepsinitializer = new CodeArrayCreateExpression(stepCodeDomTypeRef, _StepsList.ToArray());
 
-            var examplesListExpr = new CodeTypeReference(typeof(List<Examples>));
-            var examplesinitializer = new CodeArrayCreateExpression(typeof(Examples), _ExamplesList.ToArray());
+            var examplesCodeDomTypeRef = new CodeTypeReference(typeof(Examples), CodeTypeReferenceOptions.GlobalReference);
+            var examplesListExpr = new CodeTypeReference(GENERICLIST, examplesCodeDomTypeRef);
+            var examplesinitializer = new CodeArrayCreateExpression(examplesCodeDomTypeRef, _ExamplesList.ToArray());
 
-            _scenario = new CodeObjectCreateExpression(typeof(Scenario),
+            _scenario = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Scenario), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodeObjectCreateExpression(tagsListExpr, tagsinitializer),
                 new CodePrimitiveExpression(scenario.Keyword),
@@ -271,13 +281,16 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(examples);
 
-            var tagsListExpr = new CodeTypeReference(typeof(List<Tag>));
-            var tagsinitializer = new CodeArrayCreateExpression(typeof(Tag), _TagsList.ToArray());
+            var tagCodeDomTypeRef = new CodeTypeReference(typeof(Tag), CodeTypeReferenceOptions.GlobalReference);
+            var tagsListExpr = new CodeTypeReference(GENERICLIST, tagCodeDomTypeRef);
+            var tagsinitializer = new CodeArrayCreateExpression(tagCodeDomTypeRef, _TagsList.ToArray());
             var tableHeaderRow = _TableRowsList.First();
-            var tableBodyListExpr = new CodeTypeReference(typeof(List<TableRow>));
-            var tableBodyInitializer = new CodeArrayCreateExpression(typeof(TableRow), _TableRowsList.Skip(1).ToArray());
 
-            _ExamplesList.Add(new CodeObjectCreateExpression(typeof(Examples),
+            var tableRowCodeDomTypeRef = new CodeTypeReference(typeof(TableRow), CodeTypeReferenceOptions.GlobalReference);
+            var tableBodyListExpr = new CodeTypeReference(GENERICLIST, tableRowCodeDomTypeRef);
+            var tableBodyInitializer = new CodeArrayCreateExpression(tableRowCodeDomTypeRef, _TableRowsList.Skip(1).ToArray());
+
+            _ExamplesList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(Examples), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodeObjectCreateExpression(tagsListExpr, tagsinitializer),
                 new CodePrimitiveExpression(examples.Keyword),
@@ -299,10 +312,13 @@ namespace Reqnroll.Generator.Generation
             _StepsList = new List<CodeExpression>();
 
             base.Visit(background);
-            var stepListExpr = new CodeTypeReference(typeof(List<Step>));
-            var initializer = new CodeArrayCreateExpression(typeof(Step), _StepsList.ToArray());
 
-            _background = new CodeObjectCreateExpression(typeof(Background),
+
+            var stepCodeDomTypeRef = new CodeTypeReference(typeof(Step), CodeTypeReferenceOptions.GlobalReference);
+            var stepListExpr = new CodeTypeReference(GENERICLIST, stepCodeDomTypeRef);
+            var initializer = new CodeArrayCreateExpression(stepCodeDomTypeRef, _StepsList.ToArray());
+
+            _background = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Background), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodePrimitiveExpression(background.Keyword),
                 new CodePrimitiveExpression(background.Name),
@@ -325,10 +341,10 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(step);
 
-            _StepsList.Add(new CodeObjectCreateExpression(typeof(Step),
+            _StepsList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(Step), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodePrimitiveExpression(step.Keyword),
-                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(StepKeywordType)), step.KeywordType.ToString()),
+                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(StepKeywordType), CodeTypeReferenceOptions.GlobalReference)), step.KeywordType.ToString()),
                 new CodePrimitiveExpression(step.Text),
                 _DocString ?? new CodePrimitiveExpression(null),
                 _dataTable ?? new CodePrimitiveExpression(null),
@@ -345,7 +361,7 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(docString);
 
-            _DocString = new CodeObjectCreateExpression(typeof(DocString),
+            _DocString = new CodeObjectCreateExpression(new CodeTypeReference(typeof(DocString), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodePrimitiveExpression(docString.MediaType),
                 new CodePrimitiveExpression(docString.Content),
@@ -362,10 +378,11 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(dataTable);
 
-            var listExpr = new CodeTypeReference(typeof(List<TableRow>));
-            var initializer = new CodeArrayCreateExpression(typeof(TableRow), _TableRowsList.ToArray());
+            var tableRowCodeDomTypeRef = new CodeTypeReference(typeof(TableRow), CodeTypeReferenceOptions.GlobalReference);
+            var listExpr = new CodeTypeReference(GENERICLIST, tableRowCodeDomTypeRef);
+            var initializer = new CodeArrayCreateExpression(tableRowCodeDomTypeRef, _TableRowsList.ToArray());
 
-            _dataTable = new CodeObjectCreateExpression(typeof(Io.Cucumber.Messages.Types.DataTable),
+            _dataTable = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.DataTable), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodeObjectCreateExpression(listExpr, initializer));
 
@@ -381,11 +398,12 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(row);
 
-            var CellListExpr = new CodeTypeReference(typeof(List<TableCell>));
+            var tableCellCodeDomTypeRef = new CodeTypeReference(typeof(TableCell), CodeTypeReferenceOptions.GlobalReference);
+            var CellListExpr = new CodeTypeReference(GENERICLIST, tableCellCodeDomTypeRef);
 
-            var initializer = new CodeArrayCreateExpression(typeof(TableCell), _TableCellsList.ToArray());
+            var initializer = new CodeArrayCreateExpression(tableCellCodeDomTypeRef, _TableCellsList.ToArray());
 
-            _TableRowsList.Add(new CodeObjectCreateExpression(typeof(TableRow),
+            _TableRowsList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(TableRow), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodeObjectCreateExpression(CellListExpr, initializer),
                 new CodePrimitiveExpression(row.Id)));
@@ -400,7 +418,7 @@ namespace Reqnroll.Generator.Generation
 
             base.Visit(cell);
 
-            _TableCellsList.Add(new CodeObjectCreateExpression(typeof(TableCell),
+            _TableCellsList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(TableCell), CodeTypeReferenceOptions.GlobalReference),
                 _location,
                 new CodePrimitiveExpression(cell.Value)));
 
