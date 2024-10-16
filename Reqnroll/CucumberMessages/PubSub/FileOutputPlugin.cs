@@ -17,12 +17,11 @@ using System.Linq;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.CommonModels;
 using Reqnroll.CucumberMessages.Configuration;
-using Reqnroll.CucumberMessages.PubSub;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using System.Runtime.InteropServices.ComTypes;
 
 
-namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
+namespace Reqnroll.CucumberMessages.PubSub
 {
     /// <summary>
     /// The FileOutputPlugin is the subscriber to the CucumberMessageBroker. 
@@ -95,7 +94,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
             string baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
             string fileName = SanitizeFileName(config.OutputFileName);
 
-            fileWritingTask = Task.Factory.StartNew( () =>  ConsumeAndWriteToFilesBackgroundTask(baseDirectory, fileName), TaskCreationOptions.LongRunning);
+            fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFilesBackgroundTask(baseDirectory, fileName), TaskCreationOptions.LongRunning);
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
 
@@ -106,7 +105,7 @@ namespace Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin
 
         private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
         {
-            
+
             // Consider refactoring this to a Using() block.
             var fileStream = File.CreateText(Path.Combine(baseDirectory, fileName));
 
