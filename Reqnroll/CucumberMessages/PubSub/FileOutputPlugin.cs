@@ -1,24 +1,17 @@
 ﻿#nullable enable
 
-using Reqnroll.CucumberMessages;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
-using Io.Cucumber.Messages.Types;
-using System.Reflection;
 using Reqnroll.Events;
-using System.Collections.Concurrent;
-using System.Text.Json;
 using Reqnroll.Tracing;
 using Reqnroll.BoDi;
 using System;
 using System.Threading.Tasks;
 using System.IO;
 using System.Linq;
-using Reqnroll.EnvironmentAccess;
-using Reqnroll.CommonModels;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing;
-using System.Runtime.InteropServices.ComTypes;
+using System.Text;
 
 
 namespace Reqnroll.CucumberMessages.PubSub
@@ -27,21 +20,18 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// The FileOutputPlugin is the subscriber to the CucumberMessageBroker. 
     /// It receives Cucumber Messages and writes them to a file.
     /// 
-    /// File writing is done on a background thread.
     /// </summary>
     public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private Task? fileWritingTask;
 
-        //Thread safe collections to hold:
-        // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
-        private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
 
         private ICucumberConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
         private ITraceListener? trace => traceListener.Value;
         private IObjectContainer? testThreadObjectContainer;
         private IObjectContainer? globalObjectContainer;
+        private FileStream? _fileStream;
 
 
         public FileOutputPlugin(ICucumberConfiguration configuration)
@@ -75,12 +65,12 @@ namespace Reqnroll.CucumberMessages.PubSub
         }
         private void CloseFileSink()
         {
+            CloseStream(_fileStream!);
             if (disposedValue) return;
-            postedMessages.CompleteAdding();
             fileWritingTask?.Wait();
             fileWritingTask = null;
         }
-
+        private const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
             ICucumberConfiguration config = _configuration;
@@ -93,55 +83,20 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
             string baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
             string fileName = SanitizeFileName(config.OutputFileName);
-
-            fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFilesBackgroundTask(baseDirectory, fileName), TaskCreationOptions.LongRunning);
+            _fileStream = File.Create(Path.Combine(baseDirectory, fileName), TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
-
+        private static byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
         public void Publish(ReqnrollCucumberMessage message)
         {
-            postedMessages.Add(message);
-        }
-
-        private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
-        {
-
-            // Consider refactoring this to a Using() block.
-            var fileStream = File.CreateText(Path.Combine(baseDirectory, fileName));
-
-
-            foreach (var message in postedMessages.GetConsumingEnumerable())
+            if (message.Envelope != null)
             {
-                var featureName = message.CucumberMessageSource;
-
-                if (message.Envelope != null)
-                {
-                    var cm = Serialize(message.Envelope);
-                    Write(fileStream, cm);
-                }
-            }
-
-            CloseStream(fileStream);
-        }
-
-
-        private string Serialize(Envelope message)
-        {
-            return NdjsonSerializer.Serialize(message);
-        }
-        private void Write(StreamWriter fileStream, string cucumberMessage)
-        {
-            try
-            {
-                fileStream!.WriteLine(cucumberMessage);
-            }
-            catch (System.Exception ex)
-            {
-                trace?.WriteTestOutput($"FileOutputPlugin Write. Exception: {ex.Message}");
+                NdjsonSerializer.SerializeToStream(_fileStream!, message.Envelope);
+                _fileStream!.Write(nl, 0, nl.Length);
             }
         }
 
-        private void CloseStream(StreamWriter fileStream)
+        private void CloseStream(FileStream fileStream)
         {
             fileStream?.Flush();
             fileStream?.Close();
@@ -156,7 +111,6 @@ namespace Reqnroll.CucumberMessages.PubSub
                 if (disposing)
                 {
                     CloseFileSink();
-                    postedMessages.Dispose();
                 }
                 disposedValue = true;
             }

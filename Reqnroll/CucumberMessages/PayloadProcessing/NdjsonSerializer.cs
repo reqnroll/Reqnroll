@@ -1,6 +1,7 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using System;
+using System.IO;
 using System.Text.Json;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing
@@ -54,6 +55,11 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
         internal static T Deserialize<T>(string json)
         {
             return JsonSerializer.Deserialize<T>(json, JsonOptions)!;
+        }
+
+        public static void SerializeToStream(FileStream fs, Envelope message)
+        {
+            JsonSerializer.Serialize<Envelope>(fs, message, JsonOptions);
         }
     }
 }
