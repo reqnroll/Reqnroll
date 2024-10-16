@@ -25,7 +25,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// 
     /// It uses the IRuntimePlugin interface to force the runtime to load it during startup (although it is not an external plugin per se).
     /// </summary>
-    public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin
+    public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin, IExecutionEventListener
     {
         private Lazy<ICucumberMessageBroker> _brokerFactory;
         private ICucumberMessageBroker _broker;
@@ -67,17 +67,46 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
         {
-            testThreadEventPublisher.AddHandler<FeatureStartedEvent>(FeatureStartedEventHandler);
-            testThreadEventPublisher.AddHandler<FeatureFinishedEvent>(FeatureFinishedEventHandler);
-            testThreadEventPublisher.AddHandler<ScenarioStartedEvent>(ScenarioStartedEventHandler);
-            testThreadEventPublisher.AddHandler<ScenarioFinishedEvent>(ScenarioFinishedEventHandler);
-            testThreadEventPublisher.AddHandler<StepStartedEvent>(StepStartedEventHandler);
-            testThreadEventPublisher.AddHandler<StepFinishedEvent>(StepFinishedEventHandler);
-            testThreadEventPublisher.AddHandler<HookBindingStartedEvent>(HookBindingStartedEventHandler);
-            testThreadEventPublisher.AddHandler<HookBindingFinishedEvent>(HookBindingFinishedEventHandler);
-            testThreadEventPublisher.AddHandler<AttachmentAddedEvent>(AttachmentAddedEventHandler);
-            testThreadEventPublisher.AddHandler<OutputAddedEvent>(OutputAddedEventHandler);
+            testThreadEventPublisher.AddListener(this);
+        }
 
+        public void OnEvent(IExecutionEvent executionEvent)
+        {
+            switch (executionEvent)
+            {
+                case FeatureStartedEvent featureStartedEvent:
+                    FeatureStartedEventHandler(featureStartedEvent);
+                    break;
+                case FeatureFinishedEvent featureFinishedEvent:
+                    FeatureFinishedEventHandler(featureFinishedEvent);
+                    break;
+                case ScenarioStartedEvent scenarioStartedEvent:
+                    ScenarioStartedEventHandler(scenarioStartedEvent);
+                    break;
+                case ScenarioFinishedEvent scenarioFinishedEvent:
+                    ScenarioFinishedEventHandler(scenarioFinishedEvent);
+                    break;
+                case StepStartedEvent stepStartedEvent:
+                    StepStartedEventHandler(stepStartedEvent);
+                    break;
+                case StepFinishedEvent stepFinishedEvent:
+                    StepFinishedEventHandler(stepFinishedEvent);
+                    break;
+                case HookBindingStartedEvent hookBindingStartedEvent:
+                    HookBindingStartedEventHandler(hookBindingStartedEvent);
+                    break;
+                case HookBindingFinishedEvent hookBindingFinishedEvent:
+                    HookBindingFinishedEventHandler(hookBindingFinishedEvent);
+                    break;
+                case AttachmentAddedEvent attachmentAddedEvent:
+                    AttachmentAddedEventHandler(attachmentAddedEvent);
+                    break;
+                case OutputAddedEvent outputAddedEvent:
+                    OutputAddedEventHandler(outputAddedEvent);
+                    break;
+                default:
+                    break;
+            }
         }
 
         // This method will get called after TestRunStartedEvent has been published and after any BeforeTestRun hooks have been called
