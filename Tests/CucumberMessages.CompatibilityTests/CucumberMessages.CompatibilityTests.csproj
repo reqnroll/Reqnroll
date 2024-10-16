@@ -10,138 +10,138 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="CCK\ambiguous\Ambiguous.cs" />
-    <Compile Remove="CCK\attachments\attachments.cs" />
-    <Compile Remove="CCK\background\background.cs" />
-    <Compile Remove="CCK\cdata\cdata.cs" />
-    <Compile Remove="CCK\data-tables\data_tables.cs" />
-    <Compile Remove="CCK\empty\empty.cs" />
-    <Compile Remove="CCK\examples-tables\examples_tables.cs" />
-    <Compile Remove="CCK\hooks\hooks.cs" />
-    <Compile Remove="CCK\minimal\minimal.cs" />
-    <Compile Remove="CCK\parameter-types\parameter_types.cs" />
-    <Compile Remove="CCK\pending\pending.cs" />
-    <Compile Remove="CCK\rules\rules.cs" />
-    <Compile Remove="CCK\skipped\skipped.cs" />
-    <Compile Remove="CCK\stack-traces\stack_traces.cs" />
-    <Compile Remove="CCK\undefined\undefined.cs" />
-    <Compile Remove="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
+    <Compile Remove="Samples\ambiguous\Ambiguous.cs" />
+    <Compile Remove="Samples\attachments\attachments.cs" />
+    <Compile Remove="Samples\background\background.cs" />
+    <Compile Remove="Samples\cdata\cdata.cs" />
+    <Compile Remove="Samples\data-tables\data_tables.cs" />
+    <Compile Remove="Samples\empty\empty.cs" />
+    <Compile Remove="Samples\examples-tables\examples_tables.cs" />
+    <Compile Remove="Samples\hooks\hooks.cs" />
+    <Compile Remove="Samples\minimal\minimal.cs" />
+    <Compile Remove="Samples\parameter-types\parameter_types.cs" />
+    <Compile Remove="Samples\pending\pending.cs" />
+    <Compile Remove="Samples\rules\rules.cs" />
+    <Compile Remove="Samples\skipped\skipped.cs" />
+    <Compile Remove="Samples\stack-traces\stack_traces.cs" />
+    <Compile Remove="Samples\undefined\undefined.cs" />
+    <Compile Remove="Samples\unknown-parameter-type\unknown_parameter_type.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="CCK\ambiguous\ambiguous.feature" />
-    <None Remove="CCK\ambiguous\ambiguous.feature.ndjson" />
-    <None Remove="CCK\attachments\attachments.feature" />
-    <None Remove="CCK\attachments\attachments.feature.ndjson" />
-    <None Remove="CCK\background\background.feature" />
-    <None Remove="CCK\background\background.feature.ndjson" />
-    <None Remove="CCK\cdata\cdata.feature" />
-    <None Remove="CCK\cdata\cdata.feature.ndjson" />
-    <None Remove="CCK\data-tables\data_tables.feature" />
-    <None Remove="CCK\data-tables\data_tables.feature.ndjson" />
-    <None Remove="CCK\empty\empty.feature" />
-    <None Remove="CCK\empty\empty.feature.ndjson" />
-    <None Remove="CCK\examples-tables\examples_tables.feature" />
-    <None Remove="CCK\examples-tables\examples_tables.feature.ndjson" />
-    <None Remove="CCK\hooks\hooks.feature" />
-    <None Remove="CCK\hooks\hooks.feature.ndjson" />
-    <None Remove="CCK\minimal\minimal.feature" />
-    <None Remove="CCK\minimal\minimal.feature.ndjson" />
-    <None Remove="CCK\pending\pending.feature" />
-    <None Remove="CCK\pending\pending.feature.ndjson" />
-    <None Remove="CCK\rules\parameter-types.feature" />
-    <None Remove="CCK\rules\parameter-types.feature.ndjson" />
-    <None Remove="CCK\rules\rules.feature" />
-    <None Remove="CCK\rules\rules.feature.ndjson" />
-    <None Remove="CCK\skipped\skipped.feature" />
-    <None Remove="CCK\skipped\skipped.feature.ndjson" />
-    <None Remove="CCK\stack-traces\stack_traces.feature" />
-    <None Remove="CCK\stack-traces\stack_traces.feature.ndjson" />
-    <None Remove="CCK\undefined\undefined.feature" />
-    <None Remove="CCK\undefined\undefined.feature.ndjson" />
-    <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
-    <None Remove="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
+    <None Remove="Samples\ambiguous\ambiguous.feature" />
+    <None Remove="Samples\ambiguous\ambiguous.feature.ndjson" />
+    <None Remove="Samples\attachments\attachments.feature" />
+    <None Remove="Samples\attachments\attachments.feature.ndjson" />
+    <None Remove="Samples\background\background.feature" />
+    <None Remove="Samples\background\background.feature.ndjson" />
+    <None Remove="Samples\cdata\cdata.feature" />
+    <None Remove="Samples\cdata\cdata.feature.ndjson" />
+    <None Remove="Samples\data-tables\data_tables.feature" />
+    <None Remove="Samples\data-tables\data_tables.feature.ndjson" />
+    <None Remove="Samples\empty\empty.feature" />
+    <None Remove="Samples\empty\empty.feature.ndjson" />
+    <None Remove="Samples\examples-tables\examples_tables.feature" />
+    <None Remove="Samples\examples-tables\examples_tables.feature.ndjson" />
+    <None Remove="Samples\hooks\hooks.feature" />
+    <None Remove="Samples\hooks\hooks.feature.ndjson" />
+    <None Remove="Samples\minimal\minimal.feature" />
+    <None Remove="Samples\minimal\minimal.feature.ndjson" />
+    <None Remove="Samples\pending\pending.feature" />
+    <None Remove="Samples\pending\pending.feature.ndjson" />
+    <None Remove="Samples\rules\parameter-types.feature" />
+    <None Remove="Samples\rules\parameter-types.feature.ndjson" />
+    <None Remove="Samples\rules\rules.feature" />
+    <None Remove="Samples\rules\rules.feature.ndjson" />
+    <None Remove="Samples\skipped\skipped.feature" />
+    <None Remove="Samples\skipped\skipped.feature.ndjson" />
+    <None Remove="Samples\stack-traces\stack_traces.feature" />
+    <None Remove="Samples\stack-traces\stack_traces.feature.ndjson" />
+    <None Remove="Samples\undefined\undefined.feature" />
+    <None Remove="Samples\undefined\undefined.feature.ndjson" />
+    <None Remove="Samples\unknown-parameter-type\unknown_parameter_type.feature" />
+    <None Remove="Samples\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
     <None Remove="products.csv" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="CCK\ambiguous\ambiguous.feature" />
-    <EmbeddedResource Include="CCK\ambiguous\ambiguous.cs" />
-    <EmbeddedResource Include="CCK\attachments\attachments.cs" />
-    <EmbeddedResource Include="CCK\attachments\attachments.feature" />
-    <Content Include="CCK\ambiguous\ambiguous.feature.ndjson" />
-    <Content Include="CCK\attachments\attachments.feature.ndjson">
+    <EmbeddedResource Include="Samples\ambiguous\ambiguous.feature" />
+    <EmbeddedResource Include="Samples\ambiguous\ambiguous.cs" />
+    <EmbeddedResource Include="Samples\attachments\attachments.cs" />
+    <EmbeddedResource Include="Samples\attachments\attachments.feature" />
+    <Content Include="Samples\ambiguous\ambiguous.feature.ndjson" />
+    <Content Include="Samples\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="CCK\background\background.feature.ndjson">
+    <Content Include="Samples\background\background.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="CCK\empty\empty.feature.ndjson">
+    <Content Include="Samples\empty\empty.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\background\background.cs" />
-    <EmbeddedResource Include="CCK\background\background.feature" />
-    <EmbeddedResource Include="CCK\cdata\cdata.cs" />
-    <EmbeddedResource Include="CCK\cdata\cdata.feature" />
-    <Content Include="CCK\cdata\cdata.feature.ndjson">
+    <EmbeddedResource Include="Samples\background\background.cs" />
+    <EmbeddedResource Include="Samples\background\background.feature" />
+    <EmbeddedResource Include="Samples\cdata\cdata.cs" />
+    <EmbeddedResource Include="Samples\cdata\cdata.feature" />
+    <Content Include="Samples\cdata\cdata.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\data-tables\data_tables.cs" />
-    <EmbeddedResource Include="CCK\data-tables\data_tables.feature" />
-    <Content Include="CCK\data-tables\data_tables.feature.ndjson">
+    <EmbeddedResource Include="Samples\data-tables\data_tables.cs" />
+    <EmbeddedResource Include="Samples\data-tables\data_tables.feature" />
+    <Content Include="Samples\data-tables\data_tables.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\empty\empty.cs" />
-    <EmbeddedResource Include="CCK\empty\empty.feature" />
-    <EmbeddedResource Include="CCK\examples-tables\examples_tables.cs" />
-    <EmbeddedResource Include="CCK\examples-tables\examples_tables.feature" />
-    <Content Include="CCK\examples-tables\examples_tables.feature.ndjson">
+    <EmbeddedResource Include="Samples\empty\empty.cs" />
+    <EmbeddedResource Include="Samples\empty\empty.feature" />
+    <EmbeddedResource Include="Samples\examples-tables\examples_tables.cs" />
+    <EmbeddedResource Include="Samples\examples-tables\examples_tables.feature" />
+    <Content Include="Samples\examples-tables\examples_tables.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\hooks\hooks.cs" />
-    <EmbeddedResource Include="CCK\hooks\hooks.feature" />
-    <Content Include="CCK\hooks\hooks.feature.ndjson">
+    <EmbeddedResource Include="Samples\hooks\hooks.cs" />
+    <EmbeddedResource Include="Samples\hooks\hooks.feature" />
+    <Content Include="Samples\hooks\hooks.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\minimal\minimal.cs" />
-    <EmbeddedResource Include="CCK\minimal\minimal.feature" />
-    <Content Include="CCK\minimal\minimal.feature.ndjson">
+    <EmbeddedResource Include="Samples\minimal\minimal.cs" />
+    <EmbeddedResource Include="Samples\minimal\minimal.feature" />
+    <Content Include="Samples\minimal\minimal.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\parameter-types\parameter_types.cs" />
-    <EmbeddedResource Include="CCK\pending\pending.cs" />
-    <EmbeddedResource Include="CCK\pending\pending.feature" />
-    <Content Include="CCK\pending\pending.feature.ndjson">
+    <EmbeddedResource Include="Samples\parameter-types\parameter_types.cs" />
+    <EmbeddedResource Include="Samples\pending\pending.cs" />
+    <EmbeddedResource Include="Samples\pending\pending.feature" />
+    <Content Include="Samples\pending\pending.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\parameter-types\parameter_types.feature" />
-    <Content Include="CCK\parameter-types\parameter_types.feature.ndjson">
+    <EmbeddedResource Include="Samples\parameter-types\parameter_types.feature" />
+    <Content Include="Samples\parameter-types\parameter_types.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\rules\rules.cs" />
-    <EmbeddedResource Include="CCK\rules\rules.feature" />
-    <Content Include="CCK\rules\rules.feature.ndjson">
+    <EmbeddedResource Include="Samples\rules\rules.cs" />
+    <EmbeddedResource Include="Samples\rules\rules.feature" />
+    <Content Include="Samples\rules\rules.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\skipped\skipped.cs" />
-    <EmbeddedResource Include="CCK\skipped\skipped.feature" />
-    <Content Include="CCK\skipped\skipped.feature.ndjson">
+    <EmbeddedResource Include="Samples\skipped\skipped.cs" />
+    <EmbeddedResource Include="Samples\skipped\skipped.feature" />
+    <Content Include="Samples\skipped\skipped.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\stack-traces\stack_traces.cs" />
-    <EmbeddedResource Include="CCK\stack-traces\stack_traces.feature" />
-    <Content Include="CCK\stack-traces\stack_traces.feature.ndjson" />
-    <EmbeddedResource Include="CCK\undefined\undefined.cs" />
-    <EmbeddedResource Include="CCK\undefined\undefined.feature" />
-    <Content Include="CCK\undefined\undefined.feature.ndjson">
+    <EmbeddedResource Include="Samples\stack-traces\stack_traces.cs" />
+    <EmbeddedResource Include="Samples\stack-traces\stack_traces.feature" />
+    <Content Include="Samples\stack-traces\stack_traces.feature.ndjson" />
+    <EmbeddedResource Include="Samples\undefined\undefined.cs" />
+    <EmbeddedResource Include="Samples\undefined\undefined.feature" />
+    <Content Include="Samples\undefined\undefined.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.cs" />
-    <EmbeddedResource Include="CCK\unknown-parameter-type\unknown_parameter_type.feature" />
+    <EmbeddedResource Include="Samples\unknown-parameter-type\unknown_parameter_type.cs" />
+    <EmbeddedResource Include="Samples\unknown-parameter-type\unknown_parameter_type.feature" />
     <EmbeddedResource Include="products.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="CCK\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
+    <Content Include="Samples\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -169,13 +169,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="CCK\attachments\cucumber.jpeg">
+    <None Update="Samples\attachments\cucumber.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="CCK\attachments\cucumber.png">
+    <None Update="Samples\attachments\cucumber.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="CCK\hooks\cucumber.svg">
+    <None Update="Samples\hooks\cucumber.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="partialConfiguration.json">

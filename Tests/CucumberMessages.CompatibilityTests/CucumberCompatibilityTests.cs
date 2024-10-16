@@ -329,8 +329,8 @@ namespace CucumberMessages.CompatibilityTests
 
             var featureFileName = testName.Replace("-", "_");
 
-            AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
-            AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+            AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "CucumberMessages.CompatibilityTests.Samples", Assembly.GetExecutingAssembly());
+            AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "CucumberMessages.CompatibilityTests.Samples", Assembly.GetExecutingAssembly());
             //AddBinaryFilesFromResource($"{testName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
 
             ExecuteTests();
@@ -369,13 +369,13 @@ namespace CucumberMessages.CompatibilityTests
         {
             string location = AppContext.BaseDirectory;
             AddBindingClass(
-                $"public class FileSystemPath {{  public static string GetFilePathForAttachments()  {{  return @\"{location}\\CCK\"; }}  }} ");
+                $"public class FileSystemPath {{  public static string GetFilePathForAttachments()  {{  return @\"{location}\\Samples\"; }}  }} ");
         }
 
         private IEnumerable<Envelope> GetExpectedResults(string testName, string featureFileName)
         {
             var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..\\..\\..");
-            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "CCK", $"{testName}\\{featureFileName}.feature.ndjson"));
+            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "Samples", $"{testName}\\{featureFileName}.feature.ndjson"));
 
             foreach (var json in expectedJsonText)
             {
