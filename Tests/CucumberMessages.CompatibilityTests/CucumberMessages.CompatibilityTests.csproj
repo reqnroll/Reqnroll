@@ -17,6 +17,8 @@
     <Compile Remove="Samples\data-tables\data_tables.cs" />
     <Compile Remove="Samples\empty\empty.cs" />
     <Compile Remove="Samples\examples-tables\examples_tables.cs" />
+    <Compile Remove="Samples\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
+    <Compile Remove="Samples\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
     <Compile Remove="Samples\hooks\hooks.cs" />
     <Compile Remove="Samples\minimal\minimal.cs" />
     <Compile Remove="Samples\parameter-types\parameter_types.cs" />
@@ -43,6 +45,7 @@
     <None Remove="Samples\empty\empty.feature.ndjson" />
     <None Remove="Samples\examples-tables\examples_tables.feature" />
     <None Remove="Samples\examples-tables\examples_tables.feature.ndjson" />
+    <None Remove="Samples\ExternalBindingAssemblies\ExternalBinding.feature" />
     <None Remove="Samples\hooks\hooks.feature" />
     <None Remove="Samples\hooks\hooks.feature.ndjson" />
     <None Remove="Samples\minimal\minimal.feature" />
@@ -98,6 +101,9 @@
     <Content Include="Samples\examples-tables\examples_tables.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Samples\ExternalBindingAssemblies\ExternalBinding.feature" />
+    <EmbeddedResource Include="Samples\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
+    <EmbeddedResource Include="Samples\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
     <EmbeddedResource Include="Samples\hooks\hooks.cs" />
     <EmbeddedResource Include="Samples\hooks\hooks.feature" />
     <Content Include="Samples\hooks\hooks.feature.ndjson">
