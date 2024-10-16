@@ -9,7 +9,6 @@ using System.ComponentModel;
 using Reqnroll.TestProjectGenerator;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Reqnroll.TestProjectGenerator.Driver;
-using Reqnoll.CucumberMessage.FileSink.ReqnrollPlugin;
 using Moq;
 using Reqnroll.Tracing;
 using Reqnroll.EnvironmentAccess;
