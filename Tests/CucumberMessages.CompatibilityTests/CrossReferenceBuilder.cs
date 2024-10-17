@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CucumberMessages.CompatibilityTests
+namespace CucumberMessages.Tests
 {
     internal class CrossReferenceBuilder : CucumberMessage_TraversalVisitorBase
     {

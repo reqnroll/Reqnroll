@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CucumberMessages.CompatibilityTests
+namespace CucumberMessages.Tests
 {
     public class FluentAssertionsCustomStringComparisons : IEqualityComparer<string>
     {

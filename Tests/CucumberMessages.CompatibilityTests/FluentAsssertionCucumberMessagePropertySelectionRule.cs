@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 
-namespace CucumberMessages.CompatibilityTests
+namespace CucumberMessages.Tests
 {
     /// <summary>
     /// Fluent Asssertion Cucumber Message Property Selection Rule
