@@ -112,7 +112,16 @@ namespace Reqnroll.TestProjectGenerator.Factories
         {
             var configuration = new Configuration();
 
-            return new ProjectBuilder(_testProjectFolders, _featureFileGenerator, _bindingsGeneratorFactory, _configurationGeneratorFactory, configuration, _currentVersionDriver, _folders, _targetFrameworkMonikerStringBuilder);
+            return new ProjectBuilder(
+                _testProjectFolders,
+                _featureFileGenerator,
+                _bindingsGeneratorFactory,
+                _configurationGeneratorFactory,
+                configuration,
+                _currentVersionDriver,
+                _folders,
+                _targetFrameworkMonikerStringBuilder,
+                _testRunConfiguration.SourceGenerator);
         }
     }
 }

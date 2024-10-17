@@ -13,7 +13,7 @@ namespace Reqnroll.TestProjectGenerator
         public string ReqnrollVersion { get; set; }
         public string ReqnrollNuGetVersion { get; set; }
         public ConfigurationFormat ConfigurationFormat { get; set; }
-
+        public SourceGeneratorPlatform SourceGenerator { get; set; }
         public string ReqnrollAllowedNuGetVersion { get; set; }
     }
 }
