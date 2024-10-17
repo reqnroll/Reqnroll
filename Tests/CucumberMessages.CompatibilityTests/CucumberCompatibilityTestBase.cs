@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
+using Io.Cucumber.Messages.Types;
 using Moq;
 using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.SystemTests;
 using Reqnroll.Tracing;
@@ -12,7 +14,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace CucumberMessages.CompatibilityTests
+namespace CucumberMessages.Tests
 {
     public class CucumberCompatibilityTestBase : SystemTestBase
     {
@@ -138,6 +140,36 @@ namespace CucumberMessages.CompatibilityTests
             var file = Path.Combine(directory, v);
 
             File.Exists(file).Should().BeTrue(file, $"File {v} should exist");
+        }
+
+        protected void AddUtilClassWithFileSystemPath()
+        {
+            string location = AppContext.BaseDirectory;
+            AddBindingClass(
+                $"public class FileSystemPath {{  public static string GetFilePathForAttachments()  {{  return @\"{location}\\Samples\"; }}  }} ");
+        }
+
+        protected IEnumerable<Envelope> GetExpectedResults(string testName, string featureFileName)
+        {
+            var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..\\..\\..");
+            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "Samples", $"{testName}\\{featureFileName}.feature.ndjson"));
+
+            foreach (var json in expectedJsonText)
+            {
+                var e = NdjsonSerializer.Deserialize(json);
+                yield return e;
+            };
+        }
+
+        protected IEnumerable<Envelope> GetActualResults(string testName, string fileName)
+        {
+            string resultLocation = ActualsResultLocationDirectory();
+
+            // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
+
+            var actualJsonText = File.ReadAllLines(Path.Combine(resultLocation, $"{fileName}.ndjson"));
+
+            foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json);
         }
 
     }

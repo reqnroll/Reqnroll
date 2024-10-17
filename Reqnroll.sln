@@ -116,7 +116,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Resources", "Resources", "{
 		reqnroll.ico = reqnroll.ico
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CucumberMessages.CompatibilityTests", "Tests\CucumberMessages.CompatibilityTests\CucumberMessages.CompatibilityTests.csproj", "{5072F73C-8CDD-4B44-B3F8-4212F65C3708}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CucumberMessages.Tests", "Tests\CucumberMessages.CompatibilityTests\CucumberMessages.Tests.csproj", "{5072F73C-8CDD-4B44-B3F8-4212F65C3708}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

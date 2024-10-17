@@ -5,7 +5,7 @@ using FluentAssertions.Execution;
 using System.Reflection;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 
-namespace CucumberMessages.CompatibilityTests
+namespace CucumberMessages.Tests
 {
     public class CucumberMessagesValidator
     {
@@ -109,11 +109,11 @@ namespace CucumberMessages.CompatibilityTests
             else
                 actual = new List<T>();
 
-            expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList<T>(); ;
+            expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList(); ;
 
             if (!(typeof(T) == typeof(TestStepFinished)))
             {
-                actual.Should().BeEquivalentTo(expected, options => options.WithTracing(),"When comparing " + typeof(T).Name + "s");
+                actual.Should().BeEquivalentTo(expected, options => options.WithTracing(), "When comparing " + typeof(T).Name + "s");
             }
             else
             {
@@ -200,7 +200,7 @@ namespace CucumberMessages.CompatibilityTests
                 return;
             var testStepStarteds = actuals_elementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().ToList();
             var testStepFinisheds = actuals_elementsByType[typeof(TestStepFinished)].OfType<TestStepFinished>().ToList();
-            
+
             testCaseStartedIds.Should().Contain(id => testStepStarteds.Any(tss => tss.TestCaseStartedId == id), "a test case started should be referenced by at least one test step started message");
             testCaseStartedIds.Should().Contain(id => testStepFinisheds.Any(tsf => tsf.TestCaseStartedId == id), "a test case started should be referenced by at least one test step finished message");
         }
@@ -421,8 +421,8 @@ namespace CucumberMessages.CompatibilityTests
                                                                         {
                                                                             string subject = subjects[i];
                                                                             string expectation = expectations[i];
-                                                                            if ((subject.Length > 0 && subject[0] == '^') || (expectation.Length > 0 && expectation[0] == '^') ||
-                                                                                (subject.Length > 0 && subject[subject.Length - 1] == '$') || (expectation.Length > 0 && expectation[expectation.Length - 1] == '$'))
+                                                                            if (subject.Length > 0 && subject[0] == '^' || expectation.Length > 0 && expectation[0] == '^' ||
+                                                                                subject.Length > 0 && subject[subject.Length - 1] == '$' || expectation.Length > 0 && expectation[expectation.Length - 1] == '$')
                                                                             {
                                                                                 // If the first or last character is '^' or '$', remove it before comparing
                                                                                 subject = subject.Length > 0 && subject[0] == '^' ? subject.Substring(1) : subject;
