@@ -51,6 +51,7 @@ The following Visual Studio configuration shows a typical configuration.
 ```{code-block} json
 :caption: .vscode/settings.json
 {
+  "explorer.fileNesting.enabled": true,
   "explorer.fileNesting.patterns": {  // shows *.feature.cs files as nested items
     "*.feature": "${capture}.feature.cs"
   },
