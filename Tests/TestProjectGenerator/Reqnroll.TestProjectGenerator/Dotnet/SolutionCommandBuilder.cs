@@ -12,6 +12,6 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
 
         public static SolutionCommandBuilder Create(IOutputWriter outputWriter) => new SolutionCommandBuilder(outputWriter);
 
-        public AddProjectSolutionCommandBuilder AddProject() => new AddProjectSolutionCommandBuilder(_outputWriter);
+        public AddProjectSolutionCommandBuilder AddProject() => new StubAddProjectSolutionCommandBuilder(_outputWriter);
     }
 }
