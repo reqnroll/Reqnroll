@@ -194,7 +194,7 @@ namespace CucumberMessages.Tests
             CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
 
             // this test borrows a subset of a feature, the binding class, and the data file from ExternalData.ReqnrollPlugin.IntegrationTest
-            var content = _testFileManager.GetTestFileContent("products.csv", "CucumberMessages.CompatibilityTests", Assembly.GetExecutingAssembly());
+            var content = _testFileManager.GetTestFileContent("products.csv", "CucumberMessages.Tests", Assembly.GetExecutingAssembly());
             _projectsDriver.AddFile("products.csv", content);
             AddFeatureFile("""
                 Feature: External Data from CSV file
