@@ -81,7 +81,7 @@ namespace Reqnroll.EnvironmentAccess
 
         public string GetReqnrollVersion()
         {
-            return VersionInfo.AssemblyInformationalVersion;
+            return VersionInfo.NuGetVersion;
         }
         public string GetNetCoreVersion()
         {
