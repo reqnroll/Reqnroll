@@ -103,7 +103,7 @@ namespace CucumberMessages.Tests
         }
 
         [TestMethod]
-        public void SmokeTestMultipleFeatures()
+        public void SmokeTestMultipleFeaturesInParallel()
         {
             _projectsDriver.EnableTestParallelExecution();
             ResetCucumberMessages("SmokeTestMultipleFeatures.ndjson");

@@ -12,6 +12,7 @@ using System.Linq;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using System.Text;
+using System.Collections.Concurrent;
 
 
 namespace Reqnroll.CucumberMessages.PubSub
@@ -25,14 +26,15 @@ namespace Reqnroll.CucumberMessages.PubSub
     {
         private Task? fileWritingTask;
 
+        //Thread safe collections to hold:
+        // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
+        private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
 
         private ICucumberConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
         private ITraceListener? trace => traceListener.Value;
         private IObjectContainer? testThreadObjectContainer;
         private IObjectContainer? globalObjectContainer;
-        private FileStream? _fileStream;
-
 
         public FileOutputPlugin(ICucumberConfiguration configuration)
         {
@@ -63,13 +65,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             // The latter will close down the file stream.
             Dispose(true);
         }
-        private void CloseFileSink()
-        {
-            CloseStream(_fileStream!);
-            if (disposedValue) return;
-            fileWritingTask?.Wait();
-            fileWritingTask = null;
-        }
+
         private const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
@@ -83,25 +79,34 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
             string baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
             string fileName = SanitizeFileName(config.OutputFileName);
-            _fileStream = File.Create(Path.Combine(baseDirectory, fileName), TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
+            fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFilesBackgroundTask(baseDirectory, fileName), TaskCreationOptions.LongRunning);
+
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
         private static byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
         public void Publish(ReqnrollCucumberMessage message)
         {
-            if (message.Envelope != null)
-            {
-                NdjsonSerializer.SerializeToStream(_fileStream!, message.Envelope);
-                _fileStream!.Write(nl, 0, nl.Length);
-            }
+            postedMessages.Add(message);
         }
 
-        private void CloseStream(FileStream fileStream)
+        private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
         {
-            fileStream?.Flush();
-            fileStream?.Close();
-            fileStream?.Dispose();
+            using var fileStream = File.Create(Path.Combine(baseDirectory, fileName), TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
+
+            foreach (var message in postedMessages.GetConsumingEnumerable())
+            {
+                if (message.Envelope != null)
+                {
+                    NdjsonSerializer.SerializeToStream(fileStream!, message.Envelope);
+
+                    // Write a newline after each message, except for the last one
+                    if(message.Envelope.TestRunFinished == null)
+                        fileStream!.Write(nl, 0, nl.Length);
+                }
+            }
+
         }
+
         private bool disposedValue = false;
 
         protected virtual void Dispose(bool disposing)
@@ -110,7 +115,10 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 if (disposing)
                 {
-                    CloseFileSink();
+                    postedMessages.CompleteAdding();
+                    fileWritingTask?.Wait();
+                    fileWritingTask = null;
+                    postedMessages.Dispose();
                 }
                 disposedValue = true;
             }
