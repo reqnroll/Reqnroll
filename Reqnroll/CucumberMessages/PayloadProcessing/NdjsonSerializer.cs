@@ -57,7 +57,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             return JsonSerializer.Deserialize<T>(json, JsonOptions)!;
         }
 
-        public static void SerializeToStream(FileStream fs, Envelope message)
+        public static void SerializeToStream(Stream fs, Envelope message)
         {
             JsonSerializer.Serialize<Envelope>(fs, message, JsonOptions);
         }

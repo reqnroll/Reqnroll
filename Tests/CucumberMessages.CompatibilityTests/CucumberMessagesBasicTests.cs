@@ -105,6 +105,7 @@ namespace CucumberMessages.Tests
         [TestMethod]
         public void SmokeTestMultipleFeatures()
         {
+            _projectsDriver.EnableTestParallelExecution();
             ResetCucumberMessages("SmokeTestMultipleFeatures.ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName("SmokeTestMultipleFeatures.ndjson");
@@ -120,7 +121,6 @@ namespace CucumberMessages.Tests
                   Scenario: Eating Other Cukes
                      When I eat 6 cukes
                 """);
-
             AddPassingStepBinding("When");
             ExecuteTests();
 
