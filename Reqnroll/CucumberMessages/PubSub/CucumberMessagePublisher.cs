@@ -14,6 +14,7 @@ using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.CucumberMessages.Configuration;
 using Gherkin.CucumberMessages;
 using Reqnroll.Bindings;
+using System.Threading.Tasks;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -25,7 +26,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// 
     /// It uses the IRuntimePlugin interface to force the runtime to load it during startup (although it is not an external plugin per se).
     /// </summary>
-    public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin, IExecutionEventListener
+    public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin, IAsyncExecutionEventListener
     {
         private Lazy<ICucumberMessageBroker> _brokerFactory;
         private ICucumberMessageBroker _broker;
@@ -67,42 +68,42 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
         {
-            testThreadEventPublisher.AddListener(this);
+            testThreadEventPublisher.AddAsyncListener(this);
         }
 
-        public void OnEvent(IExecutionEvent executionEvent)
+        public async Task OnEventAsync(IExecutionEvent executionEvent)
         {
             switch (executionEvent)
             {
                 case FeatureStartedEvent featureStartedEvent:
-                    FeatureStartedEventHandler(featureStartedEvent);
+                    await FeatureStartedEventHandler(featureStartedEvent);
                     break;
                 case FeatureFinishedEvent featureFinishedEvent:
-                    FeatureFinishedEventHandler(featureFinishedEvent);
+                    await FeatureFinishedEventHandler(featureFinishedEvent);
                     break;
                 case ScenarioStartedEvent scenarioStartedEvent:
-                    ScenarioStartedEventHandler(scenarioStartedEvent);
+                    await ScenarioStartedEventHandler(scenarioStartedEvent);
                     break;
                 case ScenarioFinishedEvent scenarioFinishedEvent:
-                    ScenarioFinishedEventHandler(scenarioFinishedEvent);
+                    await ScenarioFinishedEventHandler(scenarioFinishedEvent);
                     break;
                 case StepStartedEvent stepStartedEvent:
-                    StepStartedEventHandler(stepStartedEvent);
+                    await StepStartedEventHandler(stepStartedEvent);
                     break;
                 case StepFinishedEvent stepFinishedEvent:
-                    StepFinishedEventHandler(stepFinishedEvent);
+                    await StepFinishedEventHandler(stepFinishedEvent);
                     break;
                 case HookBindingStartedEvent hookBindingStartedEvent:
-                    HookBindingStartedEventHandler(hookBindingStartedEvent);
+                    await HookBindingStartedEventHandler(hookBindingStartedEvent);
                     break;
                 case HookBindingFinishedEvent hookBindingFinishedEvent:
-                    HookBindingFinishedEventHandler(hookBindingFinishedEvent);
+                    await HookBindingFinishedEventHandler(hookBindingFinishedEvent);
                     break;
                 case AttachmentAddedEvent attachmentAddedEvent:
-                    AttachmentAddedEventHandler(attachmentAddedEvent);
+                    await AttachmentAddedEventHandler(attachmentAddedEvent);
                     break;
                 case OutputAddedEvent outputAddedEvent:
-                    OutputAddedEventHandler(outputAddedEvent);
+                    await OutputAddedEventHandler(outputAddedEvent);
                     break;
                 default:
                     break;
@@ -137,7 +138,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         }
 
 
-        private void FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
+        private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             _broker = _brokerFactory.Value;
             var traceListener = objectContainer.Resolve<ITraceListener>();
@@ -163,12 +164,12 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 foreach (var msg in ft.StaticMessages)
                 {
-                    _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                    await _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
                 }
             }
         }
 
-        private void FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
+        private async Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
             // For this and subsequent events, we pull up the FeatureTracker by feature name.
             // If the feature name is not avaiable (such as might be the case in certain test setups), we ignore the event.
@@ -182,13 +183,13 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
             var featureTracker = StartedFeatures[featureName];
-            featureTracker.ProcessEvent(featureFinishedEvent);
+            await featureTracker.ProcessEvent(featureFinishedEvent);
 
             // throw an exception if any of the TestCaseCucumberMessageTrackers are not done?
 
         }
 
-        private void ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
+        private async Task ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
         {
             var featureName = scenarioStartedEvent.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
@@ -198,7 +199,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 if (featureTracker.Enabled)
                 {
-                    featureTracker.ProcessEvent(scenarioStartedEvent);
+                    await featureTracker.ProcessEvent(scenarioStartedEvent);
                 }
                 else
                 {
@@ -212,7 +213,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
         }
 
-        private void ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
+        private async Task ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             var featureName = scenarioFinishedEvent.FeatureContext?.FeatureInfo?.Title;
 
@@ -220,14 +221,14 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                foreach (var msg in featureTracker.ProcessEvent(scenarioFinishedEvent))
+                foreach (var msg in await featureTracker.ProcessEvent(scenarioFinishedEvent))
                 {
-                    _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                    await _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
                 }
             }
         }
 
-        private void StepStartedEventHandler(StepStartedEvent stepStartedEvent)
+        private async Task StepStartedEventHandler(StepStartedEvent stepStartedEvent)
         {
             var featureName = stepStartedEvent.FeatureContext?.FeatureInfo?.Title;
 
@@ -236,11 +237,11 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                featureTracker.ProcessEvent(stepStartedEvent);
+                await featureTracker.ProcessEvent(stepStartedEvent);
             }
         }
 
-        private void StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
+        private async Task StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
         {
             var featureName = stepFinishedEvent.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
@@ -248,11 +249,11 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                featureTracker.ProcessEvent(stepFinishedEvent);
+                await featureTracker.ProcessEvent(stepFinishedEvent);
             }
         }
 
-        private void HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
+        private async Task HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
         {
             var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
@@ -260,11 +261,11 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                featureTracker.ProcessEvent(hookBindingStartedEvent);
+                await featureTracker.ProcessEvent(hookBindingStartedEvent);
             }
         }
 
-        private void HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
+        private async Task HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
             var featureName = hookBindingFinishedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
@@ -272,11 +273,11 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                featureTracker.ProcessEvent(hookBindingFinishedEvent);
+                await featureTracker.ProcessEvent(hookBindingFinishedEvent);
             }
         }
 
-        private void AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
+        private async Task AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
         {
             var featureName = attachmentAddedEvent.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
@@ -284,11 +285,11 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                featureTracker.ProcessEvent(attachmentAddedEvent);
+                await featureTracker.ProcessEvent(attachmentAddedEvent);
             }
         }
 
-        private void OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
+        private async Task OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
         {
             var featureName = outputAddedEvent.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
@@ -296,7 +297,7 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                featureTracker.ProcessEvent(outputAddedEvent);
+                await featureTracker.ProcessEvent(outputAddedEvent);
             }
         }
     }

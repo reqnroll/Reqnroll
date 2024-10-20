@@ -84,9 +84,9 @@ namespace Reqnroll.CucumberMessages.PubSub
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
         private static byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
-        public void Publish(ReqnrollCucumberMessage message)
+        public async Task Publish(ReqnrollCucumberMessage message)
         {
-            postedMessages.Add(message);
+            await Task.Run( () => postedMessages.Add(message));
         }
 
         private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
