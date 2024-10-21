@@ -5,6 +5,7 @@
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
 
+    <PackageId>Reqnroll.Windsor</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Windsor.nuspec</NuspecFile>
   </PropertyGroup>

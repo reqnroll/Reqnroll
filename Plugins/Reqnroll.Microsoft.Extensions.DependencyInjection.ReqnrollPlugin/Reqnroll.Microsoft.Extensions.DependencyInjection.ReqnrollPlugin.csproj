@@ -5,6 +5,7 @@
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
 
+    <PackageId>Reqnroll.Microsoft.Extensions.DependencyInjection</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Microsoft.Extensions.DependencyInjection.nuspec</NuspecFile>
     
