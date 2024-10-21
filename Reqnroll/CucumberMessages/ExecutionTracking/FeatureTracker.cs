@@ -165,7 +165,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             FeatureExecutionSuccess = testCases.All(tc => tc.Finished) switch
             {
                 true => testCases.All(tc => tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK),
-                _ => true
+                _ => false
             };
         }
 
