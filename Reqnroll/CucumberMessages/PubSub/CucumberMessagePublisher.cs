@@ -126,18 +126,25 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             SharedIDGenerator = IdGeneratorFactory.Create(CucumberConfiguration.Current.IDGenerationStyle);
 
-            _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now)) });
-            _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = CucumberMessageFactory.ToMeta(args.ObjectContainer) });
+            Task.Run(async () =>
+            {
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now)) });
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = CucumberMessageFactory.ToMeta(args.ObjectContainer) });
+            }).Wait();
         }
         private void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs e)
         {
             if (!Enabled)
                 return;
             var status = StartedFeatures.Values.All(f => f.FeatureExecutionSuccess);
-            _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now)) });
+            
+            Task.Run(async () => 
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now)) })).Wait();
         }
 
-
+        #region TestThreadExecutionEventPublisher Event Handling Methods
+        // The following methods handle the events published by the TestThreadExecutionEventPublisher
+        // When one of these calls the Broker, that method is async; otherwise these are sync methods that return a completed Task (to allow them to be called async from the TestThreadExecutionEventPublisher)
         private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             _broker = _brokerFactory.Value;
@@ -164,46 +171,46 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 foreach (var msg in ft.StaticMessages)
                 {
-                    await _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
                 }
             }
         }
 
-        private async Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
+        private Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
         {
             // For this and subsequent events, we pull up the FeatureTracker by feature name.
             // If the feature name is not avaiable (such as might be the case in certain test setups), we ignore the event.
             var featureName = featureFinishedEvent.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
             {
-                return;
+                return Task.CompletedTask;
             }
             if (!StartedFeatures.ContainsKey(featureName) || !StartedFeatures[featureName].Enabled)
             {
-                return;
+                return Task.CompletedTask;
             }
             var featureTracker = StartedFeatures[featureName];
-            await featureTracker.ProcessEvent(featureFinishedEvent);
-
+            featureTracker.ProcessEvent(featureFinishedEvent);
+            return Task.CompletedTask;
             // throw an exception if any of the TestCaseCucumberMessageTrackers are not done?
 
         }
 
-        private async Task ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
+        private Task ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
         {
             var featureName = scenarioStartedEvent.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
             var traceListener = objectContainer.Resolve<ITraceListener>();
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 if (featureTracker.Enabled)
                 {
-                    await featureTracker.ProcessEvent(scenarioStartedEvent);
+                    featureTracker.ProcessEvent(scenarioStartedEvent);
                 }
                 else
                 {
-                    return;
+                    return Task.CompletedTask;
                 }
             }
             else
@@ -211,6 +218,8 @@ namespace Reqnroll.CucumberMessages.PubSub
                 traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} FeatureTracker not available");
                 throw new ApplicationException("FeatureTracker not available");
             }
+
+            return Task.CompletedTask;
         }
 
         private async Task ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
@@ -221,84 +230,97 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                foreach (var msg in await featureTracker.ProcessEvent(scenarioFinishedEvent))
+                foreach (var msg in featureTracker.ProcessEvent(scenarioFinishedEvent))
                 {
-                    await _broker.Publish(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
                 }
             }
         }
 
-        private async Task StepStartedEventHandler(StepStartedEvent stepStartedEvent)
+        private Task StepStartedEventHandler(StepStartedEvent stepStartedEvent)
         {
             var featureName = stepStartedEvent.FeatureContext?.FeatureInfo?.Title;
 
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                await featureTracker.ProcessEvent(stepStartedEvent);
+                featureTracker.ProcessEvent(stepStartedEvent);
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
+        private Task StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
         {
             var featureName = stepFinishedEvent.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                await featureTracker.ProcessEvent(stepFinishedEvent);
+                featureTracker.ProcessEvent(stepFinishedEvent);
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
+        private Task HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
         {
             var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                await featureTracker.ProcessEvent(hookBindingStartedEvent);
+                featureTracker.ProcessEvent(hookBindingStartedEvent);
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
+        private Task HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
             var featureName = hookBindingFinishedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                await featureTracker.ProcessEvent(hookBindingFinishedEvent);
+                featureTracker.ProcessEvent(hookBindingFinishedEvent);
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
+        private Task AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
         {
             var featureName = attachmentAddedEvent.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                await featureTracker.ProcessEvent(attachmentAddedEvent);
+                featureTracker.ProcessEvent(attachmentAddedEvent);
             }
+
+            return Task.CompletedTask;
         }
 
-        private async Task OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
+        private Task OutputAddedEventHandler(OutputAddedEvent outputAddedEvent)
         {
             var featureName = outputAddedEvent.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                await featureTracker.ProcessEvent(outputAddedEvent);
+                featureTracker.ProcessEvent(outputAddedEvent);
             }
+
+            return Task.CompletedTask;
         }
+        #endregion
     }
 }

@@ -84,7 +84,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
         private static byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
-        public async Task Publish(ReqnrollCucumberMessage message)
+        public async Task PublishAsync(ReqnrollCucumberMessage message)
         {
             await Task.Run( () => postedMessages.Add(message));
         }
@@ -130,7 +130,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             Dispose(disposing: true);
             GC.SuppressFinalize(this);
         }
-        public static string SanitizeFileName(string input)
+        private static string SanitizeFileName(string input)
         {
             if (string.IsNullOrEmpty(input))
                 return string.Empty;

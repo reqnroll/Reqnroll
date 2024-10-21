@@ -16,7 +16,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     public interface ICucumberMessageBroker
     {
         bool Enabled { get; }
-        Task Publish(ReqnrollCucumberMessage featureMessages);
+        Task PublishAsync(ReqnrollCucumberMessage featureMessages);
     }
 
     /// <summary>
@@ -38,11 +38,11 @@ namespace Reqnroll.CucumberMessages.PubSub
             _objectContainer = objectContainer;
             RegisteredSinks = new Lazy<IEnumerable<ICucumberMessageSink>>(() => _objectContainer.ResolveAll<ICucumberMessageSink>());
         }
-        public async Task Publish(ReqnrollCucumberMessage message)
+        public async Task PublishAsync(ReqnrollCucumberMessage message)
         {
             foreach (var sink in RegisteredSinks.Value)
             {
-                await sink.Publish(message);
+                await sink.PublishAsync(message);
             }
         }
 
