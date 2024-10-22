@@ -25,6 +25,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
     /// </summary>
     internal class GherkinDocumentIDReWriter : CucumberMessage_TraversalVisitorBase
     {
+        internal static object _sharedLockObject = new();
+
         private IIdGenerator _idGenerator;
         public Dictionary<string, string> IdMap = new();
         public GherkinDocumentIDReWriter(IIdGenerator idGenerator)
@@ -46,16 +48,24 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
 
                     case (false, IDGenerationStyle.Incrementing):
                         var lastId = ProbeForLastUsedId(document);
-                        ((SeedableIncrementingIdGenerator)_idGenerator).SetSeed(lastId);
+                        var anotherThreadSetTheSeed = false;
+                        lock (_sharedLockObject)
+                        {
+                            if (((SeedableIncrementingIdGenerator)_idGenerator).HasBeenUsed)
+                                anotherThreadSetTheSeed = true;
+                            else
+                            {
+                                ((SeedableIncrementingIdGenerator)_idGenerator).SetSeed(lastId);
+                            }
+                        }
+
+                        if (anotherThreadSetTheSeed)
+                            return ReWrite(document);
                         return document;
                 }
             }
             // else targetStyle is IDGenerationStyle.UUID
-            if (existingIdStyle == IDGenerationStyle.UUID)
-                return document;
-
-            // else existingIdStyle is IDGenerationStyle.Incrementing
-            return ReWrite(document);
+            return document;
         }
 
         private GherkinDocument ReWrite(GherkinDocument document)
