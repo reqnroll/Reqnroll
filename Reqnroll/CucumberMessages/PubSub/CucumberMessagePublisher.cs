@@ -158,12 +158,17 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
+            // The following should be thread safe when multiple instances of the Test Class are running in parallel. 
+            // If StartedFeatures.ContainsKey returns true, then we know another instance of this Feature class has already started. We don't need a second instance of the 
+            // FeatureTracker, and we don't want multiple copies of the static messages to be published.
             if (StartedFeatures.ContainsKey(featureName))
             {
                 // Already started, don't repeat the following steps
                 return;
             }
 
+            // Creating multiple copies of the same FeatureTracker is safe as it causes no side-effects.
+            // If two or more threads are running this code simultaneously, all but one of them will get created but then will be ignored.
             var ft = new FeatureTracker(featureStartedEvent, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
 
             // This will add a FeatureTracker to the StartedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.

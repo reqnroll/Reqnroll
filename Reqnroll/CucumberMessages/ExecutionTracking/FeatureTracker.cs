@@ -157,6 +157,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         }
 
         // When the FeatureFinished event fires, we calculate the Feature-level Execution Status
+        // If Scenarios are running in parallel, this event will fire multiple times (once per each instance of the test class).
+        // Running this method multiple times is harmless. The FeatureExecutionSuccess property is only consumed upon the TestRunComplete event (ie, only once).
         public void ProcessEvent(FeatureFinishedEvent featureFinishedEvent)
         {
             var testCases = testCaseTrackersById.Values.ToList();
