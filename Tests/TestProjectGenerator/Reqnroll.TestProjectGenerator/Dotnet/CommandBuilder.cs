@@ -6,19 +6,19 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
 {
     public class CommandBuilder
     {
-        private readonly IOutputWriter _outputWriter;
-        private readonly string _workingDirectory;
+        protected readonly IOutputWriter _outputWriter;
 
         public CommandBuilder(IOutputWriter outputWriter, string executablePath, string argumentsFormat, string workingDirectory)
         {
             _outputWriter = outputWriter;
-            _workingDirectory = workingDirectory;
+            WorkingDirectory = workingDirectory;
             ExecutablePath = executablePath;
             ArgumentsFormat = argumentsFormat;
         }
 
         public string ArgumentsFormat { get; }
         public string ExecutablePath { get; }
+        public string WorkingDirectory { get; }
 
         public CommandResult ExecuteWithRetry(int times, TimeSpan interval, Func<Exception, Exception> exceptionFunction)
         {
@@ -45,11 +45,11 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
             return Execute(innerException => new Exception($"Error while executing {ExecutablePath} {ArgumentsFormat}", innerException));
         }
 
-        public CommandResult Execute(Func<Exception, Exception> exceptionFunction) 
+        public virtual CommandResult Execute(Func<Exception, Exception> exceptionFunction) 
         {
             var solutionCreateProcessHelper = new ProcessHelper();
 
-            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, _workingDirectory, ExecutablePath, ArgumentsFormat);
+            var processResult = solutionCreateProcessHelper.RunProcess(_outputWriter, WorkingDirectory, ExecutablePath, ArgumentsFormat);
             if (processResult.ExitCode != 0)
             {
                 var innerException = new Exception(processResult.CombinedOutput);

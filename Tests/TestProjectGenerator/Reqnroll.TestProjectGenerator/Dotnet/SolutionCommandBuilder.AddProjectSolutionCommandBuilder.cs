@@ -7,8 +7,8 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
     {
         public class AddProjectSolutionCommandBuilder : BaseCommandBuilder
         {
-            private string _solutionPath;
-            private string _projectPath;
+            protected string _solutionPath;
+            protected string _projectPath;
 
          
             public AddProjectSolutionCommandBuilder ToSolution(string solutionPath)
