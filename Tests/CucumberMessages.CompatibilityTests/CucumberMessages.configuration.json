@@ -1,0 +1,12 @@
+﻿{
+    "fileOutputEnabled": true,
+    "activeProfileName": "LOCAL",
+    "profiles": [
+        {
+            "profileName": "LOCAL",
+            "basePath": "C:\\Users\\clrud\\source\\repos\\scratch",
+            "outputDirectory": "CucumberMessages", 
+            "IDGenerationStyle":  "INCREMENTING"
+        }
+    ]
+}
