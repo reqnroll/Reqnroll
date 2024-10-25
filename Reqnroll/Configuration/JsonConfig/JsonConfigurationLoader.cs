@@ -15,6 +15,21 @@ namespace Reqnroll.Configuration.JsonConfig
 
             var jsonConfig = jsonContent.FromJson<JsonConfig>();
 
+            var configuration = ApplyJsonConfig(reqnrollConfiguration, jsonConfig);
+            configuration.ConfigSourceText = jsonContent;
+
+            return configuration;
+        }
+
+        public ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration, JsonConfig jsonConfig)
+        {
+            var configuration = ApplyJsonConfig(reqnrollConfiguration, jsonConfig);
+            configuration.ConfigSourceText = jsonConfig.ToJson();
+            return configuration;
+
+        }
+        private static ReqnrollConfiguration ApplyJsonConfig(ReqnrollConfiguration reqnrollConfiguration, JsonConfig jsonConfig)
+        {
             var containerRegistrationCollection = reqnrollConfiguration.CustomDependencies;
             var generatorContainerRegistrationCollection = reqnrollConfiguration.GeneratorCustomDependencies;
             var featureLanguage = reqnrollConfiguration.FeatureLanguage;
@@ -122,10 +137,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 addNonParallelizableMarkerForTags,
                 obsoleteBehavior,
                 coloredOutput
-            )
-            {
-                ConfigSourceText = jsonContent
-            };
+            );
         }
     }
 }

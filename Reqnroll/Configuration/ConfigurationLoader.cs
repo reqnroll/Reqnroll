@@ -137,9 +137,9 @@ namespace Reqnroll.Configuration
 
         private ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration)
         {
-            var jsonContent = File.ReadAllText(_reqnrollJsonLocator.GetReqnrollJsonFilePath());
+            var jsonFilePath = _reqnrollJsonLocator.GetReqnrollJsonFilePath();
 
-            return LoadJson(reqnrollConfiguration, jsonContent);
+            return new MSE_RuntimeConfigurationLoader().LoadConfiguration(reqnrollConfiguration, jsonFilePath);
         }
 
         private ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration, string jsonContent)
