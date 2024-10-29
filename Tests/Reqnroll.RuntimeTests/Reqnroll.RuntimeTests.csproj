@@ -14,16 +14,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Configuration\reqnroll_config_test.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="Configuration\reqnroll_config_test.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
 
@@ -48,6 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Configuration\reqnroll_config_test.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="xunit.runner.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
