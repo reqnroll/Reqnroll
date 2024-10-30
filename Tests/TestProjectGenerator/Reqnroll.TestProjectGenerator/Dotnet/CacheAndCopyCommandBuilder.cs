@@ -24,7 +24,7 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
     {
         var targetPathInfo = new DirectoryInfo(_targetPath);
         var directoryName = targetPathInfo.Name;
-        string argsCleaned = ArgumentsFormat.Replace(_targetPath, "").Replace(" ", "").Replace("\"", "")+directoryName;
+        string argsCleaned = ArgumentsFormat.Replace(_targetPath, "").Replace(" ", "").Replace("\"", "").Replace("/", "") + directoryName;
         if (_nameToReplace != null)
         {
             argsCleaned = argsCleaned.Replace(_nameToReplace, TemplateName);
