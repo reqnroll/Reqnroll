@@ -29,11 +29,12 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
         // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
         public IIdGenerator IDGenerator { get; set; }
+        public string TestRunStartedId { get; }
 
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
         // This dictionary is shared across all Features (via the Publisher)
-        // The same is true of hte StepTransformations and StepDefinitionBindings used for Undefined Parameter Types
+        // The same is true of the StepTransformations and StepDefinitionBindings used for Undefined Parameter Types
         internal ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
         private ConcurrentBag<IStepArgumentTransformationBinding> StepTransformRegistry;
         private ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypes;
@@ -51,8 +52,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public bool FeatureExecutionSuccess { get; private set; }
 
         // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
-        public FeatureTracker(FeatureStartedEvent featureStartedEvent, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns, ConcurrentBag<IStepArgumentTransformationBinding> stepTransformRegistry, ConcurrentBag<IStepDefinitionBinding> undefinedParameterTypes)
+        public FeatureTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns, ConcurrentBag<IStepArgumentTransformationBinding> stepTransformRegistry, ConcurrentBag<IStepDefinitionBinding> undefinedParameterTypes)
         {
+            TestRunStartedId = testRunStartedId;
             StepDefinitionsByPattern = stepDefinitionPatterns;
             StepTransformRegistry = stepTransformRegistry;
             UndefinedParameterTypes = undefinedParameterTypes;
@@ -95,54 +97,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 yield return Envelope.Create(pickle);
             }
 
-            var bindingRegistry = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IBindingRegistry>();
-
-            foreach (var stepTransform in bindingRegistry.GetStepTransformations())
-            {
-                if (StepTransformRegistry.Contains(stepTransform))
-                    continue;
-                StepTransformRegistry.Add(stepTransform);
-                var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, IDGenerator);
-                yield return Envelope.Create(parameterType);
-            }
-
-            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => !sd.IsValid))
-            {
-                var errmsg = binding.ErrorMessage;
-                if (errmsg.Contains("Undefined parameter type"))
-                {
-                    var paramName = Regex.Match(errmsg, "Undefined parameter type '(.*)'").Groups[1].Value;
-                    if (UndefinedParameterTypes.Contains(binding))
-                        continue;
-                    UndefinedParameterTypes.Add(binding);
-                    var undefinedParameterType = CucumberMessageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, IDGenerator);
-                    yield return Envelope.Create(undefinedParameterType);
-                }
-            }
-
-            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
-            {
-                var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
-                if (StepDefinitionsByPattern.ContainsKey(pattern))
-                    continue;
-                var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, IDGenerator);
-                if (StepDefinitionsByPattern.TryAdd(pattern, stepDefinition.Id))
-                {
-                    yield return Envelope.Create(stepDefinition);
-                }
-            }
-
-            foreach (var hookBinding in bindingRegistry.GetHooks())
-            {
-                var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
-                if (StepDefinitionsByPattern.ContainsKey(hookId))
-                    continue;
-                var hook = CucumberMessageFactory.ToHook(hookBinding, IDGenerator);
-                if (StepDefinitionsByPattern.TryAdd(hookId, hook.Id))
-                {
-                    yield return Envelope.Create(hook);
-                };
-            }
         }
 
         // This method is used to identify the last ID generated from the set generated during code gen. 

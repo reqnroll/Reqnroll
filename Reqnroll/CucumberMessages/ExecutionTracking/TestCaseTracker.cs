@@ -20,6 +20,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     {
         public TestCaseTracker(FeatureTracker featureTracker, string pickleId)
         {
+            TestRunStartedId = featureTracker.TestRunStartedId;
             PickleId = pickleId;
             FeatureName = featureTracker.FeatureName;
             Enabled = featureTracker.Enabled;
@@ -30,6 +31,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
         public string FeatureName { get; set; }
+        public string TestRunStartedId { get; }
         public string PickleId { get; set; } = string.Empty;
         public string TestCaseId { get; set; }
         public string TestCaseStartedId { get; private set; }
@@ -218,9 +220,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void PreProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
         {
-            // At this point we only care about hooks that wrap scenarios or steps
-            if (hookBindingStartedEvent.HookBinding.HookType == HookType.AfterFeature || hookBindingStartedEvent.HookBinding.HookType == HookType.BeforeFeature
-                || hookBindingStartedEvent.HookBinding.HookType == HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == HookType.AfterTestRun)
+            // At this point we only care about hooks that wrap scenarios or steps; Before/AfterTestRun hooks were processed earlier by the Publisher
+            if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature)
                 return;
             var step = new HookStepTracker(this);
             step.ProcessEvent(hookBindingStartedEvent);
@@ -237,9 +238,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void PreProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
-            // At this point we only care about hooks that wrap scenarios or steps
-            if (hookBindingFinishedEvent.HookBinding.HookType == HookType.AfterFeature || hookBindingFinishedEvent.HookBinding.HookType == HookType.BeforeFeature
-                || hookBindingFinishedEvent.HookBinding.HookType == HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == HookType.AfterTestRun)
+            // At this point we only care about hooks that wrap scenarios or steps; TestRunHooks were processed earlier by the Publisher
+            if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature)
                 return;
 
             var step = FindMatchingHookStartedEvent(hookBindingFinishedEvent);

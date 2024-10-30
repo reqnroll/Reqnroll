@@ -15,6 +15,8 @@ using Reqnroll.CucumberMessages.Configuration;
 using Gherkin.CucumberMessages;
 using Reqnroll.Bindings;
 using System.Threading.Tasks;
+using Reqnroll.EnvironmentAccess;
+using System.Text.RegularExpressions;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -43,8 +45,11 @@ namespace Reqnroll.CucumberMessages.PubSub
         private ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypeBindings = new();
         public IIdGenerator SharedIDGenerator { get; private set; }
 
-
+        private string _testRunStartedId;
         bool Enabled = false;
+
+        // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
+        private readonly ConcurrentDictionary<string, TestRunHookTracker> TestRunHookTrackers = new();
 
         public CucumberMessagePublisher()
         {
@@ -125,12 +130,69 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
 
             SharedIDGenerator = IdGeneratorFactory.Create(CucumberConfiguration.Current.IDGenerationStyle);
+            _testRunStartedId = SharedIDGenerator.GetNewId();
 
             Task.Run(async () =>
             {
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now)) });
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now, _testRunStartedId)) });
                 await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = CucumberMessageFactory.ToMeta(args.ObjectContainer) });
+                foreach (var msg in PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer))
+                {
+                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = msg });
+                }
             }).Wait();
+        }
+        private IEnumerable<Envelope> PopulateBindingCachesAndGenerateBindingMessages(IObjectContainer objectContainer)
+        {
+            var bindingRegistry = objectContainer.Resolve<IBindingRegistry>();
+
+            foreach (var stepTransform in bindingRegistry.GetStepTransformations())
+            {
+                if (StepArgumentTransforms.Contains(stepTransform))
+                    continue;
+                StepArgumentTransforms.Add(stepTransform);
+                var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, SharedIDGenerator);
+                yield return Envelope.Create(parameterType);
+            }
+
+            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => !sd.IsValid))
+            {
+                var errmsg = binding.ErrorMessage;
+                if (errmsg.Contains("Undefined parameter type"))
+                {
+                    var paramName = Regex.Match(errmsg, "Undefined parameter type '(.*)'").Groups[1].Value;
+                    if (UndefinedParameterTypeBindings.Contains(binding))
+                        continue;
+                    UndefinedParameterTypeBindings.Add(binding);
+                    var undefinedParameterType = CucumberMessageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, SharedIDGenerator);
+                    yield return Envelope.Create(undefinedParameterType);
+                }
+            }
+
+            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
+            {
+                var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
+                if (StepDefinitionsByPattern.ContainsKey(pattern))
+                    continue;
+                var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, SharedIDGenerator);
+                if (StepDefinitionsByPattern.TryAdd(pattern, stepDefinition.Id))
+                {
+                    yield return Envelope.Create(stepDefinition);
+                }
+            }
+
+            foreach (var hookBinding in bindingRegistry.GetHooks())
+            {
+                var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
+                if (StepDefinitionsByPattern.ContainsKey(hookId))
+                    continue;
+                var hook = CucumberMessageFactory.ToHook(hookBinding, SharedIDGenerator);
+                if (StepDefinitionsByPattern.TryAdd(hookId, hook.Id))
+                {
+                    yield return Envelope.Create(hook);
+                };
+            }
+
         }
         private void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs e)
         {
@@ -139,7 +201,8 @@ namespace Reqnroll.CucumberMessages.PubSub
             var status = StartedFeatures.Values.All(f => f.FeatureExecutionSuccess);
             
             Task.Run(async () => 
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now)) })).Wait();
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now, _testRunStartedId)) })
+                ).Wait();
         }
 
         #region TestThreadExecutionEventPublisher Event Handling Methods
@@ -169,7 +232,7 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             // Creating multiple copies of the same FeatureTracker is safe as it causes no side-effects.
             // If two or more threads are running this code simultaneously, all but one of them will get created but then will be ignored.
-            var ft = new FeatureTracker(featureStartedEvent, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
+            var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
 
             // This will add a FeatureTracker to the StartedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.
             if (StartedFeatures.TryAdd(featureName, ft) && ft.Enabled)
@@ -271,32 +334,51 @@ namespace Reqnroll.CucumberMessages.PubSub
             return Task.CompletedTask;
         }
 
-        private Task HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
+        private async Task HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
         {
+            if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun)
+            {
+                string hookId = SharedIDGenerator.GetNewId();
+                var hookTracker = new TestRunHookTracker(hookId, hookBindingStartedEvent, _testRunStartedId);
+                TestRunHookTrackers.TryAdd(hookTracker.HookBindingSignature, hookTracker);
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testRunHook", Envelope = CucumberMessageFactory.ToTestRunHookStarted(hookTracker) });
+                return;
+            }
+
             var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
+                return;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(hookBindingStartedEvent);
             }
 
-            return Task.CompletedTask;
+            return;
         }
 
-        private Task HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
+        private async Task HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
+            if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun)
+            {
+                var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
+                if (!TestRunHookTrackers.TryGetValue(signature, out var hookTracker))
+                    return;
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testRunHook", Envelope = CucumberMessageFactory.ToTestRunHookFinished(hookTracker) });
+                return;
+            }
+
+
             var featureName = hookBindingFinishedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
+                return;
 
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 featureTracker.ProcessEvent(hookBindingFinishedEvent);
             }
 
-            return Task.CompletedTask;
+            return;
         }
 
         private Task AttachmentAddedEventHandler(AttachmentAddedEvent attachmentAddedEvent)
