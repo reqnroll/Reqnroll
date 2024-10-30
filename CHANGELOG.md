@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Upgrade to Gherkin v30 from v29 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#305)
 
 ## Bug fixes:
 
