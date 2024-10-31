@@ -43,9 +43,17 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 ? new NetCoreSdkInfo(solution.SdkVersion) 
                 : _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
 
+            if (targetFramework != 0 && sdk != null)
+            {
+                var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
+
+                var globalJsonFile = globalJsonBuilder.ToProjectFile();
+                _fileWriter.Write(globalJsonFile, outputPath);
+            }
+
             DisableUsingSdkFromEnvironmentVariable();
 
-            var createSolutionCommand = DotNet.New(_outputWriter).Solution().InFolder(outputPath).WithName(solution.Name).Build();
+            var createSolutionCommand = DotNet.New(_outputWriter, sdk).Solution().InFolder(outputPath).WithName(solution.Name).Build();
             createSolutionCommand.ExecuteWithRetry(1, TimeSpan.FromSeconds(1), (innerException) =>
             {
                 if (innerException is AggregateException aggregateException && aggregateException.InnerExceptions.Any(x => x.InnerException.Message.Contains("Install the [" + sdk.Version)))
@@ -54,7 +62,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             });
             string solutionFilePath = Path.Combine(outputPath, $"{solution.Name}.sln");
 
-            WriteProjects(solution, outputPath, solutionFilePath);
+            WriteProjects(sdk, solution, outputPath, solutionFilePath);
 
             if (solution.NugetConfig != null)
             {
@@ -64,14 +72,6 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             foreach (var file in solution.Files)
             {
                 _fileWriter.Write(file, outputPath);
-            }
-
-            if (targetFramework != 0 && sdk != null)
-            {
-                var globalJsonBuilder = new GlobalJsonBuilder().WithSdk(sdk);
-
-                var globalJsonFile = globalJsonBuilder.ToProjectFile();
-                _fileWriter.Write(globalJsonFile, outputPath);
             }
 
             return solutionFilePath;
@@ -90,13 +90,13 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 Environment.SetEnvironmentVariable("MSBuildSDKsPath", null);
         }
 
-        private void WriteProjects(Solution solution, string outputPath, string solutionFilePath)
+        private void WriteProjects(NetCoreSdkInfo sdk, Solution solution, string outputPath, string solutionFilePath)
         {
             var projectPathMappings = new Dictionary<Project, string>();
             foreach (var project in solution.Projects)
             {
                 var formatProjectWriter = _projectWriterFactory.FromProjectFormat(project.ProjectFormat);
-                string pathToProjectFile = WriteProject(project, outputPath, formatProjectWriter, solutionFilePath);
+                string pathToProjectFile = WriteProject(sdk, project, outputPath, formatProjectWriter, solutionFilePath);
                 projectPathMappings.Add(project, pathToProjectFile);
             }
 
@@ -107,9 +107,9 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             }
         }
 
-        private string WriteProject(Project project, string outputPath, IProjectWriter formatProjectWriter, string solutionFilePath)
+        private string WriteProject(NetCoreSdkInfo sdk, Project project, string outputPath, IProjectWriter formatProjectWriter, string solutionFilePath)
         {
-            string projPath = formatProjectWriter.WriteProject(project, Path.Combine(outputPath, project.Name));
+            string projPath = formatProjectWriter.WriteProject(sdk, project, Path.Combine(outputPath, project.Name));
 
             var addProjCommand = DotNet.Sln(_outputWriter).AddProject().Project(projPath).ToSolution(solutionFilePath).Build().Execute();
             if (addProjCommand.ExitCode != 0)

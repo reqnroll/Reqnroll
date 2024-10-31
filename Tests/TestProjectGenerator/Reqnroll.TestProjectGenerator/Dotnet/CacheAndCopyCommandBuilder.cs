@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Reqnroll.TestProjectGenerator.FilesystemWriter;
+using System;
 using System.Collections.Concurrent;
 using System.IO;
 
@@ -7,14 +8,16 @@ namespace Reqnroll.TestProjectGenerator.Dotnet;
 public class CacheAndCopyCommandBuilder : CommandBuilder
 {
     private const string TemplateName = "TName";
+    private readonly NetCoreSdkInfo _sdk;
     private readonly CommandBuilder _baseCommandBuilder;
     private readonly string _targetPath;
     private readonly string _nameToReplace;
     private static readonly ConcurrentDictionary<string, object> LockObjects = new();
 
-    public CacheAndCopyCommandBuilder(IOutputWriter outputWriter, CommandBuilder baseCommandBuilder, string targetPath, string nameToReplace = null) 
+    public CacheAndCopyCommandBuilder(IOutputWriter outputWriter, NetCoreSdkInfo sdk, CommandBuilder baseCommandBuilder, string targetPath, string nameToReplace = null)
         : base(outputWriter, baseCommandBuilder.ExecutablePath, baseCommandBuilder.ArgumentsFormat, baseCommandBuilder.WorkingDirectory)
     {
+        _sdk = sdk;
         _baseCommandBuilder = baseCommandBuilder;
         _targetPath = targetPath;
         _nameToReplace = nameToReplace;
@@ -30,7 +33,7 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
             argsCleaned = argsCleaned.Replace(_nameToReplace, TemplateName);
             directoryName = directoryName.Replace(_nameToReplace, TemplateName);
         }
-        return Path.Combine(Path.GetTempPath(), "RRC", $"RRC_{argsCleaned}{suffix}", directoryName);
+        return Path.Combine(Path.GetTempPath(), "RRC", $"RRC_{_sdk.Version}_{argsCleaned}{suffix}", directoryName);
     }
 
     public override CommandResult Execute(Func<Exception, Exception> exceptionFunction)
