@@ -177,13 +177,15 @@ namespace Reqnroll.Events
         public IHookBinding HookBinding { get; }
         public IContextManager ContextManager { get; private set; }
 
+        [Obsolete("Use HookBindingStartedEvent(IHookBinding, IContextManager) instead")]
         public HookBindingStartedEvent(IHookBinding hookBinding)
         {
             HookBinding = hookBinding;
         }
 
-        public HookBindingStartedEvent(IHookBinding hookBinding, IContextManager contextManager) : this(hookBinding)
+        public HookBindingStartedEvent(IHookBinding hookBinding, IContextManager contextManager) 
         {
+            HookBinding = hookBinding;
             ContextManager = contextManager;
         }
     }
@@ -196,14 +198,17 @@ namespace Reqnroll.Events
         public IContextManager ContextManager { get; private set; }
         public Exception HookException { get; private set; }
 
+        [Obsolete("Use HookBindingFinishedEvent(IHookBinding, TimeSpan, IContextManager) instead")]
         public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration)
         {
             HookBinding = hookBinding;
             Duration = duration;
         }
 
-        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager, Exception hookException = null) : this(hookBinding, duration)
+        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager, Exception hookException = null) 
         {
+            HookBinding = hookBinding;
+            Duration = duration;
             ContextManager = contextManager;
             HookException = hookException;
         }
@@ -219,13 +224,15 @@ namespace Reqnroll.Events
         public string ScenarioName { get; }
         public string StepText { get; }
 
+        [Obsolete("Use OutputAddedEvent(string, FeatureInfo) instead")]
         public OutputAddedEvent(string text)
         {
             Text = text;
         }
 
-        public OutputAddedEvent(string text, FeatureInfo featureInfo) : this(text)
+        public OutputAddedEvent(string text, FeatureInfo featureInfo)
         {
+            Text = text;
             FeatureInfo = featureInfo;
         }
     }
@@ -234,13 +241,16 @@ namespace Reqnroll.Events
     {
         public string FilePath { get; }
         public FeatureInfo FeatureInfo { get; }
+
+        [Obsolete("Use AttachmentAddedEvent(string, FeatureInfo) instead")]
         public AttachmentAddedEvent(string filePath)
         {
             FilePath = filePath;
         }
 
-        public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo) : this(filePath)
+        public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo)
         {
+            FilePath = filePath;
             FeatureInfo = featureInfo;
         }
     }
