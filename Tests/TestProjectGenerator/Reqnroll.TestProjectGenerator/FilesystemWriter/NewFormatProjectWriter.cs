@@ -165,6 +165,12 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 xw.WriteAttributeString("Version", nuGetPackage.Version);
             }
 
+            if (nuGetPackage.IsDevelopmentDependency)
+            {
+                xw.WriteElementString("PrivateAssets", "all");
+                xw.WriteElementString("IncludeAssets", "runtime; build; native; contentfiles; analyzers");
+            }
+
             xw.WriteEndElement();
         }
 

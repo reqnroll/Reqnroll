@@ -68,7 +68,8 @@ namespace Reqnroll.TestProjectGenerator.Data
         {
             if (_nuGetPackages.All(n => n.Name != name))
             {
-                _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, KnownAssemblyNames.Get(name, version)));
+                _nuGetPackages.Add(
+                    new NuGetPackage(name, version, allowedVersions: allowedVersions, assemblies: KnownAssemblyNames.Get(name, version)));
             }
         }
 
@@ -80,11 +81,17 @@ namespace Reqnroll.TestProjectGenerator.Data
             }
         }
 
-        public void AddNuGetPackage(string name, string version, string allowedVersions, params NuGetPackageAssembly[] assemblies)
+        public void AddNuGetPackage(
+            string name,
+            string version,
+            string allowedVersions = null,
+            bool isDevelopmentDependency = false,
+            params NuGetPackageAssembly[] assemblies)
         {
             if (_nuGetPackages.All(n => n.Name != name))
             {
-                _nuGetPackages.Add(new NuGetPackage(name, version, allowedVersions, assemblies));
+                _nuGetPackages.Add(
+                    new NuGetPackage(name, version, allowedVersions, isDevelopmentDependency, assemblies));
             }
         }
 
