@@ -41,6 +41,12 @@ namespace Reqnroll.Specs.StepDefinitions
             _projectsDriver.CreateProject(language);
         }
 
+        [Given(@"fluent assertion nuget package is added")]
+        public void GivenFluentAssertion()
+        {
+            _projectsDriver.AddNuGetPackage("FluentAssertions", "5.3.0");
+        }
+
         [When(@"I compile the solution")]
         public void WhenTheProjectIsCompiled()
         {

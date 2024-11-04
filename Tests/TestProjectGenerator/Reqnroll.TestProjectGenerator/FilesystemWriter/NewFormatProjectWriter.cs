@@ -43,6 +43,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             WriteAssemblyReferences(project, projectElement);
             WriteNuGetPackages(project, projectElement);
             WriteFileReferences(project, projectElement);
+            WriteSatelliteResourceLanguages(project, projectElement);
 
             SetTreatWarningsAsErrors(project, projectElement);
 
@@ -110,6 +111,17 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             {
                 projectElement.Add(itemGroup);
             }
+        }
+
+        /// <summary>
+        /// This avoids the need to copy language-specific files (reduced I/O) and therefore increases test execution time.
+        /// </summary>
+        private void WriteSatelliteResourceLanguages(Project project, XElement projectElement)
+        {
+            var propertyGroupElement = projectElement.Element("PropertyGroup") ?? throw new ProjectCreationNotPossibleException();
+            var satelliteResourceLanguagesElement = new XElement("SatelliteResourceLanguages");
+            satelliteResourceLanguagesElement.SetValue("en");
+            propertyGroupElement.Add(satelliteResourceLanguagesElement);
         }
 
         private void WriteFileReference(XmlWriter xw, ProjectFile projectFile)
