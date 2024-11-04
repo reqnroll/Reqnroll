@@ -106,7 +106,6 @@ public void GivenIEnteredTheFollowingDataIntoTheNewAccountForm(DataTable table)
 }
 ```
 
-```
 **Important:** In the case of tuples, _**you need to have the same number of parameters and types; parameter names do not matter**_, as ValueTuples do not hold parameter names at runtime using reflection.
 
 **Scenarios with more than 7 properties are not currently supported when converting to ValueTuple, and you will receive an exception if you try to map more than 7 properties.**

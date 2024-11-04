@@ -30,7 +30,8 @@ author = 'Reqnroll'
 # ones.
 extensions = [
   'myst_parser',  # see https://myst-parser.readthedocs.io/en/v0.16.0/sphinx/intro.html, https://jdsalaro.com/cheatsheet/sphinx-myst-markdown/
-  'sphinx_copybutton'
+  'sphinx_copybutton',
+  'sphinxcontrib.googleanalytics'  # see https://github.com/sphinx-contrib/googleanalytics
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -42,6 +43,11 @@ templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 master_doc = 'index'
+
+# -- sphinxcontrib.googleanalytics -------------------------------------------------
+
+googleanalytics_id = 'G-Y2KPXR5RYB'
+googleanalytics_enabled = (os.getenv("READTHEDOCS", "False") == "True") # enable it only on read-the-docs, see https://docs.readthedocs.io/en/stable/reference/environment-variables.html
 
 # -- Options MyST -------------------------------------------------
 

@@ -3,6 +3,7 @@ myst_parser
 furo
 sphinx-copybutton
 sphinx-autobuild
+sphinxcontrib.googleanalytics
 
 # sphinx-markdown-tables
 # readthedocs-sphinx-search
