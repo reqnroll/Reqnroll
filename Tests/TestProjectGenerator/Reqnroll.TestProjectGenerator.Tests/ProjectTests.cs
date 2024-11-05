@@ -291,7 +291,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
                 projectFileContent.Should()
-                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net6.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net6.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>");
             });
         }
 
@@ -307,7 +307,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
                 projectFileContent.Should()
-                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net7.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net7.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>");
             });
         }
 
@@ -323,7 +323,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
                 projectFileContent.Should()
-                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net8.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>\r\n  </PropertyGroup>\r\n</Project>");
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net8.0</TargetFramework>\r\n    <ImplicitUsings>enable</ImplicitUsings>\r\n    <Nullable>enable</Nullable>");
             });
         }
 
@@ -339,7 +339,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
                 projectFileContent.Should()
-                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net481</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net481</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>");
             });
         }
 
@@ -355,7 +355,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
                 projectFileContent.Should()
-                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net462</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>");
             });
         }
 
@@ -371,7 +371,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
                 projectFileContent.Should()
-                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net472</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>\r\n  </PropertyGroup>\r\n</Project>");
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <TargetFramework>net472</TargetFramework>\r\n    <LangVersion>7.3</LangVersion>");
             });
         }
 
@@ -403,7 +403,7 @@ namespace Reqnroll.TestProjectGenerator.Tests
                 string projectFileContent = GetProjectFileContent(solutionFolder, project);
 
                 projectFileContent.Should()
-                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net462</TargetFramework>\r\n  </PropertyGroup>\r\n</Project>");
+                                  .Contain("<Project Sdk=\"Microsoft.NET.Sdk\">\r\n  <PropertyGroup>\r\n    <RootNamespace>ProjectName</RootNamespace>\r\n    <TargetFramework>net462</TargetFramework>");
             });
         }
     }
