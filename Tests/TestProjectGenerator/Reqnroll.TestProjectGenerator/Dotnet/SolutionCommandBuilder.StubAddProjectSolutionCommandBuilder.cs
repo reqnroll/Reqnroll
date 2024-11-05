@@ -6,29 +6,16 @@ namespace Reqnroll.TestProjectGenerator.Dotnet;
 
 public partial class SolutionCommandBuilder
 {
-    public class StubAddProjectSolutionCommandBuilder : AddProjectSolutionCommandBuilder
+    public class StubAddProjectSolutionCommandBuilder(IOutputWriter outputWriter) : AddProjectSolutionCommandBuilder(outputWriter)
     {
-        public StubAddProjectSolutionCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
-        {
-        }
-
         public override CommandBuilder Build()
         {
             return new AddProjectSolutionCommand(_outputWriter, _solutionPath, _projectPath, GetWorkingDirectory());
         }
 
-        class AddProjectSolutionCommand : CommandBuilder
+        class AddProjectSolutionCommand(IOutputWriter outputWriter, string _solutionPath, string _projectPath, string workingDirectory)
+            : CommandBuilder(outputWriter, "[add project to sln]", $"{_projectPath} -> {_solutionPath}", workingDirectory)
         {
-            private readonly string _solutionPath;
-            private readonly string _projectPath;
-
-            public AddProjectSolutionCommand(IOutputWriter outputWriter, string solutionPath, string projectPath, string workingDirectory) 
-                : base(outputWriter, "[add project to sln]", $"{projectPath} -> {solutionPath}", workingDirectory)
-            {
-                _solutionPath = solutionPath;
-                _projectPath = projectPath;
-            }
-
             public override CommandResult Execute(Func<Exception, Exception> exceptionFunction)
             {
                 try
