@@ -124,6 +124,7 @@ jobs:
         dotnet add ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj package GitHubActionsTestLogger
         dotnet add ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj package GitHubActionsTestLogger
         dotnet add ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj package GitHubActionsTestLogger
+        dotnet add ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj package GitHubActionsTestLogger
     - name: Build
       run: dotnet build --no-restore ${{ steps.versions.outputs.main_build_params }}
     - name: Runtime Tests
@@ -132,6 +133,8 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj --logger "trx;LogFileName=generatortests-results.trx" ${{ steps.versions.outputs.test_params }}
     - name: Plugin Tests
       run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj --logger "trx;LogFileName=plugintests-results.trx" ${{ steps.versions.outputs.test_params }}
+    - name: TestProjectGenerator Tests
+      run: dotnet test ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj --logger "trx;LogFileName=testprjgentests-results.trx" ${{ steps.versions.outputs.test_params }}
     - name: Upload packages
       uses: actions/upload-artifact@v4
       with:
