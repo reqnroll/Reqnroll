@@ -31,6 +31,7 @@ public class XRetryPluginTest : SystemTestBase
     }
 
     [TestMethod]
+    [TestCategory("MsBuild")] 
     public void XRetry_should_work_with_Reqnroll_on_DotNetFramework_generation()
     {
         // compiling with MsBuild forces the generation to run with .NET Framework
