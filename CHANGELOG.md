@@ -2,11 +2,15 @@
 
 ## Improvements:
 
+* Upgrade to Gherkin v30 from v29 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#305)
 * Support scenario-level (method-level) parallel execution (#119, #277)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @gasparnagy, @obligaron
+* Fix: Visual Studio locks Reqnroll.Tools.MsBuild.Generation task files. Using `TaskHostFactory` for our tasks on Windows. (#293)
+* Fix: Project dependencies transiently refer to System.Text.Json 8.0.4 that has security vulnerability. Microsoft.Extensions.DependencyModel updated to v8.0.2. (#291)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy, @obligaron, @Romfos, @Tiberriver256
 
 # v2.1.1 - 2024-10-08
 
