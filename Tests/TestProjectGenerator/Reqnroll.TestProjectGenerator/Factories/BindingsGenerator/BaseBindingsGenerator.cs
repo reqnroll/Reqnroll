@@ -28,12 +28,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
             return GenerateBindingClassFile(hookClass);
         }
 
-        public ProjectFile GenerateAsyncHookBindingIncludingLocking(string eventType, string name, string code = null, int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
-        {
-            string hookClass = GetAsyncHookIncludingLockingBindingClass(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
-            return GenerateBindingClassFile(hookClass);
-        }
-
         public abstract ProjectFile GenerateLoggerClass(string pathToLogFile);
 
         protected abstract string GetBindingCode(string methodName, string methodImplementation, string attributeName, string regex, ParameterType parameterType, string argumentName);
@@ -41,15 +35,6 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
         protected abstract string GetLoggingStepDefinitionCode(string methodName, string attributeName, string regex, ParameterType parameterType, string argumentName);
 
         protected abstract string GetHookBindingClass(
-            string hookType,
-            string name,
-            string code = "",
-            int? order = null,
-            IList<string> hookTypeAttributeTags = null,
-            IList<string> methodScopeAttributeTags = null,
-            IList<string> classScopeAttributeTags = null);
-
-        protected abstract string GetAsyncHookIncludingLockingBindingClass(
             string hookType,
             string name,
             string code = "",
