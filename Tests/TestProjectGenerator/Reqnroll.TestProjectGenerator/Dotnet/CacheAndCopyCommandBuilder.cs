@@ -33,7 +33,9 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
             argsCleaned = argsCleaned.Replace(_nameToReplace, TemplateName);
             directoryName = directoryName.Replace(_nameToReplace, TemplateName);
         }
-        return Path.Combine(Path.GetTempPath(), "RRC", $"RRC_{_sdk.Version}_{argsCleaned}{suffix}", directoryName);
+
+        var sdkSpecifier = _sdk == null ? "" : $"_{_sdk.Version}";
+        return Path.Combine(Path.GetTempPath(), "RRC", $"RRC{sdkSpecifier}_{argsCleaned}{suffix}", directoryName);
     }
 
     public override CommandResult Execute(Func<Exception, Exception> exceptionFunction)

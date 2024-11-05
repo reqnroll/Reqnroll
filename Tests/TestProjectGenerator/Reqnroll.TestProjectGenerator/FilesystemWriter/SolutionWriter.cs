@@ -56,7 +56,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             var createSolutionCommand = DotNet.New(_outputWriter, sdk).Solution().InFolder(outputPath).WithName(solution.Name).Build();
             createSolutionCommand.ExecuteWithRetry(1, TimeSpan.FromSeconds(1), (innerException) =>
             {
-                if (innerException is AggregateException aggregateException && aggregateException.InnerExceptions.Any(x => x.InnerException.Message.Contains("Install the [" + sdk.Version)))
+                if (sdk != null && innerException is AggregateException aggregateException && aggregateException.InnerExceptions.Any(x => x.InnerException?.Message.Contains("Install the [" + sdk.Version) ?? false))
                     return new DotNetSdkNotInstalledException($"Sdk Version \"{sdk.Version}\" is not installed", innerException);
                 return new ProjectCreationNotPossibleException("Could not create solution.", innerException);
             });
