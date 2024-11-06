@@ -315,14 +315,13 @@ jobs:
       with:
         name: packages-v${{ needs.build.outputs.product_full_version }}
         path: release_packages
-    - name: Display structure of downloaded files
-      run: ls -R release_packages
     - name: Deploy NuGet packages
       env:
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}      
       shell: pwsh
       run: |
         Write-Output "Deploying v${{ needs.build.outputs.product_full_version }} (v${{ needs.build.outputs.product_main_version }}) packages to nuget.org"
+        ls ${{ github.workspace }}/release_packages
         ${{ github.workspace }}/.github/workflows/publish_packages.ps1 -packagesDir ${{ github.workspace }}/release_packages
 
     - name: Calculate Next Version
@@ -341,7 +340,6 @@ jobs:
       shell: pwsh
       run: |
         [System.IO.File]::WriteAllText("Directory.Build.props", [System.IO.File]::ReadAllText("Directory.Build.props").Replace("<VersionPrefix>${{ needs.build.outputs.product_version_prefix }}</VersionPrefix>", "<VersionPrefix>${{ steps.next_version.outputs.product_next_version }}</VersionPrefix>"))
-        git status
 
     - name: Update Changelog
       # if: needs.build.outputs.is_production_release == 'true'
@@ -352,10 +350,13 @@ jobs:
         $newHeading = $newHeading + "# v${{ needs.build.outputs.product_full_version }} - $releaseDate"
         $content = [System.IO.File]::ReadAllText("CHANGELOG.md").Replace("# [vNext]",$newHeading)
         [System.IO.File]::WriteAllText("CHANGELOG.md", $content)
+        Write-Output "New Heading:"
+        Write-Output $newHeading
 
     - name: Update changes in GitHub repository
       # if: needs.build.outputs.is_production_release == 'true'
       run: |
+        git status
         git config --global user.name 'Reqnroll CI' 
         git config --global user.email 'ci@reqnroll.net'
         git tag v${{ needs.build.outputs.product_full_version }}
