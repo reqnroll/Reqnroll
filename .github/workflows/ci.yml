@@ -317,12 +317,13 @@ jobs:
         path: release_packages
     - name: Display structure of downloaded files
       run: ls -R release_packages
-    - name: Simulate Deployment
+    - name: Deploy NuGet packages
       env:
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}      
       shell: pwsh
       run: |
-        Write-Output "Deploying (prod: ${{ needs.build.outputs.deploy_packages }}) ${{ needs.build.outputs.product_full_version }} (${{ needs.build.outputs.product_main_version }}) / key: $env:NUGET_PUBLISH_KEY"
+        Write-Output "Deploying v${{ needs.build.outputs.product_full_version }} (v${{ needs.build.outputs.product_main_version }}) packages to nuget.org"
+        ${{ github.workspace }}/.github/workflows/publish_packages.ps1 -packagesDir ${{ github.workspace }}/release_packages
 
     - name: Calculate Next Version
       # if: needs.build.outputs.is_production_release == 'true'
