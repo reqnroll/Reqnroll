@@ -291,7 +291,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build, specs, system-tests-windows, system-tests-linux]
     environment: production_environment
-    if: github.ref == 'refs/heads/main' && needs.build.outputs.deploy_packages == 'true'
+    # if: github.ref == 'refs/heads/main' && needs.build.outputs.deploy_packages == 'true'
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
@@ -354,4 +354,3 @@ jobs:
         git add -u
         git commit -m '[automated commit] bump version after release of ${{ needs.build.outputs.product_full_version }}'
         git push --dry-run
-        
