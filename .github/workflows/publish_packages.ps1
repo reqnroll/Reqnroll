@@ -31,7 +31,7 @@ function Publish-Packages-To-NuGet($settings) {
   foreach ($file in $files) {
     Write-Output "Uploading $file"
     Write-Output "dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate"
-    # dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate
+    dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate
     Confirm-Exit-Code "upload $file"
   }
 }
@@ -42,7 +42,7 @@ function Publish-Symbol-Packages-To-NuGet($settings) {
   foreach ($file in $files) {
     Write-Output "Uploading $file"
     Write-Output "dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate"
-    # dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
+    dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
     Confirm-Exit-Code "upload $file"
   }
 }
