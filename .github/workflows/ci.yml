@@ -343,15 +343,24 @@ jobs:
 
     - name: Update Changelog
       # if: needs.build.outputs.is_production_release == 'true'
+      id: changelog
       shell: pwsh
       run: |
         $newHeading = "# [vNext]$([Environment]::NewLine)$([Environment]::NewLine)## Improvements:$([Environment]::NewLine)$([Environment]::NewLine)## Bug fixes:$([Environment]::NewLine)$([Environment]::NewLine)*Contributors of this release (in alphabetical order):* $([Environment]::NewLine)$([Environment]::NewLine)"
         $releaseDate = [System.DateTime]::Today.ToString("yyyy-MM-dd")
-        $newHeading = $newHeading + "# v${{ needs.build.outputs.product_full_version }} - $releaseDate"
+        $releaseTitle = "v${{ needs.build.outputs.product_full_version }} - $releaseDate"
+        $newHeading = $newHeading + "# $releaseTitle"
         $content = [System.IO.File]::ReadAllText("CHANGELOG.md").Replace("# [vNext]",$newHeading)
         [System.IO.File]::WriteAllText("CHANGELOG.md", $content)
         Write-Output "New Heading:"
         Write-Output $newHeading
+
+        # calculate release notes
+        $match = [System.Text.RegularExpressions.Regex]::Match($content, "(?ms)^# .*?^# (?<title>[^\r\n]*?)\s*$\s*(?<notes>.*?)\s*(?:^# |\Z)")
+        $releaseNotes =  $(if ($match.Success) { $match.Groups["notes"].Value } else { "N/A" })
+        [System.IO.File]::WriteAllText("release_notes.txt", $releaseNotes)
+        Write-Output "release_title=$releaseTitle" >> $env:GITHUB_OUTPUT
+        Write-Output "release_notes_file=release_notes.txt" >> $env:GITHUB_OUTPUT
 
     - name: Update changes in GitHub repository
       # if: needs.build.outputs.is_production_release == 'true'
@@ -364,3 +373,13 @@ jobs:
         git add -u
         git commit -m '[automated commit] bump version after release of ${{ needs.build.outputs.product_full_version }}'
         git push --dry-run
+
+    - name: Create GitHub Release
+      if: needs.build.outputs.is_production_release == 'true'
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: |
+          gh release create "v${{ needs.build.outputs.product_full_version }}" \
+              --verify-tag \
+              --title="${{ steps.changelog.outputs.release_title }}" \
+              --notes-file="${{ steps.changelog.outputs.release_notes_file }}"
