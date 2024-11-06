@@ -317,7 +317,7 @@ jobs:
         Write-Output "Deploying (prod: ${{ needs.build.outputs.deploy_packages }}) ${{ needs.build.outputs.product_full_version }} (${{ needs.build.outputs.product_main_version }}) / key: $env:NUGET_PUBLISH_KEY"
 
     - name: Calculate Next Version
-      if: needs.build.outputs.is_production_release == 'true'
+      # if: needs.build.outputs.is_production_release == 'true'
       id: next_version
       shell: pwsh
       run: |
@@ -328,14 +328,14 @@ jobs:
         Write-Output "Product Next Version: $nextVersion"
 
     - name: Bump Version
-      if: needs.build.outputs.is_production_release == 'true'
+      # if: needs.build.outputs.is_production_release == 'true'
       shell: pwsh
       run: |
         [System.IO.File]::WriteAllText("Directory.Build.props", [System.IO.File]::ReadAllText("Directory.Build.props").Replace("<VersionPrefix>${{ needs.build.outputs.product_version_prefix }}</VersionPrefix>", "<VersionPrefix>${{ steps.next_version.outputs.product_next_version }}</VersionPrefix>"))
         git status
 
     - name: Update Changelog
-      if: needs.build.outputs.is_production_release == 'true'
+      # if: needs.build.outputs.is_production_release == 'true'
       shell: pwsh
       run: |
         $newHeading = "# [vNext]$([Environment]::NewLine)$([Environment]::NewLine)## Improvements:$([Environment]::NewLine)$([Environment]::NewLine)## Bug fixes:$([Environment]::NewLine)$([Environment]::NewLine)*Contributors of this release (in alphabetical order):* $([Environment]::NewLine)$([Environment]::NewLine)"
@@ -345,7 +345,7 @@ jobs:
         [System.IO.File]::WriteAllText("CHANGELOG.md", $content)
 
     - name: Update changes in GitHub repository
-      if: needs.build.outputs.is_production_release == 'true'
+      # if: needs.build.outputs.is_production_release == 'true'
       run: |
         git config --global user.name 'Reqnroll CI' 
         git config --global user.email 'ci@reqnroll.net'
