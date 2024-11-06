@@ -308,7 +308,7 @@ jobs:
         name: packages-v${{ needs.build.outputs.product_full_version }}
         path: release_packages
     - name: Display structure of downloaded files
-      run: ls -R
+      run: ls -R release_packages
     - name: Simulate Deployment
       env:
         NUGET_PUBLISH_KEY: ${{ secrets.NUGET_PUBLISH_KEY }}      
