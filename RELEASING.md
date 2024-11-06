@@ -26,7 +26,7 @@ Anyone with permission to push to the `main` branch can prepare a release.
 
 ## Make the release
 
-Only people in group [release-managers](https://github.com/orgs/reqnroll/teams/release-managers) can make releases.
+Only people in group [release-managers](https://github.com/orgs/reqnroll/teams/release-managers) can make releases and only from the `main` branch.
 
 ### Making a preview release
 
