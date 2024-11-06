@@ -192,17 +192,19 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/plugintests-results.trx" ${{ steps.build_params.outputs.test_params }}
     - name: TestProjectGenerator Tests
       run: dotnet test ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/testprjgentests-results.trx" ${{ steps.build_params.outputs.test_params }}
-    - name: Upload packages
-      uses: actions/upload-artifact@v4
-      with:
-        name: packages
-        path: "GeneratedNuGetPackages/${{ steps.versions.outputs.product_configuration }}/*.*nupkg"
     - name: Upload TRX files
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: build-trx
+        name: build-trx-v${{ steps.versions.outputs.product_full_version }}
+        if-no-files-found: error
         path: "TestResults/*.trx"
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages-v${{ steps.versions.outputs.product_full_version }}
+        if-no-files-found: error
+        path: "GeneratedNuGetPackages/${{ steps.versions.outputs.product_configuration }}/*.*nupkg"
 
   specs:
     runs-on: ubuntu-latest
@@ -224,7 +226,8 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: specs-trx
+        name: specs-trx-v${{ needs.build.outputs.product_full_version }}
+        if-no-files-found: error
         path: "TestResults/specs-results.trx"
 
   system-tests-windows:
@@ -251,7 +254,8 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: systemtests-windows-trx
+        name: systemtests-windows-trx-v${{ needs.build.outputs.product_full_version }}
+        if-no-files-found: error
         path: "TestResults/*.trx"
 
 
@@ -279,6 +283,7 @@ jobs:
       uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: systemtests-linux-trx
+        name: systemtests-linux-trx-v${{ needs.build.outputs.product_full_version }}
+        if-no-files-found: error
         path: "TestResults/*.trx"
     
