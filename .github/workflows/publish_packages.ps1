@@ -30,7 +30,8 @@ function Publish-Packages-To-NuGet($settings) {
   $files = Join-Path $settings.OutputDir '*.nupkg' -Resolve
   foreach ($file in $files) {
     Write-Output "Uploading $file"
-    dotnet nuget push $file -k $env:REQNROLL_NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate
+    Write-Output "dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate"
+    dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --no-symbols --skip-duplicate
     Confirm-Exit-Code "upload $file"
   }
 }
@@ -40,7 +41,8 @@ function Publish-Symbol-Packages-To-NuGet($settings) {
   $files = Join-Path $settings.OutputDir '*.snupkg' -Resolve
   foreach ($file in $files) {
     Write-Output "Uploading $file"
-    dotnet nuget push $file -k $env:REQNROLL_NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
+    Write-Output "dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate"
+    dotnet nuget push $file -k $env:NUGET_PUBLISH_KEY -s https://api.nuget.org/v3/index.json --skip-duplicate
     Confirm-Exit-Code "upload $file"
   }
 }
