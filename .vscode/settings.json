@@ -10,5 +10,6 @@
     "cSpell.words": [
         "Quickstart",
         "Reqnroll"
-    ]
+    ],
+    "markdown.extension.toc.updateOnSave": false
 }
