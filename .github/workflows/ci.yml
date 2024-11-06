@@ -140,17 +140,17 @@ jobs:
       env:
         APPINSIGHTS_KEY: ${{ secrets.APPINSIGHTS_KEY }}      
       run: |
-        // Load version fields to variables
+        # Load version fields to variables
         $versionSuffix = '${{ steps.versions.outputs.product_version_suffix }}'
         $productConfig = '${{ steps.versions.outputs.product_configuration }}'
         $deployPackages = '${{ steps.versions.outputs.deploy_packages }}' -eq 'true'
 
-        // Calculate 'build_params'
+        # Calculate 'build_params'
         $buildParams = "-p:VersionSuffix=$versionSuffix -c $productConfig"
         Write-Output "build_params=$buildParams" >> $env:GITHUB_OUTPUT
         Write-Output "Build Params: $buildParams"
 
-        // Calculate 'main_build_params'
+        # Calculate 'main_build_params'
         $mainBuildParams = $buildParams
         if ($deployPackages) {
           $mainBuildParams = "$mainBuildParams -p:AppInsightsInstrumentationKey=$env:APPINSIGHTS_KEY"
@@ -158,13 +158,13 @@ jobs:
         }
         Write-Output "main_build_params=$mainBuildParams" >> $env:GITHUB_OUTPUT
 
-        // Calculate 'test_params'
+        # Calculate 'test_params'
         $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
         $testParams = "--no-build --verbosity normal -c $productConfig --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true RunConfiguration.TreatNoTestsAsError=true"
         Write-Output "test_params=$testParams" >> $env:GITHUB_OUTPUT
         Write-Output "Test Params: $testParams"
 
-        // Calculate 'specs_filter'
+        # Calculate 'specs_filter'
         $specsFilter = "${{ inputs.specs_filter }}"
         if ($specsFilter -ne "") {
             $specsFilter = "&$specsFilter"
