@@ -179,7 +179,7 @@ jobs:
       shell: pwsh
       run: |
         $releaseDate = [System.DateTime]::Today.ToString("yyyy-MM-dd")
-        $newHeading = "# ${{ steps.versions.outputs.product_full_version }} - $releaseDate"
+        $newHeading = "# v${{ steps.versions.outputs.product_full_version }} - $releaseDate"
         $content = [System.IO.File]::ReadAllText("CHANGELOG.md").Replace("# [vNext]",$newHeading)
         [System.IO.File]::WriteAllText("CHANGELOG.md", $content)
     - name: Restore dependencies
@@ -348,7 +348,7 @@ jobs:
       run: |
         $newHeading = "# [vNext]$([Environment]::NewLine)$([Environment]::NewLine)## Improvements:$([Environment]::NewLine)$([Environment]::NewLine)## Bug fixes:$([Environment]::NewLine)$([Environment]::NewLine)*Contributors of this release (in alphabetical order):* $([Environment]::NewLine)$([Environment]::NewLine)"
         $releaseDate = [System.DateTime]::Today.ToString("yyyy-MM-dd")
-        $newHeading = $newHeading + "# ${{ needs.build.outputs.product_full_version }} - $releaseDate"
+        $newHeading = $newHeading + "# v${{ needs.build.outputs.product_full_version }} - $releaseDate"
         $content = [System.IO.File]::ReadAllText("CHANGELOG.md").Replace("# [vNext]",$newHeading)
         [System.IO.File]::WriteAllText("CHANGELOG.md", $content)
 
