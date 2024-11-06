@@ -10,7 +10,7 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
             _outputWriter = outputWriter;
         }
 
-        public CommandBuilder Build()
+        public virtual CommandBuilder Build()
         {
             return new CommandBuilder(_outputWriter, ExecutablePath, BuildArguments(), GetWorkingDirectory());
         }
