@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 
 namespace Reqnroll.Tools.MsBuild.Generation
@@ -22,6 +23,18 @@ namespace Reqnroll.Tools.MsBuild.Generation
         public Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
             _taskLoggingWrapper.LogMessage(args.Name);
+
+            try
+            {
+                var requestedAssemblyName = new AssemblyName(args.Name);
+                var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == requestedAssemblyName.Name);
+                if (loadedAssembly != null) return loadedAssembly;
+            }
+            catch (Exception ex)
+            {
+                _taskLoggingWrapper.LogError(ex.Message);
+                return null;
+            }
 
             return null;
         }
