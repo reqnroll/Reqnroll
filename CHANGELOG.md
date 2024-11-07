@@ -2,6 +2,14 @@
 
 ## Improvements:
 
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v2.2.0 - 2024-11-07
+
+## Improvements:
+
 * Upgrade to Gherkin v30 from v29 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#305)
 * Support scenario-level (method-level) parallel execution (#119, #277)
 
