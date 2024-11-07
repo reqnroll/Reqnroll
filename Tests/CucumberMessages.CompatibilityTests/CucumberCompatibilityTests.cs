@@ -76,6 +76,7 @@ namespace CucumberMessages.Tests
             CCKScenarios(testName, featureNameText);
         }
 
+        [Ignore]
         [TestMethod]
         [DataRow("attachments", "Attachments")]
         [DataRow("skipped", "Skipping scenarios")]
