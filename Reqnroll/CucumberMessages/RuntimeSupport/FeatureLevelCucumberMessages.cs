@@ -15,13 +15,10 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
     {
         public FeatureLevelCucumberMessages(Func<Source> source, Func<GherkinDocument> gherkinDocument, Func<IEnumerable<Pickle>> pickles, string location)
         {
-            if (CucumberConfiguration.Current.Enabled)
-            {
-                Source = source;
-                GherkinDocument = gherkinDocument;
-                Pickles = pickles;
-                Location = location;
-            }
+            Source = source;
+            GherkinDocument = gherkinDocument;
+            Pickles = pickles;
+            Location = location;
         }
 
         public string Location { get; }
