@@ -1,10 +1,12 @@
 using System;
+using System.Diagnostics;
 using System.Globalization;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Tracing;
 
 namespace Reqnroll
 {
+    [DebuggerDisplay("{Title}")]
     public class FeatureInfo
     {
         public string[] Tags { get; private set; }

@@ -120,15 +120,6 @@ namespace Reqnroll.TestProjectGenerator
             _project.AddFile(bindingsGenerator.GenerateHookBinding(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags));
         }
 
-        public void AddAsyncHookBindingIncludingLocking(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,
-            IList<string> classScopeAttributeTags = null)
-        {
-            EnsureProjectExists();
-
-            var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
-            _project.AddFile(bindingsGenerator.GenerateAsyncHookBindingIncludingLocking(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags));
-        }
-
         public void AddStepBinding(string bindingCode)
         {
             EnsureProjectExists();
@@ -239,9 +230,6 @@ namespace Reqnroll.TestProjectGenerator
                 // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
                 _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
 
-                _project.AddNuGetPackage("System.Threading.Tasks.Extensions", "4.5.4", new NuGetPackageAssembly("System.Threading.Tasks.Extensions", "netstandard2.0\\System.Threading.Tasks.Extensions.dll"));
-                _project.AddNuGetPackage("Microsoft.Bcl.AsyncInterfaces", "8.0.0", new NuGetPackageAssembly("Microsoft.Bcl.AsyncInterfaces", "netstandard2.0\\Microsoft.Bcl.AsyncInterfaces.dll"));
-
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(_testProjectFolders.LogFilePath));
 
@@ -254,11 +242,6 @@ namespace Reqnroll.TestProjectGenerator
                     case ProgrammingLanguage.CSharp:
                         AddUnitTestProviderSpecificConfig();
                         break;
-                }
-
-                if (IsReqnrollFeatureProject)
-                {
-                    _project.AddNuGetPackage("Reqnroll.Tools.MsBuild.Generation", _currentVersionDriver.ReqnrollNuGetVersion);
                 }
 
                 switch (Configuration.UnitTestProvider)
@@ -277,8 +260,6 @@ namespace Reqnroll.TestProjectGenerator
                 }
             }
 
-            _project.AddNuGetPackage("FluentAssertions", "5.3.0");
-            AddInternalJson();
             AddAdditionalStuff();
         }
 
@@ -367,11 +348,11 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
                     break;
                 case UnitTestProvider.NUnit3 when _parallelTestExecution:
-                    _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.Fixtures)]"));
+                    _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.All)]"));
                     break;
                 case UnitTestProvider.MSTest when _parallelTestExecution:
                     _project.AddFile(
-                        new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.ClassLevel)]"));
+                        new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.MethodLevel)]"));
                     break;
                 case UnitTestProvider.MSTest when !_parallelTestExecution:
                     _project.AddFile(new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: DoNotParallelize]"));
@@ -413,11 +394,6 @@ namespace Reqnroll.TestProjectGenerator
         {
             EnsureProjectExists();
             _project.AddNuGetPackage(nugetPackage, nugetVersion);
-        }
-
-        private void AddInternalJson()
-        {
-            _project.AddNuGetPackage($"{InternalJsonPackageName}", $"{InternalJsonVersion}", new NuGetPackageAssembly($"{InternalJsonPackageName}", "net45\\SpecFlow.Internal.Json.dll"));
         }
     }
 }

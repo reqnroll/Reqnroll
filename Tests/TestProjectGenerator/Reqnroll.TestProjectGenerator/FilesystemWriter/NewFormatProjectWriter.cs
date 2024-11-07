@@ -21,7 +21,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
         }
 
-        public virtual string WriteProject(Project project, string projRootPath)
+        public virtual string WriteProject(NetCoreSdkInfo sdk, Project project, string projRootPath)
         {
             if (project is null)
             {
@@ -29,7 +29,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             }
 
 
-            CreateProjectFile(project, projRootPath);
+            CreateProjectFile(sdk, project, projRootPath);
 
             string projFileName = $"{project.Name}.{project.ProgrammingLanguage.ToProjectFileExtension()}";
 
@@ -43,6 +43,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             WriteAssemblyReferences(project, projectElement);
             WriteNuGetPackages(project, projectElement);
             WriteFileReferences(project, projectElement);
+            WriteSatelliteResourceLanguages(project, projectElement);
 
             SetTreatWarningsAsErrors(project, projectElement);
 
@@ -110,6 +111,17 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             {
                 projectElement.Add(itemGroup);
             }
+        }
+
+        /// <summary>
+        /// This avoids the need to copy language-specific files (reduced I/O) and therefore increases test execution time.
+        /// </summary>
+        private void WriteSatelliteResourceLanguages(Project project, XElement projectElement)
+        {
+            var propertyGroupElement = projectElement.Element("PropertyGroup") ?? throw new ProjectCreationNotPossibleException();
+            var satelliteResourceLanguagesElement = new XElement("SatelliteResourceLanguages");
+            satelliteResourceLanguagesElement.SetValue("en");
+            propertyGroupElement.Add(satelliteResourceLanguagesElement);
         }
 
         private void WriteFileReference(XmlWriter xw, ProjectFile projectFile)
@@ -232,7 +244,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             xw.WriteEndElement();
         }
 
-        private void CreateProjectFile(Project project, string projRootPath)
+        private void CreateProjectFile(NetCoreSdkInfo sdk, Project project, string projRootPath)
         {
             string template;
 
@@ -253,7 +265,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 
             
 
-            var newProjCommand = DotNet.New(_outputWriter)
+            var newProjCommand = DotNet.New(_outputWriter, sdk)
                                        .Project()
                                        .InFolder(projRootPath)
                                        .WithName(project.Name)

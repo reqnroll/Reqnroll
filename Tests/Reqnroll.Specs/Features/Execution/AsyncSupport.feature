@@ -1,6 +1,7 @@
 Feature: AsyncSupport
 
 Background:
+    Given fluent assertion nuget package is added
 	Given the following binding class
 		"""
 		using System;

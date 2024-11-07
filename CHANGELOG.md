@@ -4,9 +4,23 @@
 
 ## Bug fixes:
 
-* Fix: Project dependencies transiently refer to System.Text.Json 8.0.4 that has security vulnerability. Microsoft.Extensions.DependencyModel updated to v8.0.2. (#291)
+*Contributors of this release (in alphabetical order):* 
 
-*Contributors of this release (in alphabetical order):* @obligaron, @Romfos
+# v2.2.0 - 2024-11-07
+
+## Improvements:
+
+* Upgrade to Gherkin v30 from v29 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#305)
+* Support scenario-level (method-level) parallel execution (#119, #277)
+
+## Bug fixes:
+
+* Fix: Visual Studio locks Reqnroll.Tools.MsBuild.Generation task files. Using `TaskHostFactory` for our tasks on Windows. (#293)
+* Fix: Project dependencies transiently refer to System.Text.Json 8.0.4 that has security vulnerability. Microsoft.Extensions.DependencyModel updated to v8.0.2. (#291)
+* Fix: Could not load System.CodeDom exception with xRetry.Reqnroll plugin (#310)
+* Fix: Reqnroll.Microsoft.Extensions.DependencyInjection: `System.Collections.Generic.KeyNotFoundException: The given key 'Microsoft.Extensions.DependencyInjection.ServiceLookup.ServiceProviderEngineScope' was not present in the dictionary.` is thrown when a test execution dependent service is required during [BeforeTestRun]. We provide a better error message now. (#175)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy, @obligaron, @Romfos, @Tiberriver256
 
 # v2.1.1 - 2024-10-08
 

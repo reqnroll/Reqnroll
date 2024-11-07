@@ -108,6 +108,12 @@ public abstract class SystemTestBase
         AddFeatureFile(featureFileContent, preparedTests);
     }
 
+    protected void AddBindingClassFromResource(string fileName)
+    {
+        var bindingClassContent = _testFileManager.GetTestFileContent(fileName);
+        AddBindingClass(bindingClassContent);
+    }
+
     private int? GetTestCount(string gherkinContent)
     {
         var matches = Regex.Matches(gherkinContent, @"^\s*((?<scenario>Scenario:|Scenario Outline:)|(?<exmaples>Examples:)|(?<row>\|)).*?\s*$", RegexOptions.Multiline);

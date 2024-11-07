@@ -75,7 +75,7 @@ namespace Reqnroll.PluginTests
             foreach (string projectReference in projectReferences)
             {
                 //real ref, not test dependent
-                if (projectReference.Contains("Reqnroll.Generator.csproj"))
+                if (!projectReference.Contains("ReqnrollPlugin"))
                     continue;
 
                 var index = projectReference.LastIndexOf("\\", StringComparison.InvariantCulture);
@@ -96,10 +96,17 @@ namespace Reqnroll.PluginTests
                                            .Elements("ItemGroup")
                                            .Elements("ProjectReference")
                                            .Attributes("Include")
-                                           .Select(i => i.Value)
-                                           .ToList();
+                                           .Select(i => i.Value);
 
-            return projectReferences;
+            // For running this test with NCrunch we need to load the assembly references as well
+            // because NCrunch replaces project references with assembly references in the project file.
+            var assemblyReferences = project.Element("Project")
+                                            .Elements("ItemGroup")
+                                            .Elements("Reference")
+                                            .Attributes("Include")
+                                            .Select(i => Path.GetFileNameWithoutExtension(i.Value) + ".csproj");
+
+            return projectReferences.Concat(assemblyReferences).ToList();
         }
 
     }

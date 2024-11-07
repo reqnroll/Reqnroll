@@ -298,6 +298,18 @@ namespace Reqnroll.Generator.CodeDom
             // Global namespaces not yet supported in VB
             return type.FullName!;
         }
+
+        public CodeExpression CreateOptionalArgumentExpression(string parameterName, CodeVariableReferenceExpression valueExpression)
+        {
+            switch (TargetLanguage)
+            {
+                case CodeDomProviderLanguage.CSharp:
+                    return new CodeSnippetExpression($"{parameterName}: {valueExpression.VariableName}");
+                case CodeDomProviderLanguage.VB:
+                    return new CodeSnippetExpression($"{parameterName} := {valueExpression.VariableName}");
+            }
+            return valueExpression;
+        }
     }
 }
 

@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Gherkin" Version="29.0.0" />
+    <PackageReference Include="Gherkin" Version="30.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Cucumber.Messages" Version="26.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
@@ -47,8 +47,6 @@
     <ItemGroup>
       <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
     </ItemGroup>
-
-    <ReplaceTextInFileTask Condition="'$(BuildingInsideVisualStudio)' != 'true'" InputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" OutputFile="$(MSBuildThisFileDirectory)\..\CHANGELOG.md" TextToReplace="[vNext]" TextToReplaceWith="v$(Version) - $([System.DateTime]::Now.ToString('yyyy-MM-dd'))" WriteOnlyWhenChanged="true" />
   </Target>
 
 </Project>
