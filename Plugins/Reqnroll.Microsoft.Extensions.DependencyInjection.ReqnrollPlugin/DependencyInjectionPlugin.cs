@@ -157,26 +157,41 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             services.AddSingleton(sp => objectContainer.Resolve<IBindingAssemblyLoader>());
             services.AddSingleton(sp => objectContainer.Resolve<IUnitTestRuntimeProvider>());
 
-            services.AddTransient(sp =>
+            TResult GetTestThreadDependency<TResult>(IServiceProvider sp, Func<IContextManager, TResult> selector) where TResult: class
             {
-                var container = BindMappings.TryGetValue(sp, out var ctx)
-                    ? ctx.ScenarioContext?.ScenarioContainer ??
-                      ctx.FeatureContext?.FeatureContainer ??
-                      ctx.TestThreadContext?.TestThreadContainer ??
-                      objectContainer
-                    : objectContainer;
+                string GetErrorMessage()
+                    => $"Unable to access test execution dependent service '{typeof(TResult).FullName}' with the Reqnroll.Microsoft.Extensions.DependencyInjection plugin. This service is only available once test execution has been started and cannot be used in '[BeforeTestRun]' hook.";
 
-                return container.Resolve<IReqnrollOutputHelper>();
-            });
+                if (!BindMappings.TryGetValue(sp, out var contextManager))
+                {
+                    throw new ReqnrollException(GetErrorMessage());
+                }
 
-            services.AddTransient(sp => BindMappings[sp]);
-            services.AddTransient(sp => BindMappings[sp].TestThreadContext);
-            services.AddTransient(sp => BindMappings[sp].FeatureContext);
-            services.AddTransient(sp => BindMappings[sp].ScenarioContext);
-            services.AddTransient(sp => BindMappings[sp].TestThreadContext.TestThreadContainer.Resolve<ITestRunner>());
-            services.AddTransient(sp => BindMappings[sp].TestThreadContext.TestThreadContainer.Resolve<ITestExecutionEngine>());
-            services.AddTransient(sp => BindMappings[sp].TestThreadContext.TestThreadContainer.Resolve<IStepArgumentTypeConverter>());
-            services.AddTransient(sp => BindMappings[sp].TestThreadContext.TestThreadContainer.Resolve<IStepDefinitionMatchService>());
+                TResult result;
+                try
+                {
+                    result = selector(contextManager);
+                }
+                catch (Exception ex)
+                {
+                    throw new ReqnrollException(GetErrorMessage(), ex);
+                }
+
+                if (result == null)
+                    throw new ReqnrollException(GetErrorMessage());
+
+                return result;
+            }
+
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.FeatureContext));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.ScenarioContext));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<ITestRunner>()));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<ITestExecutionEngine>()));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<IStepArgumentTypeConverter>()));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<IStepDefinitionMatchService>()));
+            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<IReqnrollOutputHelper>()));
         }
 
         private class RootServiceProviderContainer
