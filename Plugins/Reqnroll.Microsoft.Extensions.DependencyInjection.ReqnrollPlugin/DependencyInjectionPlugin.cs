@@ -160,7 +160,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             TResult GetTestThreadDependency<TResult>(IServiceProvider sp, Func<IContextManager, TResult> selector) where TResult: class
             {
                 string GetErrorMessage()
-                    => $"Unable to access test execution dependent service '{typeof(TResult).FullName}' with the Reqnroll.Microsoft.Extensions.DependencyInjection plugin. This service is only available once test execution has been started and cannot be used in '[BeforeTestRun]' hook.";
+                    => $"Unable to access test execution dependent service '{typeof(TResult).FullName}' with the Reqnroll.Microsoft.Extensions.DependencyInjection plugin. This service is only available once test execution has been started and cannot be used in '[BeforeTestRun]' hook. See https://go.reqnroll.net/doc-migrate-specflow-testrun-hooks for details.";
 
                 if (!BindMappings.TryGetValue(sp, out var contextManager))
                 {
