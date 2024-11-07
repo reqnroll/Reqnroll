@@ -3,16 +3,9 @@
     <AdditionalFilesToIncludeForProject>
       <Value>ExternalData\SampleFiles\**.*</Value>
     </AdditionalFilesToIncludeForProject>
-    <IgnoredTests>
-      <NamedTestSelector>
-        <TestName>Reqnroll.PluginTests.Generator.GeneratorPluginLoaderTests.LoadPlugin_LoadXUnitSuccessfully</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Reqnroll.PluginTests.Infrastructure.WindsorPluginTests.Can_load_Windsor_plugin</TestName>
-      </NamedTestSelector>
-      <NamedTestSelector>
-        <TestName>Reqnroll.PluginTests.Infrastructure.MicrosoftExtensionsDependencyInjectionTests.LoadPlugin_MicrosoftExtensionsDependencyInjection_ShouldNotBeNull</TestName>
-      </NamedTestSelector>
-    </IgnoredTests>
+    <CopyReferencedAssembliesToWorkspace>True</CopyReferencedAssembliesToWorkspace>
+    <HiddenComponentWarnings>
+      <Value>CopyReferencedAssembliesToWorkspaceIsOn</Value>
+    </HiddenComponentWarnings>
   </Settings>
 </ProjectConfiguration>
