@@ -15,6 +15,10 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit3PackageVersion = "3.13.1";
         public const string NUnit3TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit3TestAdapterPackageVersion = "3.17.0";
+        public const string NUnit4PackageName = "NUnit";
+        public const string NUnit4PackageVersion = "4.2.2";
+        public const string NUnit4TestAdapterPackageName = "NUnit3TestAdapter";
+        public const string NUnit4TestAdapterPackageVersion = "4.6.0";
         private const string XUnitPackageVersion = "2.4.2";
         private const string MSTestPackageVersion = "2.2.8";
         private const string InternalJsonPackageName = "SpecFlow.Internal.Json";
@@ -253,7 +257,10 @@ namespace Reqnroll.TestProjectGenerator
                         ConfigureXUnit();
                         break;
                     case UnitTestProvider.NUnit3:
-                        ConfigureNUnit();
+                        ConfigureNUnit3();
+                        break;
+                    case UnitTestProvider.NUnit4:
+                        ConfigureNUnit4();
                         break;
                     default:
                         throw new InvalidOperationException(@"Invalid unit test provider.");
@@ -263,10 +270,24 @@ namespace Reqnroll.TestProjectGenerator
             AddAdditionalStuff();
         }
 
-        private void ConfigureNUnit()
+        private void ConfigureNUnit3()
         {
             _project.AddNuGetPackage(NUnit3PackageName, NUnit3PackageVersion);
             _project.AddNuGetPackage(NUnit3TestAdapterPackageName, NUnit3TestAdapterPackageVersion);
+
+
+            if (IsReqnrollFeatureProject)
+            {
+                _project.AddNuGetPackage("Reqnroll.NUnit", _currentVersionDriver.ReqnrollNuGetVersion,
+                    new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.NUnit.ReqnrollPlugin.dll"), "net462\\Reqnroll.NUnit.ReqnrollPlugin.dll"));
+                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.NUnit", ReqnrollPluginType.Runtime));
+            }
+        }
+
+        private void ConfigureNUnit4()
+        {
+            _project.AddNuGetPackage(NUnit4PackageName, NUnit4PackageVersion);
+            _project.AddNuGetPackage(NUnit4TestAdapterPackageName, NUnit4TestAdapterPackageVersion);
 
 
             if (IsReqnrollFeatureProject)
@@ -348,6 +369,7 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
                     break;
                 case UnitTestProvider.NUnit3 when _parallelTestExecution:
+                case UnitTestProvider.NUnit4 when _parallelTestExecution:
                     _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.All)]"));
                     break;
                 case UnitTestProvider.MSTest when _parallelTestExecution:

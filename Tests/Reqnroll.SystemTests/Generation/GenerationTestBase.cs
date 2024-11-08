@@ -19,6 +19,8 @@ public abstract class GenerationTestBase : SystemTestBase
         ExecuteTests();
 
         ShouldAllScenariosPass();
+
+        ShouldFinishWithoutTestExecutionWarnings();
     }
 
     [TestMethod]

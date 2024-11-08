@@ -25,6 +25,8 @@ namespace Reqnroll.TestProjectGenerator
 
         public DateTime StartTime { get; set; }
         public DateTime EndTime { get; set; }
+
+        public string[] Warnings { get; set; }
     }
 
     public class TestResult
