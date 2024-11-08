@@ -4,6 +4,14 @@
 
 ## Bug fixes:
 
+*Contributors of this release (in alphabetical order):* 
+
+# v2.2.1 - 2024-11-08
+
+## Improvements:
+
+## Bug fixes:
+
 * Fix: NUnit projects fail or provide warning as `TearDown : System.InvalidOperationException : Only static OneTimeSetUp and OneTimeTearDown are allowed for InstancePerTestCase mode.` (#320)
 
 *Contributors of this release (in alphabetical order):* @gasparnagy
