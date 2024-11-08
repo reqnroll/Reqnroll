@@ -23,6 +23,7 @@ public class ReqnrollLogger : ILogger
     private readonly LoggerExternalScopeProvider _scopeProvider;
 
     public static ILogger CreateLogger(IReqnrollOutputHelper outputHelper) => new ReqnrollLogger(outputHelper, new LoggerExternalScopeProvider(), string.Empty);
+    
     public static ILogger<T> CreateLogger<T>(IReqnrollOutputHelper outputHelper) => new ReqnrollLogger<T>(outputHelper, new LoggerExternalScopeProvider());
 
     public ReqnrollLogger(IReqnrollOutputHelper outputHelper, LoggerExternalScopeProvider scopeProvider, string? categoryName)
@@ -49,7 +50,7 @@ public class ReqnrollLogger : ILogger
 
     public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
-        if (logLevel == LogLevel.None)
+        if (!IsEnabled(logLevel))
         {
             return;
         }
