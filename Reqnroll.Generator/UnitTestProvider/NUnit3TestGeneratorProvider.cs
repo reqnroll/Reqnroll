@@ -57,7 +57,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
-            generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
+            generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
             CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR_NUNIT3);
         }
 
