@@ -47,20 +47,28 @@ namespace Reqnroll.TestProjectGenerator
         private TestExecutionResult GetCommonTestExecutionResult(XDocument trx, string output, IEnumerable<string> reportFiles, string logFileContent)
         {
             var testRunElement = trx.Descendants(_testRunElementName).Single();
-            var summaryElement = testRunElement.Element(_xmlns + "ResultSummary")?.Element(_xmlns + "Counters")
-                                 ?? throw new InvalidOperationException("Invalid document; result summary counters element not found.");
+            var summaryElement = testRunElement.Element(_xmlns + "ResultSummary")
+                                 ?? throw new InvalidOperationException("Invalid document; result summary element not found."); ;
+            var summaryCountersElement = summaryElement?.Element(_xmlns + "Counters")
+                                         ?? throw new InvalidOperationException("Invalid document; result summary counters element not found.");
 
-            var totalAttribute = summaryElement.Attribute("total");
-            var executedAttribute = summaryElement.Attribute("executed");
-            var passedAttribute = summaryElement.Attribute("passed");
-            var failedAttribute = summaryElement.Attribute("failed");
-            var inconclusiveAttribute = summaryElement.Attribute("inconclusive");
+            var totalAttribute = summaryCountersElement.Attribute("total");
+            var executedAttribute = summaryCountersElement.Attribute("executed");
+            var passedAttribute = summaryCountersElement.Attribute("passed");
+            var failedAttribute = summaryCountersElement.Attribute("failed");
+            var inconclusiveAttribute = summaryCountersElement.Attribute("inconclusive");
 
             int.TryParse(totalAttribute?.Value, out int total);
             int.TryParse(executedAttribute?.Value, out int executed);
             int.TryParse(passedAttribute?.Value, out int passed);
             int.TryParse(failedAttribute?.Value, out int failed);
             int.TryParse(inconclusiveAttribute?.Value, out int inconclusive);
+
+            var runInfos = summaryElement.Element(_xmlns + "RunInfos")?.Elements(_xmlns + "RunInfo") ?? Enumerable.Empty<XElement>();
+            var warnings = runInfos
+                           .Where(ri => "Warning".Equals(ri.Attribute("outcome")?.Value, StringComparison.InvariantCultureIgnoreCase))
+                           .Select(ri => ri.Element(_xmlns + "Text")?.Value ?? "[no warning text]")
+                           .ToArray();
 
             var testResults = GetTestResults(testRunElement, _xmlns);
             var leafTestResults =
@@ -84,6 +92,7 @@ namespace Reqnroll.TestProjectGenerator
                 Succeeded = passed,
                 Failed = failed,
                 Pending = inconclusive,
+                Warnings = warnings
             };
         }
 
@@ -93,7 +102,9 @@ namespace Reqnroll.TestProjectGenerator
             {
                 case UnitTestProvider.xUnit: return CalculateXUnitTestExecutionResult(testExecutionResult, trx);
                 case UnitTestProvider.MSTest: return CalculateMsTestTestExecutionResult(testExecutionResult);
-                case UnitTestProvider.NUnit3: return CalculateNUnitTestExecutionResult(testExecutionResult);
+                case UnitTestProvider.NUnit3: 
+                case UnitTestProvider.NUnit4: 
+                    return CalculateNUnitTestExecutionResult(testExecutionResult);
                 default: throw new NotSupportedException($"The specified unit test provider is not supported: {testRunConfiguration.UnitTestProvider}");
             }
         }

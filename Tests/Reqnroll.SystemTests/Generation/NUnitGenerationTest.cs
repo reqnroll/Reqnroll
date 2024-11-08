@@ -18,6 +18,20 @@ public class NUnitGenerationTest : GenerationTestBase
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.NUnit3;
     }
 
+    [TestMethod]
+    public void GeneratorAllIn_sample_can_be_handled_by_NUnit4()
+    {
+        _testRunConfiguration.UnitTestProvider = UnitTestProvider.NUnit4;
+
+        PrepareGeneratorAllInSamples();
+
+        ExecuteTests();
+
+        ShouldAllScenariosPass();
+
+        ShouldFinishWithoutTestExecutionWarnings();
+    }
+
     protected override void AssertIgnoredScenarioOutlineExampleHandled()
     {
         _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
