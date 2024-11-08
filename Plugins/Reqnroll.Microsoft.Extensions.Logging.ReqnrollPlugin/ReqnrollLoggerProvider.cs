@@ -8,17 +8,12 @@ public sealed class ReqnrollLoggerProvider : ILoggerProvider
     private readonly ReqnrollLoggerOptions _options;
     private readonly LoggerExternalScopeProvider _scopeProvider = new();
 
-    public ReqnrollLoggerProvider(IReqnrollOutputHelper outputHelper)
-        : this(outputHelper, options: null)
-    {
-    }
-
     public ReqnrollLoggerProvider(IReqnrollOutputHelper outputHelper, bool appendScope)
         : this(outputHelper, new ReqnrollLoggerOptions { IncludeScopes = appendScope })
     {
     }
 
-    public ReqnrollLoggerProvider(IReqnrollOutputHelper outputHelper, ReqnrollLoggerOptions? options)
+    public ReqnrollLoggerProvider(IReqnrollOutputHelper outputHelper, ReqnrollLoggerOptions? options = null)
     {
         _outputHelper = outputHelper;
         _options = options ?? new ReqnrollLoggerOptions();

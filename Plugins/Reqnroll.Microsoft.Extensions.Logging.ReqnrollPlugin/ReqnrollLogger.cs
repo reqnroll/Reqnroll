@@ -26,17 +26,12 @@ public class ReqnrollLogger : ILogger
     
     public static ILogger<T> CreateLogger<T>(IReqnrollOutputHelper outputHelper) => new ReqnrollLogger<T>(outputHelper, new LoggerExternalScopeProvider());
 
-    public ReqnrollLogger(IReqnrollOutputHelper outputHelper, LoggerExternalScopeProvider scopeProvider, string? categoryName)
-        : this(outputHelper, scopeProvider, categoryName, appendScope: true)
-    {
-    }
-
     public ReqnrollLogger(IReqnrollOutputHelper outputHelper, LoggerExternalScopeProvider scopeProvider, string? categoryName, bool appendScope)
         : this(outputHelper, scopeProvider, categoryName, options: new ReqnrollLoggerOptions { IncludeScopes = appendScope })
     {
     }
 
-    public ReqnrollLogger(IReqnrollOutputHelper outputHelper, LoggerExternalScopeProvider scopeProvider, string? categoryName, ReqnrollLoggerOptions? options)
+    public ReqnrollLogger(IReqnrollOutputHelper outputHelper, LoggerExternalScopeProvider scopeProvider, string? categoryName, ReqnrollLoggerOptions? options = null)
     {
         _outputHelper = outputHelper;
         _scopeProvider = scopeProvider;
@@ -60,7 +55,7 @@ public class ReqnrollLogger : ILogger
         if (_options.TimestampFormat is not null)
         {
             var now = _options.UseUtcTimestamp ? DateTimeOffset.UtcNow : DateTimeOffset.Now;
-            var timestamp = now.ToString(_options.TimestampFormat);
+            var timestamp = now.ToString(_options.TimestampFormat, _options.Culture);
             sb.Append(timestamp).Append(' ');
         }
 
