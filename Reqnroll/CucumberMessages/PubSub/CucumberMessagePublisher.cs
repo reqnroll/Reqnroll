@@ -171,27 +171,27 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            await Task.Run( () =>
+            await Task.Run(() =>
             {
                 lock (_lock)
                 {
-                    var ft = new FeatureTracker(featureStartedEvent, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
-
                     // This will add a FeatureTracker to the StartedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.
 
                     // We publish the messages before adding the featureTracker to the StartedFeatures dictionary b/c other parallel scenario threads might be running. 
                     //   We don't want them to run until after the static messages have been published (and the PickleJar has been populated as a result).
-                    if (!StartedFeatures.ContainsKey(featureName) && ft.Enabled)
+                    if (!StartedFeatures.ContainsKey(featureName))
                     {
-                        Task.Run(async () =>
-                        {
-                            foreach (var msg in ft.StaticMessages)
+                        var ft = new FeatureTracker(featureStartedEvent, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
+                        if (ft.Enabled)
+                            Task.Run(async () =>
                             {
-                                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
-                            }
-                        }).Wait();
+                                foreach (var msg in ft.StaticMessages)
+                                {
+                                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                                }
+                            }).Wait();
+                        StartedFeatures.TryAdd(featureName, ft);
                     }
-                    StartedFeatures.TryAdd(featureName, ft);
                 }
             });
         }
