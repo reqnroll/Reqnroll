@@ -14,37 +14,22 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
     {
         public int _PickleCounter = 0;
 
-        public bool HasPickles { get; }
+        public bool HasPickles => Pickles != null && Pickles.Count() > 0;
         public IEnumerable<Pickle> Pickles { get; set; }
 
-        public PickleJar(string picklesJSON) : this(System.Text.Json.JsonSerializer.Deserialize<List<Pickle>>(picklesJSON)) { }
-        public PickleJar(IEnumerable<Pickle> pickles) : this(pickles, 0, 0) { }
-
-        public PickleJar(IEnumerable<Pickle> pickles, int pickleCounter, int pickleStepCounter)
+        public PickleJar(IEnumerable<Pickle> pickles)
         {
             Pickles = pickles;
-            _PickleCounter = pickleCounter;
-            HasPickles = pickles != null && pickles.Count() > 0;
+            _PickleCounter = 0;
         }
-
-        public string CurrentPickleId
-        {
-            get
-            {
-                if (!HasPickles) return null;
-                return Pickles.ElementAt(_PickleCounter).Id;
-            }
-        }
-        public Pickle CurrentPickle { get { return Pickles.ElementAt(_PickleCounter); } }
 
         public PickleStepSequence PickleStepSequenceFor(string pickleIndex)
         {
-            return new PickleStepSequence(HasPickles, HasPickles ? Pickles.ElementAt(int.Parse(pickleIndex)): null);
-        }
+            var pickleIndexInt = int.Parse(pickleIndex);
+            if (HasPickles && (pickleIndexInt < 0 || pickleIndexInt >= Pickles.Count()))
+                throw new ArgumentException("Invalid pickle index: " + pickleIndex);
 
-        public void NextPickle()
-        {
-            _PickleCounter++;
+            return new PickleStepSequence(HasPickles, HasPickles ? Pickles.ElementAt(pickleIndexInt): null);
         }
     }
 }

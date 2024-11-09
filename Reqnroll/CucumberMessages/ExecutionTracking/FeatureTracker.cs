@@ -173,12 +173,25 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         public void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
-            // as in the Publisher, we're using defensive coding here b/c some test setups might not have complete info
             var pickleIndex = scenarioStartedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
-            if (String.IsNullOrEmpty(pickleIndex)) return;
+
+            // The following validations and ANE throws are in place to help identify threading bugs when Scenarios are run in parallel.
+            // TODO: consider removing these or placing them within #IFDEBUG
+
+            if (String.IsNullOrEmpty(pickleIndex))
+            {
+                // Should never happen
+                if (scenarioStartedEvent.ScenarioContext == null)
+                    throw new ArgumentNullException("ScenarioContext", "ScenarioContext is not properly initialized for Cucumber Messages.");
+                if (scenarioStartedEvent.ScenarioContext.ScenarioInfo == null)
+                    throw new ArgumentNullException("ScenarioInfo", "ScenarioContext/ScenarioInfo is not properly initialized for Cucumber Messages.");
+                throw new ArgumentNullException("PickleIdIndex", "ScenarioContext/ScenarioInfo does not have a properly initialized PickleIdIndex.");
+            }
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
+                if (PickleJar == null)
+                    throw new ArgumentNullException("PickleJar", "PickleJar is not properly initialized for Cucumber Messages.");
                 // Fetch the PickleStepSequence for this Pickle and give to the ScenarioInfo
                 var pickleStepSequence = PickleJar.PickleStepSequenceFor(pickleIndex);
                 scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence; ;

@@ -5,7 +5,6 @@ using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using System.Collections.Concurrent;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.CucumberMessages.ExecutionTracking;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
@@ -30,7 +29,9 @@ namespace Reqnroll.CucumberMessages.PubSub
     {
         private Lazy<ICucumberMessageBroker> _brokerFactory;
         private ICucumberMessageBroker _broker;
-        private IObjectContainer objectContainer;
+        private IObjectContainer testThreadObjectContainer;
+
+        public static object _lock = new object();
 
         // Started Features by name
         private ConcurrentDictionary<string, FeatureTracker> StartedFeatures = new();
@@ -59,8 +60,8 @@ namespace Reqnroll.CucumberMessages.PubSub
             };
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
               {
-                  objectContainer = args.ObjectContainer;
-                  _brokerFactory = new Lazy<ICucumberMessageBroker>(() => objectContainer.Resolve<ICucumberMessageBroker>());
+                  testThreadObjectContainer = args.ObjectContainer;
+                  _brokerFactory = new Lazy<ICucumberMessageBroker>(() => testThreadObjectContainer.Resolve<ICucumberMessageBroker>());
                   var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
                   HookIntoTestThreadExecutionEventPublisher(testThreadExecutionEventPublisher);
               };
@@ -137,18 +138,21 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (!Enabled)
                 return;
             var status = StartedFeatures.Values.All(f => f.FeatureExecutionSuccess);
-            
-            Task.Run(async () => 
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now)) })).Wait();
+            StartedFeatures.Clear();
+
+            Task.Run(async () =>
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now)) })
+                ).Wait();
         }
 
         #region TestThreadExecutionEventPublisher Event Handling Methods
+
         // The following methods handle the events published by the TestThreadExecutionEventPublisher
         // When one of these calls the Broker, that method is async; otherwise these are sync methods that return a completed Task (to allow them to be called async from the TestThreadExecutionEventPublisher)
         private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
             _broker = _brokerFactory.Value;
-            var traceListener = objectContainer.Resolve<ITraceListener>();
+            var traceListener = testThreadObjectContainer.Resolve<ITraceListener>();
 
             var featureName = featureStartedEvent.FeatureContext?.FeatureInfo?.Title;
 
@@ -167,18 +171,29 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            // Creating multiple copies of the same FeatureTracker is safe as it causes no side-effects.
-            // If two or more threads are running this code simultaneously, all but one of them will get created but then will be ignored.
-            var ft = new FeatureTracker(featureStartedEvent, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
-
-            // This will add a FeatureTracker to the StartedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.
-            if (StartedFeatures.TryAdd(featureName, ft) && ft.Enabled)
+            await Task.Run( () =>
             {
-                foreach (var msg in ft.StaticMessages)
+                lock (_lock)
                 {
-                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                    var ft = new FeatureTracker(featureStartedEvent, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
+
+                    // This will add a FeatureTracker to the StartedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.
+
+                    // We publish the messages before adding the featureTracker to the StartedFeatures dictionary b/c other parallel scenario threads might be running. 
+                    //   We don't want them to run until after the static messages have been published (and the PickleJar has been populated as a result).
+                    if (!StartedFeatures.ContainsKey(featureName) && ft.Enabled)
+                    {
+                        Task.Run(async () =>
+                        {
+                            foreach (var msg in ft.StaticMessages)
+                            {
+                                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                            }
+                        }).Wait();
+                    }
+                    StartedFeatures.TryAdd(featureName, ft);
                 }
-            }
+            });
         }
 
         private Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
@@ -206,7 +221,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             var featureName = scenarioStartedEvent.FeatureContext?.FeatureInfo?.Title;
             if (!Enabled || String.IsNullOrEmpty(featureName))
                 return Task.CompletedTask;
-            var traceListener = objectContainer.Resolve<ITraceListener>();
+            var traceListener = testThreadObjectContainer.Resolve<ITraceListener>();
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
                 if (featureTracker.Enabled)
