@@ -65,7 +65,8 @@ namespace Reqnroll.RuntimeTests.BoDi
 
             // when 
             Action act = () => container.RegisterTypeAs<SimpleClassWithDefaultCtor, IInterface1>();
-            act.Should().ThrowExactly<ObjectContainerException>();
+            var e = act.Should().ThrowExactly<ObjectContainerException>();
+            e.Which.Message.Should().Contain("IInterface1");
         }
 
         [Fact]
