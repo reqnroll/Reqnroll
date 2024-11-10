@@ -6,6 +6,7 @@
 * Enhance BoDi error handling to provide the name of the Interface being registered when that Interface has already been resolved.
 
 *Contributors of this release (in alphabetical order):* 
+clrudolphi
 
 # v2.2.1 - 2024-11-08
 
