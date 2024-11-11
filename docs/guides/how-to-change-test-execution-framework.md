@@ -1,6 +1,6 @@
 # How to change the test execution framework used by Reqnroll
 
-To change test execution framework reference relevant NuGet SpecFlow pacakge. For details see:
+To change test execution framework reference relevant NuGet Reqnroll package. For details see:
 * [xUnit](../integrations/xunit.md)
 * [NUnit](../integrations/nunit.md)
 * [MSTest](../integrations/mstest.md)
