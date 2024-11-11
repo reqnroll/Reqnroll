@@ -68,11 +68,11 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             // This has side-effects needed for proper execution of subsequent events; eg, the Ids of the static messages get generated and then subsequent events generate Ids that follow
             _staticMessages = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
         }
+
+        // This method is used to generate the static messages (Source, GherkinDocument & Pickles) and the StepTransformations, StepDefinitions and Hook messages which are global to the entire Solution
+        // This should be called only once per Feature. As such, it relies on the use of a lock section within the Publisher to ensure that only a single instance of the FeatureTracker is created per Feature
         private IEnumerable<Envelope> GenerateStaticMessages(FeatureStartedEvent featureStartedEvent)
         {
-
-            yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source());
-
             var gd = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument();
 
             var pickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles().ToList();
@@ -88,6 +88,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             }
 
             PickleJar = new PickleJar(pickles);
+
+            yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source());
 
             yield return Envelope.Create(gd);
             foreach (var pickle in pickles)
