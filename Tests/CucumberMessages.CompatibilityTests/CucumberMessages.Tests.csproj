@@ -72,7 +72,9 @@
     <EmbeddedResource Include="Samples\ambiguous\ambiguous.cs" />
     <EmbeddedResource Include="Samples\attachments\attachments.cs" />
     <EmbeddedResource Include="Samples\attachments\attachments.feature" />
-    <Content Include="Samples\ambiguous\ambiguous.feature.ndjson" />
+    <Content Include="Samples\ambiguous\ambiguous.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Samples\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
