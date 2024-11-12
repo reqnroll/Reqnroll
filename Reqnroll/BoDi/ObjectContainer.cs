@@ -364,7 +364,7 @@ public class ObjectContainer : IObjectContainer
     public IStrategyRegistration RegisterTypeAs(Type implementationType, Type interfaceType, string name = null)
     {
         if (!IsValidTypeMapping(implementationType, interfaceType))
-            throw new InvalidOperationException($"type mapping is not valid: {implementationType} -> {interfaceType}");
+            throw new InvalidOperationException($"The type mapping is not valid. The {implementationType} is not assignable to the interface {interfaceType}");
         return RegisterTypeAsInternal(implementationType, interfaceType, name);
     }
 
