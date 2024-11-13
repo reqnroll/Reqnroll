@@ -2,9 +2,11 @@
 
 ## Improvements:
 
+* Documentation on how to changing a unit test provider and a basic FAQ (just docs, no code changes).
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order): @melchiork 
 
 # v2.2.1 - 2024-11-08
 
