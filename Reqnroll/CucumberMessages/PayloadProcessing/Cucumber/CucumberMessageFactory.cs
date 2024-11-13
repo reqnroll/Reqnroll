@@ -1,12 +1,10 @@
 ﻿using Cucumber.Messages;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.Analytics;
 using Reqnroll.Bindings;
 using Reqnroll.BoDi;
 using Reqnroll.CommonModels;
 using Reqnroll.CucumberMessages.ExecutionTracking;
-using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Events;
@@ -26,15 +24,26 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
     /// </summary>
     internal class CucumberMessageFactory
     {
-        public static TestRunStarted ToTestRunStarted(DateTime timestamp)
+        public static TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
         {
-            return new TestRunStarted(Converters.ToTimestamp(timestamp));
+            return new TestRunStarted(Converters.ToTimestamp(timestamp), id);
         }
 
-        public static TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp)
+        public static TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId)
         {
-            return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp), null);
+            return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp), null, testRunStartedId);
         }
+
+        internal static Envelope ToTestRunHookStarted(TestRunHookTracker hookTracker)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal static Envelope ToTestRunHookFinished(TestRunHookTracker hookTracker)
+        {
+            throw new NotImplementedException();
+        }
+
         internal static TestCase ToTestCase(TestCaseTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
         {
             var testSteps = new List<TestStep>();
@@ -59,7 +68,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             (
                 testCaseTracker.TestCaseId,
                 testCaseTracker.PickleId,
-                testSteps
+                testSteps,
+                testCaseTracker.TestRunStartedId
             );
             return testCase;
         }
@@ -184,9 +194,26 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 iDGenerator.GetNewId(),
                 null,
                 sourceRef,
-                hookBinding.IsScoped ? $"@{hookBinding.BindingScope.Tag}" : null
+                hookBinding.IsScoped ? $"@{hookBinding.BindingScope.Tag}" : null,
+                ToHookType(hookBinding)
             );
             return result;
+        }
+
+        internal static Io.Cucumber.Messages.Types.HookType ToHookType(IHookBinding hookBinding)
+        {
+            return hookBinding.HookType switch
+            {
+                Bindings.HookType.BeforeTestRun => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_RUN,
+                Bindings.HookType.AfterTestRun => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_RUN,
+                Bindings.HookType.BeforeScenario => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_CASE,
+                Bindings.HookType.AfterScenario => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_CASE,
+                Bindings.HookType.BeforeStep => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_STEP,
+                Bindings.HookType.AfterStep => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_STEP,
+
+                // Note: The following isn't strictly correct, but about all that can be done given that Cucumber doesn't support any other types of Hooks
+                _ => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_RUN
+            };
         }
 
         internal static TestStep ToHookTestStep(HookStepTracker hookStepState)
@@ -222,7 +249,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 null,
                 attachmentAddedEventWrapper.TestCaseStartedID,
                 attachmentAddedEventWrapper.TestCaseStepID,
-                null);
+                null,
+                tracker.TestRunStartedId);
         }
         internal static Attachment ToAttachment(TestCaseTracker tracker, OutputAddedEventWrapper outputAddedEventWrapper)
         {
@@ -234,7 +262,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 null,
                 outputAddedEventWrapper.TestCaseStartedID,
                 outputAddedEventWrapper.TestCaseStepID,
-                null);
+                null,
+                tracker.TestRunStartedId);
         }
 
         private static TestStepResult ToTestStepResult(StepExecutionTrackerBase stepState)

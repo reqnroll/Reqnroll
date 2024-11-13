@@ -72,7 +72,9 @@
     <EmbeddedResource Include="Samples\ambiguous\ambiguous.cs" />
     <EmbeddedResource Include="Samples\attachments\attachments.cs" />
     <EmbeddedResource Include="Samples\attachments\attachments.feature" />
-    <Content Include="Samples\ambiguous\ambiguous.feature.ndjson" />
+    <Content Include="Samples\ambiguous\ambiguous.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Samples\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -154,7 +156,7 @@
 
   <ItemGroup>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
-    <PackageReference Include="Cucumber.Messages" Version="26.0.1" />
+    <PackageReference Include="Cucumber.Messages" Version="27.0.0" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.5.2" />

@@ -47,10 +47,10 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
                         return ReWrite(document);
 
                     case (false, IDGenerationStyle.Incrementing):
-                        var lastId = ProbeForLastUsedId(document);
                         var anotherThreadSetTheSeed = false;
                         lock (_sharedLockObject)
                         {
+                            var lastId = ProbeForLastUsedId(document);
                             if (((SeedableIncrementingIdGenerator)_idGenerator).HasBeenUsed)
                                 anotherThreadSetTheSeed = true;
                             else

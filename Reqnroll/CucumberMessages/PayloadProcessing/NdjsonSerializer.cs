@@ -23,6 +23,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing
             options.Converters.Add(new CucumberMessageEnumConverter<StepDefinitionPatternType>());
             options.Converters.Add(new CucumberMessageEnumConverter<StepKeywordType>());
             options.Converters.Add(new CucumberMessageEnumConverter<TestStepResultStatus>());
+            options.Converters.Add(new CucumberMessageEnumConverter<HookType>());
             options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
             options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 

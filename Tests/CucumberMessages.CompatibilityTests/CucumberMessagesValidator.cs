@@ -119,7 +119,7 @@ namespace CucumberMessages.Tests
             {
                 // For TestStepFinished, we will separate out those related to hooks; 
                 // the regular comparison will be done for TestStepFinished related to PickleSteps/StepDefinitions
-                // Hook related TestStepFinished - the order is indetermant, so we will check quantity, and count of Statuses
+                // Hook related TestStepFinished - the order is indeterminate, so we will check quantity, and count of Statuses
                 // Hook related TestSteps are found by following the testStepId of the Finished message to the related TestStep. If the TestStep has a value for pickleStepId, then it is a regular step.
                 // if it has a hookId, it is a hook step
 

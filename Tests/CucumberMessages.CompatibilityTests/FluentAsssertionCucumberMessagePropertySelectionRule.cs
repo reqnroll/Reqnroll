@@ -33,7 +33,8 @@ namespace CucumberMessages.Tests
         private List<string> PropertiesToSkip = new List<string>() {    
                                                                         "Location", "Line", "Column", "Uri", "JavaMethod", "JavaStackTraceElement", "Exception",
                                                                         "Duration", "Start", "FileName", "Message", "Type", "StackTrace", "UseForSnippets",
-                                                                        "Id", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", "TestCaseStartedId","TestStepId", "TestCaseId", "WorkerId",
+                                                                        "Id", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", 
+                                                                        "TestRunStartedId", "TestCaseStartedId", "TestStepId", "TestCaseId", "WorkerId",
                                                                         "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci"
                                                                     };
 
