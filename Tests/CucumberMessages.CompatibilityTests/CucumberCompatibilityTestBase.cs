@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Io.Cucumber.Messages.Types;
 using Moq;
+using Reqnroll.BoDi;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.EnvironmentAccess;
@@ -9,6 +10,7 @@ using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
@@ -121,9 +123,11 @@ namespace CucumberMessages.Tests
 
             //var config = System.Text.Json.JsonSerializer.Deserialize<ConfigurationDTO>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
+            var objectContainerMock = new Mock<IObjectContainer>();
             var tracerMock = new Mock<ITraceListener>();
+            objectContainerMock.Setup(x => x.Resolve<ITraceListener>()).Returns(tracerMock.Object);
             var env = new EnvironmentWrapper();
-            CucumberConfiguration configuration = new CucumberConfiguration(tracerMock.Object, env);
+            CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env);
             var resultLocation = Path.Combine(configuration.BaseDirectory, configuration.OutputDirectory);
             return resultLocation;
         }

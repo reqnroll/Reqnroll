@@ -1,4 +1,5 @@
-﻿using Reqnroll.CommonModels;
+﻿using Reqnroll.BoDi;
+using Reqnroll.CommonModels;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Tracing;
 using System;
@@ -29,16 +30,17 @@ namespace Reqnroll.CucumberMessages.Configuration
         public string OutputFileName => _resolvedConfiguration.Value.OutputFileName;
         public IDGenerationStyle IDGenerationStyle => _resolvedConfiguration.Value.IDGenerationStyle;
 
-
-        private ITraceListener _trace;
+        private readonly IObjectContainer _objectContainer;
+        private Lazy<ITraceListener> _traceListenerLazy;
         private IEnvironmentWrapper _environmentWrapper;
 
-        private Lazy<ResolvedConfiguration> _resolvedConfiguration; 
+        private Lazy<ResolvedConfiguration> _resolvedConfiguration;
         private bool _enablementOverrideFlag = true;
 
-        public CucumberConfiguration(ITraceListener traceListener, IEnvironmentWrapper environmentWrapper)
+        public CucumberConfiguration(IObjectContainer objectContainer, IEnvironmentWrapper environmentWrapper)
         {
-            _trace = traceListener;
+            _objectContainer = objectContainer;
+            _traceListenerLazy = new Lazy<ITraceListener>(() => _objectContainer.Resolve<ITraceListener>());
             _environmentWrapper = environmentWrapper;
             _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
             Current = this;
@@ -50,8 +52,8 @@ namespace Reqnroll.CucumberMessages.Configuration
             _enablementOverrideFlag = value;
         }
         #endregion
-        
-        
+
+
         private ResolvedConfiguration ResolveConfiguration()
         {
             var config = ApplyHierarchicalConfiguration();
@@ -61,7 +63,7 @@ namespace Reqnroll.CucumberMessages.Configuration
             if (string.IsNullOrEmpty(resolved.OutputFileName))
             {
                 resolved.OutputFileName = "reqnroll_report.ndjson";
-                _trace!.WriteToolOutput($"WARNING: Cucumber Messages: Output filename was empty. Setting filename to {resolved.OutputFileName}");
+                _traceListenerLazy.Value.WriteToolOutput($"WARNING: Cucumber Messages: Output filename was empty. Setting filename to {resolved.OutputFileName}");
             }
             EnsureOutputDirectory(resolved);
             return resolved;
@@ -82,8 +84,8 @@ namespace Reqnroll.CucumberMessages.Configuration
             var relativePathValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_RELATIVE_PATH_ENVIRONMENT_VARIABLE);
             var fileNameValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE);
             var profileValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE);
-            string profileName = profileValue is Success<string> ? 
-                                    ((Success<string>)profileValue).Result : 
+            string profileName = profileValue is Success<string> ?
+                                    ((Success<string>)profileValue).Result :
                                     !string.IsNullOrEmpty(config.ActiveProfileName) ? config.ActiveProfileName :
                                     "DEFAULT";
             var idGenStyleValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE);
@@ -117,7 +119,7 @@ namespace Reqnroll.CucumberMessages.Configuration
 
             var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
             result.Enabled = enabledResult is Success<string> ? Convert.ToBoolean(((Success<string>)enabledResult).Result) : result.Enabled;
-            
+
             return result;
         }
 
@@ -129,10 +131,10 @@ namespace Reqnroll.CucumberMessages.Configuration
                 {
                     AddOrOverrideProfile(rootConfig.Profiles, overridingProfile);
                 }
-                if (!String.IsNullOrEmpty(overridingConfig.ActiveProfileName)  && !rootConfig.Profiles.Any(p => p.ProfileName == overridingConfig.ActiveProfileName))
+                if (!String.IsNullOrEmpty(overridingConfig.ActiveProfileName) && !rootConfig.Profiles.Any(p => p.ProfileName == overridingConfig.ActiveProfileName))
                 {
                     // The incoming configuration DTO points to a profile that doesn't exist.
-                    _trace.WriteToolOutput($"WARNING: Configuration file specifies an active profile that doesn't exist: {overridingConfig.ActiveProfileName}. Using {rootConfig.ActiveProfileName} instead.");
+                    _traceListenerLazy.Value.WriteToolOutput($"WARNING: Configuration file specifies an active profile that doesn't exist: {overridingConfig.ActiveProfileName}. Using {rootConfig.ActiveProfileName} instead.");
                 }
                 else if (!String.IsNullOrEmpty(overridingConfig.ActiveProfileName))
                     rootConfig.ActiveProfileName = overridingConfig.ActiveProfileName;
