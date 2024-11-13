@@ -16,6 +16,7 @@ using Reqnroll.Bindings;
 using System.Threading.Tasks;
 using Reqnroll.EnvironmentAccess;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -351,6 +352,9 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private async Task HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
         {
+            if (!Enabled)
+                return;
+
             if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun)
             {
                 string hookId = SharedIDGenerator.GetNewId();
@@ -374,6 +378,9 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private async Task HookBindingFinishedEventHandler(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
+            if (!Enabled)
+                return;
+
             if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun)
             {
                 var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
