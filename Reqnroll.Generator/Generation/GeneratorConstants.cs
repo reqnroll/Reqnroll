@@ -13,6 +13,7 @@ namespace Reqnroll.Generator.Generation
         public const string TESTCLASS_CLEANUP_NAME = "FeatureTearDownAsync";
         public const string BACKGROUND_NAME = "FeatureBackgroundAsync";
         public const string TESTRUNNER_FIELD = "testRunner";
+        public const string FEATUREINFO_FIELD = "featureInfo";
         public const string REQNROLL_NAMESPACE = "Reqnroll";
         public const string SCENARIO_OUTLINE_EXAMPLE_TAGS_PARAMETER = "exampleTags";
         public const string SCENARIO_TAGS_VARIABLE_NAME = "tagsOfScenario";

@@ -6,10 +6,10 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
     {
         public class NewProjectCommandBuilder : BaseCommandBuilder
         {
-            private string _templateName = "classlib";
-            private string _name = "ClassLib";
-            private string _folder;
-            private ProgrammingLanguage _language = ProgrammingLanguage.CSharp;
+            protected string _templateName = "classlib";
+            protected string _name = "ClassLib";
+            protected string _folder;
+            protected ProgrammingLanguage _language = ProgrammingLanguage.CSharp;
 
 
             public NewProjectCommandBuilder(IOutputWriter outputWriter) : base(outputWriter)
@@ -47,7 +47,7 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
 
             protected override string BuildArguments()
             {
-                var arguments = AddArgument($"new {_templateName} --no-update-check", "-o", "\"" + _folder + "\"");
+                var arguments = AddArgument($"new {_templateName} --no-update-check --no-restore", "-o", "\"" + _folder + "\"");
                 arguments = AddArgument(
                     arguments,
                     "-lang",

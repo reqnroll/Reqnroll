@@ -1,12 +1,13 @@
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Threading.Tasks;
 using Reqnroll.BoDi;
 using Reqnroll.Generator.CodeDom;
 
 namespace Reqnroll.Generator.UnitTestProvider
 {
+    [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
     public class NUnit3TestGeneratorProvider : IUnitTestGeneratorProvider
     {
         protected internal const string TESTFIXTURESETUP_ATTR_NUNIT3 = "NUnit.Framework.OneTimeSetUpAttribute";
@@ -50,11 +51,13 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
+            generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
             CodeDomHelper.AddAttribute(generationContext.TestClassInitializeMethod, TESTFIXTURESETUP_ATTR_NUNIT3);
         }
 
         public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
+            generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
             CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR_NUNIT3);
         }
 
@@ -123,9 +126,11 @@ namespace Reqnroll.Generator.UnitTestProvider
             var args = arguments.Select(
                 arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
 
-            // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://github.com/reqnroll/Reqnroll/issues/116
-            bool hasExampleTags = tags.Any();
-            var exampleTagExpressionList = tags.Select(t => new CodePrimitiveExpression(t));
+            var tagsArray = tags.ToArray();
+
+            // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://github.com/SpecFlowOSS/SpecFlow/issues/116
+            bool hasExampleTags = tagsArray.Any();
+            var exampleTagExpressionList = tagsArray.Select(t => (CodeExpression)new CodePrimitiveExpression(t));
             var exampleTagsExpression = hasExampleTags
                 ? new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray())
                 : (CodeExpression) new CodePrimitiveExpression(null);
@@ -135,7 +140,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             // adds 'Category' named parameter so that NUnit also understands that this test case belongs to the given categories
             if (hasExampleTags)
             {
-                CodeExpression exampleTagsStringExpr = new CodePrimitiveExpression(string.Join(",", tags.ToArray()));
+                CodeExpression exampleTagsStringExpr = new CodePrimitiveExpression(string.Join(",", tagsArray));
                 args.Add(new CodeAttributeArgument("Category", exampleTagsStringExpr));
             }
 

@@ -10,13 +10,15 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
 {
     public class VbBindingsGenerator : BaseBindingsGenerator
     {
-        private const string BindingsClassTemplate = @"
-Imports Reqnroll
+        private const string BindingsClassTemplate = 
+            """
+            Imports Reqnroll
 
-<Binding> _
-Public Class {0}
-    {1}
-End Class";
+            <Binding> _
+            Public Class {0}
+                {1}
+            End Class
+            """;
 
         public override ProjectFile GenerateLoggerClass(string pathToLogFile)
         {
@@ -28,56 +30,41 @@ End Class";
                 Imports System.Threading.Tasks
 
                 Friend Module Log
-                   Private Const LogFileLocation As String = "{{pathToLogFile}}"
+                    Private Const RetryCount As Integer = 5
+                    Private Const LogFileLocation As String = "{{pathToLogFile}}"
+                    Private ReadOnly Rnd As Random = New Random()
+                    Private ReadOnly LockObj As Object = New Object()
                    
-                   Private Sub Retry(number As Integer, action As Action)
-                       Try
-                           action
-                       Catch ex As Exception
-                           Dim i = number - 1
-                           If (i = 0)
-                               Throw
-                           End If
-                           System.Threading.Thread.Sleep(500)
-                           Retry(i, action)
-                       End Try
-                   End Sub    
+                    Private Sub Retry(number As Integer, action As Action)
+                        Try
+                            action
+                        Catch ex As Exception
+                            Dim i = number - 1
+                            If (i = 0)
+                                Throw
+                            End If
+                            System.Threading.Thread.Sleep(50 + Rnd.Next(50))
+                            Retry(i, action)
+                        End Try
+                    End Sub    
 
-                   Friend Sub LogStep(<CallerMemberName()> Optional stepName As String = Nothing)
-                       Retry(5, sub() File.AppendAllText(LogFileLocation, $"-> step: {stepName}{Environment.NewLine}"))
-                   End Sub
+                    Friend Sub LogStep(<CallerMemberName()> Optional stepName As String = Nothing)
+                        Retry(RetryCount, sub() WriteToFile($"-> step: {stepName}{Environment.NewLine}"))
+                    End Sub
 
-                   Friend Sub LogHook(<CallerMemberName()> Optional stepName As String = Nothing)
-                       Retry(5, sub() File.AppendAllText(LogFileLocation, $"-> hook: {stepName}{Environment.NewLine}"))
-                   End Sub
+                    Friend Sub LogHook(<CallerMemberName()> Optional stepName As String = Nothing)
+                        Retry(RetryCount, sub() WriteToFile($"-> hook: {stepName}{Environment.NewLine}"))
+                    End Sub
+
+                    Friend Sub LogCustom(category As String, value As String, <CallerMemberName()> Optional memberName As String = Nothing)
+                        Retry(RetryCount, sub() WriteToFile($"-> {category}: {value}:{memberName}{Environment.NewLine}"))
+                    End Sub
                    
-                   Friend Async Function LogHookIncludingLockingAsync(
-                   <CallerMemberName> ByVal Optional stepName As String = Nothing) As Task
-                       File.AppendAllText(LogFileLocation, $"->waiting for hook lock: {stepName}{Environment.NewLine}")
-                       Await WaitForLockAsync()
-                       File.AppendAllText(LogFileLocation, $"-> hook: {stepName}{Environment.NewLine}")
-                   End Function
-
-                   Private Async Function WaitForLockAsync() As Task
-                       Dim lockFile = LogFileLocation & ".lock"
-
-                       While True
-
-                           Dim succeeded = True
-                           Try
-                               Using File.Open(lockFile, FileMode.CreateNew)
-                               End Using
-                               Exit While
-                           Catch __unusedIOException1__ As IOException
-                               succeeded = False
-                           End Try
-                           If Not succeeded Then
-                               Await Task.Delay(1000)
-                           End If
-                       End While
-
-                       File.Delete(lockFile)
-                   End Function
+                    Private Sub WriteToFile(line As String)
+                        SyncLock LockObj
+                            File.AppendAllText(LogFileLocation, line)
+                        End SyncLock
+                    End Sub
                 End Module
                 """;
             return new ProjectFile("Log.vb", "Compile", fileContent);
@@ -182,70 +169,27 @@ End Class";
             string methodScopeAttributes = ToScopeTags(methodScopeAttributeTags);
 
             string staticKeyword = isStatic ? "Static" : string.Empty;
-            return $@"
-Imports System
-Imports System.Collections
-Imports System.IO
-Imports System.Linq
-Imports System.Xml
-Imports System.Xml.Linq
-Imports Reqnroll
+            return $"""
+                Imports System
+                Imports System.Collections
+                Imports System.IO
+                Imports System.Linq
+                Imports System.Xml
+                Imports System.Xml.Linq
+                Imports Reqnroll
 
-<[Binding]> _
-{classScopeAttributes}
-Public Class {Guid.NewGuid()}
-    <[{hookType}({hookTypeAttributeTagsString})]>_
-    {methodScopeAttributes}
-    Public {staticKeyword} Sub {name}()
-        {code}
-        Console.WriteLine(""-> hook: {name}"")
-    End Sub
-End Class
-";
+                <[Binding]> _
+                {classScopeAttributes}
+                Public Class {Guid.NewGuid()}
+                    <[{hookType}({hookTypeAttributeTagsString})]>_
+                    {methodScopeAttributes}
+                    Public {staticKeyword} Sub {name}()
+                        {code}
+                        Console.WriteLine("-> hook: {name}")
+                    End Sub
+                End Class
+                """;
         }
 
-        protected override string GetAsyncHookIncludingLockingBindingClass(string hookType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,
-            IList<string> classScopeAttributeTags = null)
-        {
-            string ToScopeTags(IList<string> scopeTags) => scopeTags.Any() ? $"{scopeTags.Select(t => $@"<[Scope](Tag=""{t}"")>").JoinToString("")}_" : null;
-
-            bool isStatic = IsStaticEvent(hookType);
-
-            string hookTypeTags = hookTypeAttributeTags?.Select(t => $@"""{t}""").JoinToString(", ");
-
-            var hookAttributeConstructorProperties = new[]
-            {
-                hookTypeAttributeTags is null || !hookTypeAttributeTags.Any() ? null : $"tags:= New String() {{{hookTypeTags}}}",
-                order is null ? null : $"Order:= {order}"
-            }.Where(p => p.IsNotNullOrWhiteSpace());
-
-            string hookTypeAttributeTagsString = string.Join(", ", hookAttributeConstructorProperties);
-            string classScopeAttributes = ToScopeTags(classScopeAttributeTags);
-            string methodScopeAttributes = ToScopeTags(methodScopeAttributeTags);
-
-            string staticKeyword = isStatic ? "Static" : string.Empty;
-            return $@"
-Imports System
-Imports System.Collections
-Imports System.IO
-Imports System.Linq
-Imports System.Xml
-Imports System.Xml.Linq
-Imports Reqnroll
-Imports System.Threading
-Imports System.Threading.Tasks
-
-<[Binding]> _
-{classScopeAttributes}
-Public Class {Guid.NewGuid()}
-    <[{hookType}({hookTypeAttributeTagsString})]>_
-    {methodScopeAttributes}
-    Public {staticKeyword} Async Function {name}() as Task
-        {code}
-        Await Log.LogHookIncludingLockingAsync()
-    End Function
-End Class
-";
-        }
     }
 }

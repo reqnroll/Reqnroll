@@ -24,8 +24,34 @@ public class TestRunnerManager : ITestRunnerManager
     protected readonly IRuntimeBindingRegistryBuilder _bindingRegistryBuilder;
     protected readonly ITestTracer _testTracer;
 
-    private readonly ConcurrentDictionary<IObjectContainer, object> _availableTestWorkerContainers = new();
-    private readonly ConcurrentDictionary<IObjectContainer, object> _usedTestWorkerContainers = new();
+    /// <summary>
+    /// Contains hints to for the test runner manager to choose the test runners from multiple available
+    /// ones in a more optimal way. Our goal is to keep the test runner "sticky" to the test framework workers
+    /// so that no unnecessary feature context switches occur.
+    /// Currently, we remember the feature info and the managed thread ID to help this.
+    /// </summary>
+    class TestWorkerContainerHint(FeatureInfo lastUsedFeatureInfo, int? releasedOnManagedThreadId)
+    {
+        public FeatureInfo LastUsedFeatureInfo { get; } = lastUsedFeatureInfo;
+
+        private int? ReleasedOnManagedThreadId { get; } = releasedOnManagedThreadId;
+
+        /// <summary>
+        /// Returns information about how optimal the provided hint for the current situation. Smaller number means more optimal.
+        /// </summary>
+        public static int GetDistance(TestWorkerContainerHint hint, FeatureInfo featureHint)
+        {
+            int distance = 0;
+            distance += hint?.LastUsedFeatureInfo == null || featureHint == null || !ReferenceEquals(hint.LastUsedFeatureInfo, featureHint) ?
+                2 : 0;
+            distance += hint?.ReleasedOnManagedThreadId == null || hint.ReleasedOnManagedThreadId != Thread.CurrentThread.ManagedThreadId ? 
+                1 : 0;
+            return distance;
+        }
+    }
+
+    private readonly ConcurrentDictionary<IObjectContainer, TestWorkerContainerHint> _availableTestWorkerContainers = new();
+    private readonly ConcurrentDictionary<IObjectContainer, TestWorkerContainerHint> _usedTestWorkerContainers = new();
     private int _nextTestWorkerContainerId;
 
     public bool IsTestRunInitialized { get; private set; }
@@ -55,9 +81,9 @@ public class TestRunnerManager : ITestRunnerManager
         return _usedTestWorkerContainers.Count - (hasTestRunStartWorker ? 1 : 0);
     }
 
-    public virtual ITestRunner CreateTestRunner()
+    public virtual ITestRunner GetOrCreateTestRunner(FeatureInfo featureHint = null)
     {
-        var testRunner = CreateTestRunnerInstance();
+        var testRunner = GetOrCreateTestRunnerInstance(featureHint);
 
         if (!IsTestRunInitialized)
         {
@@ -77,9 +103,10 @@ public class TestRunnerManager : ITestRunnerManager
     public virtual void ReleaseTestThreadContext(ITestThreadContext testThreadContext)
     {
         var testThreadContainer = testThreadContext.TestThreadContainer;
-        if (!_usedTestWorkerContainers.TryRemove(testThreadContainer, out _))
+        if (!_usedTestWorkerContainers.TryRemove(testThreadContainer, out var usedContainerHint))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was already released");
-        if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, null))
+        var containerHint = new TestWorkerContainerHint(usedContainerHint?.LastUsedFeatureInfo, Thread.CurrentThread.ManagedThreadId);
+        if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, containerHint))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was released twice");
     }
 
@@ -140,19 +167,24 @@ public class TestRunnerManager : ITestRunnerManager
             await onTestRunnerStartExecutionHost.OnTestRunStartAsync();
     }
 
-    protected virtual ITestRunner CreateTestRunnerInstance()
+    protected virtual ITestRunner GetOrCreateTestRunnerInstance(FeatureInfo featureHint = null)
     {
         IObjectContainer testThreadContainer = null;
-        for (int i = 0; i < 5 && testThreadContainer == null; i++) // Try to get a available Container max 5 times
+        for (int i = 0; i < 5 && testThreadContainer == null; i++) // Try to get an available Container max 5 times
         {
             var items = _availableTestWorkerContainers.ToArray();
             if (items.Length == 0)
                 break; // No Containers are available
-            foreach (var item in items)
+
+            var prioritizedContainers = items
+                .OrderBy(it => TestWorkerContainerHint.GetDistance(it.Value, featureHint))
+                .Select(it => it.Key);
+
+            foreach (var container in prioritizedContainers)
             {
-                if (!_availableTestWorkerContainers.TryRemove(item.Key, out _))
+                if (!_availableTestWorkerContainers.TryRemove(container, out _))
                     continue; // Container was already taken by another thread
-                testThreadContainer = item.Key;
+                testThreadContainer = container;
                 break;
             }
         }
@@ -165,7 +197,7 @@ public class TestRunnerManager : ITestRunnerManager
             testThreadContainer.RegisterInstanceAs(testThreadContainerInfo);
         }
 
-        if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, null))
+        if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, new TestWorkerContainerHint(featureHint, null)))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} is already in usage");
 
         return testThreadContainer.Resolve<ITestRunner>();
@@ -176,11 +208,11 @@ public class TestRunnerManager : ITestRunnerManager
         TestAssembly = assignedTestAssembly;
     }
 
-    public virtual ITestRunner GetTestRunner()
+    public virtual ITestRunner GetTestRunner(FeatureInfo featureHint = null)
     {
         try
         {
-            return GetTestRunnerWithoutExceptionHandling();
+            return GetTestRunnerWithoutExceptionHandling(featureHint);
         }
         catch (Exception ex)
         {
@@ -189,9 +221,9 @@ public class TestRunnerManager : ITestRunnerManager
         }
     }
 
-    private ITestRunner GetTestRunnerWithoutExceptionHandling()
+    private ITestRunner GetTestRunnerWithoutExceptionHandling(FeatureInfo featureHint)
     {
-        var testRunner = CreateTestRunner();
+        var testRunner = GetOrCreateTestRunner(featureHint);
 
         if (IsMultiThreaded && Interlocked.CompareExchange(ref _wasSingletonInstanceDisabled, 1, 0) == 0)
         {
@@ -203,10 +235,26 @@ public class TestRunnerManager : ITestRunnerManager
         return testRunner;
     }
 
+    private async Task FireRemainingAfterFeatureHooks()
+    {
+        var testWorkerContainers = _availableTestWorkerContainers.Keys.Concat(_usedTestWorkerContainers.Keys).ToArray();
+        foreach (var testWorkerContainer in testWorkerContainers)
+        {
+            var contextManager = testWorkerContainer.Resolve<IContextManager>();
+            if (contextManager.FeatureContext != null)
+            {
+                var testRunner = testWorkerContainer.Resolve<ITestRunner>();
+                await testRunner.OnFeatureEndAsync();
+            }
+        }
+    }
+
     public virtual async Task DisposeAsync()
     {
         if (Interlocked.CompareExchange(ref _wasDisposed, 1, 0) == 0)
         {
+            await FireRemainingAfterFeatureHooks();
+
             await FireTestRunEndAsync();
 
             if (_globalTestRunner != null)
@@ -214,21 +262,21 @@ public class TestRunnerManager : ITestRunnerManager
                 ReleaseTestThreadContext(_globalTestRunner.TestThreadContext);
             }
 
-            var items = _availableTestWorkerContainers.ToArray();
-            while (items.Length > 0)
+            var testWorkerContainers = _availableTestWorkerContainers.ToArray();
+            while (testWorkerContainers.Length > 0)
             {
-                foreach (var item in items)
+                foreach (var item in testWorkerContainers)
                 {
                     item.Key.Dispose();
                     _availableTestWorkerContainers.TryRemove(item.Key, out _);
                 }
-                items = _availableTestWorkerContainers.ToArray();
+                testWorkerContainers = _availableTestWorkerContainers.ToArray();
             }
 
-            var notReleasedRunner = _usedTestWorkerContainers.ToArray();
-            if (notReleasedRunner.Length > 0)
+            var notReleasedTestWorkerContainers = _usedTestWorkerContainers.ToArray();
+            if (notReleasedTestWorkerContainers.Length > 0)
             {
-                var errorText = $"Found {notReleasedRunner.Length} not released TestRunners (ids: {string.Join(",", notReleasedRunner.Select(x => TestThreadContainerInfo.GetId(x.Key)))})";
+                var errorText = $"Found {notReleasedTestWorkerContainers.Length} not released TestRunners (ids: {string.Join(",", notReleasedTestWorkerContainers.Select(x => TestThreadContainerInfo.GetId(x.Key)))})";
                 _globalContainer.Resolve<ITestTracer>().TraceWarning(errorText);
             }
 
@@ -317,11 +365,20 @@ public class TestRunnerManager : ITestRunnerManager
         await testRunnerManager.FireTestRunStartAsync();
     }
 
-    public static ITestRunner GetTestRunnerForAssembly(Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
+    /// <summary>
+    /// Provides a test runner for the specified or current assembly with optionally a custom container builder and a feature hint.
+    /// When a feature hint is provided the test runner manager will attempt to return the same test runner that was used for that
+    /// feature before. 
+    /// </summary>
+    /// <param name="testAssembly">The test assembly. If omitted or invoked with <c>null</c>, the calling assembly is used.</param>
+    /// <param name="containerBuilder">The container builder to be used to set up Reqnroll dependencies. If omitted or invoked with <c>null</c>, the default container builder is used.</param>
+    /// <param name="featureHint">If specified, it is used as a hint for the test runner manager to choose the test runner that has been used for the feature before, if possible.</param>
+    /// <returns>A test runner that can be used to interact with Reqnroll.</returns>
+    public static ITestRunner GetTestRunnerForAssembly(Assembly testAssembly = null, IContainerBuilder containerBuilder = null, FeatureInfo featureHint = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);
-        return testRunnerManager.GetTestRunner();
+        return testRunnerManager.GetTestRunner(featureHint);
     }
 
     public static void ReleaseTestRunner(ITestRunner testRunner)

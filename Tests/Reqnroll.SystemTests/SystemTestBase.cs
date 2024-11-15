@@ -107,6 +107,12 @@ public abstract class SystemTestBase
         AddFeatureFile(featureFileContent, preparedTests);
     }
 
+    protected void AddBindingClassFromResource(string fileName)
+    {
+        var bindingClassContent = _testFileManager.GetTestFileContent(fileName);
+        AddBindingClass(bindingClassContent);
+    }
+
     private int? GetTestCount(string gherkinContent)
     {
         var matches = Regex.Matches(gherkinContent, @"^\s*((?<scenario>Scenario:|Scenario Outline:)|(?<exmaples>Examples:)|(?<row>\|)).*?\s*$", RegexOptions.Multiline);
@@ -218,6 +224,11 @@ public abstract class SystemTestBase
     {
         int expectedNrOfTests = ConfirmAllTestsRan(expectedNrOfTestsSpec);
         _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
+    }
+
+    protected void ShouldFinishWithoutTestExecutionWarnings()
+    {
+        _vsTestExecutionDriver.LastTestExecutionResult.Warnings.Should().BeEmpty();
     }
 
     protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)

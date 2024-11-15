@@ -2,19 +2,19 @@ using System;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Reflection;
-using Reqnroll.BoDi;
 using Castle.Windsor;
 using FluentAssertions;
 using Moq;
-using Reqnroll.Windsor;
 using Reqnroll.Bindings;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
+using Reqnroll.Windsor;
 using Xunit;
 
-namespace Reqnroll.PluginTests.Infrastructure
+namespace Reqnroll.PluginTests.Windsor
 {
     public class WindsorPluginTests
     {

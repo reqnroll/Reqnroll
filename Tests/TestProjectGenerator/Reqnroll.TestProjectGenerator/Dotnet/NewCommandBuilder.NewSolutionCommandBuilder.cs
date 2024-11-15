@@ -4,8 +4,8 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
     {
         public class NewSolutionCommandBuilder : BaseCommandBuilder
         {
-            private string _name;
-            private string _rootPath;
+            protected string _name;
+            protected string _rootPath;
 
             public NewSolutionCommandBuilder InFolder(string rootPath)
             {

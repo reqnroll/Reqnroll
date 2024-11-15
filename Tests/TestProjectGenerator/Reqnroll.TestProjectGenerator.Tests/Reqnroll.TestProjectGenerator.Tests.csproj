@@ -1,7 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
@@ -17,13 +16,8 @@
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' != '$(net471)'">
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
-  </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
   </ItemGroup>
-
 
 </Project>
