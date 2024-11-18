@@ -27,7 +27,7 @@ namespace Reqnroll.TestProjectGenerator
             [TargetFramework.Net60] = "net6.0",
             [TargetFramework.Net70] = "net7.0",
             [TargetFramework.Net80] = "net8.0",
-            [TargetFramework.Net90] = "net9.0"
+            [TargetFramework.Net90] = "net9.0",
         };
 
         public string BuildTargetFrameworkMoniker(TargetFramework targetFramework)

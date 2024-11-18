@@ -21,6 +21,6 @@ namespace Reqnroll.TestProjectGenerator.Data
         Net60,
         Net70,
         Net80,
-        Net90
+        Net90,
     }
 }
