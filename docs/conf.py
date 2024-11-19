@@ -51,6 +51,8 @@ googleanalytics_enabled = (os.getenv("READTHEDOCS", "False") == "True") # enable
 
 # -- Options MyST -------------------------------------------------
 
+# See supported Callouts & Admonitions at https://mystmd.org/guide/admonitions
+
 myst_enable_extensions = [
     "attrs_block"
 ]
