@@ -14,12 +14,14 @@ namespace Reqnroll.Configuration
     {
         //private readonly ObjectContainer _objectContainer;
         private readonly JsonConfigurationLoader _jsonConfigurationLoader;
+        private readonly IMS_ConfigurationLoader _msConfigurationLoader;
         private readonly IReqnrollJsonLocator _reqnrollJsonLocator;
 
-        public ConfigurationLoader(IReqnrollJsonLocator reqnrollJsonLocator)
+        public ConfigurationLoader(IReqnrollJsonLocator reqnrollJsonLocator, IMS_ConfigurationLoader mS_ConfigurationLoader)
         {
             _reqnrollJsonLocator = reqnrollJsonLocator;
             _jsonConfigurationLoader = new JsonConfigurationLoader();
+            _msConfigurationLoader = mS_ConfigurationLoader;
         }
 
         private static CultureInfo DefaultFeatureLanguage => CultureInfo.GetCultureInfo(ConfigDefaults.FeatureLanguage);
@@ -139,7 +141,7 @@ namespace Reqnroll.Configuration
         {
             var jsonFilePath = _reqnrollJsonLocator.GetReqnrollJsonFilePath();
 
-            return new MSE_RuntimeConfigurationLoader().LoadConfiguration(reqnrollConfiguration, jsonFilePath);
+            return _msConfigurationLoader.Load(reqnrollConfiguration);
         }
 
         private ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration, string jsonContent)
