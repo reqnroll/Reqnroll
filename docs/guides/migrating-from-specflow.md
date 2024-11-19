@@ -24,6 +24,9 @@ It is also worth mentioning that Reqnroll is based on the SpecFlow v4 codebase, 
 It is recommended to upgrade directly to the latest version of Reqnroll (e.g. v2.0), as we keep improving the migration experience and fix issues that might block migration.
 ```
 
+```{attention} Living Documentation Support
+The SpecFlow+ LivingDoc was part of the closed source implementation of SpecFlow and therefore we could not take it over for Reqnroll. We are currently in a process of re-building the tool (or something similar to that), but with a workaround you can also use Reqnroll with the SpecFlow Living Doc Generator CLI tool. See more information about the plans and the workaround at the [Living Documentation discussion topic](https://github.com/orgs/reqnroll/discussions/196).
+```
 
 {#specflow-compatibility-package}
 ## Migrate with the Reqnroll SpecFlow Compatibility Package

@@ -364,7 +364,7 @@ public class ObjectContainer : IObjectContainer
     public IStrategyRegistration RegisterTypeAs(Type implementationType, Type interfaceType, string name = null)
     {
         if (!IsValidTypeMapping(implementationType, interfaceType))
-            throw new InvalidOperationException("type mapping is not valid");
+            throw new InvalidOperationException($"The type mapping is not valid. The {implementationType} is not assignable to the interface {interfaceType}");
         return RegisterTypeAsInternal(implementationType, interfaceType, name);
     }
 
@@ -500,7 +500,7 @@ public class ObjectContainer : IObjectContainer
     private void AssertNotResolved(RegistrationKey interfaceType)
     {
         if (_resolvedKeys.Contains(interfaceType))
-            throw new ObjectContainerException("An object has been resolved for this interface already.", null);
+            throw new ObjectContainerException($"An object has already been resolved for the interface \"{interfaceType}\".", null);
     }
 
     private void ClearRegistrations(RegistrationKey registrationKey)
