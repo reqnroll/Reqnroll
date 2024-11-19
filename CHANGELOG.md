@@ -2,11 +2,11 @@
 
 ## Improvements:
 
-## Bug fixes:
-* Enhance BoDi error handling to provide the name of the Interface being registered when that Interface has already been resolved.
+* Enhance BoDi error handling to provide the name of the interface being registered when that interface has already been resolved (#324)
 
-*Contributors of this release (in alphabetical order):* 
-clrudolphi
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron
 
 # v2.2.1 - 2024-11-08
 
