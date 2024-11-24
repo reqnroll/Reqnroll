@@ -106,7 +106,9 @@ namespace Reqnroll.Generator
 
                 outputWriter.Flush();
                 var generatedTestCode = outputWriter.ToString();
-                return FixVb(generatedTestCode);
+                if (codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
+                    generatedTestCode = FixVb(generatedTestCode);
+                return generatedTestCode;
             }
         }
 
@@ -121,14 +123,17 @@ namespace Reqnroll.Generator
                     .Replace("Global.GlobalVBNetNamespace", "Global")
                     .Replace("GlobalVBNetNamespace", "Global");
         }
-        
+
+        static readonly Lazy<Regex> VBFixAsyncFunctionRegex = new Lazy<Regex>(() => new Regex(@"^([^\n]*)Function[ ]*([^(\n]*)(\([^\n]*\)[ ]*As) async([^\n]*)$", RegexOptions.Multiline));
+        static readonly Lazy<Regex> VBFixAsyncSubRegex = new Lazy<Regex>(() => new Regex(@"^([^\n]*)Sub[ ]*([^(\n]*)(\([^\n]*\)[ ]*As) async([^\n]*)$", RegexOptions.Multiline));
+
         /// <summary>
         /// This is a workaround to allow async/await calls in VB.NET. Works in cooperation with CodeDomHelper.MarkCodeMemberMethodAsAsync() method
         /// </summary>
         private string FixVBNetAsyncMethodDeclarations(string generatedTestCode)
         {
-            var functionRegex = new Regex(@"^([^\n]*)Function[ ]*([^(\n]*)(\([^\n]*\)[ ]*As) async([^\n]*)$", RegexOptions.Multiline);
-            var subRegex = new Regex(@"^([^\n]*)Sub[ ]*([^(\n]*)(\([^\n]*\)[ ]*As) async([^\n]*)$", RegexOptions.Multiline);
+            var functionRegex = VBFixAsyncFunctionRegex.Value;
+            var subRegex = VBFixAsyncSubRegex.Value;
 
             var result = functionRegex.Replace(generatedTestCode, "$1 Async Function $2$3$4");
             result = subRegex.Replace(result, "$1 Async Sub $2$3$4");

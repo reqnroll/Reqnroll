@@ -3,6 +3,7 @@
 ## Improvements:
 
 * Enhance BoDi error handling to provide the name of the interface being registered when that interface has already been resolved (#324)
+* Improve code-behind feature file compilation speed (#336)
 
 ## Bug fixes:
 
