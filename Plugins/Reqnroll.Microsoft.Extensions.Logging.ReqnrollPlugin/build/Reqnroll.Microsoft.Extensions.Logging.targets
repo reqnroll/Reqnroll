@@ -1,0 +1,6 @@
+﻿<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_Reqnroll_MicrosoftExtensionsLoggingPluginFramework>netstandard2.0</_Reqnroll_MicrosoftExtensionsLoggingPluginFramework>
+    <_Reqnroll_MicrosoftExtensionsLoggingPluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_MicrosoftExtensionsLoggingPluginFramework)\Reqnroll.Microsoft.Extensions.Logging.ReqnrollPlugin.dll</_Reqnroll_MicrosoftExtensionsLoggingPluginPath>
+  </PropertyGroup>
+</Project>
