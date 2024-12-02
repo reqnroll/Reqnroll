@@ -3,16 +3,6 @@ using System.IO;
 
 namespace Reqnroll.Generator.Interfaces
 {
-    /// IMPORTANT
-    /// This class is used for interop with the Visual Studio Extension
-    /// DO NOT REMOVE OR RENAME FIELDS!
-    /// This breaks binary serialization accross appdomains
-    /// 
-    /// 
-    /// <summary>
-    /// Represents the information related to a feature file as an input of the generation
-    /// </summary>
-    [Serializable]
     public class FeatureFileInput
     {
         /// <summary>

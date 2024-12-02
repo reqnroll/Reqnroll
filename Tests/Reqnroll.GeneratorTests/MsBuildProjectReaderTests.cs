@@ -19,8 +19,9 @@ namespace Reqnroll.GeneratorTests
             string projectFilePath = Path.Combine(directoryName, csprojPath);
 
             var reqnrollJsonLocatorMock = new Mock<IReqnrollJsonLocator>();
+            var microsoftExtensionsConfigurationLoaderMock = new Mock<IMS_ConfigurationLoader>();
             
-            var configurationLoader = new ConfigurationLoader(reqnrollJsonLocatorMock.Object);
+            var configurationLoader = new ConfigurationLoader(reqnrollJsonLocatorMock.Object, microsoftExtensionsConfigurationLoaderMock.Object);
             var generatorConfigurationProvider = new GeneratorConfigurationProvider(configurationLoader);
             var projectLanguageReader = new ProjectLanguageReader();
             var reader = new ProjectReader(generatorConfigurationProvider, projectLanguageReader);

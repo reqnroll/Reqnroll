@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Configuration;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.Configuration;
@@ -20,6 +21,10 @@ namespace Reqnroll.Generator
         public virtual void RegisterDefaults(ObjectContainer container)
         {
             container.RegisterTypeAs<FileSystem, IFileSystem>();
+
+            container.RegisterTypeAs<ConfigurationManager, IConfigurationManager>();
+            container.RegisterTypeAs<MicrosoftConfiguration_RuntimeConfigurationLoader, IMS_ConfigurationLoader>();
+
 
             container.RegisterTypeAs<GeneratorConfigurationProvider, IGeneratorConfigurationProvider>();
             container.RegisterTypeAs<InProcGeneratorInfoProvider, IGeneratorInfoProvider>();

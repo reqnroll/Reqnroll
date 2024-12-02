@@ -7,6 +7,8 @@ using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Project;
+using Microsoft.Extensions.Configuration;
+using System.ComponentModel;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
@@ -47,6 +49,10 @@ namespace Reqnroll.Tools.MsBuild.Generation
             objectContainer.RegisterTypeAs<AppInsightsEventSerializer, IAppInsightsEventSerializer>();
             objectContainer.RegisterTypeAs<HttpClientWrapper, HttpClientWrapper>();
             objectContainer.RegisterTypeAs<AnalyticsEventProvider, IAnalyticsEventProvider>();
+
+            objectContainer.RegisterTypeAs<ConfigurationManager, IConfigurationManager>();
+            objectContainer.RegisterTypeAs<MicrosoftConfiguration_RuntimeConfigurationLoader, IMS_ConfigurationLoader>();
+
             objectContainer.RegisterTypeAs<ConfigurationLoader, IConfigurationLoader>();
             objectContainer.RegisterTypeAs<GeneratorConfigurationProvider, IGeneratorConfigurationProvider>();
             objectContainer.RegisterTypeAs<ProjectReader, IReqnrollProjectReader>();
