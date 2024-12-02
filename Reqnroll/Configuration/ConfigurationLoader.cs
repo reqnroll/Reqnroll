@@ -146,7 +146,10 @@ namespace Reqnroll.Configuration
 
         private ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration, string jsonContent)
         {
-            return _jsonConfigurationLoader.LoadJson(reqnrollConfiguration, jsonContent);
+            return LoadJson(reqnrollConfiguration);
+
+            // The above ignores the previously read configuration content and uses the MS.Extensions.Configuration library to read the config file
+//            return _jsonConfigurationLoader.LoadJson(reqnrollConfiguration, jsonContent);
         }
 
 

@@ -38,6 +38,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Configuration\reqnroll_config_test.Staging.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Configuration\reqnroll_config_test.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

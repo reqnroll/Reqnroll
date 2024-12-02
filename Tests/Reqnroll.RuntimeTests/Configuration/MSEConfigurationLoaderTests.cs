@@ -10,6 +10,7 @@ using Moq;
 using FluentAssertions;
 using System.IO;
 using System.Reflection;
+using Microsoft.Extensions.Configuration;
 
 namespace Reqnroll.RuntimeTests.Configuration
 {
@@ -29,6 +30,18 @@ namespace Reqnroll.RuntimeTests.Configuration
             var runtimeConfig = new MicrosoftConfiguration_RuntimeConfigurationLoader(GetStubJsonLocator(), new Microsoft.Extensions.Configuration.ConfigurationManager())
                 .Load(ConfigurationLoader.GetDefault());
             runtimeConfig.FeatureLanguage.TwoLetterISOLanguageName.Should().Be("hu");
+        }
+
+        [Fact]
+        public void Can_Read_EnvironmentDesignationFromEnvironment()
+        {
+            Environment.SetEnvironmentVariable("DOTNET_Environment", "Staging");
+            var runtimeConfig = new MicrosoftConfiguration_RuntimeConfigurationLoader(GetStubJsonLocator(), new Microsoft.Extensions.Configuration.ConfigurationManager())
+                .Load(ConfigurationLoader.GetDefault());
+            runtimeConfig.FeatureLanguage.TwoLetterISOLanguageName.Should().Be("fr");
+
+            Environment.SetEnvironmentVariable("DOTNET_Environment", null);
+
         }
         [Fact]
         public void Can_Load_Override_From_Environment()

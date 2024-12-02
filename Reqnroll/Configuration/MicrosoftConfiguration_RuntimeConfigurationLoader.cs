@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Text;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Reqnroll.Configuration.JsonConfig;
-using Reqnroll.Tracing;
 using SpecFlow.Internal.Json;
 
 namespace Reqnroll.Configuration
@@ -16,16 +13,25 @@ namespace Reqnroll.Configuration
 
         public MicrosoftConfiguration_RuntimeConfigurationLoader(IReqnrollJsonLocator reqnrollJsonLocator, IConfigurationManager configurationManager)
         {
+            if (configurationManager == null) throw new ArgumentNullException(nameof(configurationManager), "Microsoft.Extensions.Configuration configurationManager cannot be null.");
+
+            configurationManager.AddEnvironmentVariables("DOTNET_");
+            string envName = configurationManager["Environment"];
+
             _jsonConfigurationFilePath = reqnrollJsonLocator.GetReqnrollJsonFilePath();
+
+
             if (_jsonConfigurationFilePath != null)
             {
+                var pathWithoutExt = Path.Combine(Path.GetDirectoryName(_jsonConfigurationFilePath),Path.GetFileNameWithoutExtension(_jsonConfigurationFilePath));
+                var envOverridePath = $"{pathWithoutExt}.{envName}.json";
                 configurationManager.AddJsonFile(_jsonConfigurationFilePath, optional: true, reloadOnChange: false);
-                configurationManager.AddEnvironmentVariables(prefix: "REQNROLL__");
-                _configurationManager = configurationManager;
-                //configurationManager.Build();
-                // Build not necessary as IConfigurationManager automatically rebuilds when sources are changed
+                configurationManager.AddJsonFile(envOverridePath, optional: true, reloadOnChange: false);
             }
-
+            configurationManager.AddEnvironmentVariables(prefix: "REQNROLL__");
+            _configurationManager = configurationManager;
+            //configurationManager.Build();
+            // Build not necessary as IConfigurationManager automatically rebuilds when sources are changed
         }
 
 
