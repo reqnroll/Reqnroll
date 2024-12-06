@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 
 namespace Reqnroll.Bindings.Reflection
 {
@@ -8,13 +9,30 @@ namespace Reqnroll.Bindings.Reflection
 
         public string Name => Type.Name;
 
-        public string FullName => Type.FullName;
+        public string FullName { get; }
 
         public string AssemblyName => Type.Assembly.GetName().Name;
 
         public RuntimeBindingType(Type type)
         {
             Type = type;
+            FullName = GetFullName(type);
+        }
+
+        private static string GetFullName(Type type)
+        {
+            if (!type.IsConstructedGenericType)
+            {
+                return type.FullName;
+            }
+
+            if (type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            {
+                return type.GenericTypeArguments[0].FullName + "?";
+            }
+
+            var genericParams = string.Join(",", type.GenericTypeArguments.Select(x => x.Name));
+            return $"{type.Namespace}.{type.Name.Split('`')[0]}<{genericParams}>";
         }
 
         public bool IsAssignableTo(IBindingType baseType)
@@ -37,7 +55,7 @@ namespace Reqnroll.Bindings.Reflection
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             if (obj.GetType() != GetType()) return false;
-            return Equals((RuntimeBindingType) obj);
+            return Equals((RuntimeBindingType)obj);
         }
 
         public override int GetHashCode()
