@@ -4,10 +4,11 @@
 
 * Enhance BoDi error handling to provide the name of the interface being registered when that interface has already been resolved (#324)
 * Improve code-behind feature file compilation speed (#336)
+* Improve parameter type naming for generic types (#343)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron
+*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron, @olegKoshmeliuk
 
 # v2.2.1 - 2024-11-08
 
