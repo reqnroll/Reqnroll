@@ -7,6 +7,7 @@
 * Improve parameter type naming for generic types (#343)
 
 ## Bug fixes:
+* MsTest: Only use TestContext for output and not Console.WriteLine (#368) 
 
 *Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron, @olegKoshmeliuk
 
