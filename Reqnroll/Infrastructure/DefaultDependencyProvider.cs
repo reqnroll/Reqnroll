@@ -16,6 +16,7 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
+using Microsoft.Extensions.Configuration;
 
 namespace Reqnroll.Infrastructure
 {
@@ -27,6 +28,8 @@ namespace Reqnroll.Infrastructure
         {
             container.RegisterTypeAs<DefaultTestRunContext, ITestRunContext>();
             container.RegisterTypeAs<DefaultRuntimeConfigurationProvider, IRuntimeConfigurationProvider>();
+            container.RegisterTypeAs<ConfigurationManager, IConfigurationManager>(); 
+            container.RegisterTypeAs<MicrosoftConfiguration_RuntimeConfigurationLoader, IMS_ConfigurationLoader>();
 
             container.RegisterTypeAs<TestRunnerManager, ITestRunnerManager>();
 

@@ -14,12 +14,14 @@ namespace Reqnroll.Configuration
     {
         //private readonly ObjectContainer _objectContainer;
         private readonly JsonConfigurationLoader _jsonConfigurationLoader;
+        private readonly IMS_ConfigurationLoader _msConfigurationLoader;
         private readonly IReqnrollJsonLocator _reqnrollJsonLocator;
 
-        public ConfigurationLoader(IReqnrollJsonLocator reqnrollJsonLocator)
+        public ConfigurationLoader(IReqnrollJsonLocator reqnrollJsonLocator, IMS_ConfigurationLoader mS_ConfigurationLoader)
         {
             _reqnrollJsonLocator = reqnrollJsonLocator;
             _jsonConfigurationLoader = new JsonConfigurationLoader();
+            _msConfigurationLoader = mS_ConfigurationLoader;
         }
 
         private static CultureInfo DefaultFeatureLanguage => CultureInfo.GetCultureInfo(ConfigDefaults.FeatureLanguage);
@@ -137,14 +139,17 @@ namespace Reqnroll.Configuration
 
         private ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration)
         {
-            var jsonContent = File.ReadAllText(_reqnrollJsonLocator.GetReqnrollJsonFilePath());
+            var jsonFilePath = _reqnrollJsonLocator.GetReqnrollJsonFilePath();
 
-            return LoadJson(reqnrollConfiguration, jsonContent);
+            return _msConfigurationLoader.Load(reqnrollConfiguration);
         }
 
         private ReqnrollConfiguration LoadJson(ReqnrollConfiguration reqnrollConfiguration, string jsonContent)
         {
-            return _jsonConfigurationLoader.LoadJson(reqnrollConfiguration, jsonContent);
+            return LoadJson(reqnrollConfiguration);
+
+            // The above ignores the previously read configuration content and uses the MS.Extensions.Configuration library to read the config file
+//            return _jsonConfigurationLoader.LoadJson(reqnrollConfiguration, jsonContent);
         }
 
 
