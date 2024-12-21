@@ -5,6 +5,7 @@
 * Enhance BoDi error handling to provide the name of the interface being registered when that interface has already been resolved (#324)
 * Improve code-behind feature file compilation speed (#336)
 * Improve parameter type naming for generic types (#343)
+* Add an `IsRegisteredAtAnyLevel()` method to the `IObjectContainer` interface (#367)
 
 ## Bug fixes:
 
