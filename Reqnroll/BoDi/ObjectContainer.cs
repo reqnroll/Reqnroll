@@ -487,13 +487,33 @@ public class ObjectContainer : IObjectContainer
         return factoryRegistration;
     }
 
+    /// <inheritdoc/>
     public bool IsRegistered<T>(string name = null) => IsRegistered(typeof(T), name);
 
+    /// <inheritdoc/>
     public bool IsRegistered(Type type, string name = null)
     {
         var keyToResolve = new RegistrationKey(type, name);
 
         return _registrations.ContainsKey(keyToResolve);
+    }
+
+    /// <inheritdoc/>
+    public bool IsRegisteredAtAnyLevel<T>(string name = null) => IsRegisteredAtAnyLevel(typeof(T), name);
+
+    /// <inheritdoc/>
+    public bool IsRegisteredAtAnyLevel(Type type, string name = null)
+    {
+        IObjectContainer container = this;
+        do
+        {
+            if (container.IsRegistered(type, name))
+            {
+                return true;
+            }
+        } while (container is ObjectContainer c && (container = c.BaseContainer) != null);
+
+        return false;
     }
 
     // ReSharper disable once UnusedParameter.Local

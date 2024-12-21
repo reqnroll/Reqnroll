@@ -109,7 +109,7 @@ public interface IObjectContainer : IDisposable
     IEnumerable<T> ResolveAll<T>() where T : class;
 
     /// <summary>
-    /// Determines whether the interface or type is registered optionally with the specified name.
+    /// Determines whether the interface or type is registered at the current level of the container hierarchy, optionally with the specified name.
     /// </summary>
     /// <typeparam name="T">The interface or type.</typeparam>
     /// <param name="name">The name or <c>null</c>.</param>
@@ -117,10 +117,26 @@ public interface IObjectContainer : IDisposable
     bool IsRegistered<T>(string name = null);
 
     /// <summary>
-    /// Determines whether the interface or type is registered with the specified name.
+    /// Determines whether the interface or type is registered at the current level of the container hierarchy, optionally with the specified name.
     /// </summary>
     /// <param name="type">The interface or type.</param>
     /// <param name="name">The name.</param>
     /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
     bool IsRegistered(Type type, string name = null);
+
+    /// <summary>
+    /// Determines whether the interface or type is registered at any level of the container hierarchy, optionally with the specified name.
+    /// </summary>
+    /// <typeparam name="T">The interface or type.</typeparam>
+    /// <param name="name">The name or <c>null</c>.</param>
+    /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
+    bool IsRegisteredAtAnyLevel<T>(string name = null);
+
+    /// <summary>
+    /// Determines whether the interface or type is registered at any level of the container hierarchy, optionally with the specified name.
+    /// </summary>
+    /// <param name="type">The interface or type.</param>
+    /// <param name="name">The name.</param>
+    /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
+    bool IsRegisteredAtAnyLevel(Type type, string name = null);
 }
