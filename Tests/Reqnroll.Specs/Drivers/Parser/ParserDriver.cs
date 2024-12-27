@@ -86,7 +86,7 @@ namespace Reqnroll.Specs.Drivers.Parser
         public void AssertParsedFeatureEqualTo(string expected)
         {
             static string Normalize(string value)
-                => value.Replace("\r", "");
+                => value.Replace("\r", "").Replace(@"\r", "");
 
             string got = SerializeDocument(ParsedDocument);
             got = Normalize(got);
