@@ -25,10 +25,12 @@
     <file src="buildMultiTargeting\**\*" target="buildMultiTargeting" />
     
     <file src="bin\$config$\net462\*.dll" target="tasks\$Reqnroll_FullFramework_Tools_TFM$" />
-    <file src="bin\$config$\netstandard2.0\*.dll" 
-          exclude="bin\$config$\netstandard2.0\System.*;bin\$config$\netstandard2.0\Microsoft.*" 
+    <file src="bin\$config$\netstandard2.0\*.dll"
+          exclude="bin\$config$\netstandard2.0\System.*;bin\$config$\netstandard2.0\Microsoft.*"
           target="tasks\$Reqnroll_Core_Tools_TFM$" />
     <file src="bin\$config$\netstandard2.0\*.deps.json" target="tasks\$Reqnroll_Core_Tools_TFM$" />
+    <file src="bin\$config$\netstandard2.0\System.Text.Json.dll" target="tasks\$Reqnroll_Core_Tools_TFM$" />
+    <file src="bin\$config$\netstandard2.0\Microsoft.Bcl.AsyncInterfaces.dll" target="tasks\$Reqnroll_Core_Tools_TFM$" />
 
     <file src="$SolutionDir$\Licenses\**\*" target="licenses" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
