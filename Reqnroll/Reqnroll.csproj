@@ -27,7 +27,8 @@
     <PackageReference Include="Gherkin" Version="30.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
-    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
+    <!-- System.Runtime.Loader is only used to compile .NET 6+ specific code. Without referencing it, we couldn't compile to .NET Standard. When running on .NET 6+, the assembly is part of the runtime. We don't ship it to avoid conflicts with the runtime. -->
+    <PackageReference Include="System.Runtime.Loader" Version="4.3.0" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
   </ItemGroup>
 

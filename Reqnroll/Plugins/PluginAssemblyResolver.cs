@@ -9,6 +9,9 @@ using Microsoft.Extensions.DependencyModel.Resolution;
 
 namespace Reqnroll.Plugins
 {
+    /// <summary>
+    /// This class can only be used for .NET 6+ because it relies on runtime specifics.
+    /// </summary>
     public sealed class PluginAssemblyResolver
     {
         private readonly ICompilationAssemblyResolver _assemblyResolver;
