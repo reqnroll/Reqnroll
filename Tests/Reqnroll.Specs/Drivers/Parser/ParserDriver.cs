@@ -18,7 +18,7 @@ namespace Reqnroll.Specs.Drivers.Parser
     {
         readonly JsonSerializerOptions _serializerOptions = new()
         {
-            WriteIndented = true, 
+            WriteIndented = true,
             TypeInfoResolver = new PolymorphicTypeResolver(),
         };
 
@@ -85,9 +85,15 @@ namespace Reqnroll.Specs.Drivers.Parser
 
         public void AssertParsedFeatureEqualTo(string expected)
         {
-            string got = SerializeDocument(ParsedDocument);
+            static string Normalize(string value)
+                => value.Replace("\r", "");
 
-            got.Should().Be(expected);
+            string got = SerializeDocument(ParsedDocument);
+            got = Normalize(got);
+
+            var expectedNormalized = Normalize(expected);
+
+            got.Should().Be(expectedNormalized);
         }
 
         public void AssertErrors(List<ExpectedError> expectedErrors)
