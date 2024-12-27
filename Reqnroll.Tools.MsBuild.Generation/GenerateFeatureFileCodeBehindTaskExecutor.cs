@@ -43,18 +43,18 @@ namespace Reqnroll.Tools.MsBuild.Generation
             _processInfoDumper.DumpProcessInfo();
             _taskLoggingWrapper.LogMessage("Starting GenerateFeatureFileCodeBehind");
 
-            var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
-
-            using (var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
-                reqnrollProject.ProjectSettings.ConfigurationHolder,
-                reqnrollProject.ProjectSettings,
-                _reqnrollProjectInfo.GeneratorPlugins,
-                _rootObjectContainer))
+            try
             {
-                var projectCodeBehindGenerator = generatorContainer.Resolve<IProjectCodeBehindGenerator>();
+                var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
 
-                try
+                using (var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
+                    reqnrollProject.ProjectSettings.ConfigurationHolder,
+                    reqnrollProject.ProjectSettings,
+                    _reqnrollProjectInfo.GeneratorPlugins,
+                    _rootObjectContainer))
                 {
+                    var projectCodeBehindGenerator = generatorContainer.Resolve<IProjectCodeBehindGenerator>();
+
                     _ = Task.Run(_msbuildTaskAnalyticsTransmitter.TryTransmitProjectCompilingEventAsync);
 
                     var returnValue = projectCodeBehindGenerator.GenerateCodeBehindFilesForProject();
@@ -66,11 +66,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
                     return Result.Success(returnValue);
                 }
-                catch (Exception e)
-                {
-                    _exceptionTaskLogger.LogException(e);
-                    return Result<IReadOnlyCollection<ITaskItem>>.Failure(e);
-                }
+            }
+            catch (Exception e)
+            {
+                _exceptionTaskLogger.LogException(e);
+                return Result<IReadOnlyCollection<ITaskItem>>.Failure(e);
             }
         }
     }
