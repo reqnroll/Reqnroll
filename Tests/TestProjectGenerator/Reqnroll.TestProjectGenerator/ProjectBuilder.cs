@@ -21,8 +21,6 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit4TestAdapterPackageVersion = "4.6.0";
         private const string XUnitPackageVersion = "2.4.2";
         private const string MSTestPackageVersion = "2.2.8";
-        private const string InternalJsonPackageName = "SpecFlow.Internal.Json";
-        private const string InternalJsonVersion = "1.0.8";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;

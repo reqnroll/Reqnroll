@@ -28,7 +28,6 @@
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" />
-    <PackageReference Include="SpecFlow.Internal.Json" Version="1.0.8" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(AppInsightsInstrumentationKey)' == ''">

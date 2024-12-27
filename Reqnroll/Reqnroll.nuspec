@@ -22,7 +22,6 @@
         <dependency id="Cucumber.CucumberExpressions" version="17.1.0"/>
         <dependency id="Microsoft.Extensions.DependencyModel" version="8.0.2" />
         <dependency id="System.Runtime.Loader" version="4.3.0" />
-        <dependency id="SpecFlow.Internal.Json" version="1.0.8" />
       </group>
     </dependencies>
   </metadata>
