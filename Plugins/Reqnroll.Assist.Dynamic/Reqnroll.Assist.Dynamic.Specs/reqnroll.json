@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+
+  "bindingAssemblies": [
+  ],
+  "stepAssemblies": [
+    {
+      "assembly": "Reqnroll.Assist.Dynamic"
+    }
+  ]
+}

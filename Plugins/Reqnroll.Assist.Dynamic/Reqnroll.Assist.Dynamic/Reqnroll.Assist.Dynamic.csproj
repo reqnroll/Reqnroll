@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFrameworks>netstandard2.0</TargetFrameworks>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>10</LangVersion>
+    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Autofac.nuspec</NuspecFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Dynamitey" Version="3.0.3" />
+		<PackageReference Include="Reqnroll" Version="2.2.1" />
+	</ItemGroup>
+</Project>
