@@ -1,13 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<LangVersion>10</LangVersion>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Autofac.nuspec</NuspecFile>
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    
+    <PackageId>Reqnroll.Assist.Dynamic</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Assist.Dynamic.nuspec</NuspecFile>
+
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>10</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Dynamitey" Version="3.0.3" />
-		<PackageReference Include="Reqnroll" Version="2.2.1" />
 	</ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Reqnroll\Reqnroll.csproj" />
+  </ItemGroup>
 </Project>
