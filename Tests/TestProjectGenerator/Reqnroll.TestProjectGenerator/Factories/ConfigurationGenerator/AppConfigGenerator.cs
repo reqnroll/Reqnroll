@@ -61,7 +61,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
 
         private void WriteReqnroll(XmlWriter writer, Configuration configuration)
         {
-            writer.WriteStartElement("specFlow");
+            writer.WriteStartElement("reqnRoll");
 
             if (configuration.BindingCulture != null)
             {

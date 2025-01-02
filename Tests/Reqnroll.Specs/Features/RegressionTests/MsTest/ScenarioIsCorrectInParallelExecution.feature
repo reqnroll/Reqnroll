@@ -1,17 +1,15 @@
-@NUnit3
-#TODO: port to System Tests
-@ignore
+@MSTest
 Feature: GH1052
 
-Wrong scenario context injected when running tests in parallel using NUnit (also specrun) - https://github.com/reqnroll/Reqnroll/issues/1052
+Wrong scenario context injected when running tests in parallel using NUnit
 
 
 Scenario: GH1052
 
     Given the following binding class
         """
-        [assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.Fixtures)]
-        [assembly: NUnit.Framework.LevelOfParallelism(2)]
+        using Microsoft.VisualStudio.TestTools.UnitTesting;
+        [assembly: Parallelize(Workers = 2, Scope = ExecutionScope.ClassLevel)]
 
         """
     And there is a feature file in the project as
@@ -135,7 +133,7 @@ Scenario: GH1052
                 {
                     _reqnrollOutputHelper.WriteLine($"Context ID {_scenarioContext["ID"].ToString()}");
                     _reqnrollOutputHelper.WriteLine($"ManagedThreadId {Thread.CurrentThread.ManagedThreadId}");
-                    Thread.Sleep(1000);
+                    Thread.Sleep(100);
                 }
                 catch (Exception e)
                 {
