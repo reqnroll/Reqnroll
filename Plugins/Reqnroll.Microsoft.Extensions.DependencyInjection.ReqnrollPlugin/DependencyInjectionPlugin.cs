@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;
@@ -18,12 +17,6 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 {
     public class DependencyInjectionPlugin : IRuntimePlugin
     {
-        private static readonly ConcurrentDictionary<IServiceProvider, IContextManager> BindMappings =
-            new ConcurrentDictionary<IServiceProvider, IContextManager>();
-
-        private static readonly ConcurrentDictionary<IReqnrollContext, IServiceScope> ActiveServiceScopes =
-            new ConcurrentDictionary<IReqnrollContext, IServiceScope>();
-
         private readonly object _registrationLock = new object();
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
@@ -50,10 +43,16 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                     args.ObjectContainer.RegisterFactoryAs<RootServiceProviderContainer>(() =>
                     {
                         var serviceCollectionFinder = args.ObjectContainer.Resolve<IServiceCollectionFinder>();
-                        var (services, scoping) = serviceCollectionFinder.GetServiceCollection();
+                        var (services, scoping) = serviceCollectionFinder.GetServiceEntryPoint();
 
-                        RegisterProxyBindings(args.ObjectContainer, services);
-                        return new RootServiceProviderContainer(services.BuildServiceProvider(), scoping);
+                        if (services.ServiceCollection != null)
+                        {
+                            RegisterProxyBindings(args.ObjectContainer, services.ServiceCollection);
+                        }
+
+                        return services.ServiceProvider != null 
+                            ? new RootServiceProviderContainer(services.ServiceProvider, scoping) 
+                            : new RootServiceProviderContainer(services.ServiceCollection.BuildServiceProvider(), scoping);
                     });
 
                     args.ObjectContainer.RegisterFactoryAs<IServiceProvider>(() =>
@@ -83,8 +82,8 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                 args.ObjectContainer.RegisterFactoryAs<IServiceProvider>(() =>
                 {
                     var scope = serviceProvider.CreateScope();
-                    BindMappings.TryAdd(scope.ServiceProvider, args.ObjectContainer.Resolve<IContextManager>());
-                    ActiveServiceScopes.TryAdd(args.ObjectContainer.Resolve<FeatureContext>(), scope);
+                    Context.BindMappings.TryAdd(scope.ServiceProvider, args.ObjectContainer.Resolve<IContextManager>());
+                    Context.ActiveServiceScopes.TryAdd(args.ObjectContainer.Resolve<FeatureContext>(), scope);
                     return scope.ServiceProvider;
                 });
             }
@@ -92,9 +91,9 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 
         private static void AfterFeaturePluginLifecycleEventHandler(object sender, RuntimePluginAfterFeatureEventArgs eventArgs)
         {
-            if (ActiveServiceScopes.TryRemove(eventArgs.ObjectContainer.Resolve<FeatureContext>(), out var serviceScope))
+            if (Context.ActiveServiceScopes.TryRemove(eventArgs.ObjectContainer.Resolve<FeatureContext>(), out var serviceScope))
             {
-                BindMappings.TryRemove(serviceScope.ServiceProvider, out _);
+                Context.BindMappings.TryRemove(serviceScope.ServiceProvider, out _);
                 serviceScope.Dispose();
             }
         }
@@ -111,8 +110,8 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                 args.ObjectContainer.RegisterFactoryAs<IServiceProvider>(() =>
                 {
                     var scope = serviceProvider.CreateScope();
-                    BindMappings.TryAdd(scope.ServiceProvider, args.ObjectContainer.Resolve<IContextManager>());
-                    ActiveServiceScopes.TryAdd(args.ObjectContainer.Resolve<ScenarioContext>(), scope);
+                    Context.BindMappings.TryAdd(scope.ServiceProvider, args.ObjectContainer.Resolve<IContextManager>());
+                    Context.ActiveServiceScopes.TryAdd(args.ObjectContainer.Resolve<ScenarioContext>(), scope);
                     return scope.ServiceProvider;
                 });
             }
@@ -120,9 +119,9 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 
         private static void AfterScenarioPluginLifecycleEventHandler(object sender, RuntimePluginAfterScenarioEventArgs eventArgs)
         {
-            if (ActiveServiceScopes.TryRemove(eventArgs.ObjectContainer.Resolve<ScenarioContext>(), out var serviceScope))
+            if (Context.ActiveServiceScopes.TryRemove(eventArgs.ObjectContainer.Resolve<ScenarioContext>(), out var serviceScope))
             {
-                BindMappings.TryRemove(serviceScope.ServiceProvider, out _);
+                Context.BindMappings.TryRemove(serviceScope.ServiceProvider, out _);
                 serviceScope.Dispose();
             }
         }
@@ -157,41 +156,15 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             services.AddSingleton(sp => objectContainer.Resolve<IBindingAssemblyLoader>());
             services.AddSingleton(sp => objectContainer.Resolve<IUnitTestRuntimeProvider>());
 
-            TResult GetTestThreadDependency<TResult>(IServiceProvider sp, Func<IContextManager, TResult> selector) where TResult: class
-            {
-                string GetErrorMessage()
-                    => $"Unable to access test execution dependent service '{typeof(TResult).FullName}' with the Reqnroll.Microsoft.Extensions.DependencyInjection plugin. This service is only available once test execution has been started and cannot be used in '[BeforeTestRun]' hook. See https://go.reqnroll.net/doc-migrate-specflow-testrun-hooks for details.";
-
-                if (!BindMappings.TryGetValue(sp, out var contextManager))
-                {
-                    throw new ReqnrollException(GetErrorMessage());
-                }
-
-                TResult result;
-                try
-                {
-                    result = selector(contextManager);
-                }
-                catch (Exception ex)
-                {
-                    throw new ReqnrollException(GetErrorMessage(), ex);
-                }
-
-                if (result == null)
-                    throw new ReqnrollException(GetErrorMessage());
-
-                return result;
-            }
-
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.FeatureContext));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.ScenarioContext));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<ITestRunner>()));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<ITestExecutionEngine>()));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<IStepArgumentTypeConverter>()));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<IStepDefinitionMatchService>()));
-            services.AddTransient(sp => GetTestThreadDependency(sp, cm => cm.TestThreadContext.TestThreadContainer.Resolve<IReqnrollOutputHelper>()));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.TestThreadContext));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.FeatureContext));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.ScenarioContext));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.TestThreadContext.TestThreadContainer.Resolve<ITestRunner>()));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.TestThreadContext.TestThreadContainer.Resolve<ITestExecutionEngine>()));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.TestThreadContext.TestThreadContainer.Resolve<IStepArgumentTypeConverter>()));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.TestThreadContext.TestThreadContainer.Resolve<IStepDefinitionMatchService>()));
+            services.AddTransient(sp => sp.GetTestThreadDependency(cm => cm.TestThreadContext.TestThreadContainer.Resolve<IReqnrollOutputHelper>()));
         }
 
         private class RootServiceProviderContainer

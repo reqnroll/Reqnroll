@@ -9,22 +9,22 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 {
     public class ServiceCollectionFinder : IServiceCollectionFinder
     {
-        private readonly IBindingRegistry bindingRegistry;
-        private (IServiceCollection, ScopeLevelType) _cache;
+        private readonly IBindingRegistry _bindingRegistry;
+        private (ServicesEntryPoint, ScopeLevelType) _cache;
 
         public ServiceCollectionFinder(IBindingRegistry bindingRegistry)
         {
-            this.bindingRegistry = bindingRegistry;
+            _bindingRegistry = bindingRegistry;
         }
 
-        public (IServiceCollection, ScopeLevelType) GetServiceCollection()
+        public (ServicesEntryPoint, ScopeLevelType) GetServiceEntryPoint()
         {
             if (_cache != default)
             {
                 return _cache;
             }
 
-            var assemblies = bindingRegistry.GetBindingAssemblies();
+            var assemblies = _bindingRegistry.GetBindingAssemblies();
             foreach (var assembly in assemblies)
             {
                 foreach (var type in assembly.GetTypes())
@@ -35,12 +35,19 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 
                         if (scenarioDependenciesAttribute != null)
                         {
-                            var serviceCollection = GetServiceCollection(methodInfo);
-                            if (scenarioDependenciesAttribute.AutoRegisterBindings)
+                            var entryPoint = GetServicesEntryPoint(methodInfo);
+
+                            if (entryPoint == null)
                             {
-                                AddBindingAttributes(assemblies, serviceCollection);
+                                throw new MissingScenarioDependenciesException();
                             }
-                            return _cache = (serviceCollection, scenarioDependenciesAttribute.ScopeLevel);
+
+                            if (entryPoint.ServiceCollection != null && scenarioDependenciesAttribute.AutoRegisterBindings)
+                            {
+                                AddBindingAttributes(assemblies, entryPoint.ServiceCollection);
+                            }
+
+                            return _cache = (entryPoint, scenarioDependenciesAttribute.ScopeLevel);
                         }
                     }
                 }
@@ -48,9 +55,27 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             throw new MissingScenarioDependenciesException();
         }
 
-        private static IServiceCollection GetServiceCollection(MethodBase methodInfo)
+        private static ServicesEntryPoint GetServicesEntryPoint(MethodBase methodInfo)
         {
-            return (IServiceCollection)methodInfo.Invoke(null, null);
+            var entry = methodInfo.Invoke(null, null);
+
+            if (entry is IServiceCollection serviceCollection)
+            {
+                return new ServicesEntryPoint
+                {
+                    ServiceCollection = serviceCollection
+                };
+            }
+            
+            if (entry is IServiceProvider serviceProvider)
+            {
+                return new ServicesEntryPoint
+                {
+                    ServiceProvider = serviceProvider
+                };
+            }
+
+            return null;
         }
 
         private static void AddBindingAttributes(IEnumerable<Assembly> bindingAssemblies, IServiceCollection serviceCollection)
