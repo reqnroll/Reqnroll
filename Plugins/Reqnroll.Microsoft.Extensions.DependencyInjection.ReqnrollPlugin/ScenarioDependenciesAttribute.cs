@@ -20,6 +20,9 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
         /// <summary>
         /// Automatically register all SpecFlow bindings.
         /// </summary>
+        /// <remarks>
+        /// This setting is ignored when returning an IServiceProvider from the method.
+        /// </remarks>
         public bool AutoRegisterBindings { get; set; } = true;
 
         /// <summary>
