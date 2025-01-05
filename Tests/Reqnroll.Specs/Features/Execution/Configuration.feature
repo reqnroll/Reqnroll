@@ -14,11 +14,13 @@ Background:
 
 Scenario: Generation configuration in reqnroll.json
 	Given Reqnroll is configured in the reqnroll.json
-	When I execute the tests
-	Then the reqnroll.json is used for configuration	
+	When the solution is built with log level normal
+	And I execute the tests
+	Then the reqnroll.json is used for configuration
 
 Scenario: Runtime configuration in reqnroll.json
 	Given Reqnroll is configured in the reqnroll.json
-	When I execute the tests
-	Then the reqnroll.json is used for configuration	
+	When the solution is built with log level normal
+	And I execute the tests
+	Then the reqnroll.json is used for configuration
 

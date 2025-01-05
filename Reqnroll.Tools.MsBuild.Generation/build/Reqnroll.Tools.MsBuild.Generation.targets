@@ -68,7 +68,7 @@
   <Target Name="UpdateFeatureFilesInProject"
           DependsOnTargets="BeforeUpdateFeatureFilesInProject">
 
-    <Message Text="ReqnrollFeatureFiles: @(ReqnrollFeatureFiles)" Importance="high" Condition="'$(VerboseOutput)' == 'true'" />
+    <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
 
     <Error
       Text="Reqnroll designer codebehind generation is not compatible with MSBuild codebehind generation. The custom tool must be removed from the file. See https://www.reqnroll.net/documentation/Generate-Tests-from-MsBuild"
@@ -107,8 +107,7 @@
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />
     </GenerateFeatureFileCodeBehindTask>
 
-    <Message Text="ReqnrollGeneratedFiles: %(ReqnrollGeneratedFiles.Identity)" Importance="high" Condition="'$(VerboseOutput)' == 'true'" />
-
+    <Message Text="[Reqnroll] GeneratedFile: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
 
     <!--
       net.sdk support: globbing does not support including files which are dynamically generated inside targets, we have to manually update compile items

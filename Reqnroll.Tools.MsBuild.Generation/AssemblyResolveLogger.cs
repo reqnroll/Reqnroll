@@ -22,7 +22,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            _taskLoggingWrapper.LogMessage(args.Name);
+            _taskLoggingWrapper.LogMessageWithLowImportance(args.Name);
 
             try
             {

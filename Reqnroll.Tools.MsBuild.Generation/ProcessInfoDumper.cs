@@ -18,11 +18,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
             {
                 var currentProcess = Process.GetCurrentProcess();
 
-                _taskLoggingWrapper.LogMessage($"process: {currentProcess.ProcessName}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
+                _taskLoggingWrapper.LogMessageWithLowImportance($"process: {currentProcess.ProcessName}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
 
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    _taskLoggingWrapper.LogMessage($"  {assembly.FullName}");
+                    _taskLoggingWrapper.LogMessageWithLowImportance($"  {assembly.FullName}");
                 }
             }
             catch (Exception e)

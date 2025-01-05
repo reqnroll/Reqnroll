@@ -51,5 +51,11 @@ namespace Reqnroll.Specs.StepDefinitions
         {
             _compilationDriver.CompileSolutionTimes(times);
         }
+
+        [When(@"^the solution is built with log level (minimal|normal|detailed)$")]
+        public void WhenTheSolutionIsBuiltWithLogLevel(string logLevel)
+        {
+            _compilationDriver.CompileSolution(logLevel: logLevel);
+        }
     }
 }
