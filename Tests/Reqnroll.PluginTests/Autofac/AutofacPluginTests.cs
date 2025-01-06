@@ -108,7 +108,7 @@ public class AutofacPluginTests
         }
     }
 
-private readonly RuntimePluginEvents _runtimePluginEvents;
+    private readonly RuntimePluginEvents _runtimePluginEvents;
     private readonly ObjectContainer _testRunContainer;
     private readonly ObjectContainer _testThreadContainer;
     private readonly ObjectContainer _featureContainer;
@@ -317,10 +317,12 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
 
         // Act
         var scenarioContainer = InitializeToScenarioContainer(sut);
+
         var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
 
         var testThreadContext =
             new TestThreadContext(_testThreadContainer);
+
         _testThreadContainer.RegisterInstanceAs(testThreadContext);
 
         var traceListenerMock =
@@ -330,20 +332,23 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
         var threadExecutionMock =
             new Mock<ITestThreadExecutionEventPublisher>();
 
-        var outputHelper = new ReqnrollOutputHelper(
-            threadExecutionMock.Object,
-            traceListenerMock.Object,
-            attachmentHandlerMock.Object);
+        var defaultDenpendencyProvider = new DefaultDependencyProvider();
+        defaultDenpendencyProvider
+            .RegisterTestThreadContainerDefaults(_testThreadContainer);
 
-        _testThreadContainer.RegisterInstanceAs<IReqnrollOutputHelper>(outputHelper);
+        _testThreadContainer
+            .RegisterInstanceAs<ITraceListener>(traceListenerMock.Object);
+        _testThreadContainer
+            .RegisterInstanceAs<IReqnrollAttachmentHandler>(attachmentHandlerMock.Object);
+        _testThreadContainer
+            .RegisterInstanceAs<ITestThreadExecutionEventPublisher>(threadExecutionMock.Object);
 
         // Assert
-
         var resolvedOutputHelper = resolver
             .ResolveBindingInstance(typeof(IReqnrollOutputHelper), scenarioContainer);
 
-        outputHelper
+        resolvedOutputHelper
             .Should()
-            .BeSameAs(outputHelper);
+            .NotBeNull();
     }
 }
