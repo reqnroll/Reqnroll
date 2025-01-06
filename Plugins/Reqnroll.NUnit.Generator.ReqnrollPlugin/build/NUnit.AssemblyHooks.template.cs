@@ -6,10 +6,9 @@ using System.Diagnostics;
 using global::System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-[assembly: NUnit.Framework.FixtureLifeCycle(NUnit.Framework.LifeCycle.InstancePerTestCase)]
-
 [GeneratedCode("Reqnroll", "REQNROLL_VERSION")]
 [global::NUnit.Framework.SetUpFixture]
+[NUnit.Framework.FixtureLifeCycle(NUnit.Framework.LifeCycle.InstancePerTestCase)]
 public static class PROJECT_ROOT_NAMESPACE_NUnitAssemblyHooks
 {
     [global::NUnit.Framework.OneTimeSetUp]
