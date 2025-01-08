@@ -231,7 +231,6 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddNuGetPackage("System.Runtime.CompilerServices.Unsafe", "6.0.0", new NuGetPackageAssembly("System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "netstandard2.0\\System.Runtime.CompilerServices.Unsafe.dll"));
                 }
 
-                // TODO: dei replace this hack with better logic when SpecFlow 3 can be strong name signed
                 _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
