@@ -179,5 +179,12 @@ public class AutofacPlugin : IRuntimePlugin
                 var scenarioContext = reqnrollContainer.Resolve<TestThreadContext>();
                 return scenarioContext;
             }).As<TestThreadContext>();
+        containerBuilder.Register(
+            ctx =>
+            {
+                var reqnrollContainer = ctx.Resolve<TestThreadContext>();
+                var scenarioContext = reqnrollContainer.TestThreadContainer.Resolve<IReqnrollOutputHelper>();
+                return scenarioContext;
+            }).As<IReqnrollOutputHelper>();
     }
 }
