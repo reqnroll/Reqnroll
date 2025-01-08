@@ -36,3 +36,39 @@ public class SetupTestDependencies
   }
 }
 ```
+
+### 4. Alternatively, return `IServiceProvider` from your static method
+This scenario is useful for integrating with ASP.NET Core projects, where you have a service provider that is owned by a separate class, and you want to use this pre-built container. 
+
+Note that you will need to manually register your bindings before using them. See below for a typical example:
+
+```csharp
+public class SetupTestDependencies
+{
+  // This is created when doing integration testing in ASP.NET Core
+  // See https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests
+  private CustomWebApplicationFactory<Program> application = new();
+
+  [ScenarioDependencies]
+  public static IServiceProvider GetServices()
+  {
+    return application.Services;
+  }
+
+  public class CustomWebApplicationFactory<TProgram>
+    : WebApplicationFactory<TProgram> where TProgram : class
+  {
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+      builder.ConfigureServices(services =>
+      {
+        // TODO: add your test dependencies here
+        services.AddSingleton<IMyService, MyService>();
+
+        // REQUIRED: Manually register bindings and required classes from this assembly.
+        services.AddReqnrollBindings<SetupTestDependencies>();
+      });
+    }
+  }
+}
+```
