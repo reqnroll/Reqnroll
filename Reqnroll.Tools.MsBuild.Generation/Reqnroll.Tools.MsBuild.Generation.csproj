@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_FullFramework_Tools_TFM);$(Reqnroll_Core_Tools_TFM)</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
@@ -62,11 +62,8 @@
          This is needed only for the Reqnroll projects within the solution (Specs, *.IntegrationTest),
          and not used for producing the NuGet package.
     -->
-    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Tools_TFM)'">
-      <TaskFiles Include="$(OutDir)\*.dll" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_Core_Tools_TFM)'">
-      <TaskFiles Include="$(OutDir)\*.dll;$(OutDir)\*.deps.json" Exclude="$(OutDir)\System.*;$(OutDir)\Microsoft.*" />
+    <ItemGroup>
+      <TaskFiles Include="$(OutDir)\*.dll;$(OutDir)\*.deps.json" />
     </ItemGroup>
     <Copy SourceFiles="@(TaskFiles)" DestinationFolder="$(OutDir)\tasks" />
   </Target>
