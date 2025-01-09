@@ -4,15 +4,15 @@
     <id>Reqnroll.Assist.Dynamic</id>
     <version>$version$</version>
     <title>Reqnroll.Assist.Dynamic</title>
-    <authors>Marcus Hammarberg, $author$</authors>
-    <owners>Marcus Hammarberg, $owner$</owners>
+    <authors>Oleg Koshmeliuk,Marcus Hammarberg, $author$</authors>
+    <owners>Oleg Koshmeliuk, Marcus Hammarberg, $owner$</owners>
     <description>Adds support for dynamic instances and sets from Reqnroll tables.</description>
     <summary>See documentation at https://github.com/reqnroll/Reqnroll/tree/main/Plugins/Reqnroll.Assist.Dynamic</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
     <icon>images\reqnroll-icon.png</icon>
-    <copyright>Copyright © Marcus Hammarberg, $author$</copyright>
+    <copyright>Copyright © Oleg Koshmeliuk, Marcus Hammarberg, $author$</copyright>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">BSD-3-Clause</license>
     <tags>reqnroll dynamic</tags>
