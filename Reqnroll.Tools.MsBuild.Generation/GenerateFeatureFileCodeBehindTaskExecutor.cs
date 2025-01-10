@@ -47,25 +47,23 @@ namespace Reqnroll.Tools.MsBuild.Generation
             {
                 var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
 
-                using (var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
+                using var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
                     reqnrollProject.ProjectSettings.ConfigurationHolder,
                     reqnrollProject.ProjectSettings,
                     _reqnrollProjectInfo.GeneratorPlugins,
-                    _rootObjectContainer))
+                    _rootObjectContainer);
+                var projectCodeBehindGenerator = generatorContainer.Resolve<IProjectCodeBehindGenerator>();
+
+                _ = Task.Run(_msbuildTaskAnalyticsTransmitter.TryTransmitProjectCompilingEventAsync);
+
+                var returnValue = projectCodeBehindGenerator.GenerateCodeBehindFilesForProject();
+
+                if (_taskLoggingWrapper.HasLoggedErrors())
                 {
-                    var projectCodeBehindGenerator = generatorContainer.Resolve<IProjectCodeBehindGenerator>();
-
-                    _ = Task.Run(_msbuildTaskAnalyticsTransmitter.TryTransmitProjectCompilingEventAsync);
-
-                    var returnValue = projectCodeBehindGenerator.GenerateCodeBehindFilesForProject();
-
-                    if (_taskLoggingWrapper.HasLoggedErrors())
-                    {
-                        return Result<IReadOnlyCollection<ITaskItem>>.Failure("Feature file code-behind generation has failed with errors.");
-                    }
-
-                    return Result.Success(returnValue);
+                    return Result<IReadOnlyCollection<ITaskItem>>.Failure("Feature file code-behind generation has failed with errors.");
                 }
+
+                return Result.Success(returnValue);
             }
             catch (Exception e)
             {

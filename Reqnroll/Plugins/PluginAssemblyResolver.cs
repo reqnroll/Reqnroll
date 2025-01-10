@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyModel.Resolution;
 namespace Reqnroll.Plugins
 {
     /// <summary>
-    /// This class can only be used for .NET 6+ because it relies on runtime specifics.
+    /// This class is used for .NET Core based frameworks (.NET 6+) only. See <see cref="PlatformCompatibility.PlatformHelper"/>.
     /// </summary>
     public sealed class PluginAssemblyResolver
     {
@@ -26,12 +26,12 @@ namespace Reqnroll.Plugins
             Assembly = _loadContext.LoadFromAssemblyPath(path);
             _dependencyContext = DependencyContext.Load(Assembly);
 
-            _assemblyResolver = new CompositeCompilationAssemblyResolver(new ICompilationAssemblyResolver[]
-            {
-                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)),
+            _assemblyResolver = new CompositeCompilationAssemblyResolver(
+            [
+                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)!),
                 new ReferenceAssemblyPathResolver(),
                 new PackageCompilationAssemblyResolver()
-            });
+            ]);
 
             _loadContext.Resolving += OnResolving;
             _loadContext.Unloading += OnUnloading;

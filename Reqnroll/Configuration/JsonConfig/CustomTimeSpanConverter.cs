@@ -6,7 +6,7 @@ using System.Text.Json.Serialization;
 namespace Reqnroll.Configuration.JsonConfig
 {
     /// <summary>
-    /// Custom <see cref="TimeSpan"/> Converter to stay compatible with old json format/parser
+    /// Custom <see cref="TimeSpan"/> converter to stay compatible with old json format/parser
     /// </summary>
     sealed class CustomTimeSpanConverter : JsonConverter<TimeSpan>
     {
