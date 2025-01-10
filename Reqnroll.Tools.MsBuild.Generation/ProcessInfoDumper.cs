@@ -19,11 +19,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
             try
             {
                 var currentProcess = Process.GetCurrentProcess();
-                _taskLoggingWrapper.LogMessageWithLowImportance($"process: {currentProcess.ProcessName}, .NET: {RuntimeInformation.FrameworkDescription}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
+                _taskLoggingWrapper.LogDiagnosticMessage($"process: {currentProcess.ProcessName}, .NET: {RuntimeInformation.FrameworkDescription}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
             }
             catch (Exception e)
             {
-                _taskLoggingWrapper.LogMessageWithLowImportance($"Error when dumping process info: {e}");
+                _taskLoggingWrapper.LogDiagnosticMessage($"Error when dumping process info: {e}");
             }
             DumpLoadedAssemblies();
         }
@@ -32,17 +32,17 @@ namespace Reqnroll.Tools.MsBuild.Generation
         {
             try
             {
-                _taskLoggingWrapper.LogMessageWithLowImportance("Loaded assemblies:");
+                _taskLoggingWrapper.LogDiagnosticMessage("Loaded assemblies:");
 
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(a => a.FullName))
                 {
                     var location = assembly.IsDynamic ? "<dyn>" : assembly.Location;
-                    _taskLoggingWrapper.LogMessageWithLowImportance($"  {assembly.FullName};{location}");
+                    _taskLoggingWrapper.LogDiagnosticMessage($"  {assembly.FullName};{location}");
                 }
             }
             catch (Exception e)
             {
-                _taskLoggingWrapper.LogMessageWithLowImportance($"Error when dumping loaded assemblies: {e}");
+                _taskLoggingWrapper.LogDiagnosticMessage($"Error when dumping loaded assemblies: {e}");
             }
         }
     }
