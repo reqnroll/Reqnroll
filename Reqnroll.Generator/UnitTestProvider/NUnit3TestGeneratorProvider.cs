@@ -128,7 +128,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
             var tagsArray = tags.ToArray();
 
-            // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://github.com/SpecFlowOSS/SpecFlow/issues/116
+            // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://youtrack.jetbrains.com/issue/RSRP-279138
             bool hasExampleTags = tagsArray.Any();
             var exampleTagExpressionList = tagsArray.Select(t => (CodeExpression)new CodePrimitiveExpression(t));
             var exampleTagsExpression = hasExampleTags

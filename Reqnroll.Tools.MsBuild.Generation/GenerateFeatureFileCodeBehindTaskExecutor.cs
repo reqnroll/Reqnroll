@@ -43,34 +43,32 @@ namespace Reqnroll.Tools.MsBuild.Generation
             _processInfoDumper.DumpProcessInfo();
             _taskLoggingWrapper.LogMessage("Starting GenerateFeatureFileCodeBehind");
 
-            var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
-
-            using (var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
-                reqnrollProject.ProjectSettings.ConfigurationHolder,
-                reqnrollProject.ProjectSettings,
-                _reqnrollProjectInfo.GeneratorPlugins,
-                _rootObjectContainer))
+            try
             {
+                var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
+
+                using var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
+                    reqnrollProject.ProjectSettings.ConfigurationHolder,
+                    reqnrollProject.ProjectSettings,
+                    _reqnrollProjectInfo.GeneratorPlugins,
+                    _rootObjectContainer);
                 var projectCodeBehindGenerator = generatorContainer.Resolve<IProjectCodeBehindGenerator>();
 
-                try
+                _ = Task.Run(_msbuildTaskAnalyticsTransmitter.TryTransmitProjectCompilingEventAsync);
+
+                var returnValue = projectCodeBehindGenerator.GenerateCodeBehindFilesForProject();
+
+                if (_taskLoggingWrapper.HasLoggedErrors())
                 {
-                    _ = Task.Run(_msbuildTaskAnalyticsTransmitter.TryTransmitProjectCompilingEventAsync);
-
-                    var returnValue = projectCodeBehindGenerator.GenerateCodeBehindFilesForProject();
-
-                    if (_taskLoggingWrapper.HasLoggedErrors())
-                    {
-                        return Result<IReadOnlyCollection<ITaskItem>>.Failure("Feature file code-behind generation has failed with errors.");
-                    }
-
-                    return Result.Success(returnValue);
+                    return Result<IReadOnlyCollection<ITaskItem>>.Failure("Feature file code-behind generation has failed with errors.");
                 }
-                catch (Exception e)
-                {
-                    _exceptionTaskLogger.LogException(e);
-                    return Result<IReadOnlyCollection<ITaskItem>>.Failure(e);
-                }
+
+                return Result.Success(returnValue);
+            }
+            catch (Exception e)
+            {
+                _exceptionTaskLogger.LogException(e);
+                return Result<IReadOnlyCollection<ITaskItem>>.Failure(e);
             }
         }
     }

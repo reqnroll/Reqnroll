@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -8,10 +9,12 @@ namespace Reqnroll.Tools.MsBuild.Generation
     {
         private readonly ITaskLoggingWrapper _taskLoggingWrapper;
         private bool _isDisposed;
+        private readonly string _taskFolder;
 
         public AssemblyResolveLogger(ITaskLoggingWrapper taskLoggingWrapper)
         {
             _taskLoggingWrapper = taskLoggingWrapper;
+            _taskFolder = Path.GetDirectoryName(typeof(AssemblyResolveLogger).Assembly.Location);
             AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
         }
 
@@ -22,13 +25,30 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            _taskLoggingWrapper.LogMessageWithLowImportance(args.Name);
+            _taskLoggingWrapper.LogMessageWithLowImportance($"Resolving {args.Name}");
 
             try
             {
                 var requestedAssemblyName = new AssemblyName(args.Name);
+                
                 var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == requestedAssemblyName.Name);
-                if (loadedAssembly != null) return loadedAssembly;
+                if (loadedAssembly != null)
+                {
+                    _taskLoggingWrapper.LogMessageWithLowImportance($"  Loading {args.Name} from loaded assembly ('{loadedAssembly.FullName}')");
+                    return loadedAssembly;
+                }
+
+                if (_taskFolder != null)
+                {
+                    var assemblyPath = Path.Combine(_taskFolder, requestedAssemblyName.Name + ".dll");
+                    if (File.Exists(assemblyPath))
+                    {
+                        _taskLoggingWrapper.LogMessageWithLowImportance($"  Loading {args.Name} from {assemblyPath}");
+                        return Assembly.LoadFrom(assemblyPath);
+                    }
+                }
+
+                _taskLoggingWrapper.LogMessageWithLowImportance($"  {args.Name} is not in folder {_taskFolder}");
             }
             catch (Exception ex)
             {

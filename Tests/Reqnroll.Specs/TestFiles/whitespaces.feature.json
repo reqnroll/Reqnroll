@@ -1,1 +1,236 @@
-﻿{"ReqnrollFeature":{"ScenarioDefinitions":[{"Tags":[],"Examples":[],"Location":{"Line":4,"Column":2},"Keyword":"Scenario","Name":"a simple scenario","Description":null,"Steps":[{"ScenarioBlock":1,"StepKeyword":1,"Location":{"Line":5,"Column":3},"Keyword":"Given ","KeywordType":1,"Text":"some precondition","Argument":null},{"ScenarioBlock":2,"StepKeyword":2,"Location":{"Line":6,"Column":2},"Keyword":"When ","KeywordType":2,"Text":"I do something","Argument":null},{"ScenarioBlock":3,"StepKeyword":3,"Location":{"Line":7,"Column":2},"Keyword":"Then ","KeywordType":3,"Text":"something happens","Argument":null}]}],"Background":null,"Tags":[],"Location":{"Line":2,"Column":2},"Language":"en-US","Keyword":"Feature","Name":"Whitespaces","Description":null,"Children":[{"Tags":[],"Examples":[],"Location":{"Line":4,"Column":2},"Keyword":"Scenario","Name":"a simple scenario","Description":null,"Steps":[{"ScenarioBlock":1,"StepKeyword":1,"Location":{"Line":5,"Column":3},"Keyword":"Given ","KeywordType":1,"Text":"some precondition","Argument":null},{"ScenarioBlock":2,"StepKeyword":2,"Location":{"Line":6,"Column":2},"Keyword":"When ","KeywordType":2,"Text":"I do something","Argument":null},{"ScenarioBlock":3,"StepKeyword":3,"Location":{"Line":7,"Column":2},"Keyword":"Then ","KeywordType":3,"Text":"something happens","Argument":null}]}]},"DocumentLocation":{"SourceFilePath":"sample.feature","FeatureFolderPath":""},"SourceFilePath":"sample.feature","Feature":{"ScenarioDefinitions":[{"Tags":[],"Examples":[],"Location":{"Line":4,"Column":2},"Keyword":"Scenario","Name":"a simple scenario","Description":null,"Steps":[{"ScenarioBlock":1,"StepKeyword":1,"Location":{"Line":5,"Column":3},"Keyword":"Given ","KeywordType":1,"Text":"some precondition","Argument":null},{"ScenarioBlock":2,"StepKeyword":2,"Location":{"Line":6,"Column":2},"Keyword":"When ","KeywordType":2,"Text":"I do something","Argument":null},{"ScenarioBlock":3,"StepKeyword":3,"Location":{"Line":7,"Column":2},"Keyword":"Then ","KeywordType":3,"Text":"something happens","Argument":null}]}],"Background":null,"Tags":[],"Location":{"Line":2,"Column":2},"Language":"en-US","Keyword":"Feature","Name":"Whitespaces","Description":null,"Children":[{"Tags":[],"Examples":[],"Location":{"Line":4,"Column":2},"Keyword":"Scenario","Name":"a simple scenario","Description":null,"Steps":[{"ScenarioBlock":1,"StepKeyword":1,"Location":{"Line":5,"Column":3},"Keyword":"Given ","KeywordType":1,"Text":"some precondition","Argument":null},{"ScenarioBlock":2,"StepKeyword":2,"Location":{"Line":6,"Column":2},"Keyword":"When ","KeywordType":2,"Text":"I do something","Argument":null},{"ScenarioBlock":3,"StepKeyword":3,"Location":{"Line":7,"Column":2},"Keyword":"Then ","KeywordType":3,"Text":"something happens","Argument":null}]}]},"Comments":[]}
+﻿{
+  "ReqnrollFeature": {
+    "ScenarioDefinitions": [
+      {
+        "Tags": [],
+        "Examples": [],
+        "Location": {
+          "Line": 4,
+          "Column": 2
+        },
+        "Keyword": "Scenario",
+        "Name": "a simple scenario",
+        "Description": null,
+        "Steps": [
+          {
+            "ScenarioBlock": 1,
+            "StepKeyword": 1,
+            "Location": {
+              "Line": 5,
+              "Column": 3
+            },
+            "Keyword": "Given ",
+            "KeywordType": 1,
+            "Text": "some precondition",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 2,
+            "StepKeyword": 2,
+            "Location": {
+              "Line": 6,
+              "Column": 2
+            },
+            "Keyword": "When ",
+            "KeywordType": 2,
+            "Text": "I do something",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 3,
+            "StepKeyword": 3,
+            "Location": {
+              "Line": 7,
+              "Column": 2
+            },
+            "Keyword": "Then ",
+            "KeywordType": 3,
+            "Text": "something happens",
+            "Argument": null
+          }
+        ]
+      }
+    ],
+    "Background": null,
+    "Tags": [],
+    "Location": {
+      "Line": 2,
+      "Column": 2
+    },
+    "Language": "en-US",
+    "Keyword": "Feature",
+    "Name": "Whitespaces",
+    "Description": null,
+    "Children": [
+      {
+        "Tags": [],
+        "Examples": [],
+        "Location": {
+          "Line": 4,
+          "Column": 2
+        },
+        "Keyword": "Scenario",
+        "Name": "a simple scenario",
+        "Description": null,
+        "Steps": [
+          {
+            "ScenarioBlock": 1,
+            "StepKeyword": 1,
+            "Location": {
+              "Line": 5,
+              "Column": 3
+            },
+            "Keyword": "Given ",
+            "KeywordType": 1,
+            "Text": "some precondition",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 2,
+            "StepKeyword": 2,
+            "Location": {
+              "Line": 6,
+              "Column": 2
+            },
+            "Keyword": "When ",
+            "KeywordType": 2,
+            "Text": "I do something",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 3,
+            "StepKeyword": 3,
+            "Location": {
+              "Line": 7,
+              "Column": 2
+            },
+            "Keyword": "Then ",
+            "KeywordType": 3,
+            "Text": "something happens",
+            "Argument": null
+          }
+        ]
+      }
+    ]
+  },
+  "DocumentLocation": {
+    "SourceFilePath": "sample.feature",
+    "FeatureFolderPath": ""
+  },
+  "SourceFilePath": "sample.feature",
+  "Feature": {
+    "ScenarioDefinitions": [
+      {
+        "Tags": [],
+        "Examples": [],
+        "Location": {
+          "Line": 4,
+          "Column": 2
+        },
+        "Keyword": "Scenario",
+        "Name": "a simple scenario",
+        "Description": null,
+        "Steps": [
+          {
+            "ScenarioBlock": 1,
+            "StepKeyword": 1,
+            "Location": {
+              "Line": 5,
+              "Column": 3
+            },
+            "Keyword": "Given ",
+            "KeywordType": 1,
+            "Text": "some precondition",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 2,
+            "StepKeyword": 2,
+            "Location": {
+              "Line": 6,
+              "Column": 2
+            },
+            "Keyword": "When ",
+            "KeywordType": 2,
+            "Text": "I do something",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 3,
+            "StepKeyword": 3,
+            "Location": {
+              "Line": 7,
+              "Column": 2
+            },
+            "Keyword": "Then ",
+            "KeywordType": 3,
+            "Text": "something happens",
+            "Argument": null
+          }
+        ]
+      }
+    ],
+    "Background": null,
+    "Tags": [],
+    "Location": {
+      "Line": 2,
+      "Column": 2
+    },
+    "Language": "en-US",
+    "Keyword": "Feature",
+    "Name": "Whitespaces",
+    "Description": null,
+    "Children": [
+      {
+        "Tags": [],
+        "Examples": [],
+        "Location": {
+          "Line": 4,
+          "Column": 2
+        },
+        "Keyword": "Scenario",
+        "Name": "a simple scenario",
+        "Description": null,
+        "Steps": [
+          {
+            "ScenarioBlock": 1,
+            "StepKeyword": 1,
+            "Location": {
+              "Line": 5,
+              "Column": 3
+            },
+            "Keyword": "Given ",
+            "KeywordType": 1,
+            "Text": "some precondition",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 2,
+            "StepKeyword": 2,
+            "Location": {
+              "Line": 6,
+              "Column": 2
+            },
+            "Keyword": "When ",
+            "KeywordType": 2,
+            "Text": "I do something",
+            "Argument": null
+          },
+          {
+            "ScenarioBlock": 3,
+            "StepKeyword": 3,
+            "Location": {
+              "Line": 7,
+              "Column": 2
+            },
+            "Keyword": "Then ",
+            "KeywordType": 3,
+            "Text": "something happens",
+            "Argument": null
+          }
+        ]
+      }
+    ]
+  },
+  "Comments": []
+}
