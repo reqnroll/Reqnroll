@@ -68,7 +68,12 @@ namespace Reqnroll.Tools.MsBuild.Generation
             catch (Exception e)
             {
                 _exceptionTaskLogger.LogException(e);
+                _processInfoDumper.DumpLoadedAssemblies();
                 return Result<IReadOnlyCollection<ITaskItem>>.Failure(e);
+            }
+            finally
+            {
+                _processInfoDumper.DumpLoadedAssemblies();
             }
         }
     }
