@@ -1,6 +1,4 @@
-using System.Runtime.Serialization;
-
-//using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
@@ -8,8 +6,7 @@ namespace Reqnroll.Configuration.JsonConfig
     public class BindingCultureElement
     {
         // legacy config
-        //[JsonProperty("name", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name="name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
     }
 }

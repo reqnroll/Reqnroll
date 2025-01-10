@@ -8,6 +8,8 @@
 
 ## Bug fixes:
 
+* Fix: Replace deprecated dependency `Specflow.Internal.Json` with `System.Text.Json`. The dependency was used for laoding `reqnroll.json`, for Visual Studio integration and for telemetry. (#373)
+
 *Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron, @olegKoshmeliuk
 
 # v2.2.1 - 2024-11-08

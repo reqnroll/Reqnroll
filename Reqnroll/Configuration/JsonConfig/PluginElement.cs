@@ -1,26 +1,20 @@
-//using Newtonsoft.Json;
-
-using System.Runtime.Serialization;
 using Reqnroll.Plugins;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
     public class PluginElement
     {
-        //[JsonProperty("name", NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name="name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
 
-        //[JsonProperty("path", NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "path")]
+        [JsonPropertyName("path")]
         public string Path { get; set; }
 
-        //[JsonProperty("parameters", NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "parameters")]
+        [JsonPropertyName("parameters")]
         public string Parameters { get; set; }
 
-        //[JsonProperty("type", NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "type")]
+        [JsonPropertyName("type")]
         public PluginType Type { get; set; }
     }
 }
