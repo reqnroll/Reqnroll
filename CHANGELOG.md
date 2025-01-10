@@ -7,7 +7,8 @@
 * Improve parameter type naming for generic types (#343)
 
 ## Bug fixes:
-* Fix: Replace EoL Specflow.Internal.Json with System.Text.Json. This may result in slightly different json parsing for reqnroll.json.
+
+* Fix: Replace deprecated dependency `Specflow.Internal.Json` with `System.Text.Json`. The dependency was used for laoding `reqnroll.json`, for Visual Studio integration and for telemetry. (#373)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron, @olegKoshmeliuk
 
