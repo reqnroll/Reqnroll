@@ -27,7 +27,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             }
             catch (Exception e)
             {
-                _taskLoggingWrapper.LogMessage($"Error when dumping process info: {e}");
+                _taskLoggingWrapper.LogMessageWithLowImportance($"Error when dumping process info: {e}");
             }
         }
     }
