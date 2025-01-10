@@ -25,7 +25,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
         {
-            _taskLoggingWrapper.LogMessage($"Resolving {args.Name}");
+            _taskLoggingWrapper.LogDiagnosticMessage($"Resolving {args.Name}");
 
             try
             {
@@ -34,7 +34,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
                 var loadedAssembly = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.GetName().Name == requestedAssemblyName.Name);
                 if (loadedAssembly != null)
                 {
-                    _taskLoggingWrapper.LogMessage($"  Loading {args.Name} from loaded assembly ('{loadedAssembly.FullName}')");
+                    _taskLoggingWrapper.LogDiagnosticMessage($"  Loading {args.Name} from loaded assembly ('{loadedAssembly.FullName}')");
                     return loadedAssembly;
                 }
 
@@ -43,12 +43,12 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     var assemblyPath = Path.Combine(_taskFolder, requestedAssemblyName.Name + ".dll");
                     if (File.Exists(assemblyPath))
                     {
-                        _taskLoggingWrapper.LogMessage($"  Loading {args.Name} from {assemblyPath}");
+                        _taskLoggingWrapper.LogDiagnosticMessage($"  Loading {args.Name} from {assemblyPath}");
                         return Assembly.LoadFrom(assemblyPath);
                     }
                 }
 
-                _taskLoggingWrapper.LogMessage($"  {args.Name} is not in folder {_taskFolder}");
+                _taskLoggingWrapper.LogDiagnosticMessage($"  {args.Name} is not in folder {_taskFolder}");
             }
             catch (Exception ex)
             {

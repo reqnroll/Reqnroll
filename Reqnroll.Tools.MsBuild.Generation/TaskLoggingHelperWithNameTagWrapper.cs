@@ -18,7 +18,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             _taskLoggingHelper.LogMessage(messageWithNameTag);
         }
 
-        public void LogMessageWithLowImportance(string message)
+        public void LogDiagnosticMessage(string message)
         {
             string messageWithNameTag = GetMessageWithNameTag(message);
             _taskLoggingHelper.LogMessage(MessageImportance.Low, messageWithNameTag);
