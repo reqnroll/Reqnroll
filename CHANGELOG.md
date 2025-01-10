@@ -8,6 +8,7 @@
 * Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
 
 ## Bug fixes:
+* MsTest: Only use TestContext for output and not Console.WriteLine (#368) 
 
 * Fix: Replace deprecated dependency `Specflow.Internal.Json` with `System.Text.Json`. The dependency was used for laoding `reqnroll.json`, for Visual Studio integration and for telemetry. (#373)
 
