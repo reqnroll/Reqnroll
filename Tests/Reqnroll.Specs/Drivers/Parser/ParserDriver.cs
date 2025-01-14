@@ -1,18 +1,61 @@
+using FluentAssertions;
+using Gherkin;
+using Gherkin.Ast;
+using Reqnroll.Parser;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
-using FluentAssertions;
-using Gherkin;
-using SpecFlow.Internal.Json;
-using Reqnroll.Parser;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Reqnroll.Specs.Drivers.Parser
 {
     public class ParserDriver
     {
+        readonly JsonSerializerOptions _serializerOptions = new()
+        {
+            WriteIndented = true,
+            TypeInfoResolver = new PolymorphicTypeResolver(),
+        };
+
+        /// <summary>
+        /// We don't want to decorate Gherkin objects with System.Text.Json Attributes, that's why poloymophy is handled manually in this class
+        /// </summary>
+        sealed class PolymorphicTypeResolver : DefaultJsonTypeInfoResolver
+        {
+            readonly Dictionary<Type, Type[]> _Inheritance = new()
+            {
+                 { typeof(IHasLocation), [typeof(Tag), typeof(Comment), typeof(ReqnrollFeature), typeof(Background), typeof(Scenario), typeof(ScenarioOutline), typeof(Examples), typeof(ReqnrollStep), typeof(TableCell)] },
+                 { typeof(StepsContainer), [typeof(Background), typeof(Scenario), typeof(ScenarioOutline)] },
+                 { typeof(Step), [typeof(ReqnrollStep)] },
+                 { typeof(Feature), [typeof(ReqnrollFeature)] },
+                 { typeof(StepArgument), [typeof(Gherkin.Ast.DataTable), typeof(DocString)] },
+            };
+            public override JsonTypeInfo GetTypeInfo(Type type, JsonSerializerOptions options)
+            {
+                JsonTypeInfo jsonTypeInfo = base.GetTypeInfo(type, options);
+
+                if (!_Inheritance.TryGetValue(type, out var derivedTypes))
+                    return jsonTypeInfo;
+
+                var polymorphismOptions = new JsonPolymorphismOptions
+                {
+                    UnknownDerivedTypeHandling = JsonUnknownDerivedTypeHandling.FailSerialization,
+                };
+
+                foreach (var derivedType in derivedTypes)
+                    polymorphismOptions.DerivedTypes.Add(new JsonDerivedType(derivedType));
+
+                jsonTypeInfo.PolymorphismOptions = polymorphismOptions;
+
+                return jsonTypeInfo;
+            }
+        }
+
         private readonly ReqnrollGherkinParser _parser = new ReqnrollGherkinParser(new CultureInfo("en-US"));
         public string FileContent { get; set; }
         public ReqnrollDocument ParsedDocument { get; private set; }
@@ -40,16 +83,17 @@ namespace Reqnroll.Specs.Drivers.Parser
             }
         }
 
-        public void AssertParsedFeatureEqualTo(string parsedFeatureXml)
+        public void AssertParsedFeatureEqualTo(string expected)
         {
-            const string ns1 = "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\"";
-            const string ns2 = "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"";
-            string Normalize(string value)
-                => value.Replace("\r", "").Replace(@"\r", "").Replace(ns1, "").Replace(ns2, "");
-            string expected = Normalize(parsedFeatureXml);
-            string got = Normalize(SerializeDocument(ParsedDocument));
+            static string Normalize(string value)
+                => value.Replace("\r", "").Replace(@"\r", "");
 
-            got.Should().Be(expected);
+            string got = SerializeDocument(ParsedDocument);
+            got = Normalize(got);
+
+            var expectedNormalized = Normalize(expected);
+
+            got.Should().Be(expectedNormalized);
         }
 
         public void AssertErrors(List<ExpectedError> expectedErrors)
@@ -87,7 +131,7 @@ namespace Reqnroll.Specs.Drivers.Parser
 
         private string SerializeDocument(ReqnrollDocument feature)
         {
-            return feature.ToJson(new JsonSerializerSettings(ignoreNullValues: false, useEnumUnderlyingValues: true));
+            return JsonSerializer.Serialize(feature, _serializerOptions);
         }
     }
 

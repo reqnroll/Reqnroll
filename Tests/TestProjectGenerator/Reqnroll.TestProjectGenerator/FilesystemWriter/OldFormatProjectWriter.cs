@@ -147,7 +147,6 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 xw.WriteElementString("SchemaVersion", "2.0");
                 xw.WriteElementString("ProductVersion", null);
                 xw.WriteElementString("ProjectTypeGuids", "{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}");
-                xw.WriteElementString("ShowTrace", "true");
                 xw.WriteElementString("ErrorReport", "prompt");
                 xw.WriteElementString("WarningLevel", "4");
             }
