@@ -31,6 +31,7 @@
   </ItemGroup>
    
   <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
     <ProjectReference Include="..\TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" />
