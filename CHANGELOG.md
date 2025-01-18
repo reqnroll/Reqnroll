@@ -6,7 +6,7 @@
 * Improve code-behind feature file compilation speed (#336)
 * Improve parameter type naming for generic types (#343)
 * Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
-* Add an `IsRegisteredAtAnyLevel()` method to the `IObjectContainer` interface (#367)
+* Update behavior of `ObjectContainer.IsRegistered()` to check base container for registrations, to match `Resolve()` behavior (#367)
 
 ## Bug fixes:
 * MsTest: Only use TestContext for output and not Console.WriteLine (#368) 
