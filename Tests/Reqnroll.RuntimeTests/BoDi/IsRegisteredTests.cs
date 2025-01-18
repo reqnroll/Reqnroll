@@ -31,6 +31,18 @@ namespace Reqnroll.RuntimeTests.BoDi
         }
 
         [Fact]
+        public void ShouldReturnFalseIfTypeNotRegisteredWithParent()
+        {
+            // given
+            var parentContainer = new ObjectContainer();
+            var container = new ObjectContainer(parentContainer);
+
+            // then
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeFalse();
+        }
+
+        [Fact]
         public void ShouldReturnTrueIfInterfaceRegistered()
         {
             // given
@@ -61,46 +73,29 @@ namespace Reqnroll.RuntimeTests.BoDi
         }
 
         [Fact]
-        public void AnyLevel_ShouldReturnTrueIfTypeRegisteredInParent()
+        public void ShouldReturnTrueIfTypeRegisteredInParent()
         {
             // given
-            var parentContainer = new ObjectContainer();
+            var grandparentContainer = new ObjectContainer();
+            var parentContainer = new ObjectContainer(grandparentContainer);
             var container = new ObjectContainer(parentContainer);
 
             // when
             parentContainer.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
 
             // then
-            bool isRegistered = container.IsRegisteredAtAnyLevel<SimpleClassWithDefaultCtor>();
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
             isRegistered.Should().BeTrue();
 
-            isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered = parentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = grandparentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
             isRegistered.Should().BeFalse();
         }
 
         [Fact]
-        public void AnyLevel_ShouldReturnTrueIfRegisteredInSelf()
-        {
-            // given
-            var parentContainer = new ObjectContainer();
-            var container = new ObjectContainer(parentContainer);
-
-            // when
-            container.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
-
-            // then
-            bool isRegistered = container.IsRegisteredAtAnyLevel<SimpleClassWithDefaultCtor>();
-            isRegistered.Should().BeTrue();
-
-            isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
-            isRegistered.Should().BeTrue();
-
-            isRegistered = parentContainer.IsRegisteredAtAnyLevel<SimpleClassWithDefaultCtor>();
-            isRegistered.Should().BeFalse();
-        }
-
-        [Fact]
-        public void AnyLevel_ShouldReturnTrueIfTypeRegisteredInGrandparent()
+        public void ShouldReturnTrueIfTypeRegisteredInGrandparent()
         {
             // given
             var grandparentContainer = new ObjectContainer();
@@ -111,22 +106,31 @@ namespace Reqnroll.RuntimeTests.BoDi
             grandparentContainer.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
 
             // then
-            bool isRegistered = container.IsRegisteredAtAnyLevel<SimpleClassWithDefaultCtor>();
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
             isRegistered.Should().BeTrue();
 
-            isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
-            isRegistered.Should().BeFalse();
+            isRegistered = parentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = grandparentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
         }
 
         [Fact]
-        public void AnyLevel_ShouldReturnFalseIfNotRegistered()
+        public void ShouldReturnTrueIfRegisteredInSelfButFalseInParent()
         {
             // given
             var parentContainer = new ObjectContainer();
             var container = new ObjectContainer(parentContainer);
 
+            // when
+            container.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
+
             // then
-            bool isRegistered = container.IsRegisteredAtAnyLevel<SimpleClassWithDefaultCtor>();
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = parentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
             isRegistered.Should().BeFalse();
         }
     }

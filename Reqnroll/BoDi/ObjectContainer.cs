@@ -495,24 +495,17 @@ public class ObjectContainer : IObjectContainer
     {
         var keyToResolve = new RegistrationKey(type, name);
 
-        return _registrations.ContainsKey(keyToResolve);
-    }
-
-    /// <inheritdoc/>
-    public bool IsRegisteredAtAnyLevel<T>(string name = null) => IsRegisteredAtAnyLevel(typeof(T), name);
-
-    /// <inheritdoc/>
-    public bool IsRegisteredAtAnyLevel(Type type, string name = null)
-    {
-        IObjectContainer container = this;
-        do
+        if (_registrations.ContainsKey(keyToResolve))
         {
-            if (container.IsRegistered(type, name))
-            {
-                return true;
-            }
-        } while (container is ObjectContainer c && (container = c.BaseContainer) != null);
+            return true;
+        }
+        else if (BaseContainer != null)
+        {
+            // Recursively check the base container
+            return BaseContainer.IsRegistered(type, name);
+        }
 
+        // We are at the top of the container hierarchy and the registration is not found
         return false;
     }
 
