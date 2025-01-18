@@ -1,9 +1,8 @@
+using Reqnroll.BindingSkeletons;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Reqnroll.BoDi;
-using Reqnroll.BindingSkeletons;
 
 namespace Reqnroll.Configuration
 {

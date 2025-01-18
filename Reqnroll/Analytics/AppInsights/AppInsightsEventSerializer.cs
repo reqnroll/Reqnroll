@@ -1,5 +1,4 @@
-using System.Text;
-using SpecFlow.Internal.Json;
+using System.Text.Json;
 
 namespace Reqnroll.Analytics.AppInsights
 {
@@ -8,7 +7,7 @@ namespace Reqnroll.Analytics.AppInsights
         public byte[] SerializeAnalyticsEvent(IAnalyticsEvent analyticsEvent, string instrumentationKey)
         {
             var eventTelemetry = new AppInsightsEventTelemetry(analyticsEvent, instrumentationKey);
-            return Encoding.UTF8.GetBytes(eventTelemetry.ToJson());
+            return JsonSerializer.SerializeToUtf8Bytes(eventTelemetry, AppInsightsEventTelemetryJsonSourceGenerator.Default.AppInsightsEventTelemetry);
         }
     }
 }

@@ -1,14 +1,14 @@
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
     public class Dependency
     {
-        [DataMember(Name = "type")]
+        [JsonPropertyName("type")]
         public string ImplementationType { get; set; }
-        [DataMember(Name = "as")]
+        [JsonPropertyName("as")]
         public string InterfaceType { get; set; }
-        [DataMember(Name = "name")]
+        [JsonPropertyName("name")]
         public string Name { get; set; }
     }
 }

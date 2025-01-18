@@ -184,7 +184,7 @@ namespace Reqnroll.TestProjectGenerator
 
             var logLines = stdOutText.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            var primaryOutput = logLines.TakeWhile(line => line != "TestContext Messages:");
+            var primaryOutput = logLines.Where(line => line != "TestContext Messages:");
 
             TestStepResult step = null;
 
