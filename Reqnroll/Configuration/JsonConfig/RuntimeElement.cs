@@ -1,29 +1,20 @@
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
-
-//using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
     public class RuntimeElement
     {
-        //[JsonProperty("stopAtFirstError", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "stopAtFirstError")]
-        [DefaultValue(ConfigDefaults.StopAtFirstError)]
-        public bool StopAtFirstError { get; set; }
+        [JsonPropertyName("stopAtFirstError")]
+        public bool StopAtFirstError { get; set; } = ConfigDefaults.StopAtFirstError;
 
-        //[JsonProperty("missingOrPendingStepsOutcome", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "missingOrPendingStepsOutcome")]
-        [DefaultValue(ConfigDefaults.MissingOrPendingStepsOutcome)]
-        public MissingOrPendingStepsOutcome MissingOrPendingStepsOutcome { get; set; }
+        [JsonPropertyName("missingOrPendingStepsOutcome")]
+        public MissingOrPendingStepsOutcome MissingOrPendingStepsOutcome { get; set; } = ConfigDefaults.MissingOrPendingStepsOutcome;
 
-        //[JsonProperty("obsoleteBehavior", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "obsoleteBehavior")]
-        [DefaultValue(ConfigDefaults.ObsoleteBehavior)]
-        public ObsoleteBehavior ObsoleteBehavior { get; set; }
+        [JsonPropertyName("obsoleteBehavior")]
+        public ObsoleteBehavior ObsoleteBehavior { get; set; } = ConfigDefaults.ObsoleteBehavior;
 
-        [DataMember(Name = "dependencies")]
+        [JsonPropertyName("dependencies")]
         public List<Dependency> Dependencies { get; set; }
     }
 }

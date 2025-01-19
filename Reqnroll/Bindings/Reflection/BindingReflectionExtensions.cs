@@ -17,7 +17,7 @@ namespace Reqnroll.Bindings.Reflection
             if (baseType is RuntimeBindingType runtimeBindingType)
                 return runtimeBindingType.Type.IsAssignableFrom(type);
 
-            if (type.FullName == baseType.FullName)
+            if (new RuntimeBindingType(type).FullName == baseType.FullName)
                 return true;
 
             if (type.BaseType != null && IsAssignableTo(type.BaseType, baseType))
@@ -28,10 +28,11 @@ namespace Reqnroll.Bindings.Reflection
 
         public static bool IsAssignableFrom(this Type baseType, IBindingType type)
         {
+            var bindingType = new RuntimeBindingType(baseType);
             if (type is IPolymorphicBindingType polymorphicBindingType)
-                return polymorphicBindingType.IsAssignableTo(new RuntimeBindingType(baseType));
+                return polymorphicBindingType.IsAssignableTo(bindingType);
 
-            if (type.FullName == baseType.FullName)
+            if (type.FullName == bindingType.FullName)
                 return true;
 
             return false;

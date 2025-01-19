@@ -11,7 +11,13 @@ namespace Reqnroll.Parser
     public class ReqnrollGherkinParser : IGherkinParser
     {
         private readonly IGherkinDialectProvider dialectProvider;
-        private readonly List<ISemanticValidator> semanticValidators;
+        private static readonly List<ISemanticValidator> semanticValidators = new List<ISemanticValidator>(4)
+        {
+            new DuplicateScenariosValidator(),
+            new DuplicateExamplesValidator(),
+            new MissingExamplesValidator(),
+            new DuplicateExamplesColumnHeadersValidator()
+        };
 
         public IGherkinDialectProvider DialectProvider
         {
@@ -26,13 +32,7 @@ namespace Reqnroll.Parser
         public ReqnrollGherkinParser(CultureInfo defaultLanguage)
             : this(new ReqnrollGherkinDialectProvider(defaultLanguage.Name))
         {
-            semanticValidators = new List<ISemanticValidator>
-            {
-                new DuplicateScenariosValidator(),
-                new DuplicateExamplesValidator(),
-                new MissingExamplesValidator(),
-                new DuplicateExamplesColumnHeadersValidator()
-            };
+
         }
 
         private static StepKeyword GetStepKeyword(GherkinDialect dialect, string stepKeyword)

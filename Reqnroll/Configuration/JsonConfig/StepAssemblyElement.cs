@@ -1,11 +1,10 @@
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
     public class StepAssemblyElement
     {
-        //[JsonProperty("assembly", NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "assembly")]
+        [JsonPropertyName("assembly")]
         public string Assembly { get; set; }
     }
 }

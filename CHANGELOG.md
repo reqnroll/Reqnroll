@@ -2,9 +2,27 @@
 
 ## Improvements:
 
+* Enhance BoDi error handling to provide the name of the interface being registered when that interface has already been resolved (#324)
+* Improve code-behind feature file compilation speed (#336)
+* Improve parameter type naming for generic types (#343)
+* Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
+
+## Bug fixes:
+* MsTest: Only use TestContext for output and not Console.WriteLine (#368) 
+
+* Fix: Replace deprecated dependency `Specflow.Internal.Json` with `System.Text.Json`. The dependency was used for laoding `reqnroll.json`, for Visual Studio integration and for telemetry. (#373)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron, @olegKoshmeliuk
+
+# v2.2.1 - 2024-11-08
+
+## Improvements:
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: NUnit projects fail or provide warning as `TearDown : System.InvalidOperationException : Only static OneTimeSetUp and OneTimeTearDown are allowed for InstancePerTestCase mode.` (#320)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy
 
 # v2.2.0 - 2024-11-07
 

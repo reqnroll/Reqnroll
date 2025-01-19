@@ -18,7 +18,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
     public class ScenarioDependenciesAttribute : Attribute
     {
         /// <summary>
-        /// Automatically register all SpecFlow bindings.
+        /// Automatically register all Reqnroll bindings.
         /// </summary>
         public bool AutoRegisterBindings { get; set; } = true;
 

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
-using Reqnroll.BoDi;
-using Reqnroll.Bindings.Discovery;
+﻿using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
-using SpecFlow.Internal.Json;
+using System.Linq;
+using System.Reflection;
+using System.Text.Json;
 
 namespace Reqnroll.Bindings.Provider;
+
 public class BindingProviderService
 {
     public static string DiscoverBindings(Assembly testAssembly, string jsonConfiguration)
@@ -20,7 +20,7 @@ public class BindingProviderService
         BuildBindingRegistry(testAssembly, bindingRegistryBuilder);
         var bindingRegistry = globalContainer.Resolve<IBindingRegistry>();
         var resultData = ParseDiscoveryResult(bindingRegistry, testAssembly);
-        var jsonString = resultData.ToJson();
+        var jsonString = JsonSerializer.Serialize(resultData, BindingJsonSourceGenerator.Default.BindingData);
         return jsonString;
     }
 
