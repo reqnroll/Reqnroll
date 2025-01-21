@@ -26,6 +26,7 @@ public abstract class SystemTestBase
     protected CompilationDriver _compilationDriver = null!;
     protected BindingsDriver _bindingDriver = null!;
     protected TestProjectFolders _testProjectFolders = null!;
+    protected JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver = null!;
 
     protected int _preparedTests = 0;
 
@@ -87,6 +88,7 @@ public abstract class SystemTestBase
         _compilationDriver = GetServiceSafe<CompilationDriver>();
         _testProjectFolders = GetServiceSafe<TestProjectFolders>();
         _bindingDriver = GetServiceSafe<BindingsDriver>();
+        _jsonConfigurationLoaderDriver = GetServiceSafe<JsonConfigurationLoaderDriver>();
     }
 
 
@@ -256,5 +258,10 @@ public abstract class SystemTestBase
     protected void AddBindingClass(string content)
     {
         _projectsDriver.AddBindingClass(content);
+    }
+
+    protected void AddJsonConfigFileContent(string reqnrollConfigContent)
+    {
+        _jsonConfigurationLoaderDriver.AddReqnrollJson(reqnrollConfigContent);
     }
 }

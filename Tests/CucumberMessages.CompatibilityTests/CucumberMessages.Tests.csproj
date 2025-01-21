@@ -177,6 +177,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="reqnrollConfigurationWithExternalAssembly.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="reqnroll.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="Samples\attachments\cucumber.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -187,9 +193,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="partialConfiguration.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="cucumberMessages.configuration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

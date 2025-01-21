@@ -1,5 +1,7 @@
 ﻿using Reqnroll.CommonModels;
+using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
+using System.Diagnostics;
 using System.IO;
 using System.Text.Json;
 
@@ -7,12 +9,13 @@ namespace Reqnroll.CucumberMessages.Configuration
 {
     public class RCM_ConfigFile_ConfigurationSource : IConfigurationSource
     {
-        private const string CUCUMBERMESSAGESCONFIGURATIONFILENAME = "cucumberMessages.configuration.json";
         private IEnvironmentWrapper _environmentWrapper;
+        private IReqnrollJsonLocator _configFileLocator;
 
-        public RCM_ConfigFile_ConfigurationSource(IEnvironmentWrapper environmentWrapper)
+        public RCM_ConfigFile_ConfigurationSource(IEnvironmentWrapper environmentWrapper, IReqnrollJsonLocator configurationFileLocator)
         {
             _environmentWrapper = environmentWrapper;
+            _configFileLocator = configurationFileLocator;
         }
 
         public ConfigurationDTO GetConfiguration()
@@ -20,16 +23,29 @@ namespace Reqnroll.CucumberMessages.Configuration
             var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             jsonOptions.Converters.Add(new IdGenerationStyleEnumConverter());
 
-            var fileNameOverridden = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_CONFIGURATION_FILE_OVERRIDE_ENVIRONMENT_VARIABLE);
+            var fileName = _configFileLocator.GetReqnrollJsonFilePath();
 
-            var fileName = fileNameOverridden is Success<string> ? ((Success<string>)fileNameOverridden).Result : CUCUMBERMESSAGESCONFIGURATIONFILENAME;
-
-            ConfigurationDTO configurationDTO = null;
+            ConfigurationDTO configurationDTO = new();
+            CucumberMessagesConfiguration section = null;
             if (File.Exists(fileName))
             {
-                configurationDTO = JsonSerializer.Deserialize<ConfigurationDTO>(File.ReadAllText(fileName), jsonOptions);
+                var jsonFileContent = File.ReadAllText(fileName);
+                using JsonDocument reqnrollConfigDoc = JsonDocument.Parse(jsonFileContent);
+                if (reqnrollConfigDoc.RootElement.TryGetProperty("cucumberMessagesConfiguration", out JsonElement CMC))
+                {
+                    section = JsonSerializer.Deserialize<CucumberMessagesConfiguration>(CMC.GetRawText(), jsonOptions);
+                }
             }
-            return configurationDTO;
+            if (section != null)
+            {
+                configurationDTO.Enabled = section.Enabled;
+                configurationDTO.BaseDirectory = section.BaseDirectory;
+                configurationDTO.OutputDirectory = section.OutputDirectory;
+                configurationDTO.OutputFileName = section.OutputFileName;
+                configurationDTO.IDGenerationStyle = section.IDGenerationStyle;
+                return configurationDTO;
+            }
+            return null;
         }
     }
 }

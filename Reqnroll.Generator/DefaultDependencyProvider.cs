@@ -50,7 +50,7 @@ namespace Reqnroll.Generator
             container.RegisterTypeAs<ConfigurationLoader, IConfigurationLoader>();
 
             container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();    
-            container.RegisterTypeAs<CucumberConfiguration, ICucumberConfiguration>();
+            container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
 
             container.RegisterTypeAs<ReqnrollGherkinParserFactory, IGherkinParserFactory>();
             

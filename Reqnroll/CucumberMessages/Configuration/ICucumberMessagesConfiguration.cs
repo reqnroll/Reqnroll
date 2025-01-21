@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.CucumberMessages.Configuration
 {
-    public interface ICucumberConfiguration
+    public interface ICucumberMessagesConfiguration
     {
         bool Enabled { get; }
         string BaseDirectory { get; }

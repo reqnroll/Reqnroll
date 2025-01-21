@@ -12,7 +12,6 @@ using Reqnroll.TestProjectGenerator.Driver;
 using Moq;
 using Reqnroll.Tracing;
 using Reqnroll.EnvironmentAccess;
-using SpecFlow.Internal.Json;
 using Microsoft.VisualBasic.FileIO;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.CommonModels;
@@ -67,7 +66,7 @@ namespace CucumberMessages.Tests
             ResetCucumberMessages("reqnoll_report.ndjson");
             EnableCucumberMessages();
             //SetCucumberMessagesOutputFileName();
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Test
@@ -88,7 +87,7 @@ namespace CucumberMessages.Tests
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName("CanGenerateGUIDIds_SmokeTest.ndjson");
             SetEnvironmentVariableForGUIDIdGeneration();
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Test
@@ -109,7 +108,7 @@ namespace CucumberMessages.Tests
             ResetCucumberMessages("SmokeTestMultipleFeatures.ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName("SmokeTestMultipleFeatures.ndjson");
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Test
@@ -134,7 +133,7 @@ namespace CucumberMessages.Tests
             ResetCucumberMessages("Cucumber Messages Smoke Outline Test.ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName("CucumberMessages Smoke Outline Test.ndjson");
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Outline Test
@@ -162,7 +161,7 @@ namespace CucumberMessages.Tests
 
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName("CucumberMessages Smoke Outline Test As Methods.ndjson");
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
 
             AddFeatureFile("""
                 Feature: Cucumber Messages Smoke Outline Test As Methods
@@ -191,7 +190,7 @@ namespace CucumberMessages.Tests
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName("External Data from CSV file.ndjson");
             _projectsDriver.AddNuGetPackage("Reqnroll.ExternalData", "2.1.1-local");
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
 
             // this test borrows a subset of a feature, the binding class, and the data file from ExternalData.ReqnrollPlugin.IntegrationTest
             var content = _testFileManager.GetTestFileContent("products.csv", "CucumberMessages.Tests", Assembly.GetExecutingAssembly());
@@ -310,7 +309,16 @@ namespace CucumberMessages.Tests
             ResetCucumberMessages(featureNameText + ".ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            
+            // BECAUSE the following won't work (still investigating), will use a specially crafted reqnroll.json file
+            // that already has the ExternalBindingsProject assembly mentioned. 
+            // This should be a short-term hack.
+
+            // set the Reqnroll configuration to include an external Assemblies setting
+            //var _configurationFileDriver = GetServiceSafe<ConfigurationFileDriver>();
+            //_configurationFileDriver.AddStepAssembly(new BindingAssembly("ExternalBindingsProject"));
+
+            CucumberMessagesAddConfigurationFile("reqnrollConfigurationWithExternalAssembly.json");
 
             //Set up the Default Project (main test assembly)
             AddUtilClassWithFileSystemPath();
@@ -330,9 +338,6 @@ namespace CucumberMessages.Tests
             externalProject.AddBindingClass(bindingCLassFileContent); //add the binding 
 
             _projectsDriver.AddProjectReference("ExternalBindingsProject");
-            // set the Reqnroll configuration to include an external Assemblies setting
-            var _configurationFileDriver = GetServiceSafe<ConfigurationFileDriver>();
-            _configurationFileDriver.AddStepAssembly(new BindingAssembly("ExternalBindingsProject"));
             // restoring values to the TestProjectFolders data structure
             _testProjectFolders.ProjectFolder = testPath;
             _testProjectFolders.ProjectBinOutputPath = projectBinOutputPath;

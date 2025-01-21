@@ -12,7 +12,6 @@ using Reqnroll.TestProjectGenerator.Driver;
 using Moq;
 using Reqnroll.Tracing;
 using Reqnroll.EnvironmentAccess;
-using SpecFlow.Internal.Json;
 using Microsoft.VisualBasic.FileIO;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.CommonModels;
@@ -46,7 +45,7 @@ namespace CucumberMessages.Tests
             ResetCucumberMessages(featureNameText + ".ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
-            CucumberMessagesAddConfigurationFile("CucumberMessages.configuration.json");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
             AddUtilClassWithFileSystemPath();
 
             var featureFileName = testName.Replace("-", "_");

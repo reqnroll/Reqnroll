@@ -1,35 +1,20 @@
 ﻿{
-    "description": "This class holds configuration information from a configuration source.\nEach configuration source may provide one or more Profiles (such as Dev or Prod). \nThe default profile is always named \u0027DEFAULT\u0027.",
-    "type": "object",
+    "description": "This class holds configuration information from a configuration source for Reqnroll Cucumber Message Generation.\n",
     "properties": {
-        "FileOutputEnabled": {
+        "Enabled": {
             "type": "boolean"
         },
-        "ActiveProfileName": {
+        "BaseDirectory": {
             "type": "string"
         },
-        "Profiles": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "ProfileName": {
-                        "type": "string"
-                    },
-                    "BasePath": {
-                        "type": "string"
-                    },
-                    "OutputDirectory": {
-                        "type": "string"
-                    },
-                    "OutputFileName": {
-                        "type": "string"
-                    },
-                    "IDGenerationStyle": {
-                        "type": "string"
-                    }
-                }
-            }
+        "OutputDirectory": {
+            "type": "string"
+        },
+        "OutputFileName": {
+            "type": "string"
+        },
+        "IDGenerationStyle": {
+            "type": "string"
         }
     }
 }

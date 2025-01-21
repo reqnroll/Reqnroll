@@ -2,6 +2,7 @@
 using Io.Cucumber.Messages.Types;
 using Moq;
 using Reqnroll.BoDi;
+using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.EnvironmentAccess;
@@ -28,7 +29,6 @@ namespace CucumberMessages.Tests
         protected void EnableCucumberMessages()
         {
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, "true");
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE, "LOCAL");
         }
 
         protected void SetCucumberMessagesOutputFileName(string fileName)
@@ -45,24 +45,13 @@ namespace CucumberMessages.Tests
         {
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
-            ResetCucumberMessagesConfigurationFileName();
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, null);
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE, null);
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void ResetCucumberMessagesOutputFileName()
         {
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE, null);
-        }
-
-        protected void SetCucumberMessagesConfigurationFileName(string fileName)
-        {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_CONFIGURATION_FILE_OVERRIDE_ENVIRONMENT_VARIABLE, fileName);
-        }
-        protected void ResetCucumberMessagesConfigurationFileName()
-        {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_CONFIGURATION_FILE_OVERRIDE_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
@@ -113,8 +102,7 @@ namespace CucumberMessages.Tests
         protected void CucumberMessagesAddConfigurationFile(string configFileName)
         {
             var configFileContent = File.ReadAllText(configFileName);
-            _projectsDriver.AddFile(configFileName, configFileContent);
-            SetCucumberMessagesConfigurationFileName(configFileName);
+            AddJsonConfigFileContent(configFileContent);
         }
 
         protected static string ActualsResultLocationDirectory()
@@ -127,7 +115,8 @@ namespace CucumberMessages.Tests
             var tracerMock = new Mock<ITraceListener>();
             objectContainerMock.Setup(x => x.Resolve<ITraceListener>()).Returns(tracerMock.Object);
             var env = new EnvironmentWrapper();
-            CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env);
+            var jsonConfigFileLocator = new ReqnrollJsonLocator();
+            CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env, jsonConfigFileLocator);
             var resultLocation = Path.Combine(configuration.BaseDirectory, configuration.OutputDirectory);
             return resultLocation;
         }

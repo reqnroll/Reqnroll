@@ -30,13 +30,13 @@ namespace Reqnroll.CucumberMessages.PubSub
         // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
         private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
 
-        private ICucumberConfiguration _configuration;
+        private ICucumberMessagesConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
         private ITraceListener? trace => traceListener.Value;
         private IObjectContainer? testThreadObjectContainer;
         private IObjectContainer? globalObjectContainer;
 
-        public FileOutputPlugin(ICucumberConfiguration configuration)
+        public FileOutputPlugin(ICucumberMessagesConfiguration configuration)
         {
             _configuration = configuration;
             traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
@@ -69,7 +69,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         private const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
         private void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
-            ICucumberConfiguration config = _configuration;
+            ICucumberMessagesConfiguration config = _configuration;
 
             if (!config.Enabled)
             {

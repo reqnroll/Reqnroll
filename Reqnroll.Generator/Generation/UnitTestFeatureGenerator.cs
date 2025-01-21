@@ -28,7 +28,7 @@ namespace Reqnroll.Generator.Generation
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
         private readonly UnitTestMethodGenerator _unitTestMethodGenerator;
         private readonly LinePragmaHandler _linePragmaHandler;
-        private readonly ICucumberConfiguration _cucumberConfiguration;
+        private readonly ICucumberMessagesConfiguration _cucumberConfiguration;
         private CodeMemberMethod _cucumberMessagesInitializeMethod;
 
         public UnitTestFeatureGenerator(
@@ -39,7 +39,7 @@ namespace Reqnroll.Generator.Generation
             ITraceListener traceListener,
 
             // Adding a dependency on the Cucumber configuration subsystem. Eventually remove this as Cucumber Config is folded into overall Reqnroll Config.
-            ICucumberConfiguration cucumberConfiguration)
+            ICucumberMessagesConfiguration cucumberConfiguration)
         {
             _testGeneratorProvider = testGeneratorProvider;
             _codeDomHelper = codeDomHelper;

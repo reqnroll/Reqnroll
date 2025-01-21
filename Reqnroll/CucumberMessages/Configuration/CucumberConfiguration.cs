@@ -1,5 +1,6 @@
 ﻿using Reqnroll.BoDi;
 using Reqnroll.CommonModels;
+using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Tracing;
 using System;
@@ -21,9 +22,9 @@ namespace Reqnroll.CucumberMessages.Configuration
     /// It is supplemented by one or more profiles from the configuration file. (RCM_ConfigFile_ConfigurationSource)
     /// Then Environmment Variable Overrides are applied.
     /// </summary>
-    public class CucumberConfiguration : ICucumberConfiguration
+    public class CucumberConfiguration : ICucumberMessagesConfiguration
     {
-        public static ICucumberConfiguration Current { get; private set; }
+        public static ICucumberMessagesConfiguration Current { get; private set; }
         public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
         public string BaseDirectory => _resolvedConfiguration.Value.BaseDirectory;
         public string OutputDirectory => _resolvedConfiguration.Value.OutputDirectory;
@@ -33,15 +34,16 @@ namespace Reqnroll.CucumberMessages.Configuration
         private readonly IObjectContainer _objectContainer;
         private Lazy<ITraceListener> _traceListenerLazy;
         private IEnvironmentWrapper _environmentWrapper;
-
+        private IReqnrollJsonLocator _reqnrollJsonLocator;
         private Lazy<ResolvedConfiguration> _resolvedConfiguration;
         private bool _enablementOverrideFlag = true;
 
-        public CucumberConfiguration(IObjectContainer objectContainer, IEnvironmentWrapper environmentWrapper)
+        public CucumberConfiguration(IObjectContainer objectContainer, IEnvironmentWrapper environmentWrapper, IReqnrollJsonLocator configurationFileLocator)
         {
             _objectContainer = objectContainer;
             _traceListenerLazy = new Lazy<ITraceListener>(() => _objectContainer.Resolve<ITraceListener>());
             _environmentWrapper = environmentWrapper;
+            _reqnrollJsonLocator = configurationFileLocator;
             _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
             Current = this;
         }
@@ -71,11 +73,12 @@ namespace Reqnroll.CucumberMessages.Configuration
         private ConfigurationDTO ApplyHierarchicalConfiguration()
         {
             var defaultConfigurationProvider = new DefaultConfigurationSource(_environmentWrapper);
-            var fileBasedConfigurationProvider = new RCM_ConfigFile_ConfigurationSource(_environmentWrapper);
+            var fileBasedConfigurationProvider = new RCM_ConfigFile_ConfigurationSource(_environmentWrapper, _reqnrollJsonLocator);
 
-            ConfigurationDTO config = defaultConfigurationProvider.GetConfiguration();
-            config = AddConfig(config, fileBasedConfigurationProvider.GetConfiguration());
-            return config;
+            ConfigurationDTO defaultConfig = defaultConfigurationProvider.GetConfiguration();
+            ConfigurationDTO fileBasedConfig = fileBasedConfigurationProvider.GetConfiguration();
+            defaultConfig = MergeConfigs(defaultConfig, fileBasedConfig);
+            return defaultConfig;
         }
 
         private ResolvedConfiguration ApplyEnvironmentOverrides(ConfigurationDTO config)
@@ -83,27 +86,15 @@ namespace Reqnroll.CucumberMessages.Configuration
             var baseOutDirValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_BASE_DIRECTORY_ENVIRONMENT_VARIABLE);
             var relativePathValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_RELATIVE_PATH_ENVIRONMENT_VARIABLE);
             var fileNameValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE);
-            var profileValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ACTIVE_OUTPUT_PROFILE_ENVIRONMENT_VARIABLE);
-            string profileName = profileValue is Success<string> ?
-                                    ((Success<string>)profileValue).Result :
-                                    !string.IsNullOrEmpty(config.ActiveProfileName) ? config.ActiveProfileName :
-                                    "DEFAULT";
             var idGenStyleValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE);
 
-            var activeConfiguredDestination = config.Profiles.Where(d => d.ProfileName == profileName).FirstOrDefault();
-
-            if (activeConfiguredDestination != null)
-            {
-                config.ActiveProfileName = profileName;
-            };
             var result = new ResolvedConfiguration()
             {
-                Enabled = config.FileOutputEnabled,
-                BaseDirectory = config.ActiveProfile.BasePath,
-                OutputDirectory = config.ActiveProfile.OutputDirectory,
-                OutputFileName = config.ActiveProfile.OutputFileName,
-                IDGenerationStyle = config.ActiveProfile.IDGenerationStyle
-            };
+                Enabled = config.Enabled,
+                BaseDirectory = config.BaseDirectory,
+                OutputDirectory = config.OutputDirectory,
+                OutputFileName = config.OutputFileName,
+                IDGenerationStyle = config.IDGenerationStyle            };
 
             if (baseOutDirValue is Success<string>)
                 result.BaseDirectory = ((Success<string>)baseOutDirValue).Result;
@@ -123,40 +114,19 @@ namespace Reqnroll.CucumberMessages.Configuration
             return result;
         }
 
-        private ConfigurationDTO AddConfig(ConfigurationDTO rootConfig, ConfigurationDTO overridingConfig)
+        private ConfigurationDTO MergeConfigs(ConfigurationDTO rootConfig, ConfigurationDTO overridingConfig)
         {
             if (overridingConfig != null)
             {
-                foreach (var overridingProfile in overridingConfig.Profiles)
-                {
-                    AddOrOverrideProfile(rootConfig.Profiles, overridingProfile);
-                }
-                if (!String.IsNullOrEmpty(overridingConfig.ActiveProfileName) && !rootConfig.Profiles.Any(p => p.ProfileName == overridingConfig.ActiveProfileName))
-                {
-                    // The incoming configuration DTO points to a profile that doesn't exist.
-                    _traceListenerLazy.Value.WriteToolOutput($"WARNING: Configuration file specifies an active profile that doesn't exist: {overridingConfig.ActiveProfileName}. Using {rootConfig.ActiveProfileName} instead.");
-                }
-                else if (!String.IsNullOrEmpty(overridingConfig.ActiveProfileName))
-                    rootConfig.ActiveProfileName = overridingConfig.ActiveProfileName;
+                rootConfig.Enabled = overridingConfig.Enabled;
+                rootConfig.BaseDirectory = overridingConfig.BaseDirectory ?? rootConfig.BaseDirectory;
+                rootConfig.OutputDirectory = overridingConfig.OutputDirectory ?? rootConfig.OutputDirectory;
+                rootConfig.OutputFileName = overridingConfig.OutputFileName ?? rootConfig.OutputFileName;
+                rootConfig.IDGenerationStyle = overridingConfig.IDGenerationStyle;
 
-                rootConfig.FileOutputEnabled = overridingConfig.FileOutputEnabled;
             }
 
             return rootConfig;
-        }
-
-        private void AddOrOverrideProfile(List<Profile> masterList, Profile overridingProfile)
-        {
-            if (masterList.Any(p => p.ProfileName == overridingProfile.ProfileName))
-            {
-                var existingProfile = masterList.Where(p => p.ProfileName == overridingProfile.ProfileName).FirstOrDefault();
-
-                existingProfile.BasePath = overridingProfile.BasePath;
-                existingProfile.OutputDirectory = overridingProfile.OutputDirectory;
-                existingProfile.OutputFileName = overridingProfile.OutputFileName;
-                existingProfile.IDGenerationStyle = overridingProfile.IDGenerationStyle;
-            }
-            else masterList.Add(overridingProfile);
         }
 
         private void EnsureOutputDirectory(ResolvedConfiguration config)

@@ -9,8 +9,6 @@ namespace Reqnroll.CucumberMessages.Configuration
     /// <summary>
     /// Defaults are:
     /// - FileOutputEnabled = false
-    /// - ActiveProfileName = "DEFAULT"
-    /// - A default profile with a default output directory and file name and UUID ID generation
     /// </summary>
     internal class DefaultConfigurationSource : IConfigurationSource
     {
@@ -26,9 +24,11 @@ namespace Reqnroll.CucumberMessages.Configuration
             string defaultOutputDirectory = _environmentWrapper.GetCurrentDirectory();
             string defaultOutputFileName = "reqnroll_report.ndjson";
 
-            var defaultProfile = new Profile("DEFAULT", defaultOutputDirectory, string.Empty, defaultOutputFileName, IDGenerationStyle.UUID);
-            res.FileOutputEnabled = false;
-            res.Profiles.Add(defaultProfile);
+            res.Enabled = false;
+            res.BaseDirectory = defaultOutputDirectory;
+            res.OutputDirectory = String.Empty;
+            res.OutputFileName = defaultOutputFileName;
+            res.IDGenerationStyle = IDGenerationStyle.UUID;
             return res;
         }
     }
