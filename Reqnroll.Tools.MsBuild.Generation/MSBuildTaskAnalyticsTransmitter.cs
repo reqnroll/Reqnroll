@@ -35,14 +35,14 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
                 if (transmissionResult is IFailure failure)
                 {
-                    _taskLoggingWrapper.LogMessageWithLowImportance($"Could not transmit analytics: {failure}");
+                    _taskLoggingWrapper.LogDiagnosticMessage($"Could not transmit analytics: {failure}");
                 }
             }
             catch (Exception exc)
             {
                 // catch all exceptions since we do not want to break the build simply because event creation failed
                 // but still return an error containing the exception to at least log it
-                _taskLoggingWrapper.LogMessageWithLowImportance($"Could not transmit analytics: {exc}");
+                _taskLoggingWrapper.LogDiagnosticMessage($"Could not transmit analytics: {exc}");
             }
         }
 

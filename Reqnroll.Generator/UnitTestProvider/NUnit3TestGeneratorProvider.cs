@@ -57,7 +57,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
-            generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
+            generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
             CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR_NUNIT3);
         }
 
@@ -128,7 +128,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
             var tagsArray = tags.ToArray();
 
-            // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://github.com/SpecFlowOSS/SpecFlow/issues/116
+            // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://youtrack.jetbrains.com/issue/RSRP-279138
             bool hasExampleTags = tagsArray.Any();
             var exampleTagExpressionList = tagsArray.Select(t => (CodeExpression)new CodePrimitiveExpression(t));
             var exampleTagsExpression = hasExampleTags

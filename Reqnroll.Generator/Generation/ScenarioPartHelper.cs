@@ -1,3 +1,4 @@
+using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
@@ -95,9 +96,18 @@ namespace Reqnroll.Generator.Generation
 
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, gherkinStep.Location))
             {
+                string stepKeyWord = scenarioStep.StepKeyword switch
+                {
+                    StepKeyword.Given => "Given",
+                    StepKeyword.When => "When",
+                    StepKeyword.Then => "Then",
+                    StepKeyword.And => "And",
+                    StepKeyword.But => "But",
+                    _ => throw new NotImplementedException(),
+                };
                 var expression = new CodeMethodInvokeExpression(
                     testRunnerField,
-                    scenarioStep.StepKeyword + "Async",
+                    stepKeyWord + "Async",
                     arguments.ToArray());
 
                 _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);

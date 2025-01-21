@@ -1,31 +1,31 @@
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
     public class JsonConfig
     {
-        [DataMember(Name = "language")]
+        [JsonPropertyName("language")]
         public LanguageElement Language { get; set; }
 
         // legacy config
-        [DataMember(Name = "bindingCulture")]
+        [JsonPropertyName("bindingCulture")]
         public BindingCultureElement BindingCulture { get; set; }
 
-        [DataMember(Name = "runtime")]
+        [JsonPropertyName("runtime")]
         public RuntimeElement Runtime { get; set; }
 
-        [DataMember(Name = "generator")]
+        [JsonPropertyName("generator")]
         public GeneratorElement Generator { get; set; }
 
-        [DataMember(Name = "trace")]
+        [JsonPropertyName("trace")]
         public TraceElement Trace { get; set; }
 
         // legacy config
-        [DataMember(Name = "stepAssemblies")]
+        [JsonPropertyName("stepAssemblies")]
         public List<StepAssemblyElement> StepAssemblies { get; set; }
 
-        [DataMember(Name = "bindingAssemblies")]
+        [JsonPropertyName("bindingAssemblies")]
         public List<StepAssemblyElement> BindingAssemblies { get; set; }
     }
 }

@@ -116,7 +116,7 @@ jobs:
         Write-Output "Product Configuration: $productConfig"
 
         $buildPropsXml = [xml](Get-Content Directory.Build.props)
-        $versionPrefix = $($buildPropsXml.Project.PropertyGroup.VersionPrefix)[1].Trim()
+        $versionPrefix = $buildPropsXml.SelectSingleNode('//Project/PropertyGroup/VersionPrefix/text()').Value.Trim()
         Write-Output "product_version_prefix=$versionPrefix" >> $env:GITHUB_OUTPUT
         Write-Output "Product Version Prefix: $versionPrefix"
 

@@ -25,9 +25,7 @@
     <file src="buildMultiTargeting\**\*" target="buildMultiTargeting" />
     
     <file src="bin\$config$\net462\*.dll" target="tasks\$Reqnroll_FullFramework_Tools_TFM$" />
-    <file src="bin\$config$\netstandard2.0\*.dll" 
-          exclude="bin\$config$\netstandard2.0\System.*;bin\$config$\netstandard2.0\Microsoft.*" 
-          target="tasks\$Reqnroll_Core_Tools_TFM$" />
+    <file src="bin\$config$\netstandard2.0\*.dll" target="tasks\$Reqnroll_Core_Tools_TFM$" />
     <file src="bin\$config$\netstandard2.0\*.deps.json" target="tasks\$Reqnroll_Core_Tools_TFM$" />
     
     <!-- Ensure that the needed version of System.Text.Json and its dependencies are available for the generator. -->

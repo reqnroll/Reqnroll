@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using SpecFlow.Internal.Json;
+using System.Text.Json;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
@@ -13,7 +13,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 throw new ArgumentNullException(nameof(jsonContent));
             }
 
-            var jsonConfig = jsonContent.FromJson<JsonConfig>();
+            var jsonConfig = JsonSerializer.Deserialize(jsonContent, JsonConfigurationSourceGenerator.Default.JsonConfig);
 
             var containerRegistrationCollection = reqnrollConfiguration.CustomDependencies;
             var generatorContainerRegistrationCollection = reqnrollConfiguration.GeneratorCustomDependencies;

@@ -227,6 +227,11 @@ public abstract class SystemTestBase
         _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(expectedNrOfTests, "all tests should pass");
     }
 
+    protected void ShouldFinishWithoutTestExecutionWarnings()
+    {
+        _vsTestExecutionDriver.LastTestExecutionResult.Warnings.Should().BeEmpty();
+    }
+
     protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)
     {
         if (expectedNrOfTestsSpec == null && _preparedTests == 0)
