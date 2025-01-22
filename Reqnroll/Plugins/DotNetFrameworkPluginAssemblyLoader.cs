@@ -4,5 +4,5 @@ namespace Reqnroll.Plugins;
 
 public class DotNetFrameworkPluginAssemblyLoader : IPluginAssemblyLoader
 {
-    public Assembly LoadAssembly(string assemblyName) => Assembly.LoadFrom(assemblyName);
+    public Assembly LoadAssembly(string path) => DotNetFrameworkPluginAssemblyResolver.Load(path);
 }

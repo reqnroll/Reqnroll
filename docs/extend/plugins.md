@@ -77,6 +77,22 @@ This is passed to the MSBuild task as a parameter and later used to load the plu
 * `CustomizeDependencies` - overrides registrations in the Generator container
 * `ConfigurationDefaults` - adjust configuration values
 
+### Third-Party Dependencies
+
+If your plugin uses third party assemblies, you need to make sure that the dependencies can be found.
+
+Reqnroll will attempt to find your plugin's dependencies by
+
+1. Loading assemblies from the same directory as your assembly.
+2. Loading your plugin's .deps.json and loading the specified runtime assembly (e.g. from NuGet cache).
+
+   Note: If you are using Nuget to publish your plugin, make sure your NuGet package contains the correct dependencies, otherwise the NuGet cache may be empty.
+
+3. Check if the assembly is provided by Reqnroll itself (e.g. System.CodeDom).
+
+   Note: The assemblies included by Reqnroll can change between versions, e.g. we switched to System.Text.Json at some point.
+   So if you want to be on the safe side, do not rely on this approach.
+
 ## Combined Package with both plugins
 
 You can have a single NuGet package that contains both the runtime and generator plugins. 
