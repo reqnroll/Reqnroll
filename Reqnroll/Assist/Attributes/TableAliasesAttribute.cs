@@ -13,6 +13,13 @@ namespace Reqnroll.Assist.Attributes
             Aliases = aliases;
         }
 
+        public TableAliasesAttribute(bool useExactMatch, params string[] aliases)
+        {
+            UseExactMatch = useExactMatch;
+            Aliases = aliases;
+        }
+
         public string[] Aliases { get; }
+        public bool UseExactMatch { get; }
     }
 }

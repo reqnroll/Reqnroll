@@ -1,10 +1,10 @@
+using Reqnroll.Assist.Attributes;
+using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Reqnroll.Assist.Attributes;
-using Reqnroll.Tracing;
 
 namespace Reqnroll.Assist
 {
@@ -180,7 +180,7 @@ namespace Reqnroll.Assist
         private static bool IsMatchingAlias(MemberInfo field, string id)
         {
             var aliases = field.GetCustomAttributes().OfType<TableAliasesAttribute>();
-            return aliases.Any(a => a.Aliases.Any(al => Regex.Match(id, al).Success));
+            return aliases.Any(a => a.Aliases.Any(al => a.UseExactMatch ? id == al : Regex.Match(id, al).Success));
         }
 
         private static bool TheseTypesMatch(Type targetType, Type memberType, DataTableRow row)
