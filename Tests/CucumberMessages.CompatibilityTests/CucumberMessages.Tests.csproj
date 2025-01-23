@@ -23,6 +23,7 @@
     <Compile Remove="Samples\minimal\minimal.cs" />
     <Compile Remove="Samples\parameter-types\parameter_types.cs" />
     <Compile Remove="Samples\pending\pending.cs" />
+    <Compile Remove="Samples\retry\retry.cs" />
     <Compile Remove="Samples\rules\rules.cs" />
     <Compile Remove="Samples\skipped\skipped.cs" />
     <Compile Remove="Samples\stack-traces\stack_traces.cs" />
@@ -52,6 +53,8 @@
     <None Remove="Samples\minimal\minimal.feature.ndjson" />
     <None Remove="Samples\pending\pending.feature" />
     <None Remove="Samples\pending\pending.feature.ndjson" />
+    <None Remove="Samples\retry\retry.feature" />
+    <None Remove="Samples\retry\retry.feature.ndjson" />
     <None Remove="Samples\rules\parameter-types.feature" />
     <None Remove="Samples\rules\parameter-types.feature.ndjson" />
     <None Remove="Samples\rules\rules.feature" />
@@ -124,6 +127,11 @@
     </Content>
     <EmbeddedResource Include="Samples\parameter-types\parameter_types.feature" />
     <Content Include="Samples\parameter-types\parameter_types.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="Samples\retry\retry.cs" />
+    <EmbeddedResource Include="Samples\retry\retry.feature" />
+    <Content Include="Samples\retry\retry.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Samples\rules\rules.cs" />

@@ -35,6 +35,7 @@ namespace CucumberMessages.Tests
         [DataRow("undefined", "Undefined steps")]
         [DataRow("stack-traces", "Stack traces")]
         [DataRow("rules", "Usage of a `Rule`")]
+        [DataRow("retry", "retry")]
         // These CCK scenario examples produce Cucumber Messages that are materially compliant with the CCK.
         // The messages produced match the CCK expected messages, with exceptions for things
         // that are not material to the CCK spec (such as IDs don't have to be generated in the same order, timestamps don't have to match, etc.)
@@ -45,6 +46,13 @@ namespace CucumberMessages.Tests
             ResetCucumberMessages(featureNameText + ".ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
+
+            if (testName == "retry")
+            {
+                _testRunConfiguration.UnitTestProvider = UnitTestProvider.xUnit;
+                _projectsDriver.AddNuGetPackage("xRetry.Reqnroll", "1.0.0");
+            }
+
             CucumberMessagesAddConfigurationFile("reqnroll.json");
             AddUtilClassWithFileSystemPath();
 

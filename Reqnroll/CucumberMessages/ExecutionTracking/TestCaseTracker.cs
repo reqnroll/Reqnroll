@@ -27,6 +27,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             IDGenerator = featureTracker.IDGenerator;
             StepDefinitionsByPattern = featureTracker.StepDefinitionsByPattern;
             PickleIdList = featureTracker.PickleIds;
+            Attempt_Count = 0;
         }
 
         // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
@@ -35,6 +36,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public string PickleId { get; set; } = string.Empty;
         public string TestCaseId { get; set; }
         public string TestCaseStartedId { get; private set; }
+
+        public int Attempt_Count { get; set; }
 
         private readonly Dictionary<string, string> PickleIdList;
 
@@ -74,7 +77,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
-        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern ;
+        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern;
 
         // Processing of events is handled in two stages.
         // Stage 1: As events are recieved, critical information needed right away is extracted and stored in the TestCaseTracker
@@ -169,15 +172,43 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void PreProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
-            scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_PickleId = PickleId;
-            TestCaseId = IDGenerator.GetNewId();
-            TestCaseStartedId = IDGenerator.GetNewId();
+            if (String.IsNullOrEmpty(TestCaseId))
+            {
+                scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_PickleId = PickleId;
+                TestCaseId = IDGenerator.GetNewId();
+                TestCaseStartedId = IDGenerator.GetNewId();
+            }
+            else
+            {
+                ResetTrackerForRetry();
+                _events.Enqueue(scenarioStartedEvent);
+                TestCaseStartedId = IDGenerator.GetNewId();
+                Attempt_Count++;
+            }
         }
+
+        // This method resets all the variables used to track execution state and status
+        // so that a Retry can be executed
+        private void ResetTrackerForRetry()
+        {
+            Finished = false;
+            StepsById.Clear();
+            StepsByEvent.Clear();
+            ScenarioExecutionStatus = ScenarioExecutionStatus.OK;
+            _events.Clear();
+            mostRecentTestStepStarted = null;
+        }
+
         internal IEnumerable<Envelope> PostProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
-            var TestCase = CucumberMessageFactory.ToTestCase(this, scenarioStartedEvent);
+            // On the first execution of this TestCase we emit a TestCase Message.
+            // On subsequent retries we do not.
+            if (Attempt_Count == 0)
+            {
+                var TestCase = CucumberMessageFactory.ToTestCase(this, scenarioStartedEvent);
+                yield return Envelope.Create(TestCase);
+            }
             var TestCaseStarted = CucumberMessageFactory.ToTestCaseStarted(this, scenarioStartedEvent);
-            yield return Envelope.Create(TestCase);
             yield return Envelope.Create(TestCaseStarted);
         }
 

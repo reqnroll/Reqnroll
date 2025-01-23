@@ -152,9 +152,18 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 var pickleStepSequence = PickleJar.PickleStepSequenceFor(pickleIndex);
                 scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence; ;
 
-                var tccmt = new TestCaseTracker(this, pickleId);
-                tccmt.ProcessEvent(scenarioStartedEvent);
-                testCaseTrackersById.TryAdd(pickleId, tccmt);
+                TestCaseTracker tccmt;
+                if(testCaseTrackersById.TryGetValue(pickleId, out tccmt))
+                {
+                    // This represents a re-execution of the TestCase.
+                    tccmt.ProcessEvent(scenarioStartedEvent);
+                }
+                else // This is the first time this TestCase (aka, pickle) is getting executed. New up a TestCaseTracker for it.
+                {
+                    tccmt = new TestCaseTracker(this, pickleId);
+                    tccmt.ProcessEvent(scenarioStartedEvent);
+                    testCaseTrackersById.TryAdd(pickleId, tccmt);
+                }
             }
         }
 

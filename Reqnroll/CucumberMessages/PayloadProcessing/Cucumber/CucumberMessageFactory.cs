@@ -75,7 +75,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         }
         internal static TestCaseStarted ToTestCaseStarted(TestCaseTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
         {
-            return new TestCaseStarted(0, testCaseTracker.TestCaseStartedId, testCaseTracker.TestCaseId, null, Converters.ToTimestamp(scenarioStartedEvent.Timestamp));
+            return new TestCaseStarted(testCaseTracker.Attempt_Count, testCaseTracker.TestCaseStartedId, testCaseTracker.TestCaseId, null, Converters.ToTimestamp(scenarioStartedEvent.Timestamp));
         }
         internal static TestCaseFinished ToTestCaseFinished(TestCaseTracker testCaseTracker, ScenarioFinishedEvent scenarioFinishedEvent)
         {
