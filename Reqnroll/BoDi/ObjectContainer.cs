@@ -487,13 +487,26 @@ public class ObjectContainer : IObjectContainer
         return factoryRegistration;
     }
 
+    /// <inheritdoc/>
     public bool IsRegistered<T>(string name = null) => IsRegistered(typeof(T), name);
 
+    /// <inheritdoc/>
     public bool IsRegistered(Type type, string name = null)
     {
         var keyToResolve = new RegistrationKey(type, name);
 
-        return _registrations.ContainsKey(keyToResolve);
+        if (_registrations.ContainsKey(keyToResolve))
+        {
+            return true;
+        }
+        else if (BaseContainer != null)
+        {
+            // Recursively check the base container
+            return BaseContainer.IsRegistered(type, name);
+        }
+
+        // We are at the top of the container hierarchy and the registration is not found
+        return false;
     }
 
     // ReSharper disable once UnusedParameter.Local

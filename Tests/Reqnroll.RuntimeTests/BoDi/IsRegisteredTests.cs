@@ -31,6 +31,18 @@ namespace Reqnroll.RuntimeTests.BoDi
         }
 
         [Fact]
+        public void ShouldReturnFalseIfTypeNotRegisteredWithParent()
+        {
+            // given
+            var parentContainer = new ObjectContainer();
+            var container = new ObjectContainer(parentContainer);
+
+            // then
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeFalse();
+        }
+
+        [Fact]
         public void ShouldReturnTrueIfInterfaceRegistered()
         {
             // given
@@ -58,6 +70,68 @@ namespace Reqnroll.RuntimeTests.BoDi
             bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
 
             isRegistered.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldReturnTrueIfTypeRegisteredInParent()
+        {
+            // given
+            var grandparentContainer = new ObjectContainer();
+            var parentContainer = new ObjectContainer(grandparentContainer);
+            var container = new ObjectContainer(parentContainer);
+
+            // when
+            parentContainer.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
+
+            // then
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = parentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = grandparentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeFalse();
+        }
+
+        [Fact]
+        public void ShouldReturnTrueIfTypeRegisteredInGrandparent()
+        {
+            // given
+            var grandparentContainer = new ObjectContainer();
+            var parentContainer = new ObjectContainer(grandparentContainer);
+            var container = new ObjectContainer(parentContainer);
+
+            // when
+            grandparentContainer.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
+
+            // then
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = parentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = grandparentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+        }
+
+        [Fact]
+        public void ShouldReturnTrueIfRegisteredInSelfButFalseInParent()
+        {
+            // given
+            var parentContainer = new ObjectContainer();
+            var container = new ObjectContainer(parentContainer);
+
+            // when
+            container.RegisterInstanceAs(new SimpleClassWithDefaultCtor());
+
+            // then
+            bool isRegistered = container.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeTrue();
+
+            isRegistered = parentContainer.IsRegistered<SimpleClassWithDefaultCtor>();
+            isRegistered.Should().BeFalse();
         }
     }
 }
