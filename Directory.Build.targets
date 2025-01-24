@@ -11,9 +11,6 @@
       <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);branch=$(GitBranch)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);commit=$(GitCommitSha)</NuspecProperties>
-      
-      <NuspecProperties>$(NuspecProperties);Reqnroll_FullFramework_Tools_TFM=$(Reqnroll_FullFramework_Tools_TFM)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);Reqnroll_Core_Tools_TFM=$(Reqnroll_Core_Tools_TFM)</NuspecProperties>
     </PropertyGroup>
   </Target>
 
