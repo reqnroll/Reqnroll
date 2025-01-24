@@ -13,8 +13,7 @@ public class NUnitRetryPluginTest : SystemTestBase
     {
         base.TestInitialize();
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.NUnit4;
-        _projectsDriver.AddNuGetPackage("SpecFlow.Internal.Json", "1.0.8"); // NUnitRetry.ReqnrollPlugin 1.0.0 doesn't correctly specify its dependencies in the NuGet package, so we add it here manually.
-        _projectsDriver.AddNuGetPackage("NUnitRetry.ReqnrollPlugin", "1.0.0");
+        _projectsDriver.AddNuGetPackage("NUnitRetry.ReqnrollPlugin", "1.0.100");
     }
 
     [TestMethod]
