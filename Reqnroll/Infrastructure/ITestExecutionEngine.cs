@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Reqnroll.Bindings;
+using Reqnroll.CucumberMessages;
 
 namespace Reqnroll.Infrastructure
 {

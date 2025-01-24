@@ -1,0 +1,20 @@
+﻿{
+    "description": "This class holds configuration information from a configuration source for Reqnroll Cucumber Message Generation.\n",
+    "properties": {
+        "Enabled": {
+            "type": "boolean"
+        },
+        "BaseDirectory": {
+            "type": "string"
+        },
+        "OutputDirectory": {
+            "type": "string"
+        },
+        "OutputFileName": {
+            "type": "string"
+        },
+        "IDGenerationStyle": {
+            "type": "string"
+        }
+    }
+}

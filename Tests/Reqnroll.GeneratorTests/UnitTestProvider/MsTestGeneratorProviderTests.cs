@@ -245,7 +245,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var parser = new ReqnrollGherkinParser(parserCultureInfo ?? new CultureInfo("en-US"));
             using (var reader = new StringReader(documentSource))
             {
-                var document = parser.Parse(reader, null);
+                var document = parser.Parse(reader, new ReqnrollDocumentLocation($"dummy_Reqnroll_Location_for{nameof(MsTestGeneratorProviderTests)}"));
                 document.Should().NotBeNull();
                 return document;
             }

@@ -59,17 +59,19 @@ namespace Reqnroll.ErrorHandling
         public Exception GetAmbiguousMatchError(List<BindingMatch> matches, StepInstance stepInstance)
         {
             string stepDescription = stepFormatter.GetStepDescription(stepInstance);
-            return new BindingException(
-                $"Ambiguous step definitions found for step '{stepDescription}': {string.Join(", ", matches.Select(m => GetMethodText(m.StepBinding.Method)).ToArray())}");
+            return new AmbiguousBindingException(
+                $"Ambiguous step definitions found for step '{stepDescription}': {string.Join(", ", matches.Select(m => GetMethodText(m.StepBinding.Method)).ToArray())}",
+                matches);
         }
 
 
         public Exception GetAmbiguousBecauseParamCheckMatchError(List<BindingMatch> matches, StepInstance stepInstance)
         {
             string stepDescription = stepFormatter.GetStepDescription(stepInstance);
-            return new BindingException(
+            return new AmbiguousBindingException(
                 "Multiple step definitions found, but none of them have matching parameter count and type for step "
-                + $"'{stepDescription}': {string.Join(", ", matches.Select(m => GetMethodText(m.StepBinding.Method)).ToArray())}");
+                + $"'{stepDescription}': {string.Join(", ", matches.Select(m => GetMethodText(m.StepBinding.Method)).ToArray())}",
+                matches);
         }
 
         public Exception GetNoMatchBecauseOfScopeFilterError(List<BindingMatch> matches, StepInstance stepInstance)

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+
+    "bindingAssemblies": [
+        {
+            "assembly": "ExternalBindingsProject"
+        }
+    ],
+    "cucumberMessagesConfiguration": {
+        "enabled" :  true,
+        "baseDirectory": "C:\\Users\\clrud\\source\\repos\\scratch",
+        "outputDirectory": "CucumberMessages",
+        "outputFileName" :  "reqnroll_report.ndjson",
+        "iDGenerationStyle": "INCREMENTING"
+    }
+}
