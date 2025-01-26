@@ -62,7 +62,9 @@ namespace Reqnroll.Plugins
                     library.Hash,
                     library.RuntimeAssemblyGroups.SelectMany(g => g.AssetPaths),
                     library.Dependencies,
-                    library.Serviceable);
+                    library.Serviceable,
+                    library.Path,
+                    library.HashPath);
 
                 var assemblies = new List<string>();
                 if (assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies))

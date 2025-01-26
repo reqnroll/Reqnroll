@@ -24,17 +24,28 @@ namespace Reqnroll.Plugins
         {
             _loadContext = AssemblyLoadContext.GetLoadContext(typeof(PluginAssemblyResolver).Assembly);
             Assembly = _loadContext.LoadFromAssemblyPath(path);
-            _dependencyContext = DependencyContext.Load(Assembly);
 
-            _assemblyResolver = new CompositeCompilationAssemblyResolver(
-            [
-                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)!),
-                new ReferenceAssemblyPathResolver(),
-                new PackageCompilationAssemblyResolver()
-            ]);
+            try
+            {
+                _dependencyContext = DependencyContext.Load(Assembly);
 
-            _loadContext.Resolving += OnResolving;
-            _loadContext.Unloading += OnUnloading;
+                if (_dependencyContext is null)
+                    return;
+
+                _assemblyResolver = new CompositeCompilationAssemblyResolver(
+                [
+                    new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)!),
+                    new ReferenceAssemblyPathResolver(),
+                    new PackageCompilationAssemblyResolver()
+                ]);
+
+                _loadContext.Resolving += OnResolving;
+                _loadContext.Unloading += OnUnloading;
+            }
+            catch (Exception)
+            {
+                // Don't throw if we can't load the dependencies from .deps.json
+            }
         }
 
         private void OnUnloading(AssemblyLoadContext context)
@@ -45,11 +56,14 @@ namespace Reqnroll.Plugins
 
         private Assembly OnResolving(AssemblyLoadContext context, AssemblyName name)
         {
-            var library = _dependencyContext?.RuntimeLibraries.FirstOrDefault(
+            try
+            {
+                var library = _dependencyContext?.RuntimeLibraries.FirstOrDefault(
                 runtimeLibrary => string.Equals(runtimeLibrary.Name, name.Name, StringComparison.OrdinalIgnoreCase));
 
-            if (library != null)
-            {
+                if (library == null)
+                    return null;
+
                 var wrapper = new CompilationLibrary(
                     library.Type,
                     library.Name,
@@ -57,18 +71,37 @@ namespace Reqnroll.Plugins
                     library.Hash,
                     library.RuntimeAssemblyGroups.SelectMany(g => g.AssetPaths),
                     library.Dependencies,
-                    library.Serviceable);
+                    library.Serviceable,
+                    library.Path,
+                    library.HashPath);
 
                 var assemblies = new List<string>();
                 _assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies);
 
-                if (assemblies.Count > 0)
+                if (_assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies))
                 {
-                    return _loadContext.LoadFromAssemblyPath(assemblies[0]);
+                    foreach (var asm in assemblies)
+                    {
+                        try
+                        {
+                            var assembly = _loadContext.LoadFromAssemblyPath(asm);
+                            return assembly;
+                        }
+                        catch
+                        {
+                            // Don't throw if we can't load the specified assembly (perhaps something is missing or misconfigured)
+                            continue;
+                        }
+                    }
                 }
-            }
 
-            return null;
+                return null;
+            }
+            catch
+            {
+                // Don't throw if we can't load the dependencies from .deps.json
+                return null;
+            }
         }
 
         public static Assembly Load(string path)
