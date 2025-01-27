@@ -165,5 +165,31 @@ namespace CucumberMessages.Tests
             foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json);
         }
 
+        protected void ExecuteCCKScenario(string testName, string featureNameText)
+        {
+            ResetCucumberMessages(featureNameText + ".ndjson");
+            EnableCucumberMessages();
+            SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
+
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
+            AddUtilClassWithFileSystemPath();
+
+            var featureFileName = testName.Replace("-", "_");
+
+            AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "CucumberMessages.Tests.Samples", Assembly.GetExecutingAssembly());
+            AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "CucumberMessages.Tests.Samples", Assembly.GetExecutingAssembly());
+            //AddBinaryFilesFromResource($"{testName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+
+            ExecuteTests();
+
+            var validator = new CucumberMessagesValidator(GetActualResults(testName, featureNameText).ToList(), GetExpectedResults(testName, featureFileName).ToList());
+            validator.ShouldPassBasicStructuralChecks();
+            validator.ResultShouldPassAllComparisonTests();
+            validator.ResultShouldPassSanityChecks();
+
+            // This is necessary b/c the System Test framework doesn't understand Rules and can't determine the number of expected tests
+            ConfirmAllTestsRan(testName == "rules" ? 3 : null);
+        }
+
     }
 }

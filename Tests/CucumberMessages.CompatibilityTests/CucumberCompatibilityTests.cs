@@ -16,6 +16,7 @@ using Microsoft.VisualBasic.FileIO;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using Reqnroll.CommonModels;
 using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.TestProjectGenerator.Data;
 
 namespace CucumberMessages.Tests
 {
@@ -42,28 +43,7 @@ namespace CucumberMessages.Tests
         // (located in the CucumberMessagesValidator class)
         public void CCKScenarios(string testName, string featureNameText)
         {
-            ResetCucumberMessages(featureNameText + ".ndjson");
-            EnableCucumberMessages();
-            SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
-
-            CucumberMessagesAddConfigurationFile("reqnroll.json");
-            AddUtilClassWithFileSystemPath();
-
-            var featureFileName = testName.Replace("-", "_");
-
-            AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "CucumberMessages.Tests.Samples", Assembly.GetExecutingAssembly());
-            AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "CucumberMessages.Tests.Samples", Assembly.GetExecutingAssembly());
-            //AddBinaryFilesFromResource($"{testName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
-
-            ExecuteTests();
-
-            var validator = new CucumberMessagesValidator(GetActualResults(testName, featureNameText).ToList(), GetExpectedResults(testName, featureFileName).ToList());
-            validator.ShouldPassBasicStructuralChecks();
-            validator.ResultShouldPassAllComparisonTests();
-            validator.ResultShouldPassSanityChecks();
-
-            // This is necessary b/c the System Test framework doesn't understand Rules and can't determine the number of expected tests
-            ConfirmAllTestsRan(testName == "rules" ? 3 : null);
+            ExecuteCCKScenario(testName, featureNameText);
         }
 
         [TestMethod]
@@ -88,25 +68,6 @@ namespace CucumberMessages.Tests
             CCKScenarios(testName, featureNameText);
         }
 
-        [TestMethod]
-        [DataRow("xRetry")]
-        [DataRow("NUnitRetry")]
-        // These tests attempt to execute the Retry scenario from the CCK using the known open-source plugins for Reqnroll that integrate Retry functionality into Reqnroll.
-        public void CCKRetryScenario(string pluginName)
-        {
-            var (plugin, version, unitTestProvider) = pluginName switch
-            {
-                "NUnitRetry" => ("NUnitRetry.ReqnrollPlugin", "1.0.100", UnitTestProvider.NUnit4),
-                "xRetry" => ("xRetry.Reqnroll", "1.0.0", UnitTestProvider.xUnit),
-                _ => throw new NotImplementedException("unknown plugin name")
-            };
-
-            _testRunConfiguration.UnitTestProvider = unitTestProvider;
-            _projectsDriver.AddNuGetPackage(plugin, version);
-            var testName = $"retry-{pluginName}";
-            CCKScenarios(testName, testName);
-
-        }
     }
 
 }

@@ -15,6 +15,7 @@ using Scrutor;
 namespace Reqnroll.SystemTests;
 public abstract class SystemTestBase
 {
+    protected SolutionDriver _solutionDriver = null!;
     protected ProjectsDriver _projectsDriver = null!;
     protected ExecutionDriver _executionDriver = null!;
     protected VSTestExecutionDriver _vsTestExecutionDriver = null!;
@@ -82,6 +83,7 @@ public abstract class SystemTestBase
         _folderCleaner = GetServiceSafe<FolderCleaner>();
         _folderCleaner.EnsureOldRunFoldersCleaned();
 
+        _solutionDriver = GetServiceSafe<SolutionDriver>();
         _projectsDriver = GetServiceSafe<ProjectsDriver>();
         _executionDriver = GetServiceSafe<ExecutionDriver>();
         _vsTestExecutionDriver = GetServiceSafe<VSTestExecutionDriver>();
