@@ -1,6 +1,5 @@
 using System;
 using Reqnroll.Generator.CodeDom;
-using Reqnroll.Utils;
 
 namespace Reqnroll.Generator
 {

@@ -1,7 +1,5 @@
 using System;
-using System.Linq;
 using Reqnroll.BoDi;
-using Reqnroll.Configuration;
 using Reqnroll.Generator.Configuration;
 
 namespace Reqnroll.Generator.Plugins

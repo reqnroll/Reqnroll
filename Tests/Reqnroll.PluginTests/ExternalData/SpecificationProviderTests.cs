@@ -1,4 +1,3 @@
-using System;
 using Gherkin.Ast;
 using Moq;
 using Reqnroll.ExternalData.ReqnrollPlugin;

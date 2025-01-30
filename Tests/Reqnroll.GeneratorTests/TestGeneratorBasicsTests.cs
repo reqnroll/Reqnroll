@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Moq;
@@ -8,7 +7,6 @@ using Xunit;
 using Reqnroll.Generator;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.GeneratorTests.Helper;
-using Reqnroll.Utils;
 
 namespace Reqnroll.GeneratorTests
 {

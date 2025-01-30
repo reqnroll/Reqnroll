@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Reqnroll.TestProjectGenerator.FilesystemWriter;
 
 namespace Reqnroll.TestProjectGenerator.Data
 {

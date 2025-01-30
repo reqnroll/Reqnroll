@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Threading;
 using FluentAssertions;
 using Xunit;
-using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 
 namespace Reqnroll.RuntimeTests.AssistTests
