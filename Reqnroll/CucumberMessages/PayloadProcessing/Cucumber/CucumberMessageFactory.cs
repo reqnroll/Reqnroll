@@ -172,7 +172,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             return new TestStepStarted(
                 stepState.TestCaseStartedID,
-                stepState.TestStepID,
+                stepState.StepDefinitionId,
                 Converters.ToTimestamp(stepStartedEvent.Timestamp));
         }
 
@@ -180,7 +180,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             return new TestStepFinished(
                 stepState.TestCaseStartedID,
-                stepState.TestStepID,
+                stepState.StepDefinitionId,
                 ToTestStepResult(stepState),
                 Converters.ToTimestamp(stepFinishedEvent.Timestamp));
         }

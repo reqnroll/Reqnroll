@@ -5,11 +5,13 @@ using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.SystemTests;
 using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Net.WebSockets;
 using System.Reflection;
@@ -95,7 +97,7 @@ namespace CucumberMessages.Tests
             var testAssembly = assembly ?? Assembly.GetExecutingAssembly();
             string prefixToRemove = $"{prefix}.{scenarioName}.";
             return testAssembly.GetManifestResourceNames()
-                           .Where(rn => !rn.EndsWith(".feature") && !rn.EndsWith(".cs") && !rn.EndsWith(".feature.ndjson")  && rn.StartsWith(prefixToRemove))
+                           .Where(rn => !rn.EndsWith(".feature") && !rn.EndsWith(".cs") && !rn.EndsWith(".feature.ndjson") && rn.StartsWith(prefixToRemove))
                            .Select(rn => rn.Substring(prefixToRemove.Length));
         }
 
@@ -154,15 +156,97 @@ namespace CucumberMessages.Tests
             };
         }
 
+        record TestExecution(string id, TestCaseStarted started, List<Envelope> related);
+        record TestCaseRecord(string id, TestCase tc, Dictionary<string, TestExecution> executions);
+
         protected IEnumerable<Envelope> GetActualResults(string testName, string fileName)
         {
+
             string resultLocation = ActualsResultLocationDirectory();
 
             // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
 
             var actualJsonText = File.ReadAllLines(Path.Combine(resultLocation, $"{fileName}.ndjson"));
+            var envelopes = actualJsonText.Select(json => NdjsonSerializer.Deserialize(json)).ToList();
+            var result = new List<Envelope>();
 
-            foreach (var json in actualJsonText) yield return NdjsonSerializer.Deserialize(json);
+            // Dictionary keyed by the ID of each test case.
+            var testCases = new Dictionary<string, TestCaseRecord>();
+
+            var allTestCases = envelopes.Where(e => e.Content() is TestCase).Select(e => e.TestCase).ToList().OrderBy(tc => tc.PickleId).ToList();
+
+            var testCaseStartedToTestCaseMap = new Dictionary<string, string>();
+
+            foreach (var tc in allTestCases)
+            {
+                testCases.Add(tc.Id, new TestCaseRecord(tc.Id, tc, new Dictionary<string, TestExecution>()));
+            }
+            int index = 0;
+            bool testCasesBegun = false;
+            while (index < envelopes.Count && !testCasesBegun)
+            {
+                var current = envelopes[index];
+                if (current.Content() is TestCase)
+                {
+                    testCasesBegun = true;
+                }
+                else
+                {
+                    result.Add(current);
+                    index++;
+                }
+            }
+            bool testCasesFinished = false;
+            while (index < envelopes.Count && !testCasesFinished)
+            {
+                var current = envelopes[index];
+                if (current.Content() is TestRunFinished)
+                {
+                    testCasesFinished = true;
+                    result.Add(current);
+                    index++;
+                    continue;
+                }
+                if (current.Content() is TestCase)
+                {
+                    // as TestCases were already identified and inserted into the testCases dictionary, no direct work required here; skip to the next Message
+                    index++;
+                    continue;
+                }
+                // handle test case started and related
+                if (current.Content() is TestCaseStarted testCaseStarted)
+                {
+                    var tcsId = testCaseStarted.Id;
+                    var testCaseExecution = new TestExecution(tcsId, testCaseStarted, new List<Envelope>());
+                    testCases[testCaseStarted.TestCaseId].executions.Add(tcsId, testCaseExecution);
+                    testCaseStartedToTestCaseMap.Add(tcsId, testCaseStarted.TestCaseId);
+                    index++;
+                    continue;
+                }
+                var testCaseStartedId = current.Content() switch
+                {
+                    TestStepStarted started => started.TestCaseStartedId,
+                    TestStepFinished finished => finished.TestCaseStartedId,
+                    TestCaseFinished tcFin => tcFin.TestCaseStartedId,
+                    Attachment att => att.TestCaseStartedId,
+                    _ => throw new ApplicationException("Unexpected Envelope type")
+                };
+                var testCaseId = testCaseStartedToTestCaseMap[testCaseStartedId];
+                testCases[testCaseId].executions[testCaseStartedId].related.Add(current);
+                index++;
+            }
+
+            foreach (var tc in testCases.Values)
+            {
+                result.Insert(result.Count - 1, Envelope.Create(tc.tc));
+                foreach (var e in tc.executions.Values)
+                {
+                    result.Insert(result.Count - 1, Envelope.Create(e.started));
+                    foreach (var r in e.related)
+                        result.Insert(result.Count - 1, r);
+                }
+            }
+            return result;
         }
 
     }
