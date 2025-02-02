@@ -7,6 +7,10 @@ using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// Data class that holds information about a single execution of a TestCase.
+    /// There will be mulitple of these for a given TestCase if it is Retried.
+    /// </summary>
     public class TestCaseExecutionRecord : IGenerateMessage
     {
         public int AttemptId { get; }

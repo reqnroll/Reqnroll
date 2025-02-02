@@ -6,6 +6,9 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// Captures information about TestRun Hooks (Before/After Feature)
+    /// </summary>
     internal class TestRunHookTracker
     {
         public TestRunHookTracker(string id, string hookDefinitionId, HookBindingStartedEvent hookBindingStartedEvent, string testRunID)

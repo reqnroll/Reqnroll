@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// Data class that holds information about an executed TestCase that is discovered the first time the Scenario/TestCase is executed
+    /// </summary>
     public class TestCaseDefinition
     {
         public string TestCaseId { get; }

@@ -15,6 +15,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// This class is used to track the execution of Test Cases
     /// There will be one instance of this class per gherkin Pickle/TestCase. 
     /// It will track info from both Feature-level and Scenario-level Execution Events for a single Test Case
+    /// Individual executions will be recorded as a TestExecutionRecord.
     /// </summary>
     public class TestCaseTracker
     {
@@ -26,7 +27,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             Enabled = featureTracker.Enabled;
             IDGenerator = featureTracker.IDGenerator;
             StepDefinitionsByPattern = featureTracker.StepDefinitionsByPattern;
-            PickleIdList = featureTracker.PickleIds;
             Attempt_Count = -1;
         }
 
@@ -37,11 +37,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public string TestCaseId { get; set; }
         public int Attempt_Count { get; set; }
 
-        // This dictionary maps from (string) PickleIDIndex to (string) PickleID (and is a reference back to this data held at the Feature level; here as a convenience)
-        private readonly Dictionary<string, string> PickleIdList;
-
         public bool Enabled { get; set; } //This will be false if the feature could not be pickled
-
         public bool Finished { get; set; }
         public ScenarioExecutionStatus ScenarioExecutionStatus { get { return ExecutionHistory.Last().ScenarioExecutionStatus; } }
 
@@ -61,18 +57,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 ExecutionHistory.Add(executionRecord);
         }
 
-        //// We keep two dictionaries to track the Test Steps and Hooks.
-        //// The first dictionary tracks the Test Steps by their ID, the second will have two entries for each Test Step - one for the Started event and one for the Finished event
-        //private Dictionary<string, StepExecutionTrackerBase> StepsById { get; set; } = new();
-        //private Dictionary<ExecutionEvent, StepExecutionTrackerBase> StepsByEvent { get; set; } = new();
-        //public List<StepExecutionTrackerBase> Steps
-        //{
-        //    get
-        //    {
-        //        return StepsByEvent.Where(kvp => kvp.Key is StepStartedEvent || kvp.Key is HookBindingFinishedEvent).Select(kvp => kvp.Value).ToList();
-        //    }
-        //}
-
         public IEnumerable<Envelope> RuntimeGeneratedMessages
         {
             get
@@ -85,6 +69,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                     if (tempListOfMessages.Count > 0)
                     {
                         // there has been a previous run of this scenario that was retried
+                        // We will create a copy of the last TestRunFinished message, but with the 'willBeRetried' flag set to true
+                        // and substitute the copy into the list
                         var lastRunTestCaseFinished = tempListOfMessages.Last();
                         var lastRunTCMarkedAsToBeRetried = FixupWillBeRetried(lastRunTestCaseFinished);
                         tempListOfMessages.Remove(lastRunTestCaseFinished);
@@ -108,41 +94,38 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void ProcessEvent(ExecutionEvent anEvent)
         {
-            if (Enabled) InvokeProcessEvent(anEvent);
-        }
-        private void InvokeProcessEvent(ExecutionEvent anEvent)
-        {
+            if (!Enabled) return;
             switch (anEvent)
             {
                 case ScenarioStartedEvent scenarioStartedEvent:
-                    PreProcessEvent(scenarioStartedEvent);
+                    ProcessEvent(scenarioStartedEvent);
                     break;
                 case ScenarioFinishedEvent scenarioFinishedEvent:
-                    PreProcessEvent(scenarioFinishedEvent);
+                    ProcessEvent(scenarioFinishedEvent);
                     break;
                 case StepStartedEvent stepStartedEvent:
-                    PreProcessEvent(stepStartedEvent);
+                    ProcessEvent(stepStartedEvent);
                     break;
                 case StepFinishedEvent stepFinishedEvent:
-                    PreProcessEvent(stepFinishedEvent);
+                    ProcessEvent(stepFinishedEvent);
                     break;
                 case HookBindingStartedEvent hookBindingStartedEvent:
-                    PreProcessEvent(hookBindingStartedEvent);
+                    ProcessEvent(hookBindingStartedEvent);
                     break;
                 case HookBindingFinishedEvent hookBindingFinishedEvent:
-                    PreProcessEvent(hookBindingFinishedEvent);
+                    ProcessEvent(hookBindingFinishedEvent);
                     break;
                 case AttachmentAddedEvent attachmentAddedEvent:
-                    PreProcessEvent(attachmentAddedEvent);
+                    ProcessEvent(attachmentAddedEvent);
                     break;
                 case OutputAddedEvent outputAddedEvent:
-                    PreProcessEvent(outputAddedEvent);
+                    ProcessEvent(outputAddedEvent);
                     break;
                 default:
                     throw new NotImplementedException($"Event type {anEvent.GetType().Name} is not supported.");
             }
         }
-        internal void PreProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
+        internal void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
             Attempt_Count++;
             scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_PickleId = PickleId;
@@ -164,33 +147,29 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         }
 
 
-        internal void PreProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
+        internal void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             Finished = true;
             Current_Execution.RecordFinish(scenarioFinishedEvent);
         }
 
-        internal void PreProcessEvent(StepStartedEvent stepStartedEvent)
+        internal void ProcessEvent(StepStartedEvent stepStartedEvent)
         {
             var stepState = new TestStepTracker(this, Current_Execution);
 
             stepState.ProcessEvent(stepStartedEvent);
             Current_Execution.StepExecutionTrackers.Add(stepState);
             Current_Execution.StoreMessageGenerator(stepState, stepStartedEvent);
-            //StepsById.Add(stepState.PickleStepID, stepState);
-            //StepsByEvent.Add(stepStartedEvent, stepState);
         }
-        internal void PreProcessEvent(StepFinishedEvent stepFinishedEvent)
+        internal void ProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
-            //var stepState = StepsById[stepFinishedEvent.StepContext.StepInfo.PickleStepId] as TestStepTracker;
             var stepState = Current_Execution.CurrentStep as TestStepTracker;
 
             stepState.ProcessEvent(stepFinishedEvent);
             Current_Execution.StoreMessageGenerator(stepState, stepFinishedEvent);
-            //StepsByEvent.Add(stepFinishedEvent, stepState);
         }
 
-        internal void PreProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
+        internal void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
         {
             // At this point we only care about hooks that wrap scenarios or steps; Before/AfterTestRun hooks were processed earlier by the Publisher
             if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature)
@@ -199,20 +178,18 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             hookStepStateTracker.ProcessEvent(hookBindingStartedEvent);
             Current_Execution.StepExecutionTrackers.Add(hookStepStateTracker);
             Current_Execution.StoreMessageGenerator(hookStepStateTracker, hookBindingStartedEvent);
-            //StepsByEvent.Add(hookBindingStartedEvent, hookStepStateTracker);
         }
 
-        internal void PreProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
+        internal void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
             // At this point we only care about hooks that wrap scenarios or steps; TestRunHooks were processed earlier by the Publisher
             if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature)
                 return;
             var step = Current_Execution.CurrentStep as HookStepTracker;
-            //var step = FindMatchingHookStartedEvent(hookBindingFinishedEvent);
             step.ProcessEvent(hookBindingFinishedEvent);
             Current_Execution.StoreMessageGenerator(step, hookBindingFinishedEvent);
         }
-        internal void PreProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
+        internal void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
         {
             var attachmentExecutionEventWrapper = new AttachmentAddedEventWrapper(
                 attachmentAddedEvent,
@@ -221,7 +198,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 Current_Execution.CurrentStep.Definition.TestStepId);
             Current_Execution.StoreMessageGenerator(attachmentExecutionEventWrapper, attachmentAddedEvent);
         }
-        internal void PreProcessEvent(OutputAddedEvent outputAddedEvent)
+        internal void ProcessEvent(OutputAddedEvent outputAddedEvent)
         {
             var outputExecutionEventWrapper = new OutputAddedEventWrapper(
                 outputAddedEvent,

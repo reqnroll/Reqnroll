@@ -423,7 +423,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
                 if (!TestRunHookTrackers.TryGetValue(signature, out var hookTracker))
                     return;
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testRunHook", Envelope = CucumberMessageFactory.ToTestRunHookFinished(hookTracker) });
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testRunHook", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunHookFinished(hookTracker)) });
                 return;
             }
 

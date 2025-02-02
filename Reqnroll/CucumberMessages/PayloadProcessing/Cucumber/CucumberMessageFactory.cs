@@ -38,9 +38,10 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return new TestRunHookStarted(hookTracker.TestRunHookId, hookTracker.TestRunID, hookTracker.TestRunHook_HookId, Converters.ToTimestamp(hookTracker.TimeStamp));
         }
 
-        internal static Envelope ToTestRunHookFinished(TestRunHookTracker hookTracker)
+        internal static TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker)
         {
-            throw new NotImplementedException();
+            //TODO: Incomplete imlementation; Before/After TestRun/Feature needs more work to capture result as a TestStepResult object.
+            return new TestRunHookFinished(hookTracker.TestRunHookId, null, Converters.ToTimestamp(hookTracker.TimeStamp));
         }
 
         internal static TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
@@ -74,13 +75,13 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         }
         internal static TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId)
         {
-            return new TestCaseStarted(testCaseExecution.AttemptId, 
+            return new TestCaseStarted(testCaseExecution.AttemptId,
                 testCaseExecution.TestCaseStartedId,
                 testCaseId, null, Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp));
         }
         internal static TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
         {
-            return new TestCaseFinished(testCaseExecution.TestCaseStartedId, 
+            return new TestCaseFinished(testCaseExecution.TestCaseStartedId,
                 Converters.ToTimestamp(testCaseExecution.TestCaseFinishedTimeStamp), false);
         }
         internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
@@ -101,7 +102,11 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             var bindingSourceText = binding.SourceExpression;
             var expressionType = binding.ExpressionType;
-            var stepDefinitionPatternType = expressionType switch { StepDefinitionExpressionTypes.CucumberExpression => StepDefinitionPatternType.CUCUMBER_EXPRESSION, _ => StepDefinitionPatternType.REGULAR_EXPRESSION };
+            var stepDefinitionPatternType = expressionType switch
+            {
+                StepDefinitionExpressionTypes.CucumberExpression => StepDefinitionPatternType.CUCUMBER_EXPRESSION,
+                _ => StepDefinitionPatternType.REGULAR_EXPRESSION
+            };
             var stepDefinitionPattern = new StepDefinitionPattern(bindingSourceText, stepDefinitionPatternType);
             return stepDefinitionPattern;
         }
@@ -231,8 +236,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         }
         internal static TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor)
         {
-            return new TestStepStarted(hookStepProcessor.TestCaseStartedID, 
-                hookStepProcessor.Definition.TestStepId, 
+            return new TestStepStarted(hookStepProcessor.TestCaseStartedID,
+                hookStepProcessor.Definition.TestStepId,
                 Converters.ToTimestamp(hookStepProcessor.StepStarted));
         }
 
@@ -243,21 +248,23 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookStepProcessor.StepFinished));
         }
 
-        internal static Attachment ToAttachment(AttachmentAddedEventWrapper tracker, AttachmentAddedEvent attachmentAddedEvent)
+        internal static Attachment ToAttachment(AttachmentAddedEventWrapper tracker)
         {
+            var attEvent = tracker.AttachmentAddedEvent;
             return new Attachment(
-                Base64EncodeFile(attachmentAddedEvent.FilePath),
+                Base64EncodeFile(attEvent.FilePath),
                 AttachmentContentEncoding.BASE64,
-                Path.GetFileName(attachmentAddedEvent.FilePath),
-                FileExtensionToMIMETypeMap.GetMimeType(Path.GetExtension(attachmentAddedEvent.FilePath)),
+                Path.GetFileName(attEvent.FilePath),
+                FileExtensionToMIMETypeMap.GetMimeType(Path.GetExtension(attEvent.FilePath)),
                 null,
                 tracker.TestCaseStartedId,
                 tracker.TestCaseStepId,
                 null,
                 tracker.TestRunStartedId);
         }
-        internal static Attachment ToAttachment(OutputAddedEventWrapper tracker, OutputAddedEvent outputAddedEvent)
+        internal static Attachment ToAttachment(OutputAddedEventWrapper tracker)
         {
+            var outputAddedEvent = tracker.OutputAddedEvent;
             return new Attachment(
                 outputAddedEvent.Text,
                 AttachmentContentEncoding.IDENTITY,

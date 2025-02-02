@@ -23,7 +23,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         public IEnumerable<Envelope> GenerateFrom(ExecutionEvent executionEvent)
         {
-             return [ Envelope.Create(CucumberMessageFactory.ToAttachment(this, executionEvent as AttachmentAddedEvent))];
+             return [ Envelope.Create(CucumberMessageFactory.ToAttachment(this))];
         }
     }
 }

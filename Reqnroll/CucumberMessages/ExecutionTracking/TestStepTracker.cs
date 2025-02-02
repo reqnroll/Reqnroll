@@ -50,6 +50,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             }
             else
             {
+                // On retries of the TestCase, find the Definition previously created.
                 Definition = ParentTestCase.TestCaseDefinition.StepDefinitions.OfType<TestStepDefinition>().Where(sd => sd.PickleStepID == stepStartedEvent.StepContext.StepInfo.PickleStepId).First();
             }
         }

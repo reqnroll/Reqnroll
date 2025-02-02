@@ -1,4 +1,5 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System.Collections.Generic;
 
@@ -21,7 +22,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         public IEnumerable<Envelope> GenerateFrom(ExecutionEvent executionEvent)
         {
-            throw new System.NotImplementedException();
+            return [Envelope.Create(CucumberMessageFactory.ToAttachment(this))];
         }
     }
 }

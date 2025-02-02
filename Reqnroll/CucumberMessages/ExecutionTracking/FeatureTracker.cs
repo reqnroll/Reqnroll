@@ -112,17 +112,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         }
 
-        // This method is used to identify the last ID generated from the set generated during code gen. 
-        // It takes advantage of the design assumption that Pickles are generated last, and that PickleSteps are generated before the ID of the Pickle itself.
-        // Therefore, the ID of the last Pickle is last ID generated.
-        // Subsequent Messages can be assigned IDs starting from that one (assuming incrementing integer IDs).
-        // 
-        // Note: Should the method of assigning IDs ever change (or their sequence of assignment) in the code generator, then this method may need to change as well.
-        private string ExtractLastID(List<Pickle> pickles)
-        {
-            return pickles.Last().Id;
-        }
-
         // When the FeatureFinished event fires, we calculate the Feature-level Execution Status
         // If Scenarios are running in parallel, this event will fire multiple times (once per each instance of the test class).
         // Running this method multiple times is harmless. The FeatureExecutionSuccess property is only consumed upon the TestRunComplete event (ie, only once).
@@ -167,12 +156,12 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 if(testCaseTrackersById.TryGetValue(pickleId, out tccmt))
                 {
                     // This represents a re-execution of the TestCase.
-                    tccmt.ProcessEvent(scenarioStartedEvent);
+                    tccmt.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
                 }
                 else // This is the first time this TestCase (aka, pickle) is getting executed. New up a TestCaseTracker for it.
                 {
                     tccmt = new TestCaseTracker(this, pickleId);
-                    tccmt.ProcessEvent(scenarioStartedEvent);
+                    tccmt.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
                     testCaseTrackersById.TryAdd(pickleId, tccmt);
                 }
             }
@@ -188,7 +177,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             {
                 if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
                 {
-                    tccmt.ProcessEvent(scenarioFinishedEvent);
+                    tccmt.ProcessEvent((ExecutionEvent)scenarioFinishedEvent);
                 }
             }
         }
@@ -203,7 +192,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             {
                 if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
                 {
-                    tccmt.ProcessEvent(stepStartedEvent);
+                    tccmt.ProcessEvent((ExecutionEvent)stepStartedEvent);
                 }
             }
         }
@@ -217,7 +206,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             {
                 if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
                 {
-                    tccmt.ProcessEvent(stepFinishedEvent);
+                    tccmt.ProcessEvent((ExecutionEvent)stepFinishedEvent);
                 }
             }
         }
@@ -231,7 +220,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
                 if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
-                    tccmt.ProcessEvent(hookBindingStartedEvent);
+                    tccmt.ProcessEvent((ExecutionEvent)hookBindingStartedEvent);
             }
         }
 
@@ -244,7 +233,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
                 if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
-                    tccmt.ProcessEvent(hookBindingFinishedEvent);
+                    tccmt.ProcessEvent((ExecutionEvent)hookBindingFinishedEvent);
             }
         }
 
@@ -256,7 +245,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
             {
-                tccmt.ProcessEvent(attachmentAddedEvent);
+                tccmt.ProcessEvent((ExecutionEvent)attachmentAddedEvent);
             }
         }
 
@@ -268,7 +257,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
             {
-                tccmt.ProcessEvent(outputAddedEvent);
+                tccmt.ProcessEvent((ExecutionEvent)outputAddedEvent);
             }
         }
     }

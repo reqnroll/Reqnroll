@@ -7,11 +7,14 @@ using System.Linq;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// Data class that captures information about a TestStep that is being executed for the first time.
+    /// One of these is created per step, regardless of how many times the Test Case is retried.
+    /// </summary>
     public class TestStepDefinition
     {
         // The Id of the Step within the TestCase
         public string TestStepId { get; private set; }
-
 
         // The Id of the PickleStep
         public string PickleStepID { get; set; }
@@ -19,8 +22,13 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // The Step Definition(s) that match this step of the Test Case. None for no match, 1 for a successful match, 2 or more for Ambiguous match.
         public List<string> StepDefinitionIds { get; private set; }
+        // Indicates whether the step was successfully bound to a Step Definition.
         public bool Bound { get; set; }
+
+        // The method name and signature of the bound method
         public string CanonicalizedStepPattern { get; set; }
+
+        // List of method signatures that cause an ambiguous situation to arise
         private IEnumerable<string> AmbiguousStepDefinitions { get; set; }
         public bool Ambiguous { get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0; } }
         private IStepDefinitionBinding StepDefinitionBinding;
@@ -35,6 +43,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             ParentTestCaseDefinition = parentTestCaseDefinition;
         }
 
+        // Once the StepFinished event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method
         public void PopulateStepDefinitionFromExecutionResult(StepFinishedEvent stepFinishedEvent)
         {
             var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
