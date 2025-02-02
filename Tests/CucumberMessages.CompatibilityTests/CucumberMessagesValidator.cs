@@ -258,7 +258,9 @@ namespace CucumberMessages.Tests
                         if (testRunFinishedSeenAtEnvelopeIndex != -1)
                             currentIndex.Should().BeLessThan(testRunFinishedSeenAtEnvelopeIndex, "TestStepFinished events must be before TestRunFinished event");
                         ClosedIDs.Should().NotContain(testStepFinished.TestCaseStartedId, "a TestStepFinished event must refer to an active test case");
-                        ClosedIDs.Should().NotContain(testStepFinished.TestStepId, "a TestStepFinished event must refer to an active test step");
+
+                        // Can not assert the following as TestStepIds are re-used when a step is re-executed during a Retry
+                        // ClosedIDs.Should().NotContain(testStepFinished.TestStepId, "a TestStepFinished event must refer to an active test step");
                         OpenTestCaseStartedIDs.Should().Contain(testStepFinished.TestCaseStartedId, "a TestStepFinished event must refer to an active test case");
                         OpenTestStepIds.Should().Contain(testStepFinished.TestStepId, "a TestStepFinished event must refer to an active test step");
                         ClosedIDs.Add(testStepFinished.TestStepId);

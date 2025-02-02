@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using Reqnroll.EnvironmentAccess;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using Cucumber.Messages;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -52,6 +53,8 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
         private readonly ConcurrentDictionary<string, TestRunHookTracker> TestRunHookTrackers = new();
+
+        private List<Envelope> _Messages = new();
 
         public CucumberMessagePublisher()
         {
@@ -140,6 +143,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = CucumberMessageFactory.ToMeta(args.ObjectContainer) });
                 foreach (var msg in PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer))
                 {
+                    // this publishes StepDefinition, Hook, StepArgumentTransform messages
                     await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = msg });
                 }
             }).Wait();
@@ -194,19 +198,35 @@ namespace Reqnroll.CucumberMessages.PubSub
                     yield return Envelope.Create(hook);
                 };
             }
-
         }
+
         private void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs e)
         {
             if (!Enabled)
                 return;
             var status = StartedFeatures.Values.All(f => f.FeatureExecutionSuccess);
-            StartedFeatures.Clear();
-
+            // publish all TestCase messages
+            var testCaseMessages = _Messages.Where(e => e.Content() is TestCase).OrderBy(e => e.Content().Id());
+            // sort the remaining Messages by timestamp
+            var executionMessages = _Messages.Except(testCaseMessages);
+            executionMessages = executionMessages.OrderBy(e => Converters.ToDateTime(e.Timestamp()));
+            // publish them in order to the broker
             Task.Run(async () =>
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now, _testRunStartedId)) })
-                
-                ).Wait();
+            {
+                foreach (var env in testCaseMessages)
+                {
+                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "executionMessages", Envelope = env });
+                }
+
+                foreach (var env in executionMessages)
+                {
+                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "executionMessages", Envelope = env });
+                }
+
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now, _testRunStartedId)) });
+            }).Wait();
+
+            StartedFeatures.Clear();
         }
 
         #region TestThreadExecutionEventPublisher Event Handling Methods
@@ -245,11 +265,11 @@ namespace Reqnroll.CucumberMessages.PubSub
                     //   We don't want them to run until after the static messages have been published (and the PickleJar has been populated as a result).
                     if (!StartedFeatures.ContainsKey(featureName))
                     {
-                        var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern, StepArgumentTransforms, UndefinedParameterTypeBindings);
+                        var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern);
                         if (ft.Enabled)
                             Task.Run(async () =>
                             {
-                                foreach (var msg in ft.StaticMessages)
+                                foreach (var msg in ft.StaticMessages) // Static Messages == known at compile-time (Source, Gerkhin Document, and Pickle messages)
                                 {
                                     await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
                                 }
@@ -275,6 +295,11 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
             var featureTracker = StartedFeatures[featureName];
             featureTracker.ProcessEvent(featureFinishedEvent);
+            foreach (var msg in featureTracker.RuntimeGeneratedMessages)
+            {
+                _Messages.Add(msg);
+            }
+
             return Task.CompletedTask;
             // throw an exception if any of the TestCaseCucumberMessageTrackers are not done?
 
@@ -306,19 +331,17 @@ namespace Reqnroll.CucumberMessages.PubSub
             return Task.CompletedTask;
         }
 
-        private async Task ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
+        private Task ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             var featureName = scenarioFinishedEvent.FeatureContext?.FeatureInfo?.Title;
 
             if (!Enabled || String.IsNullOrEmpty(featureName))
-                return;
+                return Task.CompletedTask;
             if (StartedFeatures.TryGetValue(featureName, out var featureTracker))
             {
-                foreach (var msg in featureTracker.ProcessEvent(scenarioFinishedEvent))
-                {
-                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
-                }
+                featureTracker.ProcessEvent(scenarioFinishedEvent);
             }
+            return Task.CompletedTask;
         }
 
         private Task StepStartedEventHandler(StepStartedEvent stepStartedEvent)
@@ -357,10 +380,12 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun)
             {
-                string hookId = SharedIDGenerator.GetNewId();
-                var hookTracker = new TestRunHookTracker(hookId, hookBindingStartedEvent, _testRunStartedId);
-                TestRunHookTrackers.TryAdd(hookTracker.HookBindingSignature, hookTracker);
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testRunHook", Envelope = CucumberMessageFactory.ToTestRunHookStarted(hookTracker) });
+                string hookRunStartedId = SharedIDGenerator.GetNewId();
+                var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
+                var hookId = StepDefinitionsByPattern[signature];
+                var hookTracker = new TestRunHookTracker(hookRunStartedId, hookId, hookBindingStartedEvent, _testRunStartedId);
+                TestRunHookTrackers.TryAdd(signature, hookTracker);
+                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testRunHook", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunHookStarted(hookTracker)) });
                 return;
             }
 

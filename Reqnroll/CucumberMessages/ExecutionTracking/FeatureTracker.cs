@@ -36,8 +36,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // This dictionary is shared across all Features (via the Publisher)
         // The same is true of the StepTransformations and StepDefinitionBindings used for Undefined Parameter Types
         internal ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
-        private ConcurrentBag<IStepArgumentTransformationBinding> StepTransformRegistry;
-        private ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypes;
 
         // This dictionary maps from (string) PickkleID to the TestCase tracker
         private ConcurrentDictionary<string, TestCaseTracker> testCaseTrackersById = new();
@@ -52,18 +50,31 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public bool FeatureExecutionSuccess { get; private set; }
 
         // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
-        public FeatureTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns, ConcurrentBag<IStepArgumentTransformationBinding> stepTransformRegistry, ConcurrentBag<IStepDefinitionBinding> undefinedParameterTypes)
+        public FeatureTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns)
         {
             TestRunStartedId = testRunStartedId;
             StepDefinitionsByPattern = stepDefinitionPatterns;
-            StepTransformRegistry = stepTransformRegistry;
-            UndefinedParameterTypes = undefinedParameterTypes;
             IDGenerator = idGenerator;
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
             Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null ? true : false;
             ProcessEvent(featureStartedEvent);
         }
+
+        // At the completion of Feature execution, this is called to generate all non-static Messages
+        // Iterating through all Scenario trackers, generating all messages.
+        public IEnumerable<Envelope> RuntimeGeneratedMessages {  get
+            {
+                foreach (var scenario in testCaseTrackersById.Values)
+                {
+                    foreach (var msg in scenario.RuntimeGeneratedMessages)
+                    {
+                        yield return msg;
+                    }
+                    ;
+                }
+            } }
+
         internal void ProcessEvent(FeatureStartedEvent featureStartedEvent)
         {
             if (!Enabled) return;
@@ -167,21 +178,19 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             }
         }
 
-        public IEnumerable<Envelope> ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
+        public void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             var pickleIndex = scenarioFinishedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
-            if (String.IsNullOrEmpty(pickleIndex)) return Enumerable.Empty<Envelope>();
+            if (String.IsNullOrEmpty(pickleIndex)) 
+                return; 
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
                 if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
                 {
                     tccmt.ProcessEvent(scenarioFinishedEvent);
-
-                    return tccmt.TestCaseCucumberMessages();
                 }
             }
-            return Enumerable.Empty<Envelope>();
         }
 
         public void ProcessEvent(StepStartedEvent stepStartedEvent)

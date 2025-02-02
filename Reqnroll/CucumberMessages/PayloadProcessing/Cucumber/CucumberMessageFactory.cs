@@ -5,7 +5,6 @@ using Reqnroll.Bindings;
 using Reqnroll.BoDi;
 using Reqnroll.CommonModels;
 using Reqnroll.CucumberMessages.ExecutionTracking;
-using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Events;
 using System;
@@ -34,9 +33,9 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp), null, testRunStartedId);
         }
 
-        internal static Envelope ToTestRunHookStarted(TestRunHookTracker hookTracker)
+        internal static TestRunHookStarted ToTestRunHookStarted(TestRunHookTracker hookTracker)
         {
-            throw new NotImplementedException();
+            return new TestRunHookStarted(hookTracker.TestRunHookId, hookTracker.TestRunID, hookTracker.TestRunHook_HookId, Converters.ToTimestamp(hookTracker.TimeStamp));
         }
 
         internal static Envelope ToTestRunHookFinished(TestRunHookTracker hookTracker)
@@ -44,21 +43,21 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             throw new NotImplementedException();
         }
 
-        internal static TestCase ToTestCase(TestCaseTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
+        internal static TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
         {
             var testSteps = new List<TestStep>();
 
-            foreach (var stepState in testCaseTracker.Steps)
+            foreach (var stepDefinition in testCaseDefinition.StepDefinitions)
             {
-                switch (stepState)
+                switch (stepDefinition)
                 {
-                    case TestStepTracker _:
-                        var testStep = ToPickleTestStep(testCaseTracker, stepState as TestStepTracker);
-                        testSteps.Add(testStep);
-                        break;
-                    case HookStepTracker _:
-                        var hookTestStep = ToHookTestStep(stepState as HookStepTracker);
+                    case HookStepDefinition _:
+                        var hookTestStep = ToHookTestStep(stepDefinition as HookStepDefinition);
                         testSteps.Add(hookTestStep);
+                        break;
+                    case TestStepDefinition _:
+                        var testStep = ToPickleTestStep(stepDefinition);
+                        testSteps.Add(testStep);
                         break;
                     default:
                         throw new NotImplementedException();
@@ -66,20 +65,23 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             }
             var testCase = new TestCase
             (
-                testCaseTracker.TestCaseId,
-                testCaseTracker.PickleId,
+                testCaseDefinition.TestCaseId,
+                testCaseDefinition.PickleId,
                 testSteps,
-                testCaseTracker.TestRunStartedId
+                testCaseDefinition.Tracker.TestRunStartedId
             );
             return testCase;
         }
-        internal static TestCaseStarted ToTestCaseStarted(TestCaseTracker testCaseTracker, ScenarioStartedEvent scenarioStartedEvent)
+        internal static TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId)
         {
-            return new TestCaseStarted(testCaseTracker.Attempt_Count, testCaseTracker.TestCaseStartedId, testCaseTracker.TestCaseId, null, Converters.ToTimestamp(scenarioStartedEvent.Timestamp));
+            return new TestCaseStarted(testCaseExecution.AttemptId, 
+                testCaseExecution.TestCaseStartedId,
+                testCaseId, null, Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp));
         }
-        internal static TestCaseFinished ToTestCaseFinished(TestCaseTracker testCaseTracker, ScenarioFinishedEvent scenarioFinishedEvent)
+        internal static TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
         {
-            return new TestCaseFinished(testCaseTracker.TestCaseStartedId, Converters.ToTimestamp(scenarioFinishedEvent.Timestamp), false);
+            return new TestCaseFinished(testCaseExecution.TestCaseStartedId, 
+                Converters.ToTimestamp(testCaseExecution.TestCaseFinishedTimeStamp), false);
         }
         internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
         {
@@ -138,20 +140,20 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return sourceRef;
         }
 
-        internal static TestStep ToPickleTestStep(TestCaseTracker tracker, TestStepTracker stepState)
+        internal static TestStep ToPickleTestStep(TestStepDefinition stepDef)
         {
-            bool bound = stepState.Bound;
-            bool ambiguous = stepState.Ambiguous;
+            bool bound = stepDef.Bound;
+            bool ambiguous = stepDef.Ambiguous;
 
-            var args = stepState.StepArguments
+            var args = stepDef.StepArguments
                .Select(arg => ToStepMatchArgument(arg))
                .ToList();
 
             var result = new TestStep(
                  null,
-                 stepState.TestStepID,
-                 stepState.PickleStepID,
-                 bound ? new List<string> { stepState.StepDefinitionId } : ambiguous ? new List<string>(stepState.AmbiguousStepDefinitions) : new List<string>(),
+                 stepDef.TestStepId,
+                 stepDef.PickleStepID,
+                 stepDef.StepDefinitionIds,
                  bound ? new List<StepMatchArgumentsList> { new StepMatchArgumentsList(args) } : new List<StepMatchArgumentsList>()
                  );
 
@@ -168,21 +170,21 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                     ),
                 NormalizePrimitiveTypeNamesToCucumberTypeNames(argument.Type));
         }
-        internal static TestStepStarted ToTestStepStarted(TestStepTracker stepState, StepStartedEvent stepStartedEvent)
+        internal static TestStepStarted ToTestStepStarted(TestStepTracker stepState)
         {
             return new TestStepStarted(
                 stepState.TestCaseStartedID,
-                stepState.StepDefinitionId,
-                Converters.ToTimestamp(stepStartedEvent.Timestamp));
+                stepState.Definition.TestStepId,
+                Converters.ToTimestamp(stepState.StepStarted));
         }
 
-        internal static TestStepFinished ToTestStepFinished(TestStepTracker stepState, StepFinishedEvent stepFinishedEvent)
+        internal static TestStepFinished ToTestStepFinished(TestStepTracker stepState)
         {
             return new TestStepFinished(
                 stepState.TestCaseStartedID,
-                stepState.StepDefinitionId,
+                stepState.Definition.TestStepId,
                 ToTestStepResult(stepState),
-                Converters.ToTimestamp(stepFinishedEvent.Timestamp));
+                Converters.ToTimestamp(stepState.StepFinished));
         }
 
         internal static Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
@@ -216,52 +218,54 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             };
         }
 
-        internal static TestStep ToHookTestStep(HookStepTracker hookStepState)
+        internal static TestStep ToHookTestStep(HookStepDefinition hookStepDefinition)
         {
-            // find the Hook message at the Feature level
-            var hookCacheKey = CanonicalizeHookBinding(hookStepState.HookBindingFinishedEvent.HookBinding);
-            var hookId = hookStepState.ParentTestCase.StepDefinitionsByPattern[hookCacheKey];
+            var hookId = hookStepDefinition.HookId;
 
             return new TestStep(
                 hookId,
-                hookStepState.TestStepID,
+                hookStepDefinition.TestStepId,
                 null,
                 null,
                 null);
         }
-        internal static TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor, HookBindingStartedEvent hookBindingStartedEvent)
+        internal static TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor)
         {
-            return new TestStepStarted(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, Converters.ToTimestamp(hookBindingStartedEvent.Timestamp));
+            return new TestStepStarted(hookStepProcessor.TestCaseStartedID, 
+                hookStepProcessor.Definition.TestStepId, 
+                Converters.ToTimestamp(hookStepProcessor.StepStarted));
         }
 
-        internal static TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor, HookBindingFinishedEvent hookFinishedEvent)
+        internal static TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor)
         {
-            return new TestStepFinished(hookStepProcessor.TestCaseStartedID, hookStepProcessor.TestStepID, ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookFinishedEvent.Timestamp));
+            return new TestStepFinished(hookStepProcessor.TestCaseStartedID,
+                hookStepProcessor.Definition.TestStepId,
+                ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookStepProcessor.StepFinished));
         }
 
-        internal static Attachment ToAttachment(TestCaseTracker tracker, AttachmentAddedEventWrapper attachmentAddedEventWrapper)
+        internal static Attachment ToAttachment(AttachmentAddedEventWrapper tracker, AttachmentAddedEvent attachmentAddedEvent)
         {
             return new Attachment(
-                Base64EncodeFile(attachmentAddedEventWrapper.AttachmentAddedEvent.FilePath),
+                Base64EncodeFile(attachmentAddedEvent.FilePath),
                 AttachmentContentEncoding.BASE64,
-                Path.GetFileName(attachmentAddedEventWrapper.AttachmentAddedEvent.FilePath),
-                FileExtensionToMIMETypeMap.GetMimeType(Path.GetExtension(attachmentAddedEventWrapper.AttachmentAddedEvent.FilePath)),
+                Path.GetFileName(attachmentAddedEvent.FilePath),
+                FileExtensionToMIMETypeMap.GetMimeType(Path.GetExtension(attachmentAddedEvent.FilePath)),
                 null,
-                attachmentAddedEventWrapper.TestCaseStartedID,
-                attachmentAddedEventWrapper.TestCaseStepID,
+                tracker.TestCaseStartedId,
+                tracker.TestCaseStepId,
                 null,
                 tracker.TestRunStartedId);
         }
-        internal static Attachment ToAttachment(TestCaseTracker tracker, OutputAddedEventWrapper outputAddedEventWrapper)
+        internal static Attachment ToAttachment(OutputAddedEventWrapper tracker, OutputAddedEvent outputAddedEvent)
         {
             return new Attachment(
-                outputAddedEventWrapper.OutputAddedEvent.Text,
+                outputAddedEvent.Text,
                 AttachmentContentEncoding.IDENTITY,
                 null,
                 "text/x.cucumber.log+plain",
                 null,
-                outputAddedEventWrapper.TestCaseStartedID,
-                outputAddedEventWrapper.TestCaseStepID,
+                tracker.TestCaseStartedId,
+                tracker.TestCaseStepId,
                 null,
                 tracker.TestRunStartedId);
         }

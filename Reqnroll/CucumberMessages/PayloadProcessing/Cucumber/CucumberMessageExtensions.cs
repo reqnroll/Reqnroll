@@ -1,4 +1,5 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.CommonModels;
 using System;
 using System.Collections.Generic;
 
@@ -90,6 +91,20 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             else if (envelope.TestStepStarted != null) { result = envelope.TestStepStarted; }
             else if (envelope.UndefinedParameterType != null) { result = envelope.UndefinedParameterType; }
             return result;
+        }
+
+        public static Timestamp Timestamp(this Envelope envelope)
+        {
+            Timestamp result = null;
+            if (envelope.TestCaseFinished != null) { result = envelope.TestCaseFinished.Timestamp; }
+            else if (envelope.TestCaseStarted != null) { result = envelope.TestCaseStarted.Timestamp; }
+            else if (envelope.TestRunFinished != null) { result = envelope.TestRunFinished.Timestamp; }
+            else if (envelope.TestRunStarted != null) { result = envelope.TestRunStarted.Timestamp; }
+            else if (envelope.TestStepFinished != null) { result = envelope.TestStepFinished.Timestamp; }
+            else if (envelope.TestStepStarted != null) { result = envelope.TestStepStarted.Timestamp; }
+            else throw new ArgumentException($"Envelope of type: {envelope.Content().GetType()} does not contain a timestamp");
+            return result;
+
         }
     }
 }

@@ -31,13 +31,12 @@ namespace CucumberMessages.Tests
         // Line, Column, Seconds and Nanos are skipped, rather than their container types (Location and TimeStamp & Duration, respectively), 
         // because that way we can assert that those container types exist in the actual CucumberMessage (without requiring that the details match the expected CucumberMessage)
 
-        // TestCaseFinished.WillBeRetried - added to this list b/c we don't yet recognize when a TestCase is retried.
         private List<string> PropertiesToSkip = new List<string>() {    
                                                                         "Location", "Line", "Column", "Uri", "JavaMethod", "JavaStackTraceElement", "Exception",
                                                                         "Duration", "Start", "FileName", "Message", "Type", "StackTrace", "UseForSnippets",
                                                                         "Id", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", 
                                                                         "TestRunStartedId", "TestCaseStartedId", "TestStepId", "TestCaseId", "WorkerId",
-                                                                        "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci", "WillBeRetried"
+                                                                        "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci"
                                                                     };
 
         public FluentAsssertionCucumberMessagePropertySelectionRule(IEnumerable<Type> CucumberMessageTypes, IEnumerable<string>? proportiesToSkip = null)
