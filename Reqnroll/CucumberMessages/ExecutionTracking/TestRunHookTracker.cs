@@ -6,17 +6,22 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// Captures information about TestRun Hooks (Before/After Feature)
+    /// </summary>
     internal class TestRunHookTracker
     {
-        public TestRunHookTracker(string id, HookBindingStartedEvent hookBindingStartedEvent, string testRunID)
+        public TestRunHookTracker(string id, string hookDefinitionId, HookBindingStartedEvent hookBindingStartedEvent, string testRunID)
         {
             TestRunHookId = id;
-            HookBindingSignature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
+            TestRunHook_HookId = hookDefinitionId;
             TestRunID = testRunID;
+            TimeStamp = hookBindingStartedEvent.Timestamp;
         }
 
         public string TestRunHookId { get; }
-        public string HookBindingSignature { get; }
+        public string TestRunHook_HookId { get; }
         public string TestRunID { get; }
+        public DateTime TimeStamp { get; }
     }
 }

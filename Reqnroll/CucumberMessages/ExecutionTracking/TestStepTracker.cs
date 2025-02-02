@@ -6,6 +6,7 @@ using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
@@ -17,67 +18,50 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     }
 
     /// <summary>
-    /// This class is used to track the execution of Test StepDefinition Methods
+    /// This class is used to track the execution of Test StepDefinitionBinding Methods
     /// </summary>
-    public class TestStepTracker : StepExecutionTrackerBase
+    public class TestStepTracker : StepExecutionTrackerBase, IGenerateMessage
     {
-        private StepStartedEvent stepStartedEvent;
-
-        public TestStepTracker(TestCaseTracker parentTracker) : base(parentTracker)
+        public TestStepTracker(TestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord) : base(parentTracker, parentExecutionRecord)
         {
         }
 
-        public string PickleStepID { get; set; }
-        public bool Bound { get; set; }
-        public string CanonicalizedStepPattern { get; set; }
-        public string StepDefinitionId { get; private set; }
-        public IEnumerable<string> AmbiguousStepDefinitions { get; set; }
-        public bool Ambiguous { get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0; } }
-        public IStepDefinitionBinding StepDefinition { get; set; }
-
-        public List<StepArgument> StepArguments { get; set; }
+        public IEnumerable<Envelope> GenerateFrom(ExecutionEvent executionEvent)
+        {
+            return executionEvent switch
+            {
+                StepStartedEvent started => [Envelope.Create(CucumberMessageFactory.ToTestStepStarted(this))],
+                StepFinishedEvent finished => [Envelope.Create(CucumberMessageFactory.ToTestStepFinished(this))],
+                _ => Enumerable.Empty<Envelope>()
+            };
+        }
 
         internal void ProcessEvent(StepStartedEvent stepStartedEvent)
         {
-            this.stepStartedEvent = stepStartedEvent;
-            TestStepID = ParentTestCase.IDGenerator.GetNewId();
-            PickleStepID = stepStartedEvent.StepContext.StepInfo.PickleStepId;
-        }
-
-        private string FindStepDefIDByStepPattern(string canonicalizedStepPattern)
-        {
-            return ParentTestCase.StepDefinitionsByPattern[canonicalizedStepPattern];
+            StepStarted = stepStartedEvent.Timestamp;
+            
+            // if this is the first time to execute this step for this test, generate the properties needed to Generate the TestStep Message (stored in a TestStepDefinition)
+            if (ParentTestCase.Attempt_Count == 0)
+            {
+                var testStepId = ParentTestCase.IDGenerator.GetNewId();
+                var pickleStepID = stepStartedEvent.StepContext.StepInfo.PickleStepId;
+                Definition = new(testStepId, pickleStepID, ParentTestCase.TestCaseDefinition);
+                ParentTestCase.TestCaseDefinition.StepDefinitions.Add(Definition);
+            }
+            else
+            {
+                // On retries of the TestCase, find the Definition previously created.
+                Definition = ParentTestCase.TestCaseDefinition.StepDefinitions.OfType<TestStepDefinition>().Where(sd => sd.PickleStepID == stepStartedEvent.StepContext.StepInfo.PickleStepId).First();
+            }
         }
 
         internal void ProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
-            var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
-            Bound = !(bindingMatch == null || bindingMatch == BindingMatch.NonMatching);
+            if (ParentTestCase.Attempt_Count == 0)
+                Definition.PopulateStepDefinitionFromExecutionResult(stepFinishedEvent);
+            StepFinished = stepFinishedEvent.Timestamp;
 
-            StepDefinition = Bound ? bindingMatch.StepBinding : null;
-            CanonicalizedStepPattern = Bound ? CucumberMessageFactory.CanonicalizeStepDefinitionPattern(StepDefinition) : "";
-            StepDefinitionId = Bound ? FindStepDefIDByStepPattern(CanonicalizedStepPattern) : null;
-
-            Duration = stepFinishedEvent.Timestamp - stepStartedEvent.Timestamp;
             Status = stepFinishedEvent.StepContext.Status;
-
-            if (Status == ScenarioExecutionStatus.TestError && stepFinishedEvent.ScenarioContext.TestError != null)
-            {
-                Exception = stepFinishedEvent.ScenarioContext.TestError;
-                if (Exception is AmbiguousBindingException)
-                {
-                    AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches.Select(m =>
-                                                    FindStepDefIDByStepPattern(CucumberMessageFactory.CanonicalizeStepDefinitionPattern(m.StepBinding))));
-                }
-            }
-
-            var IsInputDataTableOrDocString = stepFinishedEvent.StepContext.StepInfo.Table != null || stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
-            var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();
-            var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
-            StepArguments = Bound && !IsInputDataTableOrDocString ?
-                argumentValues.Zip(argumentTypes, (x, y) => new StepArgument { Value = x, Type = y }).ToList()
-                : Enumerable.Empty<StepArgument>().ToList();
-
         }
     }
 }

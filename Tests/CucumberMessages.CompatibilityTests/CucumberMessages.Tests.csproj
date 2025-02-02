@@ -23,6 +23,8 @@
     <Compile Remove="Samples\minimal\minimal.cs" />
     <Compile Remove="Samples\parameter-types\parameter_types.cs" />
     <Compile Remove="Samples\pending\pending.cs" />
+    <Compile Remove="Samples\retry-NUnitRetry\retry_NUnitRetry.cs" />
+    <Compile Remove="Samples\retry-xRetry\retry_xRetry.cs" />
     <Compile Remove="Samples\rules\rules.cs" />
     <Compile Remove="Samples\skipped\skipped.cs" />
     <Compile Remove="Samples\stack-traces\stack_traces.cs" />
@@ -84,6 +86,10 @@
     <Content Include="Samples\empty\empty.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Samples\retry-NUnitRetry\retry_NUnitRetry.cs" />
+    <Content Include="Samples\retry-NUnitRetry\retry_NUnitRetry.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="Samples\background\background.cs" />
     <EmbeddedResource Include="Samples\background\background.feature" />
     <EmbeddedResource Include="Samples\cdata\cdata.cs" />
@@ -124,6 +130,12 @@
     </Content>
     <EmbeddedResource Include="Samples\parameter-types\parameter_types.feature" />
     <Content Include="Samples\parameter-types\parameter_types.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <EmbeddedResource Include="Samples\retry-NUnitRetry\retry_NUnitRetry.feature" />
+    <EmbeddedResource Include="Samples\retry-xRetry\retry_xRetry.cs" />
+    <EmbeddedResource Include="Samples\retry-xRetry\retry_xRetry.feature" />
+    <Content Include="Samples\retry-xRetry\retry_xRetry.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Samples\rules\rules.cs" />

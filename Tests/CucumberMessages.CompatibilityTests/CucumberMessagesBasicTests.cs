@@ -48,6 +48,10 @@ namespace CucumberMessages.Tests
         {
             ResetCucumberMessages();
             // The purpose of this test is to confirm that when Cucumber Messages are turned off, the Cucumber Messages ecosystem does not cause any interference anywhere else
+            DisableCucumberMessages();
+            SetCucumberMessagesOutputFileName("null_test.ndjson");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
+
             AddFeatureFile("""
                 Feature: Cucumber Messages Null Test
                   Scenario: Eating Cukes
@@ -59,13 +63,13 @@ namespace CucumberMessages.Tests
             ExecuteTests();
 
             ShouldAllScenariosPass();
+            
         }
         [TestMethod]
         public void SmokeTest()
         {
             ResetCucumberMessages("reqnoll_report.ndjson");
             EnableCucumberMessages();
-            //SetCucumberMessagesOutputFileName();
             CucumberMessagesAddConfigurationFile("reqnroll.json");
 
             AddFeatureFile("""
@@ -78,6 +82,53 @@ namespace CucumberMessages.Tests
             ExecuteTests();
 
             ShouldAllScenariosPass();
+        }
+
+        [TestMethod]
+        public void SmokeHookTest()
+        {
+            ResetCucumberMessages("smoke_hooks.ndjson"); 
+            EnableCucumberMessages();
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
+            SetCucumberMessagesOutputFileName("smoke_hooks.ndjson");
+
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Test
+                  Scenario: Eating Cukes
+                     When I eat 5 cukes
+                """);
+            AddPassingStepBinding("When");
+
+            AddBindingClass("""
+                using Reqnroll;
+                using System;
+                using System.Collections.Generic;
+                using System.Linq;
+                using System.Text;
+                using System.Threading.Tasks;
+                using System.Diagnostics;
+
+                namespace CucumberMessages.CompatibilityTests.Smoke
+                {
+                    [Binding]
+                    internal class Hooks
+                    {
+                        public Hooks()
+                        {
+                        }
+
+                        // Hook implementations
+                        [BeforeScenario]
+                        public void BeforeScenarioHook() { }
+                    }
+                }
+                
+                """);
+
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+
         }
 
         [TestMethod]

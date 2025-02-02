@@ -30,6 +30,7 @@ namespace CucumberMessages.Tests
 
         // Line, Column, Seconds and Nanos are skipped, rather than their container types (Location and TimeStamp & Duration, respectively), 
         // because that way we can assert that those container types exist in the actual CucumberMessage (without requiring that the details match the expected CucumberMessage)
+
         private List<string> PropertiesToSkip = new List<string>() {    
                                                                         "Location", "Line", "Column", "Uri", "JavaMethod", "JavaStackTraceElement", "Exception",
                                                                         "Duration", "Start", "FileName", "Message", "Type", "StackTrace", "UseForSnippets",

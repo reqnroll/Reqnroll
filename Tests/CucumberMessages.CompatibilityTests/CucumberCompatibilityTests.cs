@@ -45,6 +45,7 @@ namespace CucumberMessages.Tests
             ResetCucumberMessages(featureNameText + ".ndjson");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
+
             CucumberMessagesAddConfigurationFile("reqnroll.json");
             AddUtilClassWithFileSystemPath();
 
@@ -85,6 +86,26 @@ namespace CucumberMessages.Tests
         public void NonCompliantCCKScenarios(string testName, string featureNameText)
         {
             CCKScenarios(testName, featureNameText);
+        }
+
+        [TestMethod]
+        //[DataRow("xRetry")] // xRetry currently fails this test because it retries a scenario with an undefined step (which is not expected behavior)
+        [DataRow("NUnitRetry")]
+        // These tests attempt to execute the Retry scenario from the CCK using the known open-source plugins for Reqnroll that integrate Retry functionality into Reqnroll.
+        public void CCKRetryScenario(string pluginName)
+        {
+            var (plugin, version, unitTestProvider) = pluginName switch
+            {
+                "NUnitRetry" => ("NUnitRetry.ReqnrollPlugin", "1.0.100", UnitTestProvider.NUnit4),
+                "xRetry" => ("xRetry.Reqnroll", "1.0.0", UnitTestProvider.xUnit),
+                _ => throw new NotImplementedException("unknown plugin name")
+            };
+
+            _testRunConfiguration.UnitTestProvider = unitTestProvider;
+            _projectsDriver.AddNuGetPackage(plugin, version);
+            var testName = $"retry-{pluginName}";
+            CCKScenarios(testName, testName);
+
         }
     }
 
