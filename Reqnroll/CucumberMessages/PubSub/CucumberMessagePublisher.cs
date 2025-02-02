@@ -207,9 +207,21 @@ namespace Reqnroll.CucumberMessages.PubSub
             var status = StartedFeatures.Values.All(f => f.FeatureExecutionSuccess);
             // publish all TestCase messages
             var testCaseMessages = _Messages.Where(e => e.Content() is TestCase).OrderBy(e => e.Content().Id());
+            var attachmentMessages = _Messages.Where(e => e.Content() is Attachment);
             // sort the remaining Messages by timestamp
-            var executionMessages = _Messages.Except(testCaseMessages);
-            executionMessages = executionMessages.OrderBy(e => Converters.ToDateTime(e.Timestamp()));
+            var executionMessages = _Messages.Except(testCaseMessages).Except(attachmentMessages).OrderBy(e => Converters.ToDateTime(e.Timestamp())).ToList();
+
+            // reinsert the Attachment messages at the correct spot (in between its related TestStepStart and TestStepFinished messages)
+            foreach (var a in attachmentMessages)
+            {
+                var attachmentBelongsToStep = (a.Content() as Attachment).TestStepId;
+                var index = executionMessages.FindIndex(e => e.Content() is TestStepFinished tsf && tsf.TestStepId == attachmentBelongsToStep);
+                if (index != -1)
+                {
+                    executionMessages.Insert(index, a);
+                }
+            }
+
             // publish them in order to the broker
             Task.Run(async () =>
             {
