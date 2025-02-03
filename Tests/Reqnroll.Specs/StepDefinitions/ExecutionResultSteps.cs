@@ -1,12 +1,9 @@
 using System;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using FluentAssertions;
-using Reqnroll.Assist;
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
-using Reqnroll.TestProjectGenerator.Helpers;
 
 namespace Reqnroll.Specs.StepDefinitions
 {

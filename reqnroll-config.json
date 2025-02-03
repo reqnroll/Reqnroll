@@ -5,6 +5,9 @@
 
   Changelog:
 
+  1.1
+  - Added ide/bindingDiscovery
+
   1.0
   - Initial Reqnroll configuration schema
   
@@ -125,6 +128,9 @@
         },
         "editor": {
           "$ref": "#/definitions/Editor"
+        },
+        "bindingDiscovery": {
+          "$ref": "#/definitions/BindingDiscovery"
         }
       }
     },
@@ -252,6 +258,18 @@
           }
         }
       }
-    } 
+    },
+
+    "BindingDiscovery": {
+      "description": "This section contains all the binding discovery related configurations.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "connectorPath": {
+          "description": "A file path for a custom binding connector. The setting might contain environment variable references in %ENV_VAR% format. If a relative path is specified, the default connector folder will be used as a base folder.",
+          "type": "string"
+        }
+      }
+    }
   }
 }

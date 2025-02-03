@@ -1,4 +1,3 @@
-using System.Linq;
 using Reqnroll.Generator.Interfaces;
 
 namespace Reqnroll.Generator

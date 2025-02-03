@@ -1,4 +1,3 @@
-using System;
 using CucumberExpressions;
 using Reqnroll.Bindings.Reflection;
 

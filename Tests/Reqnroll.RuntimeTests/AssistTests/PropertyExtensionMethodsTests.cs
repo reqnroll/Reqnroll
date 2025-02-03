@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 using FluentAssertions;
 using Reqnroll.Assist;

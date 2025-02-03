@@ -1,13 +1,11 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using Reqnroll.BoDi;
 using FluentAssertions;
 using Xunit;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Configuration;
 using Reqnroll.Configuration.JsonConfig;
-using Reqnroll.Plugins;
 
 namespace Reqnroll.RuntimeTests.Configuration
 {

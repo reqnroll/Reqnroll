@@ -2,7 +2,6 @@ using FluentAssertions;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
-using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;

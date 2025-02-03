@@ -1,5 +1,3 @@
-using Reqnroll.Generator.Configuration;
-
 namespace Reqnroll.Generator.Project
 {
     public interface IReqnrollProjectReader

@@ -20,8 +20,9 @@ public class CopyFolderCommandBuilder : CommandBuilder
         return value.Replace(_replaceFrom, _replaceTo);
     }
 
-    private void CopyDirectoryRecursively(DirectoryInfo source, DirectoryInfo target)
+    private int CopyDirectoryRecursively(DirectoryInfo source, DirectoryInfo target)
     {
+        int copiedFiles = 0;
         Directory.CreateDirectory(target.FullName);
 
         // Copy each file into the new directory.
@@ -30,15 +31,16 @@ public class CopyFolderCommandBuilder : CommandBuilder
             string fiName = ReplaceName(fi.Name);
             _outputWriter.WriteLine(@"Copying to {0}\{1}", target.FullName, fiName);
             fi.CopyTo(Path.Combine(target.FullName, fiName), true);
+            copiedFiles++;
         }
 
         // Copy each subdirectory using recursion.
         foreach (DirectoryInfo diSourceSubDir in source.GetDirectories())
         {
-            DirectoryInfo nextTargetSubDir =
-                target.CreateSubdirectory(diSourceSubDir.Name);
-            CopyDirectoryRecursively(diSourceSubDir, nextTargetSubDir);
+            DirectoryInfo nextTargetSubDir = target.CreateSubdirectory(diSourceSubDir.Name);
+            copiedFiles += CopyDirectoryRecursively(diSourceSubDir, nextTargetSubDir);
         }
+        return copiedFiles;
     }
 
     public override CommandResult Execute(Func<Exception, Exception> exceptionFunction)
@@ -50,10 +52,12 @@ public class CopyFolderCommandBuilder : CommandBuilder
         {
             _outputWriter.WriteLine($"Copying '{sourceFolder}' to '{targetFolder}'...");
 
-            CopyDirectoryRecursively(new DirectoryInfo(sourceFolder), new DirectoryInfo(targetFolder));
+            var copiedFiles = CopyDirectoryRecursively(new DirectoryInfo(sourceFolder), new DirectoryInfo(targetFolder));
 
-            _outputWriter.WriteLine("Copying done.");
+            _outputWriter.WriteLine($"Copying done, {copiedFiles} files.");
 
+            if (copiedFiles == 0)
+                return new CommandResult(1, $"No file copied from '{sourceFolder}' to '{targetFolder}'.");
             return new CommandResult(0, $"Copied '{sourceFolder}' to '{targetFolder}'.");
         }
         catch (Exception ex)

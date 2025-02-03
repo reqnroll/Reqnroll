@@ -1,13 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Reqnroll.BoDi;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-using Reqnroll.Generator;
 using Reqnroll.Generator.Interfaces;
-using Reqnroll.Generator.Project;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
