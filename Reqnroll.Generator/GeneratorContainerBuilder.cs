@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +9,6 @@ using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.Plugins;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Plugins;
-using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Generator

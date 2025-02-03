@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 using FluentAssertions;
 using Reqnroll.Plugins;

@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 using Xunit;
 

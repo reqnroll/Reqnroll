@@ -1,5 +1,4 @@
 using Xunit;
-using Reqnroll.Generator;
 using Reqnroll.Generator.UnitTestConverter;
 using FluentAssertions;
 using Reqnroll.Configuration;

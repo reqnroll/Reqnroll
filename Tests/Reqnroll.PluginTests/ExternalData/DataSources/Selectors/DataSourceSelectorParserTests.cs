@@ -1,4 +1,3 @@
-using System;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources.Selectors;
 using Xunit;
 

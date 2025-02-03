@@ -1,11 +1,9 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
 using FluentAssertions;
 using Xunit;
-using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 
 namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods

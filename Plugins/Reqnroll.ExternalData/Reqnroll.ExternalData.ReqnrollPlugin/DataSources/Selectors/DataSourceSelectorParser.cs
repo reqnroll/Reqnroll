@@ -1,5 +1,3 @@
-using System;
-
 namespace Reqnroll.ExternalData.ReqnrollPlugin.DataSources.Selectors
 {
     public class DataSourceSelectorParser
