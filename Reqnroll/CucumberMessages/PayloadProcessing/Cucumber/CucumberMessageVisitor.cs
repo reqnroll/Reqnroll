@@ -178,6 +178,12 @@ public class CucumberMessageVisitor
             case TestRunFinished testRunFinished:
                 visitor.Visit(testRunFinished);
                 break;
+            case TestRunHookStarted testRunHookStarted:
+                visitor.Visit(testRunHookStarted);
+                break;
+            case TestRunHookFinished testRunHookFinished:
+                visitor.Visit(testRunHookFinished);
+                break;
 
             default:
                 throw new ArgumentException($"Unsupported message type:{message.GetType().Name}", nameof(message));

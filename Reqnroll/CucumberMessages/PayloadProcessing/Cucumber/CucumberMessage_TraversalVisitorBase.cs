@@ -496,6 +496,21 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             OnVisited(testRunFinished);
         }
 
+        public virtual void Visit(TestRunHookStarted testRunHookStarted)
+        {
+            OnVisiting(testRunHookStarted);
+            Accept(testRunHookStarted.Timestamp);
+            OnVisited(testRunHookStarted);
+        }
+
+        public void Visit(TestRunHookFinished testRunHookFinished)
+        {
+            OnVisiting(testRunHookFinished);
+            Accept(testRunHookFinished.Result);
+            Accept(testRunHookFinished.Timestamp);
+            OnVisited(testRunHookFinished);
+        }
+
         public virtual void OnVisiting(Attachment attachment)
         { }
 
@@ -824,6 +839,18 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         { }
 
         public virtual void OnVisited(TestRunFinished testRunFinished)
+        { }
+
+        public virtual void OnVisiting(TestRunHookStarted testRunHookStarted)
+        { }
+
+        public virtual void OnVisited(TestRunHookStarted testRunHookStarted)
+        { }
+
+        public virtual void OnVisiting(TestRunHookFinished testRunHookFinished)
+        { }
+
+        public virtual void OnVisited(TestRunHookFinished testRunHookFinished)
         { }
     }
 }

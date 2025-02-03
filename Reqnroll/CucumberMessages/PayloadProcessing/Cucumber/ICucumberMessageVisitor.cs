@@ -63,4 +63,6 @@ public interface ICucumberMessageVisitor
     void Visit(StepMatchArgumentsList stepMatchArgumentsList);
     void Visit(TestRunStarted testRunStarted);
     void Visit(TestRunFinished testRunFinished);
+    void Visit(TestRunHookStarted testRunHookStarted);
+    void Visit(TestRunHookFinished testRunHookFinished);
 }

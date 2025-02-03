@@ -21,7 +21,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                                                             typeof(Tag),
                                                             typeof(TestCase),
                                                             typeof(TestCaseStarted),
-                                                            typeof(TestStep)
+                                                            typeof(TestStep),
+                                                            typeof(TestRunHookStarted)
         };
 
         public static bool HasId(this object element)
@@ -47,6 +48,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 TestCase tc => tc.Id,
                 TestCaseStarted tcs => tcs.Id,
                 TestStep ts => ts.Id,
+                TestRunHookStarted trhs => trhs.Id,
                 _ => throw new ArgumentException($"Message of type: {message.GetType()} has no ID")
             };
         }
@@ -68,7 +70,9 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             typeof(TestRunStarted),
             typeof(TestStepFinished),
             typeof(TestStepStarted),
-            typeof(UndefinedParameterType)
+            typeof(UndefinedParameterType),
+            typeof(TestRunHookStarted),
+            typeof(TestRunHookFinished)
         };
         public static object Content(this Envelope envelope)
         {
@@ -90,6 +94,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             else if (envelope.TestStepFinished != null) { result = envelope.TestStepFinished; }
             else if (envelope.TestStepStarted != null) { result = envelope.TestStepStarted; }
             else if (envelope.UndefinedParameterType != null) { result = envelope.UndefinedParameterType; }
+            else if (envelope.TestRunHookStarted != null) { result = envelope.TestRunHookStarted; }
+            else if (envelope.TestRunHookFinished != null) { result = envelope.TestRunHookFinished; }
             return result;
         }
 
@@ -102,6 +108,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             else if (envelope.TestRunStarted != null) { result = envelope.TestRunStarted.Timestamp; }
             else if (envelope.TestStepFinished != null) { result = envelope.TestStepFinished.Timestamp; }
             else if (envelope.TestStepStarted != null) { result = envelope.TestStepStarted.Timestamp; }
+            else if (envelope.TestRunHookStarted != null) { result = envelope.TestRunHookStarted.Timestamp; }
+            else if (envelope.TestRunHookFinished != null) { result = envelope.TestRunHookFinished.Timestamp; }
             else throw new ArgumentException($"Envelope of type: {envelope.Content().GetType()} does not contain a timestamp");
             return result;
 

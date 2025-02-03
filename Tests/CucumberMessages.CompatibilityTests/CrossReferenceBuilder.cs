@@ -300,5 +300,17 @@ namespace CucumberMessages.Tests
             buildCrossReferences(undefinedParameterType);
             base.OnVisiting(undefinedParameterType);
         }
+
+        public override void OnVisiting(TestRunHookStarted testRunHookStarted)
+        {
+            buildCrossReferences(testRunHookStarted);
+            base.OnVisiting(testRunHookStarted);
+        }
+
+        public override void OnVisiting(TestRunHookFinished testRunHookFinished)
+        {
+            buildCrossReferences(testRunHookFinished);
+            base.OnVisiting(testRunHookFinished);
+        }
     }
 }
