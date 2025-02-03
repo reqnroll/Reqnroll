@@ -172,7 +172,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
         {
             // At this point we only care about hooks that wrap scenarios or steps; Before/AfterTestRun hooks were processed earlier by the Publisher
-            if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature)
+            if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun)
                 return;
             var hookStepStateTracker = new HookStepTracker(this, Current_Execution);
             hookStepStateTracker.ProcessEvent(hookBindingStartedEvent);
@@ -183,7 +183,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
         {
             // At this point we only care about hooks that wrap scenarios or steps; TestRunHooks were processed earlier by the Publisher
-            if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature)
+            if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun)
                 return;
             var step = Current_Execution.CurrentStep as HookStepTracker;
             step.ProcessEvent(hookBindingFinishedEvent);

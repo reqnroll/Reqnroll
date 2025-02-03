@@ -40,8 +40,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 
         internal static TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker)
         {
-            //TODO: Incomplete imlementation; Before/After TestRun/Feature needs more work to capture result as a TestStepResult object.
-            return new TestRunHookFinished(hookTracker.TestRunHookId, null, Converters.ToTimestamp(hookTracker.TimeStamp));
+            return new TestRunHookFinished(hookTracker.TestRunHookId, ToTestStepResult(hookTracker), Converters.ToTimestamp(hookTracker.TimeStamp));
         }
 
         internal static TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
@@ -285,7 +284,15 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 ToTestStepResultStatus(stepState.Status),
                 ToException(stepState.Exception)
                 );
+        }
 
+        private static TestStepResult ToTestStepResult(TestRunHookTracker hookTracker)
+        {
+            return new TestStepResult(
+                Converters.ToDuration(hookTracker.Duration),
+                "",
+                ToTestStepResultStatus(hookTracker.Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError),
+                ToException(hookTracker.Exception));
         }
 
         private static Io.Cucumber.Messages.Types.Exception ToException(System.Exception exception)

@@ -390,7 +390,8 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (!Enabled)
                 return;
 
-            if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun)
+            if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun
+                || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature)
             {
                 string hookRunStartedId = SharedIDGenerator.GetNewId();
                 var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
@@ -418,11 +419,14 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (!Enabled)
                 return;
 
-            if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun)
+            if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun
+                || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature)
             {
                 var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
                 if (!TestRunHookTrackers.TryGetValue(signature, out var hookTracker))
                     return;
+                hookTracker.Duration = hookBindingFinishedEvent.Duration;
+                hookTracker.Exception = hookBindingFinishedEvent.HookException;
                 await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testRunHook", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunHookFinished(hookTracker)) });
                 return;
             }

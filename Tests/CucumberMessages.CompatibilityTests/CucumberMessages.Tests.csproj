@@ -28,6 +28,7 @@
     <Compile Remove="Samples\rules\rules.cs" />
     <Compile Remove="Samples\skipped\skipped.cs" />
     <Compile Remove="Samples\stack-traces\stack_traces.cs" />
+    <Compile Remove="Samples\test-run-hooks\test_run_hooks.cs" />
     <Compile Remove="Samples\undefined\undefined.cs" />
     <Compile Remove="Samples\unknown-parameter-type\unknown_parameter_type.cs" />
   </ItemGroup>
@@ -84,6 +85,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Samples\empty\empty.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Samples\test-run-hooks\test_run_hooks.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="Samples\retry-NUnitRetry\retry_NUnitRetry.cs" />
@@ -151,6 +155,8 @@
     <EmbeddedResource Include="Samples\stack-traces\stack_traces.cs" />
     <EmbeddedResource Include="Samples\stack-traces\stack_traces.feature" />
     <Content Include="Samples\stack-traces\stack_traces.feature.ndjson" />
+    <EmbeddedResource Include="Samples\test-run-hooks\test_run_hooks.cs" />
+    <EmbeddedResource Include="Samples\test-run-hooks\test_run_hooks.feature" />
     <EmbeddedResource Include="Samples\undefined\undefined.cs" />
     <EmbeddedResource Include="Samples\undefined\undefined.feature" />
     <Content Include="Samples\undefined\undefined.feature.ndjson">
