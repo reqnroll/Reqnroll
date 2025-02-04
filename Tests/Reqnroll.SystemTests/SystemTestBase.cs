@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,7 @@ public abstract class SystemTestBase
     protected CompilationDriver _compilationDriver = null!;
     protected BindingsDriver _bindingDriver = null!;
     protected TestProjectFolders _testProjectFolders = null!;
+    protected JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver = null!;
 
     protected int _preparedTests = 0;
 
@@ -86,6 +88,7 @@ public abstract class SystemTestBase
         _compilationDriver = GetServiceSafe<CompilationDriver>();
         _testProjectFolders = GetServiceSafe<TestProjectFolders>();
         _bindingDriver = GetServiceSafe<BindingsDriver>();
+        _jsonConfigurationLoaderDriver = GetServiceSafe<JsonConfigurationLoaderDriver>();
     }
 
 
@@ -101,9 +104,9 @@ public abstract class SystemTestBase
             _folderCleaner.CleanSolutionFolder();
     }
 
-    protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null)
+    protected void AddFeatureFileFromResource(string fileName, string? prefixOverride = null, Assembly? assembly = null, int? preparedTests = null)
     {
-        var featureFileContent = _testFileManager.GetTestFileContent(fileName);
+        var featureFileContent = _testFileManager.GetTestFileContent(fileName, prefixOverride, assembly);
         AddFeatureFile(featureFileContent, preparedTests);
     }
 
@@ -255,5 +258,10 @@ public abstract class SystemTestBase
     protected void AddBindingClass(string content)
     {
         _projectsDriver.AddBindingClass(content);
+    }
+
+    protected void AddJsonConfigFileContent(string reqnrollConfigContent)
+    {
+        _jsonConfigurationLoaderDriver.AddReqnrollJson(reqnrollConfigContent);
     }
 }

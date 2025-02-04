@@ -117,7 +117,7 @@ namespace Reqnroll.Infrastructure
 
             _testRunnerStartExecuted = true;
 
-            _testThreadExecutionEventPublisher.PublishEvent(new TestRunStartedEvent());
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new TestRunStartedEvent());
 
             await FireEventsAsync(HookType.BeforeTestRun);
         }
@@ -136,14 +136,14 @@ namespace Reqnroll.Infrastructure
 
             await FireEventsAsync(HookType.AfterTestRun);
             
-            _testThreadExecutionEventPublisher.PublishEvent(new TestRunFinishedEvent());
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new TestRunFinishedEvent());
         }
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
         {
             _contextManager.InitializeFeatureContext(featureInfo);
 
-            _testThreadExecutionEventPublisher.PublishEvent(new FeatureStartedEvent(FeatureContext));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new FeatureStartedEvent(FeatureContext));
 
             await FireEventsAsync(HookType.BeforeFeature);
         }
@@ -159,7 +159,7 @@ namespace Reqnroll.Infrastructure
                 _testTracer.TraceDuration(duration, "Feature: " + FeatureContext.FeatureInfo.Title);
             }
 
-            _testThreadExecutionEventPublisher.PublishEvent(new FeatureFinishedEvent(FeatureContext));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new FeatureFinishedEvent(FeatureContext));
 
             _contextManager.CleanupFeatureContext();
         }
@@ -171,7 +171,7 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnScenarioStartAsync()
         {
-            _testThreadExecutionEventPublisher.PublishEvent(new ScenarioStartedEvent(FeatureContext, ScenarioContext));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new ScenarioStartedEvent(FeatureContext, ScenarioContext));
 
             try
             {
@@ -231,10 +231,11 @@ namespace Reqnroll.Infrastructure
                 {
                     await FireScenarioEventsAsync(HookType.AfterScenario);
                 }
-                _testThreadExecutionEventPublisher.PublishEvent(new ScenarioFinishedEvent(FeatureContext, ScenarioContext));
             }
             finally
             {
+                await _testThreadExecutionEventPublisher.PublishEventAsync(new ScenarioFinishedEvent(FeatureContext, ScenarioContext));
+
                 _contextManager.CleanupScenarioContext();
             }
         }
@@ -303,7 +304,7 @@ namespace Reqnroll.Infrastructure
 
         private async Task FireEventsAsync(HookType hookType)
         {
-            _testThreadExecutionEventPublisher.PublishEvent(new HookStartedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new HookStartedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext));
             var stepContext = _contextManager.GetStepContext();
 
             var matchingHooks = _bindingRegistry.GetHooks(hookType)
@@ -335,7 +336,7 @@ namespace Reqnroll.Infrastructure
             //A plugin-hook should not throw an exception under normal circumstances, exceptions are not handled/caught here
             FireRuntimePluginTestExecutionLifecycleEvents(hookType);
 
-            _testThreadExecutionEventPublisher.PublishEvent(new HookFinishedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext, hookException));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new HookFinishedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext, hookException));
 
             //Note: the (user-)hook exception (if any) will be thrown after the plugin hooks executed to fail the test with the right error
             if (hookException != null) ExceptionDispatchInfo.Capture(hookException).Throw();
@@ -353,16 +354,24 @@ namespace Reqnroll.Infrastructure
             var currentContainer = GetHookContainer(hookType);
             var arguments = ResolveArguments(hookBinding, currentContainer);
 
-            _testThreadExecutionEventPublisher.PublishEvent(new HookBindingStartedEvent(hookBinding));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new HookBindingStartedEvent(hookBinding, _contextManager));
             var durationHolder = new DurationHolder();
-
+            Exception exceptionthrown = null;
             try
             {
                 await invoker.InvokeBindingAsync(hookBinding, _contextManager, arguments, _testTracer, durationHolder);
             }
+            catch (Exception exception)
+            {
+                // This exception is caught in order to be able to inform consumers of the HookBindingFinishedEvent;
+                // This is used by CucumberMessages to include information about the exception in the hook TestStepResult
+                // The throw; statement ensures that the exception is propagated up to the FireEventsAsync method
+                exceptionthrown = exception;
+                throw;
+            }
             finally
             {
-                _testThreadExecutionEventPublisher.PublishEvent(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration));
+                await _testThreadExecutionEventPublisher.PublishEventAsync(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager, exceptionthrown));
             }
         }
 
@@ -549,7 +558,7 @@ namespace Reqnroll.Infrastructure
 
         protected virtual async Task ExecuteStepMatchAsync(BindingMatch match, object[] arguments, DurationHolder durationHolder)
         {
-            _testThreadExecutionEventPublisher.PublishEvent(new StepBindingStartedEvent(match.StepBinding));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new StepBindingStartedEvent(match.StepBinding));
             
             try
             {
@@ -557,7 +566,7 @@ namespace Reqnroll.Infrastructure
             }
             finally
             {
-                _testThreadExecutionEventPublisher.PublishEvent(new StepBindingFinishedEvent(match.StepBinding, durationHolder.Duration));
+                await _testThreadExecutionEventPublisher.PublishEventAsync(new StepBindingFinishedEvent(match.StepBinding, durationHolder.Duration));
             }
         }
 
@@ -618,8 +627,11 @@ namespace Reqnroll.Infrastructure
             StepDefinitionType stepDefinitionType = stepDefinitionKeyword == StepDefinitionKeyword.And || stepDefinitionKeyword == StepDefinitionKeyword.But
                 ? GetCurrentBindingType()
                 : (StepDefinitionType) stepDefinitionKeyword;
-            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg));
-            _testThreadExecutionEventPublisher.PublishEvent(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
+            var stepSequenceIdentifiers = ScenarioContext.ScenarioInfo.PickleStepSequence;
+            var pickleStepId = stepSequenceIdentifiers?.CurrentPickleStepId ?? "";
+
+            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg, pickleStepId));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
             try
             {
@@ -628,7 +640,8 @@ namespace Reqnroll.Infrastructure
             }
             finally
             {
-                _testThreadExecutionEventPublisher.PublishEvent(new StepFinishedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
+                await _testThreadExecutionEventPublisher.PublishEventAsync(new StepFinishedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
+                stepSequenceIdentifiers?.NextStep();
                 _contextManager.CleanupStepContext();
             }
         }
