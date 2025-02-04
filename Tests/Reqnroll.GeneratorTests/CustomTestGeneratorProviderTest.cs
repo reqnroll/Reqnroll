@@ -11,6 +11,7 @@ using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
+using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {
