@@ -221,7 +221,7 @@ namespace Reqnroll.Events
     {
         public string Text { get; }
         public FeatureInfo FeatureInfo { get; }
-        public string ScenarioName { get; }
+        public ScenarioInfo ScenarioInfo { get; }
         public string StepText { get; }
 
         [Obsolete("Use OutputAddedEvent(string, FeatureInfo) instead")]
@@ -230,10 +230,11 @@ namespace Reqnroll.Events
             Text = text;
         }
 
-        public OutputAddedEvent(string text, FeatureInfo featureInfo)
+        public OutputAddedEvent(string text, FeatureInfo featureInfo, ScenarioInfo scenarioInfo)
         {
             Text = text;
             FeatureInfo = featureInfo;
+            ScenarioInfo = scenarioInfo;
         }
     }
 
@@ -241,6 +242,7 @@ namespace Reqnroll.Events
     {
         public string FilePath { get; }
         public FeatureInfo FeatureInfo { get; }
+        public ScenarioInfo ScenarioInfo { get; }
 
         [Obsolete("Use AttachmentAddedEvent(string, FeatureInfo) instead")]
         public AttachmentAddedEvent(string filePath)
@@ -248,10 +250,11 @@ namespace Reqnroll.Events
             FilePath = filePath;
         }
 
-        public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo)
+        public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo, ScenarioInfo scenarioInfo)
         {
             FilePath = filePath;
             FeatureInfo = featureInfo;
+            ScenarioInfo = scenarioInfo;
         }
     }
 }

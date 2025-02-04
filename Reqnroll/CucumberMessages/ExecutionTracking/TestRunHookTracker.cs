@@ -22,7 +22,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public string TestRunHookId { get; }
         public string TestRunHook_HookId { get; }
         public string TestRunID { get; }
-        public DateTime TimeStamp { get; }
+        public DateTime TimeStamp { get; set; }
         public TimeSpan Duration { get; internal set; }
         public Exception Exception { get; internal set; }
     }

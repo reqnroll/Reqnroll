@@ -229,10 +229,18 @@ namespace CucumberMessages.Tests
                     TestStepFinished finished => finished.TestCaseStartedId,
                     TestCaseFinished tcFin => tcFin.TestCaseStartedId,
                     Attachment att => att.TestCaseStartedId,
+                    TestRunHookStarted trhs => null,
+                    TestRunHookFinished trhf => null,
                     _ => throw new ApplicationException("Unexpected Envelope type")
                 };
-                var testCaseId = testCaseStartedToTestCaseMap[testCaseStartedId];
-                testCases[testCaseId].executions[testCaseStartedId].related.Add(current);
+                // attachments created by Before/After TestRun or Feature don't have a value for TestCaseStartedId, so don't attempt to add them to Test execution
+                if (!String.IsNullOrEmpty(testCaseStartedId))
+                {
+                    var testCaseId = testCaseStartedToTestCaseMap[testCaseStartedId];
+                    testCases[testCaseId].executions[testCaseStartedId].related.Add(current);
+                }
+                else
+                    result.Add(current);
                 index++;
             }
 

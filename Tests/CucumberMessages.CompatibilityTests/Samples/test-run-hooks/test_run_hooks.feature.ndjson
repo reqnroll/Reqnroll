@@ -7,13 +7,14 @@
 {"gherkinDocument":{"uri":"FeatureFile0b003a29d88f4b6eaedc514a1bc8e499.feature","feature":{"location":{"line":1,"column":1},"tags":[],"language":"en-US","keyword":"Feature","name":"Test Run Hooks","description":"  Test Run Hooks are special steps that run before or after a Feature.","children":[{"scenario":{"location":{"line":4,"column":3},"tags":[],"keyword":"Scenario","name":"No tags and a passed step","description":"","steps":[{"location":{"line":5,"column":5},"keyword":"When ","keywordType":"Action","text":"a step passes","id":"5"}],"examples":[],"id":"6"}}]},"comments":[]}}
 {"pickle":{"id":"8","uri":"FeatureFile0b003a29d88f4b6eaedc514a1bc8e499.feature","name":"No tags and a passed step","language":"en-US","steps":[{"astNodeIds":["5"],"id":"7","type":"Action","text":"a step passes"}],"tags":[],"astNodeIds":["6"]}}
 {"testRunHookStarted":{"id":"9","testRunStartedId":"1","hookId":"3","timestamp":{"seconds":1738594360,"nanos":762458600}}}
+{"attachment":{"body":"Before Feature Hook Executed.","contentEncoding":"IDENTITY","mediaType":"text/x.cucumber.log+plain","testRunStartedId":"1"}}
 {"testRunHookFinished":{"testRunHookStartedId":"9","result":{"duration":{"seconds":0,"nanos":2794800},"message":"","status":"PASSED"},"timestamp":{"seconds":1738594360,"nanos":762458600}}}
-{"testRunHookStarted":{"id":"13","testRunStartedId":"1","hookId":"4","timestamp":{"seconds":1738594360,"nanos":805301500}}}
-{"testRunHookFinished":{"testRunHookStartedId":"13","result":{"duration":{"seconds":0,"nanos":556400},"message":"","status":"PASSED"},"timestamp":{"seconds":1738594360,"nanos":805301500}}}
 {"testCase":{"id":"10","pickleId":"8","testSteps":[{"id":"12","pickleStepId":"7","stepDefinitionIds":["2"],"stepMatchArgumentsLists":[{"stepMatchArguments":[]}]}],"testRunStartedId":"1"}}
 {"testCaseStarted":{"attempt":0,"id":"11","testCaseId":"10","timestamp":{"seconds":1738594360,"nanos":774257400}}}
 {"testStepStarted":{"testCaseStartedId":"11","testStepId":"12","timestamp":{"seconds":1738594360,"nanos":777804200}}}
-{"attachment":{"body":"After Feature Hook Executed.","contentEncoding":"IDENTITY","mediaType":"text/x.cucumber.log+plain","testCaseStartedId":"11","testStepId":"12","testRunStartedId":"1"}}
 {"testStepFinished":{"testCaseStartedId":"11","testStepId":"12","testStepResult":{"duration":{"seconds":0,"nanos":12698800},"message":"","status":"PASSED"},"timestamp":{"seconds":1738594360,"nanos":790503000}}}
 {"testCaseFinished":{"testCaseStartedId":"11","timestamp":{"seconds":1738594360,"nanos":794229300},"willBeRetried":false}}
+{"testRunHookStarted":{"id":"13","testRunStartedId":"1","hookId":"4","timestamp":{"seconds":1738594360,"nanos":805301500}}}
+{"attachment":{"body":"After Feature Hook Executed.","contentEncoding":"IDENTITY","mediaType":"text/x.cucumber.log+plain","testRunStartedId":"1"}}
+{"testRunHookFinished":{"testRunHookStartedId":"13","result":{"duration":{"seconds":0,"nanos":556400},"message":"","status":"PASSED"},"timestamp":{"seconds":1738594360,"nanos":805301500}}}
 {"testRunFinished":{"success":true,"timestamp":{"seconds":1738594360,"nanos":816992300},"testRunStartedId":"1"}}
