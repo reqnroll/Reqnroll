@@ -1,7 +1,6 @@
 using System;
 using Xunit;
 using FluentAssertions;
-using Reqnroll.Assist;
 
 namespace Reqnroll.RuntimeTests.AssistTests.SituationalTests
 {

@@ -1,4 +1,3 @@
-using System;
 using Gherkin.Ast;
 using Reqnroll.Parser;
 

@@ -3,7 +3,6 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using Reqnroll.Verify.ReqnrollPlugin;

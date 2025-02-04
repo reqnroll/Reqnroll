@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using Moq;
 using Reqnroll.Configuration;

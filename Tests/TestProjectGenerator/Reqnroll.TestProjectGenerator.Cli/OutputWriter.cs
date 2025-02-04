@@ -1,5 +1,4 @@
 using System;
-using Reqnroll.TestProjectGenerator;
 
 namespace Reqnroll.TestProjectGenerator.Cli
 {

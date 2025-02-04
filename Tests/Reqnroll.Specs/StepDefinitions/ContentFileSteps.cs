@@ -1,4 +1,3 @@
-using System.IO;
 using Reqnroll.Utils;
 using Reqnroll.TestProjectGenerator.Driver;
 

@@ -8,14 +8,9 @@ using Xunit;
 using Reqnroll.Configuration;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
-using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Generation;
-using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
-using Reqnroll.Utils;
-using System.Diagnostics;
-using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {
