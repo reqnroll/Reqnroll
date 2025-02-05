@@ -11,6 +11,7 @@ namespace Reqnroll.SystemTests.Generation;
 [TestCategory("Generation")]
 public abstract class GenerationTestBase : SystemTestBase
 {
+    [TestCategory("focus")]
     [TestMethod]
     public void GeneratorAllIn_sample_can_be_handled()
     {
