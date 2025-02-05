@@ -1,6 +1,4 @@
-using System.Collections.Generic;
 using System.Reflection;
-using Reqnroll.Configuration;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
 {

@@ -3,5 +3,5 @@
 namespace Reqnroll.Plugins;
 public interface IPluginAssemblyLoader
 {
-    Assembly LoadAssembly(string assemblyName);
+    Assembly LoadAssembly(string assemblyPath);
 }

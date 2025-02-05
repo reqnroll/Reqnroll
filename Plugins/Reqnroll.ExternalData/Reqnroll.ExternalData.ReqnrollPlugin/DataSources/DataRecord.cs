@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources.Selectors;
 

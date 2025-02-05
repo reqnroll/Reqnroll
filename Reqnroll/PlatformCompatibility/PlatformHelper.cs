@@ -9,6 +9,6 @@ public static class PlatformHelper
         if (PlatformInformation.IsDotNetFramework)
             container.RegisterTypeAs<DotNetFrameworkPluginAssemblyLoader, IPluginAssemblyLoader>();
         else
-            container.RegisterTypeAs<PluginAssemblyLoader, IPluginAssemblyLoader>();
+            container.RegisterTypeAs<DotNetCorePluginAssemblyLoader, IPluginAssemblyLoader>();
     }
 }

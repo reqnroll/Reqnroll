@@ -4,10 +4,10 @@ using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
 using System.Linq;
 
-namespace Reqnroll.SystemTests.Plugins;
+namespace Reqnroll.SystemTests.ExternalPlugins;
 
 [TestClass]
-public class XRetryPluginTest : SystemTestBase
+public class XRetryPluginTest : ExternalPluginsTestBase
 {
     protected override void TestInitialize()
     {
@@ -19,8 +19,8 @@ public class XRetryPluginTest : SystemTestBase
     [TestMethod]
     public void XRetry_should_work_with_Reqnroll()
     {
-        AddFeatureFileFromResource("XRetryPlugin/XRetryPluginTestFeature.feature");
-        AddBindingClassFromResource("XRetryPlugin/XRetryPluginTestStepDefinitions.cs");
+        AddFeatureFileFromResource("XRetryPlugin/XRetryPluginTestFeature.feature", resourceGroup: "ExternalPlugins");
+        AddBindingClassFromResource("XRetryPlugin/XRetryPluginTestStepDefinitions.cs", resourceGroup: "ExternalPlugins");
 
         ExecuteTests();
 
@@ -31,7 +31,7 @@ public class XRetryPluginTest : SystemTestBase
     }
 
     [TestMethod]
-    [TestCategory("MsBuild")] 
+    [TestCategory("MsBuild")]
     public void XRetry_should_work_with_Reqnroll_on_DotNetFramework_generation()
     {
         // compiling with MsBuild forces the generation to run with .NET Framework

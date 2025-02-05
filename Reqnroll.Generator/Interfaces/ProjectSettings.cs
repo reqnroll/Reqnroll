@@ -1,5 +1,4 @@
 using System;
-using Reqnroll.Configuration;
 
 namespace Reqnroll.Generator.Interfaces
 {

@@ -1,6 +1,4 @@
 using System;
-using Reqnroll.BoDi;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
 

@@ -11,7 +11,7 @@ private readonly IReqnrollOutputHelper _reqnrollOutputHelper;
 
 public CalculatorStepDefinitions(IReqnrollOutputHelper outputHelper)
 {
-    _outputHelper = outputHelper;
+    _reqnrollOutputHelper = outputHelper;
 }
 ```
 

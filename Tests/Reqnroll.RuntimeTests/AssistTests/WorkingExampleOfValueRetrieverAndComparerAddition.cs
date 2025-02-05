@@ -2,8 +2,6 @@ using System;
 using System.Linq;
 using Xunit;
 using Reqnroll.Assist;
-using Reqnroll.Assist.ValueComparers;
-using Reqnroll.Assist.ValueRetrievers;
 using System.Collections.Generic;
 using FluentAssertions;
 

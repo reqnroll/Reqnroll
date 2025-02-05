@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Reqnroll.TestProjectGenerator.Driver
 {
     public class JsonConfigurationLoaderDriver

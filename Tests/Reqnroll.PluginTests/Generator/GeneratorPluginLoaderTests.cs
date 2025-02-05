@@ -12,7 +12,7 @@ namespace Reqnroll.PluginTests.Generator
         public void LoadPlugin_LoadXUnitSuccessfully()
         {
             //ARRANGE
-            var generatorPluginLoader = new GeneratorPluginLoader(new PluginAssemblyLoader());
+            var generatorPluginLoader = new GeneratorPluginLoader(new DotNetCorePluginAssemblyLoader());
 
             //ACT
             var pluginDescriptor = new PluginDescriptor("Reqnroll.xUnit.Generator.ReqnrollPlugin", "Reqnroll.xUnit.Generator.ReqnrollPlugin.dll", PluginType.Generator, "");

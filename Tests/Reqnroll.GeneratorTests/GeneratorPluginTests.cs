@@ -6,7 +6,6 @@ using Reqnroll.Generator;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Plugins;
 using Reqnroll.UnitTestProvider;
-using DefaultDependencyProvider = Reqnroll.Generator.DefaultDependencyProvider;
 
 namespace Reqnroll.GeneratorTests
 {
