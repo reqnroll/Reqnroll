@@ -8,8 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Resources\**\*.cs" />
-    <EmbeddedResource Include="Resources\**\*" />
+    <Compile Remove="**\Resources\**\*.cs" />
+    <EmbeddedResource Include="**\Resources\**\*" />
   </ItemGroup>
 
   <ItemGroup>

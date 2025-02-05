@@ -1,0 +1,12 @@
+﻿{
+  "$schema": "http://schemas.specsolutions.eu/specsync4azuredevops-config-latest.json",
+  "remote": {
+    "projectUrl": "https://dev.azure.com/org/project"
+  },
+  "synchronization": {
+    "automation": {
+      "enabled": true,
+      "testExecutionStrategy": "testSuiteBasedExecutionWithScenarioOutlineWrappers"
+    }
+  }
+}
