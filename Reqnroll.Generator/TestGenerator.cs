@@ -1,7 +1,6 @@
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -9,12 +8,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
-using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Parser;
 using Reqnroll.Tracing;
-using Reqnroll.Utils;
 
 namespace Reqnroll.Generator
 {

@@ -1,6 +1,5 @@
 using Reqnroll.Generator.Plugins;
 using Reqnroll.Infrastructure;
-using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 
 [assembly:GeneratorPlugin(typeof(Reqnroll.NUnit.Generator.ReqnrollPlugin.GeneratorPlugin))]

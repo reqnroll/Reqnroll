@@ -1,13 +1,11 @@
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using Moq;
 using Xunit;
 using Reqnroll.Generator;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Interfaces;
-using Reqnroll.Utils;
 using FluentAssertions;
 using Reqnroll.GeneratorTests.Helper;
 

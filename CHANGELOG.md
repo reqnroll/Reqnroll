@@ -6,11 +6,13 @@
 * Improve code-behind feature file compilation speed (#336)
 * Improve parameter type naming for generic types (#343)
 * Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
+* Update behavior of `ObjectContainer.IsRegistered()` to check base container for registrations, to match `Resolve()` behavior (#367)
 
 ## Bug fixes:
 * MsTest: Only use TestContext for output and not Console.WriteLine (#368) 
 
 * Fix: Replace deprecated dependency `Specflow.Internal.Json` with `System.Text.Json`. The dependency was used for laoding `reqnroll.json`, for Visual Studio integration and for telemetry. (#373)
+* Fix: Support loading plugin dependencies from .deps.json on .NET Framework and Visual Studio MSBuild (#408)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron, @olegKoshmeliuk
 

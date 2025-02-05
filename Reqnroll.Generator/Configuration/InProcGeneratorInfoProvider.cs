@@ -1,5 +1,3 @@
-using System;
-
 namespace Reqnroll.Generator.Configuration
 {
     public class InProcGeneratorInfoProvider : IGeneratorInfoProvider

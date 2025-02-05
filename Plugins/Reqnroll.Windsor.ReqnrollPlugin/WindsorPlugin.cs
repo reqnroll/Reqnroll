@@ -2,7 +2,6 @@ using Reqnroll.BoDi;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
 using Reqnroll.Windsor;
-using Reqnroll;
 using Reqnroll.Infrastructure;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;

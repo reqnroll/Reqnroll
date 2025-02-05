@@ -41,17 +41,35 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
     public override CommandResult Execute(Func<Exception, Exception> exceptionFunction)
     {
         var cachePath = CalculateCacheTargetPath();
+        var cacheContainerPath = Path.Combine(cachePath, "..");
 
         CommandResult originalResult = null;
-        if (!Directory.Exists(cachePath))
-        {
-            LockObjects.TryAdd(cachePath, new object());
+        if (!Directory.Exists(cacheContainerPath))
+            originalResult = ExecuteOriginal(false);
 
-            lock (LockObjects[cachePath])
+        var copyFolderCommandBuilder = new CopyFolderCommandBuilder(_outputWriter, cachePath, _targetPath, TemplateName, _nameToReplace);
+        var copyFolderResult = copyFolderCommandBuilder.Execute(exceptionFunction);
+        if (copyFolderResult.ExitCode != 0)
+        {
+            // the files cleaned up by the OS, so we need to re-run the original command
+            _outputWriter.WriteLine("Retry generating cached folder because of copy error.");
+            originalResult = ExecuteOriginal(true);
+            copyFolderResult = copyFolderCommandBuilder.Execute(exceptionFunction);
+        }
+
+        return originalResult == null ? copyFolderResult : 
+            new CommandResult(originalResult.ExitCode, originalResult.ConsoleOutput + Environment.NewLine + copyFolderResult.ConsoleOutput);
+
+        CommandResult ExecuteOriginal(bool force)
+        {
+            LockObjects.TryAdd(cacheContainerPath, new object());
+
+            lock (LockObjects[cacheContainerPath])
             {
-                if (!Directory.Exists(cachePath))
+                if (force || !Directory.Exists(cacheContainerPath))
                 {
                     var tempPath = CalculateCacheTargetPath($"-tmp{Guid.NewGuid():N}");
+                    var tempContainerPath = Path.GetFullPath(Path.Combine(tempPath, ".."));
                     var arguments = ArgumentsFormat.Replace(_targetPath, tempPath);
                     if (_nameToReplace != null) arguments = arguments.Replace(_nameToReplace, TemplateName);
                     var commandBuilder = new CommandBuilder(_outputWriter, ExecutablePath, arguments, WorkingDirectory);
@@ -59,8 +77,15 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
                     originalResult = commandBuilder.Execute(exceptionFunction);
                     try
                     {
-                        if (!Directory.Exists(cachePath))
-                            Directory.Move(Path.Combine(tempPath, ".."), Path.Combine(cachePath, ".."));
+                        bool cacheTargetExists = Directory.Exists(cacheContainerPath);
+                        if (cacheTargetExists && force)
+                        {
+                            Directory.Delete(cacheContainerPath, true);
+                            cacheTargetExists = false;
+                        }
+
+                        if (!cacheTargetExists)
+                            Directory.Move(tempContainerPath, cacheContainerPath);
                     }
                     catch (IOException ex)
                     {
@@ -68,8 +93,8 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
                     }
                     try
                     {
-                        if (Directory.Exists(tempPath))
-                            Directory.Delete(Path.Combine(tempPath, ".."), true);
+                        if (Directory.Exists(tempContainerPath))
+                            Directory.Delete(tempContainerPath, true);
                     }
                     catch (IOException ex)
                     {
@@ -77,11 +102,8 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
                     }
                 }
             }
-        }
 
-        var copyFolderCommandBuilder = new CopyFolderCommandBuilder(_outputWriter, cachePath, _targetPath, TemplateName, _nameToReplace);
-        var copyFolderResult = copyFolderCommandBuilder.Execute(exceptionFunction);
-        return originalResult == null ? copyFolderResult : 
-            new CommandResult(originalResult.ExitCode, originalResult.ConsoleOutput + Environment.NewLine + copyFolderResult.ConsoleOutput);
+            return originalResult;
+        }
     }
 }

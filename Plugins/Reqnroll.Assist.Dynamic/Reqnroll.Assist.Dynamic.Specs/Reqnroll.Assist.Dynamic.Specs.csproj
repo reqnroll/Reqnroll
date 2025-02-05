@@ -1,0 +1,58 @@
+﻿<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+  <Import Project="..\..\..\Tests\Reqnroll.Specs\build/Reqnroll.Tools.MsBuild.Generation.OwnTests.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>AssistDynamic.Specs</RootNamespace>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+
+    <PackageReference Include="nunit" Version="4.2.1" />
+    <PackageReference Include="NUnit3TestAdapter" Version="4.6.0" />
+
+    <PackageReference Include="FluentAssertions" Version="7.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\Reqnroll.Assist.Dynamic\Reqnroll.Assist.Dynamic.csproj" />
+  </ItemGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+
+  <Target Name="PreBuild">
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
+  </Target>
+
+  <ItemGroup>
+    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.NUnit.Generator.ReqnrollPlugin.dll" />
+  </ItemGroup>
+
+  <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
+  <!-- has to be before the PropertyGroup change-->
+  <PropertyGroup>
+    <BuildDependsOn>
+      PreBuild;
+      $(BuildDependsOn)
+    </BuildDependsOn>
+    <RebuildDependsOn>
+      PreBuild;
+      $(RebuildDependsOn)
+    </RebuildDependsOn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="reqnroll.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
