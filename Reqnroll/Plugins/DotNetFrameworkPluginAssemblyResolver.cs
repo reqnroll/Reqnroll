@@ -1,101 +1,34 @@
-﻿using Microsoft.Extensions.DependencyModel;
-using Microsoft.Extensions.DependencyModel.Resolution;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System;
 using System.Reflection;
 
-namespace Reqnroll.Plugins
+namespace Reqnroll.Plugins;
+
+/// <summary>
+/// This class is used for .NET Framework 4.* only. See <see cref="PlatformCompatibility.PlatformHelper"/>.
+/// </summary>
+public sealed class DotNetFrameworkPluginAssemblyResolver(string path) : AssemblyResolverBase(path)
 {
-    public sealed class DotNetFrameworkPluginAssemblyResolver
+    protected override Assembly Initialize(string path)
     {
-        public Assembly Assembly { get; }
+        var assembly = LoadAssemblyFromPath(path);
 
-        DependencyContext resolverRependencyContext;
-        CompositeCompilationAssemblyResolver assemblyResolver;
+        SetupDependencyContext(path, assembly, false);
+        AppDomain.CurrentDomain.AssemblyResolve += OnAssemblyResolve;
 
-        public DotNetFrameworkPluginAssemblyResolver(string path)
-        {
-            var absolutePath = Path.GetFullPath(path);
-            Assembly = Assembly.LoadFrom(absolutePath);
+        return assembly;
+    }
 
-            try
-            {
-                SetupDependencyContext(path);
-            }
-            catch (Exception)
-            {
-                // Don't throw if we can't load the dependencies from .deps.json
-            }
-        }
-        void SetupDependencyContext(string path)
-        {
-            resolverRependencyContext = DependencyContext.Load(Assembly);
+    protected override Assembly LoadAssemblyFromPath(string assemblyPath) 
+        => Assembly.LoadFrom(assemblyPath);
 
-            if (resolverRependencyContext is null)
-                return;
+    private Assembly OnAssemblyResolve(object sender, ResolveEventArgs args)
+    {
+        var assemblyName = new AssemblyName(args.Name);
+        return TryResolveAssembly(assemblyName);
+    }
 
-            assemblyResolver = new CompositeCompilationAssemblyResolver(
-            [
-                new AppBaseCompilationAssemblyResolver(Path.GetDirectoryName(path)!),
-                new ReferenceAssemblyPathResolver(),
-                new PackageCompilationAssemblyResolver()
-            ]);
-
-            AppDomain.CurrentDomain.AssemblyResolve += TryAssemblyResolve;
-        }
-
-        Assembly TryAssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            try
-            {
-                var assemblyName = new AssemblyName(args.Name);
-                var library = resolverRependencyContext.RuntimeLibraries.FirstOrDefault(runtimeLibrary => string.Equals(runtimeLibrary.Name, assemblyName.Name, StringComparison.OrdinalIgnoreCase));
-                if (library is null)
-                    return null;
-
-                var wrapper = new CompilationLibrary(
-                    library.Type,
-                    library.Name,
-                    library.Version,
-                    library.Hash,
-                    library.RuntimeAssemblyGroups.SelectMany(g => g.AssetPaths),
-                    library.Dependencies,
-                    library.Serviceable,
-                    library.Path,
-                    library.HashPath);
-
-                var assemblies = new List<string>();
-                if (assemblyResolver.TryResolveAssemblyPaths(wrapper, assemblies))
-                {
-                    foreach (var asm in assemblies)
-                    {
-                        try
-                        {
-                            var assembly = Assembly.LoadFrom(asm);
-                            return assembly;
-                        }
-                        catch
-                        {
-                            // Don't throw if we can't load the specified assembly (perhaps something is missing or misconfigured)
-                            continue;
-                        }
-                    }
-                }
-                return null;
-            }
-            catch
-            {
-                // Don't throw if we can't load the dependencies from .deps.json
-                return null;
-            }
-        }
-
-        public static Assembly Load(string path)
-        {
-            var absolutePath = Path.GetFullPath(path);
-            return new DotNetFrameworkPluginAssemblyResolver(absolutePath).Assembly;
-        }
+    public static Assembly Load(string path)
+    {
+        return new DotNetFrameworkPluginAssemblyResolver(path).GetAssembly();
     }
 }
