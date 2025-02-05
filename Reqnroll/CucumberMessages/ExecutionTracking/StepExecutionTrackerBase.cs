@@ -1,6 +1,4 @@
-﻿using Reqnroll.Events;
-using System;
-using System.Collections.Generic;
+﻿using System;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {

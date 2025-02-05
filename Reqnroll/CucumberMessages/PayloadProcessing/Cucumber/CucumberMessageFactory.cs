@@ -17,18 +17,18 @@ using System.Text;
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
     /// <summary>
-    /// This class provides functions to convert execution level detail (events) into Cucumber message elements
+    /// This class provides functions to convert execution level detail into Cucumber message elements
     /// 
-    /// These are called after execution is completed for a Feature.
+    /// These are typically called after execution is completed for a Feature.
     /// </summary>
     internal class CucumberMessageFactory
     {
-        public static TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
+        internal static TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
         {
             return new TestRunStarted(Converters.ToTimestamp(timestamp), id);
         }
 
-        public static TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId)
+        internal static TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId)
         {
             return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp), null, testRunStartedId);
         }
@@ -74,14 +74,19 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         }
         internal static TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId)
         {
-            return new TestCaseStarted(testCaseExecution.AttemptId,
+            return new TestCaseStarted(
+                testCaseExecution.AttemptId,
                 testCaseExecution.TestCaseStartedId,
-                testCaseId, null, Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp));
+                testCaseId,
+                null, 
+                Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp));
         }
         internal static TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
         {
-            return new TestCaseFinished(testCaseExecution.TestCaseStartedId,
-                Converters.ToTimestamp(testCaseExecution.TestCaseFinishedTimeStamp), false);
+            return new TestCaseFinished(
+                testCaseExecution.TestCaseStartedId,
+                Converters.ToTimestamp(testCaseExecution.TestCaseFinishedTimeStamp),
+                false);
         }
         internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
         {
@@ -122,10 +127,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             var result = new ParameterType
             (
                 name,
-                new List<string>
-                {
-                    regexPattern
-                },
+                [ regexPattern ],
                 false,
                 false,
                 iDGenerator.GetNewId(),
@@ -168,7 +170,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             return new StepMatchArgument(
                 new Group(
-                    new List<Group>(),
+                    [],
                     null,
                     argument.Value
                     ),
@@ -200,7 +202,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 iDGenerator.GetNewId(),
                 null,
                 sourceRef,
-                hookBinding.IsScoped ? $"@{hookBinding.BindingScope.Tag}" : null,
+                hookBinding.IsScoped ? "@{hookBinding.BindingScope.Tag}" : null,
                 ToHookType(hookBinding)
             );
             return result;
@@ -291,7 +293,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return new TestStepResult(
                 Converters.ToDuration(hookTracker.Duration),
                 "",
-                ToTestStepResultStatus(hookTracker.Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError),
+                ToTestStepResultStatus(hookTracker.Status),
                 ToException(hookTracker.Exception));
         }
 
@@ -320,7 +322,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             };
         }
 
-        public static Envelope ToMeta(IObjectContainer container)
+        internal static Envelope ToMeta(IObjectContainer container)
         {
             var environmentInfoProvider = container.Resolve<IEnvironmentInfoProvider>();
             var environmentWrapper = container.Resolve<IEnvironmentWrapper>();
@@ -384,14 +386,14 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         }
 
         #region utility methods
-        public static string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition)
+        internal static string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition)
         {
             string signature = GenerateSignature(stepDefinition);
 
             return $"{stepDefinition.Method.Type.AssemblyName}.{stepDefinition.Method.Type.FullName}.{stepDefinition.Method.Name}({signature})";
         }
 
-        public static string CanonicalizeHookBinding(IHookBinding hookBinding)
+        internal static string CanonicalizeHookBinding(IHookBinding hookBinding)
         {
             string signature = GenerateSignature(hookBinding);
             return $"{hookBinding.Method.Type.AssemblyName}.{hookBinding.Method.Type.FullName}.{hookBinding.Method.Name}({signature})";
@@ -401,7 +403,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             return stepDefinition.Method != null ? string.Join(",", stepDefinition.Method.Parameters.Select(p => p.Type.Name)) : "";
         }
-        public static string Base64EncodeFile(string filePath)
+        private static string Base64EncodeFile(string filePath)
         {
             if (Path.GetExtension(filePath) == ".png" || Path.GetExtension(filePath) == ".jpg")
             {
@@ -413,7 +415,6 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             text = text.Replace("\r\n", "\n");
             return Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
         }
-
 
         private static string NormalizePrimitiveTypeNamesToCucumberTypeNames(string name)
         {
@@ -432,7 +433,6 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 _ => name
             };
         }
-
         #endregion
     }
 }

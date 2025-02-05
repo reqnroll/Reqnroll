@@ -28,7 +28,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
         internal static object _sharedLockObject = new();
 
         private IIdGenerator _idGenerator;
-        public Dictionary<string, string> IdMap = new();
+        internal Dictionary<string, string> _IdMap { get; } = new();
+
         public GherkinDocumentIDReWriter(IIdGenerator idGenerator)
         {
             _idGenerator = idGenerator;
@@ -126,8 +127,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             base.OnVisited(tag);
             var oldId = tag.Id;
             var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            //tag.Id = newId;
+            _IdMap[oldId] = newId;
             SetPrivateProperty<Tag>(tag, "Id", newId);
         }
 
@@ -136,8 +136,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             base.OnVisited(scenario);
             var oldId = scenario.Id;
             var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            //scenario.Id = newId;
+            _IdMap[oldId] = newId;
 
             SetPrivateProperty<Scenario>(scenario, "Id", newId);
         }
@@ -147,8 +146,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             base.OnVisited(rule);
             var oldId = rule.Id;
             var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            //rule.Id = newId;
+            _IdMap[oldId] = newId;
             SetPrivateProperty<Rule>(rule, "Id", newId);
         }
         public override void OnVisited(Background background)
@@ -156,8 +154,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             base.OnVisited(background);
             var oldId = background.Id;
             var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            //background.Id = newId;
+            _IdMap[oldId] = newId;
 
             SetPrivateProperty<Background>(background, "Id", newId);
 
@@ -167,8 +164,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             base.OnVisited(step);
             var oldId = step.Id;
             var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            //step.Id = newId;
+            _IdMap[oldId] = newId;
 
             SetPrivateProperty<Step>(step, "Id", newId);
         }
@@ -177,8 +173,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             base.OnVisited(examples);
             var oldId = examples.Id;
             var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            //examples.Id = newId;
+            _IdMap[oldId] = newId;
 
             SetPrivateProperty<Examples>(examples, "Id", newId);
         }
@@ -187,8 +182,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             base.OnVisited(row);
             var oldId = row.Id;
             var newId = _idGenerator.GetNewId();
-            IdMap[oldId] = newId;
-            //row.Id = newId;
+            _IdMap[oldId] = newId;
 
             SetPrivateProperty<TableRow>(row, "Id", newId);
         }

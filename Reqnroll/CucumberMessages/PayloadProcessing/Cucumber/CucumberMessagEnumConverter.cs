@@ -8,10 +8,10 @@ using System.Text.Json.Serialization;
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
     /// <summary>
-    /// Gherkin Cucumber Message enums use attributes to provide a Text value to represent the enum value
-    /// This class is used to convert the enum to and from a string during serialization
+    /// Gherkin Cucumber Message enums use attributes to provide a Text value to represent the enum value.
+    /// This class is used to convert the enum to and from a string during serialization with System.Text.Json
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">/Gherkin Message Enum Type</typeparam>
     internal class CucumberMessageEnumConverter<T> : JsonConverter<T> where T : struct, Enum
     {
         private readonly Dictionary<T, string> _enumToString = new();

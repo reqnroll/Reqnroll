@@ -5,6 +5,9 @@ using System.Collections.Generic;
 
 namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
 {
+    /// <summary>
+    /// Convenience methods to help work with Message Envelopes
+    /// </summary>
     public static class CucumberMessageExtensions
     {
         public static List<Type> MessagesWithIds = new(){   typeof(Background),
@@ -25,10 +28,12 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                                                             typeof(TestRunHookStarted)
         };
 
+
         public static bool HasId(this object element)
         {
             return MessagesWithIds.Contains(element.GetType());
         }
+
         public static string Id(this object message)
         {
             return message switch
@@ -52,6 +57,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 _ => throw new ArgumentException($"Message of type: {message.GetType()} has no ID")
             };
         }
+
         public static List<Type> EnvelopeContentTypes = new()
         {
             typeof(Attachment),
@@ -74,6 +80,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             typeof(TestRunHookStarted),
             typeof(TestRunHookFinished)
         };
+
         public static object Content(this Envelope envelope)
         {
             object result = null;
@@ -112,7 +119,6 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             else if (envelope.TestRunHookFinished != null) { result = envelope.TestRunHookFinished.Timestamp; }
             else throw new ArgumentException($"Envelope of type: {envelope.Content().GetType()} does not contain a timestamp");
             return result;
-
         }
     }
 }

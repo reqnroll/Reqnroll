@@ -20,7 +20,7 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
             var targetIdStyle = CucumberConfiguration.Current.IDGenerationStyle;
             var gherkinDocumentIDStyleReWriter = new GherkinDocumentIDReWriter(idGenerator);
             newGherkinDocument = gherkinDocumentIDStyleReWriter.ReWriteIds(gherkinDocument, targetIdStyle);
-            var idMap = gherkinDocumentIDStyleReWriter.IdMap;
+            var idMap = gherkinDocumentIDStyleReWriter._IdMap;
 
             var pickleIDStyleReWriter = new PickleIDReWriter(idGenerator);
             newPickles = pickleIDStyleReWriter.ReWriteIds(pickles, idMap, targetIdStyle);

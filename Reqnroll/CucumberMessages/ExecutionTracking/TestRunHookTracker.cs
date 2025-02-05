@@ -1,8 +1,5 @@
-﻿using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
-using Reqnroll.Events;
+﻿using Reqnroll.Events;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
@@ -23,7 +20,11 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal string TestRunHook_HookId { get; }
         internal string TestRunID { get; }
         internal DateTime TimeStamp { get; set; }
-        internal TimeSpan Duration { get;  set; }
-        internal Exception Exception { get;  set; }
+        internal TimeSpan Duration { get; set; }
+        internal Exception Exception { get; set; }
+        internal ScenarioExecutionStatus Status
+        {
+            get { return Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError; }
+        }
     }
 }
