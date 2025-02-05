@@ -28,7 +28,7 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         //Thread safe collections to hold:
         // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
-        private readonly BlockingCollection<ReqnrollCucumberMessage> postedMessages = new();
+        private readonly BlockingCollection<ReqnrollCucumberMessage> _postedMessages = new();
 
         private ICucumberMessagesConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
@@ -86,14 +86,14 @@ namespace Reqnroll.CucumberMessages.PubSub
         private static byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
         public async Task PublishAsync(ReqnrollCucumberMessage message)
         {
-            await Task.Run( () => postedMessages.Add(message));
+            await Task.Run( () => _postedMessages.Add(message));
         }
 
         private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
         {
             using var fileStream = File.Create(Path.Combine(baseDirectory, fileName), TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
 
-            foreach (var message in postedMessages.GetConsumingEnumerable())
+            foreach (var message in _postedMessages.GetConsumingEnumerable())
             {
                 if (message.Envelope != null)
                 {
@@ -115,10 +115,10 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 if (disposing)
                 {
-                    postedMessages.CompleteAdding();
+                    _postedMessages.CompleteAdding();
                     fileWritingTask?.Wait();
                     fileWritingTask = null;
-                    postedMessages.Dispose();
+                    _postedMessages.Dispose();
                 }
                 disposedValue = true;
             }

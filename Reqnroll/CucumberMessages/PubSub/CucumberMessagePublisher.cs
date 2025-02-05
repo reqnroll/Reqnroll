@@ -28,7 +28,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// 
     /// It uses the IRuntimePlugin interface to force the runtime to load it during startup (although it is not an external plugin per se).
     /// </summary>
-    public class CucumberMessagePublisher : ICucumberMessagePublisher, IRuntimePlugin, IAsyncExecutionEventListener
+    public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventListener
     {
         private Lazy<ICucumberMessageBroker> _brokerFactory;
         private ICucumberMessageBroker _broker;
@@ -42,7 +42,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
         // shared to each Feature tracker so that we keep a single list
-        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
+        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern { get; } = new();
         private ConcurrentBag<IStepArgumentTransformationBinding> _stepArgumentTransforms = new();
         private ConcurrentBag<IStepDefinitionBinding> _undefinedParameterTypeBindings = new();
         public IIdGenerator SharedIDGenerator { get; private set; }
@@ -74,13 +74,8 @@ namespace Reqnroll.CucumberMessages.PubSub
                   _testThreadObjectContainer = args.ObjectContainer;
                   _brokerFactory = new Lazy<ICucumberMessageBroker>(() => _testThreadObjectContainer.Resolve<ICucumberMessageBroker>());
                   var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                  HookIntoTestThreadExecutionEventPublisher(testThreadExecutionEventPublisher);
+                  testThreadExecutionEventPublisher.AddAsyncListener(this);
               };
-        }
-
-        public void HookIntoTestThreadExecutionEventPublisher(ITestThreadExecutionEventPublisher testThreadEventPublisher)
-        {
-            testThreadEventPublisher.AddAsyncListener(this);
         }
 
         public async Task OnEventAsync(IExecutionEvent executionEvent)
@@ -399,7 +394,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 var hookId = StepDefinitionsByPattern[signature];
                 var hookTracker = new TestRunHookTracker(hookRunStartedId, hookId, hookBindingStartedEvent, _testRunStartedId);
                 _testRunHookTrackers.TryAdd(signature, hookTracker);
-                _messages.Add( Envelope.Create(CucumberMessageFactory.ToTestRunHookStarted(hookTracker)));
+                _messages.Add(Envelope.Create(CucumberMessageFactory.ToTestRunHookStarted(hookTracker)));
                 return Task.CompletedTask;
             }
 
@@ -430,7 +425,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 hookTracker.Exception = hookBindingFinishedEvent.HookException;
                 hookTracker.TimeStamp = hookBindingFinishedEvent.Timestamp;
 
-                _messages.Add( Envelope.Create(CucumberMessageFactory.ToTestRunHookFinished(hookTracker)) );
+                _messages.Add(Envelope.Create(CucumberMessageFactory.ToTestRunHookFinished(hookTracker)));
                 return Task.CompletedTask;
             }
 
