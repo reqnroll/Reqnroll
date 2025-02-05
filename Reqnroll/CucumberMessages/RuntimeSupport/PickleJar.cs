@@ -11,15 +11,12 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
     /// </summary>
     internal class PickleJar
     {
-        private int _PickleCounter = 0;
-
         private bool HasPickles => Pickles != null && Pickles.Count() > 0;
         private IEnumerable<Pickle> Pickles;
 
         internal PickleJar(IEnumerable<Pickle> pickles)
         {
             Pickles = pickles;
-            _PickleCounter = 0;
         }
 
         internal PickleStepSequence PickleStepSequenceFor(string pickleIndex)
