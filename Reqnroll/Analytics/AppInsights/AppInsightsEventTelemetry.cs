@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Analytics.AppInsights
 {
@@ -9,19 +9,19 @@ namespace Reqnroll.Analytics.AppInsights
     /// </summary>
     public class AppInsightsEventTelemetry
     {
-        [DataMember(Name = "name")]
+        [JsonPropertyName("name")]
         public string DataTypeName { get; set; }
 
-        [DataMember(Name = "time")]
+        [JsonPropertyName("time")]
         public string EventDateTime { get; set; }
 
-        [DataMember(Name = "iKey")]
+        [JsonPropertyName("iKey")]
         public string InstrumentationKey { get; set; }
 
-        [DataMember(Name = "data")]
+        [JsonPropertyName("data")]
         public TelemetryData TelemetryData { get; set; }
 
-        [DataMember(Name = "tags")]
+        [JsonPropertyName("tags")]
         public Dictionary<string, string> TelemetryTags { get; set; }
 
         private const string DefaultValue = "undefined";
@@ -72,20 +72,20 @@ namespace Reqnroll.Analytics.AppInsights
     }
     public class TelemetryData
     {
-        [DataMember(Name = "baseType")]
+        [JsonPropertyName("baseType")]
         public string ItemTypeName { get; set; }
 
-        [DataMember(Name = "baseData")]
+        [JsonPropertyName("baseData")]
         public TelemetryDataItem TelemetryDataItem { get; set; }
     }
 
     public class TelemetryDataItem
     {
-        [DataMember(Name = "ver")]
+        [JsonPropertyName("ver")]
         public string EndPointSchemaVersion => "2";
-        [DataMember(Name = "name")]
+        [JsonPropertyName("name")]
         public string EventName { get; set; }
-        [DataMember(Name = "properties")]
+        [JsonPropertyName("properties")]
         public Dictionary<string, string> Properties { get; set; }
     }
 }

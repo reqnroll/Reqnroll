@@ -1,23 +1,17 @@
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
     public class GeneratorElement
     {
-        //[JsonProperty("allowDebugGeneratedFiles", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "allowDebugGeneratedFiles")]
-        [DefaultValue(ConfigDefaults.AllowDebugGeneratedFiles)]
-        public bool AllowDebugGeneratedFiles { get; set; }
+        [JsonPropertyName("allowDebugGeneratedFiles")]
+        public bool AllowDebugGeneratedFiles { get; set; } = ConfigDefaults.AllowDebugGeneratedFiles;
 
-        //[JsonProperty("allowRowTests", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DefaultValue(ConfigDefaults.AllowRowTests)]
-        [DataMember(Name = "allowRowTests")]
-        public bool AllowRowTests { get; set; }
+        [JsonPropertyName("allowRowTests")]
+        public bool AllowRowTests { get; set; } = ConfigDefaults.AllowRowTests;
 
-        //[JsonProperty("addNonParallelizableMarkerForTags", NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "addNonParallelizableMarkerForTags")]
+        [JsonPropertyName("addNonParallelizableMarkerForTags")]
         public List<string> AddNonParallelizableMarkerForTags { get; set; }
     }
 }

@@ -4,7 +4,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
     {
         void LogMessage(string message);
 
-        void LogMessageWithLowImportance(string message);
+        void LogDiagnosticMessage(string message);
 
         void LogError(string message);
 

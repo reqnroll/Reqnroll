@@ -17,8 +17,6 @@
     <OverwriteReadOnlyFiles Condition="'$(OverwriteReadOnlyFiles)'==''">false</OverwriteReadOnlyFiles>
     <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
 
-    <ShowTrace Condition="'$(ShowTrace)'==''">false</ShowTrace>
-    <VerboseOutput Condition="'$(VerboseOutput)'==''">true</VerboseOutput>
     <Reqnroll_DebugMSBuildTask Condition="'$(Reqnroll_DebugMSBuildTask)' == ''">false</Reqnroll_DebugMSBuildTask>
 
     <_ReqnrollPropsImported Condition="'$(_ReqnrollPropsImported)'==''">true</_ReqnrollPropsImported>

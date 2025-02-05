@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Reqnroll.Parser;
 
 namespace Reqnroll.Generator.UnitTestConverter

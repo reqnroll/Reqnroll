@@ -1,4 +1,3 @@
-using System;
 using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Helpers;

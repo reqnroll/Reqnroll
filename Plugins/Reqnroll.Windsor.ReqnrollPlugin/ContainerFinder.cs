@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reflection;
 using Castle.MicroKernel.Registration;
 using Castle.Windsor;
-using Reqnroll;
 using Reqnroll.Bindings;
 
 namespace Reqnroll.Windsor

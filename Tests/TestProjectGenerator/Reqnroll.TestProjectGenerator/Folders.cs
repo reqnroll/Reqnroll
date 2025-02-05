@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 using Reqnroll.TestProjectGenerator.Conventions;
 using Reqnroll.TestProjectGenerator.Helpers;
 

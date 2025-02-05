@@ -22,12 +22,12 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public bool HasTriedToCompile { get; private set; }
 
-        public void CompileSolution(BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null, bool failOnError = true)
+        public void CompileSolution(BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null, bool failOnError = true, string logLevel = null)
         {
-            CompileSolutionTimes(1, buildTool, treatWarningsAsErrors, failOnError);
+            CompileSolutionTimes(1, buildTool, treatWarningsAsErrors, failOnError, logLevel);
         }
 
-        public void CompileSolutionTimes(uint times, BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null, bool failOnError = true)
+        public void CompileSolutionTimes(uint times, BuildTool buildTool = DefaultBuildTool, bool? treatWarningsAsErrors = null, bool failOnError = true, string logLevel = null)
         {
             HasTriedToCompile = true;
             _solutionWriteToDiskDriver.WriteSolutionToDisk(treatWarningsAsErrors);
@@ -36,7 +36,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
             for (uint time = 0; time < times; time++)
             {
-                _compilationResultDriver.CompileResult = _compiler.Run(usedBuildTool, treatWarningsAsErrors);
+                _compilationResultDriver.CompileResult = _compiler.Run(usedBuildTool, treatWarningsAsErrors, logLevel);
                 if (failOnError && !_compilationResultDriver.CompileResult.IsSuccessful)
                 {
                     var missingSdk = Regex.Match(_compilationResultDriver.CompileResult.Output, @"(MSB3644: .* not found\.)");

@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
@@ -17,17 +19,30 @@ namespace Reqnroll.Tools.MsBuild.Generation
             try
             {
                 var currentProcess = Process.GetCurrentProcess();
+                _taskLoggingWrapper.LogDiagnosticMessage($"process: {currentProcess.ProcessName}, .NET: {RuntimeInformation.FrameworkDescription}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
+            }
+            catch (Exception e)
+            {
+                _taskLoggingWrapper.LogDiagnosticMessage($"Error when dumping process info: {e}");
+            }
+            DumpLoadedAssemblies();
+        }
 
-                _taskLoggingWrapper.LogMessage($"process: {currentProcess.ProcessName}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
+        public void DumpLoadedAssemblies()
+        {
+            try
+            {
+                _taskLoggingWrapper.LogDiagnosticMessage("Loaded assemblies:");
 
-                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(a => a.FullName))
                 {
-                    _taskLoggingWrapper.LogMessage($"  {assembly.FullName}");
+                    var location = assembly.IsDynamic ? "<dyn>" : assembly.Location;
+                    _taskLoggingWrapper.LogDiagnosticMessage($"  {assembly.FullName};{location}");
                 }
             }
             catch (Exception e)
             {
-                _taskLoggingWrapper.LogMessage($"Error when dumping process info: {e}");
+                _taskLoggingWrapper.LogDiagnosticMessage($"Error when dumping loaded assemblies: {e}");
             }
         }
     }

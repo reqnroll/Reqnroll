@@ -1,4 +1,3 @@
-using System;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 
 namespace Reqnroll.ExternalData.ReqnrollPlugin.Loaders

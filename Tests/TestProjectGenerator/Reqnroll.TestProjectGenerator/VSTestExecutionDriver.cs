@@ -6,7 +6,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Driver;
 using Reqnroll.TestProjectGenerator.Helpers;
 

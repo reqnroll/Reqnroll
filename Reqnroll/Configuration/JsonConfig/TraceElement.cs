@@ -1,38 +1,27 @@
-using System;
-using System.ComponentModel;
-using System.Runtime.Serialization;
 using Reqnroll.BindingSkeletons;
+using System;
+using System.Text.Json.Serialization;
 
 namespace Reqnroll.Configuration.JsonConfig
 {
     public class TraceElement
     {
         // legacy config
-        //[JsonProperty("traceTimings", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "traceTimings")]
-        [DefaultValue(ConfigDefaults.TraceTimings)]
-        public bool TraceTimings { get; set; }
+        [JsonPropertyName("traceTimings")]
+        public bool TraceTimings { get; set; } = ConfigDefaults.TraceTimings;
 
         // legacy config
-        //[JsonProperty("minTracedDuration", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "minTracedDuration")]
-        [DefaultValue(ConfigDefaults.MinTracedDuration)]
-        public TimeSpan MinTracedDuration { get; set; }
+        [JsonPropertyName("minTracedDuration")]
+        public TimeSpan MinTracedDuration { get; set; } = ConfigDefaults.MinTracedDurationAsTimeSpan;
 
-        //[JsonProperty("stepDefinitionSkeletonStyle", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "stepDefinitionSkeletonStyle")]
-        [DefaultValue(ConfigDefaults.StepDefinitionSkeletonStyle)]
-        public StepDefinitionSkeletonStyle StepDefinitionSkeletonStyle { get; set; }
+        [JsonPropertyName("stepDefinitionSkeletonStyle")]
+        public StepDefinitionSkeletonStyle StepDefinitionSkeletonStyle { get; set; } = ConfigDefaults.StepDefinitionSkeletonStyle;
 
-        //[JsonProperty("ColoredOutput", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "ColoredOutput")]
-        [DefaultValue(ConfigDefaults.ColoredOutput)]
-        public bool ColoredOutput { get; set; }
+        [JsonPropertyName("ColoredOutput")]
+        public bool ColoredOutput { get; set; } = ConfigDefaults.ColoredOutput;
 
         // legacy config
-        //[JsonProperty("traceSuccessfulSteps", DefaultValueHandling = DefaultValueHandling.Populate, NullValueHandling = NullValueHandling.Ignore)]
-        [DataMember(Name = "traceSuccessfulSteps")]
-        [DefaultValue(ConfigDefaults.TraceSuccessfulSteps)]
-        public bool TraceSuccessfulSteps { get; set; }
+        [JsonPropertyName("traceSuccessfulSteps")]
+        public bool TraceSuccessfulSteps { get; set; } = ConfigDefaults.TraceSuccessfulSteps;
     }
 }

@@ -15,13 +15,11 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
         public override void WriteTestOutput(string message)
         {
             _testContextProvider.GetTestContext().WriteLine(message);
-            base.WriteTestOutput(message);
         }
 
         public override void WriteToolOutput(string message)
         {
             _testContextProvider.GetTestContext().WriteLine("-> " + message);
-            base.WriteToolOutput(message);
         }
     }
 }
