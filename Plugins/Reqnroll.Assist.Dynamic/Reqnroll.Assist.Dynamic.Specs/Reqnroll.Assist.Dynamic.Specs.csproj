@@ -28,7 +28,7 @@
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
   <Target Name="PreBuild">
-    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
+    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
     <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
   </Target>
 
