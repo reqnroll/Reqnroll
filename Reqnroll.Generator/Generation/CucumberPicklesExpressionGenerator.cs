@@ -14,7 +14,6 @@ namespace Reqnroll.Generator.Generation
     /// </summary>
     internal class CucumberPicklesExpressionGenerator : CucumberMessage_TraversalVisitorBase
     {
-        private CodeDomHelper _codeDomHelper;
         private List<CodeExpression> _PickleList;
         private List<CodeExpression> _PickleSteps;
         private List<CodeExpression> _PickleTags;
@@ -27,9 +26,8 @@ namespace Reqnroll.Generator.Generation
         private static readonly string GENERICLIST = typeof(List<>).FullName;
 
 
-        public CucumberPicklesExpressionGenerator(CodeDomHelper codeDomHelper)
+        public CucumberPicklesExpressionGenerator()
         {
-            _codeDomHelper = codeDomHelper;
         }
 
         private void Reset()
@@ -78,14 +76,15 @@ namespace Reqnroll.Generator.Generation
             var astIdsExpr = new CodeTypeReference(typeof(List<string>));
             var astIdsInitializer = new CodeArrayCreateExpression(typeof(string), pickle.AstNodeIds.Select(s => new CodePrimitiveExpression(s)).ToArray());
 
-            _PickleList.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference),
-                            new CodePrimitiveExpression(pickle.Id),
-                            new CodePrimitiveExpression(pickle.Uri),
-                            new CodePrimitiveExpression(pickle.Name),
-                            new CodePrimitiveExpression(pickle.Language),
-                            new CodeObjectCreateExpression(stepsExpr, stepsinitializer),
-                            new CodeObjectCreateExpression(tagsExpr, tagsinitializer),
-                            new CodeObjectCreateExpression(astIdsExpr, astIdsInitializer)
+            _PickleList.Add(new CodeObjectCreateExpression(
+                                new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference),
+                                new CodePrimitiveExpression(pickle.Id),
+                                new CodePrimitiveExpression(pickle.Uri),
+                                new CodePrimitiveExpression(pickle.Name),
+                                new CodePrimitiveExpression(pickle.Language),
+                                new CodeObjectCreateExpression(stepsExpr, stepsinitializer),
+                                new CodeObjectCreateExpression(tagsExpr, tagsinitializer),
+                                new CodeObjectCreateExpression(astIdsExpr, astIdsInitializer)
                             ));
 
             _PickleSteps = steps;

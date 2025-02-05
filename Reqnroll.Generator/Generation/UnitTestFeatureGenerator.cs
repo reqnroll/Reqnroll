@@ -217,7 +217,7 @@ namespace Reqnroll.Generator.Generation
             string sourceFileLocation;
             sourceFileLocation = Path.Combine(generationContext.Document.DocumentLocation.FeatureFolderPath, generationContext.Document.DocumentLocation.SourceFilePath);
 
-            // Adding three static methods to the class: one each as Factory methods for source, gherkinDocument, and pickles Messages
+            // Adding three static methods to the test class: one each as Factory methods for source, gherkinDocument, and pickles Messages
             // Bodies of these methods are added later inside the try/catch block
             sourceFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<Io.Cucumber.Messages.Types.Source>), CodeTypeReferenceOptions.GlobalReference), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "SourceFunc");
             var sourceFactoryMethod = new CodeMemberMethod();
@@ -245,12 +245,12 @@ namespace Reqnroll.Generator.Generation
             var CucumberMessagesInitializeMethod = new CodeMemberMethod();
             CucumberMessagesInitializeMethod.Attributes = MemberAttributes.Private | MemberAttributes.Static;
             CucumberMessagesInitializeMethod.Name = "InitializeCucumberMessages";
-            CucumberMessagesInitializeMethod.ReturnType = new CodeTypeReference(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureLevelCucumberMessages)));
+            CucumberMessagesInitializeMethod.ReturnType = new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference);
             generationContext.TestClass.Members.Add(CucumberMessagesInitializeMethod);
             _cucumberMessagesInitializeMethod = CucumberMessagesInitializeMethod;
 
             // Create a FeatureLevelCucumberMessages object and add it to featureInfo
-            var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureLevelCucumberMessages)),
+            var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference),
                 sourceFunc,
                 gherkinDocumentFunc,
                 picklesFunc,
@@ -273,17 +273,17 @@ namespace Reqnroll.Generator.Generation
                 var featurePickleMessages = CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToPickles(featurePickles);
 
                 // generate a CodeDom expression to create the Source object from the featureSourceMessage
-                sourceExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Io.Cucumber.Messages.Types.Source)),
+                sourceExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.Source), CodeTypeReferenceOptions.GlobalReference),
                     new CodePrimitiveExpression(featureSource.Uri),
                     new CodePrimitiveExpression(featureSource.Data),
                     new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.SourceMediaType), CodeTypeReferenceOptions.GlobalReference)), featureSource.MediaType.ToString()));
 
                 // generate a CodeDom expression to create the GherkinDocument object from the featureGherkinDocumentMessage
-                var gherkinDocumentExpressionGenerator = new CucumberGherkinDocumentExpressionGenerator(_codeDomHelper);
+                var gherkinDocumentExpressionGenerator = new CucumberGherkinDocumentExpressionGenerator();
                 gherkinDocumentExpression = gherkinDocumentExpressionGenerator.GenerateGherkinDocumentExpression(featureGherkinDocumentMessage);
 
                 // generate a CodeDom expression to create the Pickles object from the featurePickleMessages
-                var pickleExpressionGenerator = new CucumberPicklesExpressionGenerator(_codeDomHelper);
+                var pickleExpressionGenerator = new CucumberPicklesExpressionGenerator();
                 picklesExpression = pickleExpressionGenerator.GeneratePicklesExpression(featurePickleMessages);
 
                 // wrap these expressions in Func<T>

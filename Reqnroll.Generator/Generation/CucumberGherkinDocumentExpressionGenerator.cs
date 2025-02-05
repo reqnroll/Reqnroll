@@ -14,8 +14,6 @@ namespace Reqnroll.Generator.Generation
     /// </summary>
     internal class CucumberGherkinDocumentExpressionGenerator : CucumberMessage_TraversalVisitorBase
     {
-        CodeDomHelper _codeDomHelper;
-
         Io.Cucumber.Messages.Types.GherkinDocument _gherkinDocument;
         CodeExpression _gherkinDocumentExpression;
 
@@ -37,9 +35,8 @@ namespace Reqnroll.Generator.Generation
 
         private static readonly string GENERICLIST = typeof(List<>).FullName;
 
-        public CucumberGherkinDocumentExpressionGenerator(CodeDomHelper codeDomHelper)
+        public CucumberGherkinDocumentExpressionGenerator()
         {
-            _codeDomHelper = codeDomHelper;
         }
         private void Reset()
         {

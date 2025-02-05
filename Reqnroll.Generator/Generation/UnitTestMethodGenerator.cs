@@ -204,8 +204,8 @@ namespace Reqnroll.Generator.Generation
 
             AddVariableForArguments(testMethod, paramToIdentifier);
 
-            // Cucumber Messages support uses two new variables: pickleIndex and pickleStepSequence
-            // The pickleIndex tells the runtime which Pickle this test corresponds to. The pickleStepSequence is used to provide an index into the Pickle Step IDs when generating Step related Messages.
+            // Cucumber Messages support uses a new variables: pickleIndex
+            // The pickleIndex tells the runtime which Pickle this test corresponds to. 
             // When Backgrounds and Rule Backgrounds are used, we don't know ahead of time how many Steps there are in the Pickle.
             AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, _pickleIndex);
 
