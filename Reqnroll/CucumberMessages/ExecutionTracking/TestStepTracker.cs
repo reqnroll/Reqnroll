@@ -20,9 +20,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// <summary>
     /// This class is used to track the execution of Test StepDefinitionBinding Methods
     /// </summary>
-    public class TestStepTracker : StepExecutionTrackerBase, IGenerateMessage
+    internal class TestStepTracker : StepExecutionTrackerBase, IGenerateMessage
     {
-        public TestStepTracker(TestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord) : base(parentTracker, parentExecutionRecord)
+        internal TestStepTracker(TestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord) : base(parentTracker, parentExecutionRecord)
         {
         }
 
@@ -41,7 +41,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             StepStarted = stepStartedEvent.Timestamp;
             
             // if this is the first time to execute this step for this test, generate the properties needed to Generate the TestStep Message (stored in a TestStepDefinition)
-            if (ParentTestCase.Attempt_Count == 0)
+            if (ParentTestCase.AttemptCount == 0)
             {
                 var testStepId = ParentTestCase.IDGenerator.GetNewId();
                 var pickleStepID = stepStartedEvent.StepContext.StepInfo.PickleStepId;
@@ -57,7 +57,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal void ProcessEvent(StepFinishedEvent stepFinishedEvent)
         {
-            if (ParentTestCase.Attempt_Count == 0)
+            if (ParentTestCase.AttemptCount == 0)
                 Definition.PopulateStepDefinitionFromExecutionResult(stepFinishedEvent);
             StepFinished = stepFinishedEvent.Timestamp;
 

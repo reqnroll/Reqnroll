@@ -6,9 +6,9 @@ using System.Collections.Generic;
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     // This class acts as an addendum to AttachmentAddedEvent and provides the ability to convey which Pickle, TestCase, and TestStep were responsible for the Attachment being added.
-    public class AttachmentAddedEventWrapper : IGenerateMessage
+    internal class AttachmentAddedEventWrapper : IGenerateMessage
     {
-        public AttachmentAddedEventWrapper(AttachmentAddedEvent attachmentAddedEvent, string testRunStartedId, string testCaseStartedId, string testCaseStepId)
+        internal AttachmentAddedEventWrapper(AttachmentAddedEvent attachmentAddedEvent, string testRunStartedId, string testCaseStartedId, string testCaseStepId)
         {
             AttachmentAddedEvent = attachmentAddedEvent;
             TestRunStartedId = testRunStartedId;
@@ -16,14 +16,14 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             TestCaseStepId = testCaseStepId;
         }
 
-        public AttachmentAddedEvent AttachmentAddedEvent { get; }
-        public string TestCaseStartedId { get; set; }
-        public string TestCaseStepId { get; set; }
-        public string TestRunStartedId {get; set; }
+        internal AttachmentAddedEvent AttachmentAddedEvent { get; }
+        internal string TestCaseStartedId { get; }
+        internal string TestCaseStepId { get; }
+        internal string TestRunStartedId { get; }
 
         public IEnumerable<Envelope> GenerateFrom(ExecutionEvent executionEvent)
         {
-             return [ Envelope.Create(CucumberMessageFactory.ToAttachment(this))];
+            return [Envelope.Create(CucumberMessageFactory.ToAttachment(this))];
         }
     }
 }

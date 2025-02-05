@@ -10,18 +10,18 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// This class is used to track execution of Hook Steps
     /// 
     /// </summary>
-    public class HookStepTracker : StepExecutionTrackerBase, IGenerateMessage
+    internal class HookStepTracker : StepExecutionTrackerBase, IGenerateMessage
     {
-        public string HookBindingSignature { get; private set; }
-        public HookBindingFinishedEvent HookBindingFinishedEvent { get; private set; }
-        public HookStepTracker(TestCaseTracker tracker, TestCaseExecutionRecord testCaseExecutionRecord) : base(tracker, testCaseExecutionRecord)
+        internal string HookBindingSignature { get; private set; }
+        internal HookBindingFinishedEvent HookBindingFinishedEvent { get; private set; }
+        internal HookStepTracker(TestCaseTracker tracker, TestCaseExecutionRecord testCaseExecutionRecord) : base(tracker, testCaseExecutionRecord)
         {
         }
 
-        public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
+        internal void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
         {
             StepStarted = hookBindingStartedEvent.Timestamp;
-            if (ParentTestCase.Attempt_Count == 0)
+            if (ParentTestCase.AttemptCount == 0)
             {
                 HookBindingSignature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
                 var hookId = ParentTestCase.StepDefinitionsByPattern[HookBindingSignature];
@@ -37,7 +37,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             }
         }
 
-        public void ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
+        internal void ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
         {
             StepFinished = hookFinishedEvent.Timestamp;
             HookBindingFinishedEvent = hookFinishedEvent;

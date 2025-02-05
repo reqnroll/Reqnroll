@@ -7,12 +7,12 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
     internal class OutputAddedEventWrapper : IGenerateMessage
     {
-        internal OutputAddedEvent OutputAddedEvent;
-        internal string TestRunStartedId;
-        internal string TestCaseStepId;
-        internal string TestCaseStartedId;
+        internal OutputAddedEvent OutputAddedEvent { get; }
+        internal string TestRunStartedId { get; }
+        internal string TestCaseStepId { get; }
+        internal string TestCaseStartedId { get; }
 
-        public OutputAddedEventWrapper(OutputAddedEvent outputAddedEvent, string testRunStartedId, string testCaseStartedId, string testCaseStepId)
+        internal OutputAddedEventWrapper(OutputAddedEvent outputAddedEvent, string testRunStartedId, string testCaseStartedId, string testCaseStepId)
         {
             OutputAddedEvent = outputAddedEvent;
             TestRunStartedId = testRunStartedId;

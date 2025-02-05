@@ -11,7 +11,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// </summary>
     internal class TestRunHookTracker
     {
-        public TestRunHookTracker(string id, string hookDefinitionId, HookBindingStartedEvent hookBindingStartedEvent, string testRunID)
+        internal TestRunHookTracker(string id, string hookDefinitionId, HookBindingStartedEvent hookBindingStartedEvent, string testRunID)
         {
             TestRunHookId = id;
             TestRunHook_HookId = hookDefinitionId;
@@ -19,11 +19,11 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             TimeStamp = hookBindingStartedEvent.Timestamp;
         }
 
-        public string TestRunHookId { get; }
-        public string TestRunHook_HookId { get; }
-        public string TestRunID { get; }
-        public DateTime TimeStamp { get; set; }
-        public TimeSpan Duration { get; internal set; }
-        public Exception Exception { get; internal set; }
+        internal string TestRunHookId { get; }
+        internal string TestRunHook_HookId { get; }
+        internal string TestRunID { get; }
+        internal DateTime TimeStamp { get; set; }
+        internal TimeSpan Duration { get;  set; }
+        internal Exception Exception { get;  set; }
     }
 }

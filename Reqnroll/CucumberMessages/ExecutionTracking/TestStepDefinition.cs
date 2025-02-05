@@ -11,32 +11,32 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// Data class that captures information about a TestStep that is being executed for the first time.
     /// One of these is created per step, regardless of how many times the Test Case is retried.
     /// </summary>
-    public class TestStepDefinition
+    internal class TestStepDefinition
     {
         // The Id of the Step within the TestCase
-        public string TestStepId { get; private set; }
+        internal string TestStepId { get; }
 
         // The Id of the PickleStep
-        public string PickleStepID { get; set; }
-        public TestCaseDefinition ParentTestCaseDefinition { get; }
+        internal string PickleStepID { get; }
+        internal TestCaseDefinition ParentTestCaseDefinition { get; }
 
         // The Step Definition(s) that match this step of the Test Case. None for no match, 1 for a successful match, 2 or more for Ambiguous match.
-        public List<string> StepDefinitionIds { get; private set; }
+        internal List<string> StepDefinitionIds { get; private set; }
         // Indicates whether the step was successfully bound to a Step Definition.
-        public bool Bound { get; set; }
+        internal bool Bound { get; private set; }
 
         // The method name and signature of the bound method
-        public string CanonicalizedStepPattern { get; set; }
+        private string CanonicalizedStepPattern { get; set; }
 
         // List of method signatures that cause an ambiguous situation to arise
         private IEnumerable<string> AmbiguousStepDefinitions { get; set; }
-        public bool Ambiguous { get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0; } }
+        internal bool Ambiguous { get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0; } }
         private IStepDefinitionBinding StepDefinitionBinding;
 
-        public List<StepArgument> StepArguments { get; set; }
+        internal List<StepArgument> StepArguments { get; private set; }
 
 
-        public TestStepDefinition(string testStepDefinitionId, string pickleStepId, TestCaseDefinition parentTestCaseDefinition)
+        internal TestStepDefinition(string testStepDefinitionId, string pickleStepId, TestCaseDefinition parentTestCaseDefinition)
         {
             TestStepId = testStepDefinitionId;
             PickleStepID = pickleStepId;
@@ -44,7 +44,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         }
 
         // Once the StepFinished event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method
-        public void PopulateStepDefinitionFromExecutionResult(StepFinishedEvent stepFinishedEvent)
+        internal void PopulateStepDefinitionFromExecutionResult(StepFinishedEvent stepFinishedEvent)
         {
             var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
             Bound = !(bindingMatch == null || bindingMatch == BindingMatch.NonMatching);

@@ -40,12 +40,12 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // This dictionary maps from (string) PickkleID to the TestCase tracker
         private ConcurrentDictionary<string, TestCaseTracker> testCaseTrackersById = new();
 
-        public string FeatureName { get; set; }
-        public bool Enabled { get; private set; }
+        public string FeatureName { get; }
+        public bool Enabled { get; }
 
         // This dictionary maps from (string) PickleIDIndex to (string) PickleID
-        public Dictionary<string, string> PickleIds { get; } = new();
-        public PickleJar PickleJar { get; set; }
+        private Dictionary<string, string> PickleIds { get; } = new();
+        private PickleJar PickleJar { get; set; }
 
         public bool FeatureExecutionSuccess { get; private set; }
 
@@ -63,17 +63,13 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // At the completion of Feature execution, this is called to generate all non-static Messages
         // Iterating through all Scenario trackers, generating all messages.
-        public IEnumerable<Envelope> RuntimeGeneratedMessages {  get
+        public IEnumerable<Envelope> RuntimeGeneratedMessages
+        {
+            get
             {
-                foreach (var scenario in testCaseTrackersById.Values)
-                {
-                    foreach (var msg in scenario.RuntimeGeneratedMessages)
-                    {
-                        yield return msg;
-                    }
-                    ;
-                }
-            } }
+                return testCaseTrackersById.Values.SelectMany(scenario => scenario.RuntimeGeneratedMessages);
+            }
+        }
 
         internal void ProcessEvent(FeatureStartedEvent featureStartedEvent)
         {
@@ -152,17 +148,17 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 var pickleStepSequence = PickleJar.PickleStepSequenceFor(pickleIndex);
                 scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence; ;
 
-                TestCaseTracker tccmt;
-                if(testCaseTrackersById.TryGetValue(pickleId, out tccmt))
+                TestCaseTracker tct;
+                if (testCaseTrackersById.TryGetValue(pickleId, out tct))
                 {
                     // This represents a re-execution of the TestCase.
-                    tccmt.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
+                    tct.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
                 }
                 else // This is the first time this TestCase (aka, pickle) is getting executed. New up a TestCaseTracker for it.
                 {
-                    tccmt = new TestCaseTracker(this, pickleId);
-                    tccmt.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
-                    testCaseTrackersById.TryAdd(pickleId, tccmt);
+                    tct = new TestCaseTracker(this, pickleId);
+                    tct.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
+                    testCaseTrackersById.TryAdd(pickleId, tct);
                 }
             }
         }
@@ -170,8 +166,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
         {
             var pickleIndex = scenarioFinishedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
-            if (String.IsNullOrEmpty(pickleIndex)) 
-                return; 
+            if (String.IsNullOrEmpty(pickleIndex)) return;
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {

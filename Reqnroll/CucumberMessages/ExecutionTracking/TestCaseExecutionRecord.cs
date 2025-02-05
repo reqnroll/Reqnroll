@@ -11,25 +11,25 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// Data class that holds information about a single execution of a TestCase.
     /// There will be mulitple of these for a given TestCase if it is Retried.
     /// </summary>
-    public class TestCaseExecutionRecord : IGenerateMessage
+    internal class TestCaseExecutionRecord : IGenerateMessage
     {
-        public int AttemptId { get; }
-        public bool WillBeRetried { get; set; }
+        internal int AttemptId { get; }
+        internal bool WillBeRetried { get; set; }
 
         //  The ID of this particular execution of this Test Case
-        public string TestCaseStartedId { get; }
+        internal string TestCaseStartedId { get; }
 
-        public DateTime TestCaseStartedTimeStamp;
-        public DateTime TestCaseFinishedTimeStamp;
-        public ScenarioExecutionStatus ScenarioExecutionStatus { get; private set; }
-        public TestCaseTracker TestCaseTracker { get; }
+        internal DateTime TestCaseStartedTimeStamp { get; private set; }
+        internal DateTime TestCaseFinishedTimeStamp { get; private set; }
+        internal ScenarioExecutionStatus ScenarioExecutionStatus { get; private set; }
+        internal TestCaseTracker TestCaseTracker { get; }
 
-        public List<StepExecutionTrackerBase> StepExecutionTrackers { get; }
-        public StepExecutionTrackerBase CurrentStep { get { return StepExecutionTrackers.Last(); } }
+        internal List<StepExecutionTrackerBase> StepExecutionTrackers { get; }
+        internal StepExecutionTrackerBase CurrentStep { get { return StepExecutionTrackers.Last(); } }
 
 
 
-        public TestCaseExecutionRecord(int attemptId, string testCaseStartedId, TestCaseTracker testCaseTracker)
+        internal TestCaseExecutionRecord(int attemptId, string testCaseStartedId, TestCaseTracker testCaseTracker)
         {
             AttemptId = attemptId;
             TestCaseStartedId = testCaseStartedId;
@@ -38,7 +38,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             TestCaseTracker = testCaseTracker;
         }
 
-        public IEnumerable<Envelope> RuntimeMessages
+        internal IEnumerable<Envelope> RuntimeMessages
         {
             get
             {
@@ -53,7 +53,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             }
         }
 
-        public void StoreMessageGenerator(IGenerateMessage generator, ExecutionEvent executionEvent)
+        internal void StoreMessageGenerator(IGenerateMessage generator, ExecutionEvent executionEvent)
         {
             _events.Enqueue((generator, executionEvent));
         }
@@ -62,13 +62,13 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         private Queue<(IGenerateMessage, ExecutionEvent)> _events = new();
 
 
-        public void RecordStart(ScenarioStartedEvent e)
+        internal void RecordStart(ScenarioStartedEvent e)
         {
             TestCaseStartedTimeStamp = e.Timestamp;
             StoreMessageGenerator(this, e);
         }
 
-        public void RecordFinish(ScenarioFinishedEvent e)
+        internal void RecordFinish(ScenarioFinishedEvent e)
         {
             TestCaseFinishedTimeStamp = e.Timestamp;
             ScenarioExecutionStatus = e.ScenarioContext.ScenarioExecutionStatus;
