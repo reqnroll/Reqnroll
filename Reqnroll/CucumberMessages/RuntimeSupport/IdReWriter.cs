@@ -6,9 +6,16 @@ using System.Collections.Generic;
 
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
-    public class IdReWriter
+    /// <summary>
+    /// This class rewrites the GherkinDocument and Pickles collection to match the ID style configured for this test run.
+    /// 
+    /// When the Gherkin Doc and Pickles are first created during the compilation phase, we use incrementing integer IDs. 
+    /// If the current test run wants to use UUIDs, then we re-write the documents with UUIDs and ensure all the references
+    /// to those IDs are patched up.
+    /// </summary>
+    internal class IdReWriter
     {
-        public void ReWriteIds(GherkinDocument gherkinDocument, IEnumerable<Pickle> pickles, IIdGenerator idGenerator, out GherkinDocument newGherkinDocument, out IEnumerable<Pickle> newPickles)
+        internal void ReWriteIds(GherkinDocument gherkinDocument, IEnumerable<Pickle> pickles, IIdGenerator idGenerator, out GherkinDocument newGherkinDocument, out IEnumerable<Pickle> newPickles)
         {
             var targetIdStyle = CucumberConfiguration.Current.IDGenerationStyle;
             var gherkinDocumentIDStyleReWriter = new GherkinDocumentIDReWriter(idGenerator);

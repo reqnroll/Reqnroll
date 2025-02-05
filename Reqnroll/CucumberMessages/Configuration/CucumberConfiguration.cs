@@ -19,7 +19,7 @@ namespace Reqnroll.CucumberMessages.Configuration
     /// the class will resolve the configuration (only once).
     /// 
     /// A default configuration is provided (by DefaultConfigurationSource). 
-    /// It is supplemented by one or more profiles from the configuration file. (RCM_ConfigFile_ConfigurationSource)
+    /// It is supplemented by one or more profiles from the configuration file. (ConfigFile_ConfigurationSource)
     /// Then Environmment Variable Overrides are applied.
     /// </summary>
     public class CucumberConfiguration : ICucumberMessagesConfiguration
@@ -73,7 +73,7 @@ namespace Reqnroll.CucumberMessages.Configuration
         private ConfigurationDTO ApplyHierarchicalConfiguration()
         {
             var defaultConfigurationProvider = new DefaultConfigurationSource(_environmentWrapper);
-            var fileBasedConfigurationProvider = new RCM_ConfigFile_ConfigurationSource(_environmentWrapper, _reqnrollJsonLocator);
+            var fileBasedConfigurationProvider = new ConfigFile_ConfigurationSource(_reqnrollJsonLocator);
 
             ConfigurationDTO defaultConfig = defaultConfigurationProvider.GetConfiguration();
             ConfigurationDTO fileBasedConfig = fileBasedConfigurationProvider.GetConfiguration();

@@ -7,29 +7,28 @@ using System.Text;
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
     /// <summary>
-    /// These classes are used at runtime to track which Pickle and PickleStep is being executed
-    /// and to provide the appropriate PickleId and PickleStepId to the TestCaseTracker and StepTracker.
+    /// This class is used at runtime to provide the appropriate PickleId and PickleStepId to the TestCaseTracker and StepTracker.
     /// </summary>
-    public class PickleJar
+    internal class PickleJar
     {
-        public int _PickleCounter = 0;
+        private int _PickleCounter = 0;
 
-        public bool HasPickles => Pickles != null && Pickles.Count() > 0;
-        public IEnumerable<Pickle> Pickles { get; set; }
+        private bool HasPickles => Pickles != null && Pickles.Count() > 0;
+        private IEnumerable<Pickle> Pickles;
 
-        public PickleJar(IEnumerable<Pickle> pickles)
+        internal PickleJar(IEnumerable<Pickle> pickles)
         {
             Pickles = pickles;
             _PickleCounter = 0;
         }
 
-        public PickleStepSequence PickleStepSequenceFor(string pickleIndex)
+        internal PickleStepSequence PickleStepSequenceFor(string pickleIndex)
         {
             var pickleIndexInt = int.Parse(pickleIndex);
             if (HasPickles && (pickleIndexInt < 0 || pickleIndexInt >= Pickles.Count()))
                 throw new ArgumentException("Invalid pickle index: " + pickleIndex);
 
-            return new PickleStepSequence(HasPickles, HasPickles ? Pickles.ElementAt(pickleIndexInt): null);
+            return new PickleStepSequence(HasPickles, HasPickles ? Pickles.ElementAt(pickleIndexInt) : null);
         }
     }
 }

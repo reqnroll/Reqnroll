@@ -12,7 +12,7 @@ namespace Reqnroll.CucumberMessages.Configuration
     /// </summary>
     internal class DefaultConfigurationSource : IConfigurationSource
     {
-        private IEnvironmentWrapper _environmentWrapper;
+        private readonly IEnvironmentWrapper _environmentWrapper;
 
         public DefaultConfigurationSource(IEnvironmentWrapper environmentWrapper)
         {

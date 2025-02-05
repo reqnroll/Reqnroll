@@ -7,14 +7,12 @@ using System.Text.Json;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
-    public class RCM_ConfigFile_ConfigurationSource : IConfigurationSource
+    public class ConfigFile_ConfigurationSource : IConfigurationSource
     {
-        private IEnvironmentWrapper _environmentWrapper;
         private IReqnrollJsonLocator _configFileLocator;
 
-        public RCM_ConfigFile_ConfigurationSource(IEnvironmentWrapper environmentWrapper, IReqnrollJsonLocator configurationFileLocator)
+        public ConfigFile_ConfigurationSource(IReqnrollJsonLocator configurationFileLocator)
         {
-            _environmentWrapper = environmentWrapper;
             _configFileLocator = configurationFileLocator;
         }
 
@@ -27,6 +25,7 @@ namespace Reqnroll.CucumberMessages.Configuration
 
             ConfigurationDTO configurationDTO = new();
             CucumberMessagesConfiguration section = null;
+
             if (File.Exists(fileName))
             {
                 var jsonFileContent = File.ReadAllText(fileName);

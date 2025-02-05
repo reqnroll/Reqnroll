@@ -24,11 +24,5 @@ namespace Reqnroll.CucumberMessages.RuntimeSupport
             var nextId = Interlocked.Increment(ref _counter);
             return nextId.ToString();
         }
-
-
-        public void Reset()
-        {
-            _counter = 0;
-        }
     }
 }
