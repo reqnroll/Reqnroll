@@ -12,12 +12,14 @@ public class TestFileManager
 {
     private const string RootNamespace = "Reqnroll.SystemTests";
     private const string TestFileFolder = "Resources";
-    private readonly string _prefix = $"{RootNamespace}.{TestFileFolder}";
 
-    public string GetTestFileContent(string testFileName)
+    private string GetPrefix(string? resourceGroup = null) =>
+        resourceGroup == null ? $"{RootNamespace}.{TestFileFolder}" : $"{RootNamespace}.{resourceGroup}.{TestFileFolder}";
+
+    public string GetTestFileContent(string testFileName, string? resourceGroup = null)
     {
         var testFileResourceName = testFileName.Replace('/', '.');
-        var resourceName = $"{_prefix}.{testFileResourceName}";
+        var resourceName = $"{GetPrefix(resourceGroup)}.{testFileResourceName}";
         var projectTemplateStream = Assembly
                                     .GetExecutingAssembly()
                                     .GetManifestResourceStream(resourceName);
@@ -30,7 +32,7 @@ public class TestFileManager
     public IEnumerable<string> GetTestFeatureFiles()
     {
         var assembly = Assembly.GetExecutingAssembly();
-        string prefixToRemove = $"{_prefix}.";
+        string prefixToRemove = $"{GetPrefix()}.";
         return assembly.GetManifestResourceNames()
                        .Where(rn => rn.EndsWith(".feature") && rn.StartsWith(prefixToRemove))
                        .Select(rn => rn.Substring(prefixToRemove.Length));

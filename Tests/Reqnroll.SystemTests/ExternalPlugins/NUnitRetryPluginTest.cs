@@ -4,23 +4,23 @@ using Reqnroll.TestProjectGenerator;
 using Reqnroll.TestProjectGenerator.Driver;
 using System.Linq;
 
-namespace Reqnroll.SystemTests.Plugins;
+namespace Reqnroll.SystemTests.ExternalPlugins;
 
 [TestClass]
-public class XRetryPluginTest : SystemTestBase
+public class NUnitRetryPluginTest : ExternalPluginsTestBase
 {
     protected override void TestInitialize()
     {
         base.TestInitialize();
-        _testRunConfiguration.UnitTestProvider = UnitTestProvider.xUnit;
-        _projectsDriver.AddNuGetPackage("xRetry.Reqnroll", "1.0.0");
+        _testRunConfiguration.UnitTestProvider = UnitTestProvider.NUnit4;
+        _projectsDriver.AddNuGetPackage("NUnitRetry.ReqnrollPlugin", "1.0.100");
     }
 
     [TestMethod]
-    public void XRetry_should_work_with_Reqnroll()
+    public void NUnitRetry_should_work_with_Reqnroll()
     {
-        AddFeatureFileFromResource("XRetryPlugin/XRetryPluginTestFeature.feature");
-        AddBindingClassFromResource("XRetryPlugin/XRetryPluginTestStepDefinitions.cs");
+        AddFeatureFileFromResource("NUnitRetryPlugin/NUnitRetryPluginTestFeature.feature", resourceGroup: "ExternalPlugins");
+        AddBindingClassFromResource("NUnitRetryPlugin/NUnitRetryPluginTestStepDefinitions.cs", resourceGroup: "ExternalPlugins");
 
         ExecuteTests();
 
@@ -31,11 +31,11 @@ public class XRetryPluginTest : SystemTestBase
     }
 
     [TestMethod]
-    [TestCategory("MsBuild")] 
-    public void XRetry_should_work_with_Reqnroll_on_DotNetFramework_generation()
+    [TestCategory("MsBuild")]
+    public void NUnitRetry_should_work_with_Reqnroll_on_DotNetFramework_generation()
     {
         // compiling with MsBuild forces the generation to run with .NET Framework
         _compilationDriver.SetBuildTool(BuildTool.MSBuild);
-        XRetry_should_work_with_Reqnroll();
+        NUnitRetry_should_work_with_Reqnroll();
     }
 }
