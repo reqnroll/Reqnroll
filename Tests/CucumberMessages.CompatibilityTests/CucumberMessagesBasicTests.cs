@@ -232,6 +232,32 @@ namespace CucumberMessages.Tests
             ShouldAllScenariosPass();
         }
 
+        [TestMethod]
+        public void CanGenerateVB()
+        {
+            _testRunConfiguration.ProgrammingLanguage = Reqnroll.TestProjectGenerator.ProgrammingLanguage.VB;
+            ResetCucumberMessages("VB Generation Test.ndjson");
+            EnableCucumberMessages();
+            SetCucumberMessagesOutputFileName("VB Generation Test.ndjson");
+            CucumberMessagesAddConfigurationFile("reqnroll.json");
+
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Outline Test
+                  @some-tag
+                  Scenario Outline: Log JSON
+                     When the following string is attached as <color>:
+                  Examples:
+                    | color |
+                    | "red" |
+                    | "green" |
+                    | "blue" |
+                """);
+
+            AddPassingStepBinding("When");
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+        }
 
         [TestMethod]
         public void CucumberMessagesInteropWithExternalData()
