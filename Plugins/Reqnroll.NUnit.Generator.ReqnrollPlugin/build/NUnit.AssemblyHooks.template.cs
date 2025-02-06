@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 [GeneratedCode("Reqnroll", "REQNROLL_VERSION")]
 [global::NUnit.Framework.SetUpFixture]
-[global::NUnit.Framework.FixtureLifeCycle(global::NUnit.Framework.LifeCycle.InstancePerTestCase)]
 public static class PROJECT_ROOT_NAMESPACE_NUnitAssemblyHooks
 {
     [global::NUnit.Framework.OneTimeSetUp]
