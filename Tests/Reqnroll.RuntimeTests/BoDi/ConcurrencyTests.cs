@@ -522,17 +522,32 @@ namespace Reqnroll.RuntimeTests.BoDi
         [Fact]
         public void ShouldThrowConcurrentObjectResolutionTimeoutErrorIfResolutionBlocksLongerThanDefaultResolutionTimeOut()
         {
-            ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
-            var container = new ObjectContainer();
-            TestConcurrentObjectResolutionTimeout(container);
+            try
+            {
+                ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
+                var container = new ObjectContainer();
+                TestConcurrentObjectResolutionTimeout(container);
+            }
+            finally
+            {
+                ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromSeconds(1); // reset to default
+            }
         }
 
         [Fact]
         public void ShouldThrowConcurrentObjectResolutionTimeoutErrorIfResolutionBlocksLongerThanDefaultResolutionTimeOutChangedAfterContainerCreation()
         {
-            var container = new ObjectContainer();
-            ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
-            TestConcurrentObjectResolutionTimeout(container);
+            try
+            {
+                ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromSeconds(1); // make sure it is the default
+                var container = new ObjectContainer();
+                ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
+                TestConcurrentObjectResolutionTimeout(container);
+            }
+            finally
+            {
+                ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromSeconds(1); // reset to default
+            }
         }
 
         private void TestConcurrentObjectResolutionTimeout(ObjectContainer container)
