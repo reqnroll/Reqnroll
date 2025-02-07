@@ -8,6 +8,7 @@
 * Reqnroll.Autofac: Add default registration for IReqnrollOutputHelper (#357)
 * Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
 * Update behavior of `ObjectContainer.IsRegistered()` to check base container for registrations, to match `Resolve()` behavior (#367)
+* Replaced custom approach for avoiding namespace collisions with .net idiomatic approach
 * Support loading plugin dependencies from .deps.json on .NET Framework and Visual Studio MSBuild (#408)
 * Support for setting `ObjectContainer.DefaultConcurrentObjectResolutionTimeout` even after creation of the container (#435)
 

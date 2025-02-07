@@ -289,11 +289,13 @@ namespace Reqnroll.Generator.CodeDom
             };
         }
 
+        [Obsolete("Not used anymore, will be removed with Reqnroll future versions")]
         public string GetGlobalizedTypeName(Type type)
         {
             return GetGlobalizedTypeName(type.FullName!);
         }
 
+        [Obsolete("Not used anymore, will be removed with Reqnroll future versions")]
         public string GetGlobalizedTypeName(string typeName)
         {
             if (TargetLanguage == CodeDomProviderLanguage.CSharp)
