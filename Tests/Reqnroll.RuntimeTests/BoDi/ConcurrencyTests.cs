@@ -514,10 +514,31 @@ namespace Reqnroll.RuntimeTests.BoDi
         [Fact]
         public void ShouldThrowConcurrentObjectResolutionTimeoutErrorIfResolutionBlocksLongerThanObjectResolutionTimeOut()
         {
+            var container = new ObjectContainer();
+            container.ConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
+            TestConcurrentObjectResolutionTimeout(container);
+        }
+
+        [Fact]
+        public void ShouldThrowConcurrentObjectResolutionTimeoutErrorIfResolutionBlocksLongerThanDefaultResolutionTimeOut()
+        {
+            ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
+            var container = new ObjectContainer();
+            TestConcurrentObjectResolutionTimeout(container);
+        }
+
+        [Fact]
+        public void ShouldThrowConcurrentObjectResolutionTimeoutErrorIfResolutionBlocksLongerThanDefaultResolutionTimeOutChangedAfterContainerCreation()
+        {
+            var container = new ObjectContainer();
+            ObjectContainer.DefaultConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
+            TestConcurrentObjectResolutionTimeout(container);
+        }
+
+        private void TestConcurrentObjectResolutionTimeout(ObjectContainer container)
+        {
             try
             {
-                var container = new ObjectContainer();
-                container.ConcurrentObjectResolutionTimeout = TimeSpan.FromMilliseconds(10);
                 container.RegisterTypeAs<BlockingObject, BlockingObject>();
 
                 var thread1 = new Thread(_ =>
@@ -528,7 +549,9 @@ namespace Reqnroll.RuntimeTests.BoDi
                 var thread2 = new Thread(_ =>
                 {
                     Action act = () => container.Resolve<BlockingObject>();
-                    act.Should().ThrowExactly<ObjectContainerException>("Concurrent object resolution timeout (potential circular dependency).");
+                    act.Should().ThrowExactly<ObjectContainerException>("Concurrent object resolution timeout (potential circular dependency).")
+                       .And.Message.Should().Contain(nameof(ObjectContainer.DefaultConcurrentObjectResolutionTimeout))
+                       .And.Contain(nameof(ObjectContainer.ConcurrentObjectResolutionTimeout));
                 });
 
                 // start first thread and wait until ctor already in progress
