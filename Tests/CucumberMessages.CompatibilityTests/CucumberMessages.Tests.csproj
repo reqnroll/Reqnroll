@@ -10,164 +10,167 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Samples\ambiguous\Ambiguous.cs" />
-    <Compile Remove="Samples\attachments\attachments.cs" />
-    <Compile Remove="Samples\background\background.cs" />
-    <Compile Remove="Samples\cdata\cdata.cs" />
-    <Compile Remove="Samples\data-tables\data_tables.cs" />
-    <Compile Remove="Samples\empty\empty.cs" />
-    <Compile Remove="Samples\examples-tables\examples_tables.cs" />
-    <Compile Remove="Samples\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
-    <Compile Remove="Samples\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
-    <Compile Remove="Samples\hooks\hooks.cs" />
-    <Compile Remove="Samples\minimal\minimal.cs" />
-    <Compile Remove="Samples\parameter-types\parameter_types.cs" />
-    <Compile Remove="Samples\pending\pending.cs" />
-    <Compile Remove="Samples\retry-NUnitRetry\retry_NUnitRetry.cs" />
-    <Compile Remove="Samples\retry-xRetry\retry_xRetry.cs" />
-    <Compile Remove="Samples\rules\rules.cs" />
-    <Compile Remove="Samples\skipped\skipped.cs" />
-    <Compile Remove="Samples\stack-traces\stack_traces.cs" />
-    <Compile Remove="Samples\test-run-hooks\test_run_hooks.cs" />
-    <Compile Remove="Samples\undefined\undefined.cs" />
-    <Compile Remove="Samples\unknown-parameter-type\unknown_parameter_type.cs" />
+    <Compile Remove="Samples\Resources\ambiguous\Ambiguous.cs" />
+    <Compile Remove="Samples\Resources\attachments\attachments.cs" />
+    <Compile Remove="Samples\Resources\background\background.cs" />
+    <Compile Remove="Samples\Resources\cdata\cdata.cs" />
+    <Compile Remove="Samples\Resources\data-tables\data_tables.cs" />
+    <Compile Remove="Samples\Resources\empty\empty.cs" />
+    <Compile Remove="Samples\Resources\examples-tables\examples_tables.cs" />
+    <Compile Remove="Samples\Resources\external-data\external_data.cs" />
+    <Compile Remove="Samples\Resources\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
+    <Compile Remove="Samples\Resources\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
+    <Compile Remove="Samples\Resources\hooks\hooks.cs" />
+    <Compile Remove="Samples\Resources\minimal\minimal.cs" />
+    <Compile Remove="Samples\Resources\parameter-types\parameter_types.cs" />
+    <Compile Remove="Samples\Resources\pending\pending.cs" />
+    <Compile Remove="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.cs" />
+    <Compile Remove="Samples\Resources\retry-xRetry\retry_xRetry.cs" />
+    <Compile Remove="Samples\Resources\rules\rules.cs" />
+    <Compile Remove="Samples\Resources\skipped\skipped.cs" />
+    <Compile Remove="Samples\Resources\stack-traces\stack_traces.cs" />
+    <Compile Remove="Samples\Resources\test-run-hooks\test_run_hooks.cs" />
+    <Compile Remove="Samples\Resources\undefined\undefined.cs" />
+    <Compile Remove="Samples\Resources\unknown-parameter-type\unknown_parameter_type.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="Samples\ambiguous\ambiguous.feature" />
-    <None Remove="Samples\ambiguous\ambiguous.feature.ndjson" />
-    <None Remove="Samples\attachments\attachments.feature" />
-    <None Remove="Samples\attachments\attachments.feature.ndjson" />
-    <None Remove="Samples\background\background.feature" />
-    <None Remove="Samples\background\background.feature.ndjson" />
-    <None Remove="Samples\cdata\cdata.feature" />
-    <None Remove="Samples\cdata\cdata.feature.ndjson" />
-    <None Remove="Samples\data-tables\data_tables.feature" />
-    <None Remove="Samples\data-tables\data_tables.feature.ndjson" />
-    <None Remove="Samples\empty\empty.feature" />
-    <None Remove="Samples\empty\empty.feature.ndjson" />
-    <None Remove="Samples\examples-tables\examples_tables.feature" />
-    <None Remove="Samples\examples-tables\examples_tables.feature.ndjson" />
-    <None Remove="Samples\ExternalBindingAssemblies\ExternalBinding.feature" />
-    <None Remove="Samples\hooks\hooks.feature" />
-    <None Remove="Samples\hooks\hooks.feature.ndjson" />
-    <None Remove="Samples\minimal\minimal.feature" />
-    <None Remove="Samples\minimal\minimal.feature.ndjson" />
-    <None Remove="Samples\pending\pending.feature" />
-    <None Remove="Samples\pending\pending.feature.ndjson" />
-    <None Remove="Samples\rules\parameter-types.feature" />
-    <None Remove="Samples\rules\parameter-types.feature.ndjson" />
-    <None Remove="Samples\rules\rules.feature" />
-    <None Remove="Samples\rules\rules.feature.ndjson" />
-    <None Remove="Samples\skipped\skipped.feature" />
-    <None Remove="Samples\skipped\skipped.feature.ndjson" />
-    <None Remove="Samples\stack-traces\stack_traces.feature" />
-    <None Remove="Samples\stack-traces\stack_traces.feature.ndjson" />
-    <None Remove="Samples\undefined\undefined.feature" />
-    <None Remove="Samples\undefined\undefined.feature.ndjson" />
-    <None Remove="Samples\unknown-parameter-type\unknown_parameter_type.feature" />
-    <None Remove="Samples\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
+    <None Remove="Samples\Resources\ambiguous\ambiguous.feature" />
+    <None Remove="Samples\Resources\ambiguous\ambiguous.feature.ndjson" />
+    <None Remove="Samples\Resources\attachments\attachments.feature" />
+    <None Remove="Samples\Resources\attachments\attachments.feature.ndjson" />
+    <None Remove="Samples\Resources\background\background.feature" />
+    <None Remove="Samples\Resources\background\background.feature.ndjson" />
+    <None Remove="Samples\Resources\cdata\cdata.feature" />
+    <None Remove="Samples\Resources\cdata\cdata.feature.ndjson" />
+    <None Remove="Samples\Resources\data-tables\data_tables.feature" />
+    <None Remove="Samples\Resources\data-tables\data_tables.feature.ndjson" />
+    <None Remove="Samples\Resources\empty\empty.feature" />
+    <None Remove="Samples\Resources\empty\empty.feature.ndjson" />
+    <None Remove="Samples\Resources\examples-tables\examples_tables.feature" />
+    <None Remove="Samples\Resources\examples-tables\examples_tables.feature.ndjson" />
+    <None Remove="Samples\Resources\ExternalBindingAssemblies\ExternalBinding.feature" />
+    <None Remove="Samples\Resources\hooks\hooks.feature" />
+    <None Remove="Samples\Resources\hooks\hooks.feature.ndjson" />
+    <None Remove="Samples\Resources\minimal\minimal.feature" />
+    <None Remove="Samples\Resources\minimal\minimal.feature.ndjson" />
+    <None Remove="Samples\Resources\pending\pending.feature" />
+    <None Remove="Samples\Resources\pending\pending.feature.ndjson" />
+    <None Remove="Samples\Resources\rules\parameter-types.feature" />
+    <None Remove="Samples\Resources\rules\parameter-types.feature.ndjson" />
+    <None Remove="Samples\Resources\rules\rules.feature" />
+    <None Remove="Samples\Resources\rules\rules.feature.ndjson" />
+    <None Remove="Samples\Resources\skipped\skipped.feature" />
+    <None Remove="Samples\Resources\skipped\skipped.feature.ndjson" />
+    <None Remove="Samples\Resources\stack-traces\stack_traces.feature" />
+    <None Remove="Samples\Resources\stack-traces\stack_traces.feature.ndjson" />
+    <None Remove="Samples\Resources\undefined\undefined.feature" />
+    <None Remove="Samples\Resources\undefined\undefined.feature.ndjson" />
+    <None Remove="Samples\Resources\unknown-parameter-type\unknown_parameter_type.feature" />
+    <None Remove="Samples\Resources\unknown-parameter-type\unknown_parameter_type.feature.ndjson" />
     <None Remove="products.csv" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Samples\ambiguous\ambiguous.feature" />
-    <EmbeddedResource Include="Samples\ambiguous\ambiguous.cs" />
-    <EmbeddedResource Include="Samples\attachments\attachments.cs" />
-    <EmbeddedResource Include="Samples\attachments\attachments.feature" />
-    <Content Include="Samples\ambiguous\ambiguous.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\ambiguous\ambiguous.feature" />
+    <EmbeddedResource Include="Samples\Resources\ambiguous\ambiguous.cs" />
+    <EmbeddedResource Include="Samples\Resources\attachments\attachments.cs" />
+    <EmbeddedResource Include="Samples\Resources\attachments\attachments.feature" />
+    <Content Include="Samples\Resources\ambiguous\ambiguous.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Samples\attachments\attachments.feature.ndjson">
+    <Content Include="Samples\Resources\attachments\attachments.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Samples\background\background.feature.ndjson">
+    <Content Include="Samples\Resources\background\background.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Samples\empty\empty.feature.ndjson">
+    <Content Include="Samples\Resources\empty\empty.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Samples\test-run-hooks\test_run_hooks.feature.ndjson">
+    <Content Include="Samples\Resources\test-run-hooks\test_run_hooks.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\retry-NUnitRetry\retry_NUnitRetry.cs" />
-    <Content Include="Samples\retry-NUnitRetry\retry_NUnitRetry.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\external-data\external_data.cs" />
+    <EmbeddedResource Include="Samples\Resources\external-data\external_data.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks\hooks.cs" />
+    <EmbeddedResource Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.cs" />
+    <Content Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\background\background.cs" />
-    <EmbeddedResource Include="Samples\background\background.feature" />
-    <EmbeddedResource Include="Samples\cdata\cdata.cs" />
-    <EmbeddedResource Include="Samples\cdata\cdata.feature" />
-    <Content Include="Samples\cdata\cdata.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\background\background.cs" />
+    <EmbeddedResource Include="Samples\Resources\background\background.feature" />
+    <EmbeddedResource Include="Samples\Resources\cdata\cdata.cs" />
+    <EmbeddedResource Include="Samples\Resources\cdata\cdata.feature" />
+    <Content Include="Samples\Resources\cdata\cdata.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\data-tables\data_tables.cs" />
-    <EmbeddedResource Include="Samples\data-tables\data_tables.feature" />
-    <Content Include="Samples\data-tables\data_tables.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\data-tables\data_tables.cs" />
+    <EmbeddedResource Include="Samples\Resources\data-tables\data_tables.feature" />
+    <Content Include="Samples\Resources\data-tables\data_tables.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\empty\empty.cs" />
-    <EmbeddedResource Include="Samples\empty\empty.feature" />
-    <EmbeddedResource Include="Samples\examples-tables\examples_tables.cs" />
-    <EmbeddedResource Include="Samples\examples-tables\examples_tables.feature" />
-    <Content Include="Samples\examples-tables\examples_tables.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\empty\empty.cs" />
+    <EmbeddedResource Include="Samples\Resources\empty\empty.feature" />
+    <EmbeddedResource Include="Samples\Resources\examples-tables\examples_tables.cs" />
+    <EmbeddedResource Include="Samples\Resources\examples-tables\examples_tables.feature" />
+    <Content Include="Samples\Resources\examples-tables\examples_tables.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\ExternalBindingAssemblies\ExternalBinding.feature" />
-    <EmbeddedResource Include="Samples\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
-    <EmbeddedResource Include="Samples\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
-    <EmbeddedResource Include="Samples\hooks\hooks.cs" />
-    <EmbeddedResource Include="Samples\hooks\hooks.feature" />
-    <Content Include="Samples\hooks\hooks.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\ExternalBindingAssemblies\ExternalBinding.feature" />
+    <EmbeddedResource Include="Samples\Resources\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
+    <EmbeddedResource Include="Samples\Resources\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
+    <EmbeddedResource Include="Samples\Resources\hooks\hooks.feature" />
+    <Content Include="Samples\Resources\hooks\hooks.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\minimal\minimal.cs" />
-    <EmbeddedResource Include="Samples\minimal\minimal.feature" />
-    <Content Include="Samples\minimal\minimal.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\minimal\minimal.cs" />
+    <EmbeddedResource Include="Samples\Resources\minimal\minimal.feature" />
+    <Content Include="Samples\Resources\minimal\minimal.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\parameter-types\parameter_types.cs" />
-    <EmbeddedResource Include="Samples\pending\pending.cs" />
-    <EmbeddedResource Include="Samples\pending\pending.feature" />
-    <Content Include="Samples\pending\pending.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\parameter-types\parameter_types.cs" />
+    <EmbeddedResource Include="Samples\Resources\pending\pending.cs" />
+    <EmbeddedResource Include="Samples\Resources\pending\pending.feature" />
+    <Content Include="Samples\Resources\pending\pending.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\parameter-types\parameter_types.feature" />
-    <Content Include="Samples\parameter-types\parameter_types.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\parameter-types\parameter_types.feature" />
+    <Content Include="Samples\Resources\parameter-types\parameter_types.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\retry-NUnitRetry\retry_NUnitRetry.feature" />
-    <EmbeddedResource Include="Samples\retry-xRetry\retry_xRetry.cs" />
-    <EmbeddedResource Include="Samples\retry-xRetry\retry_xRetry.feature" />
-    <Content Include="Samples\retry-xRetry\retry_xRetry.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.feature" />
+    <EmbeddedResource Include="Samples\Resources\retry-xRetry\retry_xRetry.cs" />
+    <EmbeddedResource Include="Samples\Resources\retry-xRetry\retry_xRetry.feature" />
+    <Content Include="Samples\Resources\retry-xRetry\retry_xRetry.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\rules\rules.cs" />
-    <EmbeddedResource Include="Samples\rules\rules.feature" />
-    <Content Include="Samples\rules\rules.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\rules\rules.cs" />
+    <EmbeddedResource Include="Samples\Resources\rules\rules.feature" />
+    <Content Include="Samples\Resources\rules\rules.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\skipped\skipped.cs" />
-    <EmbeddedResource Include="Samples\skipped\skipped.feature" />
-    <Content Include="Samples\skipped\skipped.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\skipped\skipped.cs" />
+    <EmbeddedResource Include="Samples\Resources\skipped\skipped.feature" />
+    <Content Include="Samples\Resources\skipped\skipped.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\stack-traces\stack_traces.cs" />
-    <EmbeddedResource Include="Samples\stack-traces\stack_traces.feature" />
-    <Content Include="Samples\stack-traces\stack_traces.feature.ndjson" />
-    <EmbeddedResource Include="Samples\test-run-hooks\test_run_hooks.cs" />
-    <EmbeddedResource Include="Samples\test-run-hooks\test_run_hooks.feature" />
-    <EmbeddedResource Include="Samples\undefined\undefined.cs" />
-    <EmbeddedResource Include="Samples\undefined\undefined.feature" />
-    <Content Include="Samples\undefined\undefined.feature.ndjson">
+    <EmbeddedResource Include="Samples\Resources\stack-traces\stack_traces.cs" />
+    <EmbeddedResource Include="Samples\Resources\stack-traces\stack_traces.feature" />
+    <Content Include="Samples\Resources\stack-traces\stack_traces.feature.ndjson" />
+    <EmbeddedResource Include="Samples\Resources\test-run-hooks\test_run_hooks.cs" />
+    <EmbeddedResource Include="Samples\Resources\test-run-hooks\test_run_hooks.feature" />
+    <EmbeddedResource Include="Samples\Resources\undefined\undefined.cs" />
+    <EmbeddedResource Include="Samples\Resources\undefined\undefined.feature" />
+    <Content Include="Samples\Resources\undefined\undefined.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <EmbeddedResource Include="Samples\unknown-parameter-type\unknown_parameter_type.cs" />
-    <EmbeddedResource Include="Samples\unknown-parameter-type\unknown_parameter_type.feature" />
-    <EmbeddedResource Include="products.csv">
+    <EmbeddedResource Include="Samples\Resources\unknown-parameter-type\unknown_parameter_type.cs" />
+    <EmbeddedResource Include="Samples\Resources\unknown-parameter-type\unknown_parameter_type.feature" />
+    <EmbeddedResource Include="Samples\Resources\external-data\products.csv">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <Content Include="Samples\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
+    <Content Include="Samples\Resources\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -201,13 +204,13 @@
     <None Update="reqnroll.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Samples\attachments\cucumber.jpeg">
+    <None Update="Samples\Resources\attachments\cucumber.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Samples\attachments\cucumber.png">
+    <None Update="Samples\Resources\attachments\cucumber.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Samples\hooks\cucumber.svg">
+    <None Update="Samples\Resources\hooks\cucumber.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="partialConfiguration.json">

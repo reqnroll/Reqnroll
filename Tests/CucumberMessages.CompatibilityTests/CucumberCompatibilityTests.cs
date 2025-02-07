@@ -51,9 +51,8 @@ namespace CucumberMessages.Tests
 
             var featureFileName = testName.Replace("-", "_");
 
-            AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "CucumberMessages.Tests.Samples", Assembly.GetExecutingAssembly());
-            AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "CucumberMessages.Tests.Samples", Assembly.GetExecutingAssembly());
-            //AddBinaryFilesFromResource($"{testName}", "CucumberMessages.CompatibilityTests.CCK", Assembly.GetExecutingAssembly());
+            AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "Samples", Assembly.GetExecutingAssembly());
+            AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "Samples", Assembly.GetExecutingAssembly());
 
             ExecuteTests();
 
