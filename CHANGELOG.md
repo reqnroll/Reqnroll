@@ -5,6 +5,7 @@
 * Enhance BoDi error handling to provide the name of the interface being registered when that interface has already been resolved (#324)
 * Improve code-behind feature file compilation speed (#336)
 * Improve parameter type naming for generic types (#343)
+* Add default registration for IReqnrollOutputHelper using Autofac (#357)
 * Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
 * Update behavior of `ObjectContainer.IsRegistered()` to check base container for registrations, to match `Resolve()` behavior (#367)
 
@@ -16,7 +17,7 @@
 * Fix: Error with NUnit 4: "Only static OneTimeSetUp and OneTimeTearDown are allowed for InstancePerTestCase mode" (#379)
 * Fix: Reqnroll.Autofac: FeatureContext cannot be resolved in BeforeFeature/AfterFeature hooks (#340)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen
+*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen
 
 # v2.2.1 - 2024-11-08
 
