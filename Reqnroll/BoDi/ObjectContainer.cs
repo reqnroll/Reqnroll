@@ -258,7 +258,7 @@ public class ObjectContainer : IObjectContainer
                 }
             }
 
-            throw new ObjectContainerException("Concurrent object resolution timeout (potential circular dependency).", resolutionPath.ToTypeList());
+            throw new ObjectContainerException($"Concurrent object resolution timeout (potential circular dependency). To increase the current timeout ({timeout.TotalSeconds:F} seconds), set the static 'ObjectContainer.DefaultConcurrentObjectResolutionTimeout' property or update the 'ConcurrentObjectResolutionTimeout' property of the current container.", resolutionPath.ToTypeList());
         }
     }
 
@@ -328,6 +328,7 @@ public class ObjectContainer : IObjectContainer
     private readonly ConcurrentDictionary<RegistrationKey, IRegistration> _registrations = new();
     private readonly List<RegistrationKey> _resolvedKeys = new();
     private readonly Dictionary<RegistrationKey, object> _objectPool = new();
+    private TimeSpan? _concurrentObjectResolutionTimeout;
 
     public event Action<object> ObjectCreated;
     public IObjectContainer BaseContainer => _baseContainer;
@@ -335,7 +336,11 @@ public class ObjectContainer : IObjectContainer
     /// <summary>
     /// Sets the timeout for thread-safe object resolution. By default, it uses the value of <see cref="DefaultConcurrentObjectResolutionTimeout"/> that is initialized to 1 second. Setting it to <see cref="TimeSpan.Zero"/> disables thread-safe resolution.
     /// </summary>
-    public TimeSpan ConcurrentObjectResolutionTimeout { get; set; } = DefaultConcurrentObjectResolutionTimeout;
+    public TimeSpan ConcurrentObjectResolutionTimeout
+    {
+        get => _concurrentObjectResolutionTimeout ?? DefaultConcurrentObjectResolutionTimeout;
+        set => _concurrentObjectResolutionTimeout = value;
+    }
 
     public ObjectContainer(IObjectContainer baseContainer = null)
     {
