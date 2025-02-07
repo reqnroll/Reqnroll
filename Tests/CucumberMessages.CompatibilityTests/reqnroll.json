@@ -5,7 +5,7 @@
     ],
     "cucumberMessagesConfiguration": {
         "enabled" :  true,
-        "baseDirectory": "C:\\Users\\clrud\\source\\repos\\scratch",
+        "baseDirectory": "[BaseDirectory]",
         "outputDirectory": "CucumberMessages",
         "outputFileName" :  "reqnroll_report.ndjson",
         "iDGenerationStyle": "INCREMENTING"

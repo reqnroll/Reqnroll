@@ -23,6 +23,8 @@ namespace CucumberMessages.Tests
 {
     public class CucumberCompatibilityTestBase : SystemTestBase
     {
+        private const string DefaultSamplesDirectoryPlaceholder = "[BaseDirectory]";
+
         protected override void TestCleanup()
         {
             // TEMPORARY: this is in place so that SystemTestBase.TestCleanup does not run (which deletes the generated code)
@@ -104,8 +106,12 @@ namespace CucumberMessages.Tests
         protected void CucumberMessagesAddConfigurationFile(string configFileName)
         {
             var configFileContent = File.ReadAllText(configFileName);
+            var samplesDirectory = GetDefaultSamplesDirectory();
+            configFileContent = configFileContent.Replace(DefaultSamplesDirectoryPlaceholder, samplesDirectory.Replace(@"\", @"\\"));
             AddJsonConfigFileContent(configFileContent);
         }
+
+        private static string GetDefaultSamplesDirectory() => Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "..", "..", "..", "Samples"));
 
         protected static string ActualsResultLocationDirectory()
         {
@@ -119,7 +125,8 @@ namespace CucumberMessages.Tests
             var env = new EnvironmentWrapper();
             var jsonConfigFileLocator = new ReqnrollJsonLocator();
             CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env, jsonConfigFileLocator);
-            var resultLocation = Path.Combine(configuration.BaseDirectory, configuration.OutputDirectory);
+            string configurationBaseDirectory = configuration.BaseDirectory.Replace(DefaultSamplesDirectoryPlaceholder, GetDefaultSamplesDirectory());
+            var resultLocation = Path.Combine(configurationBaseDirectory, configuration.OutputDirectory);
             return resultLocation;
         }
 
