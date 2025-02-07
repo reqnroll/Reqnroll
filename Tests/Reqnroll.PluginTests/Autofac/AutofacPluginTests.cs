@@ -279,8 +279,8 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
         _testThreadContainer.RegisterInstanceAs(testThreadContext);
 
         // Assert
-        //var resolvedContainer = resolver.ResolveBindingInstance(typeof(IObjectContainer), _featureContainer);
-        //resolvedContainer.Should().BeSameAs(_featureContainer);
+        var resolvedContainer = resolver.ResolveBindingInstance(typeof(IObjectContainer), _featureContainer);
+        resolvedContainer.Should().BeSameAs(_featureContainer);
 
         var resolvedFeatureContext = resolver.ResolveBindingInstance(typeof(FeatureContext), _featureContainer);
         resolvedFeatureContext.Should().BeSameAs(featureContext);
