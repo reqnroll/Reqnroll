@@ -18,7 +18,11 @@ namespace Reqnroll.CucumberMessages.Configuration
 
         public ConfigurationDTO GetConfiguration()
         {
-            var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
+            var jsonOptions = new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase, 
+                ReadCommentHandling = JsonCommentHandling.Skip
+            };
             jsonOptions.Converters.Add(new IdGenerationStyleEnumConverter());
 
             var fileName = _configFileLocator.GetReqnrollJsonFilePath();
@@ -29,7 +33,10 @@ namespace Reqnroll.CucumberMessages.Configuration
             if (File.Exists(fileName))
             {
                 var jsonFileContent = File.ReadAllText(fileName);
-                using JsonDocument reqnrollConfigDoc = JsonDocument.Parse(jsonFileContent);
+                using JsonDocument reqnrollConfigDoc = JsonDocument.Parse(jsonFileContent, new JsonDocumentOptions()
+                {
+                    CommentHandling = JsonCommentHandling.Skip
+                });
                 if (reqnrollConfigDoc.RootElement.TryGetProperty("cucumberMessagesConfiguration", out JsonElement CMC))
                 {
                     section = JsonSerializer.Deserialize<CucumberMessagesConfiguration>(CMC.GetRawText(), jsonOptions);
