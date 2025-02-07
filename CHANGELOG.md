@@ -7,6 +7,7 @@
 * Improve parameter type naming for generic types (#343)
 * Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
 * Update behavior of `ObjectContainer.IsRegistered()` to check base container for registrations, to match `Resolve()` behavior (#367)
+* Replaced custom approach for avoiding namespace collisions with .net idiomatic approach
 
 ## Bug fixes:
 * MsTest: Only use TestContext for output and not Console.WriteLine (#368) 
