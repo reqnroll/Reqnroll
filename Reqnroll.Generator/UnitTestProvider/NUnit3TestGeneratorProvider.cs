@@ -75,7 +75,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClass, DESCRIPTION_ATTR, featureTitle);
             CodeDomHelper.AddAttribute(generationContext.TestClass, FIXTURELIFECYCLE_ATTR, 
                 new CodeAttributeArgument(
-                    new CodeSnippetExpression($"{CodeDomHelper.GetGlobalizedTypeName(LIFECYCLE_CLASS)}.{LIFECYCLE_INSTANCEPERTESTCASE}")));
+                    new CodeSnippetExpression($"{LIFECYCLE_CLASS}.{LIFECYCLE_INSTANCEPERTESTCASE}")));
         }
 
         public void SetTestClassCategories(TestClassGenerationContext generationContext, IEnumerable<string> featureCategories)

@@ -289,21 +289,6 @@ namespace Reqnroll.Generator.CodeDom
             };
         }
 
-        public string GetGlobalizedTypeName(Type type)
-        {
-            return GetGlobalizedTypeName(type.FullName!);
-        }
-
-        public string GetGlobalizedTypeName(string typeName)
-        {
-            if (TargetLanguage == CodeDomProviderLanguage.CSharp)
-            {
-                return "global::" + typeName;
-            }
-            // Global namespaces not yet supported in VB
-            return typeName;
-        }
-
         public CodeExpression CreateOptionalArgumentExpression(string parameterName, CodeVariableReferenceExpression valueExpression)
         {
             switch (TargetLanguage)
