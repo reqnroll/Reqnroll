@@ -6,10 +6,17 @@
 * Improve code-behind feature file compilation speed (#336)
 * Improve parameter type naming for generic types (#343)
 * Add default registration for IReqnrollOutputHelper using Autofac (#357)
+* Reduced MsBuild log output and consistent use of [Reqnroll] prefix (#381)
+* Update behavior of `ObjectContainer.IsRegistered()` to check base container for registrations, to match `Resolve()` behavior (#367)
 
 ## Bug fixes:
+* MsTest: Only use TestContext for output and not Console.WriteLine (#368) 
 
-*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @obligaron, @olegKoshmeliuk
+* Fix: Replace deprecated dependency `Specflow.Internal.Json` with `System.Text.Json`. The dependency was used for laoding `reqnroll.json`, for Visual Studio integration and for telemetry. (#373)
+* Fix: Support loading plugin dependencies from .deps.json on .NET Framework and Visual Studio MSBuild (#408)
+* Fix: Error with NUnit 4: "Only static OneTimeSetUp and OneTimeTearDown are allowed for InstancePerTestCase mode" (#379)
+
+*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen
 
 # v2.2.1 - 2024-11-08
 

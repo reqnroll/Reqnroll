@@ -48,7 +48,7 @@ namespace Reqnroll.TestProjectGenerator
         {
             var testRunElement = trx.Descendants(_testRunElementName).Single();
             var summaryElement = testRunElement.Element(_xmlns + "ResultSummary")
-                                 ?? throw new InvalidOperationException("Invalid document; result summary element not found."); ;
+                                 ?? throw new InvalidOperationException("Invalid document; result summary element not found.");
             var summaryCountersElement = summaryElement?.Element(_xmlns + "Counters")
                                          ?? throw new InvalidOperationException("Invalid document; result summary counters element not found.");
 
@@ -184,7 +184,7 @@ namespace Reqnroll.TestProjectGenerator
 
             var logLines = stdOutText.Split(new string[] { "\r\n", "\r", "\n" }, StringSplitOptions.RemoveEmptyEntries);
 
-            var primaryOutput = logLines.TakeWhile(line => line != "TestContext Messages:");
+            var primaryOutput = logLines.Where(line => line != "TestContext Messages:");
 
             TestStepResult step = null;
 

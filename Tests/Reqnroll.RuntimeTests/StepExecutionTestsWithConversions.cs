@@ -7,8 +7,6 @@ using Xunit;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
-using Reqnroll.Infrastructure;
-using ScenarioExecutionStatus = Reqnroll.ScenarioExecutionStatus;
 
 namespace Reqnroll.RuntimeTests
 {

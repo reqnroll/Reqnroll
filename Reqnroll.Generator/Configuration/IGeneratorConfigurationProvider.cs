@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.Interfaces;
-using Reqnroll.Plugins;
 
 namespace Reqnroll.Generator.Configuration
 {

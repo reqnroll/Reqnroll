@@ -1,13 +1,11 @@
 using System;
 using System.Globalization;
 using System.Linq;
-using Reqnroll.BoDi;
 using FluentAssertions;
 using Xunit;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Configuration;
 using Reqnroll.Configuration.JsonConfig;
-using Reqnroll.Plugins;
 
 namespace Reqnroll.RuntimeTests.Configuration
 {
@@ -461,17 +459,16 @@ namespace Reqnroll.RuntimeTests.Configuration
         [Fact]
         public void Check_Defaults_For_One_Config_Element()
         {
-            var traceTimings = true;
             string configAsJson = $@"{{
                 ""trace"": {{
-                    ""traceTimings"": {traceTimings}
+                    ""traceTimings"": true
                 }}
             }}";
 
             var config = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), configAsJson);
 
-            config.TraceTimings.Should().Be(traceTimings);
-            config.MinTracedDuration.Should().Be(TimeSpan.Parse(ConfigDefaults.MinTracedDuration));
+            config.TraceTimings.Should().BeTrue();
+            config.MinTracedDuration.Should().Be(ConfigDefaults.MinTracedDurationAsTimeSpan);
             config.StepDefinitionSkeletonStyle.Should().Be(ConfigDefaults.StepDefinitionSkeletonStyle);
             config.TraceSuccessfulSteps.Should().Be(ConfigDefaults.TraceSuccessfulSteps);
         }
@@ -492,15 +489,19 @@ namespace Reqnroll.RuntimeTests.Configuration
             //generator
             config.AllowDebugGeneratedFiles.Should().Be(ConfigDefaults.AllowDebugGeneratedFiles);
             config.AllowRowTests.Should().Be(ConfigDefaults.AllowRowTests);
+            (config.AddNonParallelizableMarkerForTags ?? []).Length.Should().Be(0);
+            config.GeneratorCustomDependencies.Should().NotBeNull();
+            config.GeneratorCustomDependencies.Count.Should().Be(0);
 
             //trace
             config.TraceTimings.Should().Be(ConfigDefaults.TraceTimings);
-            config.MinTracedDuration.Should().Be(TimeSpan.Parse(ConfigDefaults.MinTracedDuration));
+            config.MinTracedDuration.Should().Be(ConfigDefaults.MinTracedDurationAsTimeSpan);
             config.StepDefinitionSkeletonStyle.Should().Be(ConfigDefaults.StepDefinitionSkeletonStyle);
             config.TraceSuccessfulSteps.Should().Be(ConfigDefaults.TraceSuccessfulSteps);
+            config.ColoredOutput.Should().Be(ConfigDefaults.ColoredOutput);
 
             config.AdditionalStepAssemblies.Should().NotBeNull();
             config.AdditionalStepAssemblies.Should().BeEmpty();
         }
-   }
+    }
 }

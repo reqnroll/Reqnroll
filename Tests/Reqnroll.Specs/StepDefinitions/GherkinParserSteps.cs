@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using Reqnroll.Assist;
 using System.Linq;
 using FluentAssertions;
 using Reqnroll.Specs.Drivers.Parser;

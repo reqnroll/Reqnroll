@@ -133,7 +133,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             // While they can (and should) use the method params for injection, we can support it.
             // Note that in Feature mode, one can't inject "ScenarioContext", this can only be done from method params.
 
-            // Bases on this: https://docs.specflow.org/projects/specflow/en/latest/Extend/Available-Containers-%26-Registrations.html
+            // Bases on this: https://docs.reqnroll.net/latest/extend/available-containers.html#global-container
             // Might need to add more...
 
             services.AddSingleton<IObjectContainer>(objectContainer);

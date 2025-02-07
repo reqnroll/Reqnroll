@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using Reqnroll.BoDi;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Configuration.JsonConfig;
 using Reqnroll.PlatformCompatibility;
@@ -35,7 +34,7 @@ namespace Reqnroll.Configuration
 
         private static bool DefaultTraceSuccessfulSteps => ConfigDefaults.TraceSuccessfulSteps;
         private static bool DefaultTraceTimings => ConfigDefaults.TraceTimings;
-        private static TimeSpan DefaultMinTracedDuration => TimeSpan.Parse(ConfigDefaults.MinTracedDuration);
+        private static TimeSpan DefaultMinTracedDuration => ConfigDefaults.MinTracedDurationAsTimeSpan;
 
         private static StepDefinitionSkeletonStyle DefaultStepDefinitionSkeletonStyle => ConfigDefaults.StepDefinitionSkeletonStyle;
 
@@ -146,7 +145,5 @@ namespace Reqnroll.Configuration
         {
             return _jsonConfigurationLoader.LoadJson(reqnrollConfiguration, jsonContent);
         }
-
-
     }
 }
