@@ -253,11 +253,15 @@ jobs:
     - name: Install Test Report Dependencies
       run: | 
         dotnet add ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj package GitHubActionsTestLogger
+        dotnet add ./Tests/CucumberMessages.CompatibilityTests/CucumberMessages.Tests.csproj package GitHubActionsTestLogger
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: System Tests
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
+    - name: CucumberMessages Tests
+      shell: pwsh
+      run: dotnet test ./Tests/CucumberMessages.CompatibilityTests/CucumberMessages.Tests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/cucumbermessagestests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
@@ -282,11 +286,15 @@ jobs:
     - name: Install Test Report Dependencies
       run: | 
         dotnet add ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj package GitHubActionsTestLogger
+        dotnet add ./Tests/CucumberMessages.CompatibilityTests/CucumberMessages.Tests.csproj package GitHubActionsTestLogger
     - name: Build
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: System Tests
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj --filter "TestCategory!=MsBuild&TestCategory!=Net481" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx"  ${{ needs.build.outputs.test_params }} 
+    - name: CucumberMessages Tests
+      shell: pwsh
+      run: dotnet test ./Tests/CucumberMessages.CompatibilityTests/CucumberMessages.Tests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/cucumbermessagestests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
