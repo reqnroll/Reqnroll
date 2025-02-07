@@ -14,6 +14,7 @@
 * Fix: Replace deprecated dependency `Specflow.Internal.Json` with `System.Text.Json`. The dependency was used for laoding `reqnroll.json`, for Visual Studio integration and for telemetry. (#373)
 * Fix: Support loading plugin dependencies from .deps.json on .NET Framework and Visual Studio MSBuild (#408)
 * Fix: Error with NUnit 4: "Only static OneTimeSetUp and OneTimeTearDown are allowed for InstancePerTestCase mode" (#379)
+* Fix: Reqnroll.Autofac: FeatureContext cannot be resolved in BeforeFeature/AfterFeature hooks (#340)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen
 

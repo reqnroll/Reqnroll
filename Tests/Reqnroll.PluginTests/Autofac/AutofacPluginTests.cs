@@ -231,7 +231,7 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
 
 
     [Fact]
-    public void Should_allow_resolving_common_reqnroll_objects()
+    public void Should_allow_resolving_common_reqnroll_objects_from_scenario_container()
     {
         // Arrange
         var sut = new TestableAutofacPlugin(typeof(ContainerSetup1),
@@ -259,6 +259,33 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
         resolvedFeatureContext.Should().BeSameAs(featureContext);
 
         var resolvedTestThreadContext = resolver.ResolveBindingInstance(typeof(TestThreadContext), scenarioContainer);
+        resolvedTestThreadContext.Should().BeSameAs(testThreadContext);
+    }
+
+    [Fact]
+    public void Should_allow_resolving_common_reqnroll_objects_from_feature_container()
+    {
+        // Arrange
+        var sut = new TestableAutofacPlugin(typeof(ContainerSetup1),
+                                            nameof(ContainerSetup1.SetupGlobalContainer),
+                                            nameof(ContainerSetup1.SetupScenarioContainer));
+
+        // Act
+        InitializeToScenarioContainer(sut);
+        var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
+        var featureContext = new FeatureContext(_featureContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", ""), ConfigurationLoader.GetDefault());
+        _featureContainer.RegisterInstanceAs(featureContext);
+        var testThreadContext = new TestThreadContext(_testThreadContainer);
+        _testThreadContainer.RegisterInstanceAs(testThreadContext);
+
+        // Assert
+        //var resolvedContainer = resolver.ResolveBindingInstance(typeof(IObjectContainer), _featureContainer);
+        //resolvedContainer.Should().BeSameAs(_featureContainer);
+
+        var resolvedFeatureContext = resolver.ResolveBindingInstance(typeof(FeatureContext), _featureContainer);
+        resolvedFeatureContext.Should().BeSameAs(featureContext);
+
+        var resolvedTestThreadContext = resolver.ResolveBindingInstance(typeof(TestThreadContext), _featureContainer);
         resolvedTestThreadContext.Should().BeSameAs(testThreadContext);
     }
 
