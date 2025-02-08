@@ -7,16 +7,16 @@ namespace Reqnroll.Plugins
 {
     public class RuntimePluginLoader(IPluginAssemblyLoader _pluginAssemblyLoader) : IRuntimePluginLoader
     {
-        public IRuntimePlugin LoadPlugin(string pluginAssemblyName, ITraceListener traceListener, bool traceMissingPluginAttribute)
+        public IRuntimePlugin LoadPlugin(string pluginAssemblyPath, ITraceListener traceListener, bool traceMissingPluginAttribute)
         {
             Assembly assembly;
             try
             {
-                assembly = _pluginAssemblyLoader.LoadAssembly(pluginAssemblyName);
+                assembly = _pluginAssemblyLoader.LoadAssembly(pluginAssemblyPath);
             }
             catch (Exception ex)
             {
-                throw new ReqnrollException($"Unable to load plugin: {pluginAssemblyName}. Please check https://go.reqnroll.net/doc-plugins for details. (Framework: {PlatformInformation.DotNetFrameworkDescription})", ex);
+                throw new ReqnrollException($"Unable to load plugin: {pluginAssemblyPath}. Please check https://go.reqnroll.net/doc-plugins for details. (Framework: {PlatformInformation.DotNetFrameworkDescription})", ex);
             }
 
             var pluginAttribute = (RuntimePluginAttribute)Attribute.GetCustomAttribute(assembly, typeof(RuntimePluginAttribute));

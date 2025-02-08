@@ -7,8 +7,6 @@ Imports System.CodeDom.Compiler
 Imports System.Reflection
 Imports System.Runtime.CompilerServices
 
-<assembly: NUnit.Framework.FixtureLifeCycle(NUnit.Framework.LifeCycle.InstancePerTestCase)>
-
 <GeneratedCode("Reqnroll", "REQNROLL_VERSION")>
 <SetUpFixture>
 Public NotInheritable Class PROJECT_ROOT_NAMESPACE_NUnitAssemblyHooks

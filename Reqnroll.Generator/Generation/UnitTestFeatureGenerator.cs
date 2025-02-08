@@ -171,7 +171,7 @@ namespace Reqnroll.Generator.Generation
 
         private CodeMemberField DeclareTestRunnerMember(CodeTypeDeclaration type)
         {
-            var testRunnerField = new CodeMemberField(_codeDomHelper.GetGlobalizedTypeName(typeof(ITestRunner)), GeneratorConstants.TESTRUNNER_FIELD);
+            var testRunnerField = new CodeMemberField(new CodeTypeReference(typeof(ITestRunner), CodeTypeReferenceOptions.GlobalReference), GeneratorConstants.TESTRUNNER_FIELD);
             type.Members.Add(testRunnerField);
             return testRunnerField;
         }
@@ -187,16 +187,16 @@ namespace Reqnroll.Generator.Generation
         private void DeclareFeatureInfoMember(TestClassGenerationContext generationContext)
         {
             var featureInfoField = new CodeMemberField(
-                _codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)), GeneratorConstants.FEATUREINFO_FIELD);
+                new CodeTypeReference(typeof(FeatureInfo), CodeTypeReferenceOptions.GlobalReference), GeneratorConstants.FEATUREINFO_FIELD);
             featureInfoField.Attributes |= MemberAttributes.Static;
-            featureInfoField.InitExpression = new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(FeatureInfo)),
+            featureInfoField.InitExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(FeatureInfo), CodeTypeReferenceOptions.GlobalReference),
                 new CodeObjectCreateExpression(typeof(CultureInfo),
                                                new CodePrimitiveExpression(generationContext.Feature.Language)),
                 new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
                 new CodePrimitiveExpression(generationContext.Feature.Name),
                 new CodePrimitiveExpression(generationContext.Feature.Description),
                 new CodeFieldReferenceExpression(
-                    new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ProgrammingLanguage))),
+                    new CodeTypeReferenceExpression(new CodeTypeReference(typeof(ProgrammingLanguage), CodeTypeReferenceOptions.GlobalReference)),
                     _codeDomHelper.TargetLanguage.ToString()),
                 new CodeMethodInvokeExpression(null, _cucumberMessagesInitializeMethod.Name),
                 new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME));
@@ -347,7 +347,7 @@ namespace Reqnroll.Generator.Generation
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
             var getTestRunnerExpression = new CodeMethodInvokeExpression(
-                new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
+                new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
                 nameof(TestRunnerManager.GetTestRunnerForAssembly),
                 _codeDomHelper.CreateOptionalArgumentExpression("featureHint",
                     new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD)));
@@ -440,7 +440,7 @@ namespace Reqnroll.Generator.Generation
             // TestRunnerManager.ReleaseTestRunner(testRunner);
             testCleanupMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
-                    new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TestRunnerManager))),
+                    new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
                     nameof(TestRunnerManager.ReleaseTestRunner),
                     testRunnerField));
         }
@@ -452,7 +452,7 @@ namespace Reqnroll.Generator.Generation
             scenarioInitializeMethod.Attributes = MemberAttributes.Public | MemberAttributes.Final;
             scenarioInitializeMethod.Name = GeneratorConstants.SCENARIO_INITIALIZE_NAME;
             scenarioInitializeMethod.Parameters.Add(
-                new CodeParameterDeclarationExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)), "scenarioInfo"));
+                new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(ScenarioInfo), CodeTypeReferenceOptions.GlobalReference), "scenarioInfo"));
 
             //testRunner.OnScenarioInitialize(scenarioInfo);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();

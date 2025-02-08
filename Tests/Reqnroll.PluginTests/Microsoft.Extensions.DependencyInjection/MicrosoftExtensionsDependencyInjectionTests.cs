@@ -11,7 +11,7 @@ public class MicrosoftExtensionsDependencyInjectionTests
     [Fact]
     public void LoadPlugin_MicrosoftExtensionsDependencyInjection_ShouldNotBeNull()
     {
-        var loader = new RuntimePluginLoader(new PluginAssemblyLoader());
+        var loader = new RuntimePluginLoader(new DotNetCorePluginAssemblyLoader());
         var listener = new Mock<ITraceListener>();
 
         var plugin = loader.LoadPlugin("Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll", listener.Object, It.IsAny<bool>());

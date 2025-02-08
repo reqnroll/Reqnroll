@@ -210,8 +210,8 @@ namespace Reqnroll.Generator.Generation
             AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, _pickleIndex);
 
             testMethod.Statements.Add(
-                new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)), "scenarioInfo",
-                    new CodeObjectCreateExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(ScenarioInfo)),
+                new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(ScenarioInfo), CodeTypeReferenceOptions.GlobalReference), "scenarioInfo",
+                    new CodeObjectCreateExpression(new CodeTypeReference(typeof(ScenarioInfo), CodeTypeReferenceOptions.GlobalReference),
                         new CodePrimitiveExpression(scenarioDefinition.Name),
                         new CodePrimitiveExpression(scenarioDefinition.Description),
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME),
@@ -303,7 +303,7 @@ namespace Reqnroll.Generator.Generation
 
             var scenarioCombinedTagsPropertyExpression = new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("scenarioInfo"), "CombinedTags");
 
-            var tagHelperReference = new CodeTypeReferenceExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(TagHelper)));
+            var tagHelperReference = new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TagHelper), CodeTypeReferenceOptions.GlobalReference));
             var scenarioTagIgnoredCheckStatement = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.ContainsIgnoreTag), scenarioCombinedTagsPropertyExpression);
             var featureTagIgnoredCheckStatement = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.ContainsIgnoreTag), featureFileTagFieldReferenceExpression);
 

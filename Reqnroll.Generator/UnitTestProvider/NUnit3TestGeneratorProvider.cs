@@ -14,6 +14,9 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected internal const string TESTFIXTURETEARDOWN_ATTR_NUNIT3 = "NUnit.Framework.OneTimeTearDownAttribute";
         protected internal const string NONPARALLELIZABLE_ATTR = "NUnit.Framework.NonParallelizableAttribute";
         protected internal const string TESTFIXTURE_ATTR = "NUnit.Framework.TestFixtureAttribute";
+        protected internal const string FIXTURELIFECYCLE_ATTR = "NUnit.Framework.FixtureLifeCycleAttribute";
+        protected internal const string LIFECYCLE_CLASS = "NUnit.Framework.LifeCycle";
+        protected internal const string LIFECYCLE_INSTANCEPERTESTCASE = "InstancePerTestCase";
         protected internal const string TEST_ATTR = "NUnit.Framework.TestAttribute";
         protected internal const string ROW_ATTR = "NUnit.Framework.TestCaseAttribute";
         protected internal const string CATEGORY_ATTR = "NUnit.Framework.CategoryAttribute";
@@ -70,6 +73,9 @@ namespace Reqnroll.Generator.UnitTestProvider
         {
             CodeDomHelper.AddAttribute(generationContext.TestClass, TESTFIXTURE_ATTR);
             CodeDomHelper.AddAttribute(generationContext.TestClass, DESCRIPTION_ATTR, featureTitle);
+            CodeDomHelper.AddAttribute(generationContext.TestClass, FIXTURELIFECYCLE_ATTR, 
+                new CodeAttributeArgument(
+                    new CodeSnippetExpression($"{LIFECYCLE_CLASS}.{LIFECYCLE_INSTANCEPERTESTCASE}")));
         }
 
         public void SetTestClassCategories(TestClassGenerationContext generationContext, IEnumerable<string> featureCategories)

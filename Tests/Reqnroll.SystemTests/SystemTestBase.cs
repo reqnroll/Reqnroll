@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
@@ -110,10 +111,21 @@ public abstract class SystemTestBase
         AddFeatureFile(featureFileContent, preparedTests);
     }
 
-    protected void AddBindingClassFromResource(string fileName)
+    protected void AddBindingClassFromResource(string fileName, string? resourceGroup = null)
     {
-        var bindingClassContent = _testFileManager.GetTestFileContent(fileName);
+        var bindingClassContent = _testFileManager.GetTestFileContent(fileName, resourceGroup);
         AddBindingClass(bindingClassContent);
+    }
+
+    protected void AddContentFileFromResource(string resourceFileName, string? targetFolder = null, string? resourceGroup = null)
+    {
+        var fileContent = _testFileManager.GetTestFileContent(resourceFileName, resourceGroup);
+        var filePath = Path.GetFileName(resourceFileName);
+        if (targetFolder != null)
+        {
+            filePath = Path.Combine(targetFolder, filePath);
+        }
+        _projectsDriver.AddFile(filePath, fileContent);
     }
 
     private int? GetTestCount(string gherkinContent)

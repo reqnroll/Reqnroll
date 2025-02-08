@@ -141,7 +141,7 @@ namespace Reqnroll.Generator.Generation
         {
             if (tableArg == null)
             {
-                return new CodeCastExpression(_codeDomHelper.GetGlobalizedTypeName(typeof(Table)), new CodePrimitiveExpression(null));
+                return new CodeCastExpression(new CodeTypeReference(typeof(Table), CodeTypeReferenceOptions.GlobalReference), new CodePrimitiveExpression(null));
             }
 
             _tableCounter++;
@@ -153,9 +153,9 @@ namespace Reqnroll.Generator.Generation
             //Table table0 = new Table(header...);
             var tableVar = new CodeVariableReferenceExpression("table" + _tableCounter);
             statements.Add(
-                new CodeVariableDeclarationStatement(_codeDomHelper.GetGlobalizedTypeName(typeof(Table)), tableVar.VariableName,
+                new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(Table), CodeTypeReferenceOptions.GlobalReference), tableVar.VariableName,
                     new CodeObjectCreateExpression(
-                        _codeDomHelper.GetGlobalizedTypeName(typeof(Table)),
+                        new CodeTypeReference(typeof(Table), CodeTypeReferenceOptions.GlobalReference),
                         GetStringArrayExpression(header.Cells.Select(c => c.Value), paramToIdentifier))));
 
             foreach (var row in body)
