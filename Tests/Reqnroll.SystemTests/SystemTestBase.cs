@@ -105,9 +105,9 @@ public abstract class SystemTestBase
             _folderCleaner.CleanSolutionFolder();
     }
 
-    protected void AddFeatureFileFromResource(string fileName, string? prefixOverride = null, Assembly? assembly = null, int? preparedTests = null)
+    protected void AddFeatureFileFromResource(string fileName, string? resourceGroup = null, Assembly? assembly = null, int? preparedTests = null)
     {
-        var featureFileContent = _testFileManager.GetTestFileContent(fileName, prefixOverride, assembly);
+        var featureFileContent = _testFileManager.GetTestFileContent(fileName, resourceGroup, assembly);
         AddFeatureFile(featureFileContent, preparedTests);
     }
 
