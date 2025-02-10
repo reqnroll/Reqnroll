@@ -146,15 +146,19 @@ namespace CucumberMessages.Tests
 
         protected void AddUtilClassWithFileSystemPath()
         {
-            string location = AppContext.BaseDirectory;
-            AddBindingClass(
-                $"public class FileSystemPath {{  public static string GetFilePathForAttachments()  {{  return @\"{location}\\Samples\\Resources\"; }}  }} ");
+            string location = Path.Combine(AppContext.BaseDirectory, "Samples", "Resources");
+            AddBindingClass($$"""
+                public class FileSystemPath 
+                { 
+                    public static string GetFilePathForAttachments() => @"{{location}}";
+                } 
+                """);
         }
 
         protected IEnumerable<Envelope> GetExpectedResults(string testName, string featureFileName)
         {
-            var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..\\..\\..");
-            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory!, "Samples\\Resources", $"{testName}\\{featureFileName}.feature.ndjson"));
+            var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
+            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
 
             foreach (var json in expectedJsonText)
             {
