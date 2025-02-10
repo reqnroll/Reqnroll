@@ -22,16 +22,16 @@ namespace Reqnroll.Generator.UnitTestProvider;
 [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
 public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
 {
-    protected internal const string TEST_ATTR = "TUnit.Core.TestAttribute";
-    protected internal const string BEFORE_ATTR = "TUnit.Core.BeforeAttribute";
-    protected internal const string AFTER_ATTR = "TUnit.Core.AfterAttribute";
-    protected internal const string SKIP_ATTR = "TUnit.Core.SkipAttribute";
-    protected internal const string CATEGORY_ATTR = "TUnit.Core.CategoryAttribute";
-    protected internal const string DISPLAYNAME_ATTR = "TUnit.Core.DisplayNameAttribute";
-    protected internal const string ARGUMENTS_ATTR = "TUnit.Core.ArgumentsAttribute";
-    protected internal const string NOTINPARALLEL_ATTR = "TUnit.Core.NotInParallelAttribute";
-    protected internal const string TESTCONTEXT_TYPE = "TUnit.Core.TestContext";
-    protected internal const string TESTCONTEXT_INSTANCE = "TUnit.Core.TestContext.Current";
+    protected internal const string TEST_ATTR = "global::TUnit.Core.TestAttribute";
+    protected internal const string BEFORE_ATTR = "global::TUnit.Core.BeforeAttribute";
+    protected internal const string AFTER_ATTR = "global::TUnit.Core.AfterAttribute";
+    protected internal const string SKIP_ATTR = "global::TUnit.Core.SkipAttribute";
+    protected internal const string CATEGORY_ATTR = "global::TUnit.Core.CategoryAttribute";
+    protected internal const string DISPLAYNAME_ATTR = "global::TUnit.Core.DisplayNameAttribute";
+    protected internal const string ARGUMENTS_ATTR = "global::TUnit.Core.ArgumentsAttribute";
+    protected internal const string NOTINPARALLEL_ATTR = "global::TUnit.Core.NotInParallelAttribute";
+    protected internal const string TESTCONTEXT_TYPE = "global::TUnit.Core.TestContext";
+    protected internal const string TESTCONTEXT_INSTANCE = "global::TUnit.Core.TestContext.Current";
 
 
     public TUnitTestGeneratorProvider(CodeDomHelper codeDomHelper)
