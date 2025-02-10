@@ -11,6 +11,7 @@
 * Replaced custom approach for avoiding namespace collisions with .net idiomatic approach
 * Support loading plugin dependencies from .deps.json on .NET Framework and Visual Studio MSBuild (#408)
 * Support for setting `ObjectContainer.DefaultConcurrentObjectResolutionTimeout` even after creation of the container (#435)
+* Reqnroll.Microsoft.Extensions.DependencyInjection: Include `ReqnrollLogger` class to the Reqnroll MSDI plugin based on the work of @StefH at https://github.com/StefH/Stef.Extensions.SpecFlow.Logging (#321)
 
 ## Bug fixes:
 
@@ -19,7 +20,7 @@
 * Fix: Error with NUnit 4: "Only static OneTimeSetUp and OneTimeTearDown are allowed for InstancePerTestCase mode" (#379)
 * Fix: Reqnroll.Autofac: FeatureContext cannot be resolved in BeforeFeature/AfterFeature hooks (#340)
 
-*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen
+*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen, @StefH
 
 # v2.2.1 - 2024-11-08
 

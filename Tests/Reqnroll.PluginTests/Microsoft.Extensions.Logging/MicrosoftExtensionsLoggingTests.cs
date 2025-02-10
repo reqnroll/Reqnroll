@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Moq;
-using Reqnroll.Microsoft.Extensions.Logging;
+using Reqnroll.Microsoft.Extensions.DependencyInjection.Logging;
 using Xunit;
 
 namespace Reqnroll.PluginTests.Microsoft.Extensions.Logging;

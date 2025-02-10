@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 
-namespace Reqnroll.Microsoft.Extensions.Logging;
+namespace Reqnroll.Microsoft.Extensions.DependencyInjection.Logging;
 
 public class ReqnrollLogger : ILogger
 {

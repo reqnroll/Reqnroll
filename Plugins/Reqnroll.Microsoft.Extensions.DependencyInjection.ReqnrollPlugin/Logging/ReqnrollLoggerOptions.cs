@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
-namespace Reqnroll.Microsoft.Extensions.Logging;
+namespace Reqnroll.Microsoft.Extensions.DependencyInjection.Logging;
 
 public sealed class ReqnrollLoggerOptions
 {
@@ -24,7 +23,6 @@ public sealed class ReqnrollLoggerOptions
     /// <summary>
     /// Gets or sets format string used to format timestamp in logging messages. Defaults to <see langword="null" />.
     /// </summary>
-    [StringSyntax(StringSyntaxAttribute.DateTimeFormat)]
     public string? TimestampFormat { get; set; }
 
     /// <summary>

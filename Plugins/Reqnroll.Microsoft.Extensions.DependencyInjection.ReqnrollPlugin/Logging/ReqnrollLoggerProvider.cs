@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace Reqnroll.Microsoft.Extensions.Logging;
+namespace Reqnroll.Microsoft.Extensions.DependencyInjection.Logging;
 
 public sealed class ReqnrollLoggerProvider : ILoggerProvider
 {
