@@ -195,6 +195,7 @@
 
   <ItemGroup>
     <Folder Include="Properties\" />
+    <Folder Include="Samples\CucumberMessages\" />
   </ItemGroup>
 
   <ItemGroup>

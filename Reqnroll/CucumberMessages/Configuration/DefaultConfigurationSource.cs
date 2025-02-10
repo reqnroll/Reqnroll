@@ -21,13 +21,10 @@ namespace Reqnroll.CucumberMessages.Configuration
         public ConfigurationDTO GetConfiguration()
         {
             var res = new ConfigurationDTO();
-            string defaultOutputDirectory = _environmentWrapper.GetCurrentDirectory();
-            string defaultOutputFileName = "reqnroll_report.ndjson";
+            string defaultOutputFileName = "./reqnroll_report.ndjson";
 
             res.Enabled = false;
-            res.BaseDirectory = defaultOutputDirectory;
-            res.OutputDirectory = String.Empty;
-            res.OutputFileName = defaultOutputFileName;
+            res.OutputFilePath = defaultOutputFileName;
             res.IDGenerationStyle = IDGenerationStyle.UUID;
             return res;
         }

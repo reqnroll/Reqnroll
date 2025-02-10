@@ -77,9 +77,10 @@ namespace Reqnroll.CucumberMessages.PubSub
                 // and this class is not registered as a CucumberMessageSink, which indicates to the Broker that Messages are disabled.
                 return;
             }
-            string baseDirectory = Path.Combine(config.BaseDirectory, config.OutputDirectory);
-            string fileName = SanitizeFileName(config.OutputFileName);
-            fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFilesBackgroundTask(baseDirectory, fileName), TaskCreationOptions.LongRunning);
+            string baseDirectory = Path.GetDirectoryName(config.OutputFilePath);
+            string fileName = SanitizeFileName(Path.GetFileName(config.OutputFilePath));
+            string outputPath = Path.Combine(baseDirectory, fileName);
+            fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFilesBackgroundTask(outputPath), TaskCreationOptions.LongRunning);
 
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
@@ -89,9 +90,9 @@ namespace Reqnroll.CucumberMessages.PubSub
             await Task.Run( () => _postedMessages.Add(message));
         }
 
-        private void ConsumeAndWriteToFilesBackgroundTask(string baseDirectory, string fileName)
+        private void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
         {
-            using var fileStream = File.Create(Path.Combine(baseDirectory, fileName), TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
+            using var fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
 
             foreach (var message in _postedMessages.GetConsumingEnumerable())
             {

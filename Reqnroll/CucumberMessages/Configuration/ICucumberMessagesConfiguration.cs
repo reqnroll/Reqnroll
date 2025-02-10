@@ -3,9 +3,7 @@
     public interface ICucumberMessagesConfiguration
     {
         bool Enabled { get; }
-        string BaseDirectory { get; }
-        string OutputDirectory { get; }
-        string OutputFileName { get; }
+        string OutputFilePath { get; }
         IDGenerationStyle IDGenerationStyle { get; }
     }
 }

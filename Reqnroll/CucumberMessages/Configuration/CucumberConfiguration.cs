@@ -26,9 +26,7 @@ namespace Reqnroll.CucumberMessages.Configuration
     {
         public static ICucumberMessagesConfiguration Current { get; private set; }
         public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
-        public string BaseDirectory => _resolvedConfiguration.Value.BaseDirectory;
-        public string OutputDirectory => _resolvedConfiguration.Value.OutputDirectory;
-        public string OutputFileName => _resolvedConfiguration.Value.OutputFileName;
+        public string OutputFilePath => _resolvedConfiguration.Value.OutputFilePath;
         public IDGenerationStyle IDGenerationStyle => _resolvedConfiguration.Value.IDGenerationStyle;
 
         private readonly IObjectContainer _objectContainer;
@@ -62,10 +60,9 @@ namespace Reqnroll.CucumberMessages.Configuration
             var resolved = ApplyEnvironmentOverrides(config);
 
             // a final sanity check, the filename cannot be empty
-            if (string.IsNullOrEmpty(resolved.OutputFileName))
+            if (string.IsNullOrEmpty(resolved.OutputFilePath))
             {
-                resolved.OutputFileName = "reqnroll_report.ndjson";
-                _traceListenerLazy.Value.WriteToolOutput($"WARNING: Cucumber Messages: Output filename was empty. Setting filename to {resolved.OutputFileName}");
+                resolved.OutputFilePath = "./reqnroll_report.ndjson";
             }
             EnsureOutputDirectory(resolved);
             return resolved;
@@ -83,27 +80,17 @@ namespace Reqnroll.CucumberMessages.Configuration
 
         private ResolvedConfiguration ApplyEnvironmentOverrides(ConfigurationDTO config)
         {
-            var baseOutDirValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_BASE_DIRECTORY_ENVIRONMENT_VARIABLE);
-            var relativePathValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_RELATIVE_PATH_ENVIRONMENT_VARIABLE);
-            var fileNameValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE);
+            var filePathValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILEPATH_ENVIRONMENT_VARIABLE);
             var idGenStyleValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE);
 
             var result = new ResolvedConfiguration()
             {
                 Enabled = config.Enabled,
-                BaseDirectory = config.BaseDirectory,
-                OutputDirectory = config.OutputDirectory,
-                OutputFileName = config.OutputFileName,
+                OutputFilePath = config.OutputFilePath,
                 IDGenerationStyle = config.IDGenerationStyle            };
 
-            if (baseOutDirValue is Success<string>)
-                result.BaseDirectory = ((Success<string>)baseOutDirValue).Result;
-
-            if (relativePathValue is Success<string>)
-                result.OutputDirectory = ((Success<string>)relativePathValue).Result;
-
-            if (fileNameValue is Success<string>)
-                result.OutputFileName = ((Success<string>)fileNameValue).Result;
+            if (filePathValue is Success<string>)
+                result.OutputFilePath = ((Success<string>)filePathValue).Result;
 
             if (idGenStyleValue is Success<string>)
                 result.IDGenerationStyle = IdGenerationStyleEnumConverter.ParseIdGenerationStyle(((Success<string>)idGenStyleValue).Result);
@@ -119,9 +106,7 @@ namespace Reqnroll.CucumberMessages.Configuration
             if (overridingConfig != null)
             {
                 rootConfig.Enabled = overridingConfig.Enabled;
-                rootConfig.BaseDirectory = overridingConfig.BaseDirectory ?? rootConfig.BaseDirectory;
-                rootConfig.OutputDirectory = overridingConfig.OutputDirectory ?? rootConfig.OutputDirectory;
-                rootConfig.OutputFileName = overridingConfig.OutputFileName ?? rootConfig.OutputFileName;
+                rootConfig.OutputFilePath = overridingConfig.OutputFilePath ?? rootConfig.OutputFilePath;
                 rootConfig.IDGenerationStyle = overridingConfig.IDGenerationStyle;
 
             }
@@ -132,14 +117,9 @@ namespace Reqnroll.CucumberMessages.Configuration
         private void EnsureOutputDirectory(ResolvedConfiguration config)
         {
 
-            if (!Directory.Exists(config.BaseDirectory))
+            if (!Directory.Exists(Path.GetDirectoryName(config.OutputFilePath)))
             {
-                Directory.CreateDirectory(config.BaseDirectory);
-                Directory.CreateDirectory(config.OutputDirectory);
-            }
-            else if (!Directory.Exists(Path.Combine(config.BaseDirectory, config.OutputDirectory)))
-            {
-                Directory.CreateDirectory(Path.Combine(config.BaseDirectory, config.OutputDirectory));
+                Directory.CreateDirectory(Path.GetDirectoryName(config.OutputFilePath));
             }
         }
 

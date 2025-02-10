@@ -37,7 +37,12 @@ namespace CucumberMessages.Tests
 
         protected void SetCucumberMessagesOutputFileName(string fileName)
         {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE, fileName);
+            if (String.IsNullOrEmpty(Path.GetDirectoryName(fileName)))
+            {
+                var path = Path.GetDirectoryName(ActualsResultLocationDirectory());
+                fileName = Path.Combine(path!, fileName);
+            }
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILEPATH_ENVIRONMENT_VARIABLE, fileName);
         }
 
         protected void DisableCucumberMessages()
@@ -55,7 +60,7 @@ namespace CucumberMessages.Tests
 
         protected void ResetCucumberMessagesOutputFileName()
         {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILENAME_ENVIRONMENT_VARIABLE, null);
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILEPATH_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
@@ -115,9 +120,6 @@ namespace CucumberMessages.Tests
 
         protected static string ActualsResultLocationDirectory()
         {
-            //var configFileLocation = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, "CucumberMessages.configuration.json");
-
-            //var config = System.Text.Json.JsonSerializer.Deserialize<ConfigurationDTO>(File.ReadAllText(configFileLocation), new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
             var objectContainerMock = new Mock<IObjectContainer>();
             var tracerMock = new Mock<ITraceListener>();
@@ -125,9 +127,8 @@ namespace CucumberMessages.Tests
             var env = new EnvironmentWrapper();
             var jsonConfigFileLocator = new ReqnrollJsonLocator();
             CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env, jsonConfigFileLocator);
-            string configurationBaseDirectory = configuration.BaseDirectory.Replace(DefaultSamplesDirectoryPlaceholder, GetDefaultSamplesDirectory());
-            var resultLocation = Path.Combine(configurationBaseDirectory, configuration.OutputDirectory);
-            return resultLocation;
+            string configurationPath = configuration.OutputFilePath.Replace(DefaultSamplesDirectoryPlaceholder, GetDefaultSamplesDirectory());
+            return configurationPath;
         }
 
         protected void SetEnvironmentVariableForGUIDIdGeneration()
@@ -177,7 +178,7 @@ namespace CucumberMessages.Tests
 
             // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
 
-            var actualJsonText = File.ReadAllLines(Path.Combine(resultLocation, $"{fileName}.ndjson"));
+            var actualJsonText = File.ReadAllLines(resultLocation);
             var envelopes = actualJsonText.Select(json => NdjsonSerializer.Deserialize(json)).ToList();
             var result = new List<Envelope>();
 

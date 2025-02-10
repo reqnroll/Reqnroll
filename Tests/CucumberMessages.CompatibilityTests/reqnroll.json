@@ -3,11 +3,9 @@
 
     "bindingAssemblies": [
     ],
-    "cucumberMessagesConfiguration": {
-        "enabled" :  true,
-        "baseDirectory": "[BaseDirectory]",
-        "outputDirectory": "CucumberMessages",
-        "outputFileName" :  "reqnroll_report.ndjson",
-        "iDGenerationStyle": "INCREMENTING"
-    }
+  "cucumberMessagesConfiguration": {
+    "enabled": true,
+    "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson",
+    "iDGenerationStyle": "INCREMENTING"
+  }
 }

@@ -11,11 +11,7 @@ namespace Reqnroll.GeneratorTests
     {
         public bool Enabled => false;
 
-        public string BaseDirectory => "";
-
-        public string OutputDirectory => "";
-
-        public string OutputFileName => "reqnroll_report.ndjson";
+        public string OutputFilePath => "reqnroll_report.ndjson";
 
         public IDGenerationStyle IDGenerationStyle => IDGenerationStyle.Incrementing;
     }

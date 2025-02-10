@@ -4,13 +4,7 @@
         "Enabled": {
             "type": "boolean"
         },
-        "BaseDirectory": {
-            "type": "string"
-        },
-        "OutputDirectory": {
-            "type": "string"
-        },
-        "OutputFileName": {
+        "OutputFilePath": {
             "type": "string"
         },
         "IDGenerationStyle": {

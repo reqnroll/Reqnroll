@@ -45,9 +45,7 @@ namespace Reqnroll.CucumberMessages.Configuration
             if (section != null)
             {
                 configurationDTO.Enabled = section.Enabled;
-                configurationDTO.BaseDirectory = section.BaseDirectory;
-                configurationDTO.OutputDirectory = section.OutputDirectory;
-                configurationDTO.OutputFileName = section.OutputFileName;
+                configurationDTO.OutputFilePath = section.OutputFilePath;
                 configurationDTO.IDGenerationStyle = section.IDGenerationStyle;
                 return configurationDTO;
             }
