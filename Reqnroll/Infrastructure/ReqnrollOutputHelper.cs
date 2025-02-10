@@ -8,20 +8,20 @@ namespace Reqnroll.Infrastructure
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
         private readonly ITraceListener _traceListener;
         private readonly IReqnrollAttachmentHandler _reqnrollAttachmentHandler;
-        private readonly IContextManager contextManager;
+        private readonly IContextManager _contextManager;
 
         public ReqnrollOutputHelper(ITestThreadExecutionEventPublisher testThreadExecutionEventPublisher, ITraceListener traceListener, IReqnrollAttachmentHandler reqnrollAttachmentHandler, IContextManager contextManager)
         {
             _testThreadExecutionEventPublisher = testThreadExecutionEventPublisher;
             _traceListener = traceListener;
             _reqnrollAttachmentHandler = reqnrollAttachmentHandler;
-            this.contextManager = contextManager;
+            _contextManager = contextManager;
         }
 
         public void WriteLine(string message)
         {
-            var featureInfo = contextManager.FeatureContext?.FeatureInfo;
-            var scenarioInfo = contextManager.ScenarioContext?.ScenarioInfo;
+            var featureInfo = _contextManager.FeatureContext?.FeatureInfo;
+            var scenarioInfo = _contextManager.ScenarioContext?.ScenarioInfo;
 
             _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message, featureInfo, scenarioInfo));
             _traceListener.WriteToolOutput(message);
@@ -34,8 +34,8 @@ namespace Reqnroll.Infrastructure
 
         public void AddAttachment(string filePath)
         {
-            var featureInfo = contextManager.FeatureContext.FeatureInfo;
-            var scenarioInfo = contextManager.ScenarioContext?.ScenarioInfo;
+            var featureInfo = _contextManager.FeatureContext.FeatureInfo;
+            var scenarioInfo = _contextManager.ScenarioContext?.ScenarioInfo;
 
             _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath, featureInfo, scenarioInfo));
             _reqnrollAttachmentHandler.AddAttachment(filePath);
