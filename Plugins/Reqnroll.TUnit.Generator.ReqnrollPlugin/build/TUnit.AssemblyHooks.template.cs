@@ -3,7 +3,6 @@
 
 using System.CodeDom.Compiler;
 using System.Diagnostics;
-using global::Microsoft.VisualStudio.TestTools.UnitTesting;
 using global::Reqnroll;
 using global::Reqnroll.TUnit.ReqnrollPlugin;
 using global::System.Runtime.CompilerServices;
@@ -13,15 +12,15 @@ using TUnit.Core;
 [GeneratedCode("Reqnroll", "REQNROLL_VERSION")]
 public class PROJECT_ROOT_NAMESPACE_TUnitAssemblyHooks
 {
-    [Before(Assembly)]
+    [global::TUnit.Core.Before(Assembly)]
     [MethodImpl(MethodImplOptions.NoInlining)]
-    public static async Task AssemblyInitializeAsync(TestContext testContext)
+    public static async Task AssemblyInitializeAsync()
     {
         var currentAssembly = typeof(PROJECT_ROOT_NAMESPACE_TUnitAssemblyHooks).Assembly;
         await global::Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly);
     }
 
-    [After(Assembly)]
+    [global::TUnit.Core.After(Assembly)]
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static async Task AssemblyCleanupAsync()
     {
