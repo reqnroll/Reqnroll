@@ -27,11 +27,6 @@
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
         <dependency id="TUnit.Core" version="0.11.0" />
       </group>
-      <group targetFramework=".NET9.0">
-        <dependency id="Reqnroll" version="[$version$]" />
-        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
-        <dependency id="TUnit.Core" version="0.11.0" />
-      </group>
     </dependencies>
   </metadata>
 
