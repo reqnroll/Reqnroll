@@ -23,7 +23,6 @@ namespace Reqnroll.CucumberMessages.Configuration
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase, 
                 ReadCommentHandling = JsonCommentHandling.Skip
             };
-            jsonOptions.Converters.Add(new IdGenerationStyleEnumConverter());
 
             var fileName = _configFileLocator.GetReqnrollJsonFilePath();
 
@@ -46,7 +45,6 @@ namespace Reqnroll.CucumberMessages.Configuration
             {
                 configurationDTO.Enabled = section.Enabled;
                 configurationDTO.OutputFilePath = section.OutputFilePath;
-                configurationDTO.IDGenerationStyle = section.IDGenerationStyle;
                 return configurationDTO;
             }
             return null;

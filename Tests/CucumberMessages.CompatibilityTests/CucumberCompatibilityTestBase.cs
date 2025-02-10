@@ -55,7 +55,6 @@ namespace CucumberMessages.Tests
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, null);
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void ResetCucumberMessagesOutputFileName()
@@ -129,11 +128,6 @@ namespace CucumberMessages.Tests
             CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env, jsonConfigFileLocator);
             string configurationPath = configuration.OutputFilePath.Replace(DefaultSamplesDirectoryPlaceholder, GetDefaultSamplesDirectory());
             return configurationPath;
-        }
-
-        protected void SetEnvironmentVariableForGUIDIdGeneration()
-        {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE, CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_UUID);
         }
 
         protected void FileShouldExist(string v)

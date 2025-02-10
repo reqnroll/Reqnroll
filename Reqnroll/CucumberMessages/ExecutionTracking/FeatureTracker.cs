@@ -86,6 +86,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             var pickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles().ToList();
 
+            // When first created by the UnitTestFeatureGenerator, the IDs given to GherkinDocument and Pickles were based on IDs starting at '1'.
+            // By the time a Feature starts at test execution time, other messages have already been generated and written (eg, the StepDefinitions based on the StepBindingRegistry)
+            // Therefore, we have to rewrite the GherkinDocument and Pickles to give them IDs that fit after the IDs that have already been generated.
+
             var idReWriter = new CucumberMessages.RuntimeSupport.IdReWriter();
             idReWriter.ReWriteIds(gd, pickles, IDGenerator, out var reWrittenGherkinDocument, out var reWrittenPickles);
             gd = reWrittenGherkinDocument;

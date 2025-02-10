@@ -131,7 +131,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            SharedIDGenerator = IdGeneratorFactory.Create(CucumberConfiguration.Current.IDGenerationStyle);
+            SharedIDGenerator = new SeedableIncrementingIdGenerator(0);
             _testRunStartedId = SharedIDGenerator.GetNewId();
 
             Task.Run(async () =>

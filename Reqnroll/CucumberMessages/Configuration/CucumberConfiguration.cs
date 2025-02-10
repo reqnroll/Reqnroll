@@ -27,7 +27,6 @@ namespace Reqnroll.CucumberMessages.Configuration
         public static ICucumberMessagesConfiguration Current { get; private set; }
         public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
         public string OutputFilePath => _resolvedConfiguration.Value.OutputFilePath;
-        public IDGenerationStyle IDGenerationStyle => _resolvedConfiguration.Value.IDGenerationStyle;
 
         private readonly IObjectContainer _objectContainer;
         private Lazy<ITraceListener> _traceListenerLazy;
@@ -81,19 +80,16 @@ namespace Reqnroll.CucumberMessages.Configuration
         private ResolvedConfiguration ApplyEnvironmentOverrides(ConfigurationDTO config)
         {
             var filePathValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILEPATH_ENVIRONMENT_VARIABLE);
-            var idGenStyleValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ID_GENERATION_STYLE_ENVIRONMENT_VARIABLE);
 
             var result = new ResolvedConfiguration()
             {
                 Enabled = config.Enabled,
-                OutputFilePath = config.OutputFilePath,
-                IDGenerationStyle = config.IDGenerationStyle            };
+                OutputFilePath = config.OutputFilePath
+            };
 
             if (filePathValue is Success<string>)
                 result.OutputFilePath = ((Success<string>)filePathValue).Result;
 
-            if (idGenStyleValue is Success<string>)
-                result.IDGenerationStyle = IdGenerationStyleEnumConverter.ParseIdGenerationStyle(((Success<string>)idGenStyleValue).Result);
 
             var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
             result.Enabled = enabledResult is Success<string> ? Convert.ToBoolean(((Success<string>)enabledResult).Result) : result.Enabled;
@@ -107,8 +103,6 @@ namespace Reqnroll.CucumberMessages.Configuration
             {
                 rootConfig.Enabled = overridingConfig.Enabled;
                 rootConfig.OutputFilePath = overridingConfig.OutputFilePath ?? rootConfig.OutputFilePath;
-                rootConfig.IDGenerationStyle = overridingConfig.IDGenerationStyle;
-
             }
 
             return rootConfig;

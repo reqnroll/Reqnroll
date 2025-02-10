@@ -34,39 +34,31 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
         {
             _idGenerator = idGenerator;
         }
-        public GherkinDocument ReWriteIds(GherkinDocument document, IDGenerationStyle targetStyle)
+        public GherkinDocument ReWriteIds(GherkinDocument document)
         {
-            var existingIdStyle = ProbeForIdGenerationStyle(document);
 
-            if (targetStyle == IDGenerationStyle.Incrementing)
+            if (((SeedableIncrementingIdGenerator)_idGenerator).HasBeenUsed)
             {
-                switch ((((SeedableIncrementingIdGenerator)_idGenerator).HasBeenUsed, existingIdStyle))
-                {
-                    case (true, IDGenerationStyle.Incrementing):
-                    case (true, IDGenerationStyle.UUID):
-                    case (false, IDGenerationStyle.UUID):
-                        return ReWrite(document);
-
-                    case (false, IDGenerationStyle.Incrementing):
-                        var anotherThreadSetTheSeed = false;
-                        lock (_sharedLockObject)
-                        {
-                            var lastId = ProbeForLastUsedId(document);
-                            if (((SeedableIncrementingIdGenerator)_idGenerator).HasBeenUsed)
-                                anotherThreadSetTheSeed = true;
-                            else
-                            {
-                                ((SeedableIncrementingIdGenerator)_idGenerator).SetSeed(lastId);
-                            }
-                        }
-
-                        if (anotherThreadSetTheSeed)
-                            return ReWrite(document);
-                        return document;
-                }
+                return ReWrite(document);
             }
-            // else targetStyle is IDGenerationStyle.UUID
-            return document;
+            else
+            {
+                var anotherThreadSetTheSeed = false;
+                lock (_sharedLockObject)
+                {
+                    var lastId = ProbeForLastUsedId(document);
+                    if (((SeedableIncrementingIdGenerator)_idGenerator).HasBeenUsed)
+                        anotherThreadSetTheSeed = true;
+                    else
+                    {
+                        ((SeedableIncrementingIdGenerator)_idGenerator).SetSeed(lastId);
+                    }
+                }
+
+                if (anotherThreadSetTheSeed)
+                    return ReWrite(document);
+                return document;
+            }
         }
 
         private GherkinDocument ReWrite(GherkinDocument document)
@@ -95,31 +87,6 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
                 highestTagId = Math.Max(highestTagId, int.Parse(child.Scenario.Id));
 
             return highestTagId;
-        }
-        private IDGenerationStyle ProbeForIdGenerationStyle(GherkinDocument document)
-        {
-            if (document.Feature == null) return IDGenerationStyle.UUID;
-            var child = document.Feature.Children.FirstOrDefault();
-            if (child == null) return IDGenerationStyle.UUID;
-
-            if (child.Rule != null)
-                return ParseStyle(child.Rule.Id);
-
-            if (child.Background != null)
-                return ParseStyle(child.Background.Id);
-
-            if (child.Scenario != null)
-                return ParseStyle(child.Scenario.Id);
-
-            return IDGenerationStyle.UUID;
-        }
-
-        private IDGenerationStyle ParseStyle(string id)
-        {
-            if (Guid.TryParse(id, out var _))
-                return IDGenerationStyle.UUID;
-
-            return IDGenerationStyle.Incrementing;
         }
 
         public override void OnVisited(Tag tag)

@@ -132,27 +132,6 @@ namespace CucumberMessages.Tests
         }
 
         [TestMethod]
-        public void CanGenerateGUIDIds_SmokeTest()
-        {
-            ResetCucumberMessages("CanGenerateGUIDIds_SmokeTest.ndjson");
-            EnableCucumberMessages();
-            SetCucumberMessagesOutputFileName("CanGenerateGUIDIds_SmokeTest.ndjson");
-            SetEnvironmentVariableForGUIDIdGeneration();
-            CucumberMessagesAddConfigurationFile("reqnroll.json");
-
-            AddFeatureFile("""
-                Feature: Cucumber Messages Smoke Test
-                  Scenario: Eating Cukes
-                     When I eat 5 cukes
-                """);
-
-            AddPassingStepBinding("When");
-            ExecuteTests();
-
-            ShouldAllScenariosPass();
-        }
-
-        [TestMethod]
         public void SmokeTestMultipleFeaturesInParallel()
         {
             _projectsDriver.EnableTestParallelExecution();
@@ -176,7 +155,6 @@ namespace CucumberMessages.Tests
 
             ShouldAllScenariosPass();
         }
-
 
         [TestMethod]
         public void SmokeOutlineTest()

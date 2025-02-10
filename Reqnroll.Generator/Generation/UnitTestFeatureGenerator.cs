@@ -263,10 +263,7 @@ namespace Reqnroll.Generator.Generation
 
             try
             {
-
-                // Cucumber IDs can be UUIDs or stringified integers. This is configurable by the user.
-                var IDGenStyle = _cucumberConfiguration.IDGenerationStyle;
-                var messageConverter = new CucumberMessagesConverter(IdGeneratorFactory.Create(IDGenStyle));
+                var messageConverter = new CucumberMessagesConverter(new SeedableIncrementingIdGenerator(0));
                 var featureSource = Reqnroll.CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(messageConverter.ConvertToCucumberMessagesSource(generationContext.Document));
                 var featureGherkinDocument = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
                 var featurePickles = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocument);

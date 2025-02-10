@@ -16,8 +16,6 @@ namespace Reqnroll.CucumberMessages.Configuration
 
         public bool Enabled { get; set; }
         public string OutputFilePath { get; set; }
-        public IDGenerationStyle IDGenerationStyle { get; set; }
-
         public ConfigurationDTO() : this(false) { }
         public ConfigurationDTO(bool enabled)
         {

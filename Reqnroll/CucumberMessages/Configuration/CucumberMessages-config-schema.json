@@ -6,9 +6,6 @@
         },
         "OutputFilePath": {
             "type": "string"
-        },
-        "IDGenerationStyle": {
-            "type": "string"
         }
     }
 }

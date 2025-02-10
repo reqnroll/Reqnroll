@@ -25,7 +25,6 @@ namespace Reqnroll.CucumberMessages.Configuration
 
             res.Enabled = false;
             res.OutputFilePath = defaultOutputFileName;
-            res.IDGenerationStyle = IDGenerationStyle.UUID;
             return res;
         }
     }

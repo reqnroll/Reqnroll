@@ -4,7 +4,6 @@
     {
         public bool Enabled { get; set; }
         public string OutputFilePath { get; set; }
-        public IDGenerationStyle IDGenerationStyle { get; set; }
     }
 }
 

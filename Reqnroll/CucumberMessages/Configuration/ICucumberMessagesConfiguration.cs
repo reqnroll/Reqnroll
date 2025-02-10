@@ -4,6 +4,5 @@
     {
         bool Enabled { get; }
         string OutputFilePath { get; }
-        IDGenerationStyle IDGenerationStyle { get; }
     }
 }

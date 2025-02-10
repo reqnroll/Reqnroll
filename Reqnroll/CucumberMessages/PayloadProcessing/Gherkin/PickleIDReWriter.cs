@@ -20,8 +20,6 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
     {
         private Dictionary<string, string> _idMap;
         private IEnumerable<Pickle> _originalPickles;
-        private IDGenerationStyle _targetIdStyle;
-        private IDGenerationStyle _existingIdStyle;
         private IIdGenerator _idGenerator;
 
         public PickleIDReWriter(IIdGenerator idGenerator)
@@ -29,33 +27,20 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Gherkin
             _idGenerator = idGenerator;
         }
 
-        public IEnumerable<Pickle> ReWriteIds(IEnumerable<Pickle> pickles, Dictionary<string, string> idMap, IDGenerationStyle targetStyle)
+        public IEnumerable<Pickle> ReWriteIds(IEnumerable<Pickle> pickles, Dictionary<string, string> idMap)
         {
             if (pickles == null || pickles.Count() == 0) return pickles;
 
             _idMap = idMap;
             _originalPickles = pickles;
-            _targetIdStyle = targetStyle;
-            _existingIdStyle = ProbeForIdGenerationStyle(pickles.First());
 
-            if (_existingIdStyle == IDGenerationStyle.UUID && targetStyle == IDGenerationStyle.UUID)
-                return pickles;
-
-            //re-write the IDs (either int->UUID or UUID->int or int->int starting at a new seed)
+            //re-write the IDs (starting at a new seed)
             foreach (var pickle in _originalPickles)
             {
                 Accept(pickle);
             }
 
             return _originalPickles;
-        }
-
-        private IDGenerationStyle ProbeForIdGenerationStyle(Pickle pickle)
-        {
-            if (Guid.TryParse(pickle.Id, out var _))
-                return IDGenerationStyle.UUID;
-
-            return IDGenerationStyle.Incrementing;
         }
 
         public override void OnVisited(Pickle pickle)

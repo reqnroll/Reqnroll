@@ -7,23 +7,22 @@ using System.Collections.Generic;
 namespace Reqnroll.CucumberMessages.RuntimeSupport
 {
     /// <summary>
-    /// This class rewrites the GherkinDocument and Pickles collection to match the ID style configured for this test run.
+    /// This class rewrites the GherkinDocument and Pickles collection.
     /// 
     /// When the Gherkin Doc and Pickles are first created during the compilation phase, we use incrementing integer IDs. 
-    /// If the current test run wants to use UUIDs, then we re-write the documents with UUIDs and ensure all the references
-    /// to those IDs are patched up.
+    /// 
+    /// Rewriting of IDs is necessary when Messages have already been generated (at test-execution-time) to avoid ID collisions/re-use.
     /// </summary>
     internal class IdReWriter
     {
         internal void ReWriteIds(GherkinDocument gherkinDocument, IEnumerable<Pickle> pickles, IIdGenerator idGenerator, out GherkinDocument newGherkinDocument, out IEnumerable<Pickle> newPickles)
         {
-            var targetIdStyle = CucumberConfiguration.Current.IDGenerationStyle;
             var gherkinDocumentIDStyleReWriter = new GherkinDocumentIDReWriter(idGenerator);
-            newGherkinDocument = gherkinDocumentIDStyleReWriter.ReWriteIds(gherkinDocument, targetIdStyle);
+            newGherkinDocument = gherkinDocumentIDStyleReWriter.ReWriteIds(gherkinDocument);
             var idMap = gherkinDocumentIDStyleReWriter._IdMap;
 
             var pickleIDStyleReWriter = new PickleIDReWriter(idGenerator);
-            newPickles = pickleIDStyleReWriter.ReWriteIds(pickles, idMap, targetIdStyle);
+            newPickles = pickleIDStyleReWriter.ReWriteIds(pickles, idMap);
         }
     }
 }
