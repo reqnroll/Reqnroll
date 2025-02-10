@@ -1,5 +1,6 @@
 using System;
 using System.CodeDom;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -22,7 +23,6 @@ namespace Reqnroll.Generator.Generation
     {
         private readonly CodeDomHelper _codeDomHelper;
         private readonly IDecoratorRegistry _decoratorRegistry;
-        private readonly ITraceListener _traceListener;
         private readonly ScenarioPartHelper _scenarioPartHelper;
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
@@ -30,14 +30,13 @@ namespace Reqnroll.Generator.Generation
         private readonly LinePragmaHandler _linePragmaHandler;
         private readonly ICucumberMessagesConfiguration _cucumberConfiguration;
         private CodeMemberMethod _cucumberMessagesInitializeMethod;
+        private List<string> _generationWarnings;
 
         public UnitTestFeatureGenerator(
             IUnitTestGeneratorProvider testGeneratorProvider,
             CodeDomHelper codeDomHelper,
             ReqnrollConfiguration reqnrollConfiguration,
             IDecoratorRegistry decoratorRegistry,
-            ITraceListener traceListener,
-
             // Adding a dependency on the Cucumber configuration subsystem. Eventually remove this as Cucumber Config is folded into overall Reqnroll Config.
             ICucumberMessagesConfiguration cucumberConfiguration)
         {
@@ -45,17 +44,19 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper = codeDomHelper;
             _reqnrollConfiguration = reqnrollConfiguration;
             _decoratorRegistry = decoratorRegistry;
-            _traceListener = traceListener;
             _linePragmaHandler = new LinePragmaHandler(_reqnrollConfiguration, _codeDomHelper);
             _scenarioPartHelper = new ScenarioPartHelper(_reqnrollConfiguration, _codeDomHelper);
             _unitTestMethodGenerator = new UnitTestMethodGenerator(testGeneratorProvider, decoratorRegistry, _codeDomHelper, _scenarioPartHelper, _reqnrollConfiguration);
             _cucumberConfiguration = cucumberConfiguration;
+            _generationWarnings = new List<string>();
         }
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";
 
-        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
+        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace,out IEnumerable<string> generationWarnings)
         {
+            generationWarnings = _generationWarnings;
+
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
 
@@ -297,11 +298,10 @@ namespace Reqnroll.Generator.Generation
             }
             catch (Exception e)
             {
-                _traceListener.WriteToolOutput($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
+                _generationWarnings.Add($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
                 // This effectively turns OFF the Cucumber Messages support for this feature.
 
-                // TODO: Add error handling for this case, each factory method should return null;
                 return;
             }
         }

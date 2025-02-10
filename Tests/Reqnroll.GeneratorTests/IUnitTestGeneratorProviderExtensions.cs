@@ -20,7 +20,7 @@ namespace Reqnroll.GeneratorTests
             runtimeConfiguration.AllowRowTests = true;
             runtimeConfiguration.AllowDebugGeneratedFiles = true;
 
-            return new UnitTestFeatureGenerator(testGeneratorProvider, codeDomHelper, runtimeConfiguration, new DecoratorRegistryStub(), new DefaultListener(), new SimpleCucumberMessagesConfiguration());
+            return new UnitTestFeatureGenerator(testGeneratorProvider, codeDomHelper, runtimeConfiguration, new DecoratorRegistryStub(), new SimpleCucumberMessagesConfiguration());
         }
 
         public static IFeatureGenerator CreateFeatureGenerator(this IUnitTestGeneratorProvider testGeneratorProvider, string[] addNonParallelizableMarkerForTags = null)
