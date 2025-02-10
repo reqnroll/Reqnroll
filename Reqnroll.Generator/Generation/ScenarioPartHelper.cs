@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Gherkin.Ast;
 using Reqnroll.Configuration;
-using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Parser;
 

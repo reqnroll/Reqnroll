@@ -11,7 +11,6 @@ using Reqnroll.Parser;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
-using System.IO;
 
 namespace Reqnroll.Generator
 {
