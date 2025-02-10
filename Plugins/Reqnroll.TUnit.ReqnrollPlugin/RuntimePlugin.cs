@@ -1,7 +1,10 @@
 ﻿using Reqnroll.Infrastructure;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
+using Reqnroll.TUnit.ReqnrollPlugin;
 using Reqnroll.UnitTestProvider;
+
+[assembly: RuntimePlugin(typeof(RuntimePlugin))]
 
 namespace Reqnroll.TUnit.ReqnrollPlugin;
 
@@ -13,6 +16,7 @@ public class RuntimePlugin : IRuntimePlugin
         runtimePluginEvents.CustomizeTestThreadDependencies += RuntimePluginEvents_CustomizeTestThreadDependencies;
         unitTestProviderConfiguration.UseUnitTestProvider("tunit");
     }
+
     private void RuntimePluginEvents_RegisterGlobalDependencies(object sender, RegisterGlobalDependenciesEventArgs e)
     {
         e.ObjectContainer.RegisterTypeAs<TUnitRuntimeProvider, IUnitTestRuntimeProvider>("tunit");
