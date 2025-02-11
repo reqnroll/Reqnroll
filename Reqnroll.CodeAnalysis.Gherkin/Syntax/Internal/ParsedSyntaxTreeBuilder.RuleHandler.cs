@@ -1,57 +1,25 @@
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
-
-using global::Gherkin;
+﻿using Gherkin;
 using Microsoft.CodeAnalysis.Text;
-using static InternalSyntaxFactory;
+
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
 internal partial class ParsedSyntaxTreeBuilder
 {
-    /// <summary>
-    /// Defines the syntax builder interface to control the composition of syntax nodes.
-    /// </summary>
-    interface ISyntaxBuilder
+    abstract class RuleHandler(RuleType ruleType)
     {
-        /// <summary>
-        /// Adds a token to the syntax being built.
-        /// </summary>
-        /// <param name="token">The token to add.</param>
-        /// <param name="context">Contextual information about the building process.</param>
-        void Append(Token token, Context context);
+        public RuleType RuleType => ruleType;
 
-        /// <summary>
-        /// Called when the parser has started to consume a new element matching the specified rule.
-        /// </summary>
-        /// <param name="ruleType">The type of rule being processed.</param>
-        /// <returns>The syntax builder that should be used to handle subsequent tokens.</returns>
-        ISyntaxBuilder StartRule(RuleType ruleType);
-
-        /// <summary>
-        /// Called when the parser has reached the end of an element.
-        /// </summary>
-        /// <param name="ruleType">The type of rule the parser has reached the end of.</param>
-        /// <returns>The syntax builder that should be used to handle subsequent tokens.</returns>
-        ISyntaxBuilder EndRule(RuleType ruleType);
-    }
-
-    /// <summary>
-    /// Provides the base for creating syntax builders.
-    /// </summary>
-    /// <typeparam name="TSyntax">The type of syntax produced by the builder.</typeparam>
-    abstract class SyntaxBuilder<TSyntax> : ISyntaxBuilder where TSyntax : RawNode
-    {
-        /// <summary>
-        /// Builds a syntax node based on the tokens added to the builder.
-        /// </summary>
-        /// <returns>An instance of the raw syntax node specified by <typeparamref name="TSyntax"/>, or <c>null</c> if
-        /// the builder cannot create a syntax node from the tokens added so far.</returns>
-        public abstract TSyntax? Build();
+        public virtual RuleHandler StartChildRule(RuleType ruleType)
+        {
+            throw new NotSupportedException($"{GetType().Name} does not support having child rules of type {ruleType}");
+        }
 
         /// <summary>
         /// Appends a token to the syntax being built.
         /// </summary>
         /// <param name="token">The token from the parser to add.</param>
         /// <param name="context">Contains contextual information about the building of the syntax tree.</param>
-        public void Append(Token token, Context context)
+        public void AppendToken(Token token, Context context)
         {
             if (token.MatchedType == TokenType.EOF)
             {
@@ -86,85 +54,77 @@ internal partial class ParsedSyntaxTreeBuilder
             }
         }
 
-        public abstract ISyntaxBuilder StartRule(RuleType ruleType);
-
-        public abstract ISyntaxBuilder EndRule(RuleType ruleType);
-
         protected virtual void AppendEmpty(Token token, TextLine line, Context context)
         {
             // Empty tokens are all either zero-width or all-whitespace and can be added to leading trivia.
-            context.AddLeadingWhitespace(line.Span);
-
-            if (line.End != line.EndIncludingLineBreak)
-            {
-                context.AddLeadingTrivia(
-                    EndOfLine(context.SourceText, TextSpan.FromBounds(line.End, line.EndIncludingLineBreak)));
-            }
+            // Matched indentation will already be included by the generic line-handling behaviour.
+            context.AddLeadingWhitespace(TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End));
+            context.AddLeadingTrivia(line.GetEndOfLineTrivia());
         }
 
         protected virtual void AppendComment(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding comments.");
         }
 
         protected virtual void AppendTagLine(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding tag lines.");
         }
 
         protected virtual void AppendFeatureLine(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding feature lines.");
         }
 
         protected virtual void AppendRuleLine(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding rule lines.");
         }
 
         protected virtual void AppendBackgroundLine(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding background lines.");
         }
 
         protected virtual void AppendScenarioLine(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding scenario lines.");
         }
 
         protected virtual void AppendExamplesLine(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding examples lines.");
         }
 
         protected virtual void AppendStepLine(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding step lines.");
         }
 
         protected virtual void AppendDocStringSeparator(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding doc string separator.");
         }
 
         protected virtual void AppendTableRow(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding table rows.");
         }
 
         protected virtual void AppendLanguage(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding language comments.");
         }
 
         protected virtual void AppendOther(Token token, TextLine line, Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding other text.");
         }
 
-        public virtual void AppendEndOfFile(Context context)
+        protected virtual void AppendEndOfFile(Context context)
         {
-            throw new NotSupportedException();
+            throw new NotSupportedException($"{GetType().Name} does not support adding an end of file marker.");
         }
     }
 }
