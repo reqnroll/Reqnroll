@@ -30,7 +30,6 @@ namespace Reqnroll.Generator.Generation
         private readonly LinePragmaHandler _linePragmaHandler;
         private readonly ICucumberMessagesConfiguration _cucumberConfiguration;
         private CodeMemberMethod _cucumberMessagesInitializeMethod;
-        private List<string> _generationWarnings;
 
         public UnitTestFeatureGenerator(
             IUnitTestGeneratorProvider testGeneratorProvider,
@@ -48,15 +47,12 @@ namespace Reqnroll.Generator.Generation
             _scenarioPartHelper = new ScenarioPartHelper(_reqnrollConfiguration, _codeDomHelper);
             _unitTestMethodGenerator = new UnitTestMethodGenerator(testGeneratorProvider, decoratorRegistry, _codeDomHelper, _scenarioPartHelper, _reqnrollConfiguration);
             _cucumberConfiguration = cucumberConfiguration;
-            _generationWarnings = new List<string>();
         }
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";
 
         public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace,out IEnumerable<string> generationWarnings)
         {
-            generationWarnings = _generationWarnings;
-
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
 
@@ -79,6 +75,8 @@ namespace Reqnroll.Generator.Generation
 
             //before returning the generated code, call the provider's method in case the generated code needs to be customized            
             _testGeneratorProvider.FinalizeTestClass(generationContext);
+
+            generationWarnings = generationContext.GenerationWarnings;
             return codeNamespace;
         }
 
@@ -295,7 +293,7 @@ namespace Reqnroll.Generator.Generation
             }
             catch (Exception e)
             {
-                _generationWarnings.Add($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
+                generationContext.GenerationWarnings.Add($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
                 // This effectively turns OFF the Cucumber Messages support for this feature.
 
