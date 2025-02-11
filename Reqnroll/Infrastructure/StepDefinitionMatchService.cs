@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.ErrorHandling;
+using Reqnroll.Assist;
 
 namespace Reqnroll.Infrastructure
 {
@@ -76,6 +77,8 @@ namespace Reqnroll.Infrastructure
                 return BindingMatch.NonMatching;
 
             var arguments = match == null ? Array.Empty<object>() : _matchArgumentCalculator.CalculateArguments(match, stepInstance, stepDefinitionBinding);
+            var argumentValues = arguments.Select(a => a is ArgumentInfo ? ((ArgumentInfo)a).Value : a).ToArray();
+            var argumentOffsets = arguments.Select(a => a is ArgumentInfo ? ((ArgumentInfo)a).StartOffset : 0).ToArray();
 
             if (useParamMatching)
             {
@@ -83,16 +86,16 @@ namespace Reqnroll.Infrastructure
                 var bindingParameters = stepDefinitionBinding.Method.Parameters.ToArray();
 
                 // check if the regex + extra arguments match to the binding method parameters
-                if (arguments.Length != bindingParameters.Length)
+                if (argumentValues.Length != bindingParameters.Length)
                     return BindingMatch.NonMatching;
 
                 // Check if regex & extra arguments can be converted to the method parameters
                 //if (arguments.Zip(bindingParameters, (arg, parameter) => CanConvertArg(arg, parameter.Type)).Any(canConvert => !canConvert))
-                if (arguments.Where((arg, argIndex) => !CanConvertArg(arg, bindingParameters[argIndex].Type, bindingCulture)).Any())
+                if (argumentValues.Where((arg, argIndex) => !CanConvertArg(arg, bindingParameters[argIndex].Type, bindingCulture)).Any())
                     return BindingMatch.NonMatching;
             }
 
-            return new BindingMatch(stepDefinitionBinding, scopeMatches, arguments, stepInstance.StepContext);
+            return new BindingMatch(stepDefinitionBinding, scopeMatches, argumentValues, argumentOffsets, stepInstance.StepContext);
         }
 
         public BindingMatch GetBestMatch(StepInstance stepInstance, CultureInfo bindingCulture, out StepDefinitionAmbiguityReason ambiguityReason, out List<BindingMatch> candidatingMatches)

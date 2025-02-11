@@ -91,7 +91,7 @@ namespace Reqnroll.RuntimeTests
 
             var stepDefinitionStub = new Mock<IStepDefinitionBinding>();
             stepDefinitionStub.Setup(sd => sd.Method).Returns(bindingMethod);
-            var result = errorProvider.GetParameterCountError(new BindingMatch(stepDefinitionStub.Object, It.IsAny<int>(), null, null), 2);
+            var result = errorProvider.GetParameterCountError(new BindingMatch(stepDefinitionStub.Object, It.IsAny<int>(), null, null, null), 2);
 
             result.Should().NotBeNull();
             result.Should().BeOfType<BindingException>();
@@ -124,8 +124,8 @@ namespace Reqnroll.RuntimeTests
             stepDefinitionStub2.Setup(sd => sd.Method).Returns(bindingMethod2);
             var bindingMatch = new List<BindingMatch>()
             {
-                new BindingMatch(stepDefinitionStub1.Object, It.IsAny<int>(), null, null),
-                new BindingMatch(stepDefinitionStub2.Object, It.IsAny<int>(), null, null)
+                new BindingMatch(stepDefinitionStub1.Object, It.IsAny<int>(), null, null, null),
+                new BindingMatch(stepDefinitionStub2.Object, It.IsAny<int>(), null, null, null)
             };
 
             var result = GetMatchErrorFunc(errorProvider, bindingMatch, null);

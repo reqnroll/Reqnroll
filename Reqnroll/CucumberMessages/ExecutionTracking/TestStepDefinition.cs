@@ -69,11 +69,16 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             var IsInputDataTableOrDocString = stepFinishedEvent.StepContext.StepInfo.Table != null || stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
             var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();
+            var argumentStartOffsets = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.ArgumentStartOffsets.ToList() : new List<int>();
             var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
-            StepArguments = Bound && !IsInputDataTableOrDocString ?
-                argumentValues.Zip(argumentTypes, (x, y) => new StepArgument { Value = x, Type = y }).ToList()
-                : Enumerable.Empty<StepArgument>().ToList();
-
+            StepArguments = new();
+            if (Bound && !IsInputDataTableOrDocString)
+            {
+                for (int i = 0; i < argumentValues.Count; i++)
+                {
+                    StepArguments.Add(new StepArgument { Value = argumentValues[i], StartOffset = argumentStartOffsets[i], Type = argumentTypes[i] });
+                }
+            }
         }
     }
 }

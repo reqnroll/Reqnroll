@@ -14,6 +14,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     public class StepArgument
     {
         public string Value;
+        public int StartOffset;
         public string Type;
     }
 

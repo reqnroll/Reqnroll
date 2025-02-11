@@ -171,7 +171,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return new StepMatchArgument(
                 new Group(
                     [],
-                    null,
+                    argument.StartOffset,
                     argument.Value
                     ),
                 NormalizePrimitiveTypeNamesToCucumberTypeNames(argument.Type));
