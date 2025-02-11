@@ -31,7 +31,7 @@
 * Fix: Attempting to set the `ConcurrentObjectResolutionTimeout` value on the `ObjectContainer` to `TimeSpan.Zero` sometimes throws an exception if running multiple tests in parallel. (#440)
 * Fix: Project and Package references of Reqnroll.Verify are inconsistent. (#446)
 
-*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen, @StefH
+*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @DrEsteban, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen, @StefH
 
 # v2.2.1 - 2024-11-08
 
