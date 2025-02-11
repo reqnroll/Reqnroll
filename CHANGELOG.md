@@ -20,6 +20,7 @@
 * Support loading plugin dependencies from .deps.json on .NET Framework and Visual Studio MSBuild (#408)
 * Support for setting `ObjectContainer.DefaultConcurrentObjectResolutionTimeout` even after creation of the container (#435)
 * Reqnroll.Microsoft.Extensions.DependencyInjection: Include `ReqnrollLogger` class to the Reqnroll MSDI plugin based on the work of @StefH at https://github.com/StefH/Stef.Extensions.SpecFlow.Logging (#321)
+* Reqnroll.Assist.Dynamic: The SpecFlow.Assist.Dynamic plugin by @marcusoftnet has now been ported to Reqnroll. (#377)
 
 ## Bug fixes:
 
