@@ -28,6 +28,8 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public void SetIsRowTestsAllowed(bool isAllowed) => SetIsRowTestsAllowed(_solutionDriver.DefaultProject, isAllowed);
 
+        public void AddNonParallelizableMarkerForTag(string tagName) => AddNonParallelizableMarkerForTag(_solutionDriver.DefaultProject, tagName);
+
         public void AddRuntimeRegisterDependency(string type, string @as) => AddRuntimeRegisterDependency(_solutionDriver.DefaultProject, type, @as);
 
         private (string type, string @as) GetFullTypeAs(ProjectBuilder project, string type, string @as)
@@ -75,6 +77,11 @@ namespace Reqnroll.TestProjectGenerator.Driver
         public void SetIsRowTestsAllowed(ProjectBuilder project, bool isAllowed)
         {
             project.Configuration.Generator.Value.AllowRowTests = isAllowed;
+        }
+
+        public void AddNonParallelizableMarkerForTag(ProjectBuilder project, string tagName)
+        {
+            project.Configuration.Generator.Value.AddNonParallelizableMarkerForTag(tagName);
         }
 
         private UnitTestProvider GetUnitTestProvider(string providerName)

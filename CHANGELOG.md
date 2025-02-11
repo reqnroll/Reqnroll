@@ -20,6 +20,7 @@
 * Fix: Error with NUnit 4: "Only static OneTimeSetUp and OneTimeTearDown are allowed for InstancePerTestCase mode" (#379)
 * Fix: Reqnroll.Autofac: FeatureContext cannot be resolved in BeforeFeature/AfterFeature hooks (#340)
 * Fix: Attempting to set the `ConcurrentObjectResolutionTimeout` value on the `ObjectContainer` to `TimeSpan.Zero` sometimes throws an exception if running multiple tests in parallel. (#440)
+* Fix: Project and Package references of Reqnroll.Verify are inconsistent. (#446)
 
 *Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen, @StefH
 
