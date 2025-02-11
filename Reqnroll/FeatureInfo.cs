@@ -25,11 +25,11 @@ namespace Reqnroll
         public string CucumberMessages_PickleId { get; set; }
 
         public FeatureInfo(CultureInfo language, string folderPath, string title, string description, params string[] tags)
-            : this(language, folderPath, title, description, ProgrammingLanguage.CSharp, null, tags)
+            : this(language, folderPath, title, description, ProgrammingLanguage.CSharp, tags)
         {
         }
 
-        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, FeatureLevelCucumberMessages featureLevelCucumberMessages = null, params string[] tags)
+        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, params string[] tags)
         {
             if (language.IsNeutralCulture)
             {
@@ -43,8 +43,13 @@ namespace Reqnroll
             Title = title;
             Description = description;
             GenerationTargetLanguage = programmingLanguage;
-            FeatureCucumberMessages = featureLevelCucumberMessages;
             Tags = tags ?? Array.Empty<string>();
+        }
+
+        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, string[] tags, FeatureLevelCucumberMessages featureLevelCucumberMessages = null)
+            : this(language, folderPath, title, description, programmingLanguage, tags)
+        {
+            FeatureCucumberMessages = featureLevelCucumberMessages;
         }
     }
 }

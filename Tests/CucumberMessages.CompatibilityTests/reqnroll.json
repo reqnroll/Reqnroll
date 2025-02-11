@@ -5,7 +5,6 @@
     ],
   "cucumberMessagesConfiguration": {
     "enabled": true,
-    "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson",
-    "iDGenerationStyle": "INCREMENTING"
+    "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson"
   }
 }

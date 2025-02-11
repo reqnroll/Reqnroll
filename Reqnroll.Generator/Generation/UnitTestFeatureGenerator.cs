@@ -199,8 +199,8 @@ namespace Reqnroll.Generator.Generation
                 new CodeFieldReferenceExpression(
                     new CodeTypeReferenceExpression(new CodeTypeReference(typeof(ProgrammingLanguage), CodeTypeReferenceOptions.GlobalReference)),
                     _codeDomHelper.TargetLanguage.ToString()),
-                new CodeMethodInvokeExpression(null, _cucumberMessagesInitializeMethod.Name),
-                new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME));
+                new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME),
+                new CodeMethodInvokeExpression(null, _cucumberMessagesInitializeMethod.Name));
 
             generationContext.TestClass.Members.Add(featureInfoField);
         }
