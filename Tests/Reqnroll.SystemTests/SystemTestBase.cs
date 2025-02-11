@@ -17,8 +17,10 @@ namespace Reqnroll.SystemTests;
 public abstract class SystemTestBase
 {
     protected ProjectsDriver _projectsDriver = null!;
+    protected SolutionDriver _solutionDriver = null!;
     protected ExecutionDriver _executionDriver = null!;
     protected VSTestExecutionDriver _vsTestExecutionDriver = null!;
+    protected ConfigurationFileDriver _configurationFileDriver = null!;
     protected TestFileManager _testFileManager = new();
     protected FolderCleaner _folderCleaner = null!;
     protected IServiceProvider _testContainer = null!;
@@ -84,12 +86,14 @@ public abstract class SystemTestBase
         _folderCleaner.EnsureOldRunFoldersCleaned();
 
         _projectsDriver = GetServiceSafe<ProjectsDriver>();
+        _solutionDriver = GetServiceSafe<SolutionDriver>();
         _executionDriver = GetServiceSafe<ExecutionDriver>();
         _vsTestExecutionDriver = GetServiceSafe<VSTestExecutionDriver>();
         _compilationDriver = GetServiceSafe<CompilationDriver>();
         _testProjectFolders = GetServiceSafe<TestProjectFolders>();
         _bindingDriver = GetServiceSafe<BindingsDriver>();
         _jsonConfigurationLoaderDriver = GetServiceSafe<JsonConfigurationLoaderDriver>();
+        _configurationFileDriver = GetServiceSafe<ConfigurationFileDriver>();
     }
 
 

@@ -414,5 +414,12 @@ namespace Reqnroll.TestProjectGenerator
             EnsureProjectExists();
             _project.AddNuGetPackage(nugetPackage, nugetVersion);
         }
+
+        public void UpdateNuGetPackage(string nugetPackage, string nugetVersion)
+        {
+            EnsureProjectExists();
+            _project.RemoveNuGetPackage(nugetPackage);
+            _project.AddNuGetPackage(nugetPackage, nugetVersion);
+        }
     }
 }

@@ -142,6 +142,17 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
                 WriteDependencies(jsonWriter, generator.Dependencies);
             }
 
+            if (generator.AddNonParallelizableMarkerForTags.Count > 0)
+            {
+                jsonWriter.WritePropertyName("addNonParallelizableMarkerForTags");
+                jsonWriter.WriteStartArray();
+                foreach (var tagName in generator.AddNonParallelizableMarkerForTags)
+                {
+                    jsonWriter.WriteValue(tagName);
+                }
+                jsonWriter.WriteEndArray();
+            }
+
             jsonWriter.WriteEndObject();
         }
 

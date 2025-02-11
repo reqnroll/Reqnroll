@@ -5,25 +5,25 @@
     <title>Reqnroll.Verify</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
-    <description>Package to use Verify with Reqnroll</description>
-    <summary>Package to use Verify with Reqnroll</summary>
+    <description>Package to use Verify.Xunit with Reqnroll</description>
+    <summary>Package to use Verify.Xunit with Reqnroll</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
     <icon>images\reqnroll-icon.png</icon>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <license type="expression">BSD-3-Clause</license>
-    <tags>reqnroll verify</tags>
+    <tags>reqnroll verify xunit</tags>
     <copyright>$copyright$</copyright>
 
     <dependencies>
       <group targetFramework="net472">
         <dependency id="Reqnroll" version="$CompatibilityVersionRange$" />
-        <dependency id="Verify" version="24.2.0" />
+        <dependency id="Verify.Xunit" version="24.2.0" />
       </group>
       <group targetFramework="net6.0">
         <dependency id="Reqnroll" version="$CompatibilityVersionRange$" />
-        <dependency id="Verify" version="24.2.0" />
+        <dependency id="Verify.Xunit" version="24.2.0" />
       </group>
     </dependencies>
 
