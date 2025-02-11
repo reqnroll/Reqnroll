@@ -1,4 +1,4 @@
-﻿namespace Reqnroll.SystemTests.ExternalPlugins;
+﻿namespace Reqnroll.SystemTests.Plugins;
 
 public abstract class PluginsTestBase : SystemTestBase
 {

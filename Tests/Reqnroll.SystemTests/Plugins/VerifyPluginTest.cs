@@ -1,11 +1,6 @@
 ﻿using System;
-using System.Linq;
-using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Reqnroll.SystemTests.ExternalPlugins;
 using Reqnroll.TestProjectGenerator;
-using Reqnroll.TestProjectGenerator.Data;
-using Reqnroll.TestProjectGenerator.Driver;
 
 namespace Reqnroll.SystemTests.Plugins;
 
