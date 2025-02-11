@@ -238,7 +238,17 @@ public class ObjectContainer : IObjectContainer
                 return obj;
 
             if (timeout == TimeSpan.Zero)
-                return factory();
+            {
+                Monitor.Enter(lockObject);
+                try
+                {
+                    return factory();
+                }
+                finally
+                {
+                    Monitor.Exit(lockObject);
+                }
+            }
 
             if (Monitor.TryEnter(lockObject, timeout))
             {
