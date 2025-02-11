@@ -25,22 +25,22 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
     {
         internal static TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
         {
-            return new TestRunStarted(Converters.ToTimestamp(timestamp), id);
+            return new TestRunStarted(Converters.ToTimestamp(timestamp.ToUniversalTime()), id);
         }
 
         internal static TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId)
         {
-            return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp), null, testRunStartedId);
+            return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp.ToUniversalTime()), null, testRunStartedId);
         }
 
         internal static TestRunHookStarted ToTestRunHookStarted(TestRunHookTracker hookTracker)
         {
-            return new TestRunHookStarted(hookTracker.TestRunHookId, hookTracker.TestRunID, hookTracker.TestRunHook_HookId, Converters.ToTimestamp(hookTracker.TimeStamp));
+            return new TestRunHookStarted(hookTracker.TestRunHookId, hookTracker.TestRunID, hookTracker.TestRunHook_HookId, Converters.ToTimestamp(hookTracker.TimeStamp.ToUniversalTime()));
         }
 
         internal static TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker)
         {
-            return new TestRunHookFinished(hookTracker.TestRunHookId, ToTestStepResult(hookTracker), Converters.ToTimestamp(hookTracker.TimeStamp));
+            return new TestRunHookFinished(hookTracker.TestRunHookId, ToTestStepResult(hookTracker), Converters.ToTimestamp(hookTracker.TimeStamp.ToUniversalTime()));
         }
 
         internal static TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
@@ -79,13 +79,13 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 testCaseExecution.TestCaseStartedId,
                 testCaseId,
                 null, 
-                Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp));
+                Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp.ToUniversalTime()));
         }
         internal static TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
         {
             return new TestCaseFinished(
                 testCaseExecution.TestCaseStartedId,
-                Converters.ToTimestamp(testCaseExecution.TestCaseFinishedTimeStamp),
+                Converters.ToTimestamp(testCaseExecution.TestCaseFinishedTimeStamp.ToUniversalTime()),
                 false);
         }
         internal static StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
@@ -181,7 +181,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return new TestStepStarted(
                 stepState.TestCaseStartedID,
                 stepState.Definition.TestStepId,
-                Converters.ToTimestamp(stepState.StepStarted));
+                Converters.ToTimestamp(stepState.StepStarted.ToUniversalTime()));
         }
 
         internal static TestStepFinished ToTestStepFinished(TestStepTracker stepState)
@@ -190,7 +190,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 stepState.TestCaseStartedID,
                 stepState.Definition.TestStepId,
                 ToTestStepResult(stepState),
-                Converters.ToTimestamp(stepState.StepFinished));
+                Converters.ToTimestamp(stepState.StepFinished.ToUniversalTime()));
         }
 
         internal static Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
@@ -239,14 +239,14 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         {
             return new TestStepStarted(hookStepProcessor.TestCaseStartedID,
                 hookStepProcessor.Definition.TestStepId,
-                Converters.ToTimestamp(hookStepProcessor.StepStarted));
+                Converters.ToTimestamp(hookStepProcessor.StepStarted.ToUniversalTime()));
         }
 
         internal static TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor)
         {
             return new TestStepFinished(hookStepProcessor.TestCaseStartedID,
                 hookStepProcessor.Definition.TestStepId,
-                ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookStepProcessor.StepFinished));
+                ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookStepProcessor.StepFinished.ToUniversalTime()));
         }
 
         internal static Attachment ToAttachment(AttachmentAddedEventWrapper tracker)
