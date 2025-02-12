@@ -37,5 +37,5 @@ public class FeatureDeclarationSyntax : DeclarationSyntax
     /// </summary>
     public DescriptionSyntax? Description => RawNode.description == null ? null : new(RawNode.description, this, Position + RawNode.GetSlotOffset(3));
 
-    internal override SyntaxNode? GetNodeSlot(int index) => null;
+    internal override SyntaxNode? GetSlotAsSyntaxNode(int index) => null;
 }

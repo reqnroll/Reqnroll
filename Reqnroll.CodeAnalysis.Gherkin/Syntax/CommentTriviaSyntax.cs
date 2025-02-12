@@ -7,7 +7,7 @@ public class CommentTriviaSyntax : StructuredTriviaSyntax
     {
     }
 
-    internal override SyntaxNode? GetNodeSlot(int index)
+    internal override SyntaxNode? GetSlotAsSyntaxNode(int index)
     {
         return null;
     }

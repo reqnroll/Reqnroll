@@ -17,5 +17,5 @@ public class DescriptionSyntax : SyntaxNode
 
     public SyntaxTokenList TextTokens => new(this, RawNode.textTokens, Position + RawNode.GetSlotOffset(0));
 
-    internal override SyntaxNode? GetNodeSlot(int index) => null;
+    internal override SyntaxNode? GetSlotAsSyntaxNode(int index) => null;
 }

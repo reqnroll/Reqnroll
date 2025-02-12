@@ -159,7 +159,7 @@ public abstract class SyntaxNode
         return field;
     }
 
-    internal abstract SyntaxNode? GetNodeSlot(int index);
+    internal abstract SyntaxNode? GetSlotAsSyntaxNode(int index);
 
     public SyntaxToken GetFirstToken()
     {

@@ -37,7 +37,7 @@ public class FeatureFileSyntax : SyntaxNode
         return SyntaxFactory.FeatureFile(FeatureDeclaration, endOfFileToken);
     }
 
-    internal override SyntaxNode? GetNodeSlot(int index)
+    internal override SyntaxNode? GetSlotAsSyntaxNode(int index)
     {
         return index switch
         {

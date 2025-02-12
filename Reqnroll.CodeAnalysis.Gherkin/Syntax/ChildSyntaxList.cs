@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+using System.Collections;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -46,7 +47,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
                 var currentNode = _current.AsNode()!;
 
                 // If we're currently iterating through a list, continue.
-                if (currentNode.RawNode.IsList && MoveNextListSlot(currentNode))
+                if (currentNode.RawNode.IsList && MoveNextSyntaxNodeListSlot(currentNode))
                 {
                     return true;
                 }                
@@ -57,11 +58,13 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
             {
                 var slot = parent.RawNode.GetSlot(_slotIndex);
 
+                // If the slot is empty, we advance the enumerator.
                 if (slot == null)
                 {
                     continue;
                 }
 
+                // If the slot is a token, we return the raw token wrapped in a public type.
                 if (slot.IsToken)
                 {
                     _current = new SyntaxToken(parent, slot, _position);
@@ -69,21 +72,40 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
                     return true;
                 }
 
-                var node = parent.GetNodeSlot(_slotIndex)!;
+                var node = parent.GetSlotAsSyntaxNode(_slotIndex);
 
+                // If the slot contains a list, we move to the next item in the list.
                 if (slot.IsList)
                 {
                     _slotIndex = -1;
-                    if (MoveNextListSlot(node))
+
+                    // If the slot doesn't correspond to a syntax node, but is a list, it must be a syntax token list.
+                    // We can return the slot as a syntax token.
+                    if (node == null)
                     {
-                        return true;
+                        if (MoveNextSyntaxTokenListSlot(slot))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
                     else
                     {
-                        continue;
+                        if (MoveNextSyntaxNodeListSlot(node))
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            continue;
+                        }
                     }
                 }
 
+                // Otherwise, assume a syntax node.
                 _current = node;
                 _position += slot.FullWidth;
                 return true;
@@ -92,7 +114,24 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
             return false;
         }
 
-        private bool MoveNextListSlot(SyntaxNode childList)
+        private bool MoveNextSyntaxTokenListSlot(RawNode tokenList)
+        {
+            for (_listIndex++; _listIndex < tokenList.SlotCount; _listIndex++)
+            {
+                var listChild = tokenList.GetSlot(_listIndex);
+
+                if (listChild != null)
+                {
+                    _current = new SyntaxToken(parent, listChild, _position);
+                    _position += listChild.FullWidth;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private bool MoveNextSyntaxNodeListSlot(SyntaxNode childList)
         {
             for (_listIndex++; _listIndex < childList.RawNode.SlotCount; _listIndex++)
             {
@@ -106,7 +145,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
                     }
                     else
                     {
-                        _current = childList.GetNodeSlot(_slotIndex)!.GetNodeSlot(_listIndex);
+                        _current = childList.GetSlotAsSyntaxNode(_slotIndex)!.GetSlotAsSyntaxNode(_listIndex);
                     }
 
                     _position += listChild.FullWidth;

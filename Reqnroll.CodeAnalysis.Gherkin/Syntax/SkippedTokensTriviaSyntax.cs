@@ -11,5 +11,5 @@ public class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
 
     public SyntaxTokenList Tokens => new(this, RawNode.tokens, RawNode.GetSlotOffset(0));
 
-    internal override SyntaxNode? GetNodeSlot(int index) => null;
+    internal override SyntaxNode? GetSlotAsSyntaxNode(int index) => null;
 }

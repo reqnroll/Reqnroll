@@ -8,7 +8,7 @@ public class ScenarioOutlineDeclarationSyntax : DeclarationSyntax
 
     public override SyntaxTokenList Tags => new();
 
-    internal override SyntaxNode? GetNodeSlot(int index)
+    internal override SyntaxNode? GetSlotAsSyntaxNode(int index)
     {
         return null;
     }
