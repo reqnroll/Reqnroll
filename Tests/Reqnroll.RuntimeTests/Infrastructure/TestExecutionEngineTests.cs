@@ -39,6 +39,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         private Mock<IObsoleteStepHandler> obsoleteTestHandlerMock;
         private FeatureInfo featureInfo;
         private ScenarioInfo scenarioInfo;
+        private RuleInfo ruleInfo;
         private ObjectContainer globalContainer;
         private ObjectContainer testThreadContainer;
         private ObjectContainer featureContainer;
@@ -110,7 +111,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var culture = new CultureInfo("en-US", false);
             contextManagerStub = new Mock<IContextManager>();
             scenarioInfo = new ScenarioInfo("scenario_title", "scenario_description", null, null);
-            scenarioContext = new ScenarioContext(scenarioContainer, scenarioInfo, testObjectResolverMock.Object);
+            ruleInfo = new RuleInfo("rule_title", "rule_description", null);
+            scenarioContext = new ScenarioContext(scenarioContainer, scenarioInfo, ruleInfo, testObjectResolverMock.Object);
             scenarioContainer.RegisterInstanceAs(scenarioContext);
             contextManagerStub.Setup(cm => cm.ScenarioContext).Returns(scenarioContext);
             featureInfo = new FeatureInfo(culture, "feature path", "feature_title", "", ProgrammingLanguage.CSharp);

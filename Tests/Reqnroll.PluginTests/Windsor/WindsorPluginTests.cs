@@ -97,6 +97,7 @@ namespace Reqnroll.PluginTests.Windsor
             var context = new ScenarioContext(
                 objectContainer.Object, 
                 new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()), 
+                null,
                 new WindsorTestObjectResolver());
 
             objectContainer.Setup(x => x.Resolve<ScenarioContext>()).Returns(context);
