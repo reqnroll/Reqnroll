@@ -295,9 +295,29 @@ jobs:
         if-no-files-found: error
         path: "TestResults/*.trx"
     
+  build-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Doc Dependencies
+      working-directory: docs
+      run: | 
+        pip install -r requirements.txt
+    - name: Build Doc
+      working-directory: docs
+      run: |
+        sphinx-build -M html . _build
+    - name: Upload HTML Doc Files
+      uses: actions/upload-artifact@v4
+      with:
+        name: html-docs
+        if-no-files-found: error
+        path: "docs/_build/html/**/*"
+    
   release:
     runs-on: ubuntu-latest
-    needs: [build, specs, system-tests-windows, system-tests-linux]
+    needs: [build, specs, system-tests-windows, system-tests-linux, build-docs]
     environment: production_environment
     if: github.ref == 'refs/heads/main' && needs.build.outputs.deploy_packages == 'true'
     permissions:
