@@ -179,7 +179,7 @@ namespace CucumberMessages.Tests
             // Dictionary keyed by the ID of each test case.
             var testCases = new Dictionary<string, TestCaseRecord>();
 
-            var allTestCases = envelopes.Where(e => e.Content() is TestCase).Select(e => e.TestCase).ToList().OrderBy(tc => tc.PickleId).ToList();
+            var allTestCases = envelopes.Where(e => e.Content() is TestCase).Select(e => e.TestCase).ToList().ToList();
 
             var testCaseStartedToTestCaseMap = new Dictionary<string, string>();
 

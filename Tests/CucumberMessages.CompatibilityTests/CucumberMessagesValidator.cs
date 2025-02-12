@@ -91,7 +91,7 @@ namespace CucumberMessages.Tests
         public void ResultShouldPassAllComparisonTests()
         {
             var method = typeof(CucumberMessagesValidator).GetMethod(nameof(CompareMessageType), BindingFlags.NonPublic | BindingFlags.Instance);
-            using (new AssertionScope())
+            using (new AssertionScope("Comparing Actual to Expected Envelopes"))
             {
                 foreach (Type t in EnvelopeTypes)
                 {
@@ -144,7 +144,7 @@ namespace CucumberMessages.Tests
 
         public void ResultShouldPassSanityChecks()
         {
-            using (new AssertionScope())
+            using (new AssertionScope("Sanity Checks"))
             {
                 EachTestCaseAndStepsShouldProperlyReferToAPickleAndStepDefinitionOrHook();
                 EachPickleAndPickleStepShouldBeReferencedByTestStepsAtLeastOnce();
@@ -329,7 +329,7 @@ namespace CucumberMessages.Tests
             var actual = actualEnvelopes;
             var expected = expectedEnvelopes;
 
-            using (new AssertionScope())
+            using (new AssertionScope("Basic Structural Comparison Tests"))
             {
                 actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
 
@@ -407,6 +407,8 @@ namespace CucumberMessages.Tests
                                                                     .ComparingByMembers<TestStepResult>()
                                                                     .ComparingByMembers<TestStepStarted>()
                                                                     .ComparingByMembers<UndefinedParameterType>()
+                                                                    .ComparingByMembers<TestRunHookStarted>()
+                                                                    .ComparingByMembers<TestRunHookFinished>()
 
                                                                     // Using a custom Property Selector so that we can ignore the  properties that are not comparable
                                                                     .Using(FA_CustomCucumberMessagesPropertySelector)
