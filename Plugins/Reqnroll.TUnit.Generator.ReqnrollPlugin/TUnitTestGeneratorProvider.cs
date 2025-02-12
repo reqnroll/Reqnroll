@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Reqnroll.BoDi;
+using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.UnitTestProvider;
 
-namespace Reqnroll.Generator.UnitTestProvider;
+namespace Reqnroll.TUnit.Generator.ReqnrollPlugin;
 
 /// <summary>
 /// A TUnit test generator provider.
