@@ -88,6 +88,11 @@ namespace Reqnroll.TestProjectGenerator.Data
             }
         }
 
+        public void RemoveNuGetPackage(string packageName)
+        {
+            _nuGetPackages.RemoveAll(p => p.Name == packageName);
+        }
+
         public void AddReference(string name)
         {
             _references.Add(new Reference(name));

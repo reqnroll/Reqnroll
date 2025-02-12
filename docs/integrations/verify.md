@@ -1,12 +1,12 @@
 # Verify
 
-Reqnroll supports Verify 24.2.0 or later.  
+Reqnroll supports Verify.Xuint 24.2.0 or later.  
 
 Documentation for Verify can be found [here](https://github.com/VerifyTests/Verify).
 
 ## Needed NuGet Packages
 
-* [Reqnroll.xUnit](https://www.nuget.org/packages/Reqnroll.xUnit/) and its [dependencies](xunit.md#Needed%20NuGet%20Packages)
+* [Reqnroll.xUnit](https://www.nuget.org/packages/Reqnroll.xUnit/) and its [dependencies](xunit.md#needed-nuget-packages)
 * [Reqnroll.Verify](https://www.nuget.org/packages/Reqnroll.Verify/)
 
 ## How it works
@@ -27,6 +27,7 @@ Feature: Verify feature
 internal class StepDefinitions
 {
     private readonly VerifySettings _settings;
+    private int _result;
 
     public StepDefinitions(VerifySettings settings)
     {
@@ -34,14 +35,15 @@ internal class StepDefinitions
     }
     
     [When("I calculate (\d+) + (\d+)")]
-    public void WhenICalculate(int value, int value2)
+    public void WhenICalculate(int v1, int v2)
     {
-        _settings.Verify(value + value, _settings);
+        _result = v1 + v2; // simulate calling the SUT to get the result
     }
     
     [Then("I expect the result is correct")]
     public void ThenIExpectTheResultIsCorrect()
     {
+        Verifier.Verify(_result, _settings);
     }
 }
 

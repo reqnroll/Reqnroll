@@ -11,8 +11,10 @@ using Reqnroll.Autofac;
 using Reqnroll.Autofac.ReqnrollPlugin;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Reqnroll.Plugins;
+using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
 using Xunit;
 
@@ -106,7 +108,7 @@ public class AutofacPluginTests
         }
     }
 
-private readonly RuntimePluginEvents _runtimePluginEvents;
+    private readonly RuntimePluginEvents _runtimePluginEvents;
     private readonly ObjectContainer _testRunContainer;
     private readonly ObjectContainer _testThreadContainer;
     private readonly ObjectContainer _featureContainer;
@@ -231,7 +233,7 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
 
 
     [Fact]
-    public void Should_allow_resolving_common_reqnroll_objects()
+    public void Should_allow_resolving_common_reqnroll_objects_from_scenario_container()
     {
         // Arrange
         var sut = new TestableAutofacPlugin(typeof(ContainerSetup1),
@@ -259,6 +261,33 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
         resolvedFeatureContext.Should().BeSameAs(featureContext);
 
         var resolvedTestThreadContext = resolver.ResolveBindingInstance(typeof(TestThreadContext), scenarioContainer);
+        resolvedTestThreadContext.Should().BeSameAs(testThreadContext);
+    }
+
+    [Fact]
+    public void Should_allow_resolving_common_reqnroll_objects_from_feature_container()
+    {
+        // Arrange
+        var sut = new TestableAutofacPlugin(typeof(ContainerSetup1),
+                                            nameof(ContainerSetup1.SetupGlobalContainer),
+                                            nameof(ContainerSetup1.SetupScenarioContainer));
+
+        // Act
+        InitializeToScenarioContainer(sut);
+        var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
+        var featureContext = new FeatureContext(_featureContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", ""), ConfigurationLoader.GetDefault());
+        _featureContainer.RegisterInstanceAs(featureContext);
+        var testThreadContext = new TestThreadContext(_testThreadContainer);
+        _testThreadContainer.RegisterInstanceAs(testThreadContext);
+
+        // Assert
+        var resolvedContainer = resolver.ResolveBindingInstance(typeof(IObjectContainer), _featureContainer);
+        resolvedContainer.Should().BeSameAs(_featureContainer);
+
+        var resolvedFeatureContext = resolver.ResolveBindingInstance(typeof(FeatureContext), _featureContainer);
+        resolvedFeatureContext.Should().BeSameAs(featureContext);
+
+        var resolvedTestThreadContext = resolver.ResolveBindingInstance(typeof(TestThreadContext), _featureContainer);
         resolvedTestThreadContext.Should().BeSameAs(testThreadContext);
     }
 
@@ -303,5 +332,50 @@ private readonly RuntimePluginEvents _runtimePluginEvents;
 
         var globalDep1 = resolver.ResolveBindingInstance(typeof(IGlobalDependency1), scenarioContainer);
         globalDep1.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void Should_register_IReqnrollOutputHelper()
+    {
+        // Arrange
+        var sut = new TestableAutofacPlugin(typeof(ContainerSetup1),
+                                            nameof(ContainerSetup1.SetupGlobalContainer),
+                                            nameof(ContainerSetup1.SetupScenarioContainer));
+
+        // Act
+        var scenarioContainer = InitializeToScenarioContainer(sut);
+
+        var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
+
+        var testThreadContext =
+            new TestThreadContext(_testThreadContainer);
+
+        _testThreadContainer.RegisterInstanceAs(testThreadContext);
+
+        var traceListenerMock =
+            new Mock<ITraceListener>();
+        var attachmentHandlerMock =
+            new Mock<IReqnrollAttachmentHandler>();
+        var threadExecutionMock =
+            new Mock<ITestThreadExecutionEventPublisher>();
+
+        var defaultDenpendencyProvider = new DefaultDependencyProvider();
+        defaultDenpendencyProvider
+            .RegisterTestThreadContainerDefaults(_testThreadContainer);
+
+        _testThreadContainer
+            .RegisterInstanceAs<ITraceListener>(traceListenerMock.Object);
+        _testThreadContainer
+            .RegisterInstanceAs<IReqnrollAttachmentHandler>(attachmentHandlerMock.Object);
+        _testThreadContainer
+            .RegisterInstanceAs<ITestThreadExecutionEventPublisher>(threadExecutionMock.Object);
+
+        // Assert
+        var resolvedOutputHelper = resolver
+            .ResolveBindingInstance(typeof(IReqnrollOutputHelper), scenarioContainer);
+
+        resolvedOutputHelper
+            .Should()
+            .NotBeNull();
     }
 }

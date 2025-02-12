@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VersionPrefix>2.2.2</VersionPrefix>
+    <VersionPrefix>2.3.1</VersionPrefix>
     <VersionSuffix>local</VersionSuffix>
     <AssemblyVersion>2.0.0</AssemblyVersion>
     <CompatibilityVersionUpperRange>3</CompatibilityVersionUpperRange>
