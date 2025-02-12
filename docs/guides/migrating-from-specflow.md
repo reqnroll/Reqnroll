@@ -28,6 +28,10 @@ It is recommended to upgrade directly to the latest version of Reqnroll (e.g. v2
 The SpecFlow+ LivingDoc was part of the closed source implementation of SpecFlow and therefore we could not take it over for Reqnroll. We are currently in a process of re-building the tool (or something similar to that), but with a workaround you can also use Reqnroll with the SpecFlow Living Doc Generator CLI tool. See more information about the plans and the workaround at the [Living Documentation discussion topic](https://github.com/orgs/reqnroll/discussions/196).
 ```
 
+```{attention} MsTest Scenario Outline Handling
+Reqnroll generates data-driven tests from scenario outlines with MsTest. With some tooling (`VSTest` pipeline task, `VSTest.Console.exe` filtering) this might cause compatibility issues. Please check the [](#mstest-scenario-outline-handling) section below about the details and how to switch back to the SpecFlow compatible behavior.
+```
+
 {#specflow-compatibility-package}
 ## Migrate with the Reqnroll SpecFlow Compatibility Package
 
@@ -353,7 +357,33 @@ If you use this feature, you have two options:
 - refactor to the [Driver Pattern](../guides/driver-pattern.md)
 - call the methods directly
 
+### MsTest Scenario Outline Handling
+
+For scenario outline examples, SpecFlow has generated multiple methods, one for each example. In the newer versions of MsTest they have introduced support for data-driven tests using the MsTest `[DataTestMethod]` and `[DataRow]` attributes. Reqnroll has been changed to use this feature, so by default it will generate a single method for scenario outlines with multiple `[DataRow]` attributes. This allows the test runners to display the related scenario outline results in a hierarchical way.
+
+There are some tooling that does not fully support this MsTest feature. For example you might experience problems with the [VSTest task](https://learn.microsoft.com/en-us/azure/devops/pipelines/tasks/reference/vstest-v3?view=azure-pipelines) on Azure pipelines when you use distributed execution and the filtering options with [VSTest.Console.exe](https://learn.microsoft.com/en-us/visualstudio/test/vstest-console-options?view=vs-2022) might also have problems. 
+
+If you use such incompatible tooling, you can revert back to the original behavior by setting `generator/allowRowTests` to `false` in the `reqnroll.json` configuration file.
+
+```{code-block} json
+:caption: reqnroll.json
+{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+
+  "generator": {
+    "allowRowTests": false
+  }
+}
+```
+
+```{tip}
+If the problem is only on the pipeline, you can have a pipeline step that patches the `reqnroll.json` configuration *before the build of the project*, so that you can still enjoy the nice structured tests locally.
+```
+
+
 ### Complete changelog of SpecFlow v4
+
+As SpecFlow v4 was never officially released and the original GitHub project has been deleted, here is a list of changes that were planned for SpecFlow v4 and Reqnroll has overtaken.
 
 Breaking Changes:
 
