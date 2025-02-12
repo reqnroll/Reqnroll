@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Cucumber.Messages;
+using System.Diagnostics;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -204,8 +205,8 @@ namespace Reqnroll.CucumberMessages.PubSub
             // what remains is an Attachment.
             // match it up with an AttachmentAddedEvent in the AttachmentTracker
             // and use that event's timestamp as a proxy for the timestamp of the Attachment
-
-            return _attachmentTracker.FindMatchingAttachment(e.Attachment).Timestamp;
+            // Adjust the Reqnroll ExecutionEvent's DateTime to UTC to make it comparable to the Event's timestamp (which are all in UTC)
+            return _attachmentTracker.FindMatchingAttachment(e.Attachment).Timestamp.ToUniversalTime();
         }
 
         private void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs e)
@@ -214,7 +215,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             var status = _startedFeatures.Values.All(f => f.FeatureExecutionSuccess);
             // publish all TestCase messages
-            var testCaseMessages = _messages.Where(e => e.Content() is TestCase).OrderBy(e => e.Content().Id());
+            var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
             // sort the remaining Messages by timestamp
             var executionMessages = _messages.Except(testCaseMessages).OrderBy(e => RetrieveDateTime(e)).ToList();
 
