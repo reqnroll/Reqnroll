@@ -76,9 +76,9 @@ namespace Reqnroll.Infrastructure
             if (useScopeMatching && stepDefinitionBinding.IsScoped && stepInstance.StepContext != null && !stepDefinitionBinding.BindingScope.Match(stepInstance.StepContext, out scopeMatches))
                 return BindingMatch.NonMatching;
 
-            var arguments = match == null ? Array.Empty<object>() : _matchArgumentCalculator.CalculateArguments(match, stepInstance, stepDefinitionBinding);
-            var argumentValues = arguments.Select(a => a is ArgumentInfo ? ((ArgumentInfo)a).Value : a).ToArray();
-            var argumentOffsets = arguments.Select(a => a is ArgumentInfo ? ((ArgumentInfo)a).StartOffset : 0).ToArray();
+            var arguments = match == null ? Array.Empty<MatchArgument>() : _matchArgumentCalculator.CalculateArguments(match, stepInstance, stepDefinitionBinding);
+            var argumentValues = arguments.Select(a => a.Value).ToArray();
+            var argumentOffsets = arguments.Select(a => a.StartOffset).ToArray();
 
             if (useParamMatching)
             {

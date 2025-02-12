@@ -14,10 +14,10 @@ namespace Reqnroll.Bindings
         public bool IsScoped { get { return ScopeMatches > 0; } }
 
         public object[] Arguments  { get; private set; }
-        public int[] ArgumentStartOffsets { get; private set; }
+        public int?[] ArgumentStartOffsets { get; private set; }
         public StepContext StepContext { get; private set; }
 
-        public BindingMatch(IStepDefinitionBinding stepBinding, int scopeMatches, object[] arguments, int[] argumentStartOffsets, StepContext stepContext)
+        public BindingMatch(IStepDefinitionBinding stepBinding, int scopeMatches, object[] arguments, int?[] argumentStartOffsets, StepContext stepContext)
         {
             StepBinding = stepBinding;
             ScopeMatches = scopeMatches;

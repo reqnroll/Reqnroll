@@ -166,7 +166,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return result;
         }
 
-        internal static StepMatchArgument ToStepMatchArgument(StepArgument argument)
+        internal static StepMatchArgument ToStepMatchArgument(TestStepArgument argument)
         {
             return new StepMatchArgument(
                 new Group(

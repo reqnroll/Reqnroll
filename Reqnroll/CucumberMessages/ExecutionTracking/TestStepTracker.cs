@@ -11,13 +11,6 @@ using System.Threading;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
-    public class StepArgument
-    {
-        public string Value;
-        public int StartOffset;
-        public string Type;
-    }
-
     /// <summary>
     /// This class is used to track the execution of Test StepDefinitionBinding Methods
     /// </summary>

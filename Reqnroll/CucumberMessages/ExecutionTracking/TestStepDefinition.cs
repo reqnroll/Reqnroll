@@ -7,6 +7,14 @@ using System.Linq;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    public class TestStepArgument
+    {
+        public string Value;
+        public int? StartOffset;
+        public string Type;
+    }
+
+
     /// <summary>
     /// Data class that captures information about a TestStep that is being executed for the first time.
     /// One of these is created per step, regardless of how many times the Test Case is retried.
@@ -33,7 +41,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal bool Ambiguous { get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0; } }
         private IStepDefinitionBinding StepDefinitionBinding;
 
-        internal List<StepArgument> StepArguments { get; private set; }
+        internal List<TestStepArgument> StepArguments { get; private set; }
 
 
         internal TestStepDefinition(string testStepDefinitionId, string pickleStepId, TestCaseDefinition parentTestCaseDefinition)
@@ -69,14 +77,14 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             var IsInputDataTableOrDocString = stepFinishedEvent.StepContext.StepInfo.Table != null || stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
             var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();
-            var argumentStartOffsets = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.ArgumentStartOffsets.ToList() : new List<int>();
+            var argumentStartOffsets = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.ArgumentStartOffsets.ToList() : new List<int?>();
             var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
             StepArguments = new();
             if (Bound && !IsInputDataTableOrDocString)
             {
                 for (int i = 0; i < argumentValues.Count; i++)
                 {
-                    StepArguments.Add(new StepArgument { Value = argumentValues[i], StartOffset = argumentStartOffsets[i], Type = argumentTypes[i] });
+                    StepArguments.Add(new TestStepArgument { Value = argumentValues[i], StartOffset = argumentStartOffsets[i], Type = argumentTypes[i] });
                 }
             }
         }
