@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.RuntimeSupport;
@@ -261,7 +262,7 @@ namespace Reqnroll.Generator.Generation
 
             try
             {
-                var messageConverter = new CucumberMessagesConverter(new SeedableIncrementingIdGenerator(0));
+                var messageConverter = new CucumberMessagesConverter(new GuidIdGenerator());
                 var featureSource = Reqnroll.CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(messageConverter.ConvertToCucumberMessagesSource(generationContext.Document));
                 var featureGherkinDocument = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
                 var featurePickles = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocument);

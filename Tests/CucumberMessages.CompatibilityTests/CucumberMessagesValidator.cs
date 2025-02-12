@@ -23,9 +23,17 @@ namespace CucumberMessages.Tests
 
         // Envelope types - these are the top level types in CucumberMessages
         // Meta is excluded from the list as there is nothing there for us to compare
-        private readonly IEnumerable<Type> EnvelopeTypes = new Type[] { typeof(Attachment), typeof(GherkinDocument), typeof(Hook), typeof(ParameterType), typeof(Source),
-                                                                        typeof(StepDefinition), typeof(TestCase), typeof(TestCaseFinished), typeof(TestCaseStarted), typeof(TestRunFinished),
-                                                                        typeof(TestRunStarted), typeof(TestStepFinished), typeof(TestStepStarted), typeof(UndefinedParameterType) };
+        private IEnumerable<Type> EnvelopeTypes
+        {
+            get
+            {
+                var ect = CucumberMessageExtensions.EnvelopeContentTypes;
+                ect.Remove(typeof(Meta));
+                return ect.ToList();
+            }
+        }
+
+
 
         public CucumberMessagesValidator(IEnumerable<Envelope> actual, IEnumerable<Envelope> expected)
         {

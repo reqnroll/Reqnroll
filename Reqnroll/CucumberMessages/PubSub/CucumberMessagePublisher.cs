@@ -132,7 +132,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            SharedIDGenerator = new SeedableIncrementingIdGenerator(0);
+            SharedIDGenerator = new GuidIdGenerator();
             _testRunStartedId = SharedIDGenerator.GetNewId();
 
             Task.Run(async () =>

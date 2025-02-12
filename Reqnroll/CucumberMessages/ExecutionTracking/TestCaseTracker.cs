@@ -28,6 +28,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             IDGenerator = featureTracker.IDGenerator;
             StepDefinitionsByPattern = featureTracker.StepDefinitionsByPattern;
             AttemptCount = -1;
+            TestCaseStartedTimeStamp = DateTime.Now;
         }
 
         // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
@@ -36,7 +37,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal string PickleId { get; } = string.Empty;
         internal string TestCaseId { get; private set; }
         internal int AttemptCount { get; private set; }
-
+        public object TestCaseStartedTimeStamp { get; }
         internal bool Enabled { get; } //This will be false if the feature could not be pickled
         internal bool Finished { get; private set; }
         internal ScenarioExecutionStatus ScenarioExecutionStatus { get { return ExecutionHistory.Last().ScenarioExecutionStatus; } }
