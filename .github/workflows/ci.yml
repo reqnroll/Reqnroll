@@ -307,7 +307,7 @@ jobs:
     - name: Build Doc
       working-directory: docs
       run: |
-        sphinx-build -M html . _build
+        sphinx-build -M html . _build --fail-on-warning
     - name: Upload HTML Doc Files
       uses: actions/upload-artifact@v4
       with:
