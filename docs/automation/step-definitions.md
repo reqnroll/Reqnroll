@@ -89,7 +89,7 @@ public void GivenStuffIsDone()
 * Cannot have `out` or `ref` parameters.
 * Should return `void` or `Task`.
 
-{#step-matching-styles-rules}
+(step-matching-styles-rules)=
 ## Step Matching Styles & Rules
 
 There are multiple options for step definition matching:

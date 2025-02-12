@@ -6,7 +6,7 @@ Documentation for Verify can be found [here](https://github.com/VerifyTests/Veri
 
 ## Needed NuGet Packages
 
-* [Reqnroll.xUnit](https://www.nuget.org/packages/Reqnroll.xUnit/) and its [dependencies](xunit.md#Needed%20NuGet%20Packages)
+* [Reqnroll.xUnit](https://www.nuget.org/packages/Reqnroll.xUnit/) and its [dependencies](xunit.md#needed-nuget-packages)
 * [Reqnroll.Verify](https://www.nuget.org/packages/Reqnroll.Verify/)
 
 ## How it works

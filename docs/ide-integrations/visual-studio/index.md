@@ -1,6 +1,6 @@
 # Reqnroll Visual Studio integration
 
-For setting up Reqnroll Visual Studio integration, please check the related [Setup Visual Studio 2022](../../installation/setup-ide.md#setup-vs) section of our IDE setup guide.
+For setting up Reqnroll Visual Studio integration, please check the related [Setup Visual Studio 2022](../../installation/setup-ide.md#setup-visual-studio-2022) section of our IDE setup guide.
 
 % TODO
 ```{admonition} Documentation is in progress

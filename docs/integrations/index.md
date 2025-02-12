@@ -14,4 +14,5 @@ mstest
 nunit
 windsor
 xunit
+verify
 ```
