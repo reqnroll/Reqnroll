@@ -199,6 +199,13 @@ namespace Reqnroll.Generator.Generation
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_ARGUMENTS_VARIABLE_NAME),
                         inheritedTagsExpression)));
 
+            testMethod.Statements.Add(
+                 new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference), "ruleInfo",
+                    new CodeObjectCreateExpression(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference),
+                        new CodePrimitiveExpression(""),
+                        new CodePrimitiveExpression(""),
+                        new CodeArrayCreateExpression(typeof(string)))));
+
             GenerateScenarioInitializeCall(generationContext, scenarioDefinition, testMethod);
 
             GenerateTestMethodBody(generationContext, scenarioDefinitionInFeatureFile, testMethod, paramToIdentifier, feature);
@@ -305,7 +312,8 @@ namespace Reqnroll.Generator.Generation
                     new CodeMethodInvokeExpression(
                         new CodeThisReferenceExpression(),
                         generationContext.ScenarioInitializeMethod.Name,
-                        new CodeVariableReferenceExpression("scenarioInfo"))));
+                        new CodeVariableReferenceExpression("scenarioInfo"),
+                        new CodeVariableReferenceExpression("ruleInfo"))));
             }
 
             testMethod.Statements.AddRange(statements.ToArray());

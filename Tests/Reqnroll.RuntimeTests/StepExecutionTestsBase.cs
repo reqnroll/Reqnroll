@@ -100,7 +100,7 @@ namespace Reqnroll.RuntimeTests
             TestThreadContainer.RegisterInstanceAs(new Mock<ITestRunner>().Object);
             TestThreadContainer.RegisterTypeAs<TestObjectResolver, ITestObjectResolver>();
             var containerBuilderMock = new Mock<IContainerBuilder>();
-            containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>()))
+            containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>(), It.IsAny<RuleInfo>()))
                 .Returns((IObjectContainer fc, ScenarioInfo si) =>
                 {
                     var scenarioContainer = new ObjectContainer(fc);
@@ -119,7 +119,7 @@ namespace Reqnroll.RuntimeTests
 
             ContextManagerStub = new ContextManager(new Mock<ITestTracer>().Object, TestThreadContainer, ContainerBuilderStub);
             ContextManagerStub.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, string.Empty, "test feature", null));
-            ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null));
+            ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null), null);
 
             StepArgumentTypeConverterStub = new Mock<IStepArgumentTypeConverter>();
         }

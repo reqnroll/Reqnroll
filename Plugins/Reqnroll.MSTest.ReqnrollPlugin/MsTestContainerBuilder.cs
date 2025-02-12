@@ -27,8 +27,8 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
 
         public IObjectContainer CreateTestThreadContainer(IObjectContainer globalContainer) => _innerContainerBuilder.CreateTestThreadContainer(globalContainer);
 
-        public IObjectContainer CreateScenarioContainer(IObjectContainer testThreadContainer, ScenarioInfo scenarioInfo)
-            => _innerContainerBuilder.CreateScenarioContainer(testThreadContainer, scenarioInfo);
+        public IObjectContainer CreateScenarioContainer(IObjectContainer testThreadContainer, ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
+            => _innerContainerBuilder.CreateScenarioContainer(testThreadContainer, scenarioInfo, ruleInfo);
 
         public IObjectContainer CreateFeatureContainer(IObjectContainer testThreadContainer, FeatureInfo featureInfo)
             => _innerContainerBuilder.CreateFeatureContainer(testThreadContainer, featureInfo);

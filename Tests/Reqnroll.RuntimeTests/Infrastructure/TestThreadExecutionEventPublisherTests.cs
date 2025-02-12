@@ -119,7 +119,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
 
             _testThreadExecutionEventPublisher.Verify(te =>
@@ -134,7 +134,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();
@@ -155,7 +155,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.OnTestRunStartAsync();
             await testExecutionEngine.OnFeatureStartAsync(featureInfo);
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
             await testExecutionEngine.OnAfterLastStepAsync();
@@ -179,7 +179,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             testExecutionEngine.OnScenarioSkipped();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();

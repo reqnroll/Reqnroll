@@ -13,7 +13,7 @@ namespace Reqnroll.Infrastructure
         void InitializeFeatureContext(FeatureInfo featureInfo);
         void CleanupFeatureContext();
 
-        void InitializeScenarioContext(ScenarioInfo scenarioInfo);
+        void InitializeScenarioContext(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
         void CleanupScenarioContext();
 
         void InitializeStepContext(StepInfo stepInfo);

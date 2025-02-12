@@ -13,7 +13,7 @@ namespace Reqnroll.Infrastructure
     {
         IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider = null);
         IObjectContainer CreateTestThreadContainer(IObjectContainer globalContainer);
-        IObjectContainer CreateScenarioContainer(IObjectContainer testThreadContainer, ScenarioInfo scenarioInfo);
+        IObjectContainer CreateScenarioContainer(IObjectContainer testThreadContainer, ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
         IObjectContainer CreateFeatureContainer(IObjectContainer testThreadContainer, FeatureInfo featureInfo);
     }
 
@@ -85,13 +85,14 @@ namespace Reqnroll.Infrastructure
             return testThreadContainer;
         }
 
-        public virtual IObjectContainer CreateScenarioContainer(IObjectContainer testThreadContainer, ScenarioInfo scenarioInfo)
+        public virtual IObjectContainer CreateScenarioContainer(IObjectContainer testThreadContainer, ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
             if (testThreadContainer == null)
                 throw new ArgumentNullException(nameof(testThreadContainer));
 
             var scenarioContainer = new ObjectContainer(testThreadContainer);
             scenarioContainer.RegisterInstanceAs(scenarioInfo);
+            scenarioContainer.RegisterInstanceAs(ruleInfo);
             _defaultDependencyProvider.RegisterScenarioContainerDefaults(scenarioContainer);
 
             scenarioContainer.ObjectCreated += obj =>

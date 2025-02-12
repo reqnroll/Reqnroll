@@ -410,7 +410,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var testExecutionEngine = CreateTestExecutionEngine();
             RegisterStepDefinition();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnScenarioEndAsync();
 
@@ -429,7 +429,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                     .Throws(new Exception("simulated error"));
 
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             Func<Task> act = async () => await testExecutionEngine.OnScenarioEndAsync();
 
@@ -514,7 +514,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var beforeHook = CreateParametrizedHookMock(beforeScenarioEvents, typeof(DummyClass));
             var afterHook = CreateParametrizedHookMock(afterScenarioEvents, typeof(DummyClass));
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnScenarioEndAsync();
 
@@ -538,7 +538,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                     It.IsAny<object[]>(),It.IsAny<ITestTracer>(), It.IsAny<DurationHolder>()))
                 .Callback(() => actualInstance = testExecutionEngine.ScenarioContext.ScenarioContainer.Resolve<AnotherDummyClass>());
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             testExecutionEngine.ScenarioContext.ScenarioContainer.RegisterInstanceAs(instanceToAddBeforeScenarioEventFiring);
             await testExecutionEngine.OnScenarioStartAsync();
             actualInstance.Should().BeSameAs(instanceToAddBeforeScenarioEventFiring);
