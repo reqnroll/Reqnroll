@@ -2,6 +2,14 @@
 
 ## Improvements:
 
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v2.3.0 - 2025-02-11
+
+## Improvements:
+
 * Enhance BoDi error handling to provide the name of the interface being registered when that interface has already been resolved (#324)
 * Improve code-behind feature file compilation speed (#336)
 * Improve parameter type naming for generic types (#343)
@@ -12,6 +20,7 @@
 * Support loading plugin dependencies from .deps.json on .NET Framework and Visual Studio MSBuild (#408)
 * Support for setting `ObjectContainer.DefaultConcurrentObjectResolutionTimeout` even after creation of the container (#435)
 * Reqnroll.Microsoft.Extensions.DependencyInjection: Include `ReqnrollLogger` class to the Reqnroll MSDI plugin based on the work of @StefH at https://github.com/StefH/Stef.Extensions.SpecFlow.Logging (#321)
+* Reqnroll.Assist.Dynamic: The SpecFlow.Assist.Dynamic plugin by @marcusoftnet has now been ported to Reqnroll. (#377)
 
 ## Bug fixes:
 
@@ -22,7 +31,7 @@
 * Fix: Attempting to set the `ConcurrentObjectResolutionTimeout` value on the `ObjectContainer` to `TimeSpan.Zero` sometimes throws an exception if running multiple tests in parallel. (#440)
 * Fix: Project and Package references of Reqnroll.Verify are inconsistent. (#446)
 
-*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen, @StefH
+*Contributors of this release (in alphabetical order):* @Antwane, @clrudolphi, @DrEsteban, @gasparnagy, @obligaron, @olegKoshmeliuk, @SeanKilleen, @StefH
 
 # v2.2.1 - 2024-11-08
 

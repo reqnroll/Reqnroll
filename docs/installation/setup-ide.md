@@ -14,11 +14,11 @@ Setting up the Integrated Development Environment (IDE) integration for Reqnroll
 
 This guide describes the setup steps for the following IDEs:
 
-* [](#setup-vs)
+* [](#setup-visual-studio-2022)
 * [](#setup-vscode)
 * [](#setup-rider)
 
-{#setup-vs}
+(setup-vs)=
 ## Setup Visual Studio 2022
 
 In order to use Reqnroll with Visual Studio 2022, you need to install the [Reqnroll for Visual Studio 2022](https://go.reqnroll.net/vs2022-extension) extension.
@@ -39,7 +39,7 @@ For more details about the Reqnroll with Visual Studio extension, please check t
 The Reqnroll Visual Studio extension cannot be used for Visual Studio for Mac. On macOS we recommend using [Visual Studio Code](#setup-vscode).
 ```
 
-{#setup-vscode}
+(setup-vscode)=
 ## Setup Visual Studio Code
 
 For using Reqnroll with Visual Studio Code, you can choose from multiple available extensions. We recommend using the [Cucumber](https://marketplace.visualstudio.com/items?itemName=CucumberOpen.cucumber-official) extension.
@@ -68,7 +68,7 @@ The following Visual Studio configuration shows a typical configuration.
 }
 ```
 
-{#setup-rider}
+(setup-rider)=
 ## Setup Rider
 
 In order to use Reqnroll with Rider, you need to install the [Reqnroll for Rider](https://plugins.jetbrains.com/plugin/24012-reqnroll-for-rider) extension.

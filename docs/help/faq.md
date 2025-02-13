@@ -6,7 +6,7 @@
 
 **Is Reqnroll a replacement of SpecFlow?**
 
-Yes. Reqnroll was forked from SpecFlow and it constantly being extended and fixed. Last commit to SpecFlow GitHub repo happened in 2022.
+Yes. Reqnroll was forked from SpecFlow in January 2024 and it constantly being extended and fixed. The SpecFlow repository has been removed from GitHub by Tricentis in December 2024.
 
 **What license does Reqnroll use?**
 

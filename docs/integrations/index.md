@@ -14,5 +14,6 @@ mstest
 nunit
 windsor
 xunit
+verify
 ../cucumber-messages/introduction
 ```
