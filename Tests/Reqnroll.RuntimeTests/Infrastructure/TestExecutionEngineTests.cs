@@ -195,7 +195,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             List<BindingMatch> candidatingMatches;
             stepDefinitionMatcherStub.Setup(sdm => sdm.GetBestMatch(It.IsAny<StepInstance>(), It.IsAny<CultureInfo>(), out ambiguityReason, out candidatingMatches))
                 .Returns(
-                    new BindingMatch(stepDefStub.Object, 0, new object[0], new int?[0], new StepContext("bla", "foo", new List<string>(), CultureInfo.InvariantCulture)));
+                    new BindingMatch(stepDefStub.Object, 0, new MatchArgument[0], new StepContext("bla", "foo", new List<string>(), CultureInfo.InvariantCulture)));
 
             return stepDefStub;
         }
@@ -213,7 +213,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             List<BindingMatch> candidatingMatches;
             stepDefinitionMatcherStub.Setup(sdm => sdm.GetBestMatch(It.IsAny<StepInstance>(), It.IsAny<CultureInfo>(), out ambiguityReason, out candidatingMatches))
                 .Returns(
-                    new BindingMatch(stepDefStub.Object, 0, new object[] { "userName" }, new int?[] { 1 }, new StepContext("bla", "foo", new List<string>(), CultureInfo.InvariantCulture)));
+                    new BindingMatch(stepDefStub.Object, 0, new MatchArgument[] { new MatchArgument("username", 1) }, new StepContext("bla", "foo", new List<string>(), CultureInfo.InvariantCulture)));
 
             return stepDefStub;
         }

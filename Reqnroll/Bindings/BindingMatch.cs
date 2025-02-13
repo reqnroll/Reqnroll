@@ -1,8 +1,11 @@
+using Reqnroll.Infrastructure;
+using System.Linq;
+
 namespace Reqnroll.Bindings
 {
     public class BindingMatch
     {
-        public static readonly BindingMatch NonMatching = new BindingMatch(null, 0, null, null, null);
+        public static readonly BindingMatch NonMatching = new BindingMatch(null, 0, null, null);
 
         public IStepDefinitionBinding StepBinding { get; private set; }
         public bool Success { get { return StepBinding != null; } }
@@ -17,12 +20,12 @@ namespace Reqnroll.Bindings
         public int?[] ArgumentStartOffsets { get; private set; }
         public StepContext StepContext { get; private set; }
 
-        public BindingMatch(IStepDefinitionBinding stepBinding, int scopeMatches, object[] arguments, int?[] argumentStartOffsets, StepContext stepContext)
+        public BindingMatch(IStepDefinitionBinding stepBinding, int scopeMatches, MatchArgument[] arguments, StepContext stepContext)
         {
             StepBinding = stepBinding;
             ScopeMatches = scopeMatches;
-            Arguments = arguments;
-            ArgumentStartOffsets = argumentStartOffsets;
+            Arguments = arguments == null ? null : arguments.Select(a => a.Value).ToArray();
+            ArgumentStartOffsets = arguments == null ? null : arguments.Select(a => a.StartOffset).ToArray(); 
             StepContext = stepContext;
             BindingObsoletion = new BindingObsoletion(stepBinding);
         }
