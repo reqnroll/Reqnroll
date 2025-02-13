@@ -162,8 +162,8 @@ namespace CucumberMessages.Tests
             };
         }
 
-        record TestExecution(string id, TestCaseStarted started, List<Envelope> related);
-        record TestCaseRecord(string id, TestCase tc, Dictionary<string, TestExecution> executions);
+        record TestExecution(string id, List<Envelope> related);
+        record TestCaseRecord(string id, string pickelId, Envelope testCaseEnvelope, Dictionary<string, TestExecution> executions);
 
         protected IEnumerable<Envelope> GetActualResults(string testName, string fileName)
         {
@@ -174,21 +174,29 @@ namespace CucumberMessages.Tests
 
             var actualJsonText = File.ReadAllLines(resultLocation);
             var envelopes = actualJsonText.Select(json => NdjsonSerializer.Deserialize(json)).ToList();
-            var result = new List<Envelope>();
 
+            // The test cases (aka scenarios) might have been executed in any order
+            // Comparison with the expected output ndjson assumes that tests are executed in the order the Pickles are listed.
+            // So for the purposes of comparison, we're going to sort testCase messages (and related test execution messages) in pickle appearance order.
+
+            var result = new List<Envelope>();
+            
+            // List of Pickle IDs in the order they are seen in the message stream
+            var pickles = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle.Id).ToList();
+            
             // Dictionary keyed by the ID of each test case.
             var testCases = new Dictionary<string, TestCaseRecord>();
-
-            var allTestCases = envelopes.Where(e => e.Content() is TestCase).Select(e => e.TestCase).ToList().ToList();
-
+            var allTestCaseEnvelopes = envelopes.Where(e => e.Content() is TestCase).ToList();
             var testCaseStartedToTestCaseMap = new Dictionary<string, string>();
 
-            foreach (var tc in allTestCases)
+            foreach (var tce in allTestCaseEnvelopes)
             {
-                testCases.Add(tc.Id, new TestCaseRecord(tc.Id, tc, new Dictionary<string, TestExecution>()));
+                var tc = tce.Content() as TestCase;
+                testCases.Add(tc!.Id, new TestCaseRecord(tc.Id, tc.PickleId, tce, new Dictionary<string, TestExecution>()));
             }
             int index = 0;
             bool testCasesBegun = false;
+            // this loop sweeps all of the messages prior to the first testCase into the outgoing results collection.
             while (index < envelopes.Count && !testCasesBegun)
             {
                 var current = envelopes[index];
@@ -223,7 +231,7 @@ namespace CucumberMessages.Tests
                 if (current.Content() is TestCaseStarted testCaseStarted)
                 {
                     var tcsId = testCaseStarted.Id;
-                    var testCaseExecution = new TestExecution(tcsId, testCaseStarted, new List<Envelope>());
+                    var testCaseExecution = new TestExecution(tcsId, new List<Envelope>() { current});
                     testCases[testCaseStarted.TestCaseId].executions.Add(tcsId, testCaseExecution);
                     testCaseStartedToTestCaseMap.Add(tcsId, testCaseStarted.TestCaseId);
                     index++;
@@ -250,16 +258,18 @@ namespace CucumberMessages.Tests
                 index++;
             }
 
-            foreach (var tc in testCases.Values)
-            {
-                result.Insert(result.Count - 1, Envelope.Create(tc.tc));
-                foreach (var e in tc.executions.Values)
-                {
-                    result.Insert(result.Count - 1, Envelope.Create(e.started));
-                    foreach (var r in e.related)
-                        result.Insert(result.Count - 1, r);
-                }
-            }
+
+            // Now, sort the TestCaseRecords in order of their respective PickleId sequence
+            var sortedTestCaseRecords = testCases.Values.OrderBy(tcr => pickles.IndexOf(tcr.pickelId)).ToList();
+            var testCaseAndRelatedEnvelopes = sortedTestCaseRecords.SelectMany(tc => new List<Envelope>() { tc.testCaseEnvelope }.Concat(tc.executions.Values.SelectMany(e => e.related)));
+
+            var testRunFinished = result.Last();
+            result.Remove(testRunFinished);
+
+            result.AddRange(testCaseAndRelatedEnvelopes);
+
+            result.Add(testRunFinished);
+
             return result;
         }
 
