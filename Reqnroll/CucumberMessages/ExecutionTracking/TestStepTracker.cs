@@ -53,6 +53,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             if (ParentTestCase.AttemptCount == 0)
                 Definition.PopulateStepDefinitionFromExecutionResult(stepFinishedEvent);
+            Exception = stepFinishedEvent.ScenarioContext.TestError;
             StepFinished = stepFinishedEvent.Timestamp;
 
             Status = stepFinishedEvent.StepContext.Status;

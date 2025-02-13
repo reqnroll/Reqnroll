@@ -1,21 +1,5 @@
-using Io.Cucumber.Messages.Types;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Newtonsoft.Json.Bson;
-using Reqnroll;
 using System.Reflection;
-using FluentAssertions;
-using System.Text.Json;
-using System.ComponentModel;
 using Reqnroll.TestProjectGenerator;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Reqnroll.TestProjectGenerator.Driver;
-using Moq;
-using Reqnroll.Tracing;
-using Reqnroll.EnvironmentAccess;
-using Microsoft.VisualBasic.FileIO;
-using Reqnroll.CucumberMessages.PayloadProcessing;
-using Reqnroll.CommonModels;
-using Reqnroll.CucumberMessages.Configuration;
 
 namespace CucumberMessages.Tests
 {
