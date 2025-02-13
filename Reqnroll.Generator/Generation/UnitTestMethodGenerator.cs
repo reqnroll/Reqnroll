@@ -39,7 +39,7 @@ namespace Reqnroll.Generator.Generation
                         .Where(child => child is not Background)
                         .Select(sd => new ScenarioDefinitionInFeatureFile(sd, feature, rule));
 
-            return 
+            return
                 GetScenarioDefinitionsOfRule(feature.Children, null)
                     .Concat(feature.Children.OfType<Rule>().SelectMany(rule => GetScenarioDefinitionsOfRule(rule.Children, rule)));
         }
@@ -200,11 +200,14 @@ namespace Reqnroll.Generator.Generation
                         inheritedTagsExpression)));
 
             testMethod.Statements.Add(
-                 new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference), "ruleInfo",
-                    new CodeObjectCreateExpression(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference),
-                        new CodePrimitiveExpression(""),
-                        new CodePrimitiveExpression(""),
-                        new CodeArrayCreateExpression(typeof(string)))));
+                new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference), "ruleInfo",
+                    scenarioDefinitionInFeatureFile.Rule == null
+                        ? new CodePrimitiveExpression(null)
+                        : new CodeObjectCreateExpression(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference),
+                            new CodePrimitiveExpression(""),
+                            new CodePrimitiveExpression(""),
+                            new CodeArrayCreateExpression(typeof(string)))
+            ));
 
             GenerateScenarioInitializeCall(generationContext, scenarioDefinition, testMethod);
 
@@ -330,7 +333,7 @@ namespace Reqnroll.Generator.Generation
 
             testMethod.Statements.Add(expression);
         }
-        
+
         private CodeMethodInvokeExpression CreateTestRunnerSkipScenarioCall()
         {
             return new CodeMethodInvokeExpression(
@@ -442,7 +445,7 @@ namespace Reqnroll.Generator.Generation
             testMethod.Name = string.Format(GeneratorConstants.TEST_NAME_FORMAT, scenarioOutline.Name.ToIdentifier());
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testMethod);
-            
+
             foreach (var pair in paramToIdentifier)
             {
                 testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), pair.Value));
@@ -464,12 +467,12 @@ namespace Reqnroll.Generator.Generation
             string variantName)
         {
             var testMethod = CreateTestMethod(generationContext, scenarioOutline, exampleSetTags, variantName, exampleSetIdentifier);
-            
+
             //call test implementation with the params
             var argumentExpressions = row.Cells.Select(paramCell => new CodePrimitiveExpression(paramCell.Value)).Cast<CodeExpression>().ToList();
 
             argumentExpressions.Add(_scenarioPartHelper.GetStringArrayExpression(exampleSetTags));
-            
+
             var statements = new List<CodeStatement>();
 
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, scenarioOutline.Location))
@@ -483,7 +486,7 @@ namespace Reqnroll.Generator.Generation
 
                 statements.Add(new CodeExpressionStatement(callTestMethodExpression));
             }
-            
+
             testMethod.Statements.AddRange(statements.ToArray());
 
             //_linePragmaHandler.AddLineDirectiveHidden(testMethod.Statements);

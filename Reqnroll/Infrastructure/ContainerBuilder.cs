@@ -92,7 +92,10 @@ namespace Reqnroll.Infrastructure
 
             var scenarioContainer = new ObjectContainer(testThreadContainer);
             scenarioContainer.RegisterInstanceAs(scenarioInfo);
-            scenarioContainer.RegisterInstanceAs(ruleInfo);
+            if (ruleInfo == null)
+                scenarioContainer.RegisterNull(typeof(RuleInfo));
+            else
+                scenarioContainer.RegisterInstanceAs(ruleInfo);
             _defaultDependencyProvider.RegisterScenarioContainerDefaults(scenarioContainer);
 
             scenarioContainer.ObjectCreated += obj =>

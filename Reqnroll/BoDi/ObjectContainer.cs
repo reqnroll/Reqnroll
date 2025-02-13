@@ -203,6 +203,14 @@ public class ObjectContainer : IObjectContainer
         }
     }
 
+    private class NullRegistration : IRegistration
+    {
+        public object Resolve(ObjectContainer container, RegistrationKey keyToResolve, ResolutionList resolutionPath)
+        {
+            return null;
+        }
+    }
+
     private abstract class RegistrationWithStrategy : IStrategyRegistration
     {
         protected SolvingStrategy SolvingStrategy = SolvingStrategy.PerContext;
@@ -450,6 +458,16 @@ public class ObjectContainer : IObjectContainer
         return typeRegistration;
     }
 
+    public void RegisterNull(Type interfaceType, string name = null)
+    {
+        var registrationKey = new RegistrationKey(interfaceType, name);
+        AssertNotResolved(registrationKey);
+
+        ClearRegistrations(registrationKey);
+        AddRegistration(registrationKey, new NullRegistration());
+        _objectPool[registrationKey] = new NonDisposableWrapper(null);
+    }
+
     public void RegisterInstanceAs(object instance, Type interfaceType, string name = null, bool dispose = false)
     {
         if (instance == null)
@@ -577,7 +595,10 @@ public class ObjectContainer : IObjectContainer
         {
             _resolvedKeys.Add(keyToResolve);
         }
-        Debug.Assert(typeToResolve.IsInstanceOfType(resolvedObject));
+        if (resolvedObject != null)
+        {
+            Debug.Assert(typeToResolve.IsInstanceOfType(resolvedObject));
+        }
         return resolvedObject;
     }
 
