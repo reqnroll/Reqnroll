@@ -2,9 +2,11 @@
 
 ## Improvements:
 
+* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @loraderon
 
 # v2.3.0 - 2025-02-11
 

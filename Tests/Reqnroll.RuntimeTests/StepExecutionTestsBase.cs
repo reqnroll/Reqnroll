@@ -79,8 +79,8 @@ namespace Reqnroll.RuntimeTests
         protected virtual CultureInfo GetFeatureLanguage()
         {
             return new CultureInfo("en-US", false);
-        }     
-        
+        }
+
         protected virtual CultureInfo GetBindingCulture()
         {
             return new CultureInfo("en-US", false);
@@ -100,11 +100,15 @@ namespace Reqnroll.RuntimeTests
             TestThreadContainer.RegisterInstanceAs(new Mock<ITestRunner>().Object);
             TestThreadContainer.RegisterTypeAs<TestObjectResolver, ITestObjectResolver>();
             var containerBuilderMock = new Mock<IContainerBuilder>();
-            containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>()))
-                .Returns((IObjectContainer fc, ScenarioInfo si) =>
+            containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>(), It.IsAny<RuleInfo>()))
+                .Returns((IObjectContainer fc, ScenarioInfo si, RuleInfo ri) =>
                 {
                     var scenarioContainer = new ObjectContainer(fc);
                     scenarioContainer.RegisterInstanceAs(si);
+                    if (ri != null)
+                        scenarioContainer.RegisterInstanceAs(ri);
+                    else
+                        scenarioContainer.RegisterNull(typeof(RuleInfo));
                     return scenarioContainer;
                 });
             containerBuilderMock.Setup(m => m.CreateFeatureContainer(It.IsAny<IObjectContainer>(), It.IsAny<FeatureInfo>()))
@@ -119,7 +123,7 @@ namespace Reqnroll.RuntimeTests
 
             ContextManagerStub = new ContextManager(new Mock<ITestTracer>().Object, TestThreadContainer, ContainerBuilderStub);
             ContextManagerStub.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, string.Empty, "test feature", null));
-            ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null));
+            ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null), null);
 
             StepArgumentTypeConverterStub = new Mock<IStepArgumentTypeConverter>();
         }
@@ -146,7 +150,7 @@ namespace Reqnroll.RuntimeTests
                     });
         }
 
-        protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>() where TBinding : class 
+        protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>() where TBinding : class
         {
             return GetTestRunnerWithConverterStub<TBinding>(null);
         }

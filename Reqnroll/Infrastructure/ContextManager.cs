@@ -179,9 +179,9 @@ namespace Reqnroll.Infrastructure
             featureContextManager.Cleanup();
         }
 
-        public void InitializeScenarioContext(ScenarioInfo scenarioInfo)
+        public void InitializeScenarioContext(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
-            var scenarioContainer = containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo);
+            var scenarioContainer = containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo, ruleInfo);
             var newContext = scenarioContainer.Resolve<ScenarioContext>();
             scenarioContextManager.Init(newContext, scenarioContainer);
 #pragma warning disable 618

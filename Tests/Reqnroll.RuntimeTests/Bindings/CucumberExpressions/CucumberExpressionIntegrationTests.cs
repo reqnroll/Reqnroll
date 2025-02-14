@@ -185,7 +185,7 @@ public class CucumberExpressionIntegrationTests
         await engine.OnTestRunStartAsync();
         await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo("en-US"), ".", "Sample feature", null, ProgrammingLanguage.CSharp));
         await engine.OnScenarioStartAsync();
-        engine.OnScenarioInitialize(new ScenarioInfo("Sample scenario", null, null, null));
+        engine.OnScenarioInitialize(new ScenarioInfo("Sample scenario", null, null, null), null);
         await engine.StepAsync(StepDefinitionKeyword.Given, "Given ", stepText, null, null);
 
         var contextManager = testThreadContainer.Resolve<IContextManager>();

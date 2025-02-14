@@ -243,7 +243,7 @@ public class AutofacPluginTests
         // Act
         var scenarioContainer = InitializeToScenarioContainer(sut);
         var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
-        var scenarioContext = new ScenarioContext(scenarioContainer, new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()), resolver);
+        var scenarioContext = new ScenarioContext(scenarioContainer, new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()), null, resolver);
         scenarioContainer.RegisterInstanceAs(scenarioContext);
         var featureContext = new FeatureContext(scenarioContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", ""), ConfigurationLoader.GetDefault());
         _featureContainer.RegisterInstanceAs(featureContext);
