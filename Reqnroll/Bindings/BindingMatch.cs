@@ -16,16 +16,14 @@ namespace Reqnroll.Bindings
         public int ScopeMatches { get; private set; }
         public bool IsScoped { get { return ScopeMatches > 0; } }
 
-        public object[] Arguments  { get; private set; }
-        public int?[] ArgumentStartOffsets { get; private set; }
+        public MatchArgument[] Arguments  { get; private set; }
         public StepContext StepContext { get; private set; }
 
         public BindingMatch(IStepDefinitionBinding stepBinding, int scopeMatches, MatchArgument[] arguments, StepContext stepContext)
         {
             StepBinding = stepBinding;
             ScopeMatches = scopeMatches;
-            Arguments = arguments == null ? null : arguments.Select(a => a.Value).ToArray();
-            ArgumentStartOffsets = arguments == null ? null : arguments.Select(a => a.StartOffset).ToArray(); 
+            Arguments = arguments;
             StepContext = stepContext;
             BindingObsoletion = new BindingObsoletion(stepBinding);
         }

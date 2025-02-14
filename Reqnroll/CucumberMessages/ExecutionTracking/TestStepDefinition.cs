@@ -76,8 +76,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             StepDefinitionIds = Ambiguous ? AmbiguousStepDefinitions.ToList() : StepDefinitionId != null ? [StepDefinitionId] : [];
 
             var IsInputDataTableOrDocString = stepFinishedEvent.StepContext.StepInfo.Table != null || stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
-            var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.ToString()).ToList() : new List<string>();
-            var argumentStartOffsets = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.ArgumentStartOffsets.ToList() : new List<int?>();
+            var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.Value.ToString()).ToList() : new List<string>();
+            var argumentStartOffsets = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.StartOffset).ToList() : new List<int?>();
             var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
             StepArguments = new();
             if (Bound && !IsInputDataTableOrDocString)
