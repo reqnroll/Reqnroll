@@ -113,7 +113,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
         {
-            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, new CodeAttributeArgument("TestName", new CodePrimitiveExpression(friendlyTestName)));
             CodeDomHelper.AddAttribute(testMethod, DESCRIPTION_ATTR, friendlyTestName);
         }
 
