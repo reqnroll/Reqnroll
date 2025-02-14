@@ -1,6 +1,8 @@
 {"testRunStarted":{"timestamp":{"seconds":1738594360,"nanos":734267900},"id":"1"}}
 {"meta":{"protocolVersion":"27.0.0","implementation":{"name":"Reqnroll","version":"2.2.2-local"},"runtime":{"name":"dotNet","version":"8.0.12"},"os":{"name":"Windows","version":"Microsoft Windows 10.0.26100"},"cpu":{"name":"x64"}}}
 {"stepDefinition":{"id":"2","pattern":{"source":"a step passes","type":"CUCUMBER_EXPRESSION"},"sourceReference":{"javaMethod":{"className":"DefaultTestProject.CucumberMessages.CompatibilityTests.CCK.TestRunHooks.TestRunHooks","methodName":"AStepPasses","methodParameterTypes":[]}}}}
+{"hook":{"id":"7351305f6671448d99d100d1d82a1dbc","sourceReference":{"javaMethod":{"className":"DefaultTestProject.CucumberMessages.CompatibilityTests.CCK.TestRunHooks.TestRunHooks","methodName":"BeforeTestHookMethod","methodParameterTypes":[]}},"type":"BEFORE_TEST_RUN"}}
+{"hook":{"id":"00096745a76d4d7692c399a28dfd56bd","sourceReference":{"javaMethod":{"className":"DefaultTestProject.CucumberMessages.CompatibilityTests.CCK.TestRunHooks.TestRunHooks","methodName":"AfterTestHookMethod","methodParameterTypes":[]}},"type":"AFTER_TEST_RUN"}}
 {"hook":{"id":"3","sourceReference":{"javaMethod":{"className":"DefaultTestProject.CucumberMessages.CompatibilityTests.CCK.TestRunHooks.TestRunHooks","methodName":"BeforeFeatureHookMethod","methodParameterTypes":["IReqnrollOutputHelper"]}},"type":"BEFORE_TEST_RUN"}}
 {"hook":{"id":"4","sourceReference":{"javaMethod":{"className":"DefaultTestProject.CucumberMessages.CompatibilityTests.CCK.TestRunHooks.TestRunHooks","methodName":"AfterFeatureHookMethod","methodParameterTypes":["IReqnrollOutputHelper"]}},"type":"BEFORE_TEST_RUN"}}
 {"source":{"uri":"FeatureFile0b003a29d88f4b6eaedc514a1bc8e499.feature","data":"Feature: Test Run Hooks\r\n  Test Run Hooks are special steps that run before or after a Feature.\r\n\r\n  Scenario: No tags and a passed step\r\n    When a step passes\r\n","mediaType":"text/x.cucumber.gherkin+plain"}}
@@ -17,4 +19,6 @@
 {"testRunHookStarted":{"id":"13","testRunStartedId":"1","hookId":"4","timestamp":{"seconds":1738594360,"nanos":805301500}}}
 {"attachment":{"body":"After Feature Hook Executed.","contentEncoding":"IDENTITY","mediaType":"text/x.cucumber.log+plain","testRunStartedId":"1"}}
 {"testRunHookFinished":{"testRunHookStartedId":"13","result":{"duration":{"seconds":0,"nanos":556400},"message":"","status":"PASSED"},"timestamp":{"seconds":1738594360,"nanos":805301500}}}
+{"testRunHookStarted":{"id":"e2a3be5227da40a89785382f83573dd6","testRunStartedId":"1","hookId":"00096745a76d4d7692c399a28dfd56bd","timestamp":{"seconds":1739548397,"nanos":530237900}}}
+{"testRunHookFinished":{"testRunHookStartedId":"e2a3be5227da40a89785382f83573dd6","result":{"duration":{"seconds":0,"nanos":28100},"message":"","status":"PASSED"},"timestamp":{"seconds":1739548397,"nanos":530389100}}}
 {"testRunFinished":{"success":true,"timestamp":{"seconds":1738594360,"nanos":816992300},"testRunStartedId":"1"}}

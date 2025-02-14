@@ -387,25 +387,30 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (!_enabled)
                 return Task.CompletedTask;
 
-            if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun
-                || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature)
+            switch (hookBindingStartedEvent.HookBinding.HookType)
             {
-                string hookRunStartedId = SharedIDGenerator.GetNewId();
-                var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-                var hookId = StepDefinitionsByPattern[signature];
-                var hookTracker = new TestRunHookTracker(hookRunStartedId, hookId, hookBindingStartedEvent, _testRunStartedId);
-                _testRunHookTrackers.TryAdd(signature, hookTracker);
-                _messages.Add(Envelope.Create(CucumberMessageFactory.ToTestRunHookStarted(hookTracker)));
-                return Task.CompletedTask;
-            }
+                case Bindings.HookType.BeforeTestRun:
+                case Bindings.HookType.AfterTestRun:
+                case Bindings.HookType.BeforeFeature:
+                case Bindings.HookType.AfterFeature:
+                    string hookRunStartedId = SharedIDGenerator.GetNewId();
+                    var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
+                    var hookId = StepDefinitionsByPattern[signature];
+                    var hookTracker = new TestRunHookTracker(hookRunStartedId, hookId, hookBindingStartedEvent.Timestamp, _testRunStartedId);
+                    _testRunHookTrackers.TryAdd(signature, hookTracker);
+                    _messages.AddRange(hookTracker.GenerateFrom(hookBindingStartedEvent));
+                    return Task.CompletedTask;
 
-            var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
-            if (!_enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
+                default:
+                    var featureName = hookBindingStartedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
+                    if (!_enabled || String.IsNullOrEmpty(featureName))
+                        return Task.CompletedTask;
 
-            if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
-            {
-                featureTracker.ProcessEvent(hookBindingStartedEvent);
+                    if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
+                    {
+                        featureTracker.ProcessEvent(hookBindingStartedEvent);
+                    }
+                    break;
             }
 
             return Task.CompletedTask;
@@ -416,28 +421,32 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (!_enabled)
                 return Task.CompletedTask;
 
-            if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun
-                || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeFeature || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterFeature)
+            switch (hookBindingFinishedEvent.HookBinding.HookType)
             {
-                var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
-                if (!_testRunHookTrackers.TryGetValue(signature, out var hookTracker)) // should not happen
+                case Bindings.HookType.BeforeTestRun:
+                case Bindings.HookType.AfterTestRun:
+                case Bindings.HookType.BeforeFeature:
+                case Bindings.HookType.AfterFeature:
+                    var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
+                    if (!_testRunHookTrackers.TryGetValue(signature, out var hookTracker)) // should not happen
+                        return Task.CompletedTask;
+                    hookTracker.Duration = hookBindingFinishedEvent.Duration;
+                    hookTracker.Exception = hookBindingFinishedEvent.HookException;
+                    hookTracker.TimeStamp = hookBindingFinishedEvent.Timestamp;
+
+                    _messages.AddRange(hookTracker.GenerateFrom(hookBindingFinishedEvent));
                     return Task.CompletedTask;
-                hookTracker.Duration = hookBindingFinishedEvent.Duration;
-                hookTracker.Exception = hookBindingFinishedEvent.HookException;
-                hookTracker.TimeStamp = hookBindingFinishedEvent.Timestamp;
 
-                _messages.Add(Envelope.Create(CucumberMessageFactory.ToTestRunHookFinished(hookTracker)));
-                return Task.CompletedTask;
-            }
+                default:
+                    var featureName = hookBindingFinishedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
+                    if (!_enabled || String.IsNullOrEmpty(featureName))
+                        return Task.CompletedTask;
 
-
-            var featureName = hookBindingFinishedEvent.ContextManager?.FeatureContext?.FeatureInfo?.Title;
-            if (!_enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
-
-            if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
-            {
-                featureTracker.ProcessEvent(hookBindingFinishedEvent);
+                    if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
+                    {
+                        featureTracker.ProcessEvent(hookBindingFinishedEvent);
+                    }
+                    break;
             }
 
             return Task.CompletedTask;

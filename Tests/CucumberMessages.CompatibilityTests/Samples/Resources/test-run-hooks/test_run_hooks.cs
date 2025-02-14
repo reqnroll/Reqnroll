@@ -23,6 +23,16 @@ namespace CucumberMessages.CompatibilityTests.CCK.TestRunHooks
         {
         }
 
+        [BeforeTestRun]
+        public static void BeforeTestHookMethod()
+        {
+        }
+
+        [AfterTestRun]
+        public static void AfterTestHookMethod()
+        {
+        }
+
         [BeforeFeature]
         public static void BeforeFeatureHookMethod(IReqnrollOutputHelper reqnrollOutputHelper)
         {

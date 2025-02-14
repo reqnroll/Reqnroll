@@ -173,6 +173,8 @@ namespace CucumberMessages.Tests
             // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
 
             var actualJsonText = File.ReadAllLines(resultLocation);
+            actualJsonText.Should().HaveCountGreaterThan(0, "the test results ndjson file was emtpy.");
+
             var envelopes = actualJsonText.Select(json => NdjsonSerializer.Deserialize(json)).ToList();
 
             // The test cases (aka scenarios) might have been executed in any order
@@ -180,10 +182,10 @@ namespace CucumberMessages.Tests
             // So for the purposes of comparison, we're going to sort testCase messages (and related test execution messages) in pickle appearance order.
 
             var result = new List<Envelope>();
-            
+
             // List of Pickle IDs in the order they are seen in the message stream
             var pickles = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle.Id).ToList();
-            
+
             // Dictionary keyed by the ID of each test case.
             var testCases = new Dictionary<string, TestCaseRecord>();
             var allTestCaseEnvelopes = envelopes.Where(e => e.Content() is TestCase).ToList();
@@ -231,7 +233,7 @@ namespace CucumberMessages.Tests
                 if (current.Content() is TestCaseStarted testCaseStarted)
                 {
                     var tcsId = testCaseStarted.Id;
-                    var testCaseExecution = new TestExecution(tcsId, new List<Envelope>() { current});
+                    var testCaseExecution = new TestExecution(tcsId, new List<Envelope>() { current });
                     testCases[testCaseStarted.TestCaseId].executions.Add(tcsId, testCaseExecution);
                     testCaseStartedToTestCaseMap.Add(tcsId, testCaseStarted.TestCaseId);
                     index++;

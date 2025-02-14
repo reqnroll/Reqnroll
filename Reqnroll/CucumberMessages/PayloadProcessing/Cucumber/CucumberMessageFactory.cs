@@ -214,6 +214,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             {
                 Bindings.HookType.BeforeTestRun => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_RUN,
                 Bindings.HookType.AfterTestRun => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_RUN,
+                Bindings.HookType.BeforeFeature => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_RUN,
+                Bindings.HookType.AfterFeature => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_RUN,
                 Bindings.HookType.BeforeScenario => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_CASE,
                 Bindings.HookType.AfterScenario => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_CASE,
                 Bindings.HookType.BeforeStep => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_STEP,
