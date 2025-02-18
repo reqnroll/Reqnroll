@@ -13,21 +13,12 @@ Unless overriden by the use of the Reqnroll configuration file and/or environmen
 * - Setting
   - Value
   - Description
-* - Enable
+* - Enabled
   - true/false
   - Controls whether Cucumber Messages will be created during the execution of the test. <br/> *Default:* `false`
-* - Base Directory
-  - relative or absolute file storage path
-  - Specifies the root location for storage of Cucumber Messages result files. <br/> *Default:* `.` (i.e., current folder)
-* - Output Directory
-  - folder(/path) relative to the BasePath
-  - Folder relative to the Base Path for storage of Cucumber Messages results files. <br/> *Default:* `` (none)
-* - Output FileName
-  - filename(.ndjson)
-  - The file name in which Cucumber Messages will be stored. By convention, these files use the `.ndjson` extension. <br/> *Default:* `reqnroll_report.ndjson`
-* - ID Generation Style
-  - UUID/INCREMENTING
-  - Message elements within the .ndjson will be given IDs according to this style directive. Incrementing IDs are integers that start at 1. <br/> *Default:* `UUID`
+* - OutputFilePath
+  - Folder Path and File Name for storage of Cucumber Messages results files. <br/> *Default:* `` (none)
+  - By convention, these files use the `.ndjson` extension. <br/> *Default:* `reqnroll_report.ndjson`
 ```
 
 {#config-file}
@@ -44,10 +35,7 @@ An example configuration file looks like this:
     ],
     "cucumberMessagesConfiguration": {
         "enabled" :  true,
-        "baseDirectory": "C:\\Users\\dev\\source\\repos\\reqnroll_project",
-        "outputDirectory": "CucumberMessages",
-        "outputFileName" :  "reqnroll_report.ndjson",
-        "iDGenerationStyle": "INCREMENTING"
+        "outputFilePath": "C:\\Users\\dev\\source\\repos\\reqnroll_project\\CucumberMessages\\reqnroll_report.ndjson"
     }
 }
 ```
@@ -64,16 +52,7 @@ The json schema for this section of the configuration file is:
         "Enabled": {
             "type": "boolean"
         },
-        "BaseDirectory": {
-            "type": "string"
-        },
-        "OutputDirectory": {
-            "type": "string"
-        },
-        "OutputFileName": {
-            "type": "string"
-        },
-        "IDGenerationStyle": {
+        "OutputFilePath": {
             "type": "string"
         }
     }
@@ -88,8 +67,5 @@ Any of the settings discussed above can be overriden by setting an Environment V
 The available Environment Variables are:
 
 * REQNROLL__CUCUMBER_MESSAGES__ENABLED
-* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_BASE_DIRECTORY
-* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_DIRECTORY
-* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_FILENAME
-* REQNROLL__CUCUMBER_MESSAGES__ID_GENERATION_STYLE
+* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_FILEPATH
 
