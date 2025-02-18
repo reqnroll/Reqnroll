@@ -1,20 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
 using Reqnroll.Bindings;
+using Reqnroll.Microsoft.Extensions.DependencyInjection.Internal;
 
 namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 {
     public class ServiceCollectionFinder : IServiceCollectionFinder
     {
-        private readonly IBindingRegistry bindingRegistry;
+        private readonly IAssemblyTypeResolver assemblyTypeResolver;
         private (IServiceCollection, ScopeLevelType) _cache;
 
+        internal ServiceCollectionFinder(IAssemblyTypeResolver assemblyTypeResolver)
+        {
+            this.assemblyTypeResolver = assemblyTypeResolver;
+        }
+        
         public ServiceCollectionFinder(IBindingRegistry bindingRegistry)
         {
-            this.bindingRegistry = bindingRegistry;
+            this.assemblyTypeResolver = new AssemblyTypeResolver(bindingRegistry);
         }
 
         public (IServiceCollection, ScopeLevelType) GetServiceCollection()
@@ -24,24 +29,20 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                 return _cache;
             }
 
-            var assemblies = bindingRegistry.GetBindingAssemblies();
-            foreach (var assembly in assemblies)
+            foreach (var type in assemblyTypeResolver.GetAssemblyTypes())
             {
-                foreach (var type in assembly.GetTypes())
+                foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
                 {
-                    foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
-                    {
-                        var scenarioDependenciesAttribute = (ScenarioDependenciesAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(ScenarioDependenciesAttribute));
+                    var scenarioDependenciesAttribute = (ScenarioDependenciesAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(ScenarioDependenciesAttribute));
 
-                        if (scenarioDependenciesAttribute != null)
+                    if (scenarioDependenciesAttribute != null)
+                    {
+                        var serviceCollection = GetServiceCollection(methodInfo);
+                        if (scenarioDependenciesAttribute.AutoRegisterBindings)
                         {
-                            var serviceCollection = GetServiceCollection(methodInfo);
-                            if (scenarioDependenciesAttribute.AutoRegisterBindings)
-                            {
-                                AddBindingAttributes(assemblies, serviceCollection);
-                            }
-                            return _cache = (serviceCollection, scenarioDependenciesAttribute.ScopeLevel);
+                            AddBindingAttributes(serviceCollection);
                         }
+                        return _cache = (serviceCollection, scenarioDependenciesAttribute.ScopeLevel);
                     }
                 }
             }
@@ -53,14 +54,11 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             return (IServiceCollection)methodInfo.Invoke(null, null);
         }
 
-        private static void AddBindingAttributes(IEnumerable<Assembly> bindingAssemblies, IServiceCollection serviceCollection)
+        private void AddBindingAttributes(IServiceCollection serviceCollection)
         {
-            foreach (var assembly in bindingAssemblies)
+            foreach (var type in assemblyTypeResolver.GetAssemblyTypes().Where(t => Attribute.IsDefined(t, typeof(BindingAttribute))))
             {
-                foreach (var type in assembly.GetTypes().Where(t => Attribute.IsDefined(t, typeof(BindingAttribute))))
-                {
-                    serviceCollection.AddScoped(type);
-                }
+                serviceCollection.AddScoped(type);
             }
         }
     }
