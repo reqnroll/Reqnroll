@@ -1,10 +1,11 @@
 # [vNext]
 
 ## Improvements:
+* Fix: Autofac.ReqnrollPlugin, Removed deadcode (#480)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @304NotModified
 
 # v2.3.0 - 2025-02-11
 
