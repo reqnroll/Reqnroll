@@ -185,4 +185,30 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
         Debug.Assert(node is not null, "RawNode is required in this context.");
         return node!;
     }
+
+    /// <summary>
+    /// Gets a list of all the diagnostics associated with this trivia.
+    /// </summary>
+    /// <returns>A list of the diagnostics for this trivia.</returns>
+    public IEnumerable<Diagnostic> GetDiagnostics()
+    {
+        if (RawNode == null)
+        {
+            return [];
+        }
+
+        var tree = SyntaxTree;
+
+        if (tree != null)
+        {
+            return tree.GetDiagnostics(this);
+        }
+
+        if (RawNode.ContainsDiagnostics)
+        {
+            return RawNode.GetAttachedDiagnostics().Select(diag => diag.CreateDiagnostic());
+        }
+
+        return [];
+    }
 }

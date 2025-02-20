@@ -32,7 +32,7 @@ internal class FeatureDeclarationSyntax : DeclarationSyntax
         RawNode colon,
         RawNode name,
         DescriptionSyntax? description,
-        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<RawDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(
             SyntaxKind.FeatureDeclaration,
             diagnostics,
@@ -82,10 +82,21 @@ internal class FeatureDeclarationSyntax : DeclarationSyntax
     {
         return new FeatureDeclarationSyntax(
             keyword,
-            name,
             colon,
+            name,
             description,
-            GetDiagnostics(),
+            GetAttachedDiagnostics(),
             annotations);
+    }
+
+    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    {
+        return new FeatureDeclarationSyntax(
+            keyword,
+            colon,
+            name,
+            description,
+            diagnostics,
+            GetAnnotations());
     }
 }

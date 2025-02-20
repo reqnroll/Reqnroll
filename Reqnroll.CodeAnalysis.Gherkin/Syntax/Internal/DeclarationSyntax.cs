@@ -11,7 +11,7 @@ internal abstract class DeclarationSyntax : RawNode
 
     protected DeclarationSyntax(
         SyntaxKind kind,
-        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<RawDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(kind, diagnostics, annotations)
     {
     }

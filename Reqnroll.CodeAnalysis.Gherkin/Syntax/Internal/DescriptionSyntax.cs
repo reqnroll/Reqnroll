@@ -18,7 +18,7 @@ internal class DescriptionSyntax : RawNode
 
     public DescriptionSyntax(
         RawNode? textTokens,
-        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<RawDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(SyntaxKind.Description, diagnostics, annotations)
     {
         this.textTokens = textTokens;
@@ -48,7 +48,15 @@ internal class DescriptionSyntax : RawNode
     {
         return new DescriptionSyntax(
             textTokens,
-            GetDiagnostics(),
+            GetAttachedDiagnostics(),
             annotations);
+    }
+
+    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    {
+        return new DescriptionSyntax(
+            textTokens,
+            diagnostics,
+            GetAnnotations());
     }
 }

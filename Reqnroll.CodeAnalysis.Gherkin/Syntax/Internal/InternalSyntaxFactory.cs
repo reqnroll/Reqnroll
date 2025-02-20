@@ -137,6 +137,8 @@ internal static class InternalSyntaxFactory
 
     public static RawSyntaxToken Token(SyntaxKind kind) => Token(null, kind, null);
 
+    public static RawSyntaxToken Token(SyntaxKind kind, string text) => Token(null, kind, text, null);
+
     public static RawSyntaxToken Token(
         RawNode? leadingTrivia,
         SyntaxKind kind,

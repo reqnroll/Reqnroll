@@ -39,4 +39,9 @@ internal class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
     {
         throw new NotImplementedException();
     }
+
+    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    {
+        throw new NotImplementedException();
+    }
 }

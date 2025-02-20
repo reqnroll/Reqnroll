@@ -167,7 +167,7 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
 
         if (RawNode.ContainsDiagnostics)
         {
-            return RawNode.GetDiagnostics().Select(diag => diag.CreateDiagnosticWithoutLocation());
+            return RawNode.GetAttachedDiagnostics().Select(diag => diag.CreateDiagnostic());
         }
 
         return [];

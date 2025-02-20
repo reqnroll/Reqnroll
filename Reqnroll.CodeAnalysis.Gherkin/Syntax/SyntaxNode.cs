@@ -82,7 +82,7 @@ public abstract class SyntaxNode
     /// <summary>
     /// Gets a value indicating whether this node or any of its descendant nodes or tokens have diagnostics on them.
     /// </summary>
-    public bool HasDiagnostics { get; }
+    public bool HasDiagnostics => RawNode.ContainsDiagnostics;
 
     /// <summary>
     /// Gets a value indicating whether the node represents a construct that not actually present in the source code.

@@ -25,7 +25,7 @@ internal class FeatureFileSyntax : RawNode
     public FeatureFileSyntax(
         RawNode? featureDeclaration,
         RawNode endOfFile,
-        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<RawDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(SyntaxKind.FeatureFile, diagnostics, annotations)
     {
         this.featureDeclaration = featureDeclaration;
@@ -60,7 +60,16 @@ internal class FeatureFileSyntax : RawNode
         return new FeatureFileSyntax(
             featureDeclaration,
             endOfFile,
-            GetDiagnostics(),
+            GetAttachedDiagnostics(),
             annotations);
+    }
+
+    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    {
+        return new FeatureFileSyntax(
+            featureDeclaration,
+            endOfFile,
+            diagnostics,
+            GetAnnotations());
     }
 }

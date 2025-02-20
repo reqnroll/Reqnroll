@@ -1,5 +1,4 @@
-﻿using FluentAssertions;
-using Reqnroll.CodeAnalysis.Gherkin.Syntax;
+﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 using System.Runtime.CompilerServices;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Assertions;
@@ -13,6 +12,7 @@ internal static class AssertionOptionsInitializer
             options => options
                 .ComparingByMembers<SyntaxNode>()
                 .ComparingByMembers<SyntaxToken>()
+                .ComparingByMembers<Microsoft.CodeAnalysis.Diagnostic>()
                 .Excluding(member => member.DeclaringType == typeof(SyntaxNode) && member.Name == nameof(SyntaxNode.Parent))
                 .Excluding(member => member.DeclaringType == typeof(SyntaxToken) && member.Name == nameof(SyntaxToken.Parent))
                 .Excluding(member => member.DeclaringType == typeof(SyntaxToken) && member.Name == nameof(SyntaxToken.SyntaxTree))

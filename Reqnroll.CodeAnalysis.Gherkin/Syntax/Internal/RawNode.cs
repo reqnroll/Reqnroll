@@ -30,23 +30,43 @@ internal abstract class RawNode
     protected RawNode(
         SyntaxKind kind,
         int fullWidth,
-        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<RawDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations)
     {
         Kind = kind;
         FullWidth = fullWidth;
         _diagnostics = diagnostics;
         _annotations = annotations;
+
+        if (!diagnostics.IsDefaultOrEmpty)
+        {
+            SetFlag(NodeFlags.ContainsDiagnostics);
+        }
+
+        if (!annotations.IsDefaultOrEmpty)
+        {
+            SetFlag(NodeFlags.ContainsAnnotations);
+        }
     }
 
     protected RawNode(
         SyntaxKind kind,
-        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<RawDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations)
     {
         Kind = kind;
         _diagnostics = diagnostics;
         _annotations = annotations;
+
+        if (!diagnostics.IsDefaultOrEmpty)
+        {
+            SetFlag(NodeFlags.ContainsDiagnostics);
+        }
+
+        if (!annotations.IsDefaultOrEmpty)
+        {
+            SetFlag(NodeFlags.ContainsAnnotations);
+        }
     }
 
     /// <summary>
@@ -61,7 +81,7 @@ internal abstract class RawNode
     /// </remarks>
     private NodeFlags _flags;
 
-    private readonly ImmutableArray<InternalDiagnostic> _diagnostics;
+    private readonly ImmutableArray<RawDiagnostic> _diagnostics;
 
     private readonly ImmutableArray<SyntaxAnnotation> _annotations;
 
@@ -515,9 +535,16 @@ internal abstract class RawNode
         return WithAnnotations(annotations);
     }
 
+    public abstract RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics);
+
     public abstract RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations);
 
-    public ImmutableArray<InternalDiagnostic> GetDiagnostics() => _diagnostics;
+    /// <summary>
+    /// Gets the diagnostics directly associated with this node. This differs from <see cref="SyntaxNode.GetDiagnostics()"/> which
+    /// returns all diagnostics associated with the node directly <b>and</b> those associated with its descendant nodes.
+    /// </summary>
+    /// <returns>The collection of diagnostics attached to this node, or a default array.</returns>
+    public ImmutableArray<RawDiagnostic> GetAttachedDiagnostics() => _diagnostics;
 
     public ImmutableArray<SyntaxAnnotation> GetAnnotations() => _annotations;
 

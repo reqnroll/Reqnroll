@@ -8,12 +8,11 @@ internal partial class RawSyntaxToken : RawNode
     private readonly string _text;
     private readonly RawNode? _leading;
     private readonly RawNode? _trailing;
-    private readonly ImmutableArray<InternalDiagnostic> _diagnostics;
-    private readonly ImmutableArray<SyntaxAnnotation> _annotations;
 
     public RawSyntaxToken(SyntaxKind kind, string text) : base(kind, text.Length)
     {
         _text = text;
+
         SetFlag(NodeFlags.IsNotMissing);
     }
 
@@ -26,10 +25,18 @@ internal partial class RawSyntaxToken : RawNode
         _text = text;
         _leading = leading;
         _trailing = trailing;
+
         SetFlag(NodeFlags.IsNotMissing);
 
-        _diagnostics = ImmutableArray<InternalDiagnostic>.Empty;
-        _annotations = ImmutableArray<SyntaxAnnotation>.Empty;
+        if (leading != null)
+        {
+            IncludeChild(leading);
+        }
+
+        if (trailing != null)
+        {
+            IncludeChild(trailing);
+        }
     }
 
     public RawSyntaxToken(
@@ -37,33 +44,24 @@ internal partial class RawSyntaxToken : RawNode
         string text,
         RawNode? leading,
         RawNode? trailing,
-        ImmutableArray<InternalDiagnostic> diagnostics,
-        ImmutableArray<SyntaxAnnotation> annotations) : base(kind, GetFullWidth(text, leading, trailing))
+        ImmutableArray<RawDiagnostic> diagnostics,
+        ImmutableArray<SyntaxAnnotation> annotations) : base(kind, text.Length, diagnostics, annotations)
     {
         _text = text;
         _leading = leading;
         _trailing = trailing;
+
         SetFlag(NodeFlags.IsNotMissing);
-
-        _diagnostics = diagnostics;
-        _annotations = annotations;
-    }
-
-    private static int GetFullWidth(string text, RawNode? leading, RawNode? trailing)
-    {
-        var width = text.Length;
 
         if (leading != null)
         {
-            width += leading.FullWidth;
+            IncludeChild(leading);
         }
 
         if (trailing != null)
         {
-            width += trailing.FullWidth;
+            IncludeChild(trailing);
         }
-
-        return width;
     }
 
     public override int SlotCount => 0;
@@ -96,7 +94,7 @@ internal partial class RawSyntaxToken : RawNode
             GetText(kind),
             leadingTrivia,
             trailingTrivia,
-            ImmutableArray<InternalDiagnostic>.Empty,
+            ImmutableArray<RawDiagnostic>.Empty,
             ImmutableArray<SyntaxAnnotation>.Empty);
 
         token.ClearFlag(NodeFlags.IsNotMissing);
@@ -124,7 +122,7 @@ internal partial class RawSyntaxToken : RawNode
             GetText(kind),
             leading,
             trailing,
-            ImmutableArray<InternalDiagnostic>.Empty,
+            ImmutableArray<RawDiagnostic>.Empty,
             ImmutableArray<SyntaxAnnotation>.Empty);
     }
 
@@ -144,7 +142,7 @@ internal partial class RawSyntaxToken : RawNode
             text,
             leading,
             trailing,
-            ImmutableArray<InternalDiagnostic>.Empty,
+            ImmutableArray<RawDiagnostic>.Empty,
             ImmutableArray<SyntaxAnnotation>.Empty);
     }
 
@@ -156,9 +154,6 @@ internal partial class RawSyntaxToken : RawNode
             _ => string.Empty
         };
     }
-
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations) =>
-        new RawSyntaxToken(Kind, _text, _leading, _trailing, GetDiagnostics(), annotations);
 
     public override bool HasLeadingTrivia => _leading != null;
 
@@ -189,12 +184,22 @@ internal partial class RawSyntaxToken : RawNode
 
     public override RawNode WithLeadingTrivia(RawNode? trivia)
     {
-        return new RawSyntaxToken(Kind, _text, trivia, _trailing, _diagnostics, _annotations);
+        return new RawSyntaxToken(Kind, _text, trivia, _trailing, GetAttachedDiagnostics(), GetAnnotations());
     }
 
     public override RawNode WithTrailingTrivia(RawNode? trivia)
     {
-        return new RawSyntaxToken(Kind, _text, _leading, trivia, _diagnostics, _annotations);
+        return new RawSyntaxToken(Kind, _text, _leading, trivia, GetAttachedDiagnostics(), GetAnnotations());
+    }
+
+    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    {
+        return new RawSyntaxToken(Kind, _text, _leading, _trailing, GetAttachedDiagnostics(), annotations);
+    }
+
+    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    {
+        return new RawSyntaxToken(Kind, _text, _leading, _trailing, diagnostics, GetAnnotations());
     }
 
     public static implicit operator SyntaxToken(RawSyntaxToken token) => new(null, token, 0);

@@ -94,4 +94,9 @@ internal class RawSyntaxList<TNode> : RawNode, IReadOnlyList<TNode> where TNode 
     {
         throw new NotImplementedException();
     }
+
+    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    {
+        throw new NotImplementedException();
+    }
 }

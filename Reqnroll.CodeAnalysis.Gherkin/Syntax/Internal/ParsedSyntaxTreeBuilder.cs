@@ -1,7 +1,5 @@
 using Gherkin;
 using Microsoft.CodeAnalysis.Text;
-using Reqnroll.SourceGenerator.Gherkin.Syntax.Internal;
-using System.Collections.Immutable;
 using System.Diagnostics;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
@@ -59,6 +57,12 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         /// <param name="skippedTokens">The skipped tokens to include.</param>
         /// <param name="diagnostic">The diagnostic (usually an error) which describes the reason why the tokens 
         /// were skipped.</param>
+        /// <remarks>
+        /// <para>We delay constructing the trivia until no further skipped tokens are added to this particular failure 
+        /// to ensure the diagnostic is attached to all tokens as one group. Calling <see cref="AddSkippedToken"/>
+        /// with a new diagnostic will cause the buffered tokens to be added to buffered trivia using the buffered diagnostic
+        /// before creating a new buffer from the specified skipped tokens.</para>
+        /// </remarks>
         public void AddSkippedToken(RawNode? skippedTokens, RawDiagnostic diagnostic)
         {
             if (_skippedTokensDiagnostic == null)
@@ -149,11 +153,13 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
 
     private readonly CancellationToken _cancellationToken;
 
-    private static readonly string[] TriviaTokenTypes = [
-        "#Language",
-        "#Comment",
-        "#Empty",
-        "#EOF"];
+    private static readonly string[] TriviaTokenTypes = 
+        [
+            "#Language",
+            "#Comment",
+            "#Empty",
+            "#EOF"
+        ];
 
     private static readonly HashSet<string> FeatureTagTokenTypes = ["#FeatureLine", "#TagLine"];
 
@@ -278,11 +284,9 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         var literal = Literal(leadingTrivia, _context.SourceText.ToString(literalSpan) , trailingTrivia);
 
         // Add the skipped tokens to be included as leading trivia in the next token.
-        // Inkeeping with the CS compiler error codes, we'll create a unique number for each combination of expected tokens.
+        // Inkeeping with the CS compiler error codes, we'll create a unique error for each combination of expected tokens.
         var diagnostic = GetUnexpectedTokenDiagnostic(exception.ExpectedTokenTypes);
 
-        // We delay constructing the trivia until no further skipped tokens are added to this particular failure
-        // to ensure the diagnostic is attached to the whole span.
         _context.AddSkippedToken(literal, diagnostic);
     }
 
@@ -292,8 +296,7 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
 
         if (FeatureTagTokenTypes.SetEquals(expectedTokenSet))
         {
-            // TODO: Add diagnostic information.
-            return new();
+            return RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag);
         }
 
         throw new NotImplementedException(

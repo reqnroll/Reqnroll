@@ -13,7 +13,7 @@ internal class RawSyntaxTrivia : RawNode
     public RawSyntaxTrivia(
         SyntaxKind kind,
         string text,
-        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<RawDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(kind, text.Length, diagnostics, annotations)
     {
         Text = text;
@@ -61,5 +61,8 @@ internal class RawSyntaxTrivia : RawNode
     public static implicit operator SyntaxTrivia(RawSyntaxTrivia trivia) => new(new SyntaxToken(), trivia, 0);
 
     public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations) =>
-        new RawSyntaxTrivia(Kind, Text, GetDiagnostics(), annotations);
+        new RawSyntaxTrivia(Kind, Text, GetAttachedDiagnostics(), annotations);
+
+    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics) => 
+        new RawSyntaxTrivia(Kind, Text, diagnostics, GetAnnotations());
 }

@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.Text;
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
+using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
 /// <summary>
 /// A container of Gherkin syntax.
@@ -56,7 +57,7 @@ public class GherkinSyntaxTree
 
     public IEnumerable<Diagnostic> GetDiagnostics(SyntaxNode node) => GetDiagnostics(node.RawNode, node.Position);
 
-    private IEnumerable<Diagnostic> GetDiagnostics(Syntax.Internal.RawNode? node, int position)
+    private IEnumerable<Diagnostic> GetDiagnostics(RawNode? node, int position)
     {
         if (node != null && node.ContainsDiagnostics)
         {
@@ -66,9 +67,85 @@ public class GherkinSyntaxTree
         return [];
     }
 
-    private IEnumerable<Diagnostic> EnumerateDiagnostics(Syntax.Internal.RawNode node, int position)
+    /// <summary>
+    /// Enumerates the syntax tree, starting at the specified node and position, and moving through the tree
+    /// returning diagnostics in position order.
+    /// </summary>
+    /// <param name="node">The node to start enumeration at.</param>
+    /// <param name="position">The position of the node.</param>
+    /// <returns>An enumerable which iterates through the diagnostics of the sytnax tree.</returns>
+    private IEnumerable<Diagnostic> EnumerateDiagnostics(RawNode node, int position)
     {
-        throw new NotImplementedException();
+        var nodeStack = new Stack<RawNode>();
+
+        void PushNode(RawNode node)
+        {
+            // If the node is a token, unpack any leading and trailing trivia to be processed before and after the token.
+            if (node.IsToken)
+            {
+                var trailing = node.GetTrailingTrivia();
+                if (trailing != null)
+                {
+                    nodeStack.Push(trailing);
+                }
+
+                nodeStack.Push(node);
+
+                var leadingTrivia = node.GetLeadingTrivia();
+                if (leadingTrivia != null)
+                {
+                    nodeStack.Push(leadingTrivia);
+                }
+            }
+            else
+            {
+                nodeStack.Push(node);
+            }
+        }
+
+        PushNode(node);
+
+        while (nodeStack.Count > 0)
+        {
+            var current = nodeStack.Pop();
+
+            // If the node doesn't contain diagnostics, we can skip right past it.
+            if (!current.ContainsDiagnostics)
+            {
+                position += current.Width;
+                continue;
+            }
+
+            // Emit any diagnostics attached directly to the node.
+            var diagnostics = current.GetAttachedDiagnostics();
+
+            if (!diagnostics.IsDefaultOrEmpty)
+            {
+                foreach (var diagnostic in diagnostics)
+                {
+                    yield return diagnostic.CreateDiagnostic(this, new TextSpan(position, current.Width));
+                }
+            }
+
+            // If the node has children, push them to be processed in document order.
+            if (current.SlotCount > 0)
+            {
+                for (var i = current.SlotCount - 1; i >= 0; i--)
+                {
+                    var child = current.GetSlot(i);
+                    if (child != null)
+                    {
+                        PushNode(child);
+                    }
+                }
+            }
+            else
+            {
+                // This is a terminating node.
+                // Advance the position based on the width of the node.
+                position += current.Width;
+            }
+        }
     }
 
     public SyntaxNode GetRoot(CancellationToken cancellationToken = default) => _root;
@@ -100,19 +177,15 @@ public class GherkinSyntaxTree
         string path = "",
         CancellationToken cancellationToken = default)
     {
-#if NET6_0_OR_GREATER
-        ArgumentNullException.ThrowIfNull(nameof(text));
-#else
         if (text == null)
         {
             throw new ArgumentNullException(nameof(text));
         }
-#endif
 
         options ??= GherkinParseOptions.Default;
 
         var matcher = new TokenMatcher(new DialectProvider(options.Culture.Name));
-        var builder = new Syntax.Internal.ParsedSyntaxTreeBuilder(options, text, path, cancellationToken);
+        var builder = new ParsedSyntaxTreeBuilder(options, text, path, cancellationToken);
         var parser = new SyntaxParser(builder);
         var tokens = new SourceTokenScanner(text);
 

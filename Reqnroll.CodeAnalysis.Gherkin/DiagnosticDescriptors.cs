@@ -4,17 +4,18 @@ using System.Runtime.CompilerServices;
 
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
-internal static partial class DiagnosticDescriptors
+internal static class DiagnosticDescriptors
 {
-    private static ResourceManager ResourceManager { get; } = new ResourceManager(typeof(DiagnosticDescriptors));
+    private static readonly ResourceManager ResourceManager = new(typeof(DiagnosticDescriptors));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    internal static string? GetResourceString(string resourceKey) => ResourceManager.GetString(resourceKey);
+    private static LocalizableResourceString GetLocalizableResourceString(string resourceKey) =>
+        new(resourceKey, ResourceManager, typeof(DiagnosticDescriptor));
 
     public static readonly DiagnosticDescriptor ErrorExpectedFeatureOrTag = new(
         id: DiagnosticIds.ErrorExpectedFeatureOrTag,
-        title: GetResourceString("ErrorExpectedFeatureOrTagTitle")!,
-        messageFormat: GetResourceString("ErrorExpectedFeatureOrTagMessage")!,
+        title: GetLocalizableResourceString("ErrorExpectedFeatureOrTagTitle"),
+        messageFormat: GetLocalizableResourceString("ErrorExpectedFeatureOrTagMessage"),
         "Reqnroll.Gherkin",
         DiagnosticSeverity.Error,
         true);
