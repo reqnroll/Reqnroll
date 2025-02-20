@@ -28,7 +28,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
+                    foreach (MethodInfo methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
                     {
                         var scenarioDependenciesAttribute = (ScenarioDependenciesAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(ScenarioDependenciesAttribute));
 
@@ -44,12 +44,30 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                     }
                 }
             }
+            // TODO which assemblies are scanned?
+            // TODO say something about static of fix static
             throw new MissingScenarioDependenciesException();
         }
 
-        private static IServiceCollection GetServiceCollection(MethodBase methodInfo)
+        private static IServiceCollection GetServiceCollection(MethodInfo methodInfo)
         {
-            return (IServiceCollection)methodInfo.Invoke(null, null);
+            var serviceCollection = methodInfo.Invoke(null, null);
+            if(methodInfo.ReturnType == typeof(void))
+            {
+                throw new InvalidScenarioDependenciesException("[ScenarioDependencies] should return IServiceCollection but the method doesn't return a value.");
+            }
+
+            if (serviceCollection == null)
+            {
+                throw new InvalidScenarioDependenciesException("[ScenarioDependencies] should return IServiceCollection but returned null.");
+            }
+
+            if (serviceCollection is not IServiceCollection collection)
+            {
+                // TODO test
+                throw new InvalidScenarioDependenciesException($"[ScenarioDependencies] should return IServiceCollection but returned {serviceCollection.GetType()}.");
+            }
+            return collection;
         }
 
         private static void AddBindingAttributes(IEnumerable<Assembly> bindingAssemblies, IServiceCollection serviceCollection)
