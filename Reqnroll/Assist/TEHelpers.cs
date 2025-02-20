@@ -22,6 +22,47 @@ namespace Reqnroll.Assist
 
         internal static T CreateTheInstanceWithTheValuesFromTheTable<T>(Table table, InstanceCreationOptions creationOptions)
         {
+            if (creationOptions?.UseStrictTableToConstructorBinding == true)
+            {
+                return ConstructInstanceFromStrictTable<T>(table);
+            }
+
+            return ConstructInstanceFromLenientTable<T>(table, creationOptions);
+        }
+        
+        internal static T ConstructInstanceFromStrictTable<T>(Table table)
+        {
+            var numberOfParameters = table.RowCount;
+            var candidateConstructors = typeof(T).GetConstructors().Where(c => c.GetParameters().Length == numberOfParameters).ToList();
+
+            List<object> parameterValues;
+            foreach (var constructor in candidateConstructors)
+            {
+                parameterValues = new List<object>();
+                var parameters = constructor.GetParameters();
+                foreach (var parameter in parameters)
+                {
+                    foreach (var row in table.Rows)
+                    {
+                        if (parameter.Name.MatchesThisColumnName(row.Id()) && TheseTypesMatch(typeof(T), parameter.ParameterType, row))
+                        {
+                            var valueRetriever = Service.Instance.GetValueRetrieverFor(row, typeof(T), parameter.ParameterType);
+                            parameterValues.Add(valueRetriever!.Retrieve(new KeyValuePair<string, string>(row[0], row[1]), typeof(T), parameter.ParameterType));
+                        }
+                    }
+                }
+
+                if (parameterValues.Count == numberOfParameters)
+                {
+                    return (T)constructor.Invoke(parameterValues.ToArray());
+                }
+            }
+            
+            throw new MissingMethodException($"Unable to find a suitable constructor to create instance of {typeof(T).Name}");
+        }
+
+        internal static T ConstructInstanceFromLenientTable<T>(Table table, InstanceCreationOptions creationOptions)
+        {
             var constructor = GetConstructorMatchingToColumnNames<T>(table);
             if (constructor == null)
                 throw new MissingMethodException($"Unable to find a suitable constructor to create instance of {typeof(T).Name}");
@@ -51,7 +92,7 @@ namespace Reqnroll.Assist
             VerifyAllColumn(table, creationOptions, members);
             return (T)constructor.Invoke(parameterValues);
         }
-
+        
         internal static bool ThisTypeHasADefaultConstructor<T>()
         {
             return typeof(T).GetConstructors().Any(c => c.GetParameters().Length == 0);
