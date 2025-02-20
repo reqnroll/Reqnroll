@@ -5,7 +5,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin;
 
 class DialectProvider(string defaultLanguage) : GherkinDialectProvider(defaultLanguage)
 {
-    public override GherkinDialect GetDialect(string language, Location location)
+    public override GherkinDialect GetDialect(string language, Location? location)
     {
         try
         {
@@ -26,7 +26,7 @@ class DialectProvider(string defaultLanguage) : GherkinDialectProvider(defaultLa
         }
     }
 
-    private GherkinDialect GetFallbackDialect(string fallback, string language, Location location)
+    private GherkinDialect GetFallbackDialect(string fallback, string language, Location? location)
     {
         var dialect = GetDialect(fallback, location);
 

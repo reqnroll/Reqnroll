@@ -16,7 +16,7 @@ class SourceTokenScanner(SourceText source) : ITokenScanner
 
         if (lineNumber >= _source.Lines.Count)
         {
-            return new Token(null, new Location(lineNumber + 1));
+            return new Token(new Location(lineNumber + 1));
         }
 
         var line = _source.Lines[lineNumber];
