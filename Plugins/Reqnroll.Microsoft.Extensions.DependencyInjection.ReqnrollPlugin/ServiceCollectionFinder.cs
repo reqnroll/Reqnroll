@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Reqnroll.Bindings;
 
 namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 {
     public class ServiceCollectionFinder : IServiceCollectionFinder
     {
-        private readonly IBindingRegistry bindingRegistry;
+        private readonly ITestRunnerManager testRunnerManager;
         private (IServiceCollection, ScopeLevelType) _cache;
 
-        public ServiceCollectionFinder(IBindingRegistry bindingRegistry)
+        public ServiceCollectionFinder(ITestRunnerManager testRunnerManager)
         {
-            this.bindingRegistry = bindingRegistry;
+            this.testRunnerManager = testRunnerManager;
         }
 
         public (IServiceCollection, ScopeLevelType) GetServiceCollection()
@@ -24,7 +23,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                 return _cache;
             }
 
-            var assemblies = bindingRegistry.GetBindingAssemblies();
+            var assemblies = testRunnerManager.BindingAssemblies;
             foreach (var assembly in assemblies)
             {
                 foreach (var type in assembly.GetTypes())
