@@ -48,6 +48,7 @@ namespace Reqnroll.Assist
                         {
                             var valueRetriever = Service.Instance.GetValueRetrieverFor(row, typeof(T), parameter.ParameterType);
                             parameterValues.Add(valueRetriever!.Retrieve(new KeyValuePair<string, string>(row[0], row[1]), typeof(T), parameter.ParameterType));
+                            break;
                         }
                     }
                 }
@@ -58,7 +59,7 @@ namespace Reqnroll.Assist
                 }
             }
             
-            throw new MissingMethodException($"Unable to find a suitable constructor to create instance of {typeof(T).Name}");
+            throw new MissingMethodException($"Unable to find a suitable constructor to create instance of {nameof(T)}");
         }
 
         internal static T ConstructInstanceFromLenientTable<T>(Table table, InstanceCreationOptions creationOptions)
