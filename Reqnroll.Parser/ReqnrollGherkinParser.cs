@@ -61,22 +61,21 @@ namespace Reqnroll.Parser
                 this.documentLocation = documentLocation;
             }
 
-            protected override Feature CreateFeature(Tag[] tags, Location location, string language, string keyword, string name, string description, IHasLocation[] children, AstNode node)
+            protected override Feature CreateFeature(IEnumerable<Tag> tags, Location location, string language, string keyword, string name, string description, IEnumerable<IHasLocation> children, AstNode node)
             {
                 return new ReqnrollFeature(tags, location, language, keyword, name, description, children);
             }
 
-            protected override Scenario CreateScenario(Tag[] tags, Location location, string keyword, string name, string description, Step[] steps, Examples[] examples, AstNode node)
+            protected override Scenario CreateScenario(IEnumerable<Tag> tags, Location location, string keyword, string name, string description, IEnumerable<Step> steps, IEnumerable<Examples> examples, AstNode node)
             {
                 ResetBlock();
 
-                if (examples != null && examples.Length > 0)
+                if (examples.Any())
                 {
                     return new ScenarioOutline(tags, location, keyword, name, description, steps, examples);
                 }
 
                 return base.CreateScenario(tags, location, keyword, name, description, steps, examples, node);
-
             }
 
             protected override Step CreateStep(Location location, string keyword, StepKeywordType keywordType, string text, StepArgument argument, AstNode node)
@@ -93,12 +92,12 @@ namespace Reqnroll.Parser
                 scenarioBlock = ScenarioBlock.Given;
             }
 
-            protected override GherkinDocument CreateGherkinDocument(Feature feature, Comment[] gherkinDocumentComments, AstNode node)
+            protected override GherkinDocument CreateGherkinDocument(Feature feature, IEnumerable<Comment> gherkinDocumentComments, AstNode node)
             {
                 return new ReqnrollDocument((ReqnrollFeature)feature, gherkinDocumentComments, documentLocation);
             }
 
-            protected override Background CreateBackground(Location location, string keyword, string name, string description, Step[] steps, AstNode node)
+            protected override Background CreateBackground(Location location, string keyword, string name, string description, IEnumerable<Step> steps, AstNode node)
             {
                 ResetBlock();
                 return base.CreateBackground(location, keyword, name, description, steps, node);
