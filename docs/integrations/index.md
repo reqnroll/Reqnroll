@@ -15,5 +15,5 @@ nunit
 windsor
 xunit
 verify
-../cucumber-messages/introduction
+../cucumber-messages/index
 ```
