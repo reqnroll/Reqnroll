@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+# xUnit Conservative Mode is not supported together with xUnit v2 (#473)
+
+*Contributors of this release (in alphabetical order):* @DerAlbertCom
 
 # v2.3.0 - 2025-02-11
 
