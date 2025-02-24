@@ -10,7 +10,7 @@ using Reqnroll.Bindings.Reflection;
 
 namespace Reqnroll.RuntimeTests
 {
-    //TODO NSub fix
+    //TODO NSub fix - strange test pattern
     //internal static class LegacyStepArgumentTypeConverterExtensions
     //{
     //    public static async Task<object> ConvertAsync(this IStepArgumentTypeConverter converter, object value, Type typeToConvertTo, CultureInfo cultureInfo)
@@ -90,7 +90,7 @@ namespace Reqnroll.RuntimeTests
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.TestError);
         }
 
-        //TODO NSub fix
+        //TODO NSub fix - strange test pattern
         //[Fact]
         //public async Task ShouldCallTheOnlyThatCanConvert()
         //{
@@ -116,7 +116,7 @@ namespace Reqnroll.RuntimeTests
         //}
 
        
-        //TODO NSub fix
+        //TODO NSub fix - strange test pattern
         //[Fact]
         //public async Task ShouldRaiseAmbiguousIfMultipleCanConvert()
         //{
@@ -136,7 +136,7 @@ namespace Reqnroll.RuntimeTests
         //    GetLastTestStatus().Should().Be(ScenarioExecutionStatus.BindingError, ContextManagerStub.ScenarioContext.TestError?.ToString());
         //}
 
-        //TODO NSub fix
+        //TODO NSub fix - strange test pattern
         //[Fact]
         //public async Task ShouldCallTheOnlyThatCanConvertWithTable()
         //{

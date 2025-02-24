@@ -34,7 +34,7 @@ namespace Reqnroll.RuntimeTests
     
     public class StepExecutionTestsWithConversionsForTables : StepExecutionTestsBase
     {
-        //TODO NSub fix
+        //TODO NSub fix - strange test pattern
         //[Fact]
         //public async Task ShouldCallTheUserConverterToConvertTableWithTable()
         //{

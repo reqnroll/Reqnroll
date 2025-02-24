@@ -41,6 +41,7 @@ public class MicrosoftExtensionsLoggingTests
 
         // Verify
         _outputHelperMock.Received(1).WriteLine(expectedMessage);
-        //TODO NSub fix _outputHelperMock.VerifyNoOtherCalls();
+        //TODO NSub fix - no VerifyNoOtherCalls
+        //_outputHelperMock.VerifyNoOtherCalls();
     }
 }
