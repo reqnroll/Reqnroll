@@ -54,18 +54,18 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
             var serviceCollection = methodInfo.Invoke(null, null);
             if(methodInfo.ReturnType == typeof(void))
             {
-                throw new InvalidScenarioDependenciesException("[ScenarioDependencies] should return IServiceCollection but the method doesn't return a value.");
+                throw new InvalidScenarioDependenciesException("the method doesn't return a value.");
             }
 
             if (serviceCollection == null)
             {
-                throw new InvalidScenarioDependenciesException("[ScenarioDependencies] should return IServiceCollection but returned null.");
+                throw new InvalidScenarioDependenciesException("returned null.");
             }
 
             if (serviceCollection is not IServiceCollection collection)
             {
                 // TODO test
-                throw new InvalidScenarioDependenciesException($"[ScenarioDependencies] should return IServiceCollection but returned {serviceCollection.GetType()}.");
+                throw new InvalidScenarioDependenciesException($"returned {serviceCollection.GetType()}.");
             }
             return collection;
         }
