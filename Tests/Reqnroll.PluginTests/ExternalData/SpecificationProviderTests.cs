@@ -1,5 +1,6 @@
 using Gherkin.Ast;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Reqnroll.ExternalData.ReqnrollPlugin;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources.Selectors;
@@ -11,18 +12,18 @@ namespace Reqnroll.PluginTests.ExternalData
     public class SpecificationProviderTests
     {
         private const string SOURCE_FILE_PATH = @"C:\Temp\Sample.feature";
-        private readonly Mock<IDataSourceLoaderFactory> _dataSourceLoaderFactoryMock = new();
-        private readonly Mock<IDataSourceLoader> _dataSourceLoaderMock = new();
+        private readonly IDataSourceLoaderFactory _dataSourceLoaderFactoryMock = Substitute.For<IDataSourceLoaderFactory>();  //TODO NSub check
+        private readonly IDataSourceLoader _dataSourceLoaderMock = Substitute.For<IDataSourceLoader>();  //TODO NSub check
 
         public SpecificationProviderTests()
         {
-            _dataSourceLoaderFactoryMock.Setup(f => f.CreateLoader(It.IsAny<string>(), It.IsAny<string>()))
-                                        .Returns(_dataSourceLoaderMock.Object);
+            _dataSourceLoaderFactoryMock.CreateLoader(Arg.Any<string>(), Arg.Any<string>())
+                                        .Returns(_dataSourceLoaderMock);
         }
         
         private SpecificationProvider CreateSut()
         {
-            return new(_dataSourceLoaderFactoryMock.Object, new DataSourceSelectorParser());
+            return new(_dataSourceLoaderFactoryMock, new DataSourceSelectorParser());
         }
 
         [Fact]
@@ -73,7 +74,7 @@ namespace Reqnroll.PluginTests.ExternalData
             }, SOURCE_FILE_PATH);
             
             Assert.NotNull(result);
-            _dataSourceLoaderMock.Verify(l => l.LoadDataSource(@"path\to\file.csv", It.IsAny<string>()));
+            _dataSourceLoaderMock.Received().LoadDataSource(@"path\to\file.csv", Arg.Any<string>());
         }
 
         [Fact]
@@ -101,8 +102,7 @@ namespace Reqnroll.PluginTests.ExternalData
                 new Tag(null, @"@DataSource:path\to\file2.csv")
             }, SOURCE_FILE_PATH);
 
-            _dataSourceLoaderMock.Verify(l => 
-                l.LoadDataSource(@"path\to\file2.csv", It.IsAny<string>()));
+            _dataSourceLoaderMock.Received().LoadDataSource(@"path\to\file2.csv", Arg.Any<string>());
         }
 
         [Fact]
@@ -113,7 +113,7 @@ namespace Reqnroll.PluginTests.ExternalData
             var result = sut.GetSpecification(new[] { new Tag(null, @"@DataSource:path\to\file.csv") }, SOURCE_FILE_PATH);
             
             Assert.NotNull(result);
-            _dataSourceLoaderMock.Verify(l => l.LoadDataSource(It.IsAny<string>(), SOURCE_FILE_PATH));
+            _dataSourceLoaderMock.Received().LoadDataSource(Arg.Any<string>(), SOURCE_FILE_PATH);
         }
 
         [Fact]
@@ -127,7 +127,7 @@ namespace Reqnroll.PluginTests.ExternalData
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
-            _dataSourceLoaderFactoryMock.Verify(f => f.CreateLoader(It.IsAny<string>(), @"path\to\file.csv"));
+            _dataSourceLoaderFactoryMock.Received().CreateLoader(Arg.Any<string>(), @"path\to\file.csv");
         }
 
         [Fact]
@@ -142,7 +142,7 @@ namespace Reqnroll.PluginTests.ExternalData
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
-            _dataSourceLoaderFactoryMock.Verify(f => f.CreateLoader("csv", It.IsAny<string>()));
+            _dataSourceLoaderFactoryMock.Received().CreateLoader("csv", Arg.Any<string>());
         }
 
         [Fact]
@@ -158,7 +158,7 @@ namespace Reqnroll.PluginTests.ExternalData
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
-            _dataSourceLoaderFactoryMock.Verify(f => f.CreateLoader("csv", It.IsAny<string>()));
+            _dataSourceLoaderFactoryMock.Received().CreateLoader("csv", Arg.Any<string>());
         }
 
 

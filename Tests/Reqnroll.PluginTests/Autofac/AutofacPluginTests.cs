@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Globalization;
 using System.Linq;
@@ -6,7 +6,7 @@ using System.Reflection;
 using Autofac;
 using Autofac.Core.Registration;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Autofac;
 using Reqnroll.Autofac.ReqnrollPlugin;
 using Reqnroll.BoDi;
@@ -32,9 +32,9 @@ public class AutofacPluginTests
             {
                 configMethods = configMethods.Where(m => configMethodNames.Contains(m.Name));
             }
-            var configurationMethodsProviderMock = new Mock<IConfigurationMethodsProvider>();
-            configurationMethodsProviderMock.Setup(m => m.GetConfigurationMethods()).Returns(configMethods.ToArray());
-            _configurationMethodsProvider = configurationMethodsProviderMock.Object;
+            var configurationMethodsProviderMock = Substitute.For<IConfigurationMethodsProvider>();
+            configurationMethodsProviderMock.GetConfigurationMethods().Returns(configMethods.ToArray());
+            _configurationMethodsProvider = configurationMethodsProviderMock;
         }
 
         protected override void RegisterTestRunPluginTypes(ObjectContainer testRunContainer)
@@ -117,9 +117,9 @@ public class AutofacPluginTests
     {
         _runtimePluginEvents = new RuntimePluginEvents();
         _testRunContainer = new ObjectContainer();
-        var testAssemblyProviderMock = new Mock<ITestAssemblyProvider>();
-        testAssemblyProviderMock.SetupGet(tap => tap.TestAssembly).Returns(Assembly.GetExecutingAssembly());
-        _testRunContainer.RegisterInstanceAs(testAssemblyProviderMock.Object);
+        var testAssemblyProviderMock = Substitute.For<ITestAssemblyProvider>();
+        testAssemblyProviderMock.TestAssembly.Returns(Assembly.GetExecutingAssembly());
+        _testRunContainer.RegisterInstanceAs(testAssemblyProviderMock);
 
         _testThreadContainer = new ObjectContainer(_testRunContainer);
         _featureContainer = new ObjectContainer(_testThreadContainer);
@@ -353,22 +353,22 @@ public class AutofacPluginTests
         _testThreadContainer.RegisterInstanceAs(testThreadContext);
 
         var traceListenerMock =
-            new Mock<ITraceListener>();
+            Substitute.For<ITraceListener>();
         var attachmentHandlerMock =
-            new Mock<IReqnrollAttachmentHandler>();
+            Substitute.For<IReqnrollAttachmentHandler>();
         var threadExecutionMock =
-            new Mock<ITestThreadExecutionEventPublisher>();
+            Substitute.For<ITestThreadExecutionEventPublisher>();
 
         var defaultDenpendencyProvider = new DefaultDependencyProvider();
         defaultDenpendencyProvider
             .RegisterTestThreadContainerDefaults(_testThreadContainer);
 
         _testThreadContainer
-            .RegisterInstanceAs<ITraceListener>(traceListenerMock.Object);
+            .RegisterInstanceAs<ITraceListener>(traceListenerMock);
         _testThreadContainer
-            .RegisterInstanceAs<IReqnrollAttachmentHandler>(attachmentHandlerMock.Object);
+            .RegisterInstanceAs<IReqnrollAttachmentHandler>(attachmentHandlerMock);
         _testThreadContainer
-            .RegisterInstanceAs<ITestThreadExecutionEventPublisher>(threadExecutionMock.Object);
+            .RegisterInstanceAs<ITestThreadExecutionEventPublisher>(threadExecutionMock);
 
         // Assert
         var resolvedOutputHelper = resolver

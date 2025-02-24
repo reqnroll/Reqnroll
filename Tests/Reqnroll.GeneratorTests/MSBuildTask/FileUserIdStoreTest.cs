@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Analytics.UserId;
 using Xunit;
 
@@ -9,30 +9,30 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
     {
         private const string UserId = "491ed5c0-9f25-4c27-941a-19b17cc81c87";
         
-        Mock<IFileService> fileServiceStub;
-        Mock<IDirectoryService> directoryServiceStub;
+        IFileService fileServiceStub;
+        IDirectoryService directoryServiceStub;
         FileUserIdStore sut;
 
         public FileUserIdStoreTests()
         {
-            fileServiceStub = new Mock<IFileService>();
-            directoryServiceStub = new Mock<IDirectoryService>();
-            sut = new FileUserIdStore(fileServiceStub.Object, directoryServiceStub.Object);
+            fileServiceStub = Substitute.For<IFileService>();
+            directoryServiceStub = Substitute.For<IDirectoryService>();
+            sut = new FileUserIdStore(fileServiceStub, directoryServiceStub);
         }
 
         private void GivenUserIdStringInFile(string userIdString)
         {
-            fileServiceStub.Setup(fileService => fileService.ReadAllText(It.IsAny<string>())).Returns(userIdString);
+            fileServiceStub.ReadAllText(Arg.Any<string>()).Returns(userIdString);
         }
 
         private void GivenFileExists()
         {
-            fileServiceStub.Setup(fileService => fileService.Exists(It.IsAny<string>())).Returns(true);
+            fileServiceStub.Exists(Arg.Any<string>()).Returns(true);
         }
 
         private void GivenFileDoesNotExists()
         {
-            fileServiceStub.Setup(fileService => fileService.Exists(It.IsAny<string>())).Returns(false);
+            fileServiceStub.Exists(Arg.Any<string>()).Returns(false);
         }
 
         [Fact]
@@ -64,7 +64,7 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
             string userId = sut.GetUserId();
 
             userId.Should().NotBeEmpty();
-            fileServiceStub.Verify(fileService => fileService.WriteAllText(FileUserIdStore.UserIdFilePath, userId), Times.Once());
+            fileServiceStub.Received(1).WriteAllText(FileUserIdStore.UserIdFilePath, userId); // TODO NSub
         }
     }
 }

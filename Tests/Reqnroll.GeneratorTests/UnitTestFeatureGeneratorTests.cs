@@ -2,7 +2,7 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.BoDi;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Generator;
 using Reqnroll.Generator.Interfaces;
@@ -21,14 +21,14 @@ namespace Reqnroll.GeneratorTests
             SetupInternal();
         }
 
-        protected Mock<IUnitTestGeneratorProvider> UnitTestGeneratorProviderMock { get; private set; }
+        protected IUnitTestGeneratorProvider UnitTestGeneratorProviderMock { get; private set; }
         protected IObjectContainer Container { get; private set; }
 
         protected virtual void SetupInternal()
         {
             Container = new GeneratorContainerBuilder().CreateContainer(new ReqnrollConfigurationHolder(ConfigSource.Default, null), new ProjectSettings(), Enumerable.Empty<GeneratorPluginInfo>());
-            UnitTestGeneratorProviderMock = new Mock<IUnitTestGeneratorProvider>();
-            Container.RegisterInstanceAs(UnitTestGeneratorProviderMock.Object);
+            UnitTestGeneratorProviderMock = Substitute.For<IUnitTestGeneratorProvider>();
+            Container.RegisterInstanceAs(UnitTestGeneratorProviderMock);
         }
 
         protected IFeatureGenerator CreateUnitTestFeatureGenerator()
@@ -50,8 +50,8 @@ namespace Reqnroll.GeneratorTests
         {
             var generator = CreateUnitTestFeatureGenerator();
             string[] generatedCats = new string[0];
-            UnitTestGeneratorProviderMock.Setup(ug => ug.SetTestClassCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<IEnumerable<string>>()))
-                .Callback((TestClassGenerationContext ctx, IEnumerable<string> cats) => generatedCats = cats.ToArray());
+            UnitTestGeneratorProviderMock.When(m => m.SetTestClassCategories(Arg.Any<TestClassGenerationContext>(), Arg.Any<IEnumerable<string>>()))
+                .Do((args) => generatedCats = args.Arg<IEnumerable<string>>().ToArray());
 
             var theDocument = ParserHelper.CreateDocument(new string[] { "foo", "bar" });
 
@@ -65,8 +65,8 @@ namespace Reqnroll.GeneratorTests
         {
             var generator = CreateUnitTestFeatureGenerator();
             string[] generatedCats = new string[0];
-            UnitTestGeneratorProviderMock.Setup(ug => ug.SetTestMethodCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>(), It.IsAny<IEnumerable<string>>()))
-                .Callback((TestClassGenerationContext ctx, CodeMemberMethod _, IEnumerable<string> cats) => generatedCats = cats.ToArray());
+            UnitTestGeneratorProviderMock.When(m => m.SetTestMethodCategories(Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>(), Arg.Any<IEnumerable<string>>()))
+                                         .Do((args) => generatedCats = args.Arg<IEnumerable<string>>().ToArray());
 
             var theFeature = ParserHelper.CreateDocument(scenarioTags: new []{ "foo", "bar"});
 
@@ -80,8 +80,8 @@ namespace Reqnroll.GeneratorTests
         {
             var generator = CreateUnitTestFeatureGenerator();
             string[] generatedCats = new string[0];
-            UnitTestGeneratorProviderMock.Setup(ug => ug.SetTestMethodCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>(), It.IsAny<IEnumerable<string>>()))
-                .Callback((TestClassGenerationContext ctx, CodeMemberMethod _, IEnumerable<string> cats) => generatedCats = cats.ToArray());
+            UnitTestGeneratorProviderMock.When(m => m.SetTestMethodCategories(Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>(), Arg.Any<IEnumerable<string>>()))
+                                         .Do((args) => generatedCats = args.Arg<IEnumerable<string>>().ToArray());
 
             var theFeature = ParserHelper.CreateDocument(tags: new []{ "featuretag"}, scenarioTags: new[] { "foo", "bar" });
 
@@ -102,7 +102,7 @@ namespace Reqnroll.GeneratorTests
 
             GenerateFeature(generator, theFeature);
 
-            UnitTestGeneratorProviderMock.Verify(ug => ug.SetTestClassCategories(It.IsAny<TestClassGenerationContext>(), It.Is<IEnumerable<string>>(cats => !cats.Contains("decorated"))));
+            UnitTestGeneratorProviderMock.Received().SetTestClassCategories(Arg.Any<TestClassGenerationContext>(), Arg.Is<IEnumerable<string>>(cats => !cats.Contains("decorated")));
         }
 
         [Fact]
@@ -117,7 +117,7 @@ namespace Reqnroll.GeneratorTests
 
             GenerateFeature(generator, theFeature);
 
-            UnitTestGeneratorProviderMock.Verify(ug => ug.SetTestMethodCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>(), It.Is<IEnumerable<string>>(cats => !cats.Contains("decorated"))));
+            UnitTestGeneratorProviderMock.Received().SetTestMethodCategories(Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>(), Arg.Is<IEnumerable<string>>(cats => !cats.Contains("decorated")));
         }
     }
 }

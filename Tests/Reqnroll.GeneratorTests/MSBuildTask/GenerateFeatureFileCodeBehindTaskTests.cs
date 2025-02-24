@@ -1,6 +1,6 @@
 using FluentAssertions;
 using Microsoft.Build.Utilities;
-using Moq;
+using NSubstitute;
 using Reqnroll.Tools.MsBuild.Generation;
 using System.Collections.Generic;
 using Reqnroll.Analytics;
@@ -18,23 +18,24 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
             _output = output;
         }
 
-        private Mock<IFeatureFileCodeBehindGenerator> GetFeatureFileCodeBehindGeneratorMock()
+        private IFeatureFileCodeBehindGenerator GetFeatureFileCodeBehindGeneratorMock()
         {
-            var generatorMock = new Mock<IFeatureFileCodeBehindGenerator>();
+            var generatorMock = Substitute.For<IFeatureFileCodeBehindGenerator>();
             generatorMock
-                .Setup(m => m.GenerateFilesForProject(
-                    It.IsAny<List<string>>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>()))
+                .GenerateFilesForProject(
+                    Arg.Any<List<string>>(),
+                    Arg.Any<string>(),
+                    Arg.Any<string>())
                 .Returns(new List<string>());
             return generatorMock;
         }
 
-        private Mock<IAnalyticsTransmitter> GetAnalyticsTransmitterMock()
+        private IAnalyticsTransmitter GetAnalyticsTransmitterMock()
         {
-            var analyticsTransmitterMock = new Mock<IAnalyticsTransmitter>();
-            analyticsTransmitterMock.Setup(at => at.TransmitReqnrollProjectCompilingEventAsync(It.IsAny<ReqnrollProjectCompilingEvent>()))
-                .Callback(() => { });
+            var analyticsTransmitterMock = Substitute.For<IAnalyticsTransmitter>();
+            //TODO NSub check
+            //analyticsTransmitterMock.TransmitReqnrollProjectCompilingEventAsync(Arg.Any<ReqnrollProjectCompilingEvent>())
+            //    .Callback(() => { });
             return analyticsTransmitterMock;
         }
 
@@ -46,8 +47,8 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
             {
                 ProjectPath = "ProjectPath.csproj",
                 BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
+                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock(),
+                AnalyticsTransmitter = GetAnalyticsTransmitterMock()
             };
 
             //ACT
@@ -68,8 +69,8 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
                 FeatureFiles = new TaskItem[0],
                 GeneratorPlugins = new TaskItem[0],
                 BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
+                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock(),
+                AnalyticsTransmitter = GetAnalyticsTransmitterMock()
             };
 
             //ACT
@@ -90,8 +91,8 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
                 FeatureFiles = new TaskItem[0],
                 GeneratorPlugins = new TaskItem[0],
                 BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
+                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock(),
+                AnalyticsTransmitter = GetAnalyticsTransmitterMock()
             };
 
             //ACT
@@ -112,8 +113,8 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
                 FeatureFiles = new TaskItem[0],
                 GeneratorPlugins = new TaskItem[0],
                 BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
+                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock(),
+                AnalyticsTransmitter = GetAnalyticsTransmitterMock()
             };
 
             //ACT
@@ -133,8 +134,8 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
                 ProjectPath = "ProjectPath.csproj",
                 GeneratorPlugins = new TaskItem[0],
                 BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
+                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock(),
+                AnalyticsTransmitter = GetAnalyticsTransmitterMock()
             };
 
             //ACT
@@ -154,8 +155,8 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
                 ProjectPath = "ProjectPath.csproj",
                 FeatureFiles = new TaskItem[0],
                 BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
+                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock(),
+                AnalyticsTransmitter = GetAnalyticsTransmitterMock()
             };
 
             //ACT

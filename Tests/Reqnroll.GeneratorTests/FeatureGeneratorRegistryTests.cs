@@ -1,7 +1,7 @@
 using System.Linq;
 using Reqnroll.BoDi;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Configuration;
 using Reqnroll.Generator;
@@ -41,14 +41,14 @@ namespace Reqnroll.GeneratorTests
         [Fact]
         public void Should_use_generic_provider_with_higher_priority()
         {
-            var dummyGenerator = new Mock<IFeatureGenerator>().Object;
+            var dummyGenerator = Substitute.For<IFeatureGenerator>();
 
-            var genericHighPrioProvider = new Mock<IFeatureGeneratorProvider>();
-            genericHighPrioProvider.Setup(p => p.CreateGenerator(It.IsAny<ReqnrollDocument>())).Returns(dummyGenerator);
-            genericHighPrioProvider.Setup(p => p.CanGenerate(It.IsAny<ReqnrollDocument>())).Returns(true); // generic
-            genericHighPrioProvider.Setup(p => p.Priority).Returns(1); // high-prio
+            var genericHighPrioProvider = Substitute.For<IFeatureGeneratorProvider>();
+            genericHighPrioProvider.CreateGenerator(Arg.Any<ReqnrollDocument>()).Returns(dummyGenerator);
+            genericHighPrioProvider.CanGenerate(Arg.Any<ReqnrollDocument>()).Returns(true); // generic
+            genericHighPrioProvider.Priority.Returns(1); // high-prio
 
-            container.RegisterInstanceAs(genericHighPrioProvider.Object, "custom");
+            container.RegisterInstanceAs(genericHighPrioProvider, "custom");
 
             var featureGeneratorRegistry = CreateFeatureGeneratorRegistry();
 
@@ -61,36 +61,36 @@ namespace Reqnroll.GeneratorTests
         [Fact]
         public void Should_call_provider_wiht_the_given_feature()
         {
-            var dummyGenerator = new Mock<IFeatureGenerator>().Object;
+            var dummyGenerator = Substitute.For<IFeatureGenerator>();
 
-            var genericHighPrioProvider = new Mock<IFeatureGeneratorProvider>();
-            genericHighPrioProvider.Setup(p => p.CreateGenerator(It.IsAny<ReqnrollDocument>())).Returns(dummyGenerator);
-            genericHighPrioProvider.Setup(p => p.CanGenerate(It.IsAny<ReqnrollDocument>())).Returns(true); // generic
-            genericHighPrioProvider.Setup(p => p.Priority).Returns(1); // high-prio
+            var genericHighPrioProvider = Substitute.For<IFeatureGeneratorProvider>();
+            genericHighPrioProvider.CreateGenerator(Arg.Any<ReqnrollDocument>()).Returns(dummyGenerator);
+            genericHighPrioProvider.CanGenerate(Arg.Any<ReqnrollDocument>()).Returns(true); // generic
+            genericHighPrioProvider.Priority.Returns(1); // high-prio
 
-            container.RegisterInstanceAs(genericHighPrioProvider.Object, "custom");
+            container.RegisterInstanceAs(genericHighPrioProvider, "custom");
 
             var featureGeneratorRegistry = CreateFeatureGeneratorRegistry();
 
             ReqnrollDocument theDocument = ParserHelper.CreateAnyDocument();
             featureGeneratorRegistry.CreateGenerator(theDocument);
 
-            genericHighPrioProvider.Verify(p => p.CreateGenerator(theDocument), Times.Once());
+            genericHighPrioProvider.Received(1).CreateGenerator(theDocument); //TODO NSub check
         }
 
         [Fact]
         public void Should_skip_high_priority_provider_when_not_applicable()
         {
-            var dummyGenerator = new Mock<IFeatureGenerator>().Object;
+            var dummyGenerator = Substitute.For<IFeatureGenerator>();
 
             ReqnrollDocument theDocument = ParserHelper.CreateAnyDocument();
 
-            var genericHighPrioProvider = new Mock<IFeatureGeneratorProvider>();
-            genericHighPrioProvider.Setup(p => p.CreateGenerator(It.IsAny<ReqnrollDocument>())).Returns(dummyGenerator);
-            genericHighPrioProvider.Setup(p => p.CanGenerate(theDocument)).Returns(false); // not applicable for aFeature
-            genericHighPrioProvider.Setup(p => p.Priority).Returns(1); // high-prio
+            var genericHighPrioProvider = Substitute.For<IFeatureGeneratorProvider>();
+            genericHighPrioProvider.CreateGenerator(Arg.Any<ReqnrollDocument>()).Returns(dummyGenerator);
+            genericHighPrioProvider.CanGenerate(theDocument).Returns(false); // not applicable for aFeature
+            genericHighPrioProvider.Priority.Returns(1); // high-prio
 
-            container.RegisterInstanceAs(genericHighPrioProvider.Object, "custom");
+            container.RegisterInstanceAs(genericHighPrioProvider, "custom");
 
             var featureGeneratorRegistry = CreateFeatureGeneratorRegistry();
 
@@ -111,7 +111,7 @@ namespace Reqnroll.GeneratorTests
 
         private class TestTagFilteredFeatureGeneratorProvider : TagFilteredFeatureGeneratorProvider
         {
-            static public IFeatureGenerator DummyGenerator = new Mock<IFeatureGenerator>().Object;
+            static public IFeatureGenerator DummyGenerator = Substitute.For<IFeatureGenerator>();
 
             public TestTagFilteredFeatureGeneratorProvider(ITagFilterMatcher tagFilterMatcher, string registeredName) : base(tagFilterMatcher, registeredName)
             {

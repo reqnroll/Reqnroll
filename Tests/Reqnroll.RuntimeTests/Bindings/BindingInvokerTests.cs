@@ -5,7 +5,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Reqnroll.BoDi;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.Configuration;
@@ -43,18 +44,18 @@ public class BindingInvokerTests
 
     private async Task<object> InvokeBindingAsync(BindingInvoker sut, IContextManager contextManager, Type stepDefType, string methodName, params object[] args)
     {
-        var testTracerMock = new Mock<ITestTracer>();
+        var testTracerMock = Substitute.For<ITestTracer>();
         var setMethodBinding = new TestableMethodBinding(new RuntimeBindingMethod(stepDefType.GetMethod(methodName)));
-        return await sut.InvokeBindingAsync(setMethodBinding, contextManager, args, testTracerMock.Object, new DurationHolder());
+        return await sut.InvokeBindingAsync(setMethodBinding, contextManager, args, testTracerMock, new DurationHolder());
     }
 
     private IContextManager CreateContextManagerWith()
     {
-        var contextManagerMock = new Mock<IContextManager>();
+        var contextManagerMock = Substitute.For<IContextManager>();
         var scenarioContainer = new ObjectContainer();
         var scenarioContext = new ScenarioContext(scenarioContainer, new ScenarioInfo("S1", null, null, null), new TestObjectResolver());
-        contextManagerMock.SetupGet(ctx => ctx.ScenarioContext).Returns(scenarioContext);
-        var contextManager = contextManagerMock.Object;
+        contextManagerMock.ScenarioContext.Returns(scenarioContext);
+        var contextManager = contextManagerMock;
         return contextManager;
     }
 

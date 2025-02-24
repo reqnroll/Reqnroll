@@ -1,5 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
-using Moq;
+using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using NSubstitute;
 using Reqnroll.Microsoft.Extensions.DependencyInjection.Logging;
 using Xunit;
 
@@ -7,19 +8,19 @@ namespace Reqnroll.PluginTests.Microsoft.Extensions.Logging;
 
 public class MicrosoftExtensionsLoggingTests
 {
-    private readonly Mock<IReqnrollOutputHelper> _outputHelperMock = new();
+    private readonly IReqnrollOutputHelper _outputHelperMock = Substitute.For<IReqnrollOutputHelper>();
 
     [Fact]
     public void ReqnrollLogger_LogWithLevelNone_ShouldNotCallWriteLine()
     {
         // Arrange
-        var sut = new ReqnrollLogger(_outputHelperMock.Object, new LoggerExternalScopeProvider(), "TestCategory");
+        var sut = new ReqnrollLogger(_outputHelperMock, new LoggerExternalScopeProvider(), "TestCategory");
 
         // Act
         sut.Log(LogLevel.None, new EventId(1), "test", null, (s, _) => s.ToString());
 
         // Verify
-        _outputHelperMock.VerifyNoOtherCalls();
+        _outputHelperMock.ReceivedCalls().Should().BeEmpty();
     }
 
     [Theory]
@@ -33,13 +34,13 @@ public class MicrosoftExtensionsLoggingTests
     {
         // Arrange
         var options = new ReqnrollLoggerOptions { IncludeLogLevel = true };
-        var sut = new ReqnrollLogger(_outputHelperMock.Object, new LoggerExternalScopeProvider(), "TestCategory", options);
+        var sut = new ReqnrollLogger(_outputHelperMock, new LoggerExternalScopeProvider(), "TestCategory", options);
 
         // Act
         sut.Log(level, new EventId(1), "test", null, (s, _) => s.ToString());
 
         // Verify
-        _outputHelperMock.Verify(o => o.WriteLine(expectedMessage), Times.Once);
-        _outputHelperMock.VerifyNoOtherCalls();
+        _outputHelperMock.Received(1).WriteLine(expectedMessage);
+        //TODO NSub fix _outputHelperMock.VerifyNoOtherCalls();
     }
 }

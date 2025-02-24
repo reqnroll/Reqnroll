@@ -1,5 +1,5 @@
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.UserId;
 using Reqnroll.CommonModels;
@@ -13,12 +13,12 @@ namespace Reqnroll.RuntimeTests.Analytics
         [Fact]
         public void Should_return_the_build_server_name_in_Compiling_Event()
         {
-            var userUniqueIdStoreMock = new Mock<IUserUniqueIdStore>();
-            var environmentMock = new Mock<IEnvironmentWrapper>();
-            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock.Object);
+            var userUniqueIdStoreMock = Substitute.For<IUserUniqueIdStore>();
+            var environmentMock = Substitute.For<IEnvironmentWrapper>();
+            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock);
 
             environmentMock
-                .Setup(m => m.GetEnvironmentVariable("TF_BUILD"))
+                .GetEnvironmentVariable("TF_BUILD")
                 .Returns(new Success<string>("true"));
 
             var compilingEvent = sut.CreateProjectCompilingEvent(null, null, null, null, null);
@@ -29,12 +29,12 @@ namespace Reqnroll.RuntimeTests.Analytics
         [Fact]
         public void Should_return_the_build_server_name_in_Running_Event()
         {
-            var userUniqueIdStoreMock = new Mock<IUserUniqueIdStore>();
-            var environmentMock = new Mock<IEnvironmentWrapper>();
-            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock.Object);
+            var userUniqueIdStoreMock = Substitute.For<IUserUniqueIdStore>();
+            var environmentMock = Substitute.For<IEnvironmentWrapper>();
+            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock);
 
             environmentMock
-                .Setup(m => m.GetEnvironmentVariable("TEAMCITY_VERSION"))
+                .GetEnvironmentVariable("TEAMCITY_VERSION")
                 .Returns(new Success<string>("true"));
 
             var compilingEvent = sut.CreateProjectRunningEvent(null);
@@ -45,9 +45,9 @@ namespace Reqnroll.RuntimeTests.Analytics
         [Fact]
         public void Should_return_null_for_the_build_server_name_when_not_detected()
         {
-            var userUniqueIdStoreMock = new Mock<IUserUniqueIdStore>();
-            var environmentMock = new Mock<IEnvironmentWrapper>();
-            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock.Object, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock.Object);
+            var userUniqueIdStoreMock = Substitute.For<IUserUniqueIdStore>();
+            var environmentMock = Substitute.For<IEnvironmentWrapper>();
+            var sut = new AnalyticsEventProvider(userUniqueIdStoreMock, new UnitTestProvider.UnitTestProviderConfiguration(), environmentMock);
 
             var compilingEvent = sut.CreateProjectRunningEvent(null);
             

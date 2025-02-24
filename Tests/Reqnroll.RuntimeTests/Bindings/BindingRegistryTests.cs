@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
@@ -30,8 +30,8 @@ namespace Reqnroll.RuntimeTests.Bindings
         {
             var sut = new BindingRegistry();
 
-            var hook1 = new HookBinding(new Mock<IBindingMethod>().Object, HookType.BeforeScenario, null, 1);
-            var hook2 = new HookBinding(new Mock<IBindingMethod>().Object, HookType.AfterFeature, null, 2);
+            var hook1 = new HookBinding(Substitute.For<IBindingMethod>(), HookType.BeforeScenario, null, 1);
+            var hook2 = new HookBinding(Substitute.For<IBindingMethod>(), HookType.AfterFeature, null, 2);
             sut.RegisterHookBinding(hook1);
             sut.RegisterHookBinding(hook2);
 
@@ -45,10 +45,10 @@ namespace Reqnroll.RuntimeTests.Bindings
         {
             var sut = new BindingRegistry();
 
-            var sat1 = new StepArgumentTransformationBinding(string.Empty, new Mock<IBindingMethod>().Object);
-            var sat2 = new StepArgumentTransformationBinding(string.Empty, new Mock<IBindingMethod>().Object);
-            var sat3 = new StepArgumentTransformationBinding(string.Empty, new Mock<IBindingMethod>().Object, order: 1);
-            var sat4 = new StepArgumentTransformationBinding(string.Empty, new Mock<IBindingMethod>().Object, null, 2);
+            var sat1 = new StepArgumentTransformationBinding(string.Empty, Substitute.For<IBindingMethod>());
+            var sat2 = new StepArgumentTransformationBinding(string.Empty, Substitute.For<IBindingMethod>());
+            var sat3 = new StepArgumentTransformationBinding(string.Empty, Substitute.For<IBindingMethod>(), order: 1);
+            var sat4 = new StepArgumentTransformationBinding(string.Empty, Substitute.For<IBindingMethod>(), null, 2);
 
             sut.RegisterStepArgumentTransformationBinding(sat4);
             sut.RegisterStepArgumentTransformationBinding(sat1);

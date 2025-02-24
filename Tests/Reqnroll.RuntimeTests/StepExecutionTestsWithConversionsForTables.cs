@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Bindings.Reflection;
 
@@ -44,7 +44,7 @@ namespace Reqnroll.RuntimeTests
 
             // return false unless its a User
             StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetCanConvertMethodFilter(table, typeof(User))).Returns(true);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(User))).ReturnsAsync(user);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(User))).Returns(user);
 
             //bindingInstance.Expect(b => b.SingleTable(user));
             //MockRepository.ReplayAll();
@@ -52,7 +52,7 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step for argument convert with table", null, table);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.SingleTable(user));
+            bindingMock.Received().SingleTable(user);
         }
 
         [Fact]
@@ -65,9 +65,9 @@ namespace Reqnroll.RuntimeTests
             var multiLineArg = "multi-line arg";
             // return false unless its a User
             StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetCanConvertMethodFilter(table, typeof(User))).Returns(true);            
-            StepArgumentTypeConverterStub.Setup(c => c.CanConvert(It.IsAny<object>(), It.IsAny<IBindingType>(), It.IsAny<CultureInfo>())).Returns(false);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(multiLineArg, typeof(string))).ReturnsAsync(multiLineArg);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(User))).ReturnsAsync(user);
+            StepArgumentTypeConverterStub.CanConvert(Arg.Any<object>(), Arg.Any<IBindingType>(), Arg.Any<CultureInfo>()).Returns(false);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(multiLineArg, typeof(string))).Returns(multiLineArg);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(User))).Returns(user);
             
 
             
@@ -77,7 +77,7 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step for argument convert with multiline argument and table", multiLineArg, table);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.MultilineArgumentAndTable(multiLineArg, user));
+            bindingMock.Received().MultilineArgumentAndTable(multiLineArg, user);
         }
 
         [Fact]
@@ -92,10 +92,10 @@ namespace Reqnroll.RuntimeTests
             // return false unless its a User
             // must also stub CanConvert & Convert for the string argument as we've introduced a parameter
             StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetCanConvertMethodFilter(table, typeof(User))).Returns(true);
-            StepArgumentTypeConverterStub.Setup(c => c.CanConvert(It.IsAny<object>(), It.IsAny<IBindingType>(), It.IsAny<CultureInfo>())).Returns(false);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(User))).ReturnsAsync(user);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(argumentValue, typeof(string))).ReturnsAsync(argumentValue);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(multiLineArg, typeof(string))).ReturnsAsync(multiLineArg);
+            StepArgumentTypeConverterStub.CanConvert(Arg.Any<object>(), Arg.Any<IBindingType>(), Arg.Any<CultureInfo>()).Returns(false);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(User))).Returns(user);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(argumentValue, typeof(string))).Returns(argumentValue);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(multiLineArg, typeof(string))).Returns(multiLineArg);
 
             
             //bindingInstance.Expect(b => b.ParameterMultilineArgumentAndTable(argumentValue, multiLineArg, user));
@@ -104,7 +104,7 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step for argument convert with parameter, multiline argument and table: argument", multiLineArg, table);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.ParameterMultilineArgumentAndTable(argumentValue, multiLineArg, user));
+            bindingMock.Received().ParameterMultilineArgumentAndTable(argumentValue, multiLineArg, user);
         }
     }
 }

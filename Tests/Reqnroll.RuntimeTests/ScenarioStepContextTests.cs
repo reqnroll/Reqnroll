@@ -2,7 +2,7 @@ using System;
 using System.Globalization;
 using Reqnroll.BoDi;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Infrastructure;
@@ -16,12 +16,12 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CleanupStepContext_WhenNotInitialized_ShouldTraceWarning()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.CleanupStepContext();
 
-            mockTracer.Verify(x => x.TraceWarning("The previous ScenarioStepContext was already disposed."));
+            mockTracer.Received().TraceWarning("The previous ScenarioStepContext was already disposed.");
         }
 
         /// <summary>
@@ -53,13 +53,13 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void InitializeStepContext_WhenInitializedTwice_ShouldNotTraceWarning()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize twice"));
 
-            mockTracer.Verify(x => x.TraceWarning(It.IsAny<string>()), Times.Never());
+            mockTracer.DidNotReceive().TraceWarning(Arg.Any<string>());
         }
 
         /// <summary>
@@ -76,22 +76,22 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CleanupStepContext_WhenInitializedAsOftenAsCleanedUp_ShouldNotTraceWarning()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize twice"));
             contextManager.CleanupStepContext();
             contextManager.CleanupStepContext();
 
-            mockTracer.Verify(x => x.TraceWarning(It.IsAny<string>()), Times.Never());
+            mockTracer.DidNotReceive().TraceWarning(Arg.Any<string>());
         }
 
         [Fact]
         public void CleanupStepContext_WhenCleanedUpMoreOftenThanInitialized_ShouldTraceWarning()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
@@ -101,14 +101,14 @@ namespace Reqnroll.RuntimeTests
             contextManager.CleanupStepContext();
             contextManager.CleanupStepContext();
 
-            mockTracer.Verify(x => x.TraceWarning("The previous ScenarioStepContext was already disposed."), Times.Once());
+            mockTracer.Received(1).TraceWarning("The previous ScenarioStepContext was already disposed."); //TODO NSub check
         }
 
         [Fact]
         public void StepContext_WhenInitializedOnce_ShouldReportStepInfo()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             var firstStepInfo = CreateStepInfo("I have called initialize once");
             contextManager.InitializeStepContext(firstStepInfo);
@@ -121,8 +121,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void StepContext_WhenInitializedTwice_ShouldReportSecondStepInfo()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             var secondStepInfo = CreateStepInfo("I have called initialize twice");
@@ -136,8 +136,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void StepContext_WhenInitializedTwiceAndCleanedUpOnce_ShouldReportFirstStepInfo()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             var firstStepInfo = CreateStepInfo("I have called initialize once");
             contextManager.InitializeStepContext(firstStepInfo);
@@ -152,8 +152,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void StepContext_WhenInitializedTwiceAndCleanedUpTwice_ShouldReportNoStepInfo()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize twice"));
@@ -166,8 +166,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_WithoutInitialization_ShouldReportNull()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             Assert.Null(contextManager.CurrentTopLevelStepDefinitionType);
         }
@@ -175,8 +175,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_WhenInitialized_ShouldReportCorrectStepType()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
 
@@ -188,8 +188,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_WhenInitializedTwice_ShouldReportFirstStepType()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize twice", StepDefinitionType.When));
@@ -202,8 +202,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_WhenInitializedTwiceAndCleanedUpOnce_ShouldReportFirstStepType()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize twice", StepDefinitionType.When));
@@ -217,8 +217,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_WhenInitializedTwiceAndCleanedUpTwice_ShouldReportFirstStepType()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize twice", StepDefinitionType.When));
@@ -233,8 +233,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_AfterInitializationAndCleanupAndNewInitialization_ShouldReportSecondStepType()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.CleanupStepContext();
@@ -248,8 +248,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_AfterInitializationAndCleanupAndNewInitializationAndCleanup_ShouldReportSecondStepType()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.CleanupStepContext();
@@ -264,8 +264,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_AfterInitializingSubStepThatHasASubStepItselfAndCompletingDeepestLevelOfSteps_ShouldReportOriginalStepType()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once", StepDefinitionType.Given));
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize a second time, to initialize a sub step", StepDefinitionType.When));
@@ -280,8 +280,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void CurrentTopLevelStepDefinitionType_AfterInitializingNewScenarioContext_ShouldReportNull()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
             contextManager.InitializeFeatureContext(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
@@ -296,8 +296,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void Dispose_InInconsistentState_ShouldNotThrowException()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             //// do not call CleanupStepContext to simulate inconsistent state
@@ -310,8 +310,8 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public void Dispose_InConsistentState_ShouldNotThrowException()
         {
-            var mockTracer = new Mock<ITestTracer>();
-            var contextManager = ResolveContextManager(mockTracer.Object);
+            var mockTracer = Substitute.For<ITestTracer>();
+            var contextManager = ResolveContextManager(mockTracer);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             contextManager.CleanupStepContext();

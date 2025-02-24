@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Reqnroll.BoDi;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Reflection;
@@ -131,8 +131,8 @@ public class CucumberExpressionIntegrationTests
         public override void RegisterGlobalContainerDefaults(ObjectContainer container)
         {
             base.RegisterGlobalContainerDefaults(container);
-            var stubUintTestProvider = new Mock<IUnitTestRuntimeProvider>();
-            container.RegisterInstanceAs(stubUintTestProvider.Object, "nunit");
+            var stubUintTestProvider = Substitute.For<IUnitTestRuntimeProvider>();
+            container.RegisterInstanceAs(stubUintTestProvider, "nunit");
         }
     }
 

@@ -1,6 +1,6 @@
 using System;
 using System.Globalization;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Bindings;
@@ -11,24 +11,24 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
     
     public class StepDefinitionSkeletonProviderTests
     {
-        private Mock<ISkeletonTemplateProvider> templateProviderMock;
-        private Mock<IStepTextAnalyzer> stepTextAnalyzerMock;
+        private ISkeletonTemplateProvider templateProviderMock;
+        private IStepTextAnalyzer stepTextAnalyzerMock;
         private AnalyzedStepText analizeResult;
         private readonly CultureInfo bindingCulture = new CultureInfo("en-US", false);
 
         public StepDefinitionSkeletonProviderTests()
         {
-            templateProviderMock = new Mock<ISkeletonTemplateProvider>();
-            templateProviderMock.Setup(tp => tp.GetStepDefinitionClassTemplate(It.IsAny<ProgrammingLanguage>()))
+            templateProviderMock = Substitute.For<ISkeletonTemplateProvider>();
+            templateProviderMock.GetStepDefinitionClassTemplate(Arg.Any<ProgrammingLanguage>())
                 .Returns("{namespace}/{className}/{bindings}");
-            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), true))
+            templateProviderMock.GetStepDefinitionTemplate(Arg.Any<ProgrammingLanguage>(), true)
                 .Returns("{attribute}/{expression}/{methodName}/{parameters}");
-            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), false))
+            templateProviderMock.GetStepDefinitionTemplate(Arg.Any<ProgrammingLanguage>(), false)
                 .Returns("{attribute}/{methodName}/{parameters}");
 
             analizeResult = new AnalyzedStepText();
-            stepTextAnalyzerMock = new Mock<IStepTextAnalyzer>();
-            stepTextAnalyzerMock.Setup(a => a.Analyze(It.IsAny<string>(), It.IsAny<CultureInfo>()))
+            stepTextAnalyzerMock = Substitute.For<IStepTextAnalyzer>();
+            stepTextAnalyzerMock.Analyze(Arg.Any<string>(), Arg.Any<CultureInfo>())
                 .Returns(analizeResult);
         }
 
@@ -94,7 +94,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
         private StepDefinitionSkeletonProvider CreateSut()
         {
-            return new StepDefinitionSkeletonProvider(templateProviderMock.Object, stepTextAnalyzerMock.Object);
+            return new StepDefinitionSkeletonProvider(templateProviderMock, stepTextAnalyzerMock);
         }
 
         [Fact]
@@ -110,7 +110,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         [Fact]
         public void Should_GetBindingClassSkeleton_generate_single_step_definition_class()
         {
-            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock.Object, stepTextAnalyzerMock.Object, "step-definition-skeleton");
+            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock, stepTextAnalyzerMock, "step-definition-skeleton");
 
             var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
 
@@ -120,7 +120,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         [Fact]
         public void Should_GetBindingClassSkeleton_merges_same_step_definition_methods()
         {
-            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock.Object, stepTextAnalyzerMock.Object, "step-definition-skeleton", "other-step-definition-skeleton", "step-definition-skeleton");
+            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock, stepTextAnalyzerMock, "step-definition-skeleton", "other-step-definition-skeleton", "step-definition-skeleton");
 
             var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen(), CreateSimpleWhen(), CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
 
@@ -131,7 +131,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         [Fact]
         public void Should_GetBindingClassSkeleton_orders_step_definition_methods_by_type()
         {
-            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock.Object, stepTextAnalyzerMock.Object, si => si.StepDefinitionType.ToString() + "-skeleton");
+            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock, stepTextAnalyzerMock, si => si.StepDefinitionType.ToString() + "-skeleton");
 
             var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen(), CreateSimpleThen(), CreateSimpleGiven() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
 
@@ -143,7 +143,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         [Fact]
         public void Should_GetBindingClassSkeleton_indent_step_definition_class()
         {
-            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock.Object, stepTextAnalyzerMock.Object, StringHelpers.ConsolidateVerbatimStringLineEndings(@"step-definition-skeleton
+            var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock, stepTextAnalyzerMock, StringHelpers.ConsolidateVerbatimStringLineEndings(@"step-definition-skeleton
     inner-line
 "));
 

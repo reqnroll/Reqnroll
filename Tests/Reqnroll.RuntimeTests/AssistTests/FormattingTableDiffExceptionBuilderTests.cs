@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using Xunit;
 using FluentAssertions;
 using Reqnroll.Assist;
@@ -51,11 +51,11 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
         private static FormattingTableDiffExceptionBuilder<TestObject> GetABuilderThatReturnsThisString(string returnValue, TableDifferenceResults<TestObject> tableDifferenceResults)
         {
-            var parentFake = new Mock<ITableDiffExceptionBuilder<TestObject>>();
-            parentFake.Setup(x => x.GetTheTableDiffExceptionMessage(tableDifferenceResults))
-                .Returns(() => returnValue);
+            var parentFake = Substitute.For<ITableDiffExceptionBuilder<TestObject>>();
+            parentFake.GetTheTableDiffExceptionMessage(tableDifferenceResults)
+                .Returns(_ => returnValue);
 
-            return new FormattingTableDiffExceptionBuilder<TestObject>(parentFake.Object);
+            return new FormattingTableDiffExceptionBuilder<TestObject>(parentFake);
         }
 
         private static TableDifferenceResults<TestObject> GetATestDiffResult()

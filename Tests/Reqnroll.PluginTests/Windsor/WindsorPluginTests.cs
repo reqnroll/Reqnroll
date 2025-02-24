@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using Castle.Windsor;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Bindings;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
@@ -22,9 +22,9 @@ namespace Reqnroll.PluginTests.Windsor
         public void Can_load_Windsor_plugin()
         {
             var loader = new RuntimePluginLoader(new DotNetCorePluginAssemblyLoader());
-            var listener = new Mock<ITraceListener>();
+            var listener = Substitute.For<ITraceListener>();
 
-            var plugin = loader.LoadPlugin("Reqnroll.Windsor.ReqnrollPlugin.dll", listener.Object, It.IsAny<bool>());
+            var plugin = loader.LoadPlugin("Reqnroll.Windsor.ReqnrollPlugin.dll", listener, Arg.Any<bool>());
 
             plugin.Should().NotBeNull();
         }
@@ -34,15 +34,15 @@ namespace Reqnroll.PluginTests.Windsor
         {
             var resolver = new WindsorTestObjectResolver();
 
-            var objectContainer = new Mock<IObjectContainer>();
-            var container = new Mock<IWindsorContainer>();
-            objectContainer.Setup(x => x.IsRegistered<IWindsorContainer>(null)).Returns(false);
-            objectContainer.Setup(x => x.Resolve<IWindsorContainer>()).Returns(container.Object);
+            var objectContainer = Substitute.For<IObjectContainer>();
+            var container = Substitute.For<IWindsorContainer>();
+            objectContainer.IsRegistered<IWindsorContainer>(null).Returns(false);
+            objectContainer.Resolve<IWindsorContainer>().Returns(container);
 
-            resolver.ResolveBindingInstance(typeof(ITraceListener), objectContainer.Object);
+            resolver.ResolveBindingInstance(typeof(ITraceListener), objectContainer);
 
-            objectContainer.Verify(x => x.Resolve(typeof(ITraceListener), It.IsAny<string>()), Times.Once);
-            container.Verify(x => x.Resolve(typeof(ITraceListener)), Times.Never);
+            objectContainer.Received(1).Resolve(typeof(ITraceListener), Arg.Any<string>());
+            container.DidNotReceive().Resolve(typeof(ITraceListener));
         }
 
         [Fact]
@@ -50,15 +50,15 @@ namespace Reqnroll.PluginTests.Windsor
         {
             var resolver = new WindsorTestObjectResolver();
 
-            var objectContainer = new Mock<IObjectContainer>();
-            var container = new Mock<IWindsorContainer>();
-            objectContainer.Setup(x => x.IsRegistered<IWindsorContainer>(null)).Returns(true);
-            objectContainer.Setup(x => x.Resolve<IWindsorContainer>()).Returns(container.Object);
+            var objectContainer = Substitute.For<IObjectContainer>();
+            var container = Substitute.For<IWindsorContainer>();
+            objectContainer.IsRegistered<IWindsorContainer>(null).Returns(true);
+            objectContainer.Resolve<IWindsorContainer>().Returns(container);
 
-            resolver.ResolveBindingInstance(typeof(ITraceListener), objectContainer.Object);
+            resolver.ResolveBindingInstance(typeof(ITraceListener), objectContainer);
 
-            objectContainer.Verify(x => x.Resolve(typeof(ITraceListener), It.IsAny<string>()), Times.Never);
-            container.Verify(x => x.Resolve(typeof(ITraceListener)), Times.Once);
+            objectContainer.DidNotReceive().Resolve(typeof(ITraceListener), Arg.Any<string>());
+            container.Received(1).Resolve(typeof(ITraceListener));
         }
 
         [Fact]
@@ -93,20 +93,20 @@ namespace Reqnroll.PluginTests.Windsor
         public void Resolution_for_contexts_are_passed_to_object_container()
         {
             var container = new WindsorContainer();
-            var objectContainer = new Mock<IObjectContainer>();
+            var objectContainer = Substitute.For<IObjectContainer>();
             var context = new ScenarioContext(
-                objectContainer.Object, 
+                objectContainer, 
                 new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()), 
                 new WindsorTestObjectResolver());
 
-            objectContainer.Setup(x => x.Resolve<ScenarioContext>()).Returns(context);
+            objectContainer.Resolve<ScenarioContext>().Returns(context);
 
             var plugin = new WindsorPlugin();
-            plugin.RegisterReqnrollDependecies(objectContainer.Object, container);
+            plugin.RegisterReqnrollDependecies(objectContainer, container);
 
             container.Resolve<ScenarioContext>();
 
-            objectContainer.Verify(x => x.Resolve<ScenarioContext>(), Times.Once);
+            objectContainer.Received(1).Resolve<ScenarioContext>();
         }
 
         [Fact]
@@ -140,8 +140,8 @@ namespace Reqnroll.PluginTests.Windsor
         [Fact]
         public void Bindings_registered_by_default()
         {
-            var registry = new Mock<IBindingRegistry>();
-            var finder = new BindingRegistryContainerFinder(registry.Object, new ScenarioDependenciesAttribute());
+            var registry = Substitute.For<IBindingRegistry>();
+            var finder = new BindingRegistryContainerFinder(registry, new ScenarioDependenciesAttribute());
 
             finder.GetCreateScenarioContainer()();
 
@@ -151,8 +151,8 @@ namespace Reqnroll.PluginTests.Windsor
         [Fact]
         public void Bindings_not_registered_when_specified()
         {
-            var registry = new Mock<IBindingRegistry>();
-            var finder = new BindingRegistryContainerFinder(registry.Object, new ScenarioDependenciesAttribute { AutoRegisterBindings = false });
+            var registry = Substitute.For<IBindingRegistry>();
+            var finder = new BindingRegistryContainerFinder(registry, new ScenarioDependenciesAttribute { AutoRegisterBindings = false });
 
             finder.GetCreateScenarioContainer()();
 
@@ -203,7 +203,7 @@ namespace Reqnroll.PluginTests.Windsor
 
             protected override MethodInfo GetCreationMethod()
             {
-                return new Mock<MethodInfo>().Object;
+                return Substitute.For<MethodInfo>();
             }
 
             protected override IWindsorContainer CreateContainer(MethodInfo method)

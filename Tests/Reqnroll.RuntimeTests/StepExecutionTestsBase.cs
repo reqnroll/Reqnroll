@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
 using Reqnroll.BoDi;
-using Moq;
+using NSubstitute;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Reflection;
@@ -17,7 +17,7 @@ namespace Reqnroll.RuntimeTests
     public class StepExecutionTestsBase : IAsyncLifetime
     {
         protected CultureInfo FeatureLanguage;
-        protected Mock<IStepArgumentTypeConverter> StepArgumentTypeConverterStub;
+        protected IStepArgumentTypeConverter StepArgumentTypeConverterStub;
         protected ObjectContainer TestThreadContainer;
 
         protected IContextManager ContextManagerStub;
@@ -97,31 +97,40 @@ namespace Reqnroll.RuntimeTests
 
             TestThreadContainer = new ObjectContainer();
             TestThreadContainer.RegisterInstanceAs(runtimeConfiguration);
-            TestThreadContainer.RegisterInstanceAs(new Mock<ITestRunner>().Object);
+            TestThreadContainer.RegisterInstanceAs(Substitute.For<ITestRunner>());
             TestThreadContainer.RegisterTypeAs<TestObjectResolver, ITestObjectResolver>();
-            var containerBuilderMock = new Mock<IContainerBuilder>();
-            containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>()))
-                .Returns((IObjectContainer fc, ScenarioInfo si) =>
+            var containerBuilderMock = Substitute.For<IContainerBuilder>();
+            containerBuilderMock.CreateScenarioContainer(Arg.Any<IObjectContainer>(), Arg.Any<ScenarioInfo>())
+                                
+                .Returns(callInfo =>
                 {
+                    //TODO NSub check
+                    var fc = callInfo.Arg<IObjectContainer>();
+                    var si = callInfo.Arg<ScenarioInfo>();
+             
                     var scenarioContainer = new ObjectContainer(fc);
                     scenarioContainer.RegisterInstanceAs(si);
                     return scenarioContainer;
                 });
-            containerBuilderMock.Setup(m => m.CreateFeatureContainer(It.IsAny<IObjectContainer>(), It.IsAny<FeatureInfo>()))
-                .Returns((IObjectContainer ttc, FeatureInfo fi) =>
+            containerBuilderMock.CreateFeatureContainer(Arg.Any<IObjectContainer>(), Arg.Any<FeatureInfo>())
+                .Returns(callInfo =>
                 {
+                    //TODO NSub check
+                    var ttc = callInfo.Arg<IObjectContainer>();
+                    var fi = callInfo.Arg<FeatureInfo>();
+
                     var featureContainer = new ObjectContainer(ttc);
                     featureContainer.RegisterInstanceAs(fi);
                     return featureContainer;
                 });
-            ContainerBuilderStub = containerBuilderMock.Object;
+            ContainerBuilderStub = containerBuilderMock;
 
 
-            ContextManagerStub = new ContextManager(new Mock<ITestTracer>().Object, TestThreadContainer, ContainerBuilderStub);
+            ContextManagerStub = new ContextManager(Substitute.For<ITestTracer>(), TestThreadContainer, ContainerBuilderStub);
             ContextManagerStub.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, string.Empty, "test feature", null));
             ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null));
 
-            StepArgumentTypeConverterStub = new Mock<IStepArgumentTypeConverter>();
+            StepArgumentTypeConverterStub = Substitute.For<IStepArgumentTypeConverter>();
         }
 
         protected TestRunner GetTestRunnerFor(params Type[] bindingTypes)
@@ -146,23 +155,23 @@ namespace Reqnroll.RuntimeTests
                     });
         }
 
-        protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>() where TBinding : class 
+        protected (TestRunner, TBinding) GetTestRunnerFor<TBinding>() where TBinding : class 
         {
             return GetTestRunnerWithConverterStub<TBinding>(null);
         } 
       
 
-        protected (TestRunner, Mock<TBinding>) GetTestRunnerWithConverterStub<TBinding>() where TBinding : class
+        protected (TestRunner, TBinding) GetTestRunnerWithConverterStub<TBinding>() where TBinding : class
         {
-            return GetTestRunnerWithConverterStub<TBinding>(c => c.RegisterInstanceAs(StepArgumentTypeConverterStub.Object));
+            return GetTestRunnerWithConverterStub<TBinding>(c => c.RegisterInstanceAs(StepArgumentTypeConverterStub));
         }
 
-        private (TestRunner, Mock<TBinding>) GetTestRunnerWithConverterStub<TBinding>(Action<IObjectContainer> registerMocks) where TBinding : class
+        private (TestRunner, TBinding) GetTestRunnerWithConverterStub<TBinding>(Action<IObjectContainer> registerMocks) where TBinding : class
         {
             TestRunner testRunner = GetTestRunnerFor(registerMocks, typeof(TBinding));
 
-            var bindingInstance = new Mock<TBinding>();
-            testRunner.ScenarioContext.SetBindingInstance(typeof(TBinding), bindingInstance.Object);
+            var bindingInstance = Substitute.For<TBinding>();
+            testRunner.ScenarioContext.SetBindingInstance(typeof(TBinding), bindingInstance);
             return (testRunner, bindingInstance);
         }
 
@@ -192,7 +201,7 @@ namespace Reqnroll.RuntimeTests
 
         protected (TestRunner, TBinding) GetTestRunnerWithConverterStub2<TBinding>() where TBinding : class
         {
-            return GetTestRunnerWithConverterStub2<TBinding>(c => c.RegisterInstanceAs(StepArgumentTypeConverterStub.Object));
+            return GetTestRunnerWithConverterStub2<TBinding>(c => c.RegisterInstanceAs(StepArgumentTypeConverterStub));
         }
 
         private (TestRunner, TBinding) GetTestRunnerWithConverterStub2<TBinding>(Action<IObjectContainer> registerMocks) where TBinding : class

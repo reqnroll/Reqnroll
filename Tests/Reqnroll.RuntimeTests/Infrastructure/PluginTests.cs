@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using Reqnroll.BoDi;
-using Moq;
+using NSubstitute;
 using Xunit;
 using FluentAssertions;
 using Reqnroll.Configuration;
@@ -160,11 +160,11 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         //          </plugins>
         //        </reqnroll>
         //      </configuration>"));
-        //    var pluginMock = new Mock<IRuntimePlugin>();
-        //    ContainerBuilder.DefaultDependencyProvider = new TestDefaultDependencyProvider(pluginMock.Object);
+        //    var pluginMock = Substitute.For<IRuntimePlugin>();
+        //    ContainerBuilder.DefaultDependencyProvider = new TestDefaultDependencyProvider(pluginMock);
         //    TestObjectFactories.CreateDefaultGlobalContainer(configurationHolder);
 
-        //    pluginMock.Verify(p => p.Initialize(It.IsAny<RuntimePluginEvents>(), It.Is<RuntimePluginParameters>(pp => pp.Parameters == "foo, bar"), It.IsAny<UnitTestProviderConfiguration>()));
+        //    pluginMock.Received().Initialize(Arg.Any<RuntimePluginEvents>(), Arg.Is<RuntimePluginParameters>(pp => pp.Parameters == "foo, bar"), Arg.Any<UnitTestProviderConfiguration>());
         //}
 
         [Fact]
@@ -297,17 +297,17 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             base.RegisterGlobalContainerDefaults(container);
 
-            var runtimePluginLocator = new Mock<IRuntimePluginLocator>();
-            runtimePluginLocator.Setup(m => m.GetAllRuntimePlugins()).Returns(new List<string>() { "aPlugin" });
+            var runtimePluginLocator = Substitute.For<IRuntimePluginLocator>();
+            runtimePluginLocator.GetAllRuntimePlugins().Returns(new List<string>() { "aPlugin" });
 
 
-            var pluginLoaderStub = new Mock<IRuntimePluginLoader>();
+            var pluginLoaderStub = Substitute.For<IRuntimePluginLoader>();
             var traceListener = container.Resolve<ITraceListener>();
-            pluginLoaderStub.Setup(pl => pl.LoadPlugin(It.IsAny<string>(), traceListener, It.IsAny<bool>())).Returns(_pluginToReturn);
+            pluginLoaderStub.LoadPlugin(Arg.Any<string>(), traceListener, Arg.Any<bool>()).Returns(_pluginToReturn);
 
 
-            container.RegisterInstanceAs<IRuntimePluginLocator>(runtimePluginLocator.Object);
-            container.RegisterInstanceAs<IRuntimePluginLoader>(pluginLoaderStub.Object);
+            container.RegisterInstanceAs<IRuntimePluginLocator>(runtimePluginLocator);
+            container.RegisterInstanceAs<IRuntimePluginLoader>(pluginLoaderStub);
 
         }
     }

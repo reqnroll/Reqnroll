@@ -2,7 +2,8 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Xunit;
 using Reqnroll.Generator;
 using Reqnroll.Generator.Interfaces;
@@ -111,7 +112,7 @@ namespace Reqnroll.GeneratorTests
         public void Should_return_detected_version()
         {
             Version version = new Version();
-            TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion("any")).Returns(version);
+            TestHeaderWriterStub.DetectGeneratedTestVersion("any").Returns(version);
 
             var testGenerator = CreateTestGenerator();
             FeatureFileInput featureFileInput = CreateSimpleValidFeatureFileInput();
@@ -126,7 +127,7 @@ namespace Reqnroll.GeneratorTests
         public void Should_return_detected_version_from_file()
         {
             Version version = new Version();
-            TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion("any")).Returns(version);
+            TestHeaderWriterStub.DetectGeneratedTestVersion("any").Returns(version);
 
             using (var tempFile = new TempFile(".cs"))
             {
@@ -146,7 +147,7 @@ namespace Reqnroll.GeneratorTests
         [Fact]
         public void Should_return_unknown_version_when_there_is_an_error()
         {
-            TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion("any")).Throws(new Exception());
+            TestHeaderWriterStub.DetectGeneratedTestVersion("any").Throws(new Exception());
 
             var testGenerator = CreateTestGenerator();
             FeatureFileInput featureFileInput = CreateSimpleValidFeatureFileInput();
@@ -161,7 +162,7 @@ namespace Reqnroll.GeneratorTests
         {
             var testGenerator = CreateTestGenerator(net35CSProjectSettings);
 
-            TestUpToDateCheckerStub.Setup(tu2d => tu2d.IsUpToDatePreliminary(It.IsAny<FeatureFileInput>(), It.IsAny<string>(), It.IsAny<UpToDateCheckingMethod>()))
+            TestUpToDateCheckerStub.IsUpToDatePreliminary(Arg.Any<FeatureFileInput>(), Arg.Any<string>(), Arg.Any<UpToDateCheckingMethod>())
                 .Returns(true);
 
             var result = testGenerator.GenerateTestFile(CreateSimpleValidFeatureFileInput(), new GenerationSettings
@@ -176,7 +177,7 @@ namespace Reqnroll.GeneratorTests
         {
             var testGenerator = CreateTestGenerator(net35CSProjectSettings);
 
-            TestUpToDateCheckerStub.Setup(tu2d => tu2d.IsUpToDatePreliminary(It.IsAny<FeatureFileInput>(), It.IsAny<string>(), It.IsAny<UpToDateCheckingMethod>()))
+            TestUpToDateCheckerStub.IsUpToDatePreliminary(Arg.Any<FeatureFileInput>(), Arg.Any<string>(), Arg.Any<UpToDateCheckingMethod>())
                 .Returns(false);
 
             var result = testGenerator.GenerateTestFile(CreateSimpleValidFeatureFileInput(), new GenerationSettings
@@ -191,10 +192,10 @@ namespace Reqnroll.GeneratorTests
         {
             var testGenerator = CreateTestGenerator(net35CSProjectSettings);
 
-            TestUpToDateCheckerStub.Setup(tu2d => tu2d.IsUpToDatePreliminary(It.IsAny<FeatureFileInput>(), It.IsAny<string>(), It.IsAny<UpToDateCheckingMethod>()))
+            TestUpToDateCheckerStub.IsUpToDatePreliminary(Arg.Any<FeatureFileInput>(), Arg.Any<string>(), Arg.Any<UpToDateCheckingMethod>())
                 .Returns((bool?)null);
 
-            TestUpToDateCheckerStub.Setup(tu2d => tu2d.IsUpToDate(It.IsAny<FeatureFileInput>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpToDateCheckingMethod>()))
+            TestUpToDateCheckerStub.IsUpToDate(Arg.Any<FeatureFileInput>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<UpToDateCheckingMethod>())
                 .Returns(true);
 
             var result = testGenerator.GenerateTestFile(CreateSimpleValidFeatureFileInput(), new GenerationSettings
@@ -210,10 +211,10 @@ namespace Reqnroll.GeneratorTests
         {
             var testGenerator = CreateTestGenerator(net35CSProjectSettings);
 
-            TestUpToDateCheckerStub.Setup(tu2d => tu2d.IsUpToDatePreliminary(It.IsAny<FeatureFileInput>(), It.IsAny<string>(), It.IsAny<UpToDateCheckingMethod>()))
+            TestUpToDateCheckerStub.IsUpToDatePreliminary(Arg.Any<FeatureFileInput>(), Arg.Any<string>(), Arg.Any<UpToDateCheckingMethod>())
                 .Returns((bool?)null);
 
-            TestUpToDateCheckerStub.Setup(tu2d => tu2d.IsUpToDate(It.IsAny<FeatureFileInput>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<UpToDateCheckingMethod>()))
+            TestUpToDateCheckerStub.IsUpToDate(Arg.Any<FeatureFileInput>(), Arg.Any<string>(), Arg.Any<string>(), Arg.Any<UpToDateCheckingMethod>())
                 .Returns(false);
 
             var result = testGenerator.GenerateTestFile(CreateSimpleValidFeatureFileInput(), new GenerationSettings

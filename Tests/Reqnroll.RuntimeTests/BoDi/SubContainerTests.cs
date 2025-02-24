@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.BoDi;
 using Xunit;
 
@@ -93,9 +93,9 @@ namespace Reqnroll.RuntimeTests.BoDi
         [Fact]
         public void BaseContainerMustBeAnObjectContainer()
         {
-            var otherContainer = new Mock<IObjectContainer>();
+            var otherContainer = Substitute.For<IObjectContainer>();
 
-            Action act = () => new ObjectContainer(otherContainer.Object);
+            Action act = () => new ObjectContainer(otherContainer);
             act.Should().ThrowExactly<ArgumentException>();
         }
 

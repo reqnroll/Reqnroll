@@ -1,5 +1,5 @@
 using System.IO;
-using Moq;
+using NSubstitute;
 using Reqnroll.Configuration;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
@@ -18,8 +18,8 @@ namespace Reqnroll.GeneratorTests
         protected ProjectSettings net35CSProjectSettings;
         protected ProjectSettings net35VBProjectSettings;
         protected GenerationSettings defaultSettings;
-        protected Mock<ITestHeaderWriter> TestHeaderWriterStub;
-        protected Mock<ITestUpToDateChecker> TestUpToDateCheckerStub;
+        protected ITestHeaderWriter TestHeaderWriterStub;
+        protected ITestUpToDateChecker TestUpToDateCheckerStub;
 
         public TestGeneratorTestsBase()
         {
@@ -36,8 +36,8 @@ namespace Reqnroll.GeneratorTests
             net35VBProjectSettings = new ProjectSettings { ProjectFolder = Path.GetTempPath(), ProjectPlatformSettings = net35VBSettings };
             defaultSettings = new GenerationSettings();
 
-            TestHeaderWriterStub = new Mock<ITestHeaderWriter>();
-            TestUpToDateCheckerStub = new Mock<ITestUpToDateChecker>();
+            TestHeaderWriterStub = Substitute.For<ITestHeaderWriter>();
+            TestUpToDateCheckerStub = Substitute.For<ITestUpToDateChecker>();
         }
 
         protected FeatureFileInput CreateSimpleValidFeatureFileInput(string projectRelativeFolderPath = null)
@@ -87,10 +87,10 @@ Scenario: Add two numbers
 
             var gherkinParserFactory = new ReqnrollGherkinParserFactory();
 
-            var generatorRegistryStub = new Mock<IFeatureGeneratorRegistry>();
-            generatorRegistryStub.Setup(r => r.CreateGenerator(It.IsAny<ReqnrollDocument>())).Returns(unitTestFeatureGenerator);
+            var generatorRegistryStub = Substitute.For<IFeatureGeneratorRegistry>();
+            generatorRegistryStub.CreateGenerator(Arg.Any<ReqnrollDocument>()).Returns(unitTestFeatureGenerator);
 
-            return new TestGenerator(generatorReqnrollConfiguration, projectSettings, TestHeaderWriterStub.Object, TestUpToDateCheckerStub.Object, generatorRegistryStub.Object, codeDomHelper, gherkinParserFactory);
+            return new TestGenerator(generatorReqnrollConfiguration, projectSettings, TestHeaderWriterStub, TestUpToDateCheckerStub, generatorRegistryStub, codeDomHelper, gherkinParserFactory);
         }
     }
 }

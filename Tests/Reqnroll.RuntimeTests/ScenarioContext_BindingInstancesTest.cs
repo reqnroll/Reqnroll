@@ -2,7 +2,8 @@ using System;
 using Reqnroll.BoDi;
 using Xunit;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Reqnroll.Infrastructure;
 
 namespace Reqnroll.RuntimeTests
@@ -78,10 +79,10 @@ namespace Reqnroll.RuntimeTests
 
             var scenarioContext = CreateScenarioContext(registerGlobalMocks: (globalContainer =>
             {
-                var testObjectResolverMock = new Mock<ITestObjectResolver>();
-                testObjectResolverMock.Setup(m => m.ResolveBindingInstance(typeof(SimpleClass), It.IsAny<IObjectContainer>()))
+                var testObjectResolverMock = Substitute.For<ITestObjectResolver>();
+                testObjectResolverMock.ResolveBindingInstance(typeof(SimpleClass), Arg.Any<IObjectContainer>())
                     .Returns(expectedInstance);
-                globalContainer.RegisterInstanceAs(testObjectResolverMock.Object);
+                globalContainer.RegisterInstanceAs(testObjectResolverMock);
             }));
 
             var result = scenarioContext.GetBindingInstance(typeof(SimpleClass));

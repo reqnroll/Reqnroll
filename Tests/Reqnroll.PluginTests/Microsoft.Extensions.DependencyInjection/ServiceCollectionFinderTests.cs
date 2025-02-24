@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
+using NSubstitute;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -16,7 +16,7 @@ public class ServiceCollectionFinderTests
     {
         // Arrange
         var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ValidStartWithAutoRegister));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = new ServiceCollectionFinder(testRunnerManagerMock);
 
         // Act
         var (serviceCollection, _) = sut.GetServiceCollection();
@@ -33,7 +33,7 @@ public class ServiceCollectionFinderTests
     {
         // Arrange
         var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ValidStartWithAutoRegister), typeof(Binding1));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = new ServiceCollectionFinder(testRunnerManagerMock);
 
         // Act
         var (serviceCollection, _) = sut.GetServiceCollection();
@@ -48,7 +48,7 @@ public class ServiceCollectionFinderTests
     {
         // Arrange
         var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ValidStartWithoutAutoRegister), typeof(Binding1));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = new ServiceCollectionFinder(testRunnerManagerMock);
 
         // Act
         var (serviceCollection, _) = sut.GetServiceCollection();
@@ -58,13 +58,13 @@ public class ServiceCollectionFinderTests
         serviceCollection.Should().NotContain(d => d.ImplementationType == typeof(Binding1));
     }
 
-    private static Mock<ITestRunnerManager> CreateTestRunnerManagerMock(params Type[] types)
+    private static ITestRunnerManager CreateTestRunnerManagerMock(params Type[] types)
     {
-        var assemblyMock = new Mock<Assembly>();
-        assemblyMock.Setup(m => m.GetTypes()).Returns(types.ToArray());
+        var assemblyMock = Substitute.For<Assembly>();
+        assemblyMock.GetTypes().Returns(types.ToArray());
 
-        var testRunnerManagerMock = new Mock<ITestRunnerManager>();
-        testRunnerManagerMock.Setup(m => m.BindingAssemblies).Returns([assemblyMock.Object]);
+        var testRunnerManagerMock = Substitute.For<ITestRunnerManager>();
+        testRunnerManagerMock.BindingAssemblies.Returns([assemblyMock]);
         return testRunnerManagerMock;
     }
 

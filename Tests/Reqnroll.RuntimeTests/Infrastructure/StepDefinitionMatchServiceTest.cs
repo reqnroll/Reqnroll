@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Globalization;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
@@ -13,24 +13,24 @@ namespace Reqnroll.RuntimeTests.Infrastructure
     
     public class StepDefinitionMatchServiceTest
     {
-        private Mock<IBindingRegistry> bindingRegistryMock;
-        private Mock<IStepArgumentTypeConverter> stepArgumentTypeConverterMock;
+        private IBindingRegistry bindingRegistryMock;
+        private IStepArgumentTypeConverter stepArgumentTypeConverterMock;
         private readonly CultureInfo bindingCulture = new CultureInfo("en-US", false);
         private List<IStepDefinitionBinding> whenStepDefinitions;
             
         public StepDefinitionMatchServiceTest()
         {
             whenStepDefinitions = new List<IStepDefinitionBinding>();
-            bindingRegistryMock = new Mock<IBindingRegistry>();
-            bindingRegistryMock.Setup(r => r.GetConsideredStepDefinitions(StepDefinitionType.When, It.IsAny<string>()))
+            bindingRegistryMock = Substitute.For<IBindingRegistry>();
+            bindingRegistryMock.GetConsideredStepDefinitions(StepDefinitionType.When, Arg.Any<string>())
                 .Returns(whenStepDefinitions);
 
-            stepArgumentTypeConverterMock = new Mock<IStepArgumentTypeConverter>();
+            stepArgumentTypeConverterMock = Substitute.For<IStepArgumentTypeConverter>();
         }
 
         private StepDefinitionMatchService CreateSUT()
         {
-            return new StepDefinitionMatchService(bindingRegistryMock.Object, stepArgumentTypeConverterMock.Object, new StubErrorProvider(), new MatchArgumentCalculator());
+            return new StepDefinitionMatchService(bindingRegistryMock, stepArgumentTypeConverterMock, new StubErrorProvider(), new MatchArgumentCalculator());
         }
 
         private static BindingMethod CreateBindingMethod(string name = "dummy")

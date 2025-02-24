@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Analytics;
 using Reqnroll.CommonModels;
 using Xunit;
@@ -13,16 +13,16 @@ namespace Reqnroll.GeneratorTests.Analytics
         public async Task TryTransmitEvent_AnalyticsDisabled_ShouldReturnSuccess()
         {
             // ARRANGE
-            var analyticsTransmitterSinkMock = new Mock<IAnalyticsTransmitterSink>();
-            var environmentReqnrollTelemetryCheckerMock = new Mock<IEnvironmentReqnrollTelemetryChecker>();
-            environmentReqnrollTelemetryCheckerMock.Setup(m => m.IsReqnrollTelemetryEnabled())
+            var analyticsTransmitterSinkMock = Substitute.For<IAnalyticsTransmitterSink>();
+            var environmentReqnrollTelemetryCheckerMock = Substitute.For<IEnvironmentReqnrollTelemetryChecker>();
+            environmentReqnrollTelemetryCheckerMock.IsReqnrollTelemetryEnabled()
                                                    .Returns(false);
 
-            var analyticsEventMock = new Mock<IAnalyticsEvent>();
-            var analyticsTransmitter = new AnalyticsTransmitter(analyticsTransmitterSinkMock.Object, environmentReqnrollTelemetryCheckerMock.Object);
+            var analyticsEventMock = Substitute.For<IAnalyticsEvent>();
+            var analyticsTransmitter = new AnalyticsTransmitter(analyticsTransmitterSinkMock, environmentReqnrollTelemetryCheckerMock);
 
             // ACT
-            var result = await analyticsTransmitter.TransmitEventAsync(analyticsEventMock.Object);
+            var result = await analyticsTransmitter.TransmitEventAsync(analyticsEventMock);
 
             // ASSERT
             result.Should().BeAssignableTo<ISuccess>();
@@ -32,38 +32,38 @@ namespace Reqnroll.GeneratorTests.Analytics
         public async Task TryTransmitEvent_AnalyticsDisabled_ShouldNotCallSink()
         {
             // ARRANGE
-            var analyticsTransmitterSinkMock = new Mock<IAnalyticsTransmitterSink>();
-            var environmentReqnrollTelemetryCheckerMock = new Mock<IEnvironmentReqnrollTelemetryChecker>();
-            environmentReqnrollTelemetryCheckerMock.Setup(m => m.IsReqnrollTelemetryEnabled())
+            var analyticsTransmitterSinkMock = Substitute.For<IAnalyticsTransmitterSink>();
+            var environmentReqnrollTelemetryCheckerMock = Substitute.For<IEnvironmentReqnrollTelemetryChecker>();
+            environmentReqnrollTelemetryCheckerMock.IsReqnrollTelemetryEnabled()
                                                    .Returns(false);
 
-            var analyticsEventMock = new Mock<IAnalyticsEvent>();
-            var analyticsTransmitter = new AnalyticsTransmitter(analyticsTransmitterSinkMock.Object, environmentReqnrollTelemetryCheckerMock.Object);
+            var analyticsEventMock = Substitute.For<IAnalyticsEvent>();
+            var analyticsTransmitter = new AnalyticsTransmitter(analyticsTransmitterSinkMock, environmentReqnrollTelemetryCheckerMock);
 
             // ACT
-            await analyticsTransmitter.TransmitEventAsync(analyticsEventMock.Object);
+            await analyticsTransmitter.TransmitEventAsync(analyticsEventMock);
 
             // ASSERT
-            analyticsTransmitterSinkMock.Verify(sink => sink.TransmitEventAsync(It.IsAny<IAnalyticsEvent>(), It.IsAny<string>()), Times.Never);
+            await analyticsTransmitterSinkMock.DidNotReceive().TransmitEventAsync(Arg.Any<IAnalyticsEvent>(), Arg.Any<string>());
         }
 
         [Fact]
         public async Task TransmitReqnrollProjectCompilingEvent_AnalyticsEnabled_ShouldCallSink()
         {
             // ARRANGE
-            var analyticsTransmitterSinkMock = new Mock<IAnalyticsTransmitterSink>();
-            var environmentReqnrollTelemetryCheckerMock = new Mock<IEnvironmentReqnrollTelemetryChecker>();
-            environmentReqnrollTelemetryCheckerMock.Setup(m => m.IsReqnrollTelemetryEnabled())
+            var analyticsTransmitterSinkMock = Substitute.For<IAnalyticsTransmitterSink>();
+            var environmentReqnrollTelemetryCheckerMock = Substitute.For<IEnvironmentReqnrollTelemetryChecker>();
+            environmentReqnrollTelemetryCheckerMock.IsReqnrollTelemetryEnabled()
                                                    .Returns(true);
 
-            var reqnrollProjectCompilingEvent = It.IsAny<ReqnrollProjectCompilingEvent>();
-            var analyticsTransmitter = new AnalyticsTransmitter(analyticsTransmitterSinkMock.Object, environmentReqnrollTelemetryCheckerMock.Object);
+            var reqnrollProjectCompilingEvent = Arg.Any<ReqnrollProjectCompilingEvent>();
+            var analyticsTransmitter = new AnalyticsTransmitter(analyticsTransmitterSinkMock, environmentReqnrollTelemetryCheckerMock);
 
             // ACT
             await analyticsTransmitter.TransmitReqnrollProjectCompilingEventAsync(reqnrollProjectCompilingEvent);
 
             // ASSERT
-            analyticsTransmitterSinkMock.Verify(m => m.TransmitEventAsync(It.IsAny<IAnalyticsEvent>(), It.IsAny<string>()), Times.Once);
+            await analyticsTransmitterSinkMock.Received(1).TransmitEventAsync(Arg.Any<IAnalyticsEvent>(), Arg.Any<string>());
         }
     }
 }

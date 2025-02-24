@@ -1,5 +1,5 @@
 using Reqnroll.BoDi;
-using Moq;
+using NSubstitute;
 using Reqnroll.Infrastructure;
 using Reqnroll.UnitTestProvider;
 
@@ -13,15 +13,15 @@ namespace Reqnroll.RuntimeTests
             
         }
 
-        public Mock<IUnitTestRuntimeProvider> GetUnitTestRuntimeProviderMock()
+        public IUnitTestRuntimeProvider GetUnitTestRuntimeProviderMock()
         {
-            return new Mock<IUnitTestRuntimeProvider>();
+            return Substitute.For<IUnitTestRuntimeProvider>();
         }
 
         protected override void RegisterDefaults(ObjectContainer container)
         {
             base.RegisterDefaults(container);
-            container.RegisterInstanceAs(GetUnitTestRuntimeProviderMock().Object, "nunit");
+            container.RegisterInstanceAs(GetUnitTestRuntimeProviderMock(), "nunit");
         }
     }
 }

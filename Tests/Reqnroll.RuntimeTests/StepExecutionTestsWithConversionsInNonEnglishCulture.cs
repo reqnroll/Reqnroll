@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using NSubstitute;
 
 namespace Reqnroll.RuntimeTests
 {
@@ -46,7 +47,7 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step with simple convert param: 1,23"); // German uses , as decimal separator
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.BindingWithSimpleConvertParam(1.23));
+            bindingMock.Received().BindingWithSimpleConvertParam(1.23);
         }
 
         [Fact]
@@ -59,7 +60,7 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("argument 1,23 should be able to convert to 1,23"); // German uses , as decimal separator
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.InBindingConversion("1,23", 1.23));
+            bindingMock.Received().InBindingConversion("1,23", 1.23);
         }
     }
 }

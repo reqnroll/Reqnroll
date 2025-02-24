@@ -1,5 +1,6 @@
 using System;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Xunit;
 using FluentAssertions;
 using Reqnroll.Assist;
@@ -14,11 +15,11 @@ namespace Reqnroll.RuntimeTests.AssistTests
         {
             var parentResults = new TableDifferenceResults<TestClass>(null, null, null);
 
-            var fakeBuilder = new Mock<ITableDiffExceptionBuilder<TestClass>>();
-            fakeBuilder.Setup(x => x.GetTheTableDiffExceptionMessage(parentResults))
+            var fakeBuilder = Substitute.For<ITableDiffExceptionBuilder<TestClass>>();
+            fakeBuilder.GetTheTableDiffExceptionMessage(parentResults)
                 .Returns("Expected Results");
 
-            var builder = new SafetyTableDiffExceptionBuilder<TestClass>(fakeBuilder.Object);
+            var builder = new SafetyTableDiffExceptionBuilder<TestClass>(fakeBuilder);
 
             var result = builder.GetTheTableDiffExceptionMessage(parentResults);
 
@@ -30,11 +31,11 @@ namespace Reqnroll.RuntimeTests.AssistTests
         {
             var parentResults = new TableDifferenceResults<TestClass>(null, null, null);
 
-            var fakeBuilder = new Mock<ITableDiffExceptionBuilder<TestClass>>();
-            fakeBuilder.Setup(x => x.GetTheTableDiffExceptionMessage(parentResults))
+            var fakeBuilder = Substitute.For<ITableDiffExceptionBuilder<TestClass>>();
+            fakeBuilder.GetTheTableDiffExceptionMessage(parentResults)
                 .Returns("Expected Results Times Two");
 
-            var builder = new SafetyTableDiffExceptionBuilder<TestClass>(fakeBuilder.Object);
+            var builder = new SafetyTableDiffExceptionBuilder<TestClass>(fakeBuilder);
 
             var result = builder.GetTheTableDiffExceptionMessage(parentResults);
 
@@ -46,11 +47,11 @@ namespace Reqnroll.RuntimeTests.AssistTests
         {
             var parentResults = new TableDifferenceResults<TestClass>(null, null, null);
 
-            var fakeBuilder = new Mock<ITableDiffExceptionBuilder<TestClass>>();
-            fakeBuilder.Setup(x => x.GetTheTableDiffExceptionMessage(parentResults))
+            var fakeBuilder = Substitute.For<ITableDiffExceptionBuilder<TestClass>>();
+            fakeBuilder.GetTheTableDiffExceptionMessage(parentResults)
                 .Throws(new Exception("the parent failed"));
 
-            var builder = new SafetyTableDiffExceptionBuilder<TestClass>(fakeBuilder.Object);
+            var builder = new SafetyTableDiffExceptionBuilder<TestClass>(fakeBuilder);
 
             var result = builder.GetTheTableDiffExceptionMessage(parentResults);
 

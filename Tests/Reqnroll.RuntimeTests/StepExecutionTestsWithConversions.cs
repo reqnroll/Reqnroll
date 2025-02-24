@@ -4,7 +4,7 @@ using System.Linq.Expressions;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
-using Moq;
+using NSubstitute;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 
@@ -19,12 +19,12 @@ namespace Reqnroll.RuntimeTests
 
         public static Expression<Func<IStepArgumentTypeConverter, bool>> GetCanConvertMethodFilter(object argument, Type type)
         {
-            return c => c.CanConvert(argument, It.Is<IBindingType>(bt => bt.TypeEquals(type)), It.IsAny<CultureInfo>());
+            return c => c.CanConvert(argument, Arg.Is<IBindingType>(bt => bt.TypeEquals(type)), Arg.Any<CultureInfo>());
         }
 
         public static Expression<Func<IStepArgumentTypeConverter, Task<object>>> GetConvertAsyncMethodFilter(object argument, Type type)
         {
-            return c => c.ConvertAsync(It.Is<object>(s => s.Equals(argument)), It.Is<IBindingType>(bt => bt.TypeEquals(type)), It.IsAny<CultureInfo>());
+            return c => c.ConvertAsync(Arg.Is<object>(s => s.Equals(argument)), Arg.Is<IBindingType>(bt => bt.TypeEquals(type)), Arg.Any<CultureInfo>());
                 //Arg<string>.Is.Equal(argument),
                 //Arg<IBindingType>.Matches(bt => bt.TypeEquals(type)), 
                 //Arg<CultureInfo>.Is.Anything);
@@ -74,7 +74,7 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step with simple convert param: 1.23");
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.BindingWithSimpleConvertParam(1.23));
+            bindingMock.Received().BindingWithSimpleConvertParam(1.23);
         }
 
         [Fact]
@@ -93,8 +93,8 @@ namespace Reqnroll.RuntimeTests
         public async Task ShouldCallTheOnlyThatCanConvert()
         {
             StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetCanConvertMethodFilter("argument", typeof(double))).Returns(true);
-            //StepArgumentTypeConverterStub.Setup(c => c.CanConvert(It.IsAny<object>(), It.IsAny<IBindingType>(), It.IsAny<CultureInfo>())).Returns(false);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter("argument", typeof(double))).ReturnsAsync(1.23);
+            //StepArgumentTypeConverterStub.CanConvert(Arg.Any<object>(), Arg.Any<IBindingType>(), Arg.Any<CultureInfo>()).Returns(false);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter("argument", typeof(double))).Returns(1.23);
 
             var (testRunner, bindingMock) = GetTestRunnerWithConverterStub<StepExecutionTestsBindingsForArgumentConvert>();
 
@@ -109,8 +109,8 @@ namespace Reqnroll.RuntimeTests
 
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK, ContextManagerStub.ScenarioContext.TestError?.ToString());
-            bindingMock.Verify(x => x.DoubleArg(1.23));
-            //StepArgumentTypeConverterStub.Verify(c => c.Convert("argument", It.Is<IBindingType>(bt => bt.TypeEquals(typeof(double))), It.IsAny<CultureInfo>())).; LegacyStepArgumentTypeConverterExtensions.GetConvertMethodFilter("argument", typeof(double))).Return(1.23);
+            bindingMock.Received().DoubleArg(1.23);
+            //StepArgumentTypeConverterStub.Received().Convert("argument", Arg.Is<IBindingType>(bt => bt.TypeEquals(typeof(double))), Arg.Any<CultureInfo>())).; LegacyStepArgumentTypeConverterExtensions.GetConvertMethodFilter("argument", typeof(double)));
         }
 
        
@@ -120,7 +120,7 @@ namespace Reqnroll.RuntimeTests
         {
             StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetCanConvertMethodFilter("argument", typeof(double))).Returns(true);
             StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetCanConvertMethodFilter("argument", typeof(int))).Returns(true);
-            StepArgumentTypeConverterStub.Setup(c => c.CanConvert(It.IsAny<object>(), It.IsAny<IBindingType>(), It.IsAny<CultureInfo>())).Returns(false);
+            StepArgumentTypeConverterStub.CanConvert(Arg.Any<object>(), Arg.Any<IBindingType>(), Arg.Any<CultureInfo>()).Returns(false);
 
             var (testRunner, bindingMock) = GetTestRunnerWithConverterStub<StepExecutionTestsBindingsForArgumentConvert>();
 
@@ -141,10 +141,10 @@ namespace Reqnroll.RuntimeTests
 
             // return false unless its a Double or table->table
             StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetCanConvertMethodFilter("argument", typeof(double))).Returns(true);
-            //StepArgumentTypeConverterStub.Setup(c => c.CanConvert(It.IsAny<object>(), It.IsAny<IBindingType>(), It.IsAny<CultureInfo>())).Returns(false);
+            //StepArgumentTypeConverterStub.CanConvert(Arg.Any<object>(), Arg.Any<IBindingType>(), Arg.Any<CultureInfo>()).Returns(false);
 
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(Table))).ReturnsAsync(table);
-            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter("argument", typeof(double))).ReturnsAsync(1.23);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter(table, typeof(Table))).Returns(table);
+            StepArgumentTypeConverterStub.Setup(LegacyStepArgumentTypeConverterExtensions.GetConvertAsyncMethodFilter("argument", typeof(double))).Returns(1.23);
 
 
             var (testRunner, bindingMock) = GetTestRunnerWithConverterStub<StepExecutionTestsBindingsForArgumentConvert>();
@@ -158,7 +158,7 @@ namespace Reqnroll.RuntimeTests
 
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK, ContextManagerStub.ScenarioContext.TestError?.ToString());
-            bindingMock.Verify(x => x.DoubleArgWithTable(1.23, table));
+            bindingMock.Received().DoubleArgWithTable(1.23, table);
         }
 
         [Fact]
@@ -167,7 +167,7 @@ namespace Reqnroll.RuntimeTests
             var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindingsForArgumentConvert>();
 
             // none can convert
-            StepArgumentTypeConverterStub.Setup(c => c.CanConvert(It.IsAny<object>(), It.IsAny<IBindingType>(), It.IsAny<CultureInfo>())).Returns(false);
+            StepArgumentTypeConverterStub.CanConvert(Arg.Any<object>(), Arg.Any<IBindingType>(), Arg.Any<CultureInfo>()).Returns(false);
 
            // MockRepository.ReplayAll();
 

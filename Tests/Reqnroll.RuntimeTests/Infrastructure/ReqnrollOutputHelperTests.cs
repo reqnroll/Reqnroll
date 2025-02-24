@@ -1,4 +1,4 @@
-using Moq;
+using NSubstitute;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
@@ -8,7 +8,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 {
     public class ReqnrollOutputHelperTests
     {
-        private Mock<ITestThreadExecutionEventPublisher> _testThreadExecutionEventPublisher;
+        private ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
 
         [Fact]
         public void Should_publish_output_added_event()
@@ -18,7 +18,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             outputHelper.WriteLine(message);
 
-            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEvent(It.Is<OutputAddedEvent>(m => m.Text == message)), Times.Once);
+            _testThreadExecutionEventPublisher.Received(1).PublishEvent(Arg.Is<OutputAddedEvent>(m => m.Text == message));
         }
 
         [Fact]
@@ -29,16 +29,16 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             outputHelper.AddAttachment(filePath);
 
-            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEvent(It.Is<AttachmentAddedEvent>(m => m.FilePath == filePath)), Times.Once);
+            _testThreadExecutionEventPublisher.Received(1).PublishEvent(Arg.Is<AttachmentAddedEvent>(m => m.FilePath == filePath));
         }
 
         private ReqnrollOutputHelper CreateReqnrollOutputHelper()
         {
-            _testThreadExecutionEventPublisher = new Mock<ITestThreadExecutionEventPublisher>();
-            var traceListenerMock = new Mock<ITraceListener>();
-            var attachmentHandlerMock = new Mock<IReqnrollAttachmentHandler>();
+            _testThreadExecutionEventPublisher = Substitute.For<ITestThreadExecutionEventPublisher>();
+            var traceListenerMock = Substitute.For<ITraceListener>();
+            var attachmentHandlerMock = Substitute.For<IReqnrollAttachmentHandler>();
 
-            return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher.Object, traceListenerMock.Object, attachmentHandlerMock.Object);
+            return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher, traceListenerMock, attachmentHandlerMock);
         }
     }
 }

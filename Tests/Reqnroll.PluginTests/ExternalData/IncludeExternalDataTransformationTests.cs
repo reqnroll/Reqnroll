@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Gherkin;
 using Gherkin.Ast;
-using Moq;
+using NSubstitute;
 using Reqnroll.ExternalData.ReqnrollPlugin.DataSources;
 using Reqnroll.ExternalData.ReqnrollPlugin.Transformation;
 using Reqnroll.Parser;
 using Xunit;
+
+//TODO NSub format document
 
 namespace Reqnroll.PluginTests.ExternalData
 {
@@ -15,16 +17,16 @@ namespace Reqnroll.PluginTests.ExternalData
     {
         private const string DOCUMENT_PATH = @"C:\Temp\Sample.feature";
         private ExternalDataSpecification _specification;
-        private readonly Mock<ISpecificationProvider> _specificationProviderMock;
+        private readonly ISpecificationProvider _specificationProviderMock;
 
         public IncludeExternalDataTransformationTests()
         {
-            _specificationProviderMock = new Mock<ISpecificationProvider>(MockBehavior.Default);
-            _specificationProviderMock.Setup(sp => sp.GetSpecification(It.IsAny<IEnumerable<Tag>>(), It.IsAny<string>()))
-                                      .Returns(() => _specification);
+            _specificationProviderMock = Substitute.For<ISpecificationProvider>();
+            _specificationProviderMock.GetSpecification(Arg.Any<IEnumerable<Tag>>(), Arg.Any<string>())
+                                      .Returns(_ => _specification);
         }
 
-        private IncludeExternalDataTransformation CreateSut() => new(_specificationProviderMock.Object);
+        private IncludeExternalDataTransformation CreateSut() => new(_specificationProviderMock);
 
         private Reqnroll.ExternalData.ReqnrollPlugin.DataSources.DataTable CreateProductDataTable()
         {
@@ -144,10 +146,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
             sut.TransformDocument(document);
             
-            _specificationProviderMock.Verify(sp => 
-                sp.GetSpecification(
-                    It.Is<IEnumerable<Tag>>(tags => tags.SequenceEqual(scenarioOutline.Tags.Concat(scenarioOutline.Examples.SelectMany(e => e.Tags)))), 
-                    DOCUMENT_PATH));
+            _specificationProviderMock.Received().GetSpecification(Arg.Is<IEnumerable<Tag>>(tags => tags.SequenceEqual(scenarioOutline.Tags.Concat(scenarioOutline.Examples.SelectMany(e => e.Tags)))), DOCUMENT_PATH);
         }
 
         [Fact]
@@ -161,10 +160,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
             sut.TransformDocument(document);
             
-            _specificationProviderMock.Verify(sp => 
-                sp.GetSpecification(
-                    It.Is<IEnumerable<Tag>>(tags => tags.SequenceEqual(scenario.Tags)), 
-                    DOCUMENT_PATH));
+            _specificationProviderMock.Received().GetSpecification(Arg.Is<IEnumerable<Tag>>(tags => tags.SequenceEqual(scenario.Tags)), DOCUMENT_PATH);
         }
 
         [Fact]
@@ -178,10 +174,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
             sut.TransformDocument(document);
             
-            _specificationProviderMock.Verify(sp => 
-                sp.GetSpecification(
-                    It.Is<IEnumerable<Tag>>(tags => tags.Take(document.ReqnrollFeature.Tags.Count()).SequenceEqual(document.ReqnrollFeature.Tags)), 
-                    DOCUMENT_PATH));
+            _specificationProviderMock.Received().GetSpecification( Arg.Is<IEnumerable<Tag>>(tags => tags.Take(document.ReqnrollFeature.Tags.Count()).SequenceEqual(document.ReqnrollFeature.Tags)), DOCUMENT_PATH);
         }
 
         [Fact]
@@ -195,10 +188,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
             sut.TransformDocument(document);
             
-            _specificationProviderMock.Verify(sp => 
-                sp.GetSpecification(
-                    It.Is<IEnumerable<Tag>>(tags => tags.Take(document.ReqnrollFeature.Tags.Count()).SequenceEqual(document.ReqnrollFeature.Tags)), 
-                    DOCUMENT_PATH));
+            _specificationProviderMock.Received().GetSpecification( Arg.Is<IEnumerable<Tag>>(tags => tags.Take(document.ReqnrollFeature.Tags.Count()).SequenceEqual(document.ReqnrollFeature.Tags)), DOCUMENT_PATH);
         }
 
         [Fact]

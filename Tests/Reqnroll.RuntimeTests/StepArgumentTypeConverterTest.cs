@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
@@ -15,20 +15,20 @@ namespace Reqnroll.RuntimeTests
 {
     public class StepArgumentTypeConverterTests
     {
-        private readonly Mock<ITestTracer> _testTracer;
+        private readonly ITestTracer _testTracer;
         private readonly List<IStepArgumentTransformationBinding> _stepTransformations;
         private readonly IStepArgumentTypeConverter _stepArgumentTypeConverter;
-        private readonly Mock<IAsyncBindingInvoker> methodBindingInvokerStub = new();
+        private readonly IAsyncBindingInvoker methodBindingInvokerStub = Substitute.For<IAsyncBindingInvoker>();
         private readonly CultureInfo _enUSCulture;
 
         public StepArgumentTypeConverterTests()
         {
-            Mock<IBindingRegistry> bindingRegistryStub = new Mock<IBindingRegistry>();
+            IBindingRegistry bindingRegistryStub = Substitute.For<IBindingRegistry>();
             _stepTransformations = new List<IStepArgumentTransformationBinding>();
-            bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(_stepTransformations);
-            _testTracer = new Mock<ITestTracer>();
+            bindingRegistryStub.GetStepTransformations().Returns(_stepTransformations);
+            _testTracer = Substitute.For<ITestTracer>();
 
-            _stepArgumentTypeConverter = new StepArgumentTypeConverter(_testTracer.Object, bindingRegistryStub.Object, new Mock<IContextManager>().Object, methodBindingInvokerStub.Object);
+            _stepArgumentTypeConverter = new StepArgumentTypeConverter(_testTracer, bindingRegistryStub, Substitute.For<IContextManager>(), methodBindingInvokerStub);
             _enUSCulture = new CultureInfo("en-US", false);
         }
 
@@ -132,7 +132,7 @@ namespace Reqnroll.RuntimeTests
             
             await _stepArgumentTypeConverter.ConvertAsync("1", typeof(int), _enUSCulture);
             
-            _testTracer.Verify(c => c.TraceWarning(It.IsAny<string>()), Times.Once);
+            _testTracer.Received(1).TraceWarning(Arg.Any<string>());
         }
         
         [Fact]
@@ -145,7 +145,7 @@ namespace Reqnroll.RuntimeTests
             
             await _stepArgumentTypeConverter.ConvertAsync("1", typeof(int), _enUSCulture);
             
-            _testTracer.Verify(c => c.TraceWarning(It.IsAny<string>()), Times.Never);
+            _testTracer.DidNotReceive().TraceWarning(Arg.Any<string>());
         }
 
         [TypeConverter(typeof(TessClassTypeConverter))]

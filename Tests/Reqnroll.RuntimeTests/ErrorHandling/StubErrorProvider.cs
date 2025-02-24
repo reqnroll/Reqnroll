@@ -1,5 +1,6 @@
 using System;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Reqnroll.Configuration;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Tracing;
@@ -9,18 +10,19 @@ namespace Reqnroll.RuntimeTests.ErrorHandling
 {
     internal class StubErrorProvider : ErrorProvider
     {
-        public StubErrorProvider() : 
+        public StubErrorProvider() :
             base(new StepFormatter(new ColorOutputHelper(ConfigurationLoader.GetDefault()), new ColorOutputTheme()), ConfigurationLoader.GetDefault(), GetStubUnitTestProvider())
         {
         }
 
         private static IUnitTestRuntimeProvider GetStubUnitTestProvider()
-        {
-            var mock = new Mock<IUnitTestRuntimeProvider>();
-            mock.Setup(utp => utp.TestIgnore(It.IsAny<string>())).Throws<InvalidOperationException>();
-            mock.Setup(utp => utp.TestInconclusive(It.IsAny<string>())).Throws<InvalidOperationException>();
-            mock.Setup(utp => utp.TestPending(It.IsAny<string>())).Throws<InvalidOperationException>();
-            return mock.Object;
+        { 
+            //TODO NSub check
+            var mock = Substitute.For<IUnitTestRuntimeProvider>();
+            mock.When(m => m.TestIgnore(Arg.Any<string>())).Throws<InvalidOperationException>();
+            mock.When(m => m.TestInconclusive(Arg.Any<string>())).Throws<InvalidOperationException>();
+            mock.When(m => m.TestPending(Arg.Any<string>())).Throws<InvalidOperationException>();
+            return mock;
         }
     }
 }

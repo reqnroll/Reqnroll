@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Reqnroll.BoDi;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Reqnroll.Bindings;
 using Xunit;
 
@@ -16,7 +17,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         private void RegisterFailingHook(List<IHookBinding> hooks)
         {
             var hookMock = CreateHookMock(hooks);
-            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+            methodBindingInvokerMock.InvokeBindingAsync(hookMock, contextManagerStub, null, testTracerStub, Arg.Any<DurationHolder>())
                                     .ThrowsAsync(new Exception(SimulatedErrorMessage));
         }
 
@@ -27,7 +28,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.OnTestRunStartAsync();
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeTestRun, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeTestRun, Arg.Any<IObjectContainer>());
         }
 
         [Fact]
@@ -40,7 +41,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeTestRun, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeTestRun, Arg.Any<IObjectContainer>());
         }
 
         [Fact]
@@ -50,7 +51,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.OnTestRunEndAsync();
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterTestRun, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterTestRun, Arg.Any<IObjectContainer>());
         }
 
         [Fact]
@@ -62,7 +63,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             Func<Task> act = async () => await testExecutionEngine.OnTestRunEndAsync();
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterTestRun, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterTestRun, Arg.Any<IObjectContainer>());
         }
 
         [Fact]
@@ -72,7 +73,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.OnFeatureStartAsync(featureInfo);
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeFeature, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeFeature, Arg.Any<IObjectContainer>());
         }
         
         [Fact]
@@ -84,7 +85,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             Func<Task> act = async () => await testExecutionEngine.OnFeatureStartAsync(featureInfo);
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeFeature, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeFeature, Arg.Any<IObjectContainer>());
         }
 
 
@@ -95,7 +96,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.OnFeatureEndAsync();
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterFeature, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterFeature, Arg.Any<IObjectContainer>());
         }
         
         [Fact]
@@ -107,7 +108,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             Func<Task> act = async () => await testExecutionEngine.OnFeatureEndAsync();
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterFeature, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterFeature, Arg.Any<IObjectContainer>());
         }
 
 
@@ -118,7 +119,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.OnScenarioStartAsync();
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeScenario, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeScenario, Arg.Any<IObjectContainer>());
         }
         
         [Fact]
@@ -135,7 +136,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             };
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeScenario, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeScenario, Arg.Any<IObjectContainer>());
         }
 
 
@@ -146,7 +147,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.OnScenarioEndAsync();
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterScenario, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterScenario, Arg.Any<IObjectContainer>());
         }
 
         [Fact]
@@ -158,7 +159,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             Func<Task> act = async () => await testExecutionEngine.OnScenarioEndAsync();
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterScenario, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterScenario, Arg.Any<IObjectContainer>());
         }
 
         [Fact]
@@ -169,7 +170,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeStep, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeStep, Arg.Any<IObjectContainer>());
         }
         
         [Fact]
@@ -187,7 +188,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             };
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.BeforeStep, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.BeforeStep, Arg.Any<IObjectContainer>());
         }
 
         [Fact]
@@ -198,7 +199,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
 
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterStep, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterStep, Arg.Any<IObjectContainer>());
         }
         
         [Fact]
@@ -216,7 +217,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             };
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
-            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEvent(HookType.AfterStep, It.IsAny<IObjectContainer>()));
+            _runtimePluginTestExecutionLifecycleEventEmitter.Received().RaiseExecutionLifecycleEvent(HookType.AfterStep, Arg.Any<IObjectContainer>());
         }
 
     }

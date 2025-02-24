@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Tracing;
 using Xunit;
 
@@ -26,16 +26,16 @@ namespace Reqnroll.RuntimeTests
 
             
 
-            var traceListenerMock = new Mock<ITraceListener>();
-            traceListenerMock.Setup(l => l.WriteTestOutput(It.IsAny<string>()))
-                             .Callback<string>(WriteTestOutputCallback);
+            var traceListenerMock = Substitute.For<ITraceListener>();
+            traceListenerMock.When(m => m.WriteTestOutput(Arg.Any<string>()))
+                             .Do(args => WriteTestOutputCallback(args.Arg<string>()));
 
             var testRunnerManagerMock = GetTestRunnerManagerMock();
             var testRunnerMock = GetTestRunnerMock();
-            var traceListenerQueue = new TraceListenerQueue(traceListenerMock.Object, testRunnerManagerMock.Object);
+            var traceListenerQueue = new TraceListenerQueue(traceListenerMock, testRunnerManagerMock);
 
             // ACT
-            Parallel.For(0, times, i => traceListenerQueue.EnqueueMessage(testRunnerMock.Object, $"No. {i} - Thread {Thread.CurrentThread.ManagedThreadId}", false));
+            Parallel.For(0, times, i => traceListenerQueue.EnqueueMessage(testRunnerMock, $"No. {i} - Thread {Thread.CurrentThread.ManagedThreadId}", false));
 
             // ASSERT
             countdown.Wait(TimeSpan.FromSeconds(10)).Should().BeTrue();
@@ -58,18 +58,18 @@ namespace Reqnroll.RuntimeTests
             }
         }
 
-        private Mock<ITestRunner> GetTestRunnerMock()
+        private ITestRunner GetTestRunnerMock()
         {
-            var testRunnerMock = new Mock<ITestRunner>();
-            testRunnerMock.SetupGet(r => r.TestWorkerId)
-                          .Returns(() => Thread.CurrentThread.ManagedThreadId.ToString());
+            var testRunnerMock = Substitute.For<ITestRunner>();
+            testRunnerMock.TestWorkerId
+                          .Returns(_ => Thread.CurrentThread.ManagedThreadId.ToString());
             return testRunnerMock;
         }
 
-        private Mock<ITestRunnerManager> GetTestRunnerManagerMock()
+        private ITestRunnerManager GetTestRunnerManagerMock()
         {
-            var testRunnerManagerMock = new Mock<ITestRunnerManager>();
-            testRunnerManagerMock.SetupGet(m => m.IsMultiThreaded)
+            var testRunnerManagerMock = Substitute.For<ITestRunnerManager>();
+            testRunnerManagerMock.IsMultiThreaded
                                  .Returns(true);
             return testRunnerManagerMock;
         }

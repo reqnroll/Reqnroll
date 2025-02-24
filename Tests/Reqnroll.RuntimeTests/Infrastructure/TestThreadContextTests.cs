@@ -1,6 +1,6 @@
 using Reqnroll.BoDi;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
@@ -12,7 +12,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
     {
         public ContextManager CreateContextManager(IObjectContainer testThreadContainer = null)
         {
-            return new ContextManager(new Mock<ITestTracer>().Object, testThreadContainer ?? TestThreadContainer, ContainerBuilderStub);
+            return new ContextManager(Substitute.For<ITestTracer>(), testThreadContainer ?? TestThreadContainer, ContainerBuilderStub);
         }
 
         [Fact]

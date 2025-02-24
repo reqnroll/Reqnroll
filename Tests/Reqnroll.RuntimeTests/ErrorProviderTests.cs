@@ -5,7 +5,8 @@ using Reqnroll.ErrorHandling;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.Configuration;
@@ -66,10 +67,10 @@ namespace Reqnroll.RuntimeTests
 
             var bindingMethod = CreateBindingMethod(methodName, methodBindingTypeName, methodBindingTypeFullName, methodBindingAssemblyName, parameter1Type, parameter2Type);
 
-            var exceptionStub = new Mock<Exception>();
-            exceptionStub.Setup(e => e.Message).Returns(expectedExceptionMessage);
+            var exceptionStub = Substitute.For<Exception>();
+            exceptionStub.Message.Returns(expectedExceptionMessage);
 
-            var result = errorProvider.GetCallError(bindingMethod, exceptionStub.Object);
+            var result = errorProvider.GetCallError(bindingMethod, exceptionStub);
 
             result.Should().NotBeNull();
             result.Should().BeOfType<BindingException>();
@@ -89,9 +90,9 @@ namespace Reqnroll.RuntimeTests
 
             var bindingMethod = CreateBindingMethod(methodName, methodBindingTypeName, methodBindingTypeFullName, methodBindingAssemblyName, parameter1Type);
 
-            var stepDefinitionStub = new Mock<IStepDefinitionBinding>();
-            stepDefinitionStub.Setup(sd => sd.Method).Returns(bindingMethod);
-            var result = errorProvider.GetParameterCountError(new BindingMatch(stepDefinitionStub.Object, It.IsAny<int>(), null, null), 2);
+            var stepDefinitionStub = Substitute.For<IStepDefinitionBinding>();
+            stepDefinitionStub.Method.Returns(bindingMethod);
+            var result = errorProvider.GetParameterCountError(new BindingMatch(stepDefinitionStub, Arg.Any<int>(), null, null), 2);
 
             result.Should().NotBeNull();
             result.Should().BeOfType<BindingException>();
@@ -111,21 +112,21 @@ namespace Reqnroll.RuntimeTests
 
             const string stepInstanceDescription = "'Given I multiply 10 and 5'";
 
-            var stepFormatterStub = new Mock<IStepFormatter>();
-            stepFormatterStub.Setup(f => f.GetStepDescription(It.IsAny<StepInstance>())).Returns(stepInstanceDescription);
-            var errorProvider = CreateErrorProvider(stepFormatterStub.Object);
+            var stepFormatterStub = Substitute.For<IStepFormatter>();
+            stepFormatterStub.GetStepDescription(Arg.Any<StepInstance>()).Returns(stepInstanceDescription);
+            var errorProvider = CreateErrorProvider(stepFormatterStub);
 
             var bindingMethod1 = CreateBindingMethod(methodName, methodBindingTypeName, method1BindingTypeFullName, methodBindingAssemblyName, parameter1Type);
             var bindingMethod2 = CreateBindingMethod(methodName, methodBindingTypeName, method2BindingTypeFullName, methodBindingAssemblyName, parameter1Type);
 
-            var stepDefinitionStub1 = new Mock<IStepDefinitionBinding>();
-            stepDefinitionStub1.Setup(sd => sd.Method).Returns(bindingMethod1);
-            var stepDefinitionStub2 = new Mock<IStepDefinitionBinding>();
-            stepDefinitionStub2.Setup(sd => sd.Method).Returns(bindingMethod2);
+            var stepDefinitionStub1 = Substitute.For<IStepDefinitionBinding>();
+            stepDefinitionStub1.Method.Returns(bindingMethod1);
+            var stepDefinitionStub2 = Substitute.For<IStepDefinitionBinding>();
+            stepDefinitionStub2.Method.Returns(bindingMethod2);
             var bindingMatch = new List<BindingMatch>()
             {
-                new BindingMatch(stepDefinitionStub1.Object, It.IsAny<int>(), null, null),
-                new BindingMatch(stepDefinitionStub2.Object, It.IsAny<int>(), null, null)
+                new BindingMatch(stepDefinitionStub1, Arg.Any<int>(), null, null),
+                new BindingMatch(stepDefinitionStub2, Arg.Any<int>(), null, null)
             };
 
             var result = GetMatchErrorFunc(errorProvider, bindingMatch, null);
@@ -179,12 +180,12 @@ namespace Reqnroll.RuntimeTests
             result.Should().NotBeNull();
         }
 
-        private static Mock<IUnitTestRuntimeProvider> ThrowPendingError(MissingOrPendingStepsOutcome missingOrPendingStepsOutcome, string expectedMessage, ScenarioExecutionStatus scenarioExecutionStatus = ScenarioExecutionStatus.UndefinedStep)
+        private static IUnitTestRuntimeProvider ThrowPendingError(MissingOrPendingStepsOutcome missingOrPendingStepsOutcome, string expectedMessage, ScenarioExecutionStatus scenarioExecutionStatus = ScenarioExecutionStatus.UndefinedStep)
         {
             var reqnrollConfiguration = ConfigurationLoader.GetDefault();
             reqnrollConfiguration.MissingOrPendingStepsOutcome = missingOrPendingStepsOutcome;
-            var testRuntimeProviderMock = new Mock<IUnitTestRuntimeProvider>();
-            var errorProvider = CreateErrorProvider(null, reqnrollConfiguration, testRuntimeProviderMock.Object);
+            var testRuntimeProviderMock = Substitute.For<IUnitTestRuntimeProvider>();
+            var errorProvider = CreateErrorProvider(null, reqnrollConfiguration, testRuntimeProviderMock);
 
             errorProvider.ThrowPendingError(scenarioExecutionStatus, expectedMessage);
 
@@ -199,7 +200,7 @@ namespace Reqnroll.RuntimeTests
 
             var testRuntimeProviderMock = ThrowPendingError(missingOrPendingStepsOutcome, expectedMessage);
 
-            testRuntimeProviderMock.Verify(p => p.TestPending(expectedMessage));
+            testRuntimeProviderMock.Received().TestPending(expectedMessage);
         }
 
         [Fact]
@@ -210,7 +211,7 @@ namespace Reqnroll.RuntimeTests
 
             var testRuntimeProviderMock = ThrowPendingError(missingOrPendingStepsOutcome, expectedMessage);
 
-            testRuntimeProviderMock.Verify(p => p.TestInconclusive(expectedMessage));
+            testRuntimeProviderMock.Received().TestInconclusive(expectedMessage);
         }
 
         [Fact]
@@ -221,7 +222,7 @@ namespace Reqnroll.RuntimeTests
 
             var testRuntimeProviderMock = ThrowPendingError(missingOrPendingStepsOutcome, expectedMessage);
 
-            testRuntimeProviderMock.Verify(p => p.TestIgnore(expectedMessage));
+            testRuntimeProviderMock.Received().TestIgnore(expectedMessage);
         }
 
         [Fact]

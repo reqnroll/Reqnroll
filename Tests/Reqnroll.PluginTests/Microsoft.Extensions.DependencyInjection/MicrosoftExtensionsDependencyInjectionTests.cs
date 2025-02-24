@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using Moq;
+using FluentAssertions;
+using NSubstitute;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Xunit;
@@ -12,9 +12,9 @@ public class MicrosoftExtensionsDependencyInjectionTests
     public void LoadPlugin_MicrosoftExtensionsDependencyInjection_ShouldNotBeNull()
     {
         var loader = new RuntimePluginLoader(new DotNetCorePluginAssemblyLoader());
-        var listener = new Mock<ITraceListener>();
+        var listener = Substitute.For<ITraceListener>();
 
-        var plugin = loader.LoadPlugin("Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll", listener.Object, It.IsAny<bool>());
+        var plugin = loader.LoadPlugin("Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll", listener, Arg.Any<bool>());
 
         plugin.Should().NotBeNull();
     }

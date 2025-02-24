@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Reqnroll.Configuration;
 using Xunit;
 using Reqnroll.Generator;
@@ -18,9 +18,9 @@ namespace Reqnroll.GeneratorTests
             string directoryName = Path.GetDirectoryName(new Uri(GetType().Assembly.Location).LocalPath);
             string projectFilePath = Path.Combine(directoryName, csprojPath);
 
-            var reqnrollJsonLocatorMock = new Mock<IReqnrollJsonLocator>();
+            var reqnrollJsonLocatorMock = Substitute.For<IReqnrollJsonLocator>();
             
-            var configurationLoader = new ConfigurationLoader(reqnrollJsonLocatorMock.Object);
+            var configurationLoader = new ConfigurationLoader(reqnrollJsonLocatorMock);
             var generatorConfigurationProvider = new GeneratorConfigurationProvider(configurationLoader);
             var projectLanguageReader = new ProjectLanguageReader();
             var reader = new ProjectReader(generatorConfigurationProvider, projectLanguageReader);
