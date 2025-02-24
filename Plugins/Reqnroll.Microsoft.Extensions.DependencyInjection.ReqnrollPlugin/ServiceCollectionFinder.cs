@@ -63,7 +63,6 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 
             if (serviceCollection is not IServiceCollection collection)
             {
-                // TODO test
                 throw new InvalidScenarioDependenciesException($"returned {serviceCollection.GetType()}.");
             }
             return collection;

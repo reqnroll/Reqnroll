@@ -40,9 +40,10 @@ public class ServiceCollectionFinderTests
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<InvalidScenarioDependenciesException>().WithMessage("[ScenarioDependencies] should return IServiceCollection but the method doesn't return a value.");
-    }  
-    
+        act.Should().Throw<InvalidScenarioDependenciesException>()
+           .WithMessage("[ScenarioDependencies] should return IServiceCollection but the method doesn't return a value.");
+    }
+
     [Fact]
     public void GetServiceCollection_MethodReturnsNull_ThrowsInvalidScenarioDependenciesException()
     {
@@ -54,10 +55,11 @@ public class ServiceCollectionFinderTests
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<InvalidScenarioDependenciesException>().WithMessage("[ScenarioDependencies] should return IServiceCollection but returned null.");
-    }   
-    
-    
+        act.Should().Throw<InvalidScenarioDependenciesException>()
+           .WithMessage("[ScenarioDependencies] should return IServiceCollection but returned null.");
+    }
+
+
     [Fact]
     public void GetServiceCollection_MethodReturnsInvalidType_ThrowsInvalidScenarioDependenciesException()
     {
@@ -69,9 +71,10 @@ public class ServiceCollectionFinderTests
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<InvalidScenarioDependenciesException>().WithMessage("[ScenarioDependencies] should return IServiceCollection but returned System.Collections.Generic.List`1[System.String].");
-    }   
-    
+        act.Should().Throw<InvalidScenarioDependenciesException>()
+           .WithMessage("[ScenarioDependencies] should return IServiceCollection but returned System.Collections.Generic.List`1[System.String].");
+    }
+
     [Fact]
     public void GetServiceCollection_NotFound_ThrowsMissingScenarioDependenciesException()
     {
@@ -83,9 +86,10 @@ public class ServiceCollectionFinderTests
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<MissingScenarioDependenciesException>().WithMessage("No method marked with [ScenarioDependencies] attribute found. It should be a static method. Scanned assemblies: Reqnroll.PluginTests.");
+        act.Should().Throw<MissingScenarioDependenciesException>()
+           .WithMessage("No method marked with [ScenarioDependencies] attribute found. It should be a (public or private) static method. Scanned assemblies: Reqnroll.PluginTests.");
     }
-    
+
     [Fact]
     public void GetServiceCollection_AutoRegisterBindingsTrue_RegisterBindingsAsScoped()
     {
@@ -165,8 +169,8 @@ public class ServiceCollectionFinderTests
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<ITestInterface>(new TestInterface("ValidStartWithAutoRegister"));
         }
-    }   
-    
+    }
+
     private class InvalidStartNull
     {
         [ScenarioDependencies]
@@ -174,8 +178,8 @@ public class ServiceCollectionFinderTests
         {
             return null;
         }
-    }  
-    
+    }
+
     private class InvalidStartWrongType
     {
         [ScenarioDependencies]
