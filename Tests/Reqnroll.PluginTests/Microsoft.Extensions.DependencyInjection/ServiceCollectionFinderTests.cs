@@ -70,6 +70,20 @@ public class ServiceCollectionFinderTests
 
         // Assert
         act.Should().Throw<InvalidScenarioDependenciesException>().WithMessage("[ScenarioDependencies] should return IServiceCollection but returned System.Collections.Generic.List`1[System.String].");
+    }   
+    
+    [Fact]
+    public void GetServiceCollection_NotFound_ThrowsMissingScenarioDependenciesException()
+    {
+        // Arrange
+        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ServiceCollectionFinderTests));
+        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+
+        // Act
+        var act = () => sut.GetServiceCollection();
+
+        // Assert
+        act.Should().Throw<MissingScenarioDependenciesException>().WithMessage("No method marked with [ScenarioDependencies] attribute found. It should be a static method. Scanned assemblies: Reqnroll.PluginTests.");
     }
     
     [Fact]
@@ -106,6 +120,11 @@ public class ServiceCollectionFinderTests
     {
         var assemblyMock = new Mock<Assembly>();
         assemblyMock.Setup(m => m.GetTypes()).Returns(types.ToArray());
+        if (types.Length > 0)
+        {
+            var assembly = types[0].Assembly;
+            assemblyMock.Setup(m => m.GetName()).Returns(assembly.GetName());
+        }
 
         var testRunnerManagerMock = new Mock<ITestRunnerManager>();
         testRunnerManagerMock.Setup(m => m.BindingAssemblies).Returns([assemblyMock.Object]);

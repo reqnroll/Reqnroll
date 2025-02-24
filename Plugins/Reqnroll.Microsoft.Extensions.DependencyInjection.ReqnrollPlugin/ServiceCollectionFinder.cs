@@ -44,9 +44,8 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                     }
                 }
             }
-            // TODO which assemblies are scanned?
-            // TODO say something about static of fix static
-            throw new MissingScenarioDependenciesException();
+            var assemblyNames = assemblies.Select(a => a.GetName().Name).ToList();
+            throw new MissingScenarioDependenciesException(assemblyNames);
         }
 
         private static IServiceCollection GetServiceCollection(MethodInfo methodInfo)
