@@ -14,7 +14,8 @@ body:
     options: 
       - MSTest 
       - NUnit
-      - xUnit
+      - xUnit 2
+      - xUnit 3
   validations:
     required: true
 - type: input
