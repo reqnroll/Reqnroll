@@ -80,6 +80,18 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
             act.Should().ThrowExactly<MissingMethodException>().WithMessage($"Unable to find a suitable constructor to create instance of {nameof(ProductCreatedMessage)}");
         }
+
+        [Fact]
+        public void Create_instance_without_default_constructor_does_not_throw_if_all_projected_properties_have_matching_constructor_parameters()
+        {
+            var table = new Table("MessageCreatedAt", "ProductCode", "ProductName");
+            table.AddRow("2025-02-22T13:29:14+01:00", "X0010001B", "Teddy Bear");
+            
+            Action act = () => table.CreateInstance<ProductCreatedMessage>();
+
+            // This is odd behaviour! The constructor requires more parameters than the number of matching members. Missing constructor parameters get the default value for their Type. 
+            act.Should().NotThrow<MissingMethodException>();
+        }
         
         [Fact]
         public void When_one_row_exists_with_two_headers_and_the_first_row_value_is_not_a_property_then_treat_as_horizontal_table()
