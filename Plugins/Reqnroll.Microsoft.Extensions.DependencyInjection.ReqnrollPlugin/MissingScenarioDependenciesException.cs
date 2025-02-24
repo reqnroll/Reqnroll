@@ -19,7 +19,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 
         private static string CreateMessage(IList<string> assemblyNames)
         {
-            var message = "No method marked with [ScenarioDependencies] attribute found. It should be a (public or private) static method.";
+            var message = "No method marked with [ScenarioDependencies] attribute found. It should be a (public or non-public) static method.";
             if (assemblyNames.Count > 0)
             {
                 message += $" Scanned assemblies: {string.Join(", ", assemblyNames)}.";

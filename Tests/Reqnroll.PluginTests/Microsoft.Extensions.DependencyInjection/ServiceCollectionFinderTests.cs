@@ -87,7 +87,7 @@ public class ServiceCollectionFinderTests
 
         // Assert
         act.Should().Throw<MissingScenarioDependenciesException>()
-           .WithMessage("No method marked with [ScenarioDependencies] attribute found. It should be a (public or private) static method. Scanned assemblies: Reqnroll.PluginTests.");
+           .WithMessage("No method marked with [ScenarioDependencies] attribute found. It should be a (public or non-public) static method. Scanned assemblies: Reqnroll.PluginTests.");
     }
 
     [Fact]
