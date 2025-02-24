@@ -4,8 +4,9 @@
 
 ## Bug fixes:
 * Fix: Microsoft.Extensions.DependencyInjection.ReqnrollPlugin, the plugin was only searching for [ScenarioDependencies] in assemblies with step definitions (#477)
+* Fix: xUnit Conservative Mode is not supported together with xUnit v2 (#473)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @obligaron
+*Contributors of this release (in alphabetical order):* @304NotModified, @DerAlbertCom, @obligaron
 
 # v2.3.0 - 2025-02-11
 
