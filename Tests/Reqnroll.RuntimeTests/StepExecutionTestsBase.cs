@@ -149,7 +149,8 @@ namespace Reqnroll.RuntimeTests
         protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>() where TBinding : class 
         {
             return GetTestRunnerWithConverterStub<TBinding>(null);
-        }
+        } 
+      
 
         protected (TestRunner, Mock<TBinding>) GetTestRunnerWithConverterStub<TBinding>() where TBinding : class
         {
@@ -164,6 +165,49 @@ namespace Reqnroll.RuntimeTests
             testRunner.ScenarioContext.SetBindingInstance(typeof(TBinding), bindingInstance.Object);
             return (testRunner, bindingInstance);
         }
+
+        #region NSubstitute
+        protected TestRunner GetTestRunnerFor2(Action<IObjectContainer> registerMocks, params Type[] bindingTypes)
+        {
+            return TestObjectFactories.CreateTestRunner(
+                container =>
+                {
+                    container.RegisterTypeAs<DummyTestTracer, ITestTracer>();
+                    container.RegisterInstanceAs(ContextManagerStub);
+
+                    var builder = (RuntimeBindingRegistryBuilder)container.Resolve<IRuntimeBindingRegistryBuilder>();
+                    foreach (var bindingType in bindingTypes)
+                        builder.BuildBindingsFromType(bindingType);
+                    builder.BuildingCompleted();
+
+                    registerMocks?.Invoke(container);
+                });
+        }
+
+        protected (TestRunner, TBinding) GetTestRunnerFor2<TBinding>() where TBinding : class 
+        {
+            return GetTestRunnerWithConverterStub2<TBinding>(null);
+        } 
+      
+
+        protected (TestRunner, TBinding) GetTestRunnerWithConverterStub2<TBinding>() where TBinding : class
+        {
+            return GetTestRunnerWithConverterStub2<TBinding>(c => c.RegisterInstanceAs(StepArgumentTypeConverterStub.Object));
+        }
+
+        private (TestRunner, TBinding) GetTestRunnerWithConverterStub2<TBinding>(Action<IObjectContainer> registerMocks) where TBinding : class
+        {
+            TestRunner testRunner = GetTestRunnerFor2(registerMocks, typeof(TBinding));
+
+            var bindingInstance = NSubstitute.Substitute.For<TBinding>();
+            testRunner.ScenarioContext.SetBindingInstance(typeof(TBinding), bindingInstance);
+            return (testRunner, bindingInstance);
+        }
+
+
+
+        #endregion
+
 
         protected ScenarioExecutionStatus GetLastTestStatus()
         {

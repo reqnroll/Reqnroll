@@ -2,7 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Moq;
+using NSubstitute;
 using Xunit;
 
 
@@ -107,7 +107,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task ShouldCallBindingWithoutParameter()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
             
             //bindingInstance.Expect(b => b.BindingWithoutParam());
 
@@ -115,26 +115,26 @@ namespace Reqnroll.RuntimeTests
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
 
-            bindingMock.Verify(x => x.BindingWithoutParam(), Times.AtLeastOnce);
+            bindingMock.Received().BindingWithoutParam();
         }
 
         [Fact]
         public async Task ShouldCallBindingSingleParameter()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             await testRunner.GivenAsync("sample step with single param");
             
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
             
-            bindingMock.Verify(x => x.BindingWithSingleParam("single"), Times.AtLeastOnce);
+            bindingMock.Received().BindingWithSingleParam("single");
                
         }
 
         [Fact]
         public async Task ShouldCallBindingMultipleParameter()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             //bindingInstance.Expect(b => b.BindingWithMultipleParam("multi", "ple"));
 
@@ -142,13 +142,13 @@ namespace Reqnroll.RuntimeTests
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
             
-            bindingMock.Verify(x => x.BindingWithMultipleParam("multi", "ple"), Times.AtLeastOnce);
+            bindingMock.Received().BindingWithMultipleParam("multi", "ple");
         }
 
         [Fact]
         public async Task ShouldCallBindingWithTableParameter()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             Table table = new Table("h1");
             //bindingInstance.Expect(b => b.BindingWithTableParam(table));
@@ -158,13 +158,13 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step with table param", null, table);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.BindingWithTableParam(table));
+            bindingMock.Received().BindingWithTableParam(table);
         }
 
         [Fact]
         public async Task ShouldCallBindingWithMlStringParam()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             const string mlString = "ml-string";
             //bindingInstance.Expect(b => b.BindingWithMlStringParam(mlString));
@@ -174,13 +174,13 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step with multi-line string param", mlString, null);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.BindingWithMlStringParam(mlString));
+            bindingMock.Received().BindingWithMlStringParam(mlString);
         }
 
         [Fact]
         public async Task ShouldCallBindingWithTableAndMlStringParam()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             Table table = new Table("h1");
             const string mlString = "ml-string";
@@ -191,13 +191,13 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step with table and multi-line string param", mlString, table);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.BindingWithTableAndMlStringParam(mlString, table));
+            bindingMock.Received().BindingWithTableAndMlStringParam(mlString, table);
         }
 
         [Fact]
         public async Task ShouldCallBindingWithMixedParams()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             Table table = new Table("h1");
             const string mlString = "ml-string";
@@ -208,13 +208,13 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("sample step with mixed params", mlString, table);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.BindingWithMixedParams("mixed", mlString, table));
+            bindingMock.Received().BindingWithMixedParams("mixed", mlString, table);
         }
 
         [Fact]
         public async Task ShouldRaiseAmbiguousIfMultipleMatch()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsAmbiguousBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsAmbiguousBindings>();
 
             //MockRepository.ReplayAll();
 
@@ -226,7 +226,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task ShouldDistinguishByTableParam_CallWithoutTable()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             //bindingInstance.Expect(b => b.DistinguishByTableParam1());
 
@@ -235,13 +235,13 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("Distinguish by table param");
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.DistinguishByTableParam1());
+            bindingMock.Received().DistinguishByTableParam1();
         }
 
         [Fact]
         public async Task ShouldDistinguishByTableParam_CallWithTable()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             Table table = new Table("h1");
             //bindingInstance.Expect(b => b.DistinguishByTableParam2(table));
@@ -251,13 +251,13 @@ namespace Reqnroll.RuntimeTests
             await testRunner.GivenAsync("Distinguish by table param", null, table);
 
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.OK);
-            bindingMock.Verify(x => x.DistinguishByTableParam2(table));
+            bindingMock.Received().DistinguishByTableParam2(table);
         }
 
         [Fact]
         public async Task ShouldRaiseBindingErrorIfWrongParamNumber()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             //MockRepository.ReplayAll();
 
@@ -269,11 +269,11 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task ShouldCallBindingThatReturnsTask()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             bool taskFinished = false;
 
-            bindingMock.Setup(m => m.ReturnsATask()).Returns(Task.Factory.StartNew(() =>
+            bindingMock.ReturnsATask().Returns(Task.Factory.StartNew(() =>
             {
                 Thread.Sleep(800);
                 taskFinished = true;
@@ -295,10 +295,10 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task ShouldCallBindingThatReturnsTaskAndReportError()
         {
-            var (testRunner, bindingMock) = GetTestRunnerFor<StepExecutionTestsBindings>();
+            var (testRunner, bindingMock) = GetTestRunnerFor2<StepExecutionTestsBindings>();
 
             bool taskFinished = false;
-            bindingMock.Setup(m => m.ReturnsATask()).Returns(Task.Factory.StartNew(() =>
+            bindingMock.ReturnsATask().Returns(Task.Factory.StartNew(() =>
                     {
                         Thread.Sleep(800);
                         taskFinished = true;
