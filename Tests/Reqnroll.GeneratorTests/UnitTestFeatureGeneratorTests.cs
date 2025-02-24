@@ -94,7 +94,7 @@ namespace Reqnroll.GeneratorTests
         public void Should_not_pass_decorated_feature_tag_as_test_class_category()
         {
             var decoratorMock = DecoratorRegistryTests.CreateTestClassTagDecoratorMock("decorated");
-            Container.RegisterInstanceAs(decoratorMock.Object, "decorated");
+            Container.RegisterInstanceAs(decoratorMock, "decorated");
 
             var generator = CreateUnitTestFeatureGenerator();
 
@@ -109,7 +109,7 @@ namespace Reqnroll.GeneratorTests
         public void Should_not_pass_decorated_scenario_tag_as_test_method_category()
         {
             var decoratorMock = DecoratorRegistryTests.CreateTestMethodTagDecoratorMock("decorated");
-            Container.RegisterInstanceAs(decoratorMock.Object, "decorated");
+            Container.RegisterInstanceAs(decoratorMock, "decorated");
 
             var generator = CreateUnitTestFeatureGenerator();
 

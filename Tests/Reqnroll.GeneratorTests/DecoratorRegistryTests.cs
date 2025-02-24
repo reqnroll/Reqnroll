@@ -1,7 +1,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using Reqnroll.BoDi;
-using Moq;
+using NSubstitute;
 using Xunit;
 using Reqnroll.Generator;
 using Reqnroll.Generator.UnitTestConverter;
@@ -20,45 +20,45 @@ namespace Reqnroll.GeneratorTests
             container = new ObjectContainer();
         }
 
-        internal static Mock<ITestClassTagDecorator> CreateTestClassTagDecoratorMock(string expectedTag = null)
+        internal static ITestClassTagDecorator CreateTestClassTagDecoratorMock(string expectedTag = null)
         {
-            var testClassDecoratorMock = new Mock<ITestClassTagDecorator>();
-            testClassDecoratorMock.Setup(d => d.ApplyOtherDecoratorsForProcessedTags).Returns(false);
-            testClassDecoratorMock.Setup(d => d.RemoveProcessedTags).Returns(true);
-            testClassDecoratorMock.Setup(d => d.Priority).Returns(PriorityValues.Normal);
+            var testClassDecoratorMock = Substitute.For<ITestClassTagDecorator>();
+            testClassDecoratorMock.ApplyOtherDecoratorsForProcessedTags.Returns(false);
+            testClassDecoratorMock.RemoveProcessedTags.Returns(true);
+            testClassDecoratorMock.Priority.Returns(PriorityValues.Normal);
             if (expectedTag == null)
-                testClassDecoratorMock.Setup(d => d.CanDecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>())).Returns(true);
+                testClassDecoratorMock.CanDecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>()).Returns(true);
             else
-                testClassDecoratorMock.Setup(d => d.CanDecorateFrom(expectedTag, It.IsAny<TestClassGenerationContext>())).Returns(true);
+                testClassDecoratorMock.CanDecorateFrom(expectedTag, Arg.Any<TestClassGenerationContext>()).Returns(true);
             return testClassDecoratorMock;
         }
 
-        internal static Mock<ITestClassDecorator> CreateTestClassDecoratorMock()
+        internal static ITestClassDecorator CreateTestClassDecoratorMock()
         {
-            var testClassDecoratorMock = new Mock<ITestClassDecorator>();
-            testClassDecoratorMock.Setup(d => d.Priority).Returns(PriorityValues.Normal);
-            testClassDecoratorMock.Setup(d => d.CanDecorateFrom(It.IsAny<TestClassGenerationContext>())).Returns(true);
+            var testClassDecoratorMock = Substitute.For<ITestClassDecorator>();
+            testClassDecoratorMock.Priority.Returns(PriorityValues.Normal);
+            testClassDecoratorMock.CanDecorateFrom(Arg.Any<TestClassGenerationContext>()).Returns(true);
             return testClassDecoratorMock;
         }
 
-        internal static Mock<ITestMethodDecorator> CreateTestMethodDecoratorMock()
+        internal static ITestMethodDecorator CreateTestMethodDecoratorMock()
         {
-            var testClassDecoratorMock = new Mock<ITestMethodDecorator>();
-            testClassDecoratorMock.Setup(d => d.Priority).Returns(PriorityValues.Normal);
-            testClassDecoratorMock.Setup(d => d.CanDecorateFrom(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>())).Returns(true);
+            var testClassDecoratorMock = Substitute.For<ITestMethodDecorator>();
+            testClassDecoratorMock.Priority.Returns(PriorityValues.Normal);
+            testClassDecoratorMock.CanDecorateFrom(Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>()).Returns(true);
             return testClassDecoratorMock;
         }
 
-        internal static Mock<ITestMethodTagDecorator> CreateTestMethodTagDecoratorMock(string expectedTag = null)
+        internal static ITestMethodTagDecorator CreateTestMethodTagDecoratorMock(string expectedTag = null)
         {
-            var testClassDecoratorMock = new Mock<ITestMethodTagDecorator>();
-            testClassDecoratorMock.Setup(d => d.ApplyOtherDecoratorsForProcessedTags).Returns(false);
-            testClassDecoratorMock.Setup(d => d.RemoveProcessedTags).Returns(true);
-            testClassDecoratorMock.Setup(d => d.Priority).Returns(PriorityValues.Normal);
+            var testClassDecoratorMock = Substitute.For<ITestMethodTagDecorator>();
+            testClassDecoratorMock.ApplyOtherDecoratorsForProcessedTags.Returns(false);
+            testClassDecoratorMock.RemoveProcessedTags.Returns(true);
+            testClassDecoratorMock.Priority.Returns(PriorityValues.Normal);
             if (expectedTag == null)
-                testClassDecoratorMock.Setup(d => d.CanDecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>())).Returns(true);
+                testClassDecoratorMock.CanDecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>()).Returns(true);
             else
-                testClassDecoratorMock.Setup(d => d.CanDecorateFrom(expectedTag, It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>())).Returns(true);
+                testClassDecoratorMock.CanDecorateFrom(expectedTag, Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>()).Returns(true);
             return testClassDecoratorMock;
         }
 
@@ -76,48 +76,48 @@ namespace Reqnroll.GeneratorTests
         public void Should_decorate_test_class()
         {
             var testClassDecoratorMock = CreateTestClassDecoratorMock();
-            container.RegisterInstanceAs(testClassDecoratorMock.Object, "foo");
+            container.RegisterInstanceAs(testClassDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestClass(CreateGenerationContext("dummy"), out unprocessedTags);
 
-            testClassDecoratorMock.Verify(d => d.DecorateFrom(It.IsAny<TestClassGenerationContext>()));
+            testClassDecoratorMock.Received().DecorateFrom(Arg.Any<TestClassGenerationContext>());
         }
 
         [Fact]
         public void Should_decorate_test_class_when_not_applicable()
         {
             var testClassDecoratorMock = CreateTestClassDecoratorMock();
-            testClassDecoratorMock.Setup(d => d.CanDecorateFrom(It.IsAny<TestClassGenerationContext>())).Returns(false);
-            container.RegisterInstanceAs(testClassDecoratorMock.Object, "foo");
+            testClassDecoratorMock.CanDecorateFrom(Arg.Any<TestClassGenerationContext>()).Returns(false);
+            container.RegisterInstanceAs(testClassDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestClass(CreateGenerationContext("dummy"), out unprocessedTags);
 
-            testClassDecoratorMock.Verify(d => d.DecorateFrom(It.IsAny<TestClassGenerationContext>()), Times.Never());
+            testClassDecoratorMock.DidNotReceive().DecorateFrom(Arg.Any<TestClassGenerationContext>());
         }
 
         [Fact]
         public void Should_decorate_test_class_based_on_tag()
         {
             var testClassDecoratorMock = CreateTestClassTagDecoratorMock();
-            container.RegisterInstanceAs(testClassDecoratorMock.Object, "foo");
+            container.RegisterInstanceAs(testClassDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestClass(CreateGenerationContext("foo"), out unprocessedTags);
 
-            testClassDecoratorMock.Verify(d => d.DecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>()));
+            testClassDecoratorMock.Received().DecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>());
         }
 
         [Fact]
         public void Should_remove_processed_tag_from_test_class_category_list()
         {
             var testClassDecoratorMock = CreateTestClassTagDecoratorMock();
-            testClassDecoratorMock.Setup(d => d.RemoveProcessedTags).Returns(true);
-            container.RegisterInstanceAs(testClassDecoratorMock.Object, "foo");
+            testClassDecoratorMock.RemoveProcessedTags.Returns(true);
+            container.RegisterInstanceAs(testClassDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> classCats = null;
@@ -131,8 +131,8 @@ namespace Reqnroll.GeneratorTests
         public void Should_keep_processed_tag_from_test_class_category_list()
         {
             var testClassDecoratorMock = CreateTestClassTagDecoratorMock();
-            testClassDecoratorMock.Setup(d => d.RemoveProcessedTags).Returns(false);
-            container.RegisterInstanceAs(testClassDecoratorMock.Object, "foo");
+            testClassDecoratorMock.RemoveProcessedTags.Returns(false);
+            container.RegisterInstanceAs(testClassDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> classCats = null;
@@ -146,20 +146,20 @@ namespace Reqnroll.GeneratorTests
         public void Should_allow_multiple_decorators()
         {
             var testClassDecoratorMock1 = CreateTestClassTagDecoratorMock();
-            testClassDecoratorMock1.Setup(d => d.ApplyOtherDecoratorsForProcessedTags).Returns(true);
-            container.RegisterInstanceAs(testClassDecoratorMock1.Object, "foo1");
+            testClassDecoratorMock1.ApplyOtherDecoratorsForProcessedTags.Returns(true);
+            container.RegisterInstanceAs(testClassDecoratorMock1, "foo1");
 
             var testClassDecoratorMock2 = CreateTestClassTagDecoratorMock();
-            testClassDecoratorMock2.Setup(d => d.ApplyOtherDecoratorsForProcessedTags).Returns(true);
-            container.RegisterInstanceAs(testClassDecoratorMock2.Object, "foo2");
+            testClassDecoratorMock2.ApplyOtherDecoratorsForProcessedTags.Returns(true);
+            container.RegisterInstanceAs(testClassDecoratorMock2, "foo2");
 
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestClass(CreateGenerationContext("foo"), out unprocessedTags);
 
-            testClassDecoratorMock1.Verify(d => d.DecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>()));
-            testClassDecoratorMock2.Verify(d => d.DecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>()));
+            testClassDecoratorMock1.Received().DecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>());
+            testClassDecoratorMock2.Received().DecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>());
         }
 
         [Fact]
@@ -168,19 +168,21 @@ namespace Reqnroll.GeneratorTests
             List<string> executionOrder = new List<string>();
 
             var testClassDecoratorMock1 = CreateTestClassTagDecoratorMock();
-            testClassDecoratorMock1.Setup(d => d.ApplyOtherDecoratorsForProcessedTags).Returns(true);
-            testClassDecoratorMock1.Setup(d => d.DecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>()))
-                .Callback((string t, TestClassGenerationContext c) => executionOrder.Add("foo1"));
+            testClassDecoratorMock1.ApplyOtherDecoratorsForProcessedTags.Returns(true);
+            testClassDecoratorMock1
+                .When(m => m.DecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>()))
+                .Do((_) => executionOrder.Add("foo1"));
 
-            container.RegisterInstanceAs(testClassDecoratorMock1.Object, "foo1");
+            container.RegisterInstanceAs(testClassDecoratorMock1, "foo1");
 
             var testClassDecoratorMock2 = CreateTestClassTagDecoratorMock();
-            testClassDecoratorMock2.Setup(d => d.ApplyOtherDecoratorsForProcessedTags).Returns(true);
-            testClassDecoratorMock2.Setup(d => d.Priority).Returns(PriorityValues.High);
-            testClassDecoratorMock2.Setup(d => d.DecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>()))
-                .Callback((string t, TestClassGenerationContext c) => executionOrder.Add("foo2"));
+            testClassDecoratorMock2.ApplyOtherDecoratorsForProcessedTags.Returns(true);
+            testClassDecoratorMock2.Priority.Returns(PriorityValues.High);
+            testClassDecoratorMock2
+                .When(m => m.DecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>()))
+                .Do((_) =>executionOrder.Add("foo2"));
             
-            container.RegisterInstanceAs(testClassDecoratorMock2.Object, "foo2");
+            container.RegisterInstanceAs(testClassDecoratorMock2, "foo2");
 
             var registry = CreateDecoratorRegistry();
 
@@ -194,54 +196,54 @@ namespace Reqnroll.GeneratorTests
         public void Should_not_decorate_test_method_for_feature_tag()
         {
             var testMethodDecoratorMock = CreateTestMethodTagDecoratorMock();
-            container.RegisterInstanceAs(testMethodDecoratorMock.Object, "foo");
+            container.RegisterInstanceAs(testMethodDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestMethod(CreateGenerationContext("foo"), null, new Tag[] { }, out unprocessedTags);
 
-            testMethodDecoratorMock.Verify(d => d.DecorateFrom("foo", It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>()), Times.Never());
+            testMethodDecoratorMock.DidNotReceive().DecorateFrom("foo", Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>());
         }
 
         [Fact]
         public void Should_decorate_test_method_for_scenario_tag()
         {
             var testMethodDecoratorMock = CreateTestMethodTagDecoratorMock();
-            container.RegisterInstanceAs(testMethodDecoratorMock.Object, "foo");
+            container.RegisterInstanceAs(testMethodDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestMethod(CreateGenerationContext("dummy"), null, ParserHelper.GetTags("foo"), out unprocessedTags);
 
-            testMethodDecoratorMock.Verify(d => d.DecorateFrom(It.IsAny<string>(), It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>()));
+            testMethodDecoratorMock.Received().DecorateFrom(Arg.Any<string>(), Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>());
         }
 
         [Fact]
         public void Should_decorate_test_method()
         {
             var testMethodDecoratorMock = CreateTestMethodDecoratorMock();
-            container.RegisterInstanceAs(testMethodDecoratorMock.Object, "foo");
+            container.RegisterInstanceAs(testMethodDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestMethod(CreateGenerationContext("dummy"), null, ParserHelper.GetTags("dummy"), out unprocessedTags);
 
-            testMethodDecoratorMock.Verify(d => d.DecorateFrom(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>()));
+            testMethodDecoratorMock.Received().DecorateFrom(Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>());
         }
 
         [Fact]
         public void Should_not_decorate_test_method_when_not_applicable()
         {
             var testMethodDecoratorMock = CreateTestMethodDecoratorMock();
-            testMethodDecoratorMock.Setup(d => d.CanDecorateFrom(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>()))
+            testMethodDecoratorMock.CanDecorateFrom(Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>())
                 .Returns(false);
-            container.RegisterInstanceAs(testMethodDecoratorMock.Object, "foo");
+            container.RegisterInstanceAs(testMethodDecoratorMock, "foo");
             var registry = CreateDecoratorRegistry();
 
             List<string> unprocessedTags;
             registry.DecorateTestMethod(CreateGenerationContext("dummy"), null, ParserHelper.GetTags("dummy"), out unprocessedTags);
 
-            testMethodDecoratorMock.Verify(d => d.DecorateFrom(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>()), Times.Never());
+            testMethodDecoratorMock.DidNotReceive().DecorateFrom(Arg.Any<TestClassGenerationContext>(), Arg.Any<CodeMemberMethod>());
         }
     }
 
