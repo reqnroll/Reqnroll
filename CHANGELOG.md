@@ -5,7 +5,7 @@
 ## Bug fixes:
 * Fix: Microsoft.Extensions.DependencyInjection.ReqnrollPlugin, the plugin was only searching for [ScenarioDependencies] in assemblies with step definitions (#477)
 
-*Contributors of this release (in alphabetical order):* @304NotModified
+*Contributors of this release (in alphabetical order):* @304NotModified, @obligaron
 
 # v2.3.0 - 2025-02-11
 

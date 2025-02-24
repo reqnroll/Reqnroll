@@ -32,21 +32,16 @@
    
   <ItemGroup>
     <ProjectReference Include="..\TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
-    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MSBuild.AdditionalTasks" Version="*" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Moq" Version="4.20.70" />
-    <PackageReference Include="xunit" Version="2.9.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="MSTest" Version="3.8.2" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
@@ -61,14 +56,15 @@
 
   <Target Name="PreBuild">
     <MSBuild Projects="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
-    <MSBuild Projects="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
+    <MSBuild Projects="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
   </Target>
 
   <ItemGroup>
-    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll" />
+    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
   <Import Project="..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" /> <!-- has to be before the PropertyGroup change-->
+  <Import Project="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\build\Reqnroll.MsTest.targets" /> <!-- has to be before the PropertyGroup change-->
   <PropertyGroup>
     <BuildDependsOn>
       PreBuild;
