@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Improved message when [ScenarioDependencies] can't be found or has an incorrect return type (#494)
 
 ## Bug fixes:
 * Fix: Microsoft.Extensions.DependencyInjection.ReqnrollPlugin, the plugin was only searching for [ScenarioDependencies] in assemblies with step definitions (#477)
