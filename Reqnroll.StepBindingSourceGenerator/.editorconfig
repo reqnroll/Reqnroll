@@ -1,0 +1,10 @@
+[*]
+insert_final_newline = true
+indent_size = 4
+indent_style = space
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped
+
+[*.{csproj,targets,props}]
+indent_size = 2
