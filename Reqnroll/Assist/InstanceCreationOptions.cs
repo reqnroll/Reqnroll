@@ -1,8 +1,10 @@
 namespace Reqnroll.Assist
 {
-    public  class InstanceCreationOptions
+    public class InstanceCreationOptions
     {
         public bool VerifyAllColumnsBound { get; set; }
-        public bool UseStrictTableToConstructorBinding { get; set; }
+        public bool RequireTableToProvideAllConstructorParameters { get; set; }
+
+        internal bool AssumeInstanceIsAlreadyCreated { get; set; }
     }
 }

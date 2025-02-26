@@ -7,7 +7,6 @@ using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 
-
 namespace Reqnroll.RuntimeTests.AssistTests
 {
 
@@ -56,7 +55,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
             var options = new InstanceCreationOptions
             {
-                UseStrictTableToConstructorBinding = true
+                RequireTableToProvideAllConstructorParameters = true
             };
             
             var expectedMessage = new ProductCreatedMessage(new DateTimeOffset(2025, 2, 22, 13, 29, 14, TimeSpan.FromHours(1)), "X0010001B", "Teddy Bear", new DateTime(2025, 3,1));
@@ -73,12 +72,12 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
             var options = new InstanceCreationOptions
             {
-                UseStrictTableToConstructorBinding = true
+                RequireTableToProvideAllConstructorParameters = true
             };
             
             Action act = () => table.CreateInstance<ProductCreatedMessage>(options);
 
-            act.Should().ThrowExactly<MissingMethodException>().WithMessage($"Unable to find a suitable constructor to create instance of {nameof(ProductCreatedMessage)}");
+            act.Should().ThrowExactly<MissingMethodException>().WithMessage($"Unable to find a suitable constructor to create instance of {typeof(ProductCreatedMessage)}");
         }
 
         [Fact]
