@@ -1,18 +1,20 @@
 // Contains code from https://github.com/xunit/samples.xunit
 // originally published under Apache 2.0 license
 // For more information see aforementioned repository
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Reqnroll.xUnit.ReqnrollPlugin.Runners;
 using Xunit;
 using Xunit.Abstractions;
 using Xunit.Sdk;
 
 namespace Reqnroll.xUnit.ReqnrollPlugin
 {
-    public class XunitTestAssemblyRunnerWithAssemblyFixture : XunitTestAssemblyRunner
+    public class XunitTestAssemblyRunnerWithAssemblyFixture : XunitTestAssemblyRunnerWithParallelAlgorithm
     {
         private readonly Dictionary<Type, object> _assemblyFixtureMappings = new Dictionary<Type, object>();
 
@@ -81,7 +83,7 @@ namespace Reqnroll.xUnit.ReqnrollPlugin
             return base.BeforeTestAssemblyFinishedAsync();
         }
 
-        protected override Task<RunSummary> RunTestCollectionAsync(
+        protected override Task<RunSummary> RunTestCollectionWithinParallelAlgorithmAsync(
             IMessageBus messageBus,
             ITestCollection testCollection,
             IEnumerable<IXunitTestCase> testCases,
