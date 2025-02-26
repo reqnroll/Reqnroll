@@ -77,6 +77,7 @@
   <Folder Name="/Tests/">
     <Project Path="Tests/Reqnroll.Formatters.Tests/Reqnroll.Formatters.Tests.csproj" />
     <Project Path="Tests/Reqnroll.Specs/Reqnroll.Specs.csproj" />
+    <Project Path="Tests/Reqnroll.StepBindingSourceGeneratorTests/Reqnroll.StepBindingSourceGeneratorTests.csproj" />
     <Project Path="Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj" />
   </Folder>
   <Folder Name="/Tests/TestProjectGenerator/">
@@ -91,6 +92,7 @@
   </Folder>
   <Project Path="Reqnroll.Generator/Reqnroll.Generator.csproj" />
   <Project Path="Reqnroll.Parser/Reqnroll.Parser.csproj" />
+  <Project Path="Reqnroll.StepBindingSourceGenerator/Reqnroll.StepBindingSourceGenerator.csproj" />
   <Project Path="Reqnroll.Tools.MsBuild.Generation/Reqnroll.Tools.MsBuild.Generation.csproj" />
   <Project Path="Reqnroll.Utils/Reqnroll.Utils.csproj" />
   <Project Path="Reqnroll/Reqnroll.csproj" />
