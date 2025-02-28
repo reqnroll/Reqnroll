@@ -7,6 +7,10 @@ namespace Reqnroll.Bindings.Reflection
         public IBindingType Type { get; private set; }
         public string ParameterName { get; private set; }
 
+        public bool IsOptional { get; } = false;
+
+        public object OptionalValue { get; } = null;
+
         public BindingParameter(IBindingType type, string parameterName)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));

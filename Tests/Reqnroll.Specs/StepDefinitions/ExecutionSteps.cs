@@ -16,7 +16,7 @@ namespace Reqnroll.Specs.StepDefinitions
         }
 
         [When(@"I execute the tests")]
-        public void WhenIExecuteTheTests()
+        public void WhenIExecuteTheTests(string optb ="b", string opt = "a")
         {
             _executionDriver.ExecuteTests();
         }

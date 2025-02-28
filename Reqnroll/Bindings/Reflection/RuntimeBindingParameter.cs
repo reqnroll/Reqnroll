@@ -16,6 +16,10 @@ namespace Reqnroll.Bindings.Reflection
             get { return parameterInfo.Name; }
         }
 
+        public bool IsOptional => parameterInfo.IsOptional;
+
+        public object OptionalValue => parameterInfo.DefaultValue;
+
         public RuntimeBindingParameter(ParameterInfo parameterInfo)
         {
             this.parameterInfo = parameterInfo;

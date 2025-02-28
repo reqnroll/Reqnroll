@@ -135,7 +135,7 @@ namespace Reqnroll.Infrastructure
             }
 
             await FireEventsAsync(HookType.AfterTestRun);
-            
+
             _testThreadExecutionEventPublisher.PublishEvent(new TestRunFinishedEvent());
         }
 
@@ -279,7 +279,7 @@ namespace Reqnroll.Infrastructure
         {
             await FireScenarioEventsAsync(HookType.AfterStep);
         }
-        
+
         protected virtual void OnSkipStep()
         {
             _contextManager.StepContext.Status = ScenarioExecutionStatus.Skipped;
@@ -550,7 +550,7 @@ namespace Reqnroll.Infrastructure
         protected virtual async Task ExecuteStepMatchAsync(BindingMatch match, object[] arguments, DurationHolder durationHolder)
         {
             _testThreadExecutionEventPublisher.PublishEvent(new StepBindingStartedEvent(match.StepBinding));
-            
+
             try
             {
                 await _bindingInvoker.InvokeBindingAsync(match.StepBinding, _contextManager, arguments, _testTracer, durationHolder);
@@ -567,7 +567,7 @@ namespace Reqnroll.Infrastructure
             {
                 throw new ArgumentNullException(nameof(_contextManager));
             }
-            
+
             if (_contextManager.ScenarioContext == null)
             {
                 throw new ArgumentNullException(nameof(_contextManager.ScenarioContext));
@@ -588,14 +588,28 @@ namespace Reqnroll.Infrastructure
         private async Task<object[]> GetExecuteArgumentsAsync(BindingMatch match)
         {
             var bindingParameters = match.StepBinding.Method.Parameters.ToArray();
-            if (match.Arguments.Length != bindingParameters.Length)
-                throw _errorProvider.GetParameterCountError(match, match.Arguments.Length);
-
-            var arguments = new object[match.Arguments.Length];
-
-            for (var i = 0; i < match.Arguments.Length; i++)
+            var minimumParameters = bindingParameters.Count(b => !b.IsOptional);
+            if (match.Arguments.Length < minimumParameters)
             {
-                arguments[i] = await ConvertArg(match.Arguments[i], bindingParameters[i].Type);
+                // TODO improve error, because now it 2-4 needed parameters if 2 are optional
+                throw _errorProvider.GetParameterCountError(match, match.Arguments.Length);
+            }
+
+            var arguments = new object[bindingParameters.Length];
+
+            for (var i = 0; i < bindingParameters.Length; i++)
+            {
+                var bindingParameter = bindingParameters[i];
+                object parameterValue;
+                if (match.Arguments.Length > i)
+                {
+                    parameterValue = match.Arguments[i];
+                }
+                else
+                {
+                    parameterValue = bindingParameter.OptionalValue;
+                }
+                arguments[i] = await ConvertArg(parameterValue, bindingParameter.Type);
             }
 
             return arguments;
@@ -617,7 +631,7 @@ namespace Reqnroll.Infrastructure
         {
             StepDefinitionType stepDefinitionType = stepDefinitionKeyword == StepDefinitionKeyword.And || stepDefinitionKeyword == StepDefinitionKeyword.But
                 ? GetCurrentBindingType()
-                : (StepDefinitionType) stepDefinitionKeyword;
+                : (StepDefinitionType)stepDefinitionKeyword;
             _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg));
             _testThreadExecutionEventPublisher.PublishEvent(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
