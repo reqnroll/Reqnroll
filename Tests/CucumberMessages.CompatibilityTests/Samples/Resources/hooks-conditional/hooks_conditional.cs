@@ -23,20 +23,23 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooksMulti
         {
         }
 
-        [When("a step fails")]
-        public void AStepFails()
-        {
-            throw new Exception("Exception in step");
-        }
-
-        // When a step does not exist - no implementation should be generated
-
         // Hook implementations
-        [BeforeScenario]
+        [BeforeScenario("@passing-hook")]
         public void BeforeScenarioHook() { }
 
-        [AfterScenario]
+        [BeforeScenario("@fail-before")]
+        public void BeforeScenarioHookThatFails() {
+            throw new Exception("Exception in conditional hook");
+        }
+
+        [AfterScenario("@passing-hook")]
         public void AfterScenarioHook() { }
+
+        [AfterScenario("@fail-after")]
+        public void FailingAfterHook()
+        {
+            throw new Exception("Exception in conditional hook");
+        }
 
     }
 }

@@ -42,14 +42,6 @@ Feature: Attachments
   Scenario: Attaching PNG images
     When a PNG image is attached
 
-  Scenario Outline: Attaching images in an examples table
-    When a <type> image is attached
-
-    Examples:
-      | type |
-      | JPEG |
-      | PNG  |
-
   # Reqnroll does not support attaching a file by name and rename in the same operation
   @ignore
   Scenario: Attaching PDFs with a different filename

@@ -16,10 +16,14 @@
     <Compile Remove="Samples\Resources\cdata\cdata.cs" />
     <Compile Remove="Samples\Resources\data-tables\data_tables.cs" />
     <Compile Remove="Samples\Resources\empty\empty.cs" />
+    <Compile Remove="Samples\Resources\examples-tables-attachment\examples_tables_attachment.cs" />
     <Compile Remove="Samples\Resources\examples-tables\examples_tables.cs" />
     <Compile Remove="Samples\Resources\external-data\external_data.cs" />
     <Compile Remove="Samples\Resources\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
     <Compile Remove="Samples\Resources\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
+    <Compile Remove="Samples\Resources\hooks-attachment\hooks_attachment.cs" />
+    <Compile Remove="Samples\Resources\hooks-conditional\hooks_conditional.cs" />
+    <Compile Remove="Samples\Resources\hooks-named\hooks_named.cs" />
     <Compile Remove="Samples\Resources\hooks\hooks.cs" />
     <Compile Remove="Samples\Resources\minimal\minimal.cs" />
     <Compile Remove="Samples\Resources\parameter-types\parameter_types.cs" />
@@ -88,11 +92,31 @@
     <Content Include="Samples\Resources\empty\empty.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Samples\Resources\examples-tables-attachment\examples_tables_attachment.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Samples\Resources\hooks-attachment\hooks_attachment.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Samples\Resources\hooks-conditional\hooks_conditional.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Samples\Resources\hooks-named\hooks_named.feature.ndjson">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Samples\Resources\test-run-hooks\test_run_hooks.feature.ndjson">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <EmbeddedResource Include="Samples\Resources\examples-tables-attachment\examples_tables_attachment.cs" />
+    <EmbeddedResource Include="Samples\Resources\examples-tables-attachment\examples_tables_attachment.feature" />
     <EmbeddedResource Include="Samples\Resources\external-data\external_data.cs" />
     <EmbeddedResource Include="Samples\Resources\external-data\external_data.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-attachment\hooks_attachment.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-attachment\hooks_attachment.cs" />
+    <EmbeddedResource Include="Samples\Resources\hooks-conditional\hooks_conditional.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-conditional\hooks_conditional.cs" />
+    <EmbeddedResource Include="Samples\Resources\hooks-named\hooks_named.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-named\hooks_named.cs" />
     <EmbeddedResource Include="Samples\Resources\hooks\hooks.cs" />
     <EmbeddedResource Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.cs" />
     <Content Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.feature.ndjson">
@@ -211,7 +235,16 @@
     <None Update="Samples\Resources\attachments\cucumber.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Samples\Resources\hooks\cucumber.svg">
+    <None Update="Samples\Resources\attachments\document.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\examples-tables-attachment\cucumber.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\examples-tables-attachment\cucumber.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\hooks-attachment\cucumber.svg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Update="partialConfiguration.json">

@@ -78,7 +78,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 testCaseExecution.AttemptId,
                 testCaseExecution.TestCaseStartedId,
                 testCaseId,
-                null, 
+                null,
                 Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp.ToUniversalTime()));
         }
         internal static TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
@@ -127,7 +127,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             var result = new ParameterType
             (
                 name,
-                [ regexPattern ],
+                [regexPattern],
                 false,
                 false,
                 iDGenerator.GetNewId(),
@@ -407,15 +407,8 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         }
         private static string Base64EncodeFile(string filePath)
         {
-            if (Path.GetExtension(filePath) == ".png" || Path.GetExtension(filePath) == ".jpg")
-            {
-                byte[] fileBytes = File.ReadAllBytes(filePath);
-                return Convert.ToBase64String(fileBytes);
-            }
-            // else assume its a text file
-            string text = File.ReadAllText(filePath);
-            text = text.Replace("\r\n", "\n");
-            return Convert.ToBase64String(Encoding.UTF8.GetBytes(text));
+            byte[] fileBytes = File.ReadAllBytes(filePath);
+            return Convert.ToBase64String(fileBytes);
         }
 
         private static string NormalizePrimitiveTypeNamesToCucumberTypeNames(string name)

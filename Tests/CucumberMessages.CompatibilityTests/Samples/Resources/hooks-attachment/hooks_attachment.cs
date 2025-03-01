@@ -23,20 +23,29 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooksMulti
         {
         }
 
-        [When("a step fails")]
-        public void AStepFails()
-        {
-            throw new Exception("Exception in step");
-        }
-
-        // When a step does not exist - no implementation should be generated
-
         // Hook implementations
         [BeforeScenario]
-        public void BeforeScenarioHook() { }
+        public void BeforeScenarioHookWithAttachment()
+        {
+            AttachFile();
+        }
 
-        [AfterScenario]
-        public void AfterScenarioHook() { }
 
+        [AfterScenario()]
+        public void AfterScenarioHookWithAttachment()
+        {
+            AttachFile();
+        }
+
+
+        private void AttachFile()
+        {
+
+            var ext = "svg";
+            var path = FileSystemPath.GetFilePathForAttachments();
+            var attachment = Path.Combine(path, "hooks-attachment", $"cucumber.{ext}");
+
+            reqnrollOutputHelper.AddAttachment(attachment);
+        }
     }
 }
