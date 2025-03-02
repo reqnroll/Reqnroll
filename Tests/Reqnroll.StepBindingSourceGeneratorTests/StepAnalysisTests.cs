@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.Text;
 
 namespace Reqnroll.StepBindingSourceGenerator;
 
@@ -9,7 +8,7 @@ public class StepAnalysisTests
     [Fact]
     public void StepBindingWithEmptyText_GeneratesErrorStepTextCannotBeEmpty()
     {
-        const string source =
+        var source = MarkedSourceText.Parse(
             """
             using Reqnroll;
 
@@ -18,14 +17,14 @@ public class StepAnalysisTests
             [Binding]
             public class GameSteps
             {
-                [When("")]
+                [When(⇥""⇤)]
                 public void WhenMakerStartsAGame()
                 {
                 }
             }
-            """;
+            """);
 
-        var syntaxTree = CSharpSyntaxTree.ParseText(source);
+        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: "/spec/Sample.feature");
 
         syntaxTree.GetDiagnostics().Should().BeEmpty();
 
@@ -49,10 +48,12 @@ public class StepAnalysisTests
         var generator = new CSharpStepBindingGenerator();
         var result = CSharpGeneratorDriver.Create(generator).RunGenerators(compilation).GetRunResult();
 
-        result.Diagnostics.Should().BeEquivalentTo([
-            Diagnostic.Create(
-                DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-                syntaxTree.GetLocation(new TextSpan(89, 1)))]);
+        result.Diagnostics.Should().BeEquivalentTo(
+            [
+                Diagnostic.Create(
+                    DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
+                    source.GetMarkedLocation("/spec/Sample.feature"))
+            ]);
 
         result.GeneratedTrees.Should().BeEmpty();
     }

@@ -47,9 +47,36 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
 
             if (string.IsNullOrEmpty(text))
             {
+                var location = DiagnosticLocation.None;
+
+                var attributeSyntax = attribute.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
+
+                if (attributeSyntax?.ArgumentList != null)
+                {
+                    foreach (var argument in attributeSyntax.ArgumentList.Arguments)
+                    {
+                        if (argument.NameEquals != null)
+                        {
+                            continue;
+                        }
+
+                        if (argument.NameColon == null)
+                        {
+                            location = DiagnosticLocation.CreateFrom(argument.Expression);
+                            break;
+                        }
+
+                        if (argument.NameColon.Name.Identifier.Text == "regex")
+                        {
+                            location = DiagnosticLocation.CreateFrom(argument.Expression);
+                            break;
+                        }
+                    }
+                }
+
                 var diagnostic = new DiagnosticInfo(
                     DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-                    DiagnosticLocation.CreateFrom(attribute.ApplicationSyntaxReference));
+                    location);
 
                 yield return new StepBindingInfo(keyword, text, ImmutableCollection.Create(diagnostic));
             }
