@@ -35,6 +35,12 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
 
         foreach (var attribute in context.Attributes)
         {
+            // If the attribute candidate is an error symbol, skip it.
+            if (attribute.AttributeClass == null || attribute.AttributeClass.Kind == SymbolKind.ErrorType)
+            {
+                continue;
+            }
+
             // The first argument is the step text.
             var textConstant = attribute.ConstructorArguments[0];
             var text = (string?)textConstant.Value;
@@ -48,8 +54,6 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
                 yield return new StepBindingInfo(keyword, text, ImmutableCollection.Create(diagnostic));
             }
         }
-
-        throw new NotImplementedException();
     }
 }
 
