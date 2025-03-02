@@ -8,7 +8,7 @@ internal static class DiagnosticDescriptors
         new(name, DiagnosticResources.ResourceManager, typeof(DiagnosticResources));
 
     public static DiagnosticDescriptor ErrorStepTextCannotBeEmpty { get; } = new DiagnosticDescriptor(
-        "Reqnroll.1000",
+        "Reqnroll1000",
         Resource("ErrorStepTextCannotBeEmptyTitle"),
         Resource("ErrorStepTextCannotBeEmptyMessage"),
         "Reqnroll.Binding",
