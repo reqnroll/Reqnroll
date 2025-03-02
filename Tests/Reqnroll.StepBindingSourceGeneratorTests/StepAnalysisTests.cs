@@ -18,7 +18,7 @@ public class StepAnalysisTests
             [Binding]
             public class GameSteps
             {
-                [Reqnroll.WhenAttribute("test")]
+                [When("")]
                 public void WhenMakerStartsAGame()
                 {
                 }
@@ -33,7 +33,10 @@ public class StepAnalysisTests
             .GetAssemblies()
             .Where(assembly => !assembly.IsDynamic)
             .Select(assembly => MetadataReference.CreateFromFile(assembly.Location))
-            .Cast<MetadataReference>();
+            .Cast<MetadataReference>()
+            .ToList();
+
+        references.Add(MetadataReference.CreateFromFile(typeof(WhenAttribute).Assembly.Location));
 
         var compilation = CSharpCompilation.Create(
             "SourceGeneratorTests",
@@ -41,12 +44,15 @@ public class StepAnalysisTests
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
+        compilation.GetDiagnostics().Should().BeEmpty();
+
         var generator = new CSharpStepBindingGenerator();
         var result = CSharpGeneratorDriver.Create(generator).RunGenerators(compilation).GetRunResult();
 
         result.Diagnostics.Should().BeEquivalentTo([
-            Diagnostic.Create(DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-            syntaxTree.GetLocation(new TextSpan(100, 2)))]);
+            Diagnostic.Create(
+                DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
+                syntaxTree.GetLocation(new TextSpan(89, 1)))]);
 
         result.GeneratedTrees.Should().BeEmpty();
     }
