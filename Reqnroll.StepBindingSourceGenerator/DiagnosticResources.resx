@@ -117,10 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ErrorAsyncStepMethodMustReturnTaskMessage" xml:space="preserve">
+    <value>Asynchronous step methods must return a Task</value>
+  </data>
+  <data name="ErrorAsyncStepMethodMustReturnTaskTitle" xml:space="preserve">
+    <value>'{0}': step method is marked as {1} and must return a Task. Remove the {1} keyword or change the return type to Task.</value>
+  </data>
+  <data name="ErrorStepMethodMustReturnVoidOrTaskMessage" xml:space="preserve">
+    <value>Step methods must return either void or a Task</value>
+  </data>
+  <data name="ErrorStepMethodMustReturnVoidOrTaskTitle" xml:space="preserve">
+    <value>'{0}': method is marked as a step and must return either {1} or a Task. Change the return type of the method or remove the binding attributes.</value>
+  </data>
   <data name="ErrorStepTextCannotBeEmptyMessage" xml:space="preserve">
-    <value />
+    <value>Step text cannot be empty</value>
   </data>
   <data name="ErrorStepTextCannotBeEmptyTitle" xml:space="preserve">
-    <value />
+    <value>The text of a step binding cannot be null, an empty string, or only contain whitespace characters. Add step text or remove the text argument to bind to the method name.</value>
+  </data>
+  <data name="WarningStepTextHasLeadingWhitespaceMessage" xml:space="preserve">
+    <value>Step text has leading whitespace</value>
+  </data>
+  <data name="WarningStepTextHasLeadingWhitespaceTitle" xml:space="preserve">
+    <value>The text of this step binding includes some leading whitespace.</value>
+  </data>
+  <data name="WarningStepTextHasTrailingWhitespaceMessage" xml:space="preserve">
+    <value>Step text has trailing whitespace</value>
+  </data>
+  <data name="WarningStepTextHasTrailingWhitespaceTitle" xml:space="preserve">
+    <value>The text of this step binding includes some trailing whitespace.</value>
   </data>
 </root>
