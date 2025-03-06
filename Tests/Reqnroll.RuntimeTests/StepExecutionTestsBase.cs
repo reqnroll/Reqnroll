@@ -100,15 +100,11 @@ namespace Reqnroll.RuntimeTests
             TestThreadContainer.RegisterInstanceAs(new Mock<ITestRunner>().Object);
             TestThreadContainer.RegisterTypeAs<TestObjectResolver, ITestObjectResolver>();
             var containerBuilderMock = new Mock<IContainerBuilder>();
-            containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>(), It.IsAny<RuleInfo>()))
-                .Returns((IObjectContainer fc, ScenarioInfo si, RuleInfo ri) =>
+            containerBuilderMock.Setup(m => m.CreateScenarioContainer(It.IsAny<IObjectContainer>(), It.IsAny<ScenarioInfo>()))
+                .Returns((IObjectContainer fc, ScenarioInfo si) =>
                 {
                     var scenarioContainer = new ObjectContainer(fc);
                     scenarioContainer.RegisterInstanceAs(si);
-                    if (ri != null)
-                        scenarioContainer.RegisterInstanceAs(ri);
-                    else
-                        scenarioContainer.RegisterNull(typeof(RuleInfo));
                     return scenarioContainer;
                 });
             containerBuilderMock.Setup(m => m.CreateFeatureContainer(It.IsAny<IObjectContainer>(), It.IsAny<FeatureInfo>()))
