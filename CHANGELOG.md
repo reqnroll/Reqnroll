@@ -2,6 +2,14 @@
 
 ## Improvements:
 
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v2.4.0 - 2025-03-06
+
+## Improvements:
+
 * Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Improved message when [ScenarioDependencies] can't be found or has an incorrect return type (#494)
 * Include original exception for binding errors (`BindingException`) (#513)
 * Map data table columns to constructor parameters without having a related property for data table "assist" helpers (e.g. `CreateInstance`). To use this feature you need to set the `InstanceCreationOptions.RequireTableToProvideAllConstructorParameters` flag. (#488)
