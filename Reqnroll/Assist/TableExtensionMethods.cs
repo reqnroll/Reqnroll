@@ -16,8 +16,8 @@ namespace Reqnroll
         {
             var instanceTable = TEHelpers.GetTheProperInstanceTable(table, typeof(T));
             return TEHelpers.ThisTypeHasADefaultConstructor<T>()
-                       ? TEHelpers.CreateTheInstanceWithTheDefaultConstructor<T>(instanceTable, creationOptions)
-                       : TEHelpers.CreateTheInstanceWithTheValuesFromTheTable<T>(instanceTable, creationOptions);
+                       ? TEHelpers.CreateInstanceAndInitializeWithValuesFromTheTable<T>(instanceTable, creationOptions)
+                       : TEHelpers.ConstructInstanceWithValuesFromTheTable<T>(instanceTable, creationOptions);
         }
 
         public static T CreateInstance<T>(this Table table, Func<T> methodToCreateTheInstance)

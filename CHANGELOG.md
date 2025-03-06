@@ -1,17 +1,27 @@
 # [vNext]
 
 ## Improvements:
+* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* @loraderon
+
+# v2.4.0 - 2025-03-06
+
+## Improvements:
 
 * Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Improved message when [ScenarioDependencies] can't be found or has an incorrect return type (#494)
-* Include original exception for BindingException (#513)
-* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
+* Include original exception for binding errors (`BindingException`) (#513)
+* Map data table columns to constructor parameters without having a related property for data table "assist" helpers (e.g. `CreateInstance`). To use this feature you need to set the `InstanceCreationOptions.RequireTableToProvideAllConstructorParameters` flag. (#488)
 
 ## Bug fixes:
 
 * Fix: Microsoft.Extensions.DependencyInjection.ReqnrollPlugin, the plugin was only searching for [ScenarioDependencies] in assemblies with step definitions (#477)
 * Fix: xUnit Conservative Mode is not supported together with xUnit v2 (#473)
+* Fix: Messages logged through `IReqnrollOutputHelper` are added to the output with a `->` prefix that should be reserved for output messages of Reqnroll itself (#504)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @DerAlbertCom, @loraderon, @obligaron, @Socolin
+*Contributors of this release (in alphabetical order):* @304NotModified, @AroglDarthu, @DerAlbertCom, @gasparnagy, @obligaron, @Socolin
 
 # v2.3.0 - 2025-02-11
 
