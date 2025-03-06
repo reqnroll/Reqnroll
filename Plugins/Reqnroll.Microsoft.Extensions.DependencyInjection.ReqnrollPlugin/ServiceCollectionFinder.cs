@@ -3,18 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
-using Reqnroll.Bindings;
 
 namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 {
     public class ServiceCollectionFinder : IServiceCollectionFinder
     {
-        private readonly IBindingRegistry bindingRegistry;
+        private readonly ITestRunnerManager testRunnerManager;
         private (IServiceCollection, ScopeLevelType) _cache;
 
-        public ServiceCollectionFinder(IBindingRegistry bindingRegistry)
+        public ServiceCollectionFinder(ITestRunnerManager testRunnerManager)
         {
-            this.bindingRegistry = bindingRegistry;
+            this.testRunnerManager = testRunnerManager;
         }
 
         public (IServiceCollection, ScopeLevelType) GetServiceCollection()
@@ -24,12 +23,12 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                 return _cache;
             }
 
-            var assemblies = bindingRegistry.GetBindingAssemblies();
+            var assemblies = testRunnerManager.BindingAssemblies;
             foreach (var assembly in assemblies)
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
+                    foreach (MethodInfo methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
                     {
                         var scenarioDependenciesAttribute = (ScenarioDependenciesAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(ScenarioDependenciesAttribute));
 
@@ -45,12 +44,28 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                     }
                 }
             }
-            throw new MissingScenarioDependenciesException();
+            var assemblyNames = assemblies.Select(a => a.GetName().Name).ToList();
+            throw new MissingScenarioDependenciesException(assemblyNames);
         }
 
-        private static IServiceCollection GetServiceCollection(MethodBase methodInfo)
+        private static IServiceCollection GetServiceCollection(MethodInfo methodInfo)
         {
-            return (IServiceCollection)methodInfo.Invoke(null, null);
+            var serviceCollection = methodInfo.Invoke(null, null);
+            if(methodInfo.ReturnType == typeof(void))
+            {
+                throw new InvalidScenarioDependenciesException("the method doesn't return a value.");
+            }
+
+            if (serviceCollection == null)
+            {
+                throw new InvalidScenarioDependenciesException("returned null.");
+            }
+
+            if (serviceCollection is not IServiceCollection collection)
+            {
+                throw new InvalidScenarioDependenciesException($"returned {serviceCollection.GetType()}.");
+            }
+            return collection;
         }
 
         private static void AddBindingAttributes(IEnumerable<Assembly> bindingAssemblies, IServiceCollection serviceCollection)

@@ -19,7 +19,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit4PackageVersion = "4.2.2";
         public const string NUnit4TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit4TestAdapterPackageVersion = "4.6.0";
-        private const string XUnitPackageVersion = "2.4.2";
+        private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.8";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;

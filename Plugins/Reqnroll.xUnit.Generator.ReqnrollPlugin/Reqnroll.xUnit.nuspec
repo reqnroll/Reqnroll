@@ -20,13 +20,13 @@
       <group targetFramework=".NETStandard2.0">
         <dependency id="Reqnroll" version="[$version$]" />
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
-        <dependency id="xunit.core" version="2.4.2" />
+        <dependency id="xunit.core" version="2.8.1" />
         <dependency id="Xunit.SkippableFact" version="1.4.13" />
       </group>
       <group targetFramework=".NETFramework4.6.2">
         <dependency id="Reqnroll" version="[$version$]" />
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
-        <dependency id="xunit.core" version="2.4.2" />
+        <dependency id="xunit.core" version="2.8.1" />
         <dependency id="Xunit.SkippableFact" version="1.4.13" />
       </group>
     </dependencies>
