@@ -74,6 +74,7 @@ namespace Reqnroll.RuntimeTests
             result.Should().NotBeNull();
             result.Should().BeOfType<BindingException>();
             result.Message.Should().Be($"Error calling binding method '{methodBindingAssemblyName}:{methodBindingTypeFullName}.{methodName}({parameter1Type}, {parameter2Type})': {expectedExceptionMessage}");
+            result.InnerException.Should().BeSameAs(exceptionStub.Object);
         }
 
         [Fact]
