@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
+using System;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
@@ -15,104 +16,158 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var stepBindings = context.SyntaxProvider
+        var stepMethods = context.SyntaxProvider
             .ForAttributeWithMetadataName(
                 "Reqnroll.WhenAttribute",
                 static (_, _) => true,
-                static (context, cancellationToken) => GetStepBindingInfo(context, StepKeyword.When, cancellationToken))
-            .SelectMany(static (info, _) => info); 
+                static (context, cancellationToken) => GetStepMethodInfo(context, StepKeyword.When, cancellationToken));
 
-        context.RegisterSourceOutput(stepBindings, (context, stepBinding) =>
+        context.RegisterSourceOutput(stepMethods, (context, stepMethod) =>
         {
-            foreach (var diagnostic in stepBinding.Diagnostics)
+            if (stepMethod == null)
+            {
+                return;
+            }
+
+            foreach (var diagnostic in stepMethod.Diagnostics)
             {
                 context.ReportDiagnostic(diagnostic.CreateDiagnostic());
+            }
+
+            foreach (var binding in stepMethod.Bindings)
+            {
+                foreach (var diagnostic in binding.Diagnostics)
+                {
+                    context.ReportDiagnostic(diagnostic.CreateDiagnostic());
+                }
             }
         });
     }
 
-    private static IEnumerable<StepBindingInfo> GetStepBindingInfo(
+    private static StepMethodInfo? GetStepMethodInfo(
         GeneratorAttributeSyntaxContext context,
         StepKeyword keyword,
         CancellationToken cancellationToken)
     {
         var methodSyntax = (MethodDeclarationSyntax)context.TargetNode;
-        var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodSyntax);
+        var methodSymbol = (IMethodSymbol?)context.SemanticModel.GetDeclaredSymbol(methodSyntax);
 
         // If the semantic model does not contain the method, we can't bind to it.
         // This usually indicates a problem with the general syntax of this method.
         if (methodSymbol == null)
         {
-            yield break;
+            return null;
+        }
+
+        var diagnostics = ImmutableArray.CreateBuilder<DiagnosticInfo>();
+        var bindings = ImmutableArray.CreateBuilder<StepBindingInfo>();
+        var invocationStyle = MethodInvocationStyle.Synchronous;
+
+        // Determine whether the method is intended be invoked synchronously or asynchronously.
+        if (methodSymbol.ReturnsVoid)
+        {
+            if (methodSymbol.IsAsync)
+            {
+                diagnostics.Add(
+                    new DiagnosticInfo(
+                        DiagnosticDescriptors.ErrorAsyncStepMethodMustReturnTask,
+                        DiagnosticLocation.CreateFrom(methodSyntax.Identifier)));
+            }
+        }
+        else if (methodSymbol.ReturnType.ToDisplayString() == "System.Threading.Tasks.Task")
+        {
+            invocationStyle = MethodInvocationStyle.Asynchronous;
+        }
+        else
+        {
+            diagnostics.Add(
+                new DiagnosticInfo(
+                    DiagnosticDescriptors.ErrorStepMethodMustReturnVoidOrTask,
+                    DiagnosticLocation.CreateFrom(methodSyntax.Identifier)));
         }
 
         foreach (var attribute in context.Attributes)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            // If the attribute candidate is an error symbol, skip it.
-            if (attribute.AttributeClass == null || attribute.AttributeClass.Kind == SymbolKind.ErrorType)
+            var bindingInfo = GetStepBindingInfo(attribute, keyword);
+
+            if (bindingInfo != null)
             {
-                continue;
+                bindings.Add(bindingInfo);
             }
-
-            var diagnostics = ImmutableArray.CreateBuilder<DiagnosticInfo>();
-
-            StepBindingInfo CreateBindingInfo(BindingStyle style, string? text)
-            {
-                return new StepBindingInfo(
-                    style,
-                    keyword,
-                    text,
-                    methodSymbol.Name,
-                    methodSymbol.ContainingType.Name,
-                    methodSymbol.ContainingType.ContainingNamespace.Name,
-                    new ImmutableCollection<DiagnosticInfo>(diagnostics.ToImmutable()));
-            }
-
-            // If the attribute candidate does not have any arguments, we're matching based on the method name.
-            if (attribute.ConstructorArguments.Length == 0)
-            {
-                yield return CreateBindingInfo(BindingStyle.MethodName, null);
-                continue;
-            }
-
-            // If the attribute has any arguments, the first is the step text.
-            var textConstant = attribute.ConstructorArguments[0];
-            var text = (string?)textConstant.Value;
-
-            // Any further diagnostics will want to refer to the step text location with precision.
-            // Unfortunately Roslyn generator doesn't give us the syntax nodes for the attribute arguments,
-            // so we have to examine the attribute syntax to find the matching literal node.
-            var textExpressionSyntax = GetStepTextExpressionSyntax(attribute);
-            var textLocation = DiagnosticLocation.CreateFrom(
-                textExpressionSyntax ?? attribute.ApplicationSyntaxReference?.GetSyntax());
-
-            // Empty step text is not allowed (null, empty string or whitespace).
-            if (string.IsNullOrWhiteSpace(text))
-            {
-                diagnostics.Add(
-                    new DiagnosticInfo(
-                        DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-                        textLocation));
-
-                // There's not really any text to bind to, but we still need to return a binding style
-                // and it's definitely not "Method Name", so we'll use the Reqnroll default for text.
-                yield return CreateBindingInfo(BindingStyle.CucumberExpression, text);
-                continue;
-            }
-
-            // Determine whether to bind the non-empty text as a Cucumber expression or a regular expression.
-            // The default for Reqnroll is Cucumber expression.
-            var style = CucumberExpressionDetector.IsCucumberExpression(text!) ?
-                BindingStyle.CucumberExpression :
-                BindingStyle.RegularExpression;
-
-            CheckStepTextForLeadingWhitespace(text!, textExpressionSyntax, textLocation, diagnostics);
-            CheckStepTextForTrailingWhitespace(text!, textExpressionSyntax, textLocation, diagnostics);
-
-            yield return CreateBindingInfo(style, text);
         }
+
+        return new StepMethodInfo(
+            methodSymbol.Name,
+            methodSymbol.ContainingType.Name,
+            methodSymbol.ContainingType.ContainingNamespace.Name,
+            invocationStyle,
+            new ImmutableCollection<StepBindingInfo>(bindings.ToImmutable()),
+            new ImmutableCollection<DiagnosticInfo>(diagnostics.ToImmutable()));
+    }
+
+    private static StepBindingInfo? GetStepBindingInfo(
+        AttributeData attribute,
+        StepKeyword keyword)
+    {
+        // If the attribute candidate is an error symbol, skip it.
+        if (attribute.AttributeClass == null || attribute.AttributeClass.Kind == SymbolKind.ErrorType)
+        {
+            return null;
+        }
+
+        var diagnostics = ImmutableArray.CreateBuilder<DiagnosticInfo>();
+
+        StepBindingInfo CreateBindingInfo(BindingStyle style, string? text)
+        {
+            return new StepBindingInfo(
+                style,
+                keyword,
+                text,
+                new ImmutableCollection<DiagnosticInfo>(diagnostics.ToImmutable()));
+        }
+
+        // If the attribute candidate does not have any arguments, we're matching based on the method name.
+        if (attribute.ConstructorArguments.Length == 0)
+        {
+            return CreateBindingInfo(BindingStyle.MethodName, null);
+        }
+
+        // If the attribute has any arguments, the first is the step text.
+        var textConstant = attribute.ConstructorArguments[0];
+        var text = (string?)textConstant.Value;
+
+        // Any further diagnostics will want to refer to the step text location with precision.
+        // Unfortunately Roslyn generator doesn't give us the syntax nodes for the attribute arguments,
+        // so we have to examine the attribute syntax to find the matching literal node.
+        var textExpressionSyntax = GetStepTextExpressionSyntax(attribute);
+        var textLocation = DiagnosticLocation.CreateFrom(
+            textExpressionSyntax ?? attribute.ApplicationSyntaxReference?.GetSyntax());
+
+        // Empty step text is not allowed (null, empty string or whitespace).
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            diagnostics.Add(
+                new DiagnosticInfo(
+                    DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
+                    textLocation));
+
+            // There's not really any text to bind to, but we still need to return a binding style
+            // and it's definitely not "Method Name", so we'll use the Reqnroll default for text.
+            return CreateBindingInfo(BindingStyle.CucumberExpression, text);
+        }
+
+        // Determine whether to bind the non-empty text as a Cucumber expression or a regular expression.
+        // The default for Reqnroll is Cucumber expression.
+        var style = CucumberExpressionDetector.IsCucumberExpression(text!) ?
+            BindingStyle.CucumberExpression :
+            BindingStyle.RegularExpression;
+
+        CheckStepTextForLeadingWhitespace(text!, textExpressionSyntax, textLocation, diagnostics);
+        CheckStepTextForTrailingWhitespace(text!, textExpressionSyntax, textLocation, diagnostics);
+
+        return CreateBindingInfo(style, text);
     }
 
     private static void CheckStepTextForTrailingWhitespace(
@@ -212,12 +267,26 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
     }
 }
 
+internal record StepMethodInfo(
+    string Name,
+    string DeclaringClassName,
+    string DeclaringClassNamespace,
+    MethodInvocationStyle InvocationStyle,
+    ImmutableCollection<StepBindingInfo> Bindings,
+    ImmutableCollection<DiagnosticInfo> Diagnostics);
+
 internal enum StepKeyword
 {
     Given,
     When,
     Then,
     Any
+}
+
+public enum MethodInvocationStyle
+{
+    Synchronous,
+    Asynchronous
 }
 
 internal static class ImmutableCollection
@@ -310,9 +379,6 @@ internal record StepBindingInfo(
     BindingStyle BindingStyle,
     StepKeyword Keyword,
     string? Text,
-    string MethodName,
-    string DeclaringClassName,
-    string DeclaringClassNamespace,
     ImmutableCollection<DiagnosticInfo> Diagnostics)
 {
     public bool HasErrors => Diagnostics.Any(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
@@ -404,6 +470,8 @@ internal record struct DiagnosticLocation(string FilePath, TextSpan TextSpan, Li
 
         return CreateFrom(syntaxReference.SyntaxTree.GetLocation(syntaxReference.Span));
     }
+
+    public static DiagnosticLocation CreateFrom(SyntaxToken token) => CreateFrom(token.GetLocation());
 
     public static implicit operator Location?(DiagnosticLocation location) => location.ToLocation();
 }
