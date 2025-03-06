@@ -181,8 +181,10 @@ namespace Reqnroll.Infrastructure
 
         public void InitializeScenarioContext(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
-            var scenarioContainer = containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo, ruleInfo);
-            var newContext = scenarioContainer.Resolve<ScenarioContext>();
+            var scenarioContainer = containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo);
+            var testObjectResolver = scenarioContainer.Resolve<ITestObjectResolver>();
+            var newContext = new ScenarioContext(scenarioContainer, scenarioInfo, ruleInfo, testObjectResolver);
+            scenarioContainer.RegisterInstanceAs(newContext, dispose: true);
             scenarioContextManager.Init(newContext, scenarioContainer);
 #pragma warning disable 618
             ScenarioContext.Current = newContext;
