@@ -115,7 +115,7 @@ namespace Reqnroll.Specs.StepDefinitions
 
             foreach (var testResult in lastTestExecutionResult.LeafTestResults)
             {
-                var contextIdLines = testResult.StdOut.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries).Where(s => s.StartsWith("-> Context ID"));
+                var contextIdLines = testResult.StdOut.Split(new string[] { Environment.NewLine, "\n" }, StringSplitOptions.RemoveEmptyEntries).Where(s => s.StartsWith("Context ID"));
 
                 var distinctContextIdLines = contextIdLines.Distinct();
 
