@@ -4,13 +4,14 @@
 
 * Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Improved message when [ScenarioDependencies] can't be found or has an incorrect return type (#494)
 * Include original exception for BindingException (#513)
+* Map data table columns to constructor parameters without having a related property for data table "assist" helpers (e.g. `CreateInstance`). To use this feature you need to set the `InstanceCreationOptions.RequireTableToProvideAllConstructorParameters` flag. (#488)
 
 ## Bug fixes:
 
 * Fix: Microsoft.Extensions.DependencyInjection.ReqnrollPlugin, the plugin was only searching for [ScenarioDependencies] in assemblies with step definitions (#477)
 * Fix: xUnit Conservative Mode is not supported together with xUnit v2 (#473)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @DerAlbertCom, @obligaron, @Socolin
+*Contributors of this release (in alphabetical order):* @304NotModified, @AroglDarthu, @DerAlbertCom, @obligaron, @Socolin
 
 # v2.3.0 - 2025-02-11
 
