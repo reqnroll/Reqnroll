@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -84,6 +85,7 @@ namespace Reqnroll.RuntimeTests
         private readonly Mock<IContextManager> contextManagerStub = new Mock<IContextManager>();
         private readonly Mock<IAsyncBindingInvoker> methodBindingInvokerStub = new Mock<IAsyncBindingInvoker>();
         private readonly List<IStepArgumentTransformationBinding> stepTransformations = new List<IStepArgumentTransformationBinding>();
+        private readonly CultureInfo _enUSCulture = new CultureInfo("en-US", false);
 
         public StepArgumentTransformationTests()
         {
@@ -179,7 +181,8 @@ namespace Reqnroll.RuntimeTests
 
             var stepArgumentTypeConverter = CreateStepArgumentTypeConverter();
 
-            var result = await stepArgumentTypeConverter.ConvertAsync("user xyz", typeof(User), new CultureInfo("en-US", false));
+            var runtimeBindingType = new RuntimeBindingType(typeof(User));
+            var result = await stepArgumentTypeConverter.ConvertAsync("user xyz", runtimeBindingType, _enUSCulture);
             result.Should().Be(resultUser);
         }
 
@@ -197,7 +200,8 @@ namespace Reqnroll.RuntimeTests
 
             var stepArgumentTypeConverter = CreateStepArgumentTypeConverter();
 
-            var result = await stepArgumentTypeConverter.ConvertAsync("user xyz", typeof(User), new CultureInfo("en-US", false));
+            var runtimeBindingType = new RuntimeBindingType(typeof(User));
+            var result = await stepArgumentTypeConverter.ConvertAsync("user xyz", runtimeBindingType, _enUSCulture);
             result.Should().Be(resultUser);
         }
 
@@ -215,7 +219,8 @@ namespace Reqnroll.RuntimeTests
 
             var stepArgumentTypeConverter = CreateStepArgumentTypeConverter();
 
-            var result = await stepArgumentTypeConverter.ConvertAsync("user xyz", typeof(User), new CultureInfo("en-US", false));
+            var typeToConvertTo = new RuntimeBindingType(typeof(User));
+            var result = await stepArgumentTypeConverter.ConvertAsync("user xyz", typeToConvertTo, _enUSCulture);
             result.Should().Be(resultUser);
         }
 
@@ -240,8 +245,8 @@ namespace Reqnroll.RuntimeTests
 
             var stepArgumentTypeConverter = CreateStepArgumentTypeConverter();
 
-
-            var result = await stepArgumentTypeConverter.ConvertAsync(table, typeof(IEnumerable<User>), new CultureInfo("en-US", false));
+            var typeToConvertTo = new RuntimeBindingType(typeof(IEnumerable<User>));
+            var result = await stepArgumentTypeConverter.ConvertAsync(table, typeToConvertTo, _enUSCulture);
 
             result.Should().NotBeNull();
             result.Should().Be(resultUsers);

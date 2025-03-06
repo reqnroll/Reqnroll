@@ -1,15 +1,17 @@
 # [vNext]
 
 ## Improvements:
-* Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Improved message when [ScenarioDependencies] can't be found or has an incorrect return type (#494)
 
+* Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Improved message when [ScenarioDependencies] can't be found or has an incorrect return type (#494)
+* Include original exception for BindingException (#513)
 * Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
 
 ## Bug fixes:
+
 * Fix: Microsoft.Extensions.DependencyInjection.ReqnrollPlugin, the plugin was only searching for [ScenarioDependencies] in assemblies with step definitions (#477)
 * Fix: xUnit Conservative Mode is not supported together with xUnit v2 (#473)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @DerAlbertCom, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):* @304NotModified, @DerAlbertCom, @loraderon, @obligaron, @Socolin
 
 # v2.3.0 - 2025-02-11
 

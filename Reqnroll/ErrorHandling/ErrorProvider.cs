@@ -47,7 +47,7 @@ namespace Reqnroll.ErrorHandling
 
         public Exception GetCallError(IBindingMethod method, Exception ex)
         {
-            return new BindingException($"Error calling binding method '{GetMethodText(method)}': {ex.Message}");
+            return new BindingException($"Error calling binding method '{GetMethodText(method)}': {ex.Message}", ex);
         }
 
         public Exception GetParameterCountError(BindingMatch match, int expectedParameterCount)
