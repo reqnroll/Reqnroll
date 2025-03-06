@@ -80,6 +80,7 @@ namespace Reqnroll.PluginTests.Windsor
 
             scenarioContainer.RegisterTypeAs<WindsorTestObjectResolver, ITestObjectResolver>();
             scenarioContainer.RegisterInstanceAs(new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()));
+            scenarioContainer.RegisterInstanceAs(new RuleInfo("", "", Array.Empty<string>()));
 
             var container = CreateContainerViaPlugin(globalContainer, scenarioContainer);
 
