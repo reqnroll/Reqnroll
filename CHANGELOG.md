@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Added sorting of the list of plugins which is given back during plugin discovery (#519)
 
 ## Bug fixes:
 
