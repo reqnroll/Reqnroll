@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Reqnroll.Infrastructure;
 
@@ -46,7 +47,7 @@ namespace Reqnroll.Plugins
                 }
             }
 
-            return _runtimePluginLocationMerger.Merge(allRuntimePlugins);
+            return _runtimePluginLocationMerger.Merge(allRuntimePlugins).OrderBy(plugin => plugin).ToList();
         }
 
         private static IEnumerable<string> SearchPluginsInFolder(string folder)
