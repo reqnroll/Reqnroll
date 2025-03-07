@@ -7,5 +7,8 @@ max_line_length = 120
 [*.cs]
 csharp_style_namespace_declarations = file_scoped
 
+# IDE0290: Use primary constructor
+csharp_style_prefer_primary_constructors = true
+
 [*.{csproj,targets,props}]
 indent_size = 2
