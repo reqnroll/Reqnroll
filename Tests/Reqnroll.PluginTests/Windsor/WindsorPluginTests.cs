@@ -79,8 +79,11 @@ namespace Reqnroll.PluginTests.Windsor
             var scenarioContainer = new ObjectContainer(globalContainer);
 
             scenarioContainer.RegisterTypeAs<WindsorTestObjectResolver, ITestObjectResolver>();
-            scenarioContainer.RegisterInstanceAs(new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()));
-            scenarioContainer.RegisterInstanceAs(new RuleInfo("", "", Array.Empty<string>()));
+            scenarioContainer.RegisterInstanceAs(new ScenarioContext(
+                scenarioContainer,
+                new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()),
+                null,
+                scenarioContainer.Resolve<ITestObjectResolver>()));
 
             var container = CreateContainerViaPlugin(globalContainer, scenarioContainer);
 
@@ -96,8 +99,8 @@ namespace Reqnroll.PluginTests.Windsor
             var container = new WindsorContainer();
             var objectContainer = new Mock<IObjectContainer>();
             var context = new ScenarioContext(
-                objectContainer.Object, 
-                new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()), 
+                objectContainer.Object,
+                new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()),
                 null,
                 new WindsorTestObjectResolver());
 
@@ -165,7 +168,7 @@ namespace Reqnroll.PluginTests.Windsor
         {
             var plugin = new WindsorPlugin();
             var events = new RuntimePluginEvents();
-            
+
             globalContainer.RegisterInstanceAs<IContainerFinder>(new SpecificContainerFinder(() => new WindsorContainer()));
 
             plugin.Initialize(events, null, null);
