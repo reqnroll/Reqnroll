@@ -232,7 +232,7 @@ public class StepAnalysisTests
                     source.GetMarkedLocation("/spec/Sample.feature"))
             ]);
 
-        result.GeneratedTrees.Should().BeEmpty();
+        result.GeneratedTrees.Should().NotBeEmpty();
     }
 
     [Theory]
@@ -266,6 +266,6 @@ public class StepAnalysisTests
                     source.GetMarkedLocation("/spec/Sample.feature"))
             ]);
 
-        result.GeneratedTrees.Should().BeEmpty();
+        result.GeneratedTrees.Should().NotBeEmpty();
     }
 }

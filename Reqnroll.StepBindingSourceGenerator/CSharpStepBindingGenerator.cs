@@ -1,7 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using System;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Text.RegularExpressions;
@@ -22,14 +21,25 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
                 static (_, _) => true,
                 static (context, cancellationToken) => GetStepMethodInfo(context, StepKeyword.When, cancellationToken));
 
-        context.RegisterSourceOutput(stepMethods, (context, stepMethod) =>
+        var eligableStepMethods = stepMethods
+            .Where(method => method != null)
+            .Where(method => method!.IsEligibleForRegistry);
+
+        context.RegisterSourceOutput(eligableStepMethods.Collect(), (context, stepMethods) =>
         {
-            if (stepMethod == null)
+            if (!stepMethods.Any())
             {
                 return;
             }
 
-            foreach (var diagnostic in stepMethod.Diagnostics)
+            var emitter = new RegistryClassEmitter("Sample.Tests");
+
+            context.AddSource("ReqnrollStepRegistry.cs", emitter.EmitRegistryClassConstructor(stepMethods));
+        });
+
+        context.RegisterSourceOutput(stepMethods.Where(method => method is not null), (context, stepMethod) =>
+        {
+            foreach (var diagnostic in stepMethod!.Diagnostics)
             {
                 context.ReportDiagnostic(diagnostic.CreateDiagnostic());
             }
@@ -273,7 +283,14 @@ internal record StepMethodInfo(
     string DeclaringClassNamespace,
     MethodInvocationStyle InvocationStyle,
     ImmutableCollection<StepBindingInfo> Bindings,
-    ImmutableCollection<DiagnosticInfo> Diagnostics);
+    ImmutableCollection<DiagnosticInfo> Diagnostics)
+{
+    public bool HasErrors => Diagnostics.Any(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+
+    public bool HasValidBinding => Bindings.Any(binding => !binding.HasErrors);
+
+    public bool IsEligibleForRegistry => !HasErrors && HasValidBinding;
+}
 
 internal enum StepKeyword
 {
