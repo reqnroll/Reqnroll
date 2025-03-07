@@ -1,0 +1,7 @@
+﻿{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+
+  "cucumberMessagesConfiguration": {
+    "enabled": true
+  }
+}
