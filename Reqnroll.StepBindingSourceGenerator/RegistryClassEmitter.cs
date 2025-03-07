@@ -26,7 +26,12 @@ internal class RegistryClassEmitter
             builder.AppendLine("/// <summary>");
             builder.AppendLine("/// Provides a registry of all steps defined in this assembly.");
             builder.AppendLine("/// </summary>");
-            builder.Append("public partial class ").AppendLine(ClassName);
+            builder
+                .Append("public partial class ")
+                .Append(ClassName)
+                .Append(" : ")
+                .AppendLine("Reqnroll.Bindings.StepDefinitionRegistry");
+
             builder.AppendBodyBlock(builder =>
             {
                 builder.AppendLine("/// <summary>");
