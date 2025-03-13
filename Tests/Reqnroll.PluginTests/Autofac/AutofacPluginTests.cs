@@ -358,17 +358,21 @@ public class AutofacPluginTests
             new Mock<IReqnrollAttachmentHandler>();
         var threadExecutionMock =
             new Mock<ITestThreadExecutionEventPublisher>();
+        var contextManagerMock =
+            new Mock<IContextManager>();
 
-        var defaultDenpendencyProvider = new DefaultDependencyProvider();
-        defaultDenpendencyProvider
+        var defaultDependencyProvider = new DefaultDependencyProvider();
+        defaultDependencyProvider
             .RegisterTestThreadContainerDefaults(_testThreadContainer);
 
         _testThreadContainer
-            .RegisterInstanceAs<ITraceListener>(traceListenerMock.Object);
+            .RegisterInstanceAs(traceListenerMock.Object);
         _testThreadContainer
-            .RegisterInstanceAs<IReqnrollAttachmentHandler>(attachmentHandlerMock.Object);
+            .RegisterInstanceAs(attachmentHandlerMock.Object);
         _testThreadContainer
-            .RegisterInstanceAs<ITestThreadExecutionEventPublisher>(threadExecutionMock.Object);
+            .RegisterInstanceAs(threadExecutionMock.Object);
+        _testThreadContainer
+            .RegisterInstanceAs(contextManagerMock.Object);
 
         // Assert
         var resolvedOutputHelper = resolver

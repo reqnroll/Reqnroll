@@ -386,3 +386,4 @@ docs/_build/*
 nCrunchTemp*.csproj
 
 *.received.*
+/Tests/CucumberMessages.CompatibilityTests/Samples/CucumberMessages/*

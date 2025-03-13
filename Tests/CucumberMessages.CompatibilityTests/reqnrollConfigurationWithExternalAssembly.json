@@ -1,0 +1,14 @@
+{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+
+  "bindingAssemblies": [
+    {
+      "assembly": "ExternalBindingsProject"
+    }
+  ],
+  "cucumberMessagesConfiguration": {
+    "enabled": true,
+    "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson",
+    "iDGenerationStyle": "INCREMENTING"
+  }
+}
