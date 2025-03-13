@@ -43,8 +43,8 @@ namespace Reqnroll.RuntimeTests.AssistTests
             var table = new Table("FirstNaame");
             table.AddRow("Howard");
 
-            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions() { VerifyAllColumnsBound = true });
-            act.Should().Throw<ColumnCouldNotBeBoundException>();
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
+            act.Should().Throw<ColumnCouldNotBeBoundException>().WithMessage("Member or field FirstNaame not found");
         }
 
         [Fact]
