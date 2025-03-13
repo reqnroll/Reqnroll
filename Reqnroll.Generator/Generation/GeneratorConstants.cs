@@ -18,6 +18,7 @@ namespace Reqnroll.Generator.Generation
         public const string SCENARIO_OUTLINE_EXAMPLE_TAGS_PARAMETER = "exampleTags";
         public const string SCENARIO_TAGS_VARIABLE_NAME = "tagsOfScenario";
         public const string SCENARIO_ARGUMENTS_VARIABLE_NAME = "argumentsOfScenario";
+        public const string RULE_TAGS_VARIABLE_NAME = "tagsOfRule";
         public const string FEATURE_TAGS_VARIABLE_NAME = "featureTags";
     }
 }

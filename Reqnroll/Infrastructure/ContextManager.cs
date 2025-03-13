@@ -179,10 +179,12 @@ namespace Reqnroll.Infrastructure
             featureContextManager.Cleanup();
         }
 
-        public void InitializeScenarioContext(ScenarioInfo scenarioInfo)
+        public void InitializeScenarioContext(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
             var scenarioContainer = containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo);
-            var newContext = scenarioContainer.Resolve<ScenarioContext>();
+            var testObjectResolver = scenarioContainer.Resolve<ITestObjectResolver>();
+            var newContext = new ScenarioContext(scenarioContainer, scenarioInfo, ruleInfo, testObjectResolver);
+            scenarioContainer.RegisterInstanceAs(newContext, dispose: true);
             scenarioContextManager.Init(newContext, scenarioContainer);
 #pragma warning disable 618
             ScenarioContext.Current = newContext;
