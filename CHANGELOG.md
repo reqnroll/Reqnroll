@@ -1,7 +1,7 @@
 # [vNext]
 
 ## Improvements:
-* Added sorting of the list of plugins which is given back during plugin discovery (#519)
+* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 
 ## Bug fixes:
 

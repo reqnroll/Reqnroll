@@ -38,7 +38,7 @@ namespace Reqnroll.Plugins
 
         private static IReadOnlyList<string> SortPluginPaths(List<string> pluginPaths)
         {
-            pluginPaths.Sort((x, y) => string.Compare(Path.GetFileName(x), Path.GetFileName(y), StringComparison.Ordinal));
+            pluginPaths.Sort((x, y) => string.Compare(Path.GetFileName(x), Path.GetFileName(y), StringComparison.OrdinalIgnoreCase));
             return pluginPaths;
         }
 
