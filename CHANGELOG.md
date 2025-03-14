@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 
 ## Bug fixes:
 
