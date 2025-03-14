@@ -40,7 +40,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
         private ReqnrollDocument CreateReqnrollDocument(params IHasLocation[] children)
         {
-            return new(new ReqnrollFeature(new Tag[0], null, null, "Feature", "Sample feature", "", children ?? new IHasLocation[0]), new Comment[0], 
+            return new(new ReqnrollFeature(new Tag[0], default, null, "Feature", "Sample feature", "", children ?? new IHasLocation[0]), new Comment[0], 
                        new ReqnrollDocumentLocation(DOCUMENT_PATH));
         }
 
@@ -48,23 +48,23 @@ namespace Reqnroll.PluginTests.ExternalData
         {
             return new(
                 new Tag[0],
-                null,
+                default,
                 "Scenario Outline",
                 $"SO {++_scenarioCounter}",
                 null,
-                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has <product>", null) },
-                new[] { new Examples(new Tag[0], null, "Examples", "", "", new Gherkin.Ast.TableRow(null, new[] { new TableCell(null, "product") }), new Gherkin.Ast.TableRow[0]) });
+                new[] { new Step(default, "Given ", StepKeywordType.Context, "the customer has <product>", null) },
+                new[] { new Examples(new Tag[0], default, "Examples", "", "", new Gherkin.Ast.TableRow(default, new[] { new TableCell(default, "product") }), new Gherkin.Ast.TableRow[0]) });
         }
 
         private Scenario CreateScenario()
         {
             return new(
                 new Tag[0],
-                null,
+                default,
                 "Scenario",
                 $"S {++_scenarioCounter}",
                 null,
-                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has food", null) }, 
+                new[] { new Step(default, "Given ", StepKeywordType.Context, "the customer has food", null) }, 
                 null);
         }
 
@@ -134,7 +134,7 @@ namespace Reqnroll.PluginTests.ExternalData
         {
             var fromScenarioOutline = CreateScenarioOutline();
             var toScenarioOutline = CreateScenarioOutline();
-            var rule = new Rule(null, null, "Rule", "My rule", null, new IHasLocation[] { fromScenarioOutline });
+            var rule = new Rule(null, default, "Rule", "My rule", null, new IHasLocation[] { fromScenarioOutline });
             var document = CreateReqnrollDocument(rule);
 
             var sut = CreateSut(fromScenarioOutline, toScenarioOutline);
@@ -152,7 +152,7 @@ namespace Reqnroll.PluginTests.ExternalData
         {
             var fromScenarioOutline = CreateScenarioOutline();
             var toScenarioOutline = CreateScenarioOutline();
-            var rule = new Rule(null, null, "Rule", "My rule", null, new IHasLocation[] { CreateScenarioOutline() });
+            var rule = new Rule(null, default, "Rule", "My rule", null, new IHasLocation[] { CreateScenarioOutline() });
             var document = CreateReqnrollDocument(fromScenarioOutline, rule);
 
             var sut = CreateSut(fromScenarioOutline, toScenarioOutline);
@@ -169,7 +169,7 @@ namespace Reqnroll.PluginTests.ExternalData
         {
             var fromScenarioOutline = CreateScenarioOutline();
             var toScenarioOutline = CreateScenarioOutline();
-            var background = new Background(null, "Background", null, null, new Step[0]);
+            var background = new Background(default, "Background", null, null, new Step[0]);
             var document = CreateReqnrollDocument(background, fromScenarioOutline);
 
             var sut = CreateSut(fromScenarioOutline, toScenarioOutline);
@@ -190,7 +190,7 @@ namespace Reqnroll.PluginTests.ExternalData
             var toScenarioOutlineInRule = CreateScenarioOutline();
             _transformations.Add(fromScenarioOutline, toScenarioOutline);
             _transformations.Add(fromScenarioOutlineInRule, toScenarioOutlineInRule);
-            var rule = new Rule(null, null, "Rule", "My rule", null, new IHasLocation[] { fromScenarioOutlineInRule });
+            var rule = new Rule(null, default, "Rule", "My rule", null, new IHasLocation[] { fromScenarioOutlineInRule });
             var document = CreateReqnrollDocument(fromScenarioOutline, rule);
 
             var sut = CreateSut();
