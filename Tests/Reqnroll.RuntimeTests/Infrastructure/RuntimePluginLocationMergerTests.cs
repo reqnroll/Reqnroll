@@ -141,15 +141,15 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
 
             //ACT
-            var result = runtimePluginLocationMerger.Merge(new string[]
-            {
+            var result = runtimePluginLocationMerger.Merge(
+            [
                 "C:\\temp1\\B.ReqnrollPlugin.dll",
                 "C:\\temp2\\D.ReqnrollPlugin.dll",
                 "C:\\temp\\AA.ReqnrollPlugin.dll",
                 "C:\\temp1\\Z.ReqnrollPlugin.dll",
                 "C:\\temp2\\A.ReqnrollPlugin.dll",
                 "C:\\temp\\C.ReqnrollPlugin.dll",
-            });
+            ]);
 
 
             //ASSERT
@@ -172,25 +172,25 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
 
             //ACT
-            var result = runtimePluginLocationMerger.Merge(new string[]
-            {
-                "C:\\temp1\\B.ReqnrollPlugin.dll",
-                "C:\\temp2\\D.ReqnrollPlugin.dll",
-                "C:\\temp\\AA.ReqnrollPlugin.dll",
-                "C:\\temp1\\Z.ReqnrollPlugin.dll",
-                "C:\\temp2\\A.ReqnrollPlugin.dll",
-                "C:\\temp\\C.ReqnrollPlugin.dll",
-            });
+            var result = runtimePluginLocationMerger.Merge(
+            [
+                "C:/temp1/B.ReqnrollPlugin.dll",
+                "C:/temp2/D.ReqnrollPlugin.dll",
+                "C:/temp/AA.ReqnrollPlugin.dll",
+                "C:/temp1/Z.ReqnrollPlugin.dll",
+                "C:/temp2/A.ReqnrollPlugin.dll",
+                "C:/temp/C.ReqnrollPlugin.dll",
+            ]);
 
 
             //ASSERT
             result.Should().HaveCount(6);
-            result[0].Should().Be("C:\\temp2\\A.ReqnrollPlugin.dll");
-            result[1].Should().Be("C:\\temp\\AA.ReqnrollPlugin.dll");
-            result[2].Should().Be("C:\\temp1\\B.ReqnrollPlugin.dll");
-            result[3].Should().Be("C:\\temp\\C.ReqnrollPlugin.dll");
-            result[4].Should().Be("C:\\temp2\\D.ReqnrollPlugin.dll");
-            result[5].Should().Be("C:\\temp1\\Z.ReqnrollPlugin.dll");
+            result[0].Should().Be("C:/temp2/A.ReqnrollPlugin.dll");
+            result[1].Should().Be("C:/temp/AA.ReqnrollPlugin.dll");
+            result[2].Should().Be("C:/temp1/B.ReqnrollPlugin.dll");
+            result[3].Should().Be("C:/temp/C.ReqnrollPlugin.dll");
+            result[4].Should().Be("C:/temp2/D.ReqnrollPlugin.dll");
+            result[5].Should().Be("C:/temp1/Z.ReqnrollPlugin.dll");
         }
     }
 }
