@@ -7,7 +7,6 @@ using Reqnroll.Assist;
 using Reqnroll.RuntimeTests.AssistTests.ExampleEntities;
 using Reqnroll.RuntimeTests.AssistTests.TestInfrastructure;
 
-
 namespace Reqnroll.RuntimeTests.AssistTests
 {
 
@@ -44,10 +43,55 @@ namespace Reqnroll.RuntimeTests.AssistTests
             var table = new Table("FirstNaame");
             table.AddRow("Howard");
 
-            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions() { VerifyAllColumnsBound = true });
-            act.Should().Throw<ColumnCouldNotBeBoundException>();
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
+            act.Should().Throw<ColumnCouldNotBeBoundException>().WithMessage("Member or field FirstNaame not found");
         }
 
+        [Fact]
+        public void Create_instance_will_use_strict_constructor_binding_when_option_use_strict_constructor_binding_is_true()
+        {
+            var table = new Table("MessageCreatedAt", "ProductCode", "ProductName", "StartOfSale");
+            table.AddRow("2025-02-22T13:29:14+01:00", "X0010001B", "Teddy Bear", "2025-03-01");
+
+            var options = new InstanceCreationOptions
+            {
+                RequireTableToProvideAllConstructorParameters = true
+            };
+            
+            var expectedMessage = new ProductCreatedMessage(new DateTimeOffset(2025, 2, 22, 13, 29, 14, TimeSpan.FromHours(1)), "X0010001B", "Teddy Bear", new DateTime(2025, 3,1));
+            var actualMessage = table.CreateInstance<ProductCreatedMessage>(options);
+            
+            actualMessage.Should().BeEquivalentTo(expectedMessage);
+        }
+
+        [Fact]
+        public void Create_instance_will_use_strict_constructor_binding_when_option_use_strict_constructor_binding_is_true_and_throw_when_no_suitable_constructor_is_provided()
+        {
+            var table = new Table("MessageCreatedAt", "ProductCode", "ProductName");
+            table.AddRow("2025-02-22T13:29:14+01:00", "X0010001B", "Teddy Bear");
+
+            var options = new InstanceCreationOptions
+            {
+                RequireTableToProvideAllConstructorParameters = true
+            };
+            
+            Action act = () => table.CreateInstance<ProductCreatedMessage>(options);
+
+            act.Should().ThrowExactly<MissingMethodException>().WithMessage($"Unable to find a suitable constructor to create instance of {typeof(ProductCreatedMessage)}");
+        }
+
+        [Fact]
+        public void Create_instance_without_default_constructor_does_not_throw_if_all_projected_properties_have_matching_constructor_parameters()
+        {
+            var table = new Table("MessageCreatedAt", "ProductCode", "ProductName");
+            table.AddRow("2025-02-22T13:29:14+01:00", "X0010001B", "Teddy Bear");
+            
+            Action act = () => table.CreateInstance<ProductCreatedMessage>();
+
+            // This is odd behaviour! The constructor requires more parameters than the number of matching members. Missing constructor parameters get the default value for their Type. 
+            act.Should().NotThrow<MissingMethodException>();
+        }
+        
         [Fact]
         public void When_one_row_exists_with_two_headers_and_the_first_row_value_is_not_a_property_then_treat_as_horizontal_table()
         {

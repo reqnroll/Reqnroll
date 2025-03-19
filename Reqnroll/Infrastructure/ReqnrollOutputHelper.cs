@@ -19,7 +19,7 @@ namespace Reqnroll.Infrastructure
         public void WriteLine(string message)
         {
             _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message));
-            _traceListener.WriteToolOutput(message);
+            _traceListener.WriteTestOutput(message);
         }
 
         public void WriteLine(string format, params object[] args)
