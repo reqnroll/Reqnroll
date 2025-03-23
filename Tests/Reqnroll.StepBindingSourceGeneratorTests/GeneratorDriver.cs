@@ -23,6 +23,7 @@ public class GeneratorDriver
             .ToHashSet();
 
         assemblies.Add(typeof(object).Assembly);
+        assemblies.Add(typeof(NotImplementedException).Assembly);
 
         // Reqnroll.dll
         assemblies.Add(typeof(WhenAttribute).Assembly);

@@ -75,6 +75,7 @@
     <Project Path="Templates/Reqnroll.Templates.DotNet/Reqnroll.Templates.DotNet.csproj" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="Tests/Reqnroll.AnalyzerTests/Reqnroll.AnalyzerTests.csproj" />
     <Project Path="Tests/Reqnroll.Formatters.Tests/Reqnroll.Formatters.Tests.csproj" />
     <Project Path="Tests/Reqnroll.Specs/Reqnroll.Specs.csproj" />
     <Project Path="Tests/Reqnroll.StepBindingSourceGeneratorTests/Reqnroll.StepBindingSourceGeneratorTests.csproj" />
@@ -90,6 +91,7 @@
     <Project Path="Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj" />
     <Project Path="Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj" />
   </Folder>
+  <Project Path="Reqnroll.Analyzers/Reqnroll.Analyzers.csproj" />
   <Project Path="Reqnroll.Generator/Reqnroll.Generator.csproj" />
   <Project Path="Reqnroll.Parser/Reqnroll.Parser.csproj" />
   <Project Path="Reqnroll.StepBindingSourceGenerator/Reqnroll.StepBindingSourceGenerator.csproj" />

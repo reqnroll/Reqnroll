@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Text;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Reqnroll.StepBindingSourceGenerator;
+namespace Reqnroll.Analyzers;
 
 /// <summary>
 /// A test-helper type representing a source text with a location marked in it.
