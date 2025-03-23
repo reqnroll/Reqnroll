@@ -24,8 +24,9 @@
     <PackageReference Include="Cucumber.HtmlFormatter" Version="22.2.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
+	<PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
     <!-- System.Runtime.Loader is used for .NET (not .NET Framework) based frameworks only. 
-         From .NET, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
+         From .NET, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard.
          We need 'PrivateAssets="all"' to avoid shipping it with the package and causing conflicts with the runtime. -->
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
