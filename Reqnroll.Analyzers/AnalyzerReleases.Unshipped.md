@@ -7,3 +7,4 @@ Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
 RR1001  |  Usage   |  Error   | RR1001_StepTextCannotBeNullOrEmptyAnalyzer
 RR1002  |  Usage   |  Error   | RR1002_StepMethodMustReturnVoidOrTaskAnalyzer
+RR1003  |  Usage   |  Error   | RR1003_AsyncStepMethodMustReturnTaskAnalyzer
