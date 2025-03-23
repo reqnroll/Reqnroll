@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp.Testing;
-using Microsoft.CodeAnalysis.Testing;
+﻿using Microsoft.CodeAnalysis.Testing;
 
 namespace Reqnroll.Analyzers.StepDefinitions;
 
@@ -60,15 +59,8 @@ public class StepMethodMustReturnVoidOrTaskTests
     [Fact]
     public async Task StepMethodReturningValueRaisesDiagnostic()
     {
-        var reqnrollAssemblyLocation = typeof(WhenAttribute).Assembly.Location;
-        var reqnrollAssembly = Path.Combine(
-            Path.GetDirectoryName(reqnrollAssemblyLocation)!,
-            Path.GetFileNameWithoutExtension(reqnrollAssemblyLocation));
-
-        var test = new CSharpAnalyzerTest<StepMethodMustReturnVoidOrTaskAnalyzer, DefaultVerifier>
+        var test = new ReqnrollCSharpAnalyzerTest<StepMethodMustReturnVoidOrTaskAnalyzer>
         {
-            ReferenceAssemblies = ReferenceAssemblies.Net.Net80.AddAssemblies([reqnrollAssembly]),
-
             TestCode =
                 """"
                 using Reqnroll;

@@ -1,5 +1,4 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
 using System.Collections.Immutable;
 
@@ -8,7 +7,7 @@ namespace Reqnroll.Analyzers.StepDefinitions;
 using static DiagnosticResources;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class StepMethodMustReturnVoidOrTaskAnalyzer : DiagnosticAnalyzer
+public class StepMethodMustReturnVoidOrTaskAnalyzer : StepMethodAnalyzer
 {
     private const string RuleId = "RR1002";
 
@@ -24,51 +23,9 @@ public class StepMethodMustReturnVoidOrTaskAnalyzer : DiagnosticAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
         ImmutableArray.Create(Rule);
 
-    public override void Initialize(AnalysisContext context)
-    {
-        context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
-        context.EnableConcurrentExecution();
-        context.RegisterSyntaxNodeAction(AnalyzeMethod, SyntaxKind.MethodDeclaration);
-    }
-
-    private void AnalyzeMethod(SyntaxNodeAnalysisContext context)
+    protected override void AnalyzeStepMethod(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol)
     {
         var methodSyntax = (MethodDeclarationSyntax)context.Node;
-
-        var methodSymbol = context.SemanticModel.GetDeclaredSymbol(methodSyntax, context.CancellationToken);
-        if (methodSymbol == null)
-        {
-            return;
-        }
-
-        var isStepDefintion = false;
-
-        foreach (var attribute in methodSymbol.GetAttributes())
-        {
-            var stepAttributeTypes = new HashSet<string>
-            {
-                "Reqnroll.GivenAttribute",
-                "Reqnroll.WhenAttribute",
-                "Reqnroll.ThenAttribute",
-                "Reqnroll.StepDefinitionAttribute"
-            };
-
-            if (attribute.AttributeClass == null)
-            {
-                continue;
-            }
-
-            if (stepAttributeTypes.Contains(attribute.AttributeClass.ToDisplayString()))
-            {
-                isStepDefintion = true;
-                break;
-            }
-        }
-
-        if (!isStepDefintion)
-        {
-            return;
-        }
 
         if (methodSymbol.ReturnsVoid || methodSymbol.ReturnType.ToDisplayString() == "System.Threading.Tasks.Task")
         {
