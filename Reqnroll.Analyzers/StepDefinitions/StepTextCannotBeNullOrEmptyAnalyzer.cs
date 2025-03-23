@@ -33,10 +33,10 @@ public sealed class StepTextCannotBeNullOrEmptyAnalyzer : DiagnosticAnalyzer
 
     private static void AnalyzeAttribute(SyntaxNodeAnalysisContext context)
     {
-        var attributeSyntax = (AttributeSyntax)context.Node;
-        
+        var attributeSyntax = (AttributeSyntax)context.Node;        
         var attributeSymbol = context.SemanticModel.GetSymbolInfo(attributeSyntax).Symbol;
-        if (attributeSymbol == null || attributeSymbol.ContainingType.ToDisplayString() != "Reqnroll.WhenAttribute")
+
+        if (attributeSymbol == null || !AttributeHelper.IsStepAttribute(attributeSymbol))
         {
             return;
         }
@@ -53,8 +53,7 @@ public sealed class StepTextCannotBeNullOrEmptyAnalyzer : DiagnosticAnalyzer
 
         if (!constantValue.HasValue || string.IsNullOrWhiteSpace(constantValue.Value?.ToString()))
         {
-            var diagnostic = Diagnostic.Create(Rule, firstArgument.GetLocation());
-            context.ReportDiagnostic(diagnostic);
+            context.ReportDiagnostic(Diagnostic.Create(Rule, firstArgument.GetLocation()));
         }
     }
 }

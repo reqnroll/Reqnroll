@@ -23,31 +23,7 @@ public abstract class StepMethodAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        var isStepDefintion = false;
-
-        foreach (var attribute in methodSymbol.GetAttributes())
-        {
-            var stepAttributeTypes = new HashSet<string>
-            {
-                "Reqnroll.GivenAttribute",
-                "Reqnroll.WhenAttribute",
-                "Reqnroll.ThenAttribute",
-                "Reqnroll.StepDefinitionAttribute"
-            };
-
-            if (attribute.AttributeClass == null)
-            {
-                continue;
-            }
-
-            if (stepAttributeTypes.Contains(attribute.AttributeClass.ToDisplayString()))
-            {
-                isStepDefintion = true;
-                break;
-            }
-        }
-
-        if (!isStepDefintion)
+        if (!methodSymbol.GetAttributes().Any(AttributeHelper.IsStepAttribute))
         {
             return;
         }
