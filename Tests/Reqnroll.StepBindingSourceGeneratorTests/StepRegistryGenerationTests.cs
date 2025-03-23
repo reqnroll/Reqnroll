@@ -61,7 +61,7 @@ public class StepRegistryGenerationTests
 
         var registryType = assemblyContext.Assembly.ExportedTypes.Single(type => type.Name == "ReqnrollStepRegistry");
 
-        registryType.Should().Implement<IStepDefinitionProvider>();
+        registryType.Should().Implement<IStepDefinitionDescriptorsProvider>();
     }
 
     [Fact]
@@ -93,8 +93,47 @@ public class StepRegistryGenerationTests
 
         registryType.Should().HaveProperty(registryType, "Instance").Which.Should().BeReadable();
 
-        var registry = registryType.GetProperty("Instance")!.GetGetMethod()!.Invoke(null, null) as IStepDefinitionProvider;
+        var registry = registryType.GetProperty("Instance")!.GetGetMethod()!.Invoke(null, null) as IStepDefinitionDescriptorsProvider;
 
         registry.Should().NotBeNull();
+    }
+
+    [Fact]
+    public void StepDefinitionWithNoArgumentsIsAddedToRegistry()
+    {
+        var source = SourceText.From(
+            $$"""
+            using Reqnroll;
+
+            namespace Sample.Tests;
+
+            [Binding]
+            public class GameSteps
+            {
+                [When("Maker starts a game")]
+                public void WhenMakerStartsAGame()
+                {
+                    throw new System.NotImplementedException("f1e3f2b2-a99b-4d87-9fff-139128a61d5b");
+                }
+            }
+            """);
+
+        var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+
+        result.Diagnostics.Should().BeEmpty();
+
+        using var assemblyContext = result.CompileAssembly();
+
+        var registry = assemblyContext.Assembly.GetStepRegistry();
+
+        registry.GetStepDefinitions().Should().HaveCount(1);
+        
+        var stepDefinition = registry.GetStepDefinitions().Single();
+
+        stepDefinition.Should().BeEquivalentTo(
+            new StepDefinitionDescriptor(
+                "When Maker starts a game",
+                StepDefinitionType.When,
+                StepTextPattern.CucumberExpression("Maker starts a game")));
     }
 }
