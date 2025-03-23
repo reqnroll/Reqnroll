@@ -1,269 +1,125 @@
-﻿namespace Reqnroll.Analyzers.StepDefinitions;
+﻿using Microsoft.CodeAnalysis.Testing;
+
+namespace Reqnroll.Analyzers.StepDefinitions;
 
 public class StepTextCannotBeNullOrEmptyTests
 {
-    //[Fact]
-    //public void StepBindingOnMethodWithReturnValue_GeneratesErrorStepMethodMustReturnVoidOrTask()
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        """
-    //        using Reqnroll;
-            
-    //        namespace Sample.Tests;
-            
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When(null)]
-    //            public string ⇥WhenMakerStartsAGame⇤()
-    //            {
-    //                return "Game started";
-    //            }
-    //        }
-    //        """);
+    [Fact]
+    public async Task StepBindingWithNullTextRaisesDiagnostic()
+    {
+        var test = new ReqnrollCSharpAnalyzerTest<StepTextCannotBeNullOrEmptyAnalyzer>
+        {
+            TestCode =
+                """"
+                using Reqnroll;
 
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+                namespace Sample.Tests;
 
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.ErrorStepMethodMustReturnVoidOrTask,
-    //                source.GetMarkedLocation("/spec/Sample.feature"),
-    //                "GameSteps.WhenmakerStartsAGame",
-    //                "void")
-    //        ]);
+                [Binding]
+                public class GameSteps
+                {
+                    [When({|#0:null|})]
+                    public void WhenMakerStartsAGame()
+                    {
+                    }
+                }
+                """"
+        };
 
-    //    result.GeneratedTrees.Should().BeEmpty();
-    //}
+        test.ExpectedDiagnostics.Add(
+            new DiagnosticResult(StepTextCannotBeNullOrEmptyAnalyzer.Rule)
+                .WithLocation(0));
 
-    //[Fact]
-    //public void StepBindingOnAsyncMethodWithVoidReturn_GeneratesErrorAsyncStepMethodMustReturnTask()
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        """
-    //        using System.Threading.Tasks;
-    //        using Reqnroll;
-            
-    //        namespace Sample.Tests;
-            
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When]
-    //            public async void ⇥WhenMakerStartsAGame⇤()
-    //            {
-    //                await Task.Delay(100);
-    //            }
-    //        }
-    //        """);
+        await test.RunAsync();
+    }
 
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+    [Fact]
+    public async Task StepBindingWithDefaultTextRaisesDiagnostic()
+    {
+        var test = new ReqnrollCSharpAnalyzerTest<StepTextCannotBeNullOrEmptyAnalyzer>
+        {
+            TestCode =
+                """"
+                using Reqnroll;
 
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.ErrorAsyncStepMethodMustReturnTask,
-    //                source.GetMarkedLocation("/spec/Sample.feature"),
-    //                "GameSteps.WhenMakerStartsAGame",
-    //                "async")
-    //        ]);
+                namespace Sample.Tests;
 
-    //    result.GeneratedTrees.Should().BeEmpty();
-    //}
+                [Binding]
+                public class GameSteps
+                {
+                    [When({|#0:default|})]
+                    public void WhenMakerStartsAGame()
+                    {
+                    }
+                }
+                """"
+        };
 
-    //[Fact]
-    //public void StepBindingWithNullText_GeneratesErrorStepTextCannotBeEmpty()
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        """
-    //        using Reqnroll;
+        test.ExpectedDiagnostics.Add(
+            new DiagnosticResult(StepTextCannotBeNullOrEmptyAnalyzer.Rule)
+                .WithLocation(0));
 
-    //        namespace Sample.Tests;
+        await test.RunAsync();
+    }
 
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When(⇥null⇤)]
-    //            public void WhenMakerStartsAGame()
-    //            {
-    //            }
-    //        }
-    //        """);
+    [Fact]
+    public async Task StepBindingWithEmptyTextRaisesDiagnostic()
+    {
+        var test = new ReqnrollCSharpAnalyzerTest<StepTextCannotBeNullOrEmptyAnalyzer>
+        {
+            TestCode =
+                """"
+                using Reqnroll;
 
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+                namespace Sample.Tests;
 
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-    //                source.GetMarkedLocation("/spec/Sample.feature"))
-    //        ]);
+                [Binding]
+                public class GameSteps
+                {
+                    [When({|#0:""|})]
+                    public void WhenMakerStartsAGame()
+                    {
+                    }
+                }
+                """"
+        };
 
-    //    result.GeneratedTrees.Should().BeEmpty();
-    //}
+        test.ExpectedDiagnostics.Add(
+            new DiagnosticResult(StepTextCannotBeNullOrEmptyAnalyzer.Rule)
+                .WithLocation(0));
 
-    //[Fact]
-    //public void StepBindingWithDefaultText_GeneratesErrorStepTextCannotBeEmpty()
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        """
-    //        using Reqnroll;
+        await test.RunAsync();
+    }
 
-    //        namespace Sample.Tests;
+    [Theory]
+    [InlineData(" ")]
+    [InlineData("\t")]
+    [InlineData("    ")]
+    public async Task StepBindingWithWhitespaceTextRaisesDiagnostic(string whitespace)
+    {
+        var test = new ReqnrollCSharpAnalyzerTest<StepTextCannotBeNullOrEmptyAnalyzer>
+        {
+            TestCode =
+                $$""""
+                using Reqnroll;
 
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When(⇥default⇤)]
-    //            public void WhenMakerStartsAGame()
-    //            {
-    //            }
-    //        }
-    //        """);
+                namespace Sample.Tests;
 
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+                [Binding]
+                public class GameSteps
+                {
+                    [When({|#0:"{{whitespace}}"|})]
+                    public void WhenMakerStartsAGame()
+                    {
+                    }
+                }
+                """"
+        };
 
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-    //                source.GetMarkedLocation("/spec/Sample.feature"))
-    //        ]);
+        test.ExpectedDiagnostics.Add(
+            new DiagnosticResult(StepTextCannotBeNullOrEmptyAnalyzer.Rule)
+                .WithLocation(0));
 
-    //    result.GeneratedTrees.Should().BeEmpty();
-    //}
-
-    //[Fact]
-    //public void StepBindingWithEmptyText_GeneratesErrorStepTextCannotBeEmpty()
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        """
-    //        using Reqnroll;
-
-    //        namespace Sample.Tests;
-
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When(⇥""⇤)]
-    //            public void WhenMakerStartsAGame()
-    //            {
-    //            }
-    //        }
-    //        """);
-
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
-
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-    //                source.GetMarkedLocation("/spec/Sample.feature"))
-    //        ]);
-
-    //    result.GeneratedTrees.Should().BeEmpty();
-    //}
-
-    //[Theory]
-    //[InlineData(" ")]
-    //[InlineData("\t")]
-    //[InlineData("    ")]
-    //public void StepBindingWithWhitespaceText_GeneratesErrorStepTextCannotBeEmpty(string whitespace)
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        $$"""
-    //        using Reqnroll;
-
-    //        namespace Sample.Tests;
-
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When(⇥"{{whitespace}}"⇤)]
-    //            public void WhenMakerStartsAGame()
-    //            {
-    //            }
-    //        }
-    //        """);
-
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
-
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-    //                source.GetMarkedLocation("/spec/Sample.feature"))
-    //        ]);
-
-    //    result.GeneratedTrees.Should().BeEmpty();
-    //}
-
-
-    //[Theory]
-    //[InlineData(" ")]
-    //[InlineData("\t")]
-    //[InlineData("    ")]
-    //public void StepBindingWithLeadingWhitespace_GeneratesWarningStepTextHasLeadingWhitespace(string whitespace)
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        $$"""
-    //        using Reqnroll;
-
-    //        namespace Sample.Tests;
-
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When("⇥{{whitespace}}⇤Maker starts a game")]
-    //            public void WhenMakerStartsAGame()
-    //            {
-    //            }
-    //        }
-    //        """);
-
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
-
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.WarningStepTextHasLeadingWhitespace,
-    //                source.GetMarkedLocation("/spec/Sample.feature"))
-    //        ]);
-
-    //    result.GeneratedTrees.Should().NotBeEmpty();
-    //}
-
-    //[Theory]
-    //[InlineData(" ")]
-    //[InlineData("\t")]
-    //[InlineData("    ")]
-    //public void StepBindingWithTrailingWhitespace_GeneratesWarningStepTextHasTrailingWhitespace(string whitespace)
-    //{
-    //    var source = MarkedSourceText.Parse(
-    //        $$"""
-    //        using Reqnroll;
-
-    //        namespace Sample.Tests;
-
-    //        [Binding]
-    //        public class GameSteps
-    //        {
-    //            [When("Maker starts a game⇥{{whitespace}}⇤")]
-    //            public void WhenMakerStartsAGame()
-    //            {
-    //            }
-    //        }
-    //        """);
-
-    //    var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
-
-    //    result.Diagnostics.Should().BeEquivalentTo(
-    //        [
-    //            Diagnostic.Create(
-    //                DiagnosticDescriptors.WarningStepTextHasTrailingWhitespace,
-    //                source.GetMarkedLocation("/spec/Sample.feature"))
-    //        ]);
-
-    //    result.GeneratedTrees.Should().NotBeEmpty();
-    //}
+        await test.RunAsync();
+    }
 }
