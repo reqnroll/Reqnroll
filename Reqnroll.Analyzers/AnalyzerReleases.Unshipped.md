@@ -5,6 +5,8 @@
 
 Rule ID | Category | Severity | Notes
 --------|----------|----------|--------------------
-RR1001  |  Usage   |  Error   | RR1001_StepTextCannotBeNullOrEmptyAnalyzer
-RR1002  |  Usage   |  Error   | RR1002_StepMethodMustReturnVoidOrTaskAnalyzer
-RR1003  |  Usage   |  Error   | RR1003_AsyncStepMethodMustReturnTaskAnalyzer
+RR1001  |  Usage   |  Error   | StepTextAnalyzer
+RR1002  |  Usage   |  Error   | StepMethodMustReturnVoidOrTaskAnalyzer
+RR1003  |  Usage   |  Error   | AsyncStepMethodMustReturnTaskAnalyzer
+RR1004  |  Usage   | Warning  | StepTextAnalyzer
+RR1005  |  Usage   | Warning  | StepTextAnalyzer
