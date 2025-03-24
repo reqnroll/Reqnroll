@@ -135,16 +135,16 @@
   <data name="StepTextCannotBeNullOrEmptyMessage" xml:space="preserve">
     <value>The text of a step binding cannot be null, an empty string, or only contain whitespace characters. Add step text or remove the text argument to bind to the method name.</value>
   </data>
-  <data name="StepTextHasLeadingWhitespaceMessage" xml:space="preserve">
-    <value>Step text has leading whitespace</value>
-  </data>
-  <data name="StepTextHasLeadingWhitespaceTitle" xml:space="preserve">
-    <value>The text of this step binding includes some leading whitespace.</value>
-  </data>
-  <data name="StepTextHasTrailingWhitespaceMessage" xml:space="preserve">
+  <data name="StepTextShouldNotHaveTrailingWhitespaceMessage" xml:space="preserve">
     <value>Step text has trailing whitespace</value>
   </data>
-  <data name="StepTextHasTrailingWhitespaceTitle" xml:space="preserve">
+  <data name="StepTextShouldNotHaveTrailingWhitespaceTitle" xml:space="preserve">
     <value>The text of this step binding includes some trailing whitespace.</value>
+  </data>
+  <data name="StepTextShouldNotHaveLeadingWhitespaceMessage" xml:space="preserve">
+    <value>Step text has leading whitespace</value>
+  </data>
+  <data name="StepTextShouldNotHaveLeadingWhitespaceTitle" xml:space="preserve">
+    <value>The text of this step binding includes some leading whitespace.</value>
   </data>
 </root>

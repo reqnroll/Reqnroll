@@ -9,11 +9,9 @@ using static DiagnosticResources;
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
 public class StepMethodMustReturnVoidOrTaskAnalyzer : StepMethodAnalyzer
 {
-    private const string RuleId = "RR1002";
-
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
     internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-        RuleId,
+        "RR1002",
         CreateResourceString(nameof(StepMethodMustReturnVoidOrTaskTitle)),
         CreateResourceString(nameof(StepMethodMustReturnVoidOrTaskMessage)),
         DiagnosticCategory.Usage,
