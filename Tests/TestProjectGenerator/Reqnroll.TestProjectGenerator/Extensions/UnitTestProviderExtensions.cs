@@ -14,6 +14,7 @@ namespace Reqnroll.TestProjectGenerator.Extensions
                 case UnitTestProvider.NUnit4: 
                     return "NUnit";
                 case UnitTestProvider.xUnit: return "XUnit";
+                case UnitTestProvider.xUnit3: return "XUnit3";
                 default: throw new ArgumentOutOfRangeException(nameof(unitTestProvider), unitTestProvider, "value is not known");
             }
         }

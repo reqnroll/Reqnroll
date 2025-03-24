@@ -21,6 +21,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit4TestAdapterPackageVersion = "4.6.0";
         private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.10";
+        private const string XUnit3PackageVersion = "2.0.0";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -253,6 +254,9 @@ namespace Reqnroll.TestProjectGenerator
                     case UnitTestProvider.xUnit:
                         ConfigureXUnit();
                         break;
+                    case UnitTestProvider.xUnit3:
+                        ConfigureXUnit3();
+                        break;
                     case UnitTestProvider.NUnit3:
                         ConfigureNUnit3();
                         break;
@@ -330,6 +334,17 @@ namespace Reqnroll.TestProjectGenerator
             }
         }
 
+        private void ConfigureXUnit3()
+        {
+            _project.AddNuGetPackage("xunit.v3.core", XUnit3PackageVersion);
+            if (IsReqnrollFeatureProject)
+            {
+                _project.AddNuGetPackage("Reqnroll.xUnit.v3", _currentVersionDriver.ReqnrollNuGetVersion,
+                                         new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.xUnit3.ReqnrollPlugin.dll"), "net462\\Reqnroll.xUnit3.ReqnrollPlugin.dll"));
+                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.xUnit.v3", ReqnrollPluginType.Runtime));
+            }
+        }
+
         private void ConfigureMSTest()
         {
             _project.AddNuGetPackage("MSTest.TestAdapter", MSTestPackageVersion);
@@ -364,6 +379,9 @@ namespace Reqnroll.TestProjectGenerator
                     break;
                 case UnitTestProvider.xUnit:
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
+                    break;
+                case UnitTestProvider.xUnit3:
+                    _project.AddFile(new ProjectFile("XUnit3Configuration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
                     break;
                 case UnitTestProvider.NUnit3 when _parallelTestExecution:
                 case UnitTestProvider.NUnit4 when _parallelTestExecution:

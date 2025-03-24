@@ -100,7 +100,9 @@ namespace Reqnroll.TestProjectGenerator
         {
             switch (testRunConfiguration.UnitTestProvider)
             {
-                case UnitTestProvider.xUnit: return CalculateXUnitTestExecutionResult(testExecutionResult, trx);
+                case UnitTestProvider.xUnit: 
+                case UnitTestProvider.xUnit3: 
+                    return CalculateXUnitTestExecutionResult(testExecutionResult, trx);
                 case UnitTestProvider.MSTest: return CalculateMsTestTestExecutionResult(testExecutionResult);
                 case UnitTestProvider.NUnit3: 
                 case UnitTestProvider.NUnit4: 
