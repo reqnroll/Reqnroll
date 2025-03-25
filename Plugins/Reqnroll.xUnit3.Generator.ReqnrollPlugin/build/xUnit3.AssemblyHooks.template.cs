@@ -5,7 +5,7 @@ using System.CodeDom.Compiler;
 using global::System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-[assembly: global::Xunit.TestFramework("Reqnroll.xUnit3.ReqnrollPlugin.Xunit3TestFrameworkWithAssemblyFixture", "Reqnroll.xUnit3.ReqnrollPlugin")]
+[assembly: global::Xunit.TestFramework(typeof(Reqnroll.xUnit3.ReqnrollPlugin.XUnit3TestFrameworkWithAssemblyFixture))]
 [assembly: global::Xunit.AssemblyFixture(typeof(global::PROJECT_ROOT_NAMESPACE_XUnit3AssemblyFixture))]
 
 [GeneratedCode("Reqnroll", "REQNROLL_VERSION")]

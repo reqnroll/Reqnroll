@@ -223,7 +223,7 @@ namespace Reqnroll.TestProjectGenerator
                 _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
 
 
-                _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "16.4.0");
+                _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "17.12.0");
 
                 if (_project.ProjectFormat == ProjectFormat.Old)
                 {
@@ -337,6 +337,7 @@ namespace Reqnroll.TestProjectGenerator
         private void ConfigureXUnit3()
         {
             _project.AddNuGetPackage("xunit.v3.core", XUnit3PackageVersion);
+            _project.AddNuGetPackage("xunit.runner.visualstudio", "3.0.2");
             if (IsReqnrollFeatureProject)
             {
                 _project.AddNuGetPackage("Reqnroll.xUnit.v3", _currentVersionDriver.ReqnrollNuGetVersion,
