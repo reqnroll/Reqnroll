@@ -1,17 +1,12 @@
 using System;
+using Reqnroll.BoDi;
+using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using Xunit;
 
 namespace Reqnroll.xUnit3.ReqnrollPlugin;
 
-public class XUnit3TraceListener : ITraceListener
+public class XUnit3TraceListener(ITraceListenerQueue traceListenerQueue, IObjectContainer container)
+    : AsyncTraceListener(traceListenerQueue, container)
 {
-    public void WriteTestOutput(string message)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void WriteToolOutput(string message)
-    {
-        throw new NotImplementedException();
-    }
 }

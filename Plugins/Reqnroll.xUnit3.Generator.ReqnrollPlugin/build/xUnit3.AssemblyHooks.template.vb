@@ -5,7 +5,7 @@ Imports System.Runtime.CompilerServices
 Imports System.Threading.Tasks
 Imports System.Reflection
 
-<Assembly: Global.Xunit.TestFramework("Reqnroll.xUnit3.ReqnrollPlugin.XunitTestFrameworkWithAssemblyFixture", "Reqnroll.xUnit3.ReqnrollPlugin")>
+<Assembly: Global.Xunit.TestFramework(GetType(Reqnroll.xUnit3.ReqnrollPlugin.XUnit3TestFrameworkWithAssemblyFixture))>
 <Assembly: Global.Reqnroll.xUnit3.ReqnrollPlugin.AssemblyFixture(GetType(PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture))>
 
 <GeneratedCode("Reqnroll", "REQNROLL_VERSION")>
