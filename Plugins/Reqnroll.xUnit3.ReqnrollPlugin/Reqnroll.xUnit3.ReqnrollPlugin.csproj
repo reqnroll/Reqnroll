@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="xunit.v3.assert" Version="2.0.0" />
       <PackageReference Include="xunit.v3.extensibility.core" Version="2.0.0" />
     </ItemGroup>
 

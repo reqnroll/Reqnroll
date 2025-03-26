@@ -17,9 +17,6 @@ public class XUnit3GenerationTest : GenerationTestBase
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.xUnit3;
     }
 
-    protected override string GetExpectedPendingOutcome() => "Failed";
-    protected override string GetExpectedUndefinedOutcome() => "Failed";
-
     protected override void AssertScenarioLevelParallelExecution()
     {
         //nop - xUnit currently does not support method-level parallelization
