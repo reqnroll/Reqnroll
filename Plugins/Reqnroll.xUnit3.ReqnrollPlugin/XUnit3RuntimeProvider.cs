@@ -4,9 +4,9 @@ namespace Reqnroll.xUnit3.ReqnrollPlugin;
 
 public class XUnit3RuntimeProvider : IUnitTestRuntimeProvider
 {
-    public void TestPending(string message) => throw new XUnitPendingStepException(message);
+    public void TestPending(string message) => Xunit.Assert.Skip(message);
 
-    public void TestInconclusive(string message) => throw new XUnitInconclusiveException(message);
+    public void TestInconclusive(string message) => throw new XUnitInconclusiveException($"Test inconclusive: {message}");
 
-    public void TestIgnore(string message) => throw new XUnitIgnoreException(message);
+    public void TestIgnore(string message) => Xunit.Assert.Skip(message);
 }

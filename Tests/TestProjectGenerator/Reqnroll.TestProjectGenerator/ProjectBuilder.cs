@@ -337,6 +337,7 @@ namespace Reqnroll.TestProjectGenerator
         private void ConfigureXUnit3()
         {
             _project.AddNuGetPackage("xunit.v3.core", XUnit3PackageVersion);
+            _project.AddNuGetPackage("xunit.v3.assert", XUnit3PackageVersion);
             _project.AddNuGetPackage("xunit.runner.visualstudio", "3.0.2");
             if (IsReqnrollFeatureProject)
             {

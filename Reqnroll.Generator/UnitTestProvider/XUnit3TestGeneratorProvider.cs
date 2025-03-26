@@ -1,5 +1,6 @@
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Linq;
 using Reqnroll.BoDi;
 using Reqnroll.Generator.CodeDom;
 
@@ -8,11 +9,11 @@ namespace Reqnroll.Generator.UnitTestProvider;
 public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     : IUnitTestGeneratorProvider
 {
-    private CodeTypeDeclaration _currentFixtureDataTypeDeclaration = null;
+    private CodeTypeDeclaration _currentFixtureDataTypeDeclaration;
     private readonly CodeTypeReference _objectCodeTypeReference = new(typeof(object));
     private readonly CodeDomHelper _codeDomHelper = codeDomHelper;
 
-    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.None;
+    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests;
 
     public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
     {
@@ -36,7 +37,10 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestClassCategories(TestClassGenerationContext generationContext, IEnumerable<string> featureCategories)
     {
-        throw new System.NotImplementedException();
+        foreach (string category in featureCategories)
+        {
+            SetProperty(_currentFixtureDataTypeDeclaration, "Category", category);
+        }
     }
 
     public void SetTestClassIgnore(TestClassGenerationContext generationContext)
@@ -46,6 +50,18 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void FinalizeTestClass(TestClassGenerationContext generationContext)
     {
+        // testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<ITestOutputHelper>(_testOutputHelper);
+        generationContext.ScenarioInitializeMethod.Statements.Add(
+            new CodeMethodInvokeExpression(
+                new CodeMethodReferenceExpression(
+                    new CodePropertyReferenceExpression(
+                        new CodePropertyReferenceExpression(
+                            new CodeFieldReferenceExpression(null, generationContext.TestRunnerField.Name),
+                            nameof(ScenarioContext)),
+                        nameof(ScenarioContext.ScenarioContainer)),
+                    nameof(IObjectContainer.RegisterInstanceAs),
+                    new CodeTypeReference("Xunit.ITestOutputHelper")),
+                new CodeVariableReferenceExpression("_testOutputHelper")));
     }
 
     public void SetTestClassNonParallelizable(TestClassGenerationContext generationContext)
@@ -55,6 +71,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
     {
+        // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
 
         // ValueTask IAsyncLifetime.InitializeAsync() { <fixtureSetupMethod>(); }
@@ -80,6 +97,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
     {
+        // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
         
         // ValueTask IAsyncDisposable.DisposeAsync() { <fixtureTearDownMethod>(); }
@@ -137,7 +155,6 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     public void SetTestCleanupMethod(TestClassGenerationContext generationContext)
     {
         // ValueTask IAsyncLifetime.DisposeAsync() { <memberMethod>(); }
-
         var disposeMethod = new CodeMemberMethod
         {
             PrivateImplementationType = new CodeTypeReference("System.IAsyncDisposable"),
@@ -161,6 +178,8 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     public void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
     {
         _codeDomHelper.AddAttribute(testMethod, "Xunit.FactAttribute", new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
+        SetProperty(testMethod, "FeatureTitle", generationContext.Feature.Name);
+        SetDescription(testMethod, friendlyTestName);
     }
 
     public void SetTestMethodCategories(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> scenarioCategories)
@@ -169,21 +188,48 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestMethodIgnore(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
     {
-        throw new System.NotImplementedException();
+        var factAttr = testMethod.CustomAttributes
+                                 .OfType<CodeAttributeDeclaration>()
+                                 .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == "Xunit.FactAttribute");
+
+        // set [FactAttribute(Skip="reason")]
+        factAttr?.Arguments.Add(new CodeAttributeArgument("Skip", new CodePrimitiveExpression("Ignored")));
+
+        var theoryAttr = testMethod.CustomAttributes
+                                   .OfType<CodeAttributeDeclaration>()
+                                   .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == "Xunit.TheoryAttribute");
+
+        // set [TheoryAttribute(Skip="reason")]
+        theoryAttr?.Arguments.Add(new CodeAttributeArgument("Skip", new CodePrimitiveExpression("Ignored")));
     }
 
     public void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
     {
-        throw new System.NotImplementedException();
+        _codeDomHelper.AddAttribute(testMethod, "Xunit.TheoryAttribute", new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(scenarioTitle)));
+        SetProperty(testMethod, "FeatureTitle", generationContext.Feature.Name);
+        SetDescription(testMethod, scenarioTitle);
     }
 
+    // Set InlineDataAttribute for row test
     public void SetRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> arguments, IEnumerable<string> tags, bool isIgnored)
     {
-        throw new System.NotImplementedException();
+        if (isIgnored)
+        {
+            return;
+        }
+
+        var args = arguments.Select(arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
+
+        args.Add(
+            new CodeAttributeArgument(
+                new CodeArrayCreateExpression(typeof(string[]), tags.Select(CodeExpression (t) => new CodePrimitiveExpression(t)).ToArray())));
+
+        _codeDomHelper.AddAttribute(testMethod, "Xunit.InlineDataAttribute", args.ToArray());
     }
 
     public void SetTestMethodAsRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle, string exampleSetName, string variantName, IEnumerable<KeyValuePair<string, string>> arguments)
     {
+        // doing nothing since we support RowTest
     }
 
     public void MarkCodeMethodInvokeExpressionAsAwait(CodeMethodInvokeExpression expression)
@@ -224,5 +270,16 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callTestInitializeMethodExpression);
 
         method.Statements.Add(callTestInitializeMethodExpression);
+    }
+    
+    private void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
+    {
+        _codeDomHelper.AddAttribute(codeTypeMember, "Xunit.TraitAttribute", name, value);
+    }
+    
+    private void SetDescription(CodeTypeMember codeTypeMember, string description)
+    {
+        // xUnit doesn't have a DescriptionAttribute so using a TraitAttribute instead
+        SetProperty(codeTypeMember, "Description", description);
     }
 }
