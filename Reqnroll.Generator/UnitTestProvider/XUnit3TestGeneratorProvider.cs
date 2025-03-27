@@ -90,7 +90,12 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             new CodeTypeReferenceExpression(new CodeTypeReference(generationContext.TestClass.Name)),
             generationContext.TestClassInitializeMethod.Name);
 
-        _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+        // Skip awaiting for VB when the method returns ValueTask
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+              initializeMethod.ReturnType.BaseType.Contains("ValueTask")))
+        {
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+        }
 
         initializeMethod.Statements.Add(expression);
     }
@@ -116,7 +121,12 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             new CodeTypeReferenceExpression(new CodeTypeReference(generationContext.TestClass.Name)),
             generationContext.TestClassCleanupMethod.Name);
 
-        _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+        // Skip awaiting for VB when the method returns ValueTask
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+              disposeMethod.ReturnType.BaseType.Contains("ValueTask")))
+        {
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+        }
 
         disposeMethod.Statements.Add(expression);
     }
@@ -144,7 +154,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             Name = "InitializeAsync",
             ReturnType = new CodeTypeReference(typeof(System.Threading.Tasks.ValueTask))
         };
-        
+
         _codeDomHelper.MarkCodeMemberMethodAsAsync(initializeMethod);
 
         generationContext.TestClass.Members.Add(initializeMethod);
@@ -169,8 +179,13 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         var expression = new CodeMethodInvokeExpression(
             new CodeThisReferenceExpression(),
             generationContext.TestCleanupMethod.Name);
-
-        _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+        
+        // Skip awaiting for VB when the method returns ValueTask
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+              disposeMethod.ReturnType.BaseType.Contains("ValueTask")))
+        {
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+        }
 
         disposeMethod.Statements.Add(expression);
     }
@@ -267,7 +282,12 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             new CodeThisReferenceExpression(),
             generationContext.TestInitializeMethod.Name);
 
-        _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callTestInitializeMethodExpression);
+        // Skip awaiting for VB when the method returns ValueTask
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+             method.ReturnType.BaseType.Contains("ValueTask")))
+        {
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callTestInitializeMethodExpression);
+        }
 
         method.Statements.Add(callTestInitializeMethodExpression);
     }
