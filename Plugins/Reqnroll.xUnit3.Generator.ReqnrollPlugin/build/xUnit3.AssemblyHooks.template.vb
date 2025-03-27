@@ -13,15 +13,15 @@ Public Class PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture
     Implements Global.Xunit.IAsyncLifetime
 
     <MethodImpl(MethodImplOptions.NoInlining)>
-    Public Async Function InitializeAsync() As Task Implements Global.Xunit.IAsyncLifetime.InitializeAsync
+    Public Function InitializeAsync() As ValueTask Implements Global.Xunit.IAsyncLifetime.InitializeAsync
         Dim currentAssembly As Assembly = GetType(PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture).Assembly
-        Await Global.Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly)
+        Global.Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly)
     End Function
 
     <MethodImpl(MethodImplOptions.NoInlining)>
-    Private Async Function DisposeAsync() As Task Implements Global.Xunit.IAsyncLifetime.DisposeAsync
+    Private Function DisposeAsync() As ValueTask Implements Global.Xunit.IAsyncLifetime.DisposeAsync
         Dim currentAssembly As Assembly = GetType(PROJECT_ROOT_NAMESPACE_XUnitAssemblyFixture).Assembly
-        Await Global.Reqnroll.TestRunnerManager.OnTestRunEndAsync(currentAssembly)
+        Global.Reqnroll.TestRunnerManager.OnTestRunEndAsync(currentAssembly)
     End Function
 End Class
 
