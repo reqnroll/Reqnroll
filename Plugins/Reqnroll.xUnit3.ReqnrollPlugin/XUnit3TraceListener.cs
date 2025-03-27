@@ -14,11 +14,19 @@ public class XUnit3TraceListener(ITraceListenerQueue traceListenerQueue, IObject
     {
         var testOutputHelper = GetTestOutputHelper();
         if (testOutputHelper != null)
-            testOutputHelper.WriteLine(message);
+            testOutputHelper.WriteLine("-> " + message);
         else
             base.WriteTestOutput(message);
     }
 
+    public override void WriteToolOutput(string message)
+    {
+        var testOutputHelper = GetTestOutputHelper();
+        if (testOutputHelper != null)
+            testOutputHelper.WriteLine(message);
+        else
+            base.WriteToolOutput(message);
+    }
     private ITestOutputHelper GetTestOutputHelper()
     {
         var scenarioContext = _contextManager.Value.ScenarioContext;
