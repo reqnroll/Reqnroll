@@ -136,25 +136,25 @@ public class StepDefinitionDescriptor
     /// Initializes a new instance of the <see cref="StepDefinitionDescriptor"/> class.
     /// </summary>
     /// <param name="displayName">A friendly name for this step.</param>
-    /// <param name="type">The type of the step definition.</param>
+    /// <param name="matchedTypes">The step types matched by this definition.</param>
     /// <param name="textPattern">The text pattern that must be matched by step text.</param>
     /// <param name="parameters">The parameters of the step definition.</param>
     /// <exception cref="ArgumentException">
-    /// <para><paramref name="textPattern"/> is an empty text pattern.</para>
+    /// <para><paramref name="matchedTypes"/> is a default value or empty.</para>
     /// </exception>
     public StepDefinitionDescriptor(
         string displayName,
-        StepDefinitionType type,
+        ImmutableArray<StepDefinitionType> matchedTypes,
         StepTextPattern textPattern,
         ImmutableArray<StepParameterDescriptor> parameters = default)
     {
-        if (textPattern.IsEmpty)
+        if (matchedTypes.IsDefaultOrEmpty)
         {
-            throw new ArgumentException("Value cannot be an empty text pattern.", nameof(textPattern));
+            throw new ArgumentException("Array cannot be default or empty.", nameof(matchedTypes));
         }
 
         DisplayName = displayName;
-        Type = type;
+        MatchedTypes = matchedTypes;
         TextPattern = textPattern;
         Parameters = parameters.IsDefault ? [] : parameters;
     }
@@ -165,9 +165,9 @@ public class StepDefinitionDescriptor
     public string DisplayName { get; }
 
     /// <summary>
-    /// Gets the type of the step defintion, indicating the class of keyword it will bind to.
+    /// Gets step types matched by this definition, indicating the class of keyword it will bind to.
     /// </summary>
-    public StepDefinitionType Type { get; }
+    public ImmutableArray<StepDefinitionType> MatchedTypes { get; }
 
     /// <summary>
     /// Gets the text pattern that must be matched by step text.
