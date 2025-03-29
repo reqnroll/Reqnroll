@@ -119,7 +119,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         }
 
         // This method will get called after TestRunStartedEvent has been published and after any BeforeTestRun hooks have been called
-        // The TestRunStartedEvent will be used by the FileOutputPlugin to launch the File writing thread and establish Messages configuration
+        // The TestRunStartedEvent will be used by the MessagesFormatterPlugin to launch the File writing thread and establish Messages configuration
         // Running this after the BeforeTestRun hooks will allow them to programmatically configure CucumberMessages
         private void PublisherStartup(object sender, RuntimePluginBeforeTestRunEventArgs args)
         {

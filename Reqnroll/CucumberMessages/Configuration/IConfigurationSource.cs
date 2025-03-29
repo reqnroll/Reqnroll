@@ -6,6 +6,6 @@ namespace Reqnroll.CucumberMessages.Configuration
 {
     internal interface IConfigurationSource
     {
-        ConfigurationDTO GetConfiguration();
+        IDictionary<string, string> GetConfiguration();
     }
 }

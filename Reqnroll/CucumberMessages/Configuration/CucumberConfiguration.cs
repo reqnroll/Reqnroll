@@ -6,8 +6,10 @@ using Reqnroll.Tracing;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Dynamic;
 using System.IO;
 using System.Linq;
+using System.Text.Json;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
@@ -26,7 +28,6 @@ namespace Reqnroll.CucumberMessages.Configuration
     {
         public static ICucumberMessagesConfiguration Current { get; private set; }
         public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
-        public string OutputFilePath => _resolvedConfiguration.Value.OutputFilePath;
 
         private readonly IObjectContainer _objectContainer;
         private Lazy<ITraceListener> _traceListenerLazy;
@@ -52,71 +53,64 @@ namespace Reqnroll.CucumberMessages.Configuration
         }
         #endregion
 
+        public string FormatterConfiguration(string formatterName)
+        {
+            var config = _resolvedConfiguration.Value;
+            return config.Formatters[formatterName];
+        }
 
         private ResolvedConfiguration ResolveConfiguration()
         {
             var config = ApplyHierarchicalConfiguration();
             var resolved = ApplyEnvironmentOverrides(config);
 
-            // a final sanity check, the filename cannot be empty
-            if (string.IsNullOrEmpty(resolved.OutputFilePath))
-            {
-                resolved.OutputFilePath = "./reqnroll_report.ndjson";
-            }
-            EnsureOutputDirectory(resolved);
             return resolved;
         }
-        private ConfigurationDTO ApplyHierarchicalConfiguration()
+        private ResolvedConfiguration ApplyHierarchicalConfiguration()
         {
             var defaultConfigurationProvider = new DefaultConfigurationSource(_environmentWrapper);
             var fileBasedConfigurationProvider = new ConfigFile_ConfigurationSource(_reqnrollJsonLocator);
 
-            ConfigurationDTO defaultConfig = defaultConfigurationProvider.GetConfiguration();
-            ConfigurationDTO fileBasedConfig = fileBasedConfigurationProvider.GetConfiguration();
-            defaultConfig = MergeConfigs(defaultConfig, fileBasedConfig);
-            return defaultConfig;
-        }
+            var defaultConfigEntries = defaultConfigurationProvider.GetConfiguration();
+            var fileBasedConfigEntries = fileBasedConfigurationProvider.GetConfiguration();
 
-        private ResolvedConfiguration ApplyEnvironmentOverrides(ConfigurationDTO config)
-        {
-            var filePathValue = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILEPATH_ENVIRONMENT_VARIABLE);
+            foreach (var entry in fileBasedConfigEntries)
+                defaultConfigEntries.Add(entry.Key, entry.Value);
 
-            var result = new ResolvedConfiguration()
-            {
-                Enabled = config.Enabled,
-                OutputFilePath = config.OutputFilePath
-            };
-
-            if (filePathValue is Success<string>)
-                result.OutputFilePath = ((Success<string>)filePathValue).Result;
-
-
-            var enabledResult = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
-            result.Enabled = enabledResult is Success<string> ? Convert.ToBoolean(((Success<string>)enabledResult).Result) : result.Enabled;
-
+            ResolvedConfiguration result = new() { Formatters = defaultConfigEntries, Enabled = defaultConfigEntries.Count > 0 };
             return result;
         }
 
-        private ConfigurationDTO MergeConfigs(ConfigurationDTO rootConfig, ConfigurationDTO overridingConfig)
+        private ResolvedConfiguration ApplyEnvironmentOverrides(ResolvedConfiguration config)
         {
-            if (overridingConfig != null)
+            //Debugger.Launch();
+
+            var formatters = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE);
+            // treating formatters as a json string containing an object, iterate over the properties and add them to the configuration, replacing all existing values;
+            if (formatters is Success<string> formattersSuccess)
             {
-                rootConfig.Enabled = overridingConfig.Enabled;
-                rootConfig.OutputFilePath = overridingConfig.OutputFilePath ?? rootConfig.OutputFilePath;
+                config.Formatters.Clear();
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    ReadCommentHandling = JsonCommentHandling.Skip
+                };
+                using JsonDocument formattersDoc = JsonDocument.Parse(formattersSuccess.Result, new JsonDocumentOptions()
+                {
+                    CommentHandling = JsonCommentHandling.Skip
+                });
+                var formattersEntry = formattersDoc.RootElement;
+                foreach (JsonProperty jsonProperty in formattersEntry.EnumerateObject())
+                {
+                    config.Formatters[jsonProperty.Name] = jsonProperty.Value.GetRawText();
+                }
             }
 
-            return rootConfig;
+            var enabledVariable = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
+            var enabledVariableValue = enabledVariable is Success<string> ? Convert.ToBoolean(((Success<string>)enabledVariable).Result) : config.Enabled;
+            config.Enabled = config.Enabled && enabledVariableValue;
+            return config;
         }
-
-        private void EnsureOutputDirectory(ResolvedConfiguration config)
-        {
-
-            if (!Directory.Exists(Path.GetDirectoryName(config.OutputFilePath)))
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(config.OutputFilePath));
-            }
-        }
-
     }
 }
 

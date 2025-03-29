@@ -19,11 +19,11 @@ using Io.Cucumber.Messages.Types;
 namespace Reqnroll.CucumberMessages.PubSub
 {
     /// <summary>
-    /// The FileOutputPlugin is the subscriber to the CucumberMessageBroker. 
+    /// The MessagesFormatterPlugin is the subscriber to the CucumberMessageBroker. 
     /// It receives Cucumber Messages and writes them to a file.
     /// 
     /// </summary>
-    public class FileOutputPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
+    public class MessagesFormatterPlugin : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private Task? fileWritingTask;
 
@@ -37,7 +37,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         private IObjectContainer? testThreadObjectContainer;
         private IObjectContainer? globalObjectContainer;
 
-        public FileOutputPlugin(ICucumberMessagesConfiguration configuration)
+        public MessagesFormatterPlugin(ICucumberMessagesConfiguration configuration)
         {
             _configuration = configuration;
             traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
@@ -78,12 +78,40 @@ namespace Reqnroll.CucumberMessages.PubSub
                 // and this class is not registered as a CucumberMessageSink, which indicates to the Broker that Messages are disabled.
                 return;
             }
-            string baseDirectory = Path.GetDirectoryName(config.OutputFilePath);
-            string fileName = SanitizeFileName(Path.GetFileName(config.OutputFilePath));
+            string messagesConfiguration = config.FormatterConfiguration("messages");
+            string outputFilePath = String.Empty;
+            int colonIndex = messagesConfiguration.IndexOf(':');
+            if (colonIndex != -1)
+            {
+                int firstQuoteIndex = messagesConfiguration.IndexOf('"', colonIndex);
+                if (firstQuoteIndex != -1)
+                {
+                    int secondQuoteIndex = messagesConfiguration.IndexOf('"', firstQuoteIndex + 1);
+                    if (secondQuoteIndex != -1)
+                    {
+                        outputFilePath = messagesConfiguration.Substring(firstQuoteIndex + 1, secondQuoteIndex - firstQuoteIndex - 1);
+                    }
+                }
+            }
+            if (String.IsNullOrEmpty(outputFilePath))
+                outputFilePath = ".\\reqnroll_report.ndjson";
+
+            string baseDirectory = Path.GetDirectoryName(outputFilePath);
+            if (!Directory.Exists(baseDirectory))
+            {
+                Directory.CreateDirectory(baseDirectory);
+            }
+
+            string fileName = SanitizeFileName(Path.GetFileName(outputFilePath));
+            if (!fileName.EndsWith(".ndjson", StringComparison.OrdinalIgnoreCase))
+            {
+                fileName += ".ndjson";
+            }
+
             string outputPath = Path.Combine(baseDirectory, fileName);
             fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFilesBackgroundTask(outputPath), TaskCreationOptions.LongRunning);
 
-            globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
+            globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_MessagesOutputPlugin", true);
         }
         private static byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
         public async Task PublishAsync(Envelope message)

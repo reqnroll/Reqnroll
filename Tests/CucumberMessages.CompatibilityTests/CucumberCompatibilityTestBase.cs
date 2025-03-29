@@ -23,7 +23,7 @@ namespace CucumberMessages.Tests
 {
     public class CucumberCompatibilityTestBase : SystemTestBase
     {
-        private const string DefaultSamplesDirectoryPlaceholder = "[BaseDirectory]";
+        private const string DEFAULTSAMPLESDIRECTORYPLACEHOLDER = "[BaseDirectory]";
 
         protected override void TestCleanup()
         {
@@ -42,7 +42,9 @@ namespace CucumberMessages.Tests
                 var path = Path.GetDirectoryName(ActualsResultLocationDirectory());
                 fileName = Path.Combine(path!, fileName);
             }
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILEPATH_ENVIRONMENT_VARIABLE, fileName);
+            string messageFormatter = "{\"messages\" : { \"outputFilePath\" : \"" + fileName.Replace("\\", "\\\\") + "\" } }";
+
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE, messageFormatter);
         }
 
         protected void DisableCucumberMessages()
@@ -59,7 +61,7 @@ namespace CucumberMessages.Tests
 
         protected void ResetCucumberMessagesOutputFileName()
         {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_OUTPUT_FILEPATH_ENVIRONMENT_VARIABLE, null);
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
@@ -111,7 +113,7 @@ namespace CucumberMessages.Tests
         {
             var configFileContent = File.ReadAllText(configFileName);
             var samplesDirectory = GetDefaultSamplesDirectory();
-            configFileContent = configFileContent.Replace(DefaultSamplesDirectoryPlaceholder, samplesDirectory.Replace(@"\", @"\\"));
+            configFileContent = configFileContent.Replace(DEFAULTSAMPLESDIRECTORYPLACEHOLDER, samplesDirectory.Replace(@"\", @"\\"));
             AddJsonConfigFileContent(configFileContent);
         }
 
@@ -126,7 +128,25 @@ namespace CucumberMessages.Tests
             var env = new EnvironmentWrapper();
             var jsonConfigFileLocator = new ReqnrollJsonLocator();
             CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env, jsonConfigFileLocator);
-            string configurationPath = configuration.OutputFilePath.Replace(DefaultSamplesDirectoryPlaceholder, GetDefaultSamplesDirectory());
+            string messagesConfiguration = configuration.FormatterConfiguration("messages");
+            string outputFilePath = String.Empty;
+            int colonIndex = messagesConfiguration.IndexOf(':');
+            if (colonIndex != -1)
+            {
+                int firstQuoteIndex = messagesConfiguration.IndexOf('"', colonIndex);
+                if (firstQuoteIndex != -1)
+                {
+                    int secondQuoteIndex = messagesConfiguration.IndexOf('"', firstQuoteIndex + 1);
+                    if (secondQuoteIndex != -1)
+                    {
+                        outputFilePath = messagesConfiguration.Substring(firstQuoteIndex + 1, secondQuoteIndex - firstQuoteIndex - 1);
+                    }
+                }
+            }
+            if (String.IsNullOrEmpty(outputFilePath))
+                outputFilePath = ".\\reqnroll_report.ndjson";
+
+            string configurationPath = outputFilePath.Replace(DEFAULTSAMPLESDIRECTORYPLACEHOLDER, GetDefaultSamplesDirectory());
             return configurationPath;
         }
 

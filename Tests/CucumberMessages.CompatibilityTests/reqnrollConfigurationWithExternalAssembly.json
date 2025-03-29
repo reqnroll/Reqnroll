@@ -6,9 +6,9 @@
       "assembly": "ExternalBindingsProject"
     }
   ],
-  "cucumberMessagesConfiguration": {
-    "enabled": true,
-    "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson",
-    "iDGenerationStyle": "INCREMENTING"
+  "formatters": {
+    "messages": {
+      "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson"
+    }
   }
 }

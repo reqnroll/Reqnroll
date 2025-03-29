@@ -18,14 +18,9 @@ namespace Reqnroll.CucumberMessages.Configuration
         {
             _environmentWrapper = environmentWrapper;
         }
-        public ConfigurationDTO GetConfiguration()
+        public IDictionary<string, string> GetConfiguration()
         {
-            var res = new ConfigurationDTO();
-            string defaultOutputFileName = "./reqnroll_report.ndjson";
-
-            res.Enabled = false;
-            res.OutputFilePath = defaultOutputFileName;
-            return res;
+            return new Dictionary<string, string>();
         }
     }
 }

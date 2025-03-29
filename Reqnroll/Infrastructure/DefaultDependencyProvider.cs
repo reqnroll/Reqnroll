@@ -104,7 +104,7 @@ namespace Reqnroll.Infrastructure
 
             //Support for publishing Cucumber Messages
             container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
-            container.RegisterTypeAs<FileOutputPlugin, IRuntimePlugin>("FileOutputPlugin");
+            container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
         }
