@@ -13,6 +13,7 @@ using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing;
 using System.Text;
 using System.Collections.Concurrent;
+using Io.Cucumber.Messages.Types;
 
 
 namespace Reqnroll.CucumberMessages.PubSub
@@ -28,7 +29,7 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         //Thread safe collections to hold:
         // 1. Inbound Cucumber Messages - BlockingCollection<Cucumber Message>
-        private readonly BlockingCollection<ReqnrollCucumberMessage> _postedMessages = new();
+        private readonly BlockingCollection<Envelope> _postedMessages = new();
 
         private ICucumberMessagesConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
@@ -85,7 +86,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, "CucumberMessages_FileOutputPlugin", true);
         }
         private static byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
-        public async Task PublishAsync(ReqnrollCucumberMessage message)
+        public async Task PublishAsync(Envelope message)
         {
             await Task.Run( () => _postedMessages.Add(message));
         }
@@ -96,12 +97,12 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             foreach (var message in _postedMessages.GetConsumingEnumerable())
             {
-                if (message.Envelope != null)
+                if (message != null)
                 {
-                    NdjsonSerializer.SerializeToStream(fileStream!, message.Envelope);
+                    NdjsonSerializer.SerializeToStream(fileStream!, message);
 
                     // Write a newline after each message, except for the last one
-                    if(message.Envelope.TestRunFinished == null)
+                    if(message.TestRunFinished == null)
                         fileStream!.Write(nl, 0, nl.Length);
                 }
             }

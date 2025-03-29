@@ -137,12 +137,12 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             Task.Run(async () =>
             {
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now, _testRunStartedId)) });
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = CucumberMessageFactory.ToMeta(args.ObjectContainer) });
+                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now, _testRunStartedId)) );
+                await _broker.PublishAsync(CucumberMessageFactory.ToMeta(args.ObjectContainer) );
                 foreach (var msg in PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer))
                 {
                     // this publishes StepDefinition, Hook, StepArgumentTransform messages
-                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "startup", Envelope = msg });
+                    await _broker.PublishAsync(msg);
                 }
             }).Wait();
         }
@@ -224,15 +224,15 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 foreach (var env in testCaseMessages)
                 {
-                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testCaseMessages", Envelope = env });
+                    await _broker.PublishAsync(env);
                 }
 
                 foreach (var env in executionMessages)
                 {
-                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "testExecutionMessages", Envelope = env });
+                    await _broker.PublishAsync(env);
                 }
 
-                await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = "shutdown", Envelope = Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now, _testRunStartedId)) });
+                await _broker.PublishAsync( Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now, _testRunStartedId)) );
             }).Wait();
 
             _startedFeatures.Clear();
@@ -280,7 +280,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                             {
                                 foreach (var msg in ft.StaticMessages) // Static Messages == known at compile-time (Source, Gerkhin Document, and Pickle messages)
                                 {
-                                    await _broker.PublishAsync(new ReqnrollCucumberMessage() { CucumberMessageSource = featureName, Envelope = msg });
+                                    await _broker.PublishAsync(msg);
                                 }
                             }).Wait();
                         _startedFeatures.TryAdd(featureName, ft);

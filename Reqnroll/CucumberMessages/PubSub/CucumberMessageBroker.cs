@@ -1,4 +1,5 @@
-﻿using Reqnroll.BoDi;
+﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.BoDi;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.Tracing;
 using System;
@@ -16,7 +17,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     public interface ICucumberMessageBroker
     {
         bool Enabled { get; }
-        Task PublishAsync(ReqnrollCucumberMessage featureMessages);
+        Task PublishAsync(Envelope featureMessages);
     }
 
     /// <summary>
@@ -38,7 +39,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             _objectContainer = objectContainer;
             RegisteredSinks = new Lazy<IEnumerable<ICucumberMessageSink>>(() => _objectContainer.ResolveAll<ICucumberMessageSink>());
         }
-        public async Task PublishAsync(ReqnrollCucumberMessage message)
+        public async Task PublishAsync(Envelope message)
         {
             foreach (var sink in RegisteredSinks.Value)
             {
