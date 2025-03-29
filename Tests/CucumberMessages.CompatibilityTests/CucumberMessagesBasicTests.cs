@@ -328,6 +328,25 @@ namespace CucumberMessages.Tests
             stepDefs.Any(sd => sd.SourceReference.JavaMethod.ClassName.Contains("SampleExternalBindingClass")).Should().BeTrue("StepDefinition for SampleExternalBindingClass should be found in the StepDefinitions");
 
         }
+
+        [TestMethod]
+        public void SmokeRendersHTML()
+        {
+            ResetCucumberMessagesHTML("reqnoll_report.html");
+            EnableCucumberMessages();
+            CucumberMessagesAddConfigurationFile("reqnroll_withHtmlOutput.json");
+
+            AddFeatureFile("""
+                Feature: Cucumber Messages Smoke Test
+                  Scenario: Eating Cukes
+                     When I eat 5 cukes
+                """);
+
+            AddPassingStepBinding("When");
+            ExecuteTests();
+
+            ShouldAllScenariosPass();
+        }
     }
 
 }

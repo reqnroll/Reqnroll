@@ -58,6 +58,12 @@ namespace CucumberMessages.Tests
             ResetCucumberMessagesOutputFileName();
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, null);
         }
+        protected void ResetCucumberMessagesHTML(string? fileToDelete = null)
+        {
+            DeletePreviousMessagesOutput(fileToDelete);
+            ResetCucumberMessagesOutputFileName();
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, null);
+        }
 
         protected void ResetCucumberMessagesOutputFileName()
         {

@@ -56,7 +56,9 @@ namespace Reqnroll.CucumberMessages.Configuration
         public string FormatterConfiguration(string formatterName)
         {
             var config = _resolvedConfiguration.Value;
-            return config.Formatters[formatterName];
+            if (config.Formatters.TryGetValue(formatterName, out var formatterConfig))
+                return formatterConfig;
+            else return String.Empty;
         }
 
         private ResolvedConfiguration ResolveConfiguration()

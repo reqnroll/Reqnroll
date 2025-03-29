@@ -223,6 +223,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="reqnroll_withHtmlOutput.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="reqnrollConfigurationWithExternalAssembly.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
