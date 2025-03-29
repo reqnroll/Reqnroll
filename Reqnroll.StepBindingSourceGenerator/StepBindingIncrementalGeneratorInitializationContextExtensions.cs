@@ -92,7 +92,6 @@ internal static class StepBindingIncrementalGeneratorInitializationContextExtens
                 new MethodInfo(
                     methodSymbol.Name,
                     new QualifiedTypeName(methodSymbol.ContainingNamespace.Name, methodSymbol.ContainingType.Name),
-                    DiagnosticLocation.CreateFrom(methodSyntax.Identifier),
                     methodSymbol.ReturnsVoid,
                     methodSymbol.ReturnType.ToDisplayString() == "System.Threading.Tasks.Task",
                     methodSymbol.IsAsync,
