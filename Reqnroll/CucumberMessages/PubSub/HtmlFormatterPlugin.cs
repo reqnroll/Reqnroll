@@ -32,10 +32,6 @@ namespace Reqnroll.CucumberMessages.PubSub
         {
             _configuration = configuration;
         }
-        public void Dispose()
-        {
-            throw new NotImplementedException();
-        }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
@@ -56,6 +52,13 @@ namespace Reqnroll.CucumberMessages.PubSub
         private void Close(TestRunFinishedEvent @event)
         {
             Dispose(true);
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         private bool disposedValue = false;
