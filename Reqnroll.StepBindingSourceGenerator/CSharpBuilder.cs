@@ -71,6 +71,8 @@ internal class CSharpBuilder
         return this;
     }
 
+    public CSharpBuilder BeginBlock(string delimiter) => AppendLine(delimiter).BeginBlock();
+
     public CSharpBuilder BeginBlock(char delimiter) => AppendLine(delimiter).BeginBlock();
 
     public CSharpBuilder EndBlock()
@@ -93,6 +95,8 @@ internal class CSharpBuilder
     }
 
     public CSharpBuilder EndBlock(char delimiter) => EndBlock().AppendLine(delimiter);
+
+    public CSharpBuilder EndBlock(string delimiter) => EndBlock().AppendLine(delimiter);
 
     public override string ToString() => _builder.ToString();
 }

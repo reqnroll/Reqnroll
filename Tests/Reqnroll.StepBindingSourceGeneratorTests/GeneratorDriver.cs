@@ -24,6 +24,7 @@ public class GeneratorDriver
 
         assemblies.Add(typeof(object).Assembly);
         assemblies.Add(typeof(NotImplementedException).Assembly);
+        assemblies.Add(typeof(ImmutableArray).Assembly);
 
         // Reqnroll.dll
         assemblies.Add(typeof(WhenAttribute).Assembly);
