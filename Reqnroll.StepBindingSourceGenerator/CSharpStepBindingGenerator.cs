@@ -1,115 +1,130 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Text;
 using System.Collections;
 using System.Collections.Immutable;
-using System.Text.RegularExpressions;
-using System.Xml.Linq;
 
 namespace Reqnroll.StepBindingSourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
 public class CSharpStepBindingGenerator : IIncrementalGenerator
 {
-    private static readonly Regex LeadingWhitespacePattern = new(@"^\s+", RegexOptions.Compiled);
-    private static readonly Regex TrailingWhitespacePattern = new(@"\s+$", RegexOptions.Compiled);
-
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
-        var stepDefinitions = context.SyntaxProvider
-            .ForAttributeWithMetadataName(
-                "Reqnroll.WhenAttribute",
-                static (syntaxNode, _) => syntaxNode is MethodDeclarationSyntax,
-                static (context, cancellationToken) => ExtractStepDeclaration(context, StepKeyword.When, cancellationToken))
-            .Combine(context.AnalyzerConfigOptionsProvider)
-            .SelectMany(static (stepDefinitionsAndOptionsProvider, cancellationToken) =>
-            {
-                var (stepDefinitions, optionsProvider) = stepDefinitionsAndOptionsProvider;
+        // Obtain step definitions by looking for the various attributes
+        var givenStepDefinitions = context
+            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.GivenAttribute", StepKeywordMatch.Given);
+        var whenStepDefinitions = context
+            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.WhenAttribute", StepKeywordMatch.When);
+        var thenStepDefinitions = context
+            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.ThenAttribute", StepKeywordMatch.Then);
+        var otherStepDefinitions = context
+            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.StepDefinitionAttribute", StepKeywordMatch.Any);
 
-                return CombineStepDefinitionDataWithConfig(stepDefinitions, optionsProvider, cancellationToken);
+        // Combine all step definitions into a single stream and create definitions for emittings
+        var allStepDefinitions = givenStepDefinitions.Collect()
+            .Combine(whenStepDefinitions.Collect())
+            .Combine(thenStepDefinitions.Collect())
+            .Combine(otherStepDefinitions.Collect())
+            .SelectMany(static (definitions, _) =>
+            {
+                var (((givens, whens), thens), others) = definitions;
+
+                return givens.Concat(whens).Concat(thens).Concat(others);
             })
-            .Select(static (declaration, cancellationToken) =>
+            .Select(static (definitionSyntax, cancellationToken) =>
             {
-                var diagnostics = ImmutableArray.CreateBuilder<DiagnosticInfo>();
-                var bindingMethod = BindingMethod.CucumberExpression;
-                var invocationStyle = MethodInvocationStyle.Synchronous;
-                string? textPattern = null;
-                var name = declaration.Method.Name;
-                var displayName = name;
-
-                StepDefinitionInfo Definition()
+                var displayName = definitionSyntax.Method.Name;
+                BindingMethod bindingMethod; 
+                if (definitionSyntax.TextPattern == null)
                 {
-                    return new StepDefinitionInfo(
-                        name,
-                        displayName,
-                        declaration.Method,
-                        declaration.Keyword,
-                        bindingMethod,
-                        textPattern,
-                        invocationStyle,
-                        diagnostics.ToImmutable());
+                    bindingMethod = BindingMethod.MethodName;
                 }
+                else if (CucumberExpressionDetector.IsCucumberExpression(definitionSyntax.TextPattern))
+                {
+                    bindingMethod = BindingMethod.CucumberExpression;
 
-                // Determine whether the method is intended be invoked synchronously or asynchronously.
-                if (declaration.Method.ReturnsVoid)
-                {
-                    if (declaration.Method.IsAsync)
-                    {
-                        diagnostics.Add(
-                            new DiagnosticInfo(
-                                DiagnosticDescriptors.ErrorAsyncStepMethodMustReturnTask,
-                                declaration.Method.IdentifierLocation));
-                    }
-                }
-                else if (declaration.Method.ReturnsTask)
-                {
-                    invocationStyle = MethodInvocationStyle.Asynchronous;
+                    var prefix = definitionSyntax.MatchedKeywords == StepKeywordMatch.Any ? 
+                        "*" : 
+                        definitionSyntax.MatchedKeywords.ToString();
+                    
+                    displayName = $"{prefix} {definitionSyntax.TextPattern}";
                 }
                 else
                 {
-                    diagnostics.Add(
-                        new DiagnosticInfo(
-                            DiagnosticDescriptors.ErrorStepMethodMustReturnVoidOrTask,
-                            declaration.Method.IdentifierLocation));
+                    bindingMethod = BindingMethod.RegularExpression;
                 }
 
-                // If no step text has been specified, the step has been defined to use method-name binding.
-                if (declaration.TextPattern == null)
-                {
-                    return Definition();
-                }
+                var invocationStyle = definitionSyntax.Method.IsAsync ?
+                    MethodInvocationStyle.Asynchronous :
+                    MethodInvocationStyle.Synchronous;
 
-                // Empty step text is not allowed (null, empty string or whitespace).
-                if (string.IsNullOrWhiteSpace(declaration.TextPattern.Text))
-                {
-                    diagnostics.Add(
-                        new DiagnosticInfo(
-                            DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-                            declaration.TextPattern.Location));
-
-                    return Definition();
-                }
-
-                textPattern = declaration.TextPattern.Text!;
-
-                // Determine whether to bind the non-empty text as a Cucumber expression or a regular expression.
-                // The default for Reqnroll is Cucumber expression.
-                var bindingStyle = CucumberExpressionDetector.IsCucumberExpression(textPattern) ?
-                    BindingMethod.CucumberExpression :
-                    BindingMethod.RegularExpression;
-
-                CheckStepTextForLeadingWhitespace(textPattern, declaration.TextPattern.Location, diagnostics);
-                CheckStepTextForTrailingWhitespace(textPattern, declaration.TextPattern.Location, diagnostics);
-
-                return Definition();
+                return new StepDefinitionInfo(
+                    definitionSyntax.Method.Name,
+                    displayName,
+                    definitionSyntax.Method,
+                    definitionSyntax.MatchedKeywords,
+                    bindingMethod,
+                    definitionSyntax.TextPattern,
+                    invocationStyle);
             })
-            .Where(stepDefinition => stepDefinition is not null)!;
+            .Collect();
 
-        var eligableStepDefinitions = stepDefinitions.Where(static method => method.IsEligibleForRegistry).Collect();
+        // Group steps definitions into their respective catalogs based on the class which declares them
+        var catalogs = allStepDefinitions
+            .SelectMany(static (definitions, _) => definitions
+                .GroupBy(definition => definition.Method.DeclaringClassName)
+                .Select(group => new StepDefinitionCatalogInfo(
+                    group.Key.Name + "Catalog",
+                    group.Key with { Name = group.Key.Name + "Catalog" },
+                    ComparableArray.CreateRange(group))));
 
-        // Output the step registry constructor which roots all defined step methods.
-        context.RegisterSourceOutput(eligableStepDefinitions, (context, stepMethods) =>
+        // Generate unique hint names for each catalog
+        var catalogHintNames = catalogs
+            .Select(static (catalog, _) => (catalog.ClassName))
+            .Collect()
+            .Select(static (catalogIds, _) =>
+            {
+                var names = new HashSet<string>();
+                var mappedNames = ImmutableDictionary.CreateBuilder<QualifiedTypeName, string>();
+
+                foreach (var catalogId in catalogIds)
+                {
+                    var (classNamespace, className) = catalogId;
+                    var hintName = className;
+                    var i = 1;
+
+                    while (names.Contains(hintName))
+                    {
+                        hintName = className + i++;
+                    }
+
+                    names.Add(hintName);
+                    mappedNames.Add(catalogId, hintName);
+                }
+
+                return mappedNames.ToImmutable();
+            })
+            .WithComparer(
+                ImmutableDictionaryEqualityComparer<QualifiedTypeName, string>.Instance);
+
+        // Combine the catalogs with their hint names
+        var hintedCatalogs = catalogs
+            .Combine(catalogHintNames)
+            .Select(static (catalogAndHintNames, _) =>
+            {
+                var (catalog, hintNames) = catalogAndHintNames;
+
+                if (hintNames.TryGetValue(catalog.ClassName, out var hintName))
+                {
+                    return catalog with { HintName = hintName };
+                }
+
+                return catalog;
+            });
+
+        // Output the step registry constructor which roots all defined step methods
+        context.RegisterSourceOutput(allStepDefinitions, (context, stepMethods) =>
         {
             if (!stepMethods.Any())
             {
@@ -121,313 +136,15 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
             context.AddSource("ReqnrollStepRegistry.g.cs", emitter.EmitRegistryClassConstructor(stepMethods));
         });
 
-        // Output the definition class for every step definition type.
-        var stepDefinitionClasses = eligableStepDefinitions
-            .SelectMany((stepDefinitions, _) => stepDefinitions
-                .GroupBy(step => (step.Method.DeclaringClassNamespace, step.Method.DeclaringClassName))
-                .Select(group => new StepDefinitionClassInfo(
-                    group.Key.DeclaringClassNamespace,
-                    group.Key.DeclaringClassName,
-                    group.ToImmutableArray())));
-
-        context.RegisterSourceOutput(stepDefinitionClasses, (context, stepDefinitionClass) =>
+        // Output the step catalog classes
+        context.RegisterSourceOutput(hintedCatalogs, (context, stepDefinitionClass) =>
         {
             var emitter = new StepDefinitionEmitter();
 
             context.AddSource(
-                $"{stepDefinitionClass.ClassNamespace}/{stepDefinitionClass.ClassName}.g.cs",
-                emitter.EmitStepDefinitionClass(stepDefinitionClass));
+                $"{stepDefinitionClass.HintName}.g.cs",
+                emitter.EmitStepDefinitionCatalogClass(stepDefinitionClass));
         });
-
-        // Report any diagnostics encountered during generation.
-        context.RegisterSourceOutput(
-            stepDefinitions.Where(static stepDefinition => stepDefinition.HasDiagnostics),
-            static (context, stepDefinition) =>
-            {
-                foreach (var diagnostic in stepDefinition.Diagnostics)
-                {
-                    context.ReportDiagnostic(diagnostic.CreateDiagnostic());
-                }
-            });
-    }
-
-    /// <summary>
-    /// Processes a set of step definition data to produce <see cref="StepDefinitionInfo"/> instances.
-    /// This method is likely to be called for every change to affected attributes due to 
-    /// <see cref="StepDeclarationInfo"/> containing a reference to a syntax node which prevents it from being an
-    /// effective key value.
-    /// </summary>
-    /// <param name="data">The source collection to use as the basis for creating step definitions. The collection
-    /// may be empty or not initialized.</param>
-    /// <param name="optionsProvider">The options proivder to use to obtain options that influence the generation process.</param>
-    /// <param name="cancellationToken">A token used to signal when the operation should be canceled.</param>
-    /// <returns>A collection of <see cref="StepDeclarationInfoAndConfig"/> that represent the combined step declaration
-    /// and configuration.</returns>
-    private static IEnumerable<StepDeclarationInfoAndConfig> CombineStepDefinitionDataWithConfig(
-        ComparableArray<StepDeclarationInfo> data,
-        AnalyzerConfigOptionsProvider optionsProvider,
-        CancellationToken cancellationToken)
-    {
-        if (data.IsDefaultOrEmpty)
-        {
-            yield break;
-        }
-        
-        foreach (var stepDefinitionData in data)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var options = optionsProvider.GetOptions(stepDefinitionData.MethodDeclarationSyntax.SyntaxTree);
-
-            yield return CombineStepDefinitionDataWithConfig(stepDefinitionData, options, cancellationToken);
-        }
-    }
-
-    /// <summary>
-    /// Processes a <see cref="StepDeclarationInfo"/> with <see cref="AnalyzerConfigOptions"/> to produce a
-    /// <see cref="StepDeclarationInfoAndConfig"/> instance which either contains all relevent data of a step definition
-    /// to be processed, plus all configuration which affects the processing of the step.
-    /// </summary>
-    /// <param name="stepDefinitionData">The step definition information to process.</param>
-    /// <param name="options">Options which apply to this step definition.</param>
-    /// <param name="cancellationToken">A token used to signal when the process should be canceled.</param>
-    /// <returns>A <see cref="StepDeclarationInfoAndConfig"/> representing processed step definition.</returns>
-    private static StepDeclarationInfoAndConfig CombineStepDefinitionDataWithConfig(
-        StepDeclarationInfo stepDefinitionData,
-        AnalyzerConfigOptions options,
-        CancellationToken cancellationToken)
-    {
-        
-    }
-
-    /// <summary>
-    /// This method extracts the essential data for each attribute. The objective is to do as little work as possible as
-    /// this method is going to be called every time a Given, When, Then or StepDefinition attribute is modified
-    /// or the method they're attached to is modified.
-    /// </summary>
-    /// <param name="context">The context containing the syntax information for matched attributes.</param>
-    /// <param name="keyword">The keyword associated with the matched attributes.</param>
-    /// <param name="cancellationToken">A token used to signal when the process should be cancelled.</param>
-    /// <returns>An array of the step definition data extracted from the matched attributes.</returns>
-    private static ComparableArray<StepDeclarationInfo> ExtractStepDeclaration(
-        GeneratorAttributeSyntaxContext context,
-        StepKeyword keyword,
-        CancellationToken cancellationToken)
-    {
-        var methodSyntax = (MethodDeclarationSyntax)context.TargetNode;
-        var methodSymbol = (IMethodSymbol?)context.SemanticModel.GetDeclaredSymbol(methodSyntax);
-
-        // If the semantic model does not contain the method, we can't bind to it.
-        // This usually indicates a problem with the general syntax of this method.
-        if (methodSymbol == null)
-        {
-            return ComparableArray<StepDeclarationInfo>.Empty;
-        }
-
-        var result = ImmutableArray.CreateBuilder<StepDeclarationInfo>();
-
-        foreach (var attribute in context.Attributes)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            // If the attribute candidate is an error symbol, skip it.
-            if (attribute.AttributeClass == null || attribute.AttributeClass.Kind == SymbolKind.ErrorType)
-            {
-                continue;
-            }
-
-            attribute.ConstructorArguments.
-
-            var data = new StepDeclarationInfo(methodSyntax);
-
-            result.Add(data);
-        }
-
-        return result.ToImmutable();
-    }
-
-    private static StepMethodInfo? GetStepMethodInfo(
-        GeneratorAttributeSyntaxContext context,
-        StepKeyword keyword,
-        CancellationToken cancellationToken)
-    {
-        var methodSyntax = (MethodDeclarationSyntax)context.TargetNode;
-        var methodSymbol = (IMethodSymbol?)context.SemanticModel.GetDeclaredSymbol(methodSyntax);
-
-        // If the semantic model does not contain the method, we can't bind to it.
-        // This usually indicates a problem with the general syntax of this method.
-        if (methodSymbol == null)
-        {
-            return null;
-        }
-
-        var diagnostics = ImmutableArray.CreateBuilder<DiagnosticInfo>();
-        var bindings = ImmutableArray.CreateBuilder<StepBindingInfo>();
-        var invocationStyle = MethodInvocationStyle.Synchronous;
-
-        // Determine whether the method is intended be invoked synchronously or asynchronously.
-        if (methodSymbol.ReturnsVoid)
-        {
-            if (methodSymbol.IsAsync)
-            {
-                diagnostics.Add(
-                    new DiagnosticInfo(
-                        DiagnosticDescriptors.ErrorAsyncStepMethodMustReturnTask,
-                        DiagnosticLocation.CreateFrom(methodSyntax.Identifier)));
-            }
-        }
-        else if (methodSymbol.ReturnType.ToDisplayString() == "System.Threading.Tasks.Task")
-        {
-            invocationStyle = MethodInvocationStyle.Asynchronous;
-        }
-        else
-        {
-            diagnostics.Add(
-                new DiagnosticInfo(
-                    DiagnosticDescriptors.ErrorStepMethodMustReturnVoidOrTask,
-                    DiagnosticLocation.CreateFrom(methodSyntax.Identifier)));
-        }
-
-        foreach (var attribute in context.Attributes)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var bindingInfo = GetStepBindingInfo(attribute, keyword);
-
-            if (bindingInfo != null)
-            {
-                bindings.Add(bindingInfo);
-            }
-        }
-
-        return new StepMethodInfo(
-            methodSymbol.Name,
-            methodSymbol.ContainingType.Name,
-            methodSymbol.ContainingType.ContainingNamespace.Name,
-            invocationStyle,
-            new ComparableArray<StepBindingInfo>(bindings.ToImmutable()),
-            new ComparableArray<DiagnosticInfo>(diagnostics.ToImmutable()));
-    }
-
-    private static StepBindingInfo? GetStepBindingInfo(
-        AttributeData attribute,
-        StepKeyword keyword)
-    {
-        // If the attribute candidate is an error symbol, skip it.
-        if (attribute.AttributeClass == null || attribute.AttributeClass.Kind == SymbolKind.ErrorType)
-        {
-            return null;
-        }
-
-        var diagnostics = ImmutableArray.CreateBuilder<DiagnosticInfo>();
-
-        StepBindingInfo CreateBindingInfo(BindingMethod style, string? text)
-        {
-            return new StepBindingInfo(
-                style,
-                keyword,
-                text,
-                new ComparableArray<DiagnosticInfo>(diagnostics.ToImmutable()));
-        }
-
-        // If the attribute candidate does not have any arguments, we're matching based on the method name.
-        if (attribute.ConstructorArguments.Length == 0)
-        {
-            return CreateBindingInfo(BindingMethod.MethodName, null);
-        }
-
-        // If the attribute has any arguments, the first is the step text.
-        var textConstant = attribute.ConstructorArguments[0];
-        var text = (string?)textConstant.Value;
-
-        // Any further diagnostics will want to refer to the step text location with precision.
-        // Unfortunately Roslyn generator doesn't give us the syntax nodes for the attribute arguments,
-        // so we have to examine the attribute syntax to find the matching literal node.
-        var textExpressionSyntax = GetStepTextExpressionSyntax(attribute);
-        var textLocation = DiagnosticLocation.CreateFrom(
-            textExpressionSyntax ?? attribute.ApplicationSyntaxReference?.GetSyntax());
-
-        // Empty step text is not allowed (null, empty string or whitespace).
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            diagnostics.Add(
-                new DiagnosticInfo(
-                    DiagnosticDescriptors.ErrorStepTextCannotBeEmpty,
-                    textLocation));
-
-            // There's not really any text to bind to, but we still need to return a binding style
-            // and it's definitely not "Method Name", so we'll use the Reqnroll default for text.
-            return CreateBindingInfo(BindingMethod.CucumberExpression, text);
-        }
-
-        // Determine whether to bind the non-empty text as a Cucumber expression or a regular expression.
-        // The default for Reqnroll is Cucumber expression.
-        var style = CucumberExpressionDetector.IsCucumberExpression(text!) ?
-            BindingMethod.CucumberExpression :
-            BindingMethod.RegularExpression;
-
-        CheckStepTextForLeadingWhitespace(text!, textExpressionSyntax, textLocation, diagnostics);
-        CheckStepTextForTrailingWhitespace(text!, textExpressionSyntax, textLocation, diagnostics);
-
-        return CreateBindingInfo(style, text);
-    }
-
-    private static void CheckStepTextForTrailingWhitespace(
-        string text,
-        DiagnosticLocation textLocation,
-        ImmutableArray<DiagnosticInfo>.Builder diagnostics)
-    {
-        var trailingWhitespaceMatch = TrailingWhitespacePattern.Match(text);
-        if (trailingWhitespaceMatch.Success)
-        {
-            diagnostics.Add(
-                new DiagnosticInfo(
-                    DiagnosticDescriptors.WarningStepTextHasTrailingWhitespace,
-                    textLocation));
-        }
-    }
-
-    private static void CheckStepTextForLeadingWhitespace(
-        string text,
-        DiagnosticLocation textLocation,
-        ImmutableArray<DiagnosticInfo>.Builder diagnostics)
-    {
-        var leadingWhitespaceMatch = LeadingWhitespacePattern.Match(text);
-        if (leadingWhitespaceMatch.Success)
-        {
-            diagnostics.Add(
-                new DiagnosticInfo(
-                    DiagnosticDescriptors.WarningStepTextHasLeadingWhitespace,
-                    textLocation));
-        }
-    }
-
-    private static ExpressionSyntax? GetStepTextExpressionSyntax(AttributeData attribute)
-    {
-        var attributeSyntax = attribute.ApplicationSyntaxReference?.GetSyntax() as AttributeSyntax;
-
-        if (attributeSyntax?.ArgumentList != null)
-        {
-            foreach (var argument in attributeSyntax.ArgumentList.Arguments)
-            {
-                if (argument.NameEquals != null)
-                {
-                    continue;
-                }
-
-                if (argument.NameColon == null)
-                {
-                    return argument.Expression;
-                }
-
-                if (argument.NameColon.Name.Identifier.Text == "regex")
-                {
-                    return argument.Expression;
-                }
-            }
-        }
-
-        return null;
     }
 }
 
@@ -436,37 +153,31 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
 /// </summary>
 /// <param name="MethodDeclarationSyntax">The method declaration syntax which has been identified to be a step 
 /// definition.</param>
-internal record StepDeclarationInfo(
-    MethodDeclarationSyntax MethodDeclarationSyntax);
-
-/// <summary>
-/// Represents the combined step declaration data and the config which applies to it.
-/// </summary>
-internal record StepDeclarationInfoAndConfig(
+internal record StepDefinitionSyntaxInfo(
+    MethodDeclarationSyntax MethodDeclarationSyntax,
     MethodInfo Method,
-    StepTextPatternInfo? TextPattern,
-    StepKeyword Keyword,
-    bool IsSourceGenerationEnabled);
-
-internal record StepTextPatternInfo(string? Text, DiagnosticLocation Location);
+    StepKeywordMatch MatchedKeywords,
+    string? TextPattern);
 
 internal record MethodInfo(
     string Name,
-    string DeclaringClassName,
-    string DeclaringClassNamespace,
+    QualifiedTypeName DeclaringClassName,
     DiagnosticLocation IdentifierLocation,
     bool ReturnsVoid,
     bool ReturnsTask,
     bool IsAsync,
     ComparableArray<ParameterInfo> Parameters);
 
+internal record struct QualifiedTypeName(string Namespace, string Name);
+
 internal record ParameterInfo(string Name, string ParameterType);
 
-internal enum StepKeyword
+internal enum StepKeywordMatch
 {
     Given,
     When,
-    Then
+    Then,
+    Any
 }
 
 internal enum MethodInvocationStyle
@@ -479,33 +190,27 @@ internal record StepDefinitionInfo(
     string Name,
     string DisplayName,
     MethodInfo Method,
-    StepKeyword Keyword,
+    StepKeywordMatch MatchesKeywords,
     BindingMethod BindingMethod,
     string? TextPattern,
-    MethodInvocationStyle InvocationStyle,
-    ComparableArray<DiagnosticInfo> Diagnostics)
-{
-    public bool HasErrors => Diagnostics.Any(diagnostic => diagnostic.Severity == DiagnosticSeverity.Error);
+    MethodInvocationStyle InvocationStyle);
 
-    public bool IsEligibleForRegistry => !HasErrors;
-
-    public bool HasDiagnostics => Diagnostics.Length > 0;
-}
-
-internal record StepDefinitionClassInfo(
-    string ClassName,
-    string ClassNamespace,
+internal record StepDefinitionCatalogInfo(
+    string HintName,
+    QualifiedTypeName ClassName,
     ComparableArray<StepDefinitionInfo> StepDefinitions);
 
-internal static class ImmutableCollection
+internal static class ComparableArray
 {
-    public static ComparableArray<T> Create<T>(T item) => new ComparableArray<T>(ImmutableArray.Create(item));
+    public static ComparableArray<T> CreateRange<T>(IEnumerable<T> items) => new(ImmutableArray.CreateRange(items));
 
-    public static ComparableArray<T> Create<T>(ReadOnlySpan<T> values)
+    public static ComparableArray<T> Create<T>(T item) => new(ImmutableArray.Create(item));
+
+    public static ComparableArray<T> CreateRange<T>(ReadOnlySpan<T> items)
     {
-        var builder = ImmutableArray.CreateBuilder<T>(values.Length);
+        var builder = ImmutableArray.CreateBuilder<T>(items.Length);
 
-        foreach (var item in values)
+        foreach (var item in items)
         {
             builder.Add(item);
         }

@@ -1,13 +1,8 @@
 ﻿namespace Reqnroll.StepBindingSourceGenerator;
 
-internal class RegistryClassEmitter
+internal class RegistryClassEmitter(string @namespace)
 {
-    public RegistryClassEmitter(string @namespace)
-    {
-        Namespace = @namespace;
-    }
-
-    public string Namespace { get; }
+    public string Namespace { get; } = @namespace;
 
     public string ClassName { get; } = "ReqnrollStepRegistry";
 
@@ -65,12 +60,12 @@ internal class RegistryClassEmitter
                     {
                         builder
                             .Append("Register(global::")
-                            .Append(stepDefinition.Method.DeclaringClassNamespace)
+                            .Append(stepDefinition.Method.DeclaringClassName.Namespace)
                             .Append('.')
-                            .Append(stepDefinition.Method.DeclaringClassName)
+                            .Append(stepDefinition.Method.DeclaringClassName.Name)
                             .Append("Catalog.")
                             .Append(stepDefinition.Name)
-                            .AppendLine("Definition.Description);");
+                            .AppendLine("Definition);");
                     }
                 });
             });

@@ -9,7 +9,7 @@ public class StepRegistryGenerationTests
     public void HavingAStepMethodCausesAStepRegistryToBeGenerated()
     {
         var source = SourceText.From(
-            $$"""
+            """
             using Reqnroll;
 
             namespace Sample.Tests;
@@ -38,7 +38,7 @@ public class StepRegistryGenerationTests
     public void GeneratedRegistryImplementsIStepDefinitionProvider()
     {
         var source = SourceText.From(
-            $$"""
+            """
             using Reqnroll;
 
             namespace Sample.Tests;
@@ -68,7 +68,7 @@ public class StepRegistryGenerationTests
     public void GeneratedRegistryIsAvailableThroughInstanceProperty()
     {
         var source = SourceText.From(
-            $$"""
+            """
             using Reqnroll;
 
             namespace Sample.Tests;
@@ -102,7 +102,7 @@ public class StepRegistryGenerationTests
     public void StepDefinitionWithNoArgumentsIsAddedToRegistry()
     {
         var source = SourceText.From(
-            $$"""
+            """
             using Reqnroll;
 
             namespace Sample.Tests;
@@ -133,7 +133,7 @@ public class StepRegistryGenerationTests
         stepDefinition.Should().BeEquivalentTo(
             new StepDefinitionDescriptor(
                 "When Maker starts a game",
-                StepDefinitionType.When,
+                [StepDefinitionType.When],
                 StepTextPattern.CucumberExpression("Maker starts a game")));
     }
 }
