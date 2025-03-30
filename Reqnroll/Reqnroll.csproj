@@ -16,6 +16,7 @@
 
   <!-- build time dependencies -->
   <ItemGroup>
+    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.10.0" />
     <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
   </ItemGroup>
 
@@ -43,14 +44,6 @@
   <ItemGroup>
     <Compile Remove="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
     <None Include="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="CucumberMessages\PubSub\HtmlFormatter\Resources\cucumber-mark-green-128.png" />
-    <EmbeddedResource Include="CucumberMessages\PubSub\HtmlFormatter\Resources\index.mustache.html" />
-    <EmbeddedResource Include="CucumberMessages\PubSub\HtmlFormatter\Resources\main.css" />
-    <EmbeddedResource Include="CucumberMessages\PubSub\HtmlFormatter\Resources\main.js" />
-    <EmbeddedResource Include="CucumberMessages\PubSub\HtmlFormatter\Resources\main.js.LICENSE.txt" />
   </ItemGroup>
 
   <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
