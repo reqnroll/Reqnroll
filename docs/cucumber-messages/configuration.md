@@ -16,9 +16,6 @@ Unless overriden by the use of the Reqnroll configuration file and/or environmen
 * - Enabled
   - true/false
   - Controls whether Cucumber Messages will be created during the execution of the test. <br/> *Default:* `false`
-* - OutputFilePath
-  - Folder Path and File Name for storage of Cucumber Messages results files. <br/> *Default:* `` (none)
-  - By convention, these files use the `.ndjson` extension. <br/> *Default:* `reqnroll_report.ndjson`
 ```
 
 {#config-file}
@@ -33,39 +30,29 @@ An example configuration file looks like this:
 
     "bindingAssemblies": [
     ],
-    "cucumberMessagesConfiguration": {
-        "enabled" :  true,
-        "outputFilePath": "C:\\Users\\dev\\source\\repos\\reqnroll_project\\CucumberMessages\\reqnroll_report.ndjson"
+    "formatters": {
+        "messages" : { "outputFilePath" : "C:\\Users\\dev\\source\\repos\\reqnroll_project\\CucumberMessages\\reqnroll_report.ndjson" },
+        "html" : { "outputFilePath" : "C:\\Users\\dev\\source\\repos\\reqnroll_project\\CucumberMessages\\reqnroll_report.html" }
     }
 }
 ```
 
-In the above example, the configuration file instructs Reqnroll to turn Cucumber Message support ON, store the file in an absolute path (C:\\Users\\dev\\source\\repos\\reqnroll_project\\CucumberMessages\\reqnroll_report.ndjson). 
+In the above example, the configuration file instructs Reqnroll to use both Reporting formatters. Each is given a location to store it's respective file in an absolute path (C:\\Users\\dev\\source\\repos\\reqnroll_project\\CucumberMessages\\reqnroll_report.ndjson). 
+
+If the formatters object is omitted or empty, report generation is turned OFF.
 
 
-The json schema for this section of the configuration file is:
-```{code-block} json
-:caption: cucumbermessages.config-schema.json
-{
-    "description": "This class holds configuration information from a configuration source for Reqnroll Cucumber Message Generation.\n",
-    "properties": {
-        "Enabled": {
-            "type": "boolean"
-        },
-        "OutputFilePath": {
-            "type": "string"
-        }
-    }
-}
-```
 
 {#environment-variable}
 ## Environment Variables
 
-Any of the settings discussed above can be overriden by setting an Environment Variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overridden by an evironment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used.
+The settings discussed above can be overriden by setting an Environment Variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overridden by an evironment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used.
 
 The available Environment Variables are:
 
 * REQNROLL__CUCUMBER_MESSAGES__ENABLED
-* REQNROLL__CUCUMBER_MESSAGES__OUTPUT_FILEPATH
+* REQNROLL__CUCUMBER_MESSAGES__FORMATTERS
 
+```{note}
+When using an environment variable to override the Formatters section of the reqnroll.json configuration file, the value of the environment variable replaces the Formatters element in its entirety.
+```
