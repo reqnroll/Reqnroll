@@ -37,14 +37,21 @@ namespace CucumberMessages.Tests
 
         protected void SetCucumberMessagesOutputFileName(string fileName)
         {
-            if (String.IsNullOrEmpty(Path.GetDirectoryName(fileName)))
-            {
-                var path = Path.GetDirectoryName(ActualsResultLocationDirectory());
-                fileName = Path.Combine(path!, fileName);
-            }
-            string messageFormatter = "{\"messages\" : { \"outputFilePath\" : \"" + fileName.Replace("\\", "\\\\") + "\" } }";
+            var baseFileName = Path.GetFileNameWithoutExtension(fileName);
+            var ndjsonFileName = baseFileName + ".ndjson";
+            var htmlFileName = baseFileName + ".html";
+            var path = Path.GetDirectoryName(fileName);
 
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE, messageFormatter);
+            if (String.IsNullOrEmpty(path))
+            {
+                path = ActualsResultLocationDirectory();
+                ndjsonFileName = Path.Combine(path!, ndjsonFileName);
+                htmlFileName = Path.Combine(path!, htmlFileName);
+            }
+            string formatters = "{\"messages\" : { \"outputFilePath\" : \"" + ndjsonFileName.Replace("\\", "\\\\") + "\" }," +
+                " \"html\" : { \"outputFilePath\" : \"" + htmlFileName.Replace("\\", "\\\\") + "\" } }";
+
+            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE, formatters);
         }
 
         protected void DisableCucumberMessages()
@@ -54,12 +61,14 @@ namespace CucumberMessages.Tests
 
         protected void ResetCucumberMessages(string? fileToDelete = null)
         {
+            fileToDelete = String.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".ndjson";
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, null);
         }
         protected void ResetCucumberMessagesHTML(string? fileToDelete = null)
         {
+            fileToDelete = String.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".html";
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, null);
@@ -127,7 +136,6 @@ namespace CucumberMessages.Tests
 
         protected static string ActualsResultLocationDirectory()
         {
-
             var objectContainerMock = new Mock<IObjectContainer>();
             var tracerMock = new Mock<ITraceListener>();
             objectContainerMock.Setup(x => x.Resolve<ITraceListener>()).Returns(tracerMock.Object);
@@ -150,9 +158,10 @@ namespace CucumberMessages.Tests
                 }
             }
             if (String.IsNullOrEmpty(outputFilePath))
-                outputFilePath = ".\\reqnroll_report.ndjson";
+                outputFilePath = "[BASEDIRECTORY]\\CucumberMessages\\reqnroll_report.ndson";
 
             string configurationPath = outputFilePath.Replace(DEFAULTSAMPLESDIRECTORYPLACEHOLDER, GetDefaultSamplesDirectory());
+            configurationPath = Path.GetDirectoryName(configurationPath)!;
             return configurationPath;
         }
 
@@ -178,8 +187,7 @@ namespace CucumberMessages.Tests
 
         protected IEnumerable<Envelope> GetExpectedResults(string testName, string featureFileName)
         {
-            var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
-            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
+            string[] expectedJsonText = GetExpectedJsonText(testName, featureFileName);
 
             foreach (var json in expectedJsonText)
             {
@@ -188,17 +196,26 @@ namespace CucumberMessages.Tests
             };
         }
 
+        protected static string[] GetExpectedJsonText(string testName, string featureFileName)
+        {
+            var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
+            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
+            return expectedJsonText;
+        }
+
+        protected static string[] GetActualGeneratedHTML(string testName, string featureFileName)
+        {
+            string resultLocation = ActualsResultLocationDirectory();
+            var expectedJsonText = File.ReadAllLines(Path.Combine(resultLocation, $"{featureFileName}.html"));
+            return expectedJsonText;
+        }
+
         record TestExecution(string id, List<Envelope> related);
         record TestCaseRecord(string id, string pickelId, Envelope testCaseEnvelope, Dictionary<string, TestExecution> executions);
 
         protected IEnumerable<Envelope> GetActualResults(string testName, string fileName)
         {
-
-            string resultLocation = ActualsResultLocationDirectory();
-
-            // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
-
-            var actualJsonText = File.ReadAllLines(resultLocation);
+            string[] actualJsonText = GetActualsJsonText(testName, fileName);
             actualJsonText.Should().HaveCountGreaterThan(0, "the test results ndjson file was emtpy.");
 
             var envelopes = actualJsonText.Select(json => NdjsonSerializer.Deserialize(json)).ToList();
@@ -301,5 +318,14 @@ namespace CucumberMessages.Tests
             return result;
         }
 
+        protected static string[] GetActualsJsonText(string testName, string fileName)
+        {
+            string resultLocation = ActualsResultLocationDirectory();
+            fileName = Path.Combine(resultLocation, fileName + ".ndjson");
+            // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
+
+            var actualJsonText = File.ReadAllLines(fileName);
+            return actualJsonText;
+        }
     }
 }

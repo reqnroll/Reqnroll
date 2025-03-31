@@ -29,9 +29,9 @@ namespace CucumberMessages.Tests
         // (located in the CucumberMessagesValidator class)
         public void CCKScenarios(string testName, string featureNameText)
         {
-            ResetCucumberMessages(featureNameText + ".ndjson");
+            ResetCucumberMessages(featureNameText);
             EnableCucumberMessages();
-            SetCucumberMessagesOutputFileName(featureNameText + ".ndjson");
+            SetCucumberMessagesOutputFileName(featureNameText);
 
             CucumberMessagesAddConfigurationFile("reqnroll.json");
             AddUtilClassWithFileSystemPath();
@@ -42,11 +42,19 @@ namespace CucumberMessages.Tests
             AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "Samples", Assembly.GetExecutingAssembly());
 
             ExecuteTests();
-
-            var validator = new CucumberMessagesValidator(GetActualResults(testName, featureNameText).ToList(), GetExpectedResults(testName, featureFileName).ToList());
+            var actuals = GetActualResults(testName, featureNameText).ToList();
+            var validator = new CucumberMessagesValidator(actuals, GetExpectedResults(testName, featureFileName).ToList());
             validator.ShouldPassBasicStructuralChecks();
             validator.ResultShouldPassAllComparisonTests();
             validator.ResultShouldPassSanityChecks();
+
+            // Validate that the generated html, if present, has a line of text that includes all of the ACTUAL envelope messages
+            // We're not validating that envelope generation succeeded (that was already tested); we're validating that those generated messages
+            // made their way into the HTML
+            var generatedHtml = GetActualGeneratedHTML(testName, featureNameText);
+            var actualsMessagesJson = GetActualsJsonText(testName, featureNameText);
+            var htmlValidator = new CucumberMessagesHTMLGenerationValidator(generatedHtml, actualsMessagesJson);
+            htmlValidator.GeneratedHtmlProperlyReflectsExpectedMessages();
 
             // This is necessary b/c the System Test framework doesn't understand Rules and can't determine the number of expected tests
             ConfirmAllTestsRan(testName == "rules" ? 3 : null);
