@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Don't crash on already released TestThreadContexts (#550)
+
+*Contributors of this release (in alphabetical order): @304NotModified* 
 
 # v2.4.0 - 2025-03-06
 
