@@ -104,7 +104,9 @@ public class TestRunnerManager : ITestRunnerManager
     {
         var testThreadContainer = testThreadContext.TestThreadContainer;
         if (!_usedTestWorkerContainers.TryRemove(testThreadContainer, out var usedContainerHint))
-            throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was already released");
+        {
+            // Already released   
+        }
         var containerHint = new TestWorkerContainerHint(usedContainerHint?.LastUsedFeatureInfo, Thread.CurrentThread.ManagedThreadId);
         if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, containerHint))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was released twice");
