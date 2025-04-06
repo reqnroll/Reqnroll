@@ -13,9 +13,9 @@ public class DescriptionSyntax : SyntaxNode
     {
     }
 
-    internal new Internal.DescriptionSyntax RawNode => (Internal.DescriptionSyntax)base.RawNode;
+    internal new Internal.DescriptionSyntax InternalNode => (Internal.DescriptionSyntax)base.InternalNode;
 
-    public SyntaxTokenList TextTokens => new(this, RawNode.textTokens, Position + RawNode.GetSlotOffset(0));
+    public SyntaxTokenList TextTokens => new(this, InternalNode.textTokens, Position + InternalNode.GetSlotOffset(0));
 
     internal override SyntaxNode? GetSlotAsSyntaxNode(int index) => null;
 }

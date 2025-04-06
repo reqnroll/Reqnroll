@@ -10,7 +10,7 @@ internal partial class ParsedSyntaxTreeBuilder
 {
     class DescriptionRuleHandler() : RuleHandler(RuleType.Description)
     {
-        private readonly ImmutableArray<RawNode>.Builder _description = ImmutableArray.CreateBuilder<RawNode>();
+        private readonly ImmutableArray<InternalNode>.Builder _description = ImmutableArray.CreateBuilder<InternalNode>();
 
         protected override void AppendOther(Token token, TextLine line, Context context)
         {
@@ -22,7 +22,7 @@ internal partial class ParsedSyntaxTreeBuilder
             //
             // [text-literal] [end-of-line]
 
-            RawNode? trailing;
+            InternalNode? trailing;
 
             // Blank lines will be matched as "other" in this context. These lines should be included as trivia, rather than tokens.
             if (token.MatchedText.Length == 0)
@@ -50,7 +50,7 @@ internal partial class ParsedSyntaxTreeBuilder
 
         public DescriptionSyntax? CreateDescriptionSyntax()
         {
-            var text = RawNode.CreateList(_description);
+            var text = InternalNode.CreateList(_description);
 
             if (text == null)
             {

@@ -1,5 +1,4 @@
-﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
@@ -8,7 +7,7 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
 {
     private readonly SyntaxNode? _parent;
 
-    internal SyntaxTokenList(SyntaxNode? parent, RawNode? node, int position)
+    internal SyntaxTokenList(SyntaxNode? parent, InternalNode? node, int position)
     {
         _parent = parent;
         RawNode = node;
@@ -18,7 +17,7 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
     public SyntaxTokenList(SyntaxToken token)
     {
         _parent = token.Parent;
-        RawNode = token.RawNode;
+        RawNode = token.InternalNode;
         Position = token.Position;
     }
 
@@ -26,23 +25,23 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
     {
     }
 
-    private static RawNode? CreateNode(IEnumerable<SyntaxToken> tokens)
+    private static InternalNode? CreateNode(IEnumerable<SyntaxToken> tokens)
     {
-        var nodes = ImmutableArray.CreateBuilder<RawNode>();
+        var nodes = ImmutableArray.CreateBuilder<InternalNode>();
 
         foreach (var token in tokens)
         {
-            var node = token.RawNode;
+            var node = token.InternalNode;
             if (node != null)
             {
                 nodes.Add(node);
             }
         }
 
-        return RawNode.CreateList(nodes);
+        return InternalNode.CreateList(nodes);
     }
 
-    internal RawNode? RawNode { get; }
+    internal InternalNode? RawNode { get; }
 
     public struct Enumerator(SyntaxTokenList list) : IEnumerator<SyntaxToken>
     {

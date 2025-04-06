@@ -1,4 +1,3 @@
-using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -19,7 +18,7 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
         RawNode = builder.CreateRawNode();
     }
 
-    internal SyntaxTriviaList(in SyntaxToken token, RawNode? node, int position)
+    internal SyntaxTriviaList(in SyntaxToken token, InternalNode? node, int position)
     {
         _token = token;
         RawNode = node;
@@ -64,7 +63,7 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
 
     internal struct Builder()
     {
-        private readonly ImmutableArray<RawNode>.Builder _nodes = ImmutableArray.CreateBuilder<RawNode>();
+        private readonly ImmutableArray<InternalNode>.Builder _nodes = ImmutableArray.CreateBuilder<InternalNode>();
 
         public void AddRange(IEnumerable<SyntaxTrivia> trivia)
         {
@@ -78,13 +77,13 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
             }
         }
 
-        public readonly RawNode? CreateRawNode() => RawNode.CreateList(_nodes);
+        public readonly InternalNode? CreateRawNode() => InternalNode.CreateList(_nodes);
     }
 
     private readonly SyntaxToken _token;
     private readonly int _position;
 
-    internal RawNode? RawNode { get; }
+    internal InternalNode? RawNode { get; }
 
     public static SyntaxTriviaList Empty { get; } = default;
 

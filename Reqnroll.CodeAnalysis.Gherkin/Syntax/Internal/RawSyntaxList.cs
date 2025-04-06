@@ -7,7 +7,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
 internal static class RawSyntaxList
 {
-    public static RawSyntaxList<T> Create<T>(IEnumerable<T> nodes) where T : RawNode
+    public static RawSyntaxList<T> Create<T>(IEnumerable<T> nodes) where T : InternalNode
     {
         var builder = new RawSyntaxList<T>.Builder();
 
@@ -16,7 +16,7 @@ internal static class RawSyntaxList
         return builder.ToRawSyntaxList();
     }
 
-    public static RawSyntaxList<T> Create<T>(ImmutableArray<T> nodes) where T : RawNode
+    public static RawSyntaxList<T> Create<T>(ImmutableArray<T> nodes) where T : InternalNode
     {
         Debug.Assert(!nodes.IsDefault, "Do not pass default array to RawSyntaxList.Create");
 
@@ -24,7 +24,7 @@ internal static class RawSyntaxList
     }
 }
 
-internal class RawSyntaxList<TNode> : RawNode, IReadOnlyList<TNode> where TNode : RawNode
+internal class RawSyntaxList<TNode> : InternalNode, IReadOnlyList<TNode> where TNode : InternalNode
 {
     public readonly struct Builder() : ICollection<TNode>
     {
@@ -83,19 +83,19 @@ internal class RawSyntaxList<TNode> : RawNode, IReadOnlyList<TNode> where TNode 
         throw new NotImplementedException();
     }
 
-    public override RawNode? GetSlot(int index) => this[index];
+    public override InternalNode? GetSlot(int index) => this[index];
 
     IEnumerator IEnumerable.GetEnumerator()
     {
         throw new NotImplementedException();
     }
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
         throw new NotImplementedException();
     }
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
         throw new NotImplementedException();
     }

@@ -2,27 +2,27 @@
 using Microsoft.CodeAnalysis.Text;
 using System.Diagnostics;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 /// <summary>
 /// Represents diagnostic information which is not bound to an absolute location.
 /// </summary>
 [DebuggerDisplay("{GetDebuggerDisplay(), nq}")]
-internal class RawDiagnostic
+internal class InternalDiagnostic
 {
     private readonly DiagnosticDescriptor _descriptor;
 
     private readonly object?[]? _arguments;
 
-    private RawDiagnostic(DiagnosticDescriptor descriptor, object?[]? arguments)
+    private InternalDiagnostic(DiagnosticDescriptor descriptor, object?[]? arguments)
     {
         _descriptor = descriptor;
         _arguments = arguments;
     }
 
-    public static RawDiagnostic Create(DiagnosticDescriptor descriptor) => new(descriptor, null);
+    public static InternalDiagnostic Create(DiagnosticDescriptor descriptor) => new(descriptor, null);
 
-    public static RawDiagnostic Create(DiagnosticDescriptor descriptor, params object?[] arguments) => new(descriptor, arguments);
+    public static InternalDiagnostic Create(DiagnosticDescriptor descriptor, params object?[] arguments) => new(descriptor, arguments);
 
     public Diagnostic CreateDiagnostic(GherkinSyntaxTree syntaxTree, TextSpan textSpan)
     {

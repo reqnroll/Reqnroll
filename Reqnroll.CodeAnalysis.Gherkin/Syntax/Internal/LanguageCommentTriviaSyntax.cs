@@ -27,7 +27,7 @@ internal class LanguageCommentTriviaSyntax : CommentTriviaSyntax
 
     public override int SlotCount => 4;
 
-    public override RawNode? GetSlot(int index)
+    public override InternalNode? GetSlot(int index)
     {
         return index switch
         {
@@ -44,12 +44,12 @@ internal class LanguageCommentTriviaSyntax : CommentTriviaSyntax
         throw new NotImplementedException();
     }
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
         throw new NotImplementedException();
     }
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
         throw new NotImplementedException();
     }

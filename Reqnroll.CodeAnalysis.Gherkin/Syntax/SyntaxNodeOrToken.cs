@@ -1,5 +1,4 @@
-﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -10,7 +9,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
 {
     private readonly SyntaxNode? _node;
-    private readonly RawNode? _token;
+    private readonly InternalNode? _token;
     private readonly int _position;
 
     private SyntaxNodeOrToken(SyntaxNode node)
@@ -18,7 +17,7 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
         _node = node;
     }
 
-    private SyntaxNodeOrToken(SyntaxNode? node, RawNode? token, int position)
+    private SyntaxNodeOrToken(SyntaxNode? node, InternalNode? token, int position)
     {
         _node = node;
         _token = token;
@@ -148,7 +147,7 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
 
     public static implicit operator SyntaxNodeOrToken(SyntaxToken token)
     {
-        return new SyntaxNodeOrToken(token.Parent, token.RawNode, token.Position);
+        return new SyntaxNodeOrToken(token.Parent, token.InternalNode, token.Position);
     }
 
     internal string GetDebuggerDisplay() => GetType().Name + " " + Kind + " " + ToString();

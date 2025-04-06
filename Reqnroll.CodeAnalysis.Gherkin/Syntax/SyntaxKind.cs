@@ -20,6 +20,12 @@ public enum SyntaxKind : ushort
     /// </summary>
     FeatureFile,
 
+    /// <summary>
+    /// The node is the root structure of a Gherkin document.
+    /// </summary>
+    [SyntaxKindDescription("a Gherkin document")]
+    GherkinDocument,
+
     // Textless syntax tokens //
 
     /// <summary>
@@ -30,6 +36,7 @@ public enum SyntaxKind : ushort
     /// <summary>
     /// The token marks the end of the file.
     /// </summary>
+    [SyntaxKindDescription("an end-of-file token")]
     EndOfFileToken, // This is assumed to be the last textless syntax token.
 
     // Keywords //
@@ -37,6 +44,7 @@ public enum SyntaxKind : ushort
     /// <summary>
     /// The token is a feature keyword.
     /// </summary>
+    [SyntaxKindDescription("a feature keyword token")]
     FeatureKeyword,
 
     // Other text-containing tokens //
@@ -90,6 +98,7 @@ public enum SyntaxKind : ushort
     /// <summary>
     /// The node is a feature declaration.
     /// </summary>
+    [SyntaxKindDescription("a feature declaration")]
     FeatureDeclaration,
 
     /// <summary>

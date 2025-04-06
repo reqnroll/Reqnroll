@@ -6,7 +6,7 @@ using static InternalSyntaxFactory;
 
 internal static class TextLineParsingExtensions
 {
-    public static RawNode? GetEndOfLineTrivia(this TextLine line)
+    public static InternalNode? GetEndOfLineTrivia(this TextLine line)
     {
         if (line.End == line.EndIncludingLineBreak)
         {

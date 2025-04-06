@@ -1,12 +1,14 @@
 using Microsoft.CodeAnalysis;
+using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 /// <summary>
-/// Represents an immutable node that is independant of any parent structure or syntax tree.
+/// Represents an immutable node in the internal syntax tree. This node is independant of any parent structure or 
+/// syntax tree and is intended to be shared between trees.
 /// </summary>
 /// <remarks>
 /// <para>Having a separate class to represent a raw node independant of location information or hierarchy allows
@@ -14,23 +16,23 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 /// with a node.</para>
 /// </remarks>
 [DebuggerDisplay("{GetDebuggerDisplay(), nq}")]
-internal abstract class RawNode
+internal abstract class InternalNode
 {
-    protected RawNode(SyntaxKind kind)
+    protected InternalNode(SyntaxKind kind)
     {
         Kind = kind;
     }
 
-    protected RawNode(SyntaxKind kind, int fullWidth)
+    protected InternalNode(SyntaxKind kind, int fullWidth)
     {
         Kind = kind;
         FullWidth = fullWidth;
     }
 
-    protected RawNode(
+    protected InternalNode(
         SyntaxKind kind,
         int fullWidth,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations)
     {
         Kind = kind;
@@ -49,9 +51,9 @@ internal abstract class RawNode
         }
     }
 
-    protected RawNode(
+    protected InternalNode(
         SyntaxKind kind,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations)
     {
         Kind = kind;
@@ -81,7 +83,7 @@ internal abstract class RawNode
     /// </remarks>
     private NodeFlags _flags;
 
-    private readonly ImmutableArray<RawDiagnostic> _diagnostics;
+    private readonly ImmutableArray<InternalDiagnostic> _diagnostics;
 
     private readonly ImmutableArray<SyntaxAnnotation> _annotations;
 
@@ -101,7 +103,7 @@ internal abstract class RawNode
     /// <returns>A <see cref="SyntaxNode"/> which encapsulates this raw node.</returns>
     public abstract SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position);
 
-    public static RawNode? CreateList(IEnumerable<RawNode>? nodes)
+    public static InternalNode? CreateList(IEnumerable<InternalNode>? nodes)
     {
         if (nodes == null)
         {
@@ -111,7 +113,7 @@ internal abstract class RawNode
         return CreateList(nodes.ToList());
     }
 
-    public static RawNode? CreateList(IReadOnlyList<RawNode> nodes)
+    public static InternalNode? CreateList(IReadOnlyList<InternalNode> nodes)
     {
         return nodes.Count switch
         {
@@ -121,7 +123,7 @@ internal abstract class RawNode
         };
     }
 
-    public static RawNode? CreateList(ImmutableArray<RawNode>.Builder nodes)
+    public static InternalNode? CreateList(ImmutableArray<InternalNode>.Builder nodes)
     {
         return nodes.Count switch
         {
@@ -131,7 +133,7 @@ internal abstract class RawNode
         };
     }
 
-    public static RawNode? CreateList<T>(ImmutableArray<T> nodes) where T : RawNode
+    public static InternalNode? CreateList<T>(ImmutableArray<T> nodes) where T : InternalNode
     {
         return nodes.Length switch
         {
@@ -147,9 +149,9 @@ internal abstract class RawNode
     /// <param name="node1">The first node in the list.</param>
     /// <param name="node2">The second node in the list.</param>
     /// <returns>A list containing both nodes.</returns>
-    public static RawNode CreateList(RawNode node1, RawNode node2)
+    public static InternalNode CreateList(InternalNode node1, InternalNode node2)
     {
-        var builder = ImmutableArray.CreateBuilder<RawNode>(2);
+        var builder = ImmutableArray.CreateBuilder<InternalNode>(2);
 
         builder.Add(node1);
         builder.Add(node2);
@@ -164,11 +166,11 @@ internal abstract class RawNode
     /// <param name="node">The node to append.</param>
     /// <returns>A new list containing the elements of the list specified by <paramref name="list"/> with 
     /// the node specified by <paramref name="node"/> appended as the last element.</returns>
-    private static RawNode AppendList(RawNode list, RawNode node)
+    private static InternalNode AppendList(InternalNode list, InternalNode node)
     {
         Debug.Assert(list.IsList, "The list is not a list.");
 
-        var builder = ImmutableArray.CreateBuilder<RawNode>(list.SlotCount + 1);
+        var builder = ImmutableArray.CreateBuilder<InternalNode>(list.SlotCount + 1);
 
         for (var i = 0; i < list.SlotCount; i++)
         {
@@ -180,12 +182,12 @@ internal abstract class RawNode
         return RawSyntaxList.Create(builder.ToImmutableArray());
     }
 
-    private static RawNode ConcatLists(RawNode list1, RawNode list2)
+    private static InternalNode ConcatLists(InternalNode list1, InternalNode list2)
     {
         Debug.Assert(list1.IsList, "List 1 is not a list.");
         Debug.Assert(list2.IsList, "List 2 is not a list.");
 
-        var builder = ImmutableArray.CreateBuilder<RawNode>(list1.SlotCount + list2.SlotCount);
+        var builder = ImmutableArray.CreateBuilder<InternalNode>(list1.SlotCount + list2.SlotCount);
 
         for (var i = 0; i < list1.SlotCount; i++)
         {
@@ -200,11 +202,11 @@ internal abstract class RawNode
         return RawSyntaxList.Create(builder.ToImmutableArray());
     }
 
-    private static RawNode PrefixList(RawNode node, RawNode list)
+    private static InternalNode PrefixList(InternalNode node, InternalNode list)
     {
         Debug.Assert(list.IsList, "The list is not a list.");
 
-        var builder = ImmutableArray.CreateBuilder<RawNode>(list.SlotCount + 1);
+        var builder = ImmutableArray.CreateBuilder<InternalNode>(list.SlotCount + 1);
 
         builder.Add(node);
 
@@ -247,21 +249,21 @@ internal abstract class RawNode
         return offset;
     }
 
-    public abstract RawNode? GetSlot(int index);
+    public abstract InternalNode? GetSlot(int index);
 
-    private RawNode GetRequiredSlot(int index)
+    private InternalNode GetRequiredSlot(int index)
     {
         var node = GetSlot(index);
         Debug.Assert(node is not null, "");
         return node!;
     }
 
-    public virtual RawNode WithLeadingTrivia(RawNode? trivia)
+    public virtual InternalNode WithLeadingTrivia(InternalNode? trivia)
     {
         return this;
     }
 
-    public virtual RawNode WithTrailingTrivia(RawNode? trivia)
+    public virtual InternalNode WithTrailingTrivia(InternalNode? trivia)
     {
         return this;
     }
@@ -322,7 +324,7 @@ internal abstract class RawNode
 
     private bool IsSingleItemList => IsList && SlotCount == 1;
 
-    public virtual bool IsEquivalentTo(RawNode? other)
+    public virtual bool IsEquivalentTo(InternalNode? other)
     {
         if (other == null)
         {
@@ -390,7 +392,7 @@ internal abstract class RawNode
         return true;
     }
 
-    public virtual RawNode? GetLeadingTrivia()
+    public virtual InternalNode? GetLeadingTrivia()
     {
         // Zero-width nodes cannot have trivia.
         if (FullWidth == 0)
@@ -420,7 +422,7 @@ internal abstract class RawNode
         return first!.GetLeadingTriviaWidth();
     }
 
-    public virtual RawNode? GetTrailingTrivia()
+    public virtual InternalNode? GetTrailingTrivia()
     {
         // Zero-width nodes cannot have trivia.
         if (FullWidth == 0)
@@ -450,14 +452,14 @@ internal abstract class RawNode
         return last!.GetTrailingTriviaWidth();
     }
 
-    private RawNode? GetFirstTerminalDescendant()
+    private InternalNode? GetFirstTerminalDescendant()
     {
-        RawNode? node = this;
+        InternalNode? node = this;
 
         // Walk the node tree until we hit a terminal node (one that cannot have children).
         do
         {
-            RawNode? descendant = null;
+            InternalNode? descendant = null;
             var count = node.SlotCount;
             for (var i = 0; i < count; i++)
             {
@@ -477,14 +479,14 @@ internal abstract class RawNode
         return node;
     }
 
-    private RawNode? GetLastTerminalDescendant()
+    private InternalNode? GetLastTerminalDescendant()
     {
         if (SlotCount == 0)
         {
             return null;
         }
 
-        RawNode? node = this;
+        InternalNode? node = this;
 
         // Walk the node tree until we hit a terminal node (one that cannot have children).
         do
@@ -506,7 +508,7 @@ internal abstract class RawNode
         return node;
     }
 
-    public RawNode WithAdditionalAnnotations(SyntaxAnnotation syntaxAnnotation)
+    public InternalNode WithAdditionalAnnotations(SyntaxAnnotation syntaxAnnotation)
     {
         if (_annotations.IsDefaultOrEmpty)
         {
@@ -516,7 +518,7 @@ internal abstract class RawNode
         return WithAnnotations(_annotations.Add(syntaxAnnotation));
     }
 
-    public RawNode WithAdditionalAnnotations(IEnumerable<SyntaxAnnotation> syntaxAnnotations)
+    public InternalNode WithAdditionalAnnotations(IEnumerable<SyntaxAnnotation> syntaxAnnotations)
     {
         if (_annotations.IsDefaultOrEmpty)
         {
@@ -526,7 +528,7 @@ internal abstract class RawNode
         return WithAnnotations(_annotations.AddRange(syntaxAnnotations));
     }
 
-    public RawNode WithAnnotations(SyntaxAnnotation annotation)
+    public InternalNode WithAnnotations(SyntaxAnnotation annotation)
     {
         var builder = ImmutableArray.CreateBuilder<SyntaxAnnotation>();
         builder.Add(annotation);
@@ -535,16 +537,16 @@ internal abstract class RawNode
         return WithAnnotations(annotations);
     }
 
-    public abstract RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics);
+    public abstract InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics);
 
-    public abstract RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations);
+    public abstract InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations);
 
     /// <summary>
     /// Gets the diagnostics directly associated with this node. This differs from <see cref="SyntaxNode.GetDiagnostics()"/> which
     /// returns all diagnostics associated with the node directly <b>and</b> those associated with its descendant nodes.
     /// </summary>
     /// <returns>The collection of diagnostics attached to this node, or a default array.</returns>
-    public ImmutableArray<RawDiagnostic> GetAttachedDiagnostics() => _diagnostics;
+    public ImmutableArray<InternalDiagnostic> GetAttachedDiagnostics() => _diagnostics;
 
     public ImmutableArray<SyntaxAnnotation> GetAnnotations() => _annotations;
 
@@ -553,7 +555,7 @@ internal abstract class RawNode
     /// that are children of the current node. As nodes are immutable, is not valid to call this method outside of the constructor.
     /// </summary>
     /// <param name="node">The child node to incorporate into this node.</param>
-    protected void IncludeChild(RawNode node)
+    protected void IncludeChild(InternalNode node)
     {
         _flags |= node._flags & (NodeFlags.ContainsAnnotations | NodeFlags.ContainsDiagnostics | NodeFlags.IsNotMissing);
         FullWidth += node.FullWidth;
@@ -581,7 +583,7 @@ internal abstract class RawNode
 
     internal virtual void WriteTo(TextWriter writer, bool leading, bool trailing)
     {
-        var nodesToProcess = new Stack<(RawNode node, bool leading, bool trailing)>();
+        var nodesToProcess = new Stack<(InternalNode node, bool leading, bool trailing)>();
 
         nodesToProcess.Push((this, leading, trailing));
 
@@ -657,8 +659,8 @@ internal abstract class RawNode
     /// </summary>
     /// <param name="node1">The first node to combine.</param>
     /// <param name="node2">The second node to combine.</param>
-    /// <returns>A <see cref="RawNode"/> which is the combined result of the node pair.</returns>
-    internal static RawNode? Concat(RawNode? node1, RawNode? node2)
+    /// <returns>A <see cref="InternalNode"/> which is the combined result of the node pair.</returns>
+    internal static InternalNode? Concat(InternalNode? node1, InternalNode? node2)
     {
         if (node1 == null)
         {
@@ -691,15 +693,15 @@ internal abstract class RawNode
     }
 
     /// <summary>
-    /// Creates a <see cref="Syntax.StructuredTriviaSyntax"/> which encapsulates this raw node as structured trivia as part of a syntax tree.
+    /// Creates a <see cref="StructuredTriviaSyntax"/> which encapsulates this raw node as structured trivia as part of a syntax tree.
     /// </summary>
     /// <param name="parent">The syntax trivia which encapsulates this structured syntax.</param>
-    /// <returns>A <see cref="Syntax.StructuredTriviaSyntax"/> which encapsulates this raw node, or <c>null</c> 
+    /// <returns>A <see cref="StructuredTriviaSyntax"/> which encapsulates this raw node, or <c>null</c> 
     /// if the node is not structure trivia.</returns>
-    public virtual Syntax.StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia parent)
+    public virtual StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia parent)
     {
         return null;
     }
 
-    public static RawNode? operator +(RawNode? node1, RawNode? node2) => Concat(node1, node2);
+    public static InternalNode? operator +(InternalNode? node1, InternalNode? node2) => Concat(node1, node2);
 }

@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
-internal class RawSyntaxTrivia : RawNode
+internal class RawSyntaxTrivia : InternalNode
 {
     public RawSyntaxTrivia(SyntaxKind kind, string text) : base(kind, text.Length)
     {
@@ -13,7 +13,7 @@ internal class RawSyntaxTrivia : RawNode
     public RawSyntaxTrivia(
         SyntaxKind kind,
         string text,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(kind, text.Length, diagnostics, annotations)
     {
         Text = text;
@@ -35,16 +35,16 @@ internal class RawSyntaxTrivia : RawNode
 
     public override int GetTrailingTriviaWidth() => 0;
 
-    public override RawNode? GetLeadingTrivia() => null;
+    public override InternalNode? GetLeadingTrivia() => null;
 
-    public override RawNode? GetTrailingTrivia() => null;
+    public override InternalNode? GetTrailingTrivia() => null;
 
     public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
     {
         throw new InvalidOperationException();
     }
 
-    public override RawNode? GetSlot(int index)
+    public override InternalNode? GetSlot(int index)
     {
         throw new InvalidOperationException();
     }
@@ -60,9 +60,9 @@ internal class RawSyntaxTrivia : RawNode
 
     public static implicit operator SyntaxTrivia(RawSyntaxTrivia trivia) => new(new SyntaxToken(), trivia, 0);
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations) =>
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations) =>
         new RawSyntaxTrivia(Kind, Text, GetAttachedDiagnostics(), annotations);
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics) => 
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics) => 
         new RawSyntaxTrivia(Kind, Text, diagnostics, GetAnnotations());
 }

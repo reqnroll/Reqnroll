@@ -12,7 +12,7 @@ internal partial class RawSyntaxToken
             ClearFlag(NodeFlags.IsNotMissing);
         }
 
-        public MissingToken(SyntaxKind kind, string text, RawNode? leading, RawNode? trailing) : base(kind, text, leading, trailing)
+        public MissingToken(SyntaxKind kind, string text, InternalNode? leading, InternalNode? trailing) : base(kind, text, leading, trailing)
         {
             ClearFlag(NodeFlags.IsNotMissing);
         }
@@ -20,25 +20,25 @@ internal partial class RawSyntaxToken
         public MissingToken(
             SyntaxKind kind,
             string text,
-            RawNode? leading,
-            RawNode? trailing,
-            ImmutableArray<RawDiagnostic> diagnostics,
+            InternalNode? leading,
+            InternalNode? trailing,
+            ImmutableArray<InternalDiagnostic> diagnostics,
             ImmutableArray<SyntaxAnnotation> annotations) : base(kind, text, leading, trailing, diagnostics, annotations)
         {
             ClearFlag(NodeFlags.IsNotMissing);
         }
 
-        public override RawNode WithLeadingTrivia(RawNode? trivia)
+        public override InternalNode WithLeadingTrivia(InternalNode? trivia)
         {
             throw new NotImplementedException();
         }
 
-        public override RawNode WithTrailingTrivia(RawNode? trivia)
+        public override InternalNode WithTrailingTrivia(InternalNode? trivia)
         {
             throw new NotImplementedException();
         }
 
-        public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+        public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
         {
             return new MissingToken(Kind, _text, _leading, _trailing, diagnostics, GetAnnotations());
         }

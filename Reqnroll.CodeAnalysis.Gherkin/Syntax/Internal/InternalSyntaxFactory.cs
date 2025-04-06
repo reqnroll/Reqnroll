@@ -140,17 +140,17 @@ internal static class InternalSyntaxFactory
     public static RawSyntaxToken Token(SyntaxKind kind, string text) => Token(null, kind, text, null);
 
     public static RawSyntaxToken Token(
-        RawNode? leadingTrivia,
+        InternalNode? leadingTrivia,
         SyntaxKind kind,
-        RawNode? trailingTrivia) => RawSyntaxToken.Create(kind, leadingTrivia, trailingTrivia);
+        InternalNode? trailingTrivia) => RawSyntaxToken.Create(kind, leadingTrivia, trailingTrivia);
 
     public static RawSyntaxToken Token(
-        RawNode? leadingTrivia,
+        InternalNode? leadingTrivia,
         SyntaxKind kind,
         string text,
-        RawNode? trailingTrivia) => RawSyntaxToken.Create(kind, text, leadingTrivia, trailingTrivia);
+        InternalNode? trailingTrivia) => RawSyntaxToken.Create(kind, text, leadingTrivia, trailingTrivia);
 
-    public static RawSyntaxToken Literal(RawNode? leadingTrivia, string text, RawNode? trailingTrivia) => 
+    public static RawSyntaxToken Literal(InternalNode? leadingTrivia, string text, InternalNode? trailingTrivia) => 
         RawSyntaxToken.Create(SyntaxKind.TextLiteralToken, text, leadingTrivia, trailingTrivia);
 
     public static RawSyntaxToken MissingToken(SyntaxKind kind) => RawSyntaxToken.CreateMissing(
@@ -159,23 +159,23 @@ internal static class InternalSyntaxFactory
         ElasticZeroSpace);
 
     public static RawSyntaxToken MissingToken(
-        RawNode? leadingTrivia,
+        InternalNode? leadingTrivia,
         SyntaxKind kind,
-        RawNode? trailingTrivia) => RawSyntaxToken.CreateMissing(kind, leadingTrivia, trailingTrivia);
+        InternalNode? trailingTrivia) => RawSyntaxToken.CreateMissing(kind, leadingTrivia, trailingTrivia);
 
     public static FeatureDeclarationSyntax FeatureDeclaration(
-        RawNode keyword,
-        RawNode colon,
-        RawNode name,
+        InternalNode keyword,
+        InternalNode colon,
+        InternalNode name,
         DescriptionSyntax? description)
     {
         return new FeatureDeclarationSyntax(keyword, colon, name, description);
     }
 
-    public static RawSyntaxToken Identifier(RawNode? leadingTrivia, string text, RawNode? trailingTrivia) =>
+    public static RawSyntaxToken Identifier(InternalNode? leadingTrivia, string text, InternalNode? trailingTrivia) =>
         RawSyntaxToken.Create(SyntaxKind.IdentifierToken, text, leadingTrivia, trailingTrivia);
 
-    public static FeatureFileSyntax FeatureFile(RawNode? featureDeclaration, RawNode endOfFileToken)
+    public static FeatureFileSyntax FeatureFile(InternalNode? featureDeclaration, InternalNode endOfFileToken)
     {
         return new(featureDeclaration, endOfFileToken);
     }
@@ -202,10 +202,10 @@ internal static class InternalSyntaxFactory
         return new(SyntaxKind.WhitespaceTrivia, whitespace);
     }
 
-    public static DescriptionSyntax Description(RawNode? textNodes)
+    public static DescriptionSyntax Description(InternalNode? textNodes)
     {
         return new(textNodes);
     }
 
-    public static SkippedTokensTriviaSyntax SkippedTokensTrivia(RawNode? tokens) => new(tokens);
+    public static SkippedTokensTriviaSyntax SkippedTokensTrivia(InternalNode? tokens) => new(tokens);
 }

@@ -11,7 +11,7 @@ internal partial class ParsedSyntaxTreeBuilder
     {
         private FeatureRuleHandler? _featureRuleHandler;
 
-        private RawNode? _endOfFile;
+        private InternalNode? _endOfFile;
 
         public FeatureFileSyntax BuildFeatureFileSyntax()
         {

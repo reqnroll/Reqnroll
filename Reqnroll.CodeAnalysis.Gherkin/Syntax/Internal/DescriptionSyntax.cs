@@ -3,11 +3,11 @@ using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
-internal class DescriptionSyntax : RawNode
+internal class DescriptionSyntax : InternalNode
 {
-    public readonly RawNode? textTokens;
+    public readonly InternalNode? textTokens;
 
-    public DescriptionSyntax(RawNode? textTokens) : base(SyntaxKind.Description)
+    public DescriptionSyntax(InternalNode? textTokens) : base(SyntaxKind.Description)
     {
         this.textTokens = textTokens;
         if (textTokens != null)
@@ -17,8 +17,8 @@ internal class DescriptionSyntax : RawNode
     }
 
     public DescriptionSyntax(
-        RawNode? textTokens,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        InternalNode? textTokens,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(SyntaxKind.Description, diagnostics, annotations)
     {
         this.textTokens = textTokens;
@@ -33,7 +33,7 @@ internal class DescriptionSyntax : RawNode
         return new Syntax.DescriptionSyntax(this, parent, position);
     }
 
-    public override RawNode? GetSlot(int index)
+    public override InternalNode? GetSlot(int index)
     {
         return index switch
         {
@@ -44,7 +44,7 @@ internal class DescriptionSyntax : RawNode
 
     public override int SlotCount => 1;
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
         return new DescriptionSyntax(
             textTokens,
@@ -52,7 +52,7 @@ internal class DescriptionSyntax : RawNode
             annotations);
     }
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
         return new DescriptionSyntax(
             textTokens,

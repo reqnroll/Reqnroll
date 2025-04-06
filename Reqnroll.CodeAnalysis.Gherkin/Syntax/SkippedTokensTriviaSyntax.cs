@@ -7,9 +7,9 @@ public class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
     {
     }
 
-    private new Internal.SkippedTokensTriviaSyntax RawNode => (Internal.SkippedTokensTriviaSyntax)base.RawNode;
+    private new Internal.SkippedTokensTriviaSyntax InternalNode => (Internal.SkippedTokensTriviaSyntax)base.InternalNode;
 
-    public SyntaxTokenList Tokens => new(this, RawNode.tokens, RawNode.GetSlotOffset(0));
+    public SyntaxTokenList Tokens => new(this, InternalNode.tokens, InternalNode.GetSlotOffset(0));
 
     internal override SyntaxNode? GetSlotAsSyntaxNode(int index) => null;
 }

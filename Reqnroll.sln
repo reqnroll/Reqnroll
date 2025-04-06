@@ -127,6 +127,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.CodeAnalysis.Gherk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.GherkinCodeAnalysisTests", "Tests\Reqnroll.GherkinCodeAnalysisTests\Reqnroll.GherkinCodeAnalysisTests.csproj", "{4D66C58C-958E-424B-BE7B-B1D56C29FCAF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator", "Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator\Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator.csproj", "{DE102998-8C26-445F-B276-718FCEA856ED}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -269,6 +271,10 @@ Global
 		{4D66C58C-958E-424B-BE7B-B1D56C29FCAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4D66C58C-958E-424B-BE7B-B1D56C29FCAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4D66C58C-958E-424B-BE7B-B1D56C29FCAF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE102998-8C26-445F-B276-718FCEA856ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE102998-8C26-445F-B276-718FCEA856ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE102998-8C26-445F-B276-718FCEA856ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE102998-8C26-445F-B276-718FCEA856ED}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

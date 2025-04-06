@@ -1,10 +1,8 @@
-﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
-
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
+﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 public class DocStringSyntax : SyntaxNode
 {
-    internal DocStringSyntax(RawNode node, SyntaxNode? parent, int position) : base(node, parent, position)
+    internal DocStringSyntax(InternalNode node, SyntaxNode? parent, int position) : base(node, parent, position)
     {
     }
 

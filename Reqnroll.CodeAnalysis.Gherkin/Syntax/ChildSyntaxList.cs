@@ -1,5 +1,4 @@
-﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
-using System.Collections;
+﻿using System.Collections;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -47,16 +46,16 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
                 var currentNode = _current.AsNode()!;
 
                 // If we're currently iterating through a list, continue.
-                if (currentNode.RawNode.IsList && MoveNextSyntaxNodeListSlot(currentNode))
+                if (currentNode.InternalNode.IsList && MoveNextSyntaxNodeListSlot(currentNode))
                 {
                     return true;
                 }                
             }
 
             // If the current node is not a list, or we have exhausted the list, advance to the next slot.
-            for(_slotIndex++; _slotIndex < parent.RawNode.SlotCount; _slotIndex++)
+            for(_slotIndex++; _slotIndex < parent.InternalNode.SlotCount; _slotIndex++)
             {
-                var slot = parent.RawNode.GetSlot(_slotIndex);
+                var slot = parent.InternalNode.GetSlot(_slotIndex);
 
                 // If the slot is empty, we advance the enumerator.
                 if (slot == null)
@@ -114,7 +113,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
             return false;
         }
 
-        private bool MoveNextSyntaxTokenListSlot(RawNode tokenList)
+        private bool MoveNextSyntaxTokenListSlot(InternalNode tokenList)
         {
             for (_listIndex++; _listIndex < tokenList.SlotCount; _listIndex++)
             {
@@ -133,9 +132,9 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
 
         private bool MoveNextSyntaxNodeListSlot(SyntaxNode childList)
         {
-            for (_listIndex++; _listIndex < childList.RawNode.SlotCount; _listIndex++)
+            for (_listIndex++; _listIndex < childList.InternalNode.SlotCount; _listIndex++)
             {
-                var listChild = childList.RawNode.GetSlot(_listIndex);
+                var listChild = childList.InternalNode.GetSlot(_listIndex);
 
                 if (listChild != null)
                 {
@@ -177,9 +176,9 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
     {
         var count = 0;
 
-        for (var index = 0; index < parent.RawNode.SlotCount; index++)
+        for (var index = 0; index < parent.InternalNode.SlotCount; index++)
         {
-            var node = parent.RawNode.GetSlot(index);
+            var node = parent.InternalNode.GetSlot(index);
             if (node == null)
             {
                 continue;
@@ -250,7 +249,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
 
     IEnumerator<SyntaxNodeOrToken> IEnumerable<SyntaxNodeOrToken>.GetEnumerator()
     {
-        if (_parent.RawNode == null)
+        if (_parent.InternalNode == null)
         {
             return Enumerable.Empty<SyntaxNodeOrToken>().GetEnumerator();
         }

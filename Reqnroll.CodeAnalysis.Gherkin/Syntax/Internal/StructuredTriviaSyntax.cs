@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
-internal abstract class StructuredTriviaSyntax : RawNode
+internal abstract class StructuredTriviaSyntax : InternalNode
 {
     protected StructuredTriviaSyntax(SyntaxKind kind) : base(kind)
     {

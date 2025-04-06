@@ -10,7 +10,7 @@ internal abstract class CommentTriviaSyntax : StructuredTriviaSyntax
         IncludeChild(hashToken);
     }
 
-    public override RawNode? GetSlot(int index)
+    public override InternalNode? GetSlot(int index)
     {
         return index switch
         {

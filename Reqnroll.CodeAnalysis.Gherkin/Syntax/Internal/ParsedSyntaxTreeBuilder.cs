@@ -33,17 +33,17 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         /// <summary>
         /// The leading trivia to be included with the next significant node.
         /// </summary>
-        private RawNode? _trivia;
+        private InternalNode? _trivia;
 
         /// <summary>
         /// The tokens to be included as skipped tokens.
         /// </summary>
-        private RawNode? _skippedTokens;
+        private InternalNode? _skippedTokens;
 
         /// <summary>
         /// The diagnostic associated with the skipped tokens.
         /// </summary>
-        private RawDiagnostic? _skippedTokensDiagnostic;
+        private InternalDiagnostic? _skippedTokensDiagnostic;
 
         /// <summary>
         /// Gets the source text being parsed.
@@ -63,7 +63,7 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         /// with a new diagnostic will cause the buffered tokens to be added to buffered trivia using the buffered diagnostic
         /// before creating a new buffer from the specified skipped tokens.</para>
         /// </remarks>
-        public void AddSkippedToken(RawNode? skippedTokens, RawDiagnostic diagnostic)
+        public void AddSkippedToken(InternalNode? skippedTokens, InternalDiagnostic diagnostic)
         {
             if (_skippedTokensDiagnostic == null)
             {
@@ -96,7 +96,7 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         /// Adds leading trivia to be included with the next syntax token.
         /// </summary>
         /// <param name="trivia">A raw node representing the trivia to add. If the value is <c>null</c>, no node is added.</param>
-        public void AddLeadingTrivia(RawNode? trivia)
+        public void AddLeadingTrivia(InternalNode? trivia)
         {
             if (trivia != null)
             {
@@ -120,14 +120,14 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         }
 
         /// <summary>
-        /// Consumes all leading trivia that has been added to the context by calling <see cref="AddLeadingTrivia(RawNode?)"/>, 
-        /// emptying the buffer and returning a <see cref="RawNode"/> that contains all the buffered trivia, or <c>null</c> if 
+        /// Consumes all leading trivia that has been added to the context by calling <see cref="AddLeadingTrivia(InternalNode?)"/>, 
+        /// emptying the buffer and returning a <see cref="InternalNode"/> that contains all the buffered trivia, or <c>null</c> if 
         /// no leading trivia has been buffered.
         /// buffered.
         /// </summary>
-        /// <returns>A <see cref="RawNode"/> that is the buffered leading trivia, or <c>null</c> if no leading trivia has been
+        /// <returns>A <see cref="InternalNode"/> that is the buffered leading trivia, or <c>null</c> if no leading trivia has been
         /// buffered.</returns>
-        public RawNode? ConsumeLeadingTrivia()
+        public InternalNode? ConsumeLeadingTrivia()
         {
             ConsumeSkippedTokensTrivia();
 
@@ -268,13 +268,13 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         var line = _context.SourceText.Lines[token.Line.LineNumber - 1];
         var contentSpan = TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End);
 
-        RawNode? leadingTrivia = Whitespace(_context.SourceText, line.Start, token.MatchedIndent);
+        InternalNode? leadingTrivia = Whitespace(_context.SourceText, line.Start, token.MatchedIndent);
         var leadingWhitespace = _context.SourceText.ConsumeWhitespace(contentSpan);
 
         leadingTrivia += leadingWhitespace;
 
         var trailingWhitespace = _context.SourceText.ReverseConsumeWhitespace(contentSpan);
-        RawNode? trailingTrivia = trailingWhitespace + line.GetEndOfLineTrivia();
+        InternalNode? trailingTrivia = trailingWhitespace + line.GetEndOfLineTrivia();
 
         // All text remaining between any whitespace we'll treat as a literal.
         var literalSpan = TextSpan.FromBounds(
@@ -290,13 +290,13 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         _context.AddSkippedToken(literal, diagnostic);
     }
 
-    private static RawDiagnostic GetUnexpectedTokenDiagnostic(string[] expectedTokenTypes)
+    private static InternalDiagnostic GetUnexpectedTokenDiagnostic(string[] expectedTokenTypes)
     {
         var expectedTokenSet = expectedTokenTypes.Except(TriviaTokenTypes).ToArray();
 
         if (FeatureTagTokenTypes.SetEquals(expectedTokenSet))
         {
-            return RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag);
+            return InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag);
         }
 
         throw new NotImplementedException(

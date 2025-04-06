@@ -13,7 +13,7 @@ public class DiagnosticTests
     {
         const string text = "Descriptive, eh?";
         var token = Token(null, SyntaxKind.TextLiteralToken, text, null)
-            .WithDiagnostics([RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag) ]);
+            .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag) ]);
 
         // Create a sytax node to attach the token to a tree.
         var description = (DescriptionSyntax)Description(token).CreateSyntaxNode();
@@ -39,7 +39,7 @@ public class DiagnosticTests
     {
         const string text = "Descriptive, eh?";
         var token = Token(null, SyntaxKind.TextLiteralToken, text, null)
-            .WithDiagnostics([RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
+            .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
 
         var textToken = new SyntaxToken(token);
 
@@ -55,9 +55,9 @@ public class DiagnosticTests
     public void CanAttachDiagnosticsToSyntaxTrivia()
     {
         var leading = Whitespace("    ")
-            .WithDiagnostics([RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
+            .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
         var trailing = CarriageReturnLineFeed
-            .WithDiagnostics([RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
+            .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
 
         // Create a token and syntax node to attach the trivia to a tree.
         const string text = "Descriptive, eh?";
@@ -95,7 +95,7 @@ public class DiagnosticTests
     public void CanAttachDiagnosticsToFloatingSyntaxTrivia()
     {
         var trivia = (SyntaxTrivia)(RawSyntaxTrivia)Whitespace("    ")
-            .WithDiagnostics([RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
+            .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
 
         trivia.ContainsDiagnostics.Should().BeTrue();
         trivia.GetDiagnostics().Should().HaveCount(1);
@@ -112,7 +112,7 @@ public class DiagnosticTests
         const string text = "Descriptive, eh?";
 
         var description = (DescriptionSyntax)Description(Token(null, SyntaxKind.TextLiteralToken, text, null))
-            .WithDiagnostics([RawDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)])
+            .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)])
             .CreateSyntaxNode();
 
         description.HasDiagnostics.Should().BeTrue();
@@ -130,10 +130,10 @@ public class DiagnosticTests
     public void AttachedDiagnosticsAreReturnedInDocumentOrder()
     {
         var descriptor1 = new DiagnosticDescriptor("GT1", "Diagnostic 1", "", "", DiagnosticSeverity.Error, true);
-        var diagnostic1 = RawDiagnostic.Create(descriptor1);
+        var diagnostic1 = InternalDiagnostic.Create(descriptor1);
 
         var descriptor2 = new DiagnosticDescriptor("GT2", "Diagnostic 2", "", "", DiagnosticSeverity.Error, true);
-        var diagnostic2 = RawDiagnostic.Create(descriptor2);
+        var diagnostic2 = InternalDiagnostic.Create(descriptor2);
 
         var feature = (FeatureDeclarationSyntax)FeatureDeclaration(
             Token(SyntaxKind.FeatureKeyword, "Feature").WithDiagnostics([diagnostic2]),

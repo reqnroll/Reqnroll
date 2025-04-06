@@ -3,11 +3,11 @@ using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
-internal partial class RawSyntaxToken : RawNode
+internal partial class RawSyntaxToken : InternalNode
 {
     private readonly string _text;
-    private readonly RawNode? _leading;
-    private readonly RawNode? _trailing;
+    private readonly InternalNode? _leading;
+    private readonly InternalNode? _trailing;
 
     public RawSyntaxToken(SyntaxKind kind, string text) : base(kind, text.Length)
     {
@@ -19,8 +19,8 @@ internal partial class RawSyntaxToken : RawNode
     public RawSyntaxToken(
         SyntaxKind kind,
         string text,
-        RawNode? leading,
-        RawNode? trailing) : base(kind, text.Length)
+        InternalNode? leading,
+        InternalNode? trailing) : base(kind, text.Length)
     {
         _text = text;
         _leading = leading;
@@ -42,9 +42,9 @@ internal partial class RawSyntaxToken : RawNode
     public RawSyntaxToken(
         SyntaxKind kind,
         string text,
-        RawNode? leading,
-        RawNode? trailing,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        InternalNode? leading,
+        InternalNode? trailing,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(kind, text.Length, diagnostics, annotations)
     {
         _text = text;
@@ -66,7 +66,7 @@ internal partial class RawSyntaxToken : RawNode
 
     public override int SlotCount => 0;
 
-    public override RawNode? GetSlot(int index) => throw new InvalidOperationException();
+    public override InternalNode? GetSlot(int index) => throw new InvalidOperationException();
 
     public override bool IsToken => true;
 
@@ -81,8 +81,8 @@ internal partial class RawSyntaxToken : RawNode
 
     internal static RawSyntaxToken CreateMissing(
         SyntaxKind kind,
-        RawNode? leadingTrivia,
-        RawNode? trailingTrivia)
+        InternalNode? leadingTrivia,
+        InternalNode? trailingTrivia)
     {
         if (!kind.IsToken())
         {
@@ -94,7 +94,7 @@ internal partial class RawSyntaxToken : RawNode
             GetText(kind),
             leadingTrivia,
             trailingTrivia,
-            ImmutableArray<RawDiagnostic>.Empty,
+            ImmutableArray<InternalDiagnostic>.Empty,
             ImmutableArray<SyntaxAnnotation>.Empty);
 
         token.ClearFlag(NodeFlags.IsNotMissing);
@@ -104,8 +104,8 @@ internal partial class RawSyntaxToken : RawNode
 
     internal static RawSyntaxToken Create(
         SyntaxKind kind,
-        RawNode? leading,
-        RawNode? trailing)
+        InternalNode? leading,
+        InternalNode? trailing)
     {
         if (!kind.IsToken())
         {
@@ -122,15 +122,15 @@ internal partial class RawSyntaxToken : RawNode
             GetText(kind),
             leading,
             trailing,
-            ImmutableArray<RawDiagnostic>.Empty,
+            ImmutableArray<InternalDiagnostic>.Empty,
             ImmutableArray<SyntaxAnnotation>.Empty);
     }
 
     internal static RawSyntaxToken Create(
         SyntaxKind kind,
         string text,
-        RawNode? leading,
-        RawNode? trailing)
+        InternalNode? leading,
+        InternalNode? trailing)
     {
         if (!kind.IsToken())
         {
@@ -142,7 +142,7 @@ internal partial class RawSyntaxToken : RawNode
             text,
             leading,
             trailing,
-            ImmutableArray<RawDiagnostic>.Empty,
+            ImmutableArray<InternalDiagnostic>.Empty,
             ImmutableArray<SyntaxAnnotation>.Empty);
     }
 
@@ -157,13 +157,13 @@ internal partial class RawSyntaxToken : RawNode
 
     public override bool HasLeadingTrivia => _leading != null;
 
-    public override RawNode? GetLeadingTrivia() => _leading;
+    public override InternalNode? GetLeadingTrivia() => _leading;
 
     public override int GetLeadingTriviaWidth() => _leading?.FullWidth ?? 0;
 
     public override bool HasTrailingTrivia => _trailing != null;
 
-    public override RawNode? GetTrailingTrivia() => _trailing;
+    public override InternalNode? GetTrailingTrivia() => _trailing;
 
     public override int GetTrailingTriviaWidth() => _trailing?.FullWidth ?? 0;
 
@@ -182,22 +182,22 @@ internal partial class RawSyntaxToken : RawNode
         }
     }
 
-    public override RawNode WithLeadingTrivia(RawNode? trivia)
+    public override InternalNode WithLeadingTrivia(InternalNode? trivia)
     {
         return new RawSyntaxToken(Kind, _text, trivia, _trailing, GetAttachedDiagnostics(), GetAnnotations());
     }
 
-    public override RawNode WithTrailingTrivia(RawNode? trivia)
+    public override InternalNode WithTrailingTrivia(InternalNode? trivia)
     {
         return new RawSyntaxToken(Kind, _text, _leading, trivia, GetAttachedDiagnostics(), GetAnnotations());
     }
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
         return new RawSyntaxToken(Kind, _text, _leading, _trailing, GetAttachedDiagnostics(), annotations);
     }
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
         return new RawSyntaxToken(Kind, _text, _leading, _trailing, diagnostics, GetAnnotations());
     }

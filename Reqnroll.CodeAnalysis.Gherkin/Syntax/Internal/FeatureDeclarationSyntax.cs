@@ -6,9 +6,9 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 internal class FeatureDeclarationSyntax : DeclarationSyntax
 {
     public FeatureDeclarationSyntax(
-        RawNode keyword,
-        RawNode colon,
-        RawNode name,
+        InternalNode keyword,
+        InternalNode colon,
+        InternalNode name,
         DescriptionSyntax? description) : base(SyntaxKind.FeatureDeclaration)
     {
         this.keyword = keyword;
@@ -28,11 +28,11 @@ internal class FeatureDeclarationSyntax : DeclarationSyntax
     }
 
     private FeatureDeclarationSyntax(
-        RawNode keyword,
-        RawNode colon,
-        RawNode name,
+        InternalNode keyword,
+        InternalNode colon,
+        InternalNode name,
         DescriptionSyntax? description,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(
             SyntaxKind.FeatureDeclaration,
             diagnostics,
@@ -54,9 +54,9 @@ internal class FeatureDeclarationSyntax : DeclarationSyntax
         }
     }
 
-    public readonly RawNode keyword;
-    public readonly RawNode colon;
-    public readonly RawNode name;
+    public readonly InternalNode keyword;
+    public readonly InternalNode colon;
+    public readonly InternalNode name;
     public readonly DescriptionSyntax? description;
 
     public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
@@ -64,7 +64,7 @@ internal class FeatureDeclarationSyntax : DeclarationSyntax
         return new Syntax.FeatureDeclarationSyntax(this, parent, position);
     }
 
-    public override RawNode? GetSlot(int index)
+    public override InternalNode? GetSlot(int index)
     {
         return index switch
         {
@@ -78,7 +78,7 @@ internal class FeatureDeclarationSyntax : DeclarationSyntax
 
     public override int SlotCount => 4;
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
         return new FeatureDeclarationSyntax(
             keyword,
@@ -89,7 +89,7 @@ internal class FeatureDeclarationSyntax : DeclarationSyntax
             annotations);
     }
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
         return new FeatureDeclarationSyntax(
             keyword,

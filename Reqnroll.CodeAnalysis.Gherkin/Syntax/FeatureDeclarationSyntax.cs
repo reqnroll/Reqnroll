@@ -13,29 +13,29 @@ public class FeatureDeclarationSyntax : DeclarationSyntax
     {
     }
 
-    private new Internal.FeatureDeclarationSyntax RawNode => (Internal.FeatureDeclarationSyntax)base.RawNode;
+    private new Internal.FeatureDeclarationSyntax InternalNode => (Internal.FeatureDeclarationSyntax)base.InternalNode;
 
     public override SyntaxTokenList Tags => new();
 
     /// <summary>
     /// Gets the token that represents the <c>Feature:</c> keyword.
     /// </summary>
-    public SyntaxToken FeatureKeyword => new(this, RawNode.keyword, Position + RawNode.GetSlotOffset(0));
+    public SyntaxToken FeatureKeyword => new(this, InternalNode.keyword, Position + InternalNode.GetSlotOffset(0));
 
     /// <summary>
     /// Gets the token that represents the colon following the keyword.
     /// </summary>
-    public SyntaxToken ColonToken => new(this, RawNode.colon, Position + RawNode.GetSlotOffset(1));
+    public SyntaxToken ColonToken => new(this, InternalNode.colon, Position + InternalNode.GetSlotOffset(1));
 
     /// <summary>
     /// Gets the name of the feature.
     /// </summary>
-    public SyntaxToken Name => new(this, RawNode.name, Position + RawNode.GetSlotOffset(2));
+    public SyntaxToken Name => new(this, InternalNode.name, Position + InternalNode.GetSlotOffset(2));
 
     /// <summary>
     /// Gets the description of the feature.
     /// </summary>
-    public DescriptionSyntax? Description => RawNode.description == null ? null : new(RawNode.description, this, Position + RawNode.GetSlotOffset(3));
+    public DescriptionSyntax? Description => InternalNode.description == null ? null : new(InternalNode.description, this, Position + InternalNode.GetSlotOffset(3));
 
     internal override SyntaxNode? GetSlotAsSyntaxNode(int index) => null;
 }

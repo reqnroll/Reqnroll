@@ -1,6 +1,5 @@
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 using System.Diagnostics;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
@@ -18,7 +17,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 [DebuggerDisplay("{GetDebuggerDisplay(), nq}")]
 public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
 {
-    internal SyntaxTrivia(in SyntaxToken token, RawNode? rawNode, int position)
+    internal SyntaxTrivia(in SyntaxToken token, InternalNode? rawNode, int position)
     {
         Token = token;
         RawNode = rawNode;
@@ -33,7 +32,7 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     /// <summary>
     /// Gets the raw node that this trivia wraps.
     /// </summary>
-    internal RawNode? RawNode { get; }
+    internal InternalNode? RawNode { get; }
 
     /// <summary>
     /// Gets the position of this triva in the source tree.
@@ -179,7 +178,7 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
         return SyntaxTree.GetLocation(Span);
     }
 
-    internal RawNode RequireRawNode()
+    internal InternalNode RequireRawNode()
     {
         var node = RawNode;
         Debug.Assert(node is not null, "RawNode is required in this context.");

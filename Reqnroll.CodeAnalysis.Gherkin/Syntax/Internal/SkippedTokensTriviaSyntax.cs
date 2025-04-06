@@ -5,9 +5,9 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
 internal class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
 {
-    public readonly RawNode? tokens;
+    public readonly InternalNode? tokens;
 
-    public SkippedTokensTriviaSyntax(RawNode? tokens) : base(SyntaxKind.SkippedTokensTrivia)
+    public SkippedTokensTriviaSyntax(InternalNode? tokens) : base(SyntaxKind.SkippedTokensTrivia)
     {
         if (tokens != null)
         {
@@ -26,7 +26,7 @@ internal class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
 
     public override int SlotCount => 1;
 
-    public override RawNode? GetSlot(int index)
+    public override InternalNode? GetSlot(int index)
     {
         return index switch
         {
@@ -35,12 +35,12 @@ internal class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
         };
     }
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
         throw new NotImplementedException();
     }
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
         throw new NotImplementedException();
     }

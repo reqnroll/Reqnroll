@@ -12,9 +12,9 @@ internal partial class ParsedSyntaxTreeBuilder
     {
         private DescriptionRuleHandler? _descriptionRuleHandler;
 
-        public RawNode? keyword;
-        public RawNode? colon;
-        public RawNode? name;
+        public InternalNode? keyword;
+        public InternalNode? colon;
+        public InternalNode? name;
 
         protected override void AppendFeatureLine(Token token, TextLine line, Context context)
         {
@@ -36,7 +36,7 @@ internal partial class ParsedSyntaxTreeBuilder
 
             // Extract any whitespace between the end of the feature name and the end of the line.
             var featureNameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
-            RawNode? nameWhitespace = context.SourceText
+            InternalNode? nameWhitespace = context.SourceText
                 .ConsumeWhitespace(featureNameEndPosition, line.End);
 
             nameWhitespace += line.GetEndOfLineTrivia();

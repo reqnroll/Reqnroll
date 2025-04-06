@@ -51,13 +51,13 @@ public class GherkinSyntaxTree
     public IEnumerable<Diagnostic> GetDiagnostics(CancellationToken cancellationToken = default) => 
         GetDiagnostics(GetRoot(cancellationToken));
 
-    public IEnumerable<Diagnostic> GetDiagnostics(SyntaxToken token) => GetDiagnostics(token.RawNode, token.Position);
+    public IEnumerable<Diagnostic> GetDiagnostics(SyntaxToken token) => GetDiagnostics(token.InternalNode, token.Position);
 
     public IEnumerable<Diagnostic> GetDiagnostics(SyntaxTrivia trivia) => GetDiagnostics(trivia.RawNode, trivia.Position);
 
-    public IEnumerable<Diagnostic> GetDiagnostics(SyntaxNode node) => GetDiagnostics(node.RawNode, node.Position);
+    public IEnumerable<Diagnostic> GetDiagnostics(SyntaxNode node) => GetDiagnostics(node.InternalNode, node.Position);
 
-    private IEnumerable<Diagnostic> GetDiagnostics(RawNode? node, int position)
+    private IEnumerable<Diagnostic> GetDiagnostics(InternalNode? node, int position)
     {
         if (node != null && node.ContainsDiagnostics)
         {
@@ -74,11 +74,11 @@ public class GherkinSyntaxTree
     /// <param name="node">The node to start enumeration at.</param>
     /// <param name="position">The position of the node.</param>
     /// <returns>An enumerable which iterates through the diagnostics of the sytnax tree.</returns>
-    private IEnumerable<Diagnostic> EnumerateDiagnostics(RawNode node, int position)
+    private IEnumerable<Diagnostic> EnumerateDiagnostics(InternalNode node, int position)
     {
-        var nodeStack = new Stack<RawNode>();
+        var nodeStack = new Stack<InternalNode>();
 
-        void PushNode(RawNode node)
+        void PushNode(InternalNode node)
         {
             // If the node is a token, unpack any leading and trailing trivia to be processed before and after the token.
             if (node.IsToken)

@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 using System.Diagnostics;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
@@ -11,16 +10,16 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 [DebuggerDisplay("{GetDebuggerDisplay(), nq}")]
 public readonly struct SyntaxToken : IEquatable<SyntaxToken>
 {
-    internal SyntaxToken(SyntaxNode? parent, RawNode? syntaxToken, int position)
+    internal SyntaxToken(SyntaxNode? parent, InternalNode? syntaxToken, int position)
     {
         Parent = parent;
-        RawNode = syntaxToken;
+        InternalNode = syntaxToken;
         Position = position;
     }
 
-    internal SyntaxToken(RawNode? token)
+    internal SyntaxToken(InternalNode? token)
     {
-        RawNode = token;
+        InternalNode = token;
     }
 
     /// <summary>
@@ -35,12 +34,12 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 return default;
             }
 
-            return new(Position, RawNode.FullWidth);
+            return new(Position, InternalNode.FullWidth);
         }
     }
 
@@ -61,19 +60,19 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 return default;
             }
 
             return TextSpan.FromBounds(
-                Position + RawNode.GetLeadingTriviaWidth(),
-                (Position + RawNode.FullWidth) - RawNode.GetTrailingTriviaWidth());
+                Position + InternalNode.GetLeadingTriviaWidth(),
+                (Position + InternalNode.FullWidth) - InternalNode.GetTrailingTriviaWidth());
 
         }
     }
 
-    private int FullWidth => RawNode?.FullWidth ?? 0;
+    private int FullWidth => InternalNode?.FullWidth ?? 0;
 
     /// <summary>
     /// Gets the node that is the parent of this node.
@@ -88,16 +87,16 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     /// <summary>
     /// Gets what kind of language construct is represented by this token.
     /// </summary>
-    public SyntaxKind Kind => RawNode?.Kind ?? SyntaxKind.None;
+    public SyntaxKind Kind => InternalNode?.Kind ?? SyntaxKind.None;
 
     /// <summary>
     /// Gets whether the syntax token represents a token that was actually parsed from source code. Missing
     /// tokens are generate by the parser in error scenarios to represent constructs that should have been
     /// present in the source code but were actually missing.
     /// </summary>
-    public bool IsMissing => RawNode?.IsMissing ?? false;
+    public bool IsMissing => InternalNode?.IsMissing ?? false;
 
-    internal RawNode? RawNode { get; }
+    internal InternalNode? InternalNode { get; }
 
     internal int Position { get; }
 
@@ -105,12 +104,12 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 return default;
             }
 
-            return new SyntaxTriviaList(this, RawNode.GetLeadingTrivia(), Position);
+            return new SyntaxTriviaList(this, InternalNode.GetLeadingTrivia(), Position);
         }
     }
 
@@ -118,14 +117,14 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 return default;
             }
 
             var position = Position + FullWidth;
 
-            var trivia = RawNode.GetTrailingTrivia();
+            var trivia = InternalNode.GetTrailingTrivia();
 
             if (trivia != null)
             {
@@ -140,7 +139,7 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     /// Gets a value indicating whether the token has any diagnostics on it or its associated trivia.
     /// </summary>
     /// <value><c>true</c> if the token or its trivia has diagnostics; otherwise <c>false</c>.</value>
-    public bool ContainsDiagnostics => RawNode?.ContainsDiagnostics ?? false;
+    public bool ContainsDiagnostics => InternalNode?.ContainsDiagnostics ?? false;
 
     private string GetDebuggerDisplay()
     {
@@ -153,7 +152,7 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     /// <returns>A list of the diagnostics for this token.</returns>
     public IEnumerable<Diagnostic> GetDiagnostics()
     {
-        if (RawNode == null)
+        if (InternalNode == null)
         {
             return [];
         }
@@ -165,9 +164,9 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
             return tree.GetDiagnostics(this);
         }
 
-        if (RawNode.ContainsDiagnostics)
+        if (InternalNode.ContainsDiagnostics)
         {
-            return RawNode.GetAttachedDiagnostics().Select(diag => diag.CreateDiagnostic());
+            return InternalNode.GetAttachedDiagnostics().Select(diag => diag.CreateDiagnostic());
         }
 
         return [];
@@ -181,12 +180,12 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     /// otherwise <c>false</c>.</returns>
     public bool IsEquivalentTo(SyntaxToken token)
     {
-        if (RawNode == null)
+        if (InternalNode == null)
         {
-            return token.RawNode == null;
+            return token.InternalNode == null;
         }
 
-        return RawNode.IsEquivalentTo(token.RawNode);
+        return InternalNode.IsEquivalentTo(token.InternalNode);
     }
 
     /// <summary>
@@ -203,9 +202,9 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
         return SyntaxTree.GetLocation(Span);
     }
 
-    public override string ToString() => RawNode?.ToString() ?? string.Empty;
+    public override string ToString() => InternalNode?.ToString() ?? string.Empty;
 
-    public string ToFullString() => RawNode?.ToFullString() ?? string.Empty;
+    public string ToFullString() => InternalNode?.ToFullString() ?? string.Empty;
 
     public override bool Equals(object? other)
     {
@@ -220,24 +219,24 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     public bool Equals(SyntaxToken other)
     {
         return ReferenceEquals(Parent, other.Parent)
-            && ReferenceEquals(RawNode, other.RawNode)
+            && ReferenceEquals(InternalNode, other.InternalNode)
             && Position == other.Position;
     }
 
-    public override int GetHashCode() => Hash.Combine(Parent, RawNode, Position);
+    public override int GetHashCode() => Hash.Combine(Parent, InternalNode, Position);
 
     public SyntaxToken WithLeadingTrivia(params SyntaxTrivia[] trivia) => WithLeadingTrivia((IEnumerable<SyntaxTrivia>)trivia);
 
     public SyntaxToken WithLeadingTrivia(IEnumerable<SyntaxTrivia> trivia)
     {
-        if (RawNode == null)
+        if (InternalNode == null)
         {
             return default;
         }
 
         return new SyntaxToken(
             null,
-            RawNode.WithLeadingTrivia(RawNode.CreateList(trivia.Select(static t => t.RequireRawNode()))),
+            InternalNode.WithLeadingTrivia(InternalNode.CreateList(trivia.Select(static t => t.RequireRawNode()))),
             position: 0);
     }
 
@@ -247,14 +246,14 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
 
     public SyntaxToken WithTrailingTrivia(IEnumerable<SyntaxTrivia> trivia)
     {
-        if (RawNode == null)
+        if (InternalNode == null)
         {
             return default;
         }
 
         return new SyntaxToken(
             null,
-            RawNode.WithTrailingTrivia(RawNode.CreateList(trivia.Select(static t => t.RequireRawNode()))),
+            InternalNode.WithTrailingTrivia(InternalNode.CreateList(trivia.Select(static t => t.RequireRawNode()))),
             position: 0);
     }
 

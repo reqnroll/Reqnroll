@@ -3,7 +3,7 @@ using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
-internal abstract class DeclarationSyntax : RawNode
+internal abstract class DeclarationSyntax : InternalNode
 {
     protected DeclarationSyntax(SyntaxKind kind) : base(kind)
     {
@@ -11,7 +11,7 @@ internal abstract class DeclarationSyntax : RawNode
 
     protected DeclarationSyntax(
         SyntaxKind kind,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(kind, diagnostics, annotations)
     {
     }

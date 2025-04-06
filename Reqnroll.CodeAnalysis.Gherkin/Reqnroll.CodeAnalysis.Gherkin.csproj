@@ -15,4 +15,11 @@
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference
+      Include="..\Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator\Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator.csproj"
+      OutputItemType="Analyzer"
+      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
 </Project>

@@ -3,14 +3,14 @@ using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
-internal class FeatureFileSyntax : RawNode
+internal class FeatureFileSyntax : InternalNode
 {
-    public readonly RawNode? featureDeclaration;
-    public readonly RawNode endOfFile;
+    public readonly InternalNode? featureDeclaration;
+    public readonly InternalNode endOfFile;
 
     public FeatureFileSyntax(
-        RawNode? featureDeclaration,
-        RawNode endOfFile) : base(SyntaxKind.FeatureFile)
+        InternalNode? featureDeclaration,
+        InternalNode endOfFile) : base(SyntaxKind.FeatureFile)
     {
         this.featureDeclaration = featureDeclaration;
         if (featureDeclaration != null)
@@ -23,9 +23,9 @@ internal class FeatureFileSyntax : RawNode
     }
 
     public FeatureFileSyntax(
-        RawNode? featureDeclaration,
-        RawNode endOfFile,
-        ImmutableArray<RawDiagnostic> diagnostics,
+        InternalNode? featureDeclaration,
+        InternalNode endOfFile,
+        ImmutableArray<InternalDiagnostic> diagnostics,
         ImmutableArray<SyntaxAnnotation> annotations) : base(SyntaxKind.FeatureFile, diagnostics, annotations)
     {
         this.featureDeclaration = featureDeclaration;
@@ -43,7 +43,7 @@ internal class FeatureFileSyntax : RawNode
         return new Syntax.FeatureFileSyntax(this, parent, position);
     }
 
-    public override RawNode? GetSlot(int index)
+    public override InternalNode? GetSlot(int index)
     {
         return index switch
         {
@@ -55,7 +55,7 @@ internal class FeatureFileSyntax : RawNode
 
     public override int SlotCount => 2;
 
-    public override RawNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
         return new FeatureFileSyntax(
             featureDeclaration,
@@ -64,7 +64,7 @@ internal class FeatureFileSyntax : RawNode
             annotations);
     }
 
-    public override RawNode WithDiagnostics(ImmutableArray<RawDiagnostic> diagnostics)
+    public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
         return new FeatureFileSyntax(
             featureDeclaration,

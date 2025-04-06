@@ -5,7 +5,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 /// <summary>
 /// Represents the structure of a Gherkin feature file.
 /// </summary>
-public class FeatureFileSyntax : SyntaxNode
+public partial class FeatureFileSyntax : SyntaxNode
 {
     private FeatureDeclarationSyntax? _featureDeclaration;
 
@@ -25,7 +25,7 @@ public class FeatureFileSyntax : SyntaxNode
     /// <summary>
     /// Gets the token which represents the end of the source file.
     /// </summary>
-    public SyntaxToken EndOfFileToken => new(this, ((Internal.FeatureFileSyntax)RawNode).endOfFile, Position + RawNode.GetSlotOffset(1));
+    public SyntaxToken EndOfFileToken => new(this, ((Internal.FeatureFileSyntax)InternalNode).endOfFile, Position + InternalNode.GetSlotOffset(1));
 
     public FeatureFileSyntax WithEndOfFileToken(SyntaxToken endOfFileToken)
     {

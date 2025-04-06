@@ -4,7 +4,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin;
 
 using InternalSyntaxFactory = Syntax.Internal.InternalSyntaxFactory;
 
-public static class SyntaxFactory
+public static partial class SyntaxFactory
 {
     /// <summary>
     /// A token used to represent an opportunity to insert any amount of additional whitespace.
@@ -47,7 +47,7 @@ public static class SyntaxFactory
             throw new ArgumentException("Token must be an end-of-file token.", nameof(endOfFileToken));
         }
 
-        return new(InternalSyntaxFactory.FeatureFile(featureDeclaration?.RawNode, endOfFileToken.RawNode!));
+        return new(InternalSyntaxFactory.FeatureFile(featureDeclaration?.InternalNode, endOfFileToken.InternalNode!));
     }
 
     public static FeatureDeclarationSyntax FeatureDeclaration(string keyword, string name)
@@ -80,13 +80,13 @@ public static class SyntaxFactory
         }
 
         return new(InternalSyntaxFactory.FeatureDeclaration(
-            keyword.RawNode!,
-            colon.RawNode!,
-            name.RawNode!,
-            description?.RawNode));
+            keyword.InternalNode!,
+            colon.InternalNode!,
+            name.InternalNode!,
+            description?.InternalNode));
     }
 
-    public static DescriptionSyntax Description(SyntaxToken text) => new(InternalSyntaxFactory.Description(text.RawNode));
+    public static DescriptionSyntax Description(SyntaxToken text) => new(InternalSyntaxFactory.Description(text.InternalNode));
 
     public static DescriptionSyntax Description(SyntaxTokenList text) => new(InternalSyntaxFactory.Description(text.RawNode));
 
@@ -96,7 +96,7 @@ public static class SyntaxFactory
     /// <param name="node">The structured trivia to create the syntax from.</param>
     /// <returns></returns>
     public static SyntaxTrivia Trivia(StructuredTriviaSyntax node) => 
-        new(default, (Syntax.Internal.StructuredTriviaSyntax)node.RawNode, position: 0);
+        new(default, (Syntax.Internal.StructuredTriviaSyntax)node.InternalNode, position: 0);
 
     public static SyntaxToken MissingToken(SyntaxKind kind) => 
         InternalSyntaxFactory.MissingToken(ElasticMarker.RawNode, kind, ElasticMarker.RawNode);
