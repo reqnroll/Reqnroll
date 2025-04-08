@@ -5,7 +5,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 {
     public class NetCoreSdkInfoProvider
     {
-        private static readonly NetCoreSdkInfo DefaultSdk = new("6.0.100");
+        private static readonly NetCoreSdkInfo DefaultSdk = new("8.0.100");
         private static readonly NetCoreSdkInfo NetCore31 = new("3.1.201");
         private static readonly NetCoreSdkInfo NetCore30 = new("3.0.101");
         private static readonly NetCoreSdkInfo NetCore22 = new("2.2.402");
