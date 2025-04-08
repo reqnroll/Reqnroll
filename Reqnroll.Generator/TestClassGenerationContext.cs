@@ -28,6 +28,8 @@ namespace Reqnroll.Generator
 
         public IDictionary<string, object> CustomData { get; private set; }
 
+        public ICollection<string> GenerationWarnings { get; private set; }
+
         public TestClassGenerationContext(
             IUnitTestGeneratorProvider unitTestGeneratorProvider,
             ReqnrollDocument document,
@@ -60,6 +62,7 @@ namespace Reqnroll.Generator
             GenerateRowTests = generateRowTests;
 
             CustomData = new Dictionary<string, object>();
+            GenerationWarnings = new List<string>();
         }
     }
 }

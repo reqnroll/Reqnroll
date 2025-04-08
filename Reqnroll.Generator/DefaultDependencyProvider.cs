@@ -1,5 +1,7 @@
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
@@ -44,6 +46,9 @@ namespace Reqnroll.Generator
             container.RegisterInstanceAs(GenerationTargetLanguage.CreateCodeDomHelper(GenerationTargetLanguage.VB), GenerationTargetLanguage.VB, dispose: true);
 
             container.RegisterTypeAs<ConfigurationLoader, IConfigurationLoader>();
+
+            container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();    
+            container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
 
             container.RegisterTypeAs<ReqnrollGherkinParserFactory, IGherkinParserFactory>();
             

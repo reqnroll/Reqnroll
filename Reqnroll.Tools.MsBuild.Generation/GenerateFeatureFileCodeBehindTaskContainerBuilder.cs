@@ -40,7 +40,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             objectContainer.RegisterTypeAs<FileService, IFileService>();
             objectContainer.RegisterTypeAs<DirectoryService, IDirectoryService>();
             objectContainer.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
-
+            objectContainer.RegisterTypeAs<EnvironmentInfoProvider, IEnvironmentInfoProvider>();
             objectContainer.RegisterTypeAs<EnvironmentReqnrollTelemetryChecker, IEnvironmentReqnrollTelemetryChecker>();
             objectContainer.RegisterTypeAs<AnalyticsTransmitter, IAnalyticsTransmitter>();
             objectContainer.RegisterTypeAs<HttpClientAnalyticsTransmitterSink, IAnalyticsTransmitterSink>();

@@ -1,3 +1,6 @@
+using Reqnroll.Infrastructure;
+using System.Linq;
+
 namespace Reqnroll.Bindings
 {
     public class BindingMatch
@@ -13,10 +16,10 @@ namespace Reqnroll.Bindings
         public int ScopeMatches { get; private set; }
         public bool IsScoped { get { return ScopeMatches > 0; } }
 
-        public object[] Arguments  { get; private set; }
+        public MatchArgument[] Arguments  { get; private set; }
         public StepContext StepContext { get; private set; }
 
-        public BindingMatch(IStepDefinitionBinding stepBinding, int scopeMatches, object[] arguments, StepContext stepContext)
+        public BindingMatch(IStepDefinitionBinding stepBinding, int scopeMatches, MatchArgument[] arguments, StepContext stepContext)
         {
             StepBinding = stepBinding;
             ScopeMatches = scopeMatches;

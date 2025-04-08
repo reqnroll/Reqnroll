@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Microsoft.Build.Utilities;
 using Reqnroll.Utils;
 
@@ -53,6 +54,14 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     }
 
                     continue;
+                }
+
+                if (generatorResult.Warnings != null)
+                {
+                    foreach (var warning in generatorResult.Warnings)
+                    {
+                        Log.LogWarning(warning);
+                    }
                 }
 
                 string targetFilePath = _filePathGenerator.GenerateFilePath(
