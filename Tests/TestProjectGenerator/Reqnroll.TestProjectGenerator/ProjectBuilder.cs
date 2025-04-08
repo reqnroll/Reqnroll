@@ -214,7 +214,7 @@ namespace Reqnroll.TestProjectGenerator
                 Directory.CreateDirectory(_testProjectFolders.PathToNuGetPackages);
             }
 
-            if (ProjectType == ProjectType.Library)
+            if (ProjectType is ProjectType.Library or ProjectType.Exe)
             {
                 _testProjectFolders.ProjectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _project.Name);
                 _testProjectFolders.ProjectBinOutputPath = Path.Combine(_testProjectFolders.ProjectFolder, GetProjectCompilePath(_project));
@@ -336,8 +336,7 @@ namespace Reqnroll.TestProjectGenerator
 
         private void ConfigureXUnit3()
         {
-            _project.AddNuGetPackage("xunit.v3.core", XUnit3PackageVersion);
-            _project.AddNuGetPackage("xunit.v3.assert", XUnit3PackageVersion);
+            _project.AddNuGetPackage("xunit.v3", XUnit3PackageVersion);
             _project.AddNuGetPackage("xunit.runner.visualstudio", "3.0.2");
             if (IsReqnrollFeatureProject)
             {

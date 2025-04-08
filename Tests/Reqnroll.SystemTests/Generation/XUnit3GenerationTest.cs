@@ -16,6 +16,10 @@ public class XUnit3GenerationTest : GenerationTestBase
         base.TestInitialize();
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.xUnit3;
     }
+    
+    protected override string GetExpectedPendingOutcome() => "Failed";
+    
+    protected override string GetExpectedUndefinedOutcome() => "Failed";
 
     protected override void AssertScenarioLevelParallelExecution()
     {
