@@ -24,4 +24,20 @@ public class XUnitGenerationTest : GenerationTestBase
     {
         //nop - xUnit currently does not support method-level parallelization
     }
+
+    [TestMethod]
+    public void AfterTestRun_hook_can_execute_longer_async_actions()
+    {
+        AddSimpleScenario();
+        AddPassingStepBinding();
+        AddHookBinding("AfterTestRun", 
+                       code: "await Task.Delay(TimeSpan.FromMilliseconds(100));",
+                       asyncHook: true);
+
+        ExecuteTests();
+
+        _bindingDriver.AssertExecutedHooksEqual("AfterTestRun");
+        ShouldAllScenariosPass();
+    }
+
 }
