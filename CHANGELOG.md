@@ -5,6 +5,7 @@
 ## Bug fixes:
 
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
+* Fix: Scenario finished event is not published when the `[AfterScenario]` hook fails (#560)
 
 *Contributors of this release (in alphabetical order): @gasparnagy* 
 
