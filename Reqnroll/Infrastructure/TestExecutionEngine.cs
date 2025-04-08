@@ -119,6 +119,8 @@ namespace Reqnroll.Infrastructure
 
             _testThreadExecutionEventPublisher.PublishEvent(new TestRunStartedEvent());
 
+            // The 'FireEventsAsync' call might throw an exception if the related before test run hook fails,
+            // but we can let the exception propagate to the caller.
             await FireEventsAsync(HookType.BeforeTestRun);
         }
 
@@ -145,6 +147,8 @@ namespace Reqnroll.Infrastructure
 
             _testThreadExecutionEventPublisher.PublishEvent(new FeatureStartedEvent(FeatureContext));
 
+            // The 'FireEventsAsync' call might throw an exception if the related before feature hook fails,
+            // but we can let the exception propagate to the caller.
             await FireEventsAsync(HookType.BeforeFeature);
         }
 
@@ -437,6 +441,8 @@ namespace Reqnroll.Infrastructure
 
         private async Task ExecuteStepAsync(IContextManager contextManager, StepInstance stepInstance)
         {
+            // The 'HandleBlockSwitchAsync' call might throw an exception if any related before/after block hook fails.
+            // This exception will be propagated to the caller, so we don't need to handle it here.
             await HandleBlockSwitchAsync(stepInstance.StepDefinitionType.ToScenarioBlock());
 
             _testTracer.TraceStep(stepInstance, true);
@@ -463,6 +469,8 @@ namespace Reqnroll.Infrastructure
                     _obsoleteStepHandler.Handle(match);
 
                     onStepStartExecuted = true;
+                    // Both 'OnStepStartAsync' and 'ExecuteStepMatchAsync' can throw exceptions
+                    // if the related hook or step definition fails.
                     await OnStepStartAsync();
                     await ExecuteStepMatchAsync(match, arguments, durationHolder);
                     if (_reqnrollConfiguration.TraceSuccessfulSteps)
@@ -503,6 +511,10 @@ namespace Reqnroll.Infrastructure
             {
                 if (onStepStartExecuted)
                 {
+                    // We need to have this call after the 'UpdateStatusOnStepFailure' above, because otherwise
+                    // after step hooks cannot handle step errors.
+                    // The 'OnStepEndAsync' call might throw an exception if the related after step hook fails,
+                    // but we can let the exception propagate to the caller.
                     await OnStepEndAsync();
                 }
             }
@@ -576,12 +588,21 @@ namespace Reqnroll.Infrastructure
             if (_contextManager.ScenarioContext.CurrentScenarioBlock != block)
             {
                 if (_contextManager.ScenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.OK)
+                {
+                    // The 'OnBlockEndAsync' call might throw and exception if the related hook fails,
+                    // but we can let the exception propagate to the caller, because in that case we don't 
+                    // want to execute the next block anyway.
                     await OnBlockEndAsync(_contextManager.ScenarioContext.CurrentScenarioBlock);
+                }
 
                 _contextManager.ScenarioContext.CurrentScenarioBlock = block;
 
                 if (_contextManager.ScenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.OK)
+                {
+                    // The 'OnBlockStartAsync' call might throw and exception if the related hook fails,
+                    // but we can let the exception propagate to the caller.
                     await OnBlockStartAsync(_contextManager.ScenarioContext.CurrentScenarioBlock);
+                }
             }
         }
 

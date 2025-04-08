@@ -248,7 +248,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
-        public async Task Should_publish_testrun_started_event()
+        public async Task Should_publish_test_run_started_event()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
@@ -259,7 +259,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
-        public async Task Should_publish_testrun_finished_event()
+        public async Task Should_publish_test_run_finished_event()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
