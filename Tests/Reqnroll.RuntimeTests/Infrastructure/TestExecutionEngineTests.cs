@@ -638,6 +638,24 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
+        public async Task Should_cleanup_feature_context_when_after_feature_hook_error()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+            RegisterStepDefinition();
+
+            var hookMock = CreateHookMock(afterFeatureEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                                    .Throws(new Exception("simulated after feature hook error"));
+
+            await testExecutionEngine.OnFeatureStartAsync(featureInfo);
+            await FluentActions.Awaiting(testExecutionEngine.OnFeatureEndAsync)
+                               .Should().ThrowAsync<Exception>("execution of the step should have failed because of the exception thrown by the before scenario block hook");
+
+            methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+            contextManagerStub.Verify(cm => cm.CleanupFeatureContext());
+        }
+
+        [Fact]
         public async Task Should_resolve_BeforeAfterFeature_hook_parameter_from_feature_container()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
