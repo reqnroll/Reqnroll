@@ -280,6 +280,113 @@ public abstract class GenerationTestBase : SystemTestBase
             "AfterTestRun");
         ShouldAllScenariosPass();
     }
+
+    [TestMethod]
+    public void Before_After_Feature_hooks_execute_only_once_on_sequential_run()
+    {
+        // After a failure, the scenario execution should properly "release" the test runner, so that 
+        // the next scenario can run in the same one.
+        // We verify here that only one test runner is used by logging and checking _testRunnerManager.IsMultiThreaded
+        // and that the BeforeFeature and AfterFeature hooks are executed only once.
+
+        AddFeatureFile(
+            """
+            Feature: Feature 1
+            
+            @failBefore
+            Scenario: Before scenario hook failing
+            When the step passes
+            
+            @failAfter
+            Scenario: After scenario hook failing
+            When the step passes
+            
+            Scenario: Passing scenario
+            When the step passes
+            
+            Scenario: Failing scenario
+            When the step fails
+            """);
+
+        AddBindingClass(
+            """
+            namespace ReqnrollExecution.StepDefinitions
+            {
+                [Binding]
+                public class ReqnrollExecutionBindings
+                {
+                    private readonly ITestRunnerManager _testRunnerManager;
+                    
+                    public ReqnrollExecutionBindings(ITestRunnerManager testRunnerManager)
+                    {
+                        _testRunnerManager = testRunnerManager;
+                    }
+                    
+                    [When("the step passes")]
+                    public void WhenTheStepPasses()
+                    {
+                        global::Log.LogStep();
+                        Log.LogCustom("parallel", _testRunnerManager.IsMultiThreaded.ToString());
+                    }
+                    
+                    [When("the step fails")]
+                    public void WhenTheStepFails()
+                    {
+                        global::Log.LogStep();
+                        Log.LogCustom("parallel", _testRunnerManager.IsMultiThreaded.ToString());
+                        throw new System.Exception("simulated failure");
+                    }
+                    
+                    [BeforeScenario("@failBefore")]
+                    public void FailBefore()
+                    {
+                        Log.LogCustom("parallel", _testRunnerManager.IsMultiThreaded.ToString());
+                        throw new System.Exception("Fail before");
+                    }
+                    
+                    [AfterScenario("@failAfter")]
+                    public void FailAfter()
+                    {
+                        Log.LogCustom("parallel", _testRunnerManager.IsMultiThreaded.ToString());
+                        throw new System.Exception("Fail after");
+                    }
+                }
+            }
+            """);
+
+        AddHookBinding("BeforeTestRun");
+        AddHookBinding("AfterTestRun");
+        AddHookBinding("BeforeFeature");
+        AddHookBinding("AfterFeature");
+        AddHookBinding("BeforeScenario");
+        AddHookBinding("AfterScenario");
+
+        ExecuteTests();
+        ConfirmAllTestsRan();
+
+        var parallelLogs = _bindingDriver.GetActualLogLines("parallel").ToList();
+        parallelLogs.Should().NotBeEmpty("the scenarios should have parallel logs");
+        parallelLogs.Should().AllSatisfy(log => log.Should().StartWith("-> parallel: False"));
+
+        _bindingDriver.AssertExecutedHooksEqual(
+            "BeforeTestRun",
+            "BeforeFeature",
+            "BeforeScenario",
+            "AfterScenario",
+            "BeforeScenario",
+            "AfterScenario",
+            "BeforeScenario",
+            "AfterScenario",
+            "BeforeScenario",
+            "AfterScenario",
+            "AfterFeature",
+            "AfterTestRun");
+
+        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(1, "only 'Passing scenario' should pass");
+        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(3, "the three other scenario should fail");
+    }
+
+
     #endregion
 
     #region Test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)

@@ -247,7 +247,7 @@ public abstract class SystemTestBase
         _vsTestExecutionDriver.LastTestExecutionResult.Warnings.Should().BeEmpty();
     }
 
-    protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)
+    protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec = null)
     {
         if (expectedNrOfTestsSpec == null && _preparedTests == 0)
             throw new ArgumentException($"If {nameof(_preparedTests)} is not set, the {nameof(expectedNrOfTestsSpec)} is mandatory.", nameof(expectedNrOfTestsSpec));
