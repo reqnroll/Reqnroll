@@ -59,7 +59,7 @@ namespace Reqnroll.xUnit.ReqnrollPlugin
                 });
         }
 
-        protected override Task BeforeTestAssemblyFinishedAsync()
+        protected override async Task BeforeTestAssemblyFinishedAsync()
         {
             // Make sure we clean up everybody who is disposable, and use Aggregator.Run to isolate Dispose failures
             foreach (var potentialDisposable in _assemblyFixtureMappings.Values)
@@ -71,16 +71,16 @@ namespace Reqnroll.xUnit.ReqnrollPlugin
 #if NET // IAsyncDisposable supported natively in .NET 5, .NET 6
                 else if (potentialDisposable is IAsyncDisposable asyncDisposable)
                 {
-                    Aggregator.RunAsync(async () => await asyncDisposable.DisposeAsync());
+                    await Aggregator.RunAsync(async () => await asyncDisposable.DisposeAsync());
                 }
 #endif
                 else if (potentialDisposable is IAsyncLifetime asyncLifetime)
                 {
-                    Aggregator.RunAsync(async () => await asyncLifetime.DisposeAsync());
+                    await Aggregator.RunAsync(async () => await asyncLifetime.DisposeAsync());
                 }
             }
 
-            return base.BeforeTestAssemblyFinishedAsync();
+            await base.BeforeTestAssemblyFinishedAsync();
         }
 
         protected override Task<RunSummary> RunTestCollectionWithinParallelAlgorithmAsync(

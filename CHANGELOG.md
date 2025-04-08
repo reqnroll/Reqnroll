@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
+
+*Contributors of this release (in alphabetical order): @gasparnagy* 
 
 # v2.4.0 - 2025-03-06
 
