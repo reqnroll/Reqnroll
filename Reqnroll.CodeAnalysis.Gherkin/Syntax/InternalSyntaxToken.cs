@@ -1,22 +1,22 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-internal partial class RawSyntaxToken : InternalNode
+internal partial class InternalSyntaxToken : InternalNode
 {
     private readonly string _text;
     private readonly InternalNode? _leading;
     private readonly InternalNode? _trailing;
 
-    public RawSyntaxToken(SyntaxKind kind, string text) : base(kind, text.Length)
+    public InternalSyntaxToken(SyntaxKind kind, string text) : base(kind, text.Length)
     {
         _text = text;
 
         SetFlag(NodeFlags.IsNotMissing);
     }
 
-    public RawSyntaxToken(
+    public InternalSyntaxToken(
         SyntaxKind kind,
         string text,
         InternalNode? leading,
@@ -39,7 +39,7 @@ internal partial class RawSyntaxToken : InternalNode
         }
     }
 
-    public RawSyntaxToken(
+    public InternalSyntaxToken(
         SyntaxKind kind,
         string text,
         InternalNode? leading,
@@ -79,7 +79,7 @@ internal partial class RawSyntaxToken : InternalNode
 
     public override string ToString() => _text;
 
-    internal static RawSyntaxToken CreateMissing(
+    internal static InternalSyntaxToken CreateMissing(
         SyntaxKind kind,
         InternalNode? leadingTrivia,
         InternalNode? trailingTrivia)
@@ -89,7 +89,7 @@ internal partial class RawSyntaxToken : InternalNode
             throw new ArgumentOutOfRangeException(nameof(kind), kind, "This method can only be used to create tokens.");
         }
 
-        var token = new RawSyntaxToken(
+        var token = new InternalSyntaxToken(
             kind,
             GetText(kind),
             leadingTrivia,
@@ -102,7 +102,7 @@ internal partial class RawSyntaxToken : InternalNode
         return token;
     }
 
-    internal static RawSyntaxToken Create(
+    internal static InternalSyntaxToken Create(
         SyntaxKind kind,
         InternalNode? leading,
         InternalNode? trailing)
@@ -117,7 +117,7 @@ internal partial class RawSyntaxToken : InternalNode
             return CreateMissing(kind, leading, trailing);
         }
 
-        return new RawSyntaxToken(
+        return new InternalSyntaxToken(
             kind,
             GetText(kind),
             leading,
@@ -126,7 +126,7 @@ internal partial class RawSyntaxToken : InternalNode
             ImmutableArray<SyntaxAnnotation>.Empty);
     }
 
-    internal static RawSyntaxToken Create(
+    internal static InternalSyntaxToken Create(
         SyntaxKind kind,
         string text,
         InternalNode? leading,
@@ -137,7 +137,7 @@ internal partial class RawSyntaxToken : InternalNode
             throw new ArgumentOutOfRangeException(nameof(kind), kind, "This method can only be used to create tokens.");
         }
 
-        return new RawSyntaxToken(
+        return new InternalSyntaxToken(
             kind,
             text,
             leading,
@@ -184,23 +184,23 @@ internal partial class RawSyntaxToken : InternalNode
 
     public override InternalNode WithLeadingTrivia(InternalNode? trivia)
     {
-        return new RawSyntaxToken(Kind, _text, trivia, _trailing, GetAttachedDiagnostics(), GetAnnotations());
+        return new InternalSyntaxToken(Kind, _text, trivia, _trailing, GetAttachedDiagnostics(), GetAnnotations());
     }
 
     public override InternalNode WithTrailingTrivia(InternalNode? trivia)
     {
-        return new RawSyntaxToken(Kind, _text, _leading, trivia, GetAttachedDiagnostics(), GetAnnotations());
+        return new InternalSyntaxToken(Kind, _text, _leading, trivia, GetAttachedDiagnostics(), GetAnnotations());
     }
 
     public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
     {
-        return new RawSyntaxToken(Kind, _text, _leading, _trailing, GetAttachedDiagnostics(), annotations);
+        return new InternalSyntaxToken(Kind, _text, _leading, _trailing, GetAttachedDiagnostics(), annotations);
     }
 
     public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
-        return new RawSyntaxToken(Kind, _text, _leading, _trailing, diagnostics, GetAnnotations());
+        return new InternalSyntaxToken(Kind, _text, _leading, _trailing, diagnostics, GetAnnotations());
     }
 
-    public static implicit operator SyntaxToken(RawSyntaxToken token) => new(null, token, 0);
+    public static implicit operator SyntaxToken(InternalSyntaxToken token) => new(null, token, 0);
 }

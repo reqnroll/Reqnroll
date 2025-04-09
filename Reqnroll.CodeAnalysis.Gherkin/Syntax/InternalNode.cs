@@ -1,5 +1,4 @@
 using Microsoft.CodeAnalysis;
-using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
@@ -119,7 +118,7 @@ internal abstract class InternalNode
         {
             0 => null,
             1 => nodes[0],
-            _ => RawSyntaxList.Create(nodes),
+            _ => InternalSyntaxList.Create(nodes),
         };
     }
 
@@ -129,7 +128,7 @@ internal abstract class InternalNode
         {
             0 => null,
             1 => nodes[0],
-            _ => RawSyntaxList.Create(nodes.ToImmutable()),
+            _ => InternalSyntaxList.Create(nodes.ToImmutable()),
         };
     }
 
@@ -139,7 +138,7 @@ internal abstract class InternalNode
         {
             0 => null,
             1 => nodes[0],
-            _ => RawSyntaxList.Create(nodes),
+            _ => InternalSyntaxList.Create(nodes),
         };
     }
 
@@ -156,7 +155,7 @@ internal abstract class InternalNode
         builder.Add(node1);
         builder.Add(node2);
 
-        return RawSyntaxList.Create(builder.ToImmutableArray());
+        return InternalSyntaxList.Create(builder.ToImmutableArray());
     }
 
     /// <summary>
@@ -179,7 +178,7 @@ internal abstract class InternalNode
 
         builder.Add(node);
 
-        return RawSyntaxList.Create(builder.ToImmutableArray());
+        return InternalSyntaxList.Create(builder.ToImmutableArray());
     }
 
     private static InternalNode ConcatLists(InternalNode list1, InternalNode list2)
@@ -199,7 +198,7 @@ internal abstract class InternalNode
             builder.Add(list2.GetRequiredSlot(i));
         }
 
-        return RawSyntaxList.Create(builder.ToImmutableArray());
+        return InternalSyntaxList.Create(builder.ToImmutableArray());
     }
 
     private static InternalNode PrefixList(InternalNode node, InternalNode list)
@@ -215,7 +214,7 @@ internal abstract class InternalNode
             builder.Add(list.GetRequiredSlot(i));
         }
 
-        return RawSyntaxList.Create(builder.ToImmutableArray());
+        return InternalSyntaxList.Create(builder.ToImmutableArray());
     }
 
     public abstract int SlotCount { get; }

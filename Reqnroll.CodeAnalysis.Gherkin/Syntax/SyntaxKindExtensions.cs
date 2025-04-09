@@ -1,4 +1,4 @@
-﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 internal static class SyntaxKindExtensions
 {

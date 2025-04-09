@@ -17,10 +17,10 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 [DebuggerDisplay("{GetDebuggerDisplay(), nq}")]
 public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
 {
-    internal SyntaxTrivia(in SyntaxToken token, InternalNode? rawNode, int position)
+    internal SyntaxTrivia(in SyntaxToken token, InternalNode? node, int position)
     {
         Token = token;
-        RawNode = rawNode;
+        InternalNode = node;
         Position = position;
     }
 
@@ -32,7 +32,7 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     /// <summary>
     /// Gets the raw node that this trivia wraps.
     /// </summary>
-    internal InternalNode? RawNode { get; }
+    internal InternalNode? InternalNode { get; }
 
     /// <summary>
     /// Gets the position of this triva in the source tree.
@@ -81,21 +81,21 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
         }
     }
 
-    internal int Width => RawNode?.Width ?? 0;
+    internal int Width => InternalNode?.Width ?? 0;
 
-    internal int FullWidth => RawNode?.FullWidth ?? 0;
+    internal int FullWidth => InternalNode?.FullWidth ?? 0;
 
     /// <summary>
     /// Gets the kind of the trivia.
     /// </summary>
-    public SyntaxKind Kind => RawNode?.Kind ?? SyntaxKind.None;
+    public SyntaxKind Kind => InternalNode?.Kind ?? SyntaxKind.None;
 
     /// <summary>
     /// Gets a value indicating whether this trivia has any diagnostics on it. If the trivia has structure and any of the 
     /// structure has a diagnostic on it, the trivia is considered to have a contain a diagnostic.
     /// </summary>
     /// <value><c>true</c> if the trivia has any diagnostics on it or any structured content; otherwise <c>false</c>.</value>
-    public bool ContainsDiagnostics => RawNode?.ContainsDiagnostics ?? false;
+    public bool ContainsDiagnostics => InternalNode?.ContainsDiagnostics ?? false;
 
     /// <summary>
     /// Gets a value indicating whether the trivia has a child structure.
@@ -108,14 +108,14 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     /// <para>In these cases, the structure is wrapped into trivia to clearly separate it from the valid and syntactically 
     /// meaningful tree nodes.</para>
     /// </remarks>
-    public bool HasStructure => RawNode?.IsStructuredTrivia ?? false;
+    public bool HasStructure => InternalNode?.IsStructuredTrivia ?? false;
 
     /// <summary>
     /// Gets the structure of the trivia, if it has structure.
     /// </summary>
     /// <returns>If the trivia has structure, the <see cref="StructuredTriviaSyntax"/> representing the structure 
     /// of the trivia; otherwise <c>null</c>.</returns>
-    public StructuredTriviaSyntax? GetStructure() => HasStructure ? RawNode!.CreateStructuredTriviaSyntaxNode(this) : null;
+    public StructuredTriviaSyntax? GetStructure() => HasStructure ? InternalNode!.CreateStructuredTriviaSyntaxNode(this) : null;
 
     private string GetDebuggerDisplay() => 
         GetType().Name + " " + Kind.ToString() + " " + ToString();
@@ -124,9 +124,9 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     /// Gets the string representation of this trivia.
     /// </summary>
     /// <returns>The string representation of this trivia.</returns>
-    public override string ToString() => RawNode?.ToString() ?? string.Empty;
+    public override string ToString() => InternalNode?.ToString() ?? string.Empty;
 
-    public string ToFullString() => RawNode?.ToFullString() ?? string.Empty;
+    public string ToFullString() => InternalNode?.ToFullString() ?? string.Empty;
 
     public override bool Equals(object? obj)
     {
@@ -141,7 +141,7 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     public bool Equals(SyntaxTrivia other)
     {
         return Token == other.Token &&
-            ReferenceEquals(RawNode, other.RawNode) &&
+            ReferenceEquals(InternalNode, other.InternalNode) &&
             Position == other.Position;
     }
 
@@ -154,19 +154,19 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     /// otherwise <c>false</c>.</returns>
     public bool IsEquivalentTo(SyntaxTrivia trivia)
     {
-        if (RawNode == null)
+        if (InternalNode == null)
         {
-            return trivia.RawNode == null;
+            return trivia.InternalNode == null;
         }
 
-        return RawNode.IsEquivalentTo(trivia.RawNode);
+        return InternalNode.IsEquivalentTo(trivia.InternalNode);
     }
 
     public static bool operator ==(SyntaxTrivia left, SyntaxTrivia right) => left.Equals(right);
 
     public static bool operator !=(SyntaxTrivia left, SyntaxTrivia right) => !left.Equals(right);
 
-    public override int GetHashCode() => Hash.Combine(RawNode, Token, Position);
+    public override int GetHashCode() => Hash.Combine(InternalNode, Token, Position);
 
     public Location GetLocation()
     {
@@ -180,7 +180,7 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
 
     internal InternalNode RequireRawNode()
     {
-        var node = RawNode;
+        var node = InternalNode;
         Debug.Assert(node is not null, "RawNode is required in this context.");
         return node!;
     }
@@ -191,7 +191,7 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     /// <returns>A list of the diagnostics for this trivia.</returns>
     public IEnumerable<Diagnostic> GetDiagnostics()
     {
-        if (RawNode == null)
+        if (InternalNode == null)
         {
             return [];
         }
@@ -203,9 +203,9 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
             return tree.GetDiagnostics(this);
         }
 
-        if (RawNode.ContainsDiagnostics)
+        if (InternalNode.ContainsDiagnostics)
         {
-            return RawNode.GetAttachedDiagnostics().Select(diag => diag.CreateDiagnostic());
+            return InternalNode.GetAttachedDiagnostics().Select(diag => diag.CreateDiagnostic());
         }
 
         return [];

@@ -66,20 +66,24 @@ internal class SyntaxFactoryMethodEmitter(SyntaxNodeClassInfo2 classInfo)
         {
             foreach (var property in classInfo.SlotProperties)
             {
+                var argumentName = NamingHelper.PascalCaseToCamelCase(property.Name);
+
                 if (property.NodeType == SyntaxNodeType.SyntaxToken)
                 {
                     builder
                         .Append("if (")
-                        .Append(NamingHelper.PascalCaseToCamelCase(property.Name))
+                        .Append(argumentName)
                         .Append(".Kind != SyntaxKind.")
                         .Append(property.SyntaxKind.Name)
                         .AppendLine(')');
                     builder.AppendBodyBlock(builder =>
                     {
                         builder
-                            .Append("throw new ArgumentException(\"Token must be ")
-                            .Append(property.SyntaxKind.Description)
-                            .AppendLine(".\");");
+                            .Append("throw new ArgumentException(SyntaxFactoryExceptionMessages.TokenMustBe")
+                            .Append(property.SyntaxKind.Name)
+                            .Append(", nameof(")
+                            .Append(argumentName)
+                            .AppendLine("));");
                     });
 
                     builder.AppendLine();

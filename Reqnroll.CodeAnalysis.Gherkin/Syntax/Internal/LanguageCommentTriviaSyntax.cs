@@ -6,10 +6,10 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 internal class LanguageCommentTriviaSyntax : CommentTriviaSyntax
 {
     public LanguageCommentTriviaSyntax(
-        RawSyntaxToken hashToken,
-        RawSyntaxToken languageKeyword,
-        RawSyntaxToken colon,
-        RawSyntaxToken identifier) : base(hashToken, SyntaxKind.LanguageCommentTrivia)
+        InternalSyntaxToken hashToken,
+        InternalSyntaxToken languageKeyword,
+        InternalSyntaxToken colon,
+        InternalSyntaxToken identifier) : base(hashToken, SyntaxKind.LanguageCommentTrivia)
     {
         this.languageKeyword = languageKeyword;
         IncludeChild(languageKeyword);
@@ -21,9 +21,9 @@ internal class LanguageCommentTriviaSyntax : CommentTriviaSyntax
         IncludeChild(identifier);
     }
 
-    public readonly RawSyntaxToken languageKeyword;
-    public readonly RawSyntaxToken colon;
-    public readonly RawSyntaxToken identifier;
+    public readonly InternalSyntaxToken languageKeyword;
+    public readonly InternalSyntaxToken colon;
+    public readonly InternalSyntaxToken identifier;
 
     public override int SlotCount => 4;
 

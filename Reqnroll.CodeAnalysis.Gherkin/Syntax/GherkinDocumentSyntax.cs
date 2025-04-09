@@ -6,8 +6,8 @@ public partial class GherkinDocumentSyntax : SyntaxNode
     /// <summary>
     /// Gets the feature declaration syntax contained by the file structure.
     /// </summary>
-    [SyntaxSlot(SyntaxKind.FeatureDeclaration)]
-    public partial FeatureDeclarationSyntax? FeatureDeclaration { get; }
+    [SyntaxSlot(SyntaxKind.Feature)]
+    public partial FeatureSyntax? FeatureDeclaration { get; }
 
     /// <summary>
     /// Gets the token which represents the end of the source file.

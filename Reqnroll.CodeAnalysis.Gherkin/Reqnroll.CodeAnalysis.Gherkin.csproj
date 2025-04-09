@@ -13,13 +13,14 @@
   <ItemGroup>
     <PackageReference Include="Gherkin" Version="32.0.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.5.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.11.0-beta1.24072.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator\Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator.csproj"
-      OutputItemType="Analyzer"
-      ReferenceOutputAssembly="false" />
+    <ProjectReference Include="..\Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator\Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator.csproj" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
   </ItemGroup>
 
 </Project>

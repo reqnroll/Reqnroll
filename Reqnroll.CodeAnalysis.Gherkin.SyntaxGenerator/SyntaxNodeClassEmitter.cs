@@ -162,8 +162,11 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
         switch (property.NodeType)
         {
             case SyntaxNodeType.SyntaxToken:
+            case SyntaxNodeType.SyntaxTokenList:
                 builder
-                    .Append("public partial SyntaxToken ")
+                    .Append("public partial ")
+                    .Append(property.TypeName)
+                    .Append(' ')
                     .Append(property.Name)
                     .Append(" => new (this, InternalNode.")
                     .Append(NamingHelper.PascalCaseToCamelCase(property.Name))
@@ -193,7 +196,8 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
                 break;
 
             default:
-                throw new InvalidOperationException();
+                throw new NotImplementedException(
+                    $"Support for syntax node type {property.NodeType} has not been added.");
         }
     }
 

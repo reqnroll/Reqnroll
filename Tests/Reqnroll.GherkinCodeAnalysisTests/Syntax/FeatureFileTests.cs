@@ -7,7 +7,7 @@ public class FeatureFileTests
     [Fact]
     public void CanCreateEmptyFeatureFile()
     {
-        var featureFile = SyntaxFactory.FeatureFile();
+        var featureFile = SyntaxFactory.GherkinDocument();
 
         featureFile.ToFullString().Should().Be("");
 
@@ -32,7 +32,7 @@ public class FeatureFileTests
     [Fact]
     public void CanCreateFeatureFileWithFeatureDeclaration()
     {
-        var featureFile = SyntaxFactory.FeatureFile(
+        var featureFile = SyntaxFactory.GherkinDocument(
             SyntaxFactory.FeatureDeclaration("Feature", "Guess the word"));
 
         featureFile.ToFullString().Should().Be("Feature:Guess the word");

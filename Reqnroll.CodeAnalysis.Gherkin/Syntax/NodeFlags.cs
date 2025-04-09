@@ -1,4 +1,4 @@
-﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 /// <summary>
 /// Flags which identify the specific qualities of a node.

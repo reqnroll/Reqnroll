@@ -13,9 +13,9 @@ internal static class SourceTextParsingExtensions
     /// </summary>
     /// <param name="sourceText">The source text to read from.</param>
     /// <param name="textSpan">The span within the source text to read from.</param>
-    /// <returns>A <see cref="RawSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
+    /// <returns>A <see cref="InternalSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
     /// if there is no whitespace at the start of the text-span.</returns>
-    public static RawSyntaxTrivia? ConsumeWhitespace(this SourceText sourceText, TextSpan textSpan)
+    public static InternalSyntaxTrivia? ConsumeWhitespace(this SourceText sourceText, TextSpan textSpan)
     {
         return sourceText.ConsumeWhitespace(textSpan.Start, textSpan.End);
     }
@@ -27,9 +27,9 @@ internal static class SourceTextParsingExtensions
     /// <param name="sourceText">The source text to read from.</param>
     /// <param name="startIndex">The index to start consuming characters from.</param>
     /// <param name="endIndex">The index at which to stop consuming.</param>
-    /// <returns>A <see cref="RawSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
+    /// <returns>A <see cref="InternalSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
     /// if there is no whitespace at the start index.</returns>
-    public static RawSyntaxTrivia? ConsumeWhitespace(this SourceText sourceText, int startIndex, int endIndex)
+    public static InternalSyntaxTrivia? ConsumeWhitespace(this SourceText sourceText, int startIndex, int endIndex)
     {
         var builder = new StringBuilder();
 
@@ -56,9 +56,9 @@ internal static class SourceTextParsingExtensions
     /// </summary>
     /// <param name="sourceText">The source text to read from.</param>
     /// <param name="textSpan">The span within the source text to read from.</param>
-    /// <returns>A <see cref="RawSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
+    /// <returns>A <see cref="InternalSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
     /// if there is no whitespace at the end of the text-span.</returns>
-    public static RawSyntaxTrivia? ReverseConsumeWhitespace(this SourceText sourceText, TextSpan textSpan)
+    public static InternalSyntaxTrivia? ReverseConsumeWhitespace(this SourceText sourceText, TextSpan textSpan)
     {
         return sourceText.ReverseConsumeWhitespace(textSpan.End - 1, textSpan.Start - 1);
     }
@@ -70,9 +70,9 @@ internal static class SourceTextParsingExtensions
     /// <param name="sourceText">The source text to read from.</param>
     /// <param name="startIndex">The index to start consuming characters from.</param>
     /// <param name="endIndex">The index at which to stop consuming.</param>
-    /// <returns>A <see cref="RawSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
+    /// <returns>A <see cref="InternalSyntaxTrivia"/> representing the whitespace read from the source, or <c>null</c>
     /// if there is no whitespace at the specified index.</returns>
-    public static RawSyntaxTrivia? ReverseConsumeWhitespace(this SourceText sourceText, int startIndex, int endIndex)
+    public static InternalSyntaxTrivia? ReverseConsumeWhitespace(this SourceText sourceText, int startIndex, int endIndex)
     {
         var builder = new StringBuilder();
 

@@ -1,10 +1,10 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
-internal abstract class CommentTriviaSyntax : StructuredTriviaSyntax
+internal abstract class CommentTriviaSyntax : InternalStructuredTriviaSyntax
 {
-    public readonly RawSyntaxToken hashToken;
+    public readonly InternalSyntaxToken hashToken;
 
-    protected CommentTriviaSyntax(RawSyntaxToken hashToken, SyntaxKind kind) : base(kind)
+    protected CommentTriviaSyntax(InternalSyntaxToken hashToken, SyntaxKind kind) : base(kind)
     {
         this.hashToken = hashToken;
         IncludeChild(hashToken);

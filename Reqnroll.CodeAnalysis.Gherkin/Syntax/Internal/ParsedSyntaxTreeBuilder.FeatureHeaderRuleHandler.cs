@@ -55,6 +55,6 @@ internal partial class ParsedSyntaxTreeBuilder
             return base.StartChildRule(ruleType);
         }
 
-        public DescriptionSyntax? CreateDescriptionSyntax() => _descriptionRuleHandler?.CreateDescriptionSyntax();
+        public DescriptionSyntax.Internal? CreateDescriptionSyntax() => _descriptionRuleHandler?.CreateDescriptionSyntax();
     }
 }

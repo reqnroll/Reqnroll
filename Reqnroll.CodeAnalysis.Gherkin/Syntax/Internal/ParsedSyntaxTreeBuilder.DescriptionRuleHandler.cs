@@ -48,7 +48,7 @@ internal partial class ParsedSyntaxTreeBuilder
             _description.Add(Literal(context.ConsumeLeadingTrivia(), text, trailing));
         }
 
-        public DescriptionSyntax? CreateDescriptionSyntax()
+        public DescriptionSyntax.Internal? CreateDescriptionSyntax()
         {
             var text = InternalNode.CreateList(_description);
 

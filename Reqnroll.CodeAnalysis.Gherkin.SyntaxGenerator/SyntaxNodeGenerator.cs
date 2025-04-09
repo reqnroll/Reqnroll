@@ -10,7 +10,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
 public class SyntaxNodeGenerator : IIncrementalGenerator
 {
     const string SyntaxTokenType = "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxToken";
-    const string SyntaxKindDescriptionAttributeType = "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxKindDescriptionAttribute";
+    const string SyntaxTokenListType = "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxTokenList";
     const string SyntaxSlotAttributeType = "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxSlotAttribute";
 
     public void Initialize(IncrementalGeneratorInitializationContext context)
@@ -27,22 +27,8 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                 var enumValues = enumSymbol.GetMembers().OfType<IFieldSymbol>();
 
                 return enumValues.ToImmutableDictionary(
-                    member =>
-                    {
-                        return (ushort)member.ConstantValue!;
-                    },
-                    member =>
-                    {
-                        var descriptionAttribute = member.GetAttributes()
-                            .FirstOrDefault(attr => attr.AttributeClass!.ToDisplayString() == 
-                                SyntaxKindDescriptionAttributeType);
-
-                        return new SyntaxKindInfo(
-                            (ushort)member.ConstantValue!,
-                            member.Name,
-                            (string?)descriptionAttribute?.ConstructorArguments[0].Value ??
-                                $"a {NamingHelper.PascalCaseToLowercaseWords(member.Name)}");
-                    });
+                    member => (ushort)member.ConstantValue!,
+                    member => new SyntaxKindInfo((ushort)member.ConstantValue!, member.Name));
             })
             .Collect()
             .Select((items, _) => items.Single())
@@ -82,17 +68,25 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
 
                     SyntaxNodeType nodeType;
 
-                    if (property.Type.ToDisplayString() == SyntaxTokenType)
+                    switch (property.Type.ToDisplayString())
                     {
-                        nodeType = SyntaxNodeType.SyntaxToken;
-                    }
-                    else if (property.Type.IsSyntaxNode())
-                    {
-                        nodeType = SyntaxNodeType.SyntaxNode;
-                    }
-                    else
-                    {
-                        continue;
+                        case SyntaxTokenType:
+                            nodeType = SyntaxNodeType.SyntaxToken;
+                            break;
+                        case SyntaxTokenListType:
+                            nodeType = SyntaxNodeType.SyntaxTokenList;
+                            break;
+                        default:
+                            if (property.Type.IsSyntaxNode())
+                            {
+                                nodeType = SyntaxNodeType.SyntaxNode;
+                            }
+                            else
+                            {
+                                continue;
+                            }
+
+                            break;
                     }
 
                     slots.Add(
@@ -159,7 +153,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
     }
 }
 
-internal record SyntaxKindInfo(int Value, string Name, string Description);
+internal record SyntaxKindInfo(int Value, string Name);
 
 internal record SyntaxNodeClassInfo(
     string ClassNamespace,
@@ -185,11 +179,15 @@ internal record SyntaxSlotInfo2(
     string Name,
     int Index,
     string TypeName,
-    SyntaxKindInfo SyntaxKind);
+    SyntaxKindInfo SyntaxKind)
+{
+    public bool IsInternalNodeNullable => NodeType == SyntaxNodeType.SyntaxNode || NodeType == SyntaxNodeType.SyntaxTokenList;
+}
 
 internal enum SyntaxNodeType
 {
     SyntaxToken,
+    SyntaxTokenList,
     SyntaxNode
 }
 

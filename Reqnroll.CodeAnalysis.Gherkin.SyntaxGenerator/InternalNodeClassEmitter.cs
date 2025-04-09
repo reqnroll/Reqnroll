@@ -69,8 +69,7 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
             builder.AppendLine("return index switch");
             builder.AppendBlock("{", builder =>
             {
-                foreach (var property in classInfo.SlotProperties
-                    .Where(property => property.NodeType == SyntaxNodeType.SyntaxNode))
+                foreach (var property in classInfo.SlotProperties)
                 {
                     builder
                         .Append(property.Index.ToString())
@@ -153,7 +152,7 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
         {
             builder.Append(InternalNodeClassName);
 
-            if (property.NodeType == SyntaxNodeType.SyntaxNode)
+            if (property.IsInternalNodeNullable)
             {
                 builder.Append('?');
             }
@@ -181,6 +180,15 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
 
         foreach (var property in classInfo.SlotProperties)
         {
+            if (first)
+            {
+                first = false;
+            }
+            else
+            {
+                builder.AppendLine();
+            }
+
             var fieldName = NamingHelper.PascalCaseToCamelCase(property.Name);
 
             builder.Append("this.").Append(fieldName).Append(" = ").Append(fieldName).AppendLine(';');
@@ -196,15 +204,6 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
                 {
                     builder.Append("IncludeChild(").Append(fieldName).AppendLine(");");
                 });
-            }
-
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                builder.AppendLine();
             }
         }
     }
@@ -229,7 +228,7 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
 
             builder.Append(InternalNodeClassName);
 
-            if (property.NodeType == SyntaxNodeType.SyntaxNode)
+            if (property.IsInternalNodeNullable)
             {
                 builder.Append('?');
             }
@@ -254,7 +253,7 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo2 classInfo)
         {
             builder.Append("public readonly ").Append(InternalNodeClassName);
 
-            if (property.NodeType == SyntaxNodeType.SyntaxNode)
+            if (property.IsInternalNodeNullable)
             {
                 builder.Append('?');
             }

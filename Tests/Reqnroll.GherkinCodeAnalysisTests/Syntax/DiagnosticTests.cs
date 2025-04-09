@@ -1,6 +1,5 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Text;
-using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -94,7 +93,7 @@ public class DiagnosticTests
     [Fact]
     public void CanAttachDiagnosticsToFloatingSyntaxTrivia()
     {
-        var trivia = (SyntaxTrivia)(RawSyntaxTrivia)Whitespace("    ")
+        var trivia = (SyntaxTrivia)(InternalSyntaxTrivia)Whitespace("    ")
             .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
 
         trivia.ContainsDiagnostics.Should().BeTrue();
@@ -135,7 +134,7 @@ public class DiagnosticTests
         var descriptor2 = new DiagnosticDescriptor("GT2", "Diagnostic 2", "", "", DiagnosticSeverity.Error, true);
         var diagnostic2 = InternalDiagnostic.Create(descriptor2);
 
-        var feature = (FeatureDeclarationSyntax)FeatureDeclaration(
+        var feature = (FeatureSyntax)FeatureDeclaration(
             Token(SyntaxKind.FeatureKeyword, "Feature").WithDiagnostics([diagnostic2]),
             Token(null, SyntaxKind.ColonToken, Whitespace(" ").WithDiagnostics([diagnostic1])).WithDiagnostics([diagnostic2]),
             Identifier(null, "Guess the word", CarriageReturnLineFeed),

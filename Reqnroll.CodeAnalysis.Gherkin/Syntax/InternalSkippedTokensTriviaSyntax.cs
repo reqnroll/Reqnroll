@@ -1,13 +1,13 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-internal class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
+internal class InternalSkippedTokensTriviaSyntax : InternalStructuredTriviaSyntax
 {
     public readonly InternalNode? tokens;
 
-    public SkippedTokensTriviaSyntax(InternalNode? tokens) : base(SyntaxKind.SkippedTokensTrivia)
+    public InternalSkippedTokensTriviaSyntax(InternalNode? tokens) : base(SyntaxKind.SkippedTokensTrivia)
     {
         if (tokens != null)
         {
@@ -18,11 +18,11 @@ internal class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
         SetFlag(NodeFlags.ContainsSkippedText);
     }
 
-    public override Syntax.StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia parent) =>
-        new Syntax.SkippedTokensTriviaSyntax(this, parent.Token.Parent, parent.Position);
+    public override StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia parent) =>
+        new SkippedTokensTriviaSyntax(this, parent.Token.Parent, parent.Position);
 
     public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position) => 
-        new Syntax.SkippedTokensTriviaSyntax(this, parent, position);
+        new SkippedTokensTriviaSyntax(this, parent, position);
 
     public override int SlotCount => 1;
 

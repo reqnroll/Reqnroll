@@ -1,11 +1,11 @@
 using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-internal partial class RawSyntaxToken
+internal partial class InternalSyntaxToken
 {
-    internal class MissingToken : RawSyntaxToken
+    internal class MissingToken : InternalSyntaxToken
     {
         public MissingToken(SyntaxKind kind, string text) : base(kind, text)
         {

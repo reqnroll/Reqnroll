@@ -1,16 +1,16 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-internal class RawSyntaxTrivia : InternalNode
+internal class InternalSyntaxTrivia : InternalNode
 {
-    public RawSyntaxTrivia(SyntaxKind kind, string text) : base(kind, text.Length)
+    public InternalSyntaxTrivia(SyntaxKind kind, string text) : base(kind, text.Length)
     {
         Text = text;
     }
 
-    public RawSyntaxTrivia(
+    public InternalSyntaxTrivia(
         SyntaxKind kind,
         string text,
         ImmutableArray<InternalDiagnostic> diagnostics,
@@ -58,11 +58,11 @@ internal class RawSyntaxTrivia : InternalNode
 
     public override string ToFullString() => Text;
 
-    public static implicit operator SyntaxTrivia(RawSyntaxTrivia trivia) => new(new SyntaxToken(), trivia, 0);
+    public static implicit operator SyntaxTrivia(InternalSyntaxTrivia trivia) => new(new SyntaxToken(), trivia, 0);
 
     public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations) =>
-        new RawSyntaxTrivia(Kind, Text, GetAttachedDiagnostics(), annotations);
+        new InternalSyntaxTrivia(Kind, Text, GetAttachedDiagnostics(), annotations);
 
     public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics) => 
-        new RawSyntaxTrivia(Kind, Text, diagnostics, GetAnnotations());
+        new InternalSyntaxTrivia(Kind, Text, diagnostics, GetAnnotations());
 }

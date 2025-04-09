@@ -2,7 +2,7 @@
 
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
-using InternalSyntaxFactory = Syntax.Internal.InternalSyntaxFactory;
+using InternalSyntaxFactory = InternalSyntaxFactory;
 
 public static partial class SyntaxFactory
 {
@@ -35,60 +35,21 @@ public static partial class SyntaxFactory
 
     public static SyntaxTrivia Space { get; } = InternalSyntaxFactory.Space;
 
-    public static FeatureFileSyntax FeatureFile() => FeatureFile(null);
+    public static GherkinDocumentSyntax GherkinDocument() => GherkinDocument(null);
 
-    public static FeatureFileSyntax FeatureFile(FeatureDeclarationSyntax? featureDeclaration) =>
-        FeatureFile(featureDeclaration, Token(SyntaxKind.EndOfFileToken));
+    public static GherkinDocumentSyntax GherkinDocument(FeatureSyntax? featureDeclaration) =>
+        GherkinDocument(featureDeclaration, Token(SyntaxKind.EndOfFileToken));
 
-    public static FeatureFileSyntax FeatureFile(FeatureDeclarationSyntax? featureDeclaration, SyntaxToken endOfFileToken)
+    public static FeatureSyntax Feature(string keyword, string name)
     {
-        if (endOfFileToken.Kind != SyntaxKind.EndOfFileToken)
-        {
-            throw new ArgumentException("Token must be an end-of-file token.", nameof(endOfFileToken));
-        }
-
-        return new(InternalSyntaxFactory.FeatureFile(featureDeclaration?.InternalNode, endOfFileToken.InternalNode!));
-    }
-
-    public static FeatureDeclarationSyntax FeatureDeclaration(string keyword, string name)
-    {
-        return FeatureDeclaration(
+        return Feature(
             Token(SyntaxKind.FeatureKeyword, keyword),
             Token(SyntaxKind.ColonToken),
-            Identifier(name));
-    }
-
-    public static FeatureDeclarationSyntax FeatureDeclaration(
-        SyntaxToken keyword,
-        SyntaxToken colon,
-        SyntaxToken name,
-        DescriptionSyntax? description = null)
-    {
-        if (keyword.Kind != SyntaxKind.FeatureKeyword)
-        {
-            throw new ArgumentException("Token must be feature keyword.", nameof(keyword));
-        }
-
-        if (colon.Kind != SyntaxKind.ColonToken)
-        {
-            throw new ArgumentException("Token must be colon.", nameof(colon));
-        }
-
-        if (name.Kind != SyntaxKind.IdentifierToken)
-        {
-            throw new ArgumentException("Token must be an identifier.", nameof(name));
-        }
-
-        return new(InternalSyntaxFactory.FeatureDeclaration(
-            keyword.InternalNode!,
-            colon.InternalNode!,
-            name.InternalNode!,
-            description?.InternalNode));
+            Identifier(name),
+            null);
     }
 
     public static DescriptionSyntax Description(SyntaxToken text) => new(InternalSyntaxFactory.Description(text.InternalNode));
-
-    public static DescriptionSyntax Description(SyntaxTokenList text) => new(InternalSyntaxFactory.Description(text.RawNode));
 
     /// <summary>
     /// Creates a trivia from a <see cref="StructuredTriviaSyntax"/> node.
@@ -96,37 +57,37 @@ public static partial class SyntaxFactory
     /// <param name="node">The structured trivia to create the syntax from.</param>
     /// <returns></returns>
     public static SyntaxTrivia Trivia(StructuredTriviaSyntax node) => 
-        new(default, (Syntax.Internal.StructuredTriviaSyntax)node.InternalNode, position: 0);
+        new(default, (InternalStructuredTriviaSyntax)node.InternalNode, position: 0);
 
     public static SyntaxToken MissingToken(SyntaxKind kind) => 
-        InternalSyntaxFactory.MissingToken(ElasticMarker.RawNode, kind, ElasticMarker.RawNode);
+        InternalSyntaxFactory.MissingToken(ElasticMarker.InternalNode, kind, ElasticMarker.InternalNode);
 
     public static SyntaxToken MissingToken(SyntaxTriviaList leading, SyntaxKind kind, SyntaxTriviaList trailing) => 
-        InternalSyntaxFactory.MissingToken(leading.RawNode, kind, trailing.RawNode);
+        InternalSyntaxFactory.MissingToken(leading.InternalNode, kind, trailing.InternalNode);
 
     public static SyntaxToken Token(SyntaxKind kind) => 
-        InternalSyntaxFactory.Token(ElasticMarker.RawNode, kind, ElasticMarker.RawNode);
+        InternalSyntaxFactory.Token(ElasticMarker.InternalNode, kind, ElasticMarker.InternalNode);
 
     public static SyntaxToken Token(SyntaxKind kind, string text) =>
-        InternalSyntaxFactory.Token(ElasticMarker.RawNode, kind, text, ElasticMarker.RawNode);
+        InternalSyntaxFactory.Token(ElasticMarker.InternalNode, kind, text, ElasticMarker.InternalNode);
 
     public static SyntaxToken Token(SyntaxTriviaList leading, SyntaxKind kind, SyntaxTriviaList trailing) => 
-        InternalSyntaxFactory.Token(leading.RawNode, kind, trailing.RawNode);
+        InternalSyntaxFactory.Token(leading.InternalNode, kind, trailing.InternalNode);
 
     public static SyntaxToken Token(SyntaxTriviaList leading, SyntaxKind kind, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.Token(leading.RawNode, kind, text, trailing.RawNode);
+        InternalSyntaxFactory.Token(leading.InternalNode, kind, text, trailing.InternalNode);
 
     public static SyntaxToken Identifier(string text) =>
         InternalSyntaxFactory.Identifier(null, text, null);
 
     public static SyntaxToken Identifier(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.Identifier(leading.RawNode, text, trailing.RawNode);
+        InternalSyntaxFactory.Identifier(leading.InternalNode, text, trailing.InternalNode);
 
     public static SyntaxToken Literal(string text) =>
         InternalSyntaxFactory.Literal(null, text, null);
 
     public static SyntaxToken Literal(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.Literal(leading.RawNode, text, trailing.RawNode);
+        InternalSyntaxFactory.Literal(leading.InternalNode, text, trailing.InternalNode);
 
     public static SyntaxTriviaList TriviaList() => default;
 
@@ -145,5 +106,5 @@ public static partial class SyntaxFactory
     public static SyntaxTrivia Comment(string text) => InternalSyntaxFactory.Comment(text);
 
     public static SkippedTokensTriviaSyntax SkippedTokensTrivia(SyntaxTokenList tokens) =>
-        (SkippedTokensTriviaSyntax)InternalSyntaxFactory.SkippedTokensTrivia(tokens.RawNode).CreateSyntaxNode();
+        (SkippedTokensTriviaSyntax)InternalSyntaxFactory.SkippedTokensTrivia(tokens.InternalNode).CreateSyntaxNode();
 }

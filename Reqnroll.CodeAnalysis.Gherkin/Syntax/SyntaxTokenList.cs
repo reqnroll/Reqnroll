@@ -5,19 +5,17 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyList<SyntaxToken>
 {
-    private readonly SyntaxNode? _parent;
-
     internal SyntaxTokenList(SyntaxNode? parent, InternalNode? node, int position)
     {
-        _parent = parent;
-        RawNode = node;
+        Parent = parent;
+        InternalNode = node;
         Position = position;
     }
 
     public SyntaxTokenList(SyntaxToken token)
     {
-        _parent = token.Parent;
-        RawNode = token.InternalNode;
+        Parent = token.Parent;
+        InternalNode = token.InternalNode;
         Position = token.Position;
     }
 
@@ -40,8 +38,13 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
 
         return InternalNode.CreateList(nodes);
     }
+    
+    /// <summary>
+    /// Gets the node that is the parent of this token list.
+    /// </summary>
+    public SyntaxNode? Parent { get; }
 
-    internal InternalNode? RawNode { get; }
+    internal InternalNode? InternalNode { get; }
 
     public struct Enumerator(SyntaxTokenList list) : IEnumerator<SyntaxToken>
     {
@@ -70,21 +73,21 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            if (RawNode.IsList)
+            if (InternalNode.IsList)
             {
-                if (index < RawNode.SlotCount)
+                if (index < InternalNode.SlotCount)
                 {
-                    return new(_parent!, RawNode.GetSlot(index), Position + RawNode.GetSlotOffset(index));
+                    return new(Parent!, InternalNode.GetSlot(index), Position + InternalNode.GetSlotOffset(index));
                 }
             }
             else if (index == 0)
             {
-                return new(_parent, RawNode, Position);
+                return new(Parent, InternalNode, Position);
             }
 
             throw new ArgumentOutOfRangeException(nameof(index));
@@ -97,28 +100,44 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 return 0;
             }
 
-            if (RawNode.IsList)
+            if (InternalNode.IsList)
             {
-                return RawNode.SlotCount;
+                return InternalNode.SlotCount;
             }
 
             return 1;
         }
     }
 
-    public bool Equals(SyntaxTokenList other)
+    public override bool Equals(object? obj)
     {
-        throw new NotImplementedException();
+        if (obj is SyntaxTokenList list)
+        {
+            return Equals(list);
+        }
+
+        return false;
     }
+
+    public bool Equals(SyntaxTokenList other) =>
+        ReferenceEquals(Parent, other.Parent)
+            && ReferenceEquals(InternalNode, other.InternalNode)
+            && Position == other.Position;
+
+    public override int GetHashCode() => InternalNode?.GetHashCode() ?? 0;
 
     public Enumerator GetEnumerator() => new(this);
 
     IEnumerator<SyntaxToken> IEnumerable<SyntaxToken>.GetEnumerator() => GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public static bool operator ==(SyntaxTokenList left, SyntaxTokenList right) => left.Equals(right);
+
+    public static bool operator !=(SyntaxTokenList left, SyntaxTokenList right) => left.Equals(right);
 }

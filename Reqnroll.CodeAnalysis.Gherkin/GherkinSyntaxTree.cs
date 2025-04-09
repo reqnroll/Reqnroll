@@ -53,7 +53,7 @@ public class GherkinSyntaxTree
 
     public IEnumerable<Diagnostic> GetDiagnostics(SyntaxToken token) => GetDiagnostics(token.InternalNode, token.Position);
 
-    public IEnumerable<Diagnostic> GetDiagnostics(SyntaxTrivia trivia) => GetDiagnostics(trivia.RawNode, trivia.Position);
+    public IEnumerable<Diagnostic> GetDiagnostics(SyntaxTrivia trivia) => GetDiagnostics(trivia.InternalNode, trivia.Position);
 
     public IEnumerable<Diagnostic> GetDiagnostics(SyntaxNode node) => GetDiagnostics(node.InternalNode, node.Position);
 

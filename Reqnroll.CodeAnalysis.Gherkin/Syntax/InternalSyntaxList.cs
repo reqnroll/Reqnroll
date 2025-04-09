@@ -3,28 +3,28 @@ using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-internal static class RawSyntaxList
+internal static class InternalSyntaxList
 {
-    public static RawSyntaxList<T> Create<T>(IEnumerable<T> nodes) where T : InternalNode
+    public static InternalSyntaxList<T> Create<T>(IEnumerable<T> nodes) where T : InternalNode
     {
-        var builder = new RawSyntaxList<T>.Builder();
+        var builder = new InternalSyntaxList<T>.Builder();
 
         builder.AddRange(nodes);
 
         return builder.ToRawSyntaxList();
     }
 
-    public static RawSyntaxList<T> Create<T>(ImmutableArray<T> nodes) where T : InternalNode
+    public static InternalSyntaxList<T> Create<T>(ImmutableArray<T> nodes) where T : InternalNode
     {
         Debug.Assert(!nodes.IsDefault, "Do not pass default array to RawSyntaxList.Create");
 
-        return new RawSyntaxList<T>(nodes);
+        return new InternalSyntaxList<T>(nodes);
     }
 }
 
-internal class RawSyntaxList<TNode> : InternalNode, IReadOnlyList<TNode> where TNode : InternalNode
+internal class InternalSyntaxList<TNode> : InternalNode, IReadOnlyList<TNode> where TNode : InternalNode
 {
     public readonly struct Builder() : ICollection<TNode>
     {
@@ -40,7 +40,7 @@ internal class RawSyntaxList<TNode> : InternalNode, IReadOnlyList<TNode> where T
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public RawSyntaxList<TNode> ToRawSyntaxList() => new(_nodes.ToImmutableArray());
+        public InternalSyntaxList<TNode> ToRawSyntaxList() => new(_nodes.ToImmutableArray());
 
         public void Add(TNode item) => _nodes.Add(item);
 
@@ -55,7 +55,7 @@ internal class RawSyntaxList<TNode> : InternalNode, IReadOnlyList<TNode> where T
 
     private readonly ImmutableArray<TNode> _items;
 
-    internal RawSyntaxList(ImmutableArray<TNode> items) : base(SyntaxKind.List)
+    internal InternalSyntaxList(ImmutableArray<TNode> items) : base(SyntaxKind.List)
     {
         _items = items;
 
@@ -71,7 +71,7 @@ internal class RawSyntaxList<TNode> : InternalNode, IReadOnlyList<TNode> where T
 
     public override int SlotCount => _items.Length;
 
-    public static RawSyntaxList<TNode> Empty { get; } = new Builder().ToRawSyntaxList();
+    public static InternalSyntaxList<TNode> Empty { get; } = new Builder().ToRawSyntaxList();
 
     public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
     {

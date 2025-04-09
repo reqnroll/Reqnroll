@@ -11,14 +11,14 @@ internal partial class ParsedSyntaxTreeBuilder
     {
         private FeatureHeaderRuleHandler? _featureHeaderRuleHandler;
 
-        public FeatureDeclarationSyntax? CreateFeatureDeclarationSyntax()
+        public FeatureSyntax.Internal? CreateFeatureDeclarationSyntax()
         {
             if (_featureHeaderRuleHandler == null)
             {
                 return null;
             }
 
-            return FeatureDeclaration(
+            return Feature(
                 _featureHeaderRuleHandler.keyword ?? MissingToken(SyntaxKind.FeatureKeyword),
                 _featureHeaderRuleHandler.colon ?? MissingToken(SyntaxKind.ColonToken),
                 _featureHeaderRuleHandler.name ?? MissingToken(SyntaxKind.IdentifierToken),

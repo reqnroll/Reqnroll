@@ -1,3 +1,4 @@
+using Microsoft.CodeAnalysis.Operations;
 using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
@@ -8,20 +9,20 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
 {
     public SyntaxTriviaList(SyntaxTrivia trivia)
     {
-        RawNode = trivia.RawNode;
+        InternalNode = trivia.InternalNode;
     }
 
     public SyntaxTriviaList(IEnumerable<SyntaxTrivia> trivia)
     {
         var builder = new Builder();
         builder.AddRange(trivia);
-        RawNode = builder.CreateRawNode();
+        InternalNode = builder.CreateRawNode();
     }
 
     internal SyntaxTriviaList(in SyntaxToken token, InternalNode? node, int position)
     {
         _token = token;
-        RawNode = node;
+        InternalNode = node;
         _position = position;
     }
 
@@ -69,7 +70,7 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
         {
             foreach (var item in trivia)
             {
-                var node = item.RawNode;
+                var node = item.InternalNode;
                 if (node != null)
                 {
                     _nodes.Add(node);
@@ -83,7 +84,7 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
     private readonly SyntaxToken _token;
     private readonly int _position;
 
-    internal InternalNode? RawNode { get; }
+    internal InternalNode? InternalNode { get; }
 
     public static SyntaxTriviaList Empty { get; } = default;
 
@@ -91,14 +92,14 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 return 0;
             }
 
-            if (RawNode.IsList)
+            if (InternalNode.IsList)
             {
-                return RawNode.SlotCount;
+                return InternalNode.SlotCount;
             }
 
             return 1;
@@ -109,21 +110,21 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
     {
         get
         {
-            if (RawNode == null)
+            if (InternalNode == null)
             {
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
 
-            if (RawNode.IsList)
+            if (InternalNode.IsList)
             {
-                if (index < RawNode.SlotCount)
+                if (index < InternalNode.SlotCount)
                 {
-                    return new SyntaxTrivia(_token, RawNode.GetSlot(index), _position + RawNode.GetSlotOffset(index));
+                    return new SyntaxTrivia(_token, InternalNode.GetSlot(index), _position + InternalNode.GetSlotOffset(index));
                 }
             }
             else
             {
-                return new SyntaxTrivia(_token, RawNode, _position);
+                return new SyntaxTrivia(_token, InternalNode, _position);
             }
 
             throw new ArgumentOutOfRangeException(nameof(index));
@@ -136,9 +137,9 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
 
     readonly IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-    public override string ToString() => RawNode?.ToString() ?? "";
+    public override string ToString() => InternalNode?.ToString() ?? "";
 
-    public string ToFullString() => RawNode?.ToFullString() ?? "";
+    public string ToFullString() => InternalNode?.ToFullString() ?? "";
 
     public override bool Equals([NotNullWhen(true)] object? obj)
     {
@@ -152,10 +153,14 @@ public readonly struct SyntaxTriviaList : IReadOnlyList<SyntaxTrivia>, IEquatabl
 
     public bool Equals(SyntaxTriviaList other)
     {
-        return ReferenceEquals(RawNode, other.RawNode) &&
+        return ReferenceEquals(InternalNode, other.InternalNode) &&
             _token.Equals(other._token) &&
             _position == other._position;
     }
 
-    public override int GetHashCode() => Hash.Combine(RawNode, _token, _position);
+    public override int GetHashCode() => Hash.Combine(InternalNode, _token, _position);
+
+    public static bool operator==(SyntaxTriviaList left, SyntaxTriviaList right) => left.Equals(right);
+
+    public static bool operator !=(SyntaxTriviaList left, SyntaxTriviaList right) => !left.Equals(right);
 }

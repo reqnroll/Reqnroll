@@ -50,7 +50,7 @@ internal class InternalSyntaxFactoryMethodEmitter(SyntaxNodeClassInfo2 classInfo
 
             builder.Append("InternalNode");
 
-            if (property.NodeType == SyntaxNodeType.SyntaxNode)
+            if (property.IsInternalNodeNullable)
             {
                 builder.Append('?');
             }

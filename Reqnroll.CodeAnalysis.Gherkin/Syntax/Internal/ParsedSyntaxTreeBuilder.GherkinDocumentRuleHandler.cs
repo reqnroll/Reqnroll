@@ -13,9 +13,9 @@ internal partial class ParsedSyntaxTreeBuilder
 
         private InternalNode? _endOfFile;
 
-        public FeatureFileSyntax BuildFeatureFileSyntax()
+        public GherkinDocumentSyntax.Internal BuildFeatureFileSyntax()
         {
-            return new FeatureFileSyntax(
+            return new GherkinDocumentSyntax.Internal(
                 _featureRuleHandler?.CreateFeatureDeclarationSyntax(),
                 _endOfFile ?? MissingToken(SyntaxKind.EndOfFileToken));
         }

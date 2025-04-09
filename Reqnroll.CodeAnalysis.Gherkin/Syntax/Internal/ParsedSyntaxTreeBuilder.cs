@@ -14,7 +14,7 @@ using static InternalSyntaxFactory;
 /// parser in order to build the lossless <see cref="GherkinSyntaxTree"/>.</para>
 /// <para>The builder is implemented using a stack of builders where each builder is responsible for constructing one
 /// syntax node in the tree. As tokens are recieved from the parser, they are passed to the current syntax builder.
-/// The builder inspects the token and converts it into <see cref="RawSyntaxToken"/> and <see cref="RawSyntaxTrivia"/>
+/// The builder inspects the token and converts it into <see cref="InternalSyntaxToken"/> and <see cref="InternalSyntaxTrivia"/>
 /// values, building up the components of the syntax node.</para>
 /// <para>When the parser signals the start of a new syntax node (identified by the <see cref="RuleType"/> enum), the
 /// syntax builder is given the opportunity to continue accepting tokens, or delegate tokens to a child syntax builder

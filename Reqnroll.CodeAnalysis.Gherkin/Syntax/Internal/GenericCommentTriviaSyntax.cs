@@ -6,14 +6,14 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 internal class GenericCommentTriviaSyntax : CommentTriviaSyntax
 {
     public GenericCommentTriviaSyntax(
-        RawSyntaxToken hashToken,
-        RawSyntaxToken text) : base(hashToken, SyntaxKind.CommentTrivia)
+        InternalSyntaxToken hashToken,
+        InternalSyntaxToken text) : base(hashToken, SyntaxKind.CommentTrivia)
     {
         this.text = text;
         IncludeChild(text);
     }
 
-    public readonly RawSyntaxToken text;
+    public readonly InternalSyntaxToken text;
 
     public override int SlotCount => 2;
 
