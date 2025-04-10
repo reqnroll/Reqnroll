@@ -505,7 +505,7 @@ public abstract class GenerationTestBase : SystemTestBase
         }
         hookLines.Should().OnlyHaveUniqueItems();
         hookLines.Should().HaveElementAt(0, "-> hook: BeforeTestRun", "The BeforeTestRun hook should be the first");
-        hookLines.Should().HaveElementAt(-1, "-> hook: AfterTestRun", "The AfterTestRun hook should be the last");
+        hookLines.Should().HaveElementAt(hookLines.Count-1, "-> hook: AfterTestRun", "The AfterTestRun hook should be the last");
 
         _vsTestExecutionDriver.LastTestExecutionResult.Output.Should().NotContain("NullReferenceException");
         _vsTestExecutionDriver.LastTestExecutionResult.Output.Should().NotContain("The previous ScenarioContext was already disposed.");
