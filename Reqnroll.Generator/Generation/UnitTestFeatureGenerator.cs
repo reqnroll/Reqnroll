@@ -311,21 +311,27 @@ namespace Reqnroll.Generator.Generation
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
             
             //await testRunner.OnScenarioEndAsync();
-            var expression = new CodeMethodInvokeExpression(
+            var onScenarioEndCallExpression = new CodeMethodInvokeExpression(
                 testRunnerField,
                 nameof(ITestRunner.OnScenarioEndAsync));
-
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
-
-            testCleanupMethod.Statements.Add(expression);
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onScenarioEndCallExpression);
+            var onScenarioEndCallStatement = new CodeExpressionStatement(onScenarioEndCallExpression);
 
             // "Release" the TestRunner, so that other threads can pick it up
             // TestRunnerManager.ReleaseTestRunner(testRunner);
-            testCleanupMethod.Statements.Add(
+            var releaseTestRunnerCallStatement = new CodeExpressionStatement(
                 new CodeMethodInvokeExpression(
                     new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
                     nameof(TestRunnerManager.ReleaseTestRunner),
                     testRunnerField));
+
+            // add ReleaseTestRunner to the finally block of OnScenarioEndAsync 
+            testCleanupMethod.Statements.Add(
+                new CodeTryCatchFinallyStatement(
+                    [onScenarioEndCallStatement],
+                    [],
+                    [releaseTestRunnerCallStatement]
+                ));
         }
 
         private void SetupScenarioInitializeMethod(TestClassGenerationContext generationContext)

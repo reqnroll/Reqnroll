@@ -366,31 +366,89 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
-        public async Task Should_cleanup_step_context_after_scenario_block_hook_error()
+        public async Task Should_cleanup_step_context_when_before_scenario_block_hook_error()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
             RegisterStepDefinition();
 
             var hookMock = CreateHookMock(beforeScenarioBlockEvents);
             methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
-                .Throws(new Exception("simulated error"));
+                .Throws(new Exception("simulated before block hook error"));
 
-            try
-            {
-                await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
-
-                Assert.Fail("execution of the step should have failed because of the exeption thrown by the before scenario block hook");
-            }
-            catch (Exception)
-            {
-            }
+            await FluentActions.Awaiting(() => testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null))
+                               .Should().ThrowAsync<Exception>("execution of the step should have failed because of the exception thrown by the before scenario block hook");
 
             methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
             contextManagerStub.Verify(cm => cm.CleanupStepContext());
+
+            contextManagerStub.Object.ScenarioContext.ScenarioExecutionStatus.Should().Be(ScenarioExecutionStatus.TestError);
+            contextManagerStub.Object.ScenarioContext.TestError?.Message.Should().Be("simulated before block hook error");
         }
 
         [Fact]
-        public async Task Should_not_execute_afterstep_when_step_is_undefined()
+        public async Task Should_cleanup_step_context_when_after_scenario_block_hook_error()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+            RegisterStepDefinition();
+
+            var hookMock = CreateHookMock(afterScenarioBlockEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                .Throws(new Exception("simulated after block hook error"));
+
+            await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
+            await FluentActions.Awaiting(() => testExecutionEngine.StepAsync(StepDefinitionKeyword.When, null, "bar", null, null))
+                               .Should().ThrowAsync<Exception>("execution of the step should have failed because of the exception thrown by the before scenario block hook");
+
+            methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+            contextManagerStub.Verify(cm => cm.CleanupStepContext());
+
+            contextManagerStub.Object.ScenarioContext.ScenarioExecutionStatus.Should().Be(ScenarioExecutionStatus.TestError);
+            contextManagerStub.Object.ScenarioContext.TestError?.Message.Should().Be("simulated after block hook error");
+        }
+
+        [Fact]
+        public async Task Should_cleanup_step_context_when_before_step_hook_error()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+            RegisterStepDefinition();
+
+            var hookMock = CreateHookMock(beforeStepEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                .Throws(new Exception("simulated before step hook error"));
+
+            reqnrollConfiguration.StopAtFirstError = true;
+            await FluentActions.Awaiting(() => testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null))
+                               .Should().ThrowAsync<Exception>("execution of the step should have failed because of the exception thrown by the before scenario block hook");
+
+            methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+            contextManagerStub.Verify(cm => cm.CleanupStepContext());
+
+            contextManagerStub.Object.ScenarioContext.ScenarioExecutionStatus.Should().Be(ScenarioExecutionStatus.TestError);
+            contextManagerStub.Object.ScenarioContext.TestError?.Message.Should().Be("simulated before step hook error");
+        }
+
+        [Fact]
+        public async Task Should_cleanup_step_context_when_after_step_hook_error()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+            RegisterStepDefinition();
+
+            var hookMock = CreateHookMock(afterStepEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                .Throws(new Exception("simulated after step hook error"));
+
+            await FluentActions.Awaiting(() => testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null))
+                               .Should().ThrowAsync<Exception>("execution of the step should have failed because of the exception thrown by the before scenario block hook");
+
+            methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+            contextManagerStub.Verify(cm => cm.CleanupStepContext());
+
+            contextManagerStub.Object.ScenarioContext.ScenarioExecutionStatus.Should().Be(ScenarioExecutionStatus.TestError);
+            contextManagerStub.Object.ScenarioContext.TestError?.Message.Should().Be("simulated after step hook error");
+        }
+
+        [Fact]
+        public async Task Should_not_execute_after_step_when_step_is_undefined()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
             RegisterUndefinedStepDefinition();
@@ -577,6 +635,24 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             AssertHooksWasCalledWithParam(afterHook, DummyClass.LastInstance);
             testObjectResolverMock.Verify(bir => bir.ResolveBindingInstance(typeof(DummyClass), scenarioContainer),
                 Times.Exactly(2));
+        }
+
+        [Fact]
+        public async Task Should_cleanup_feature_context_when_after_feature_hook_error()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+            RegisterStepDefinition();
+
+            var hookMock = CreateHookMock(afterFeatureEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                                    .Throws(new Exception("simulated after feature hook error"));
+
+            await testExecutionEngine.OnFeatureStartAsync(featureInfo);
+            await FluentActions.Awaiting(testExecutionEngine.OnFeatureEndAsync)
+                               .Should().ThrowAsync<Exception>("execution of the step should have failed because of the exception thrown by the before scenario block hook");
+
+            methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+            contextManagerStub.Verify(cm => cm.CleanupFeatureContext());
         }
 
         [Fact]
