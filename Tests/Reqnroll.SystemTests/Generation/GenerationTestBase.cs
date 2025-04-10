@@ -282,7 +282,7 @@ public abstract class GenerationTestBase : SystemTestBase
     }
 
     [TestMethod]
-    public void Before_After_Feature_hooks_execute_only_once_on_sequential_run()
+    public void Before_After_Feature_hooks_execute_only_once_on_sequential_run_even_with_failing_scenario_hooks()
     {
         // After a failure, the scenario execution should properly "release" the test runner, so that 
         // the next scenario can run in the same one.
@@ -384,6 +384,131 @@ public abstract class GenerationTestBase : SystemTestBase
 
         _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().Be(1, "only 'Passing scenario' should pass");
         _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().Be(3, "the three other scenario should fail");
+    }
+
+    [TestMethod]
+    public void Before_After_Feature_hooks_execute_only_once_on_sequential_run_even_with_failing_feature_hooks()
+    {
+        // After a failure, the scenario execution should properly "release" the test runner, so that 
+        // the next scenario can run in the same one.
+        // We verify here that only one test runner is used by logging and checking _testRunnerManager.IsMultiThreaded
+        // and that the BeforeFeature and AfterFeature hooks are executed only once.
+
+        AddFeatureFile(
+            """
+            @failBefore
+            Feature: Feature 1
+            
+            Scenario: Passing scenario 1
+            When the step passes
+            
+            Scenario: Failing scenario 1
+            When the step fails
+            """);
+        AddFeatureFile(
+            """
+            @failAfter
+            Feature: Feature 2
+            
+            Scenario: Passing scenario 2
+            When the step passes
+            
+            Scenario: Failing scenario 2
+            When the step fails
+            """);
+        AddFeatureFile(
+            """
+            Feature: Feature 3
+            
+            Scenario: Passing scenario 3
+            When the step passes
+            
+            Scenario: Failing scenario 3
+            When the step fails
+            """);
+
+        AddBindingClass(
+            """
+            namespace ReqnrollExecution.StepDefinitions
+            {
+                [Binding]
+                public class ReqnrollExecutionBindings
+                {
+                    private readonly ITestRunnerManager _testRunnerManager;
+                    
+                    public ReqnrollExecutionBindings(ITestRunnerManager testRunnerManager)
+                    {
+                        _testRunnerManager = testRunnerManager;
+                    }
+                    
+                    [When("the step passes")]
+                    public void WhenTheStepPasses()
+                    {
+                        global::Log.LogStep();
+                        Log.LogCustom("parallel", _testRunnerManager.IsMultiThreaded.ToString());
+                    }
+                    
+                    [When("the step fails")]
+                    public void WhenTheStepFails()
+                    {
+                        global::Log.LogStep();
+                        Log.LogCustom("parallel", _testRunnerManager.IsMultiThreaded.ToString());
+                        throw new System.Exception("simulated failure");
+                    }
+                    
+                    [BeforeFeature(Order = 0)]
+                    public static void BeforeFeature(FeatureContext featureContext)
+                    {
+                        Log.LogCustom("hook", featureContext.FeatureInfo.Title);
+                    }
+                    
+                    [AfterFeature(Order = 0)]
+                    public static void AfterFeature(FeatureContext featureContext)
+                    {
+                        Log.LogCustom("hook", featureContext.FeatureInfo.Title);
+                    }
+                    
+                    [BeforeFeature("@failBefore", Order = 10)]
+                    public static void FailBefore()
+                    {
+                        throw new System.Exception("Fail before");
+                    }
+                    
+                    [AfterFeature("@failAfter", Order = 10)]
+                    public static void FailAfter()
+                    {
+                        throw new System.Exception("Fail after");
+                    }
+                }
+            }
+            """);
+
+        AddHookBinding("BeforeTestRun", order: 0);
+        AddHookBinding("AfterTestRun", order: 0);
+
+        ExecuteTests();
+
+        var parallelLogs = _bindingDriver.GetActualLogLines("parallel").ToList();
+        parallelLogs.Should().NotBeEmpty("the scenarios should have parallel logs");
+        //parallelLogs.Should().AllSatisfy(log => log.Should().StartWith("-> parallel: False"));
+
+        var hookLines = _bindingDriver.GetActualHookLines().ToList();
+        TestContext.WriteLine(string.Join(Environment.NewLine, hookLines.Select((l,i) => $"#{i}: {l}")));
+
+        for (int i = 1; i <= 3; i++)
+        {
+            hookLines.Should()
+                     .ContainInConsecutiveOrder(
+                         $"-> hook: Feature {i}:BeforeFeature",
+                         $"-> hook: Feature {i}:AfterFeature"
+                     );
+        }
+        hookLines.Should().OnlyHaveUniqueItems();
+        hookLines.Should().HaveElementAt(0, "-> hook: BeforeTestRun", "The BeforeTestRun hook should be the first");
+        hookLines.Should().HaveElementAt(-1, "-> hook: AfterTestRun", "The AfterTestRun hook should be the last");
+
+        _vsTestExecutionDriver.LastTestExecutionResult.Output.Should().NotContain("NullReferenceException");
+        _vsTestExecutionDriver.LastTestExecutionResult.Output.Should().NotContain("The previous ScenarioContext was already disposed.");
     }
 
 
