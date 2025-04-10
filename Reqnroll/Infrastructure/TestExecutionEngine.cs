@@ -136,9 +136,14 @@ namespace Reqnroll.Infrastructure
                 _testRunnerEndExecuted = true;
             }
 
-            await FireEventsAsync(HookType.AfterTestRun);
-            
-            _testThreadExecutionEventPublisher.PublishEvent(new TestRunFinishedEvent());
+            try
+            {
+                await FireEventsAsync(HookType.AfterTestRun);
+            }
+            finally
+            {
+                _testThreadExecutionEventPublisher.PublishEvent(new TestRunFinishedEvent());
+            }
         }
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
@@ -154,18 +159,23 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnFeatureEndAsync()
         {
-            await FireEventsAsync(HookType.AfterFeature);
-
-            if (_reqnrollConfiguration.TraceTimings)
+            try
             {
-                FeatureContext.Stopwatch.Stop();
-                var duration = FeatureContext.Stopwatch.Elapsed;
-                _testTracer.TraceDuration(duration, "Feature: " + FeatureContext.FeatureInfo.Title);
+                await FireEventsAsync(HookType.AfterFeature);
             }
+            finally
+            {
+                if (_reqnrollConfiguration.TraceTimings)
+                {
+                    FeatureContext.Stopwatch.Stop();
+                    var duration = FeatureContext.Stopwatch.Elapsed;
+                    _testTracer.TraceDuration(duration, "Feature: " + FeatureContext.FeatureInfo.Title);
+                }
 
-            _testThreadExecutionEventPublisher.PublishEvent(new FeatureFinishedEvent(FeatureContext));
+                _testThreadExecutionEventPublisher.PublishEvent(new FeatureFinishedEvent(FeatureContext));
 
-            _contextManager.CleanupFeatureContext();
+                _contextManager.CleanupFeatureContext();
+            }
         }
 
         public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo)
