@@ -32,6 +32,8 @@ internal readonly struct ComparableArray<T>(ImmutableArray<T> values) : IEquatab
 
     public bool IsDefaultOrEmpty => _values.IsDefaultOrEmpty;
 
+public T this[int index] => _values[index];
+
     public override bool Equals(object obj)
     {
         if (obj is ComparableArray<T> other)

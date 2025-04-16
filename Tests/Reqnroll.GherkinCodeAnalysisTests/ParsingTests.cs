@@ -12,7 +12,7 @@ public partial class ParsingTests
         var tree = GherkinSyntaxTree.ParseText("");
 
         var root = tree.GetRoot();
-        var featureFileSyntax = root.Should().BeOfType<FeatureFileSyntax>().Subject;
+        var featureFileSyntax = root.Should().BeOfType<GherkinDocumentSyntax>().Subject;
 
         featureFileSyntax.FeatureDeclaration.Should().BeNull();
 

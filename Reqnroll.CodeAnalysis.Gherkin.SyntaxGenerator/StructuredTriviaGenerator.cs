@@ -71,7 +71,8 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                             info.Index,
                             info.TypeName,
                             syntaxKinds[info.SyntaxKind],
-                            info.Description))
+                            info.Description,
+                            !info.IsOptional))
                         .ToImmutableArray());
             });
 

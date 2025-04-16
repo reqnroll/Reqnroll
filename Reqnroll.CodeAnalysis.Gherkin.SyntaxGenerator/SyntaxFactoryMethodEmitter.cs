@@ -58,9 +58,12 @@ internal class SyntaxFactoryMethodEmitter(SyntaxNodeClassInfo classInfo)
         builder.BeginBlock();
 
         var first = true;
+        var hasRequiredFollowingSlot = true;
 
-        foreach (var property in classInfo.SlotProperties)
+        for (var i = 0; i < classInfo.SlotProperties.Length; i++)
         {
+            var property = classInfo.SlotProperties[i];
+
             if (first)
             {
                 first = false;
@@ -78,6 +81,23 @@ internal class SyntaxFactoryMethodEmitter(SyntaxNodeClassInfo classInfo)
             }
 
             builder.Append(' ').Append(NamingHelper.PascalCaseToCamelCase(property.Name));
+
+            // If the property is optional and there are no required properties following it,
+            // we can make the parameter optional.
+            if (!property.IsRequired)
+            {
+                if (hasRequiredFollowingSlot)
+                {
+                    hasRequiredFollowingSlot = classInfo.SlotProperties
+                        .Skip(i + 1)
+                        .Any(property => property.IsRequired);
+                }
+
+                if (!hasRequiredFollowingSlot)
+                {
+                    builder.Append(" = default");
+                }
+            }
         }
 
         builder.AppendLine(')');

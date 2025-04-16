@@ -7,7 +7,7 @@ public class FeatureDeclarationTests
     [Fact]
     public void ToStringReturnsTokensInDocumentOrder()
     {
-        var feature = FeatureDeclaration(
+        var feature = Feature(
             Token(SyntaxKind.FeatureKeyword, "Feature"),
             Token(TriviaList(), SyntaxKind.ColonToken, TriviaList([Whitespace(" ")])),
             Identifier(TriviaList(), "Guess the word", TriviaList([CarriageReturnLineFeed, CarriageReturnLineFeed])),

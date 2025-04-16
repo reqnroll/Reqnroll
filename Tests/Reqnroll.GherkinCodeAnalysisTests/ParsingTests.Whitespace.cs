@@ -20,8 +20,8 @@ public partial class ParsingTests
         var tree = GherkinSyntaxTree.ParseText(source);
 
         tree.GetRoot().Should().BeEquivalentTo(
-            FeatureFile(
-                FeatureDeclaration(
+            GherkinDocument(
+                Feature(
                     Token(
                         TriviaList([Whitespace("    "), CarriageReturnLineFeed, Whitespace("    ")]),
                         SyntaxKind.FeatureKeyword,
@@ -56,8 +56,8 @@ public partial class ParsingTests
         var tree = GherkinSyntaxTree.ParseText(source);
 
         tree.GetRoot().Should().BeEquivalentTo(
-            FeatureFile(
-                FeatureDeclaration(
+            GherkinDocument(
+                Feature(
                     Token(
                         TriviaList([Whitespace("    ")]),
                         SyntaxKind.FeatureKeyword,

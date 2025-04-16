@@ -17,7 +17,7 @@ public class DiagnosticTests
         // Create a sytax node to attach the token to a tree.
         var description = (DescriptionSyntax)Description(token).CreateSyntaxNode();
 
-        var textToken = description.TextTokens[0];
+        var textToken = description.Text[0];
 
         textToken.ContainsDiagnostics.Should().BeTrue();
         textToken.GetDiagnostics().Should().HaveCount(1);
@@ -63,7 +63,7 @@ public class DiagnosticTests
         var token = Token(leading, SyntaxKind.TextLiteralToken, text, trailing);
         var description = (DescriptionSyntax)Description(token).CreateSyntaxNode();
 
-        var textToken = description.TextTokens.Single();
+        var textToken = description.Text.Single();
 
         var leadingTrivia = textToken.LeadingTrivia[0];
         var trailingTrivia = textToken.TrailingTrivia[0];
@@ -134,7 +134,7 @@ public class DiagnosticTests
         var descriptor2 = new DiagnosticDescriptor("GT2", "Diagnostic 2", "", "", DiagnosticSeverity.Error, true);
         var diagnostic2 = InternalDiagnostic.Create(descriptor2);
 
-        var feature = (FeatureSyntax)FeatureDeclaration(
+        var feature = (FeatureSyntax)Feature(
             Token(SyntaxKind.FeatureKeyword, "Feature").WithDiagnostics([diagnostic2]),
             Token(null, SyntaxKind.ColonToken, Whitespace(" ").WithDiagnostics([diagnostic1])).WithDiagnostics([diagnostic2]),
             Identifier(null, "Guess the word", CarriageReturnLineFeed),

@@ -27,7 +27,7 @@ public class Examples(ITestOutputHelper output)
         // At this point the ideal strategy would be to implement a visitor pattern to filter to just the nodes we care about.
         // This isn't strictly required at this stage, so this example walks the tree in a more manual/verbose fashion.
         // The Roslyn engine has a whole subsystem for analysers, which we could probably learn from.
-        var featureFile = (FeatureFileSyntax)syntax.GetRoot();
+        var featureFile = (GherkinDocumentSyntax)syntax.GetRoot();
 
         var featureDeclaration = featureFile.FeatureDeclaration;
 

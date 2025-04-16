@@ -42,6 +42,7 @@ internal static class SlotHelper
             }
 
             SyntaxNodeType nodeType;
+            bool isOptional = false;
 
             switch (property.Type.ToDisplayString())
             {
@@ -55,6 +56,7 @@ internal static class SlotHelper
                     if (property.Type.IsSyntaxNode())
                     {
                         nodeType = SyntaxNodeType.SyntaxNode;
+                        isOptional = property.Type.NullableAnnotation == NullableAnnotation.Annotated;
                     }
                     else
                     {
@@ -71,7 +73,8 @@ internal static class SlotHelper
                     slotIndex,
                     property.Type.Name,
                     slotSyntaxKindValue,
-                    description));
+                    description,
+                    isOptional));
         }
 
         return slots.ToImmutable();

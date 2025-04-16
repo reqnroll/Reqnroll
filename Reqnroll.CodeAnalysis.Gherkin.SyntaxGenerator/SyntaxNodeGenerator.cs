@@ -71,7 +71,8 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             info.Index,
                             info.TypeName,
                             syntaxKinds[info.SyntaxKind],
-                            info.Description))
+                            info.Description, 
+                            !info.IsOptional))
                         .ToImmutableArray());
             });
 
@@ -120,7 +121,8 @@ internal record BareSyntaxSlotPropertyInfo(
     int Index,
     string TypeName,
     ushort SyntaxKind,
-    string? Description);
+    string? Description,
+    bool IsOptional);
 
 internal record SyntaxSlotPropertyInfo(
     SyntaxNodeType NodeType,
@@ -128,7 +130,8 @@ internal record SyntaxSlotPropertyInfo(
     int Index,
     string TypeName,
     SyntaxKindInfo SyntaxKind,
-    string? Description)
+    string? Description,
+    bool IsRequired)
 {
     public bool IsInternalNodeNullable => NodeType == SyntaxNodeType.SyntaxNode || NodeType == SyntaxNodeType.SyntaxTokenList;
 }
