@@ -1,7 +1,6 @@
 using Gherkin;
 using Microsoft.CodeAnalysis.Text;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
-using System.Diagnostics;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
@@ -92,7 +91,7 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
     {
         _cancellationToken.ThrowIfCancellationRequested();
 
-        Debug.Assert(
+        CodeAnalysisDebug.Assert(
             CurrentRuleHandler.RuleType == ruleType,
             "Parser requsted to end rule that is not current.",
             "The current rule being processed is {0} but the parser instructed to end a rule of type {1}",

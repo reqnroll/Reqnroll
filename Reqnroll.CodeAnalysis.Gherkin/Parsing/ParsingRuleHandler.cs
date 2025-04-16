@@ -9,7 +9,10 @@ internal abstract class ParsingRuleHandler(RuleType ruleType)
 
     public virtual ParsingRuleHandler StartChildRule(RuleType ruleType)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support having child rules of type {ruleType}");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportChildRuleType,
+            GetType().Name,
+            ruleType));
     }
 
     /// <summary>
@@ -62,66 +65,80 @@ internal abstract class ParsingRuleHandler(RuleType ruleType)
 
     protected virtual void AppendComment(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding comments.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingComments, GetType().Name));
     }
 
     protected virtual void AppendTagLine(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding tag lines.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingTagLines, GetType().Name));
     }
 
     protected virtual void AppendFeatureLine(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding feature lines.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingFeatureLines, GetType().Name));
     }
 
     protected virtual void AppendRuleLine(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding rule lines.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingRuleLines, GetType().Name));
     }
 
     protected virtual void AppendBackgroundLine(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding background lines.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingBackgroundLines, GetType().Name));
     }
 
     protected virtual void AppendScenarioLine(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding scenario lines.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingScenarioLines, GetType().Name));
     }
 
     protected virtual void AppendExamplesLine(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding examples lines.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingExamplesLines, GetType().Name));
     }
 
     protected virtual void AppendStepLine(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding step lines.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingStepLines, GetType().Name));
     }
 
     protected virtual void AppendDocStringSeparator(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding doc string separator.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingDocStringSeparator, GetType().Name));
     }
 
     protected virtual void AppendTableRow(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding table rows.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingTableRows, GetType().Name));
     }
 
     protected virtual void AppendLanguage(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding language comments.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingLanguageComments, GetType().Name));
     }
 
     protected virtual void AppendOther(Token token, TextLine line, ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding other text.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingOtherText, GetType().Name));
     }
 
     protected virtual void AppendEndOfFile(ParsingContext context)
     {
-        throw new NotSupportedException($"{GetType().Name} does not support adding an end of file marker.");
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingEndOfFileMarker, GetType().Name));
     }
+
 }
