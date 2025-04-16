@@ -92,7 +92,7 @@ internal abstract class InternalNode
     /// Creates a stand-alone <see cref="SyntaxNode"/> which encapsulates this raw node.
     /// </summary>
     /// <returns>A <see cref="SyntaxNode"/> which encapsulates this raw node.</returns>
-    public SyntaxNode CreateSyntaxNode() => CreateSyntaxNode(null, 0);
+    internal SyntaxNode CreateSyntaxNode() => CreateSyntaxNode(null, 0);
 
     /// <summary>
     /// Creates a <see cref="SyntaxNode"/> which encapsulates this raw node as part of a larger syntax tree.
@@ -100,7 +100,7 @@ internal abstract class InternalNode
     /// <param name="parent">The syntax node which is the parent of the new node.</param>
     /// <param name="position">The position of the new node within its tree.</param>
     /// <returns>A <see cref="SyntaxNode"/> which encapsulates this raw node.</returns>
-    public abstract SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position);
+    internal abstract SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position);
 
     public static InternalNode? CreateList(IEnumerable<InternalNode>? nodes)
     {
@@ -165,7 +165,7 @@ internal abstract class InternalNode
     /// <param name="node">The node to append.</param>
     /// <returns>A new list containing the elements of the list specified by <paramref name="list"/> with 
     /// the node specified by <paramref name="node"/> appended as the last element.</returns>
-    private static InternalNode AppendList(InternalNode list, InternalNode node)
+    private static InternalSyntaxList<InternalNode> AppendList(InternalNode list, InternalNode node)
     {
         Debug.Assert(list.IsList, "The list is not a list.");
 
@@ -181,7 +181,7 @@ internal abstract class InternalNode
         return InternalSyntaxList.Create(builder.ToImmutableArray());
     }
 
-    private static InternalNode ConcatLists(InternalNode list1, InternalNode list2)
+    private static InternalSyntaxList<InternalNode> ConcatLists(InternalNode list1, InternalNode list2)
     {
         Debug.Assert(list1.IsList, "List 1 is not a list.");
         Debug.Assert(list2.IsList, "List 2 is not a list.");
@@ -201,7 +201,7 @@ internal abstract class InternalNode
         return InternalSyntaxList.Create(builder.ToImmutableArray());
     }
 
-    private static InternalNode PrefixList(InternalNode node, InternalNode list)
+    private static InternalSyntaxList<InternalNode> PrefixList(InternalNode node, InternalNode list)
     {
         Debug.Assert(list.IsList, "The list is not a list.");
 
@@ -220,6 +220,8 @@ internal abstract class InternalNode
     public abstract int SlotCount { get; }
 
     public bool IsTerminal => SlotCount == 0;
+
+    public virtual object? GetValue() => null;
 
     internal void SetFlag(NodeFlags flag)
     {
@@ -317,8 +319,14 @@ internal abstract class InternalNode
 
     public bool ContainsAnnotations => (_flags & NodeFlags.ContainsAnnotations) == NodeFlags.ContainsAnnotations;
 
+    /// <summary>
+    /// Gets whether the node is a list of nodes.
+    /// </summary>
     public bool IsList => Kind == SyntaxKind.List;
 
+    /// <summary>
+    /// Gets whether the node is a structured trivia node.
+    /// </summary>
     public virtual bool IsStructuredTrivia => false;
 
     private bool IsSingleItemList => IsList && SlotCount == 1;
@@ -692,12 +700,13 @@ internal abstract class InternalNode
     }
 
     /// <summary>
-    /// Creates a <see cref="StructuredTriviaSyntax"/> which encapsulates this raw node as structured trivia as part of a syntax tree.
+    /// Creates a <see cref="StructuredTriviaSyntax"/> which encapsulates this raw node as structured trivia 
+    /// as part of a syntax tree.
     /// </summary>
-    /// <param name="parent">The syntax trivia which encapsulates this structured syntax.</param>
+    /// <param name="trivia">A <see cref="SyntaxTrivia"/> which represents this node in a syntax tree.</param>
     /// <returns>A <see cref="StructuredTriviaSyntax"/> which encapsulates this raw node, or <c>null</c> 
     /// if the node is not structure trivia.</returns>
-    public virtual StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia parent)
+    internal virtual StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia trivia)
     {
         return null;
     }

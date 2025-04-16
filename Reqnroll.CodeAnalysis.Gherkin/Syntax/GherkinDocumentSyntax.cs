@@ -3,15 +3,9 @@
 [SyntaxNode(SyntaxKind.GherkinDocument)]
 public partial class GherkinDocumentSyntax : SyntaxNode
 {
-    /// <summary>
-    /// Gets the feature declaration syntax contained by the file structure.
-    /// </summary>
-    [SyntaxSlot(SyntaxKind.Feature)]
+    [SyntaxSlot(SyntaxKind.Feature, "The feature declaration syntax contained by the file structure.")]
     public partial FeatureSyntax? FeatureDeclaration { get; }
 
-    /// <summary>
-    /// Gets the token which represents the end of the source file.
-    /// </summary>
-    [SyntaxSlot(SyntaxKind.EndOfFileToken)]
+    [SyntaxSlot(SyntaxKind.EndOfFileToken, "The token which represents the end of the source file.")]
     public partial SyntaxToken EndOfFileToken { get; }
 }

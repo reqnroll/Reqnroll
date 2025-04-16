@@ -33,6 +33,11 @@ public enum SyntaxKind : ushort
     ColonToken, // This is assumed to be the first textless syntax token.
 
     /// <summary>
+    /// The token is the at sign <c>@</c>
+    /// </summary>
+    AtToken,
+
+    /// <summary>
     /// The token marks the end of the file.
     /// </summary>
     EndOfFileToken, // This is assumed to be the last textless syntax token.
@@ -86,6 +91,16 @@ public enum SyntaxKind : ushort
     // Components // 
 
     /// <summary>
+    /// The node is a tag.
+    /// </summary>
+    Tag,
+
+    /// <summary>
+    /// The node is one or more tags applied to a declaration.
+    /// </summary>
+    TagList,
+
+    /// <summary>
     /// The node is a description.
     /// </summary>
     Description,
@@ -115,5 +130,5 @@ public enum SyntaxKind : ushort
     /// <summary>
     /// The node is a scenario outline declaration.
     /// </summary>
-    ScenarioOutlineDeclaration
+    ScenarioOutlineDeclaration,
 }

@@ -5,8 +5,8 @@ using Microsoft.CodeAnalysis.Text;
 
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
+using Reqnroll.CodeAnalysis.Gherkin.Parsing;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
-using Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
 
 /// <summary>
 /// A container of Gherkin syntax.

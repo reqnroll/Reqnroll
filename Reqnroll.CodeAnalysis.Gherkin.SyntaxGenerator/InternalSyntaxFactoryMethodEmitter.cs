@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
 
-internal class InternalSyntaxFactoryMethodEmitter(SyntaxNodeClassInfo2 classInfo)
+internal class InternalSyntaxFactoryMethodEmitter(SyntaxNodeClassInfo classInfo)
 {
     public string EmitInternalSyntaxFactoryMethod()
     {

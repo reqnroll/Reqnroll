@@ -1,7 +1,7 @@
 ﻿using Gherkin;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 internal partial class ParsedSyntaxTreeBuilder
 {

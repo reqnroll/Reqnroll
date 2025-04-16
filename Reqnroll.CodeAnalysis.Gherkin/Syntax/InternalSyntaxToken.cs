@@ -72,9 +72,9 @@ internal partial class InternalSyntaxToken : InternalNode
 
     public override int Width => _text.Length;
 
-    public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
+    internal override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
     {
-        throw new InvalidOperationException();
+        throw new InvalidOperationException(SyntaxExceptionMessages.CannotCreateSyntaxNodeFromSyntaxToken);
     }
 
     public override string ToString() => _text;

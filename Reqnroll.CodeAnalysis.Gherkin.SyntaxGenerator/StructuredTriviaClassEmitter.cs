@@ -1,7 +1,6 @@
-﻿
-namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
+﻿namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
 
-internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
+internal class StructuredTriviaClassEmitter(SyntaxNodeClassInfo classInfo)
 {
     public string EmitSyntaxNodeClass()
     {
@@ -132,9 +131,9 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
     {
         builder
             .Append("internal new ")
-            .Append(InternalNodeClassEmitter.ClassName)
+            .Append(InternalStructuredTriviaClassEmitter.ClassName)
             .Append(" InternalNode => (")
-            .Append(InternalNodeClassEmitter.ClassName)
+            .Append(InternalStructuredTriviaClassEmitter.ClassName)
             .AppendLine(")base.InternalNode;");
     }
 
@@ -216,10 +215,10 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             .Append("internal ")
             .Append(classInfo.ClassName)
             .Append('(')
-            .Append(InternalNodeClassEmitter.ClassName)
-            .AppendLine(" node, SyntaxNode? parent, int position)");
+            .Append(InternalStructuredTriviaClassEmitter.ClassName)
+            .AppendLine(" node, SyntaxTrivia trivia, int position)");
         builder.BeginBlock();
-        builder.AppendLine(": base(node, parent, position) {}");
+        builder.AppendLine(": base(node, trivia, position) {}");
         builder.EndBlock();
     }
 
@@ -229,10 +228,11 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             .Append("internal ")
             .Append(classInfo.ClassName)
             .Append('(')
-            .Append(InternalNodeClassEmitter.ClassName)
+            .Append(InternalStructuredTriviaClassEmitter.ClassName)
             .AppendLine(" node)");
         builder.BeginBlock();
         builder.AppendLine(": base(node) {}");
         builder.EndBlock();
     }
 }
+

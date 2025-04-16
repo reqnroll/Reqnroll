@@ -85,6 +85,11 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     public string Text => ToString();
 
     /// <summary>
+    /// Gets the value of the token. For example, the value of a tag token is the name of the tag.
+    /// </summary>
+    public object? Value => InternalNode?.GetValue();
+
+    /// <summary>
     /// Gets what kind of language construct is represented by this token.
     /// </summary>
     public SyntaxKind Kind => InternalNode?.Kind ?? SyntaxKind.None;

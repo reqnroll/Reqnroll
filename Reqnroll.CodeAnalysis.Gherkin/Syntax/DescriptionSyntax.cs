@@ -6,6 +6,6 @@
 [SyntaxNode(SyntaxKind.Description)]
 public partial class DescriptionSyntax : SyntaxNode
 {
-    [SyntaxSlot(SyntaxKind.List)]
-    public partial SyntaxTokenList TextTokens { get; }
+    [SyntaxSlot(SyntaxKind.List, "The text tokens which form the descriptive text.")]
+    public partial SyntaxTokenList Text { get; }
 }

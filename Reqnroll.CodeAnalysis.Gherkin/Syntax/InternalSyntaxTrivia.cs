@@ -3,6 +3,9 @@ using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
+/// <summary>
+/// The internal representation of syntax trivia.
+/// </summary>
 internal class InternalSyntaxTrivia : InternalNode
 {
     public InternalSyntaxTrivia(SyntaxKind kind, string text) : base(kind, text.Length)
@@ -39,7 +42,7 @@ internal class InternalSyntaxTrivia : InternalNode
 
     public override InternalNode? GetTrailingTrivia() => null;
 
-    public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
+    internal override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
     {
         throw new InvalidOperationException();
     }

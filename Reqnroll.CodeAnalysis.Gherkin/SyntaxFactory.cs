@@ -40,6 +40,15 @@ public static partial class SyntaxFactory
     public static GherkinDocumentSyntax GherkinDocument(FeatureSyntax? featureDeclaration) =>
         GherkinDocument(featureDeclaration, Token(SyntaxKind.EndOfFileToken));
 
+    /// <summary>
+    /// Creates a new <see cref="FeatureSyntax"/> instance,
+    /// specifying the keyword for the feature and the name of the feature.
+    /// </summary>
+    /// <param name="keyword">The "Feature" keyword which will be used to create the keyword
+    /// token for the feature syntax.</param>
+    /// <param name="name">The name of the feature which will be used to create the identifier token
+    /// for the feature syntax's name.</param>
+    /// <returns></returns>
     public static FeatureSyntax Feature(string keyword, string name)
     {
         return Feature(

@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
 
-internal class SyntaxFactoryMethodEmitter(SyntaxNodeClassInfo2 classInfo)
+internal class SyntaxFactoryMethodEmitter(SyntaxNodeClassInfo classInfo)
 {
     public string EmitSyntaxFactoryMethod()
     {
@@ -27,6 +27,27 @@ internal class SyntaxFactoryMethodEmitter(SyntaxNodeClassInfo2 classInfo)
 
     private void AppendFullFactoryMethodTo(CSharpBuilder builder)
     {
+        builder.AppendLine("/// <summary>");
+        builder.Append("/// Creates a new <see cref=\"").Append(classInfo.ClassName).AppendLine("\"/> instance,");
+        builder.Append("/// specifying all syntax nodes required to compose ")
+            .Append(classInfo.SyntaxKind.Name).AppendLine(" syntax.");
+        builder.AppendLine("/// </summary>");
+
+        foreach (var property in classInfo.SlotProperties)
+        {
+            builder
+                .Append("/// <param name=\"")
+                .Append(NamingHelper.PascalCaseToCamelCase(property.Name))
+                .Append("\">")
+                .Append(DescriptionHelper.DescribeSlot(property))
+                .AppendLine("</param>");
+        }
+
+        builder
+            .Append("/// <returns>A new <see cref=\"")
+            .Append(classInfo.ClassName)
+            .AppendLine("\"/> instance.</returns>");
+
         builder
             .Append("public static ")
             .Append(classInfo.ClassName)

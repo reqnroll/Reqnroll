@@ -1,6 +1,6 @@
 ﻿using Gherkin;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 internal class SyntaxParser : Parser<GherkinSyntaxTree>
 {

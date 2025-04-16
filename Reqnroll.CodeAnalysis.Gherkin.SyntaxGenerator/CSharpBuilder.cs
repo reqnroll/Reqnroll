@@ -40,6 +40,24 @@ internal class CSharpBuilder
 
     public CSharpBuilder AppendLine(string value) => Append(value).AppendLine();
 
+    public CSharpBuilder AppendLine(ReadOnlySpan<char> span) => Append(span).AppendLine();
+
+    public CSharpBuilder Append(ReadOnlySpan<char> span)
+    {
+        if (_onNewLine)
+        {
+            _builder.Append(_linePrefix);
+            _onNewLine = false;
+        }
+
+        foreach (var c in span)
+        {
+            _builder.Append(c);
+        }
+
+        return this;
+    }
+
     public CSharpBuilder Append(string value)
     {
         if (_onNewLine)

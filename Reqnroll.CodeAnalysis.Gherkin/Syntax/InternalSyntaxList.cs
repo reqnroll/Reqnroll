@@ -73,7 +73,7 @@ internal class InternalSyntaxList<TNode> : InternalNode, IReadOnlyList<TNode> wh
 
     public static InternalSyntaxList<TNode> Empty { get; } = new Builder().ToRawSyntaxList();
 
-    public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
+    internal override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
     {
         throw new NotImplementedException();
     }

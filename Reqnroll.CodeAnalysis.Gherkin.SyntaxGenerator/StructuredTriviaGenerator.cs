@@ -6,7 +6,7 @@ using System.Collections.Immutable;
 namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
 
 [Generator(LanguageNames.CSharp)]
-public class SyntaxNodeGenerator : IIncrementalGenerator
+public class StructuredTriviaGenerator : IIncrementalGenerator
 {
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
@@ -29,7 +29,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
             .Select((items, _) => items.Single())
             .WithComparer(ImmutableDictionaryComparer<ushort, SyntaxKindInfo>.Instance);
 
-        var bareSyntaxNodeClasses = context.SyntaxProvider.ForAttributeWithMetadataName(
+        var bareStructuredTriviaClasses = context.SyntaxProvider.ForAttributeWithMetadataName(
             SyntaxTypes.SyntaxNodeAttribute,
             static (syntax, _) => syntax is ClassDeclarationSyntax cds &&
                 cds.Modifiers.Any(token => token.IsKind(SyntaxKind.PartialKeyword)),
@@ -37,7 +37,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
             {
                 var symbol = (ITypeSymbol)context.TargetSymbol;
 
-                if (symbol.BaseType?.ToDisplayString() != SyntaxTypes.SyntaxNode)
+                if (symbol.BaseType?.ToDisplayString() != SyntaxTypes.StructuredTriviaSyntax)
                 {
                     return null;
                 }
@@ -53,7 +53,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                     slots);
             });
 
-        var syntaxNodeClasses = bareSyntaxNodeClasses.Where(syntax => syntax != null).Combine(syntaxKinds)
+        var structuredTriviaClasses = bareStructuredTriviaClasses.Where(syntax => syntax != null).Combine(syntaxKinds)
             .Select((tuple, _) =>
             {
                 var (syntaxClass, syntaxKinds) = tuple;
@@ -75,16 +75,19 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                         .ToImmutableArray());
             });
 
-        context.RegisterSourceOutput(syntaxNodeClasses, static (context, classInfo) =>
+        context.RegisterSourceOutput(structuredTriviaClasses, static (context, classInfo) =>
         {
-            var syntaxNodeEmitter = new SyntaxNodeClassEmitter(classInfo);
+            var syntaxNodeEmitter = new StructuredTriviaClassEmitter(classInfo);
             context.AddSource(
                 $"Syntax/{classInfo.ClassName}.g.cs",
                 syntaxNodeEmitter.EmitSyntaxNodeClass());
 
-            var internalSyntaxNodeEmitter = new InternalNodeClassEmitter(classInfo);
+            var internalSyntaxNodeEmitter = new InternalStructuredTriviaClassEmitter(classInfo)
+            {
+                BaseClassName = "InternalStructuredTriviaSyntax"
+            };
             context.AddSource(
-                $"Syntax/{classInfo.ClassName}.{InternalNodeClassEmitter.ClassName}.g.cs",
+                $"Syntax/{classInfo.ClassName}.{InternalStructuredTriviaClassEmitter.ClassName}.g.cs",
                 internalSyntaxNodeEmitter.EmitRawSyntaxNodeClass());
 
             var factoryMethodEmitter = new SyntaxFactoryMethodEmitter(classInfo);
@@ -97,63 +100,5 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                 $"Syntax/InternalSyntaxFactory.{classInfo.ClassName}.g.cs",
                 internalFactoryMethodEmitter.EmitInternalSyntaxFactoryMethod());
         });
-    }
-}
-
-internal record SyntaxKindInfo(int Value, string Name);
-
-internal record BareSyntaxNodeClassInfo(
-    string ClassNamespace,
-    string ClassName,
-    ushort SyntaxKind,
-    ComparableArray<BareSyntaxSlotPropertyInfo> SlotProperties);
-
-internal record SyntaxNodeClassInfo(
-    string ClassNamespace,
-    string ClassName,
-    SyntaxKindInfo SyntaxKind,
-    ComparableArray<SyntaxSlotPropertyInfo> SlotProperties);
-
-internal record BareSyntaxSlotPropertyInfo(
-    SyntaxNodeType NodeType,
-    string Name,
-    int Index,
-    string TypeName,
-    ushort SyntaxKind,
-    string? Description);
-
-internal record SyntaxSlotPropertyInfo(
-    SyntaxNodeType NodeType,
-    string Name,
-    int Index,
-    string TypeName,
-    SyntaxKindInfo SyntaxKind,
-    string? Description)
-{
-    public bool IsInternalNodeNullable => NodeType == SyntaxNodeType.SyntaxNode || NodeType == SyntaxNodeType.SyntaxTokenList;
-}
-
-internal enum SyntaxNodeType
-{
-    SyntaxToken,
-    SyntaxTokenList,
-    SyntaxNode
-}
-
-internal static class SymbolExtensions
-{
-    public static bool IsSyntaxNode(this ITypeSymbol symbol)
-    {
-        if (symbol.BaseType == null)
-        {
-            return false;
-        }
-
-        if (symbol.BaseType.ToDisplayString() == "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxNode")
-        {
-            return true;
-        }
-
-        return symbol.BaseType.IsSyntaxNode();
     }
 }

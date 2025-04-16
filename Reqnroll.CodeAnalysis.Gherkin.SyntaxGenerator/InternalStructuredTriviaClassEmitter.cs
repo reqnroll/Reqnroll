@@ -1,10 +1,10 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
 
-internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
+internal class InternalStructuredTriviaClassEmitter(SyntaxNodeClassInfo classInfo)
 {
     public const string ClassName = "Internal";
 
-    public string BaseClassName { get; set; } = "InternalNode";
+    public string BaseClassName { get; set; } = "InternalStructuredTriviaSyntax";
 
     public string EmitRawSyntaxNodeClass()
     {
@@ -50,13 +50,13 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             AppendGetSlotMethodTo(builder);
             builder.AppendLine();
 
-            AppendCreateSyntaxNodeMethodTo(builder);
-            builder.AppendLine();
-
-            AppendWithDiagnosticsMethodTo(builder); 
+            AppendWithDiagnosticsMethodTo(builder);
             builder.AppendLine();
 
             AppendWithAnnotationsMethodTo(builder);
+            builder.AppendLine();
+
+            AppendCreateSyntaxNodeMethodTo(builder);
         });
     }
 
@@ -131,16 +131,6 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             .Append("public override int SlotCount => ")
             .Append(classInfo.SlotProperties.Length.ToString())
             .AppendLine(';');
-    }
-
-    private void AppendCreateSyntaxNodeMethodTo(CSharpBuilder builder)
-    {
-        builder.AppendLine("/// <inheritdoc />");
-        builder.AppendLine("internal override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)");
-        builder.AppendBodyBlock(builder =>
-        {
-            builder.Append("return new ").Append(classInfo.ClassName).AppendLine("(this, parent, position);");
-        });
     }
 
     private void AppendDiagnosticsAndAnnotationsConstructorTo(CSharpBuilder builder)
@@ -261,4 +251,28 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             builder.Append(" ").Append(NamingHelper.PascalCaseToCamelCase(property.Name)).AppendLine(";");
         }
     }
+
+    private void AppendCreateSyntaxNodeMethodTo(CSharpBuilder builder)
+    {
+        builder.AppendLine("/// <inheritdoc />");
+        builder.AppendLine("internal override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)");
+        builder.AppendBodyBlock(builder =>
+        {
+            builder.AppendLine("CodeAnalysisDebug.Assert(");
+            builder
+                .BeginBlock()
+                .AppendLine("parent == null,")
+                .AppendLine("\"Cannot specify a parent when creating a syntax node from a structured trivia. \" +")
+                .AppendLine("\"To specify a parent, instead use CreateStructuredTriviaSyntaxNode(SyntaxTrivia)\");")
+                .EndBlock();
+
+            builder.AppendLine();
+
+            builder
+                .Append("return new ")
+                .Append(classInfo.ClassName)
+                .AppendLine("(this, new SyntaxTrivia(default, this, position), position);");
+        });
+    }
 }
+

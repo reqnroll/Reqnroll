@@ -3,6 +3,9 @@ using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
+/// <summary>
+/// Represents the internal state of a skipped tokens trivia syntax.
+/// </summary>
 internal class InternalSkippedTokensTriviaSyntax : InternalStructuredTriviaSyntax
 {
     public readonly InternalNode? tokens;
@@ -18,11 +21,35 @@ internal class InternalSkippedTokensTriviaSyntax : InternalStructuredTriviaSynta
         SetFlag(NodeFlags.ContainsSkippedText);
     }
 
-    public override StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia parent) =>
-        new SkippedTokensTriviaSyntax(this, parent.Token.Parent, parent.Position);
+    public InternalSkippedTokensTriviaSyntax(
+        InternalNode? tokens,
+        ImmutableArray<InternalDiagnostic> diagnostics,
+        ImmutableArray<SyntaxAnnotation> annotations) : 
+        base(SyntaxKind.SkippedTokensTrivia, diagnostics, annotations)
+    {
+        if (tokens != null)
+        {
+            this.tokens = tokens;
+            IncludeChild(tokens);
+        }
 
-    public override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position) => 
-        new SkippedTokensTriviaSyntax(this, parent, position);
+        SetFlag(NodeFlags.ContainsSkippedText);
+    }
+
+    internal override StructuredTriviaSyntax? CreateStructuredTriviaSyntaxNode(SyntaxTrivia trivia)
+    {
+        return new SkippedTokensTriviaSyntax(this, trivia, trivia.Position);
+    }
+
+    internal override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)
+    {
+        CodeAnalysisDebug.Assert(
+            parent == null,
+            "Cannot specify a parent when creating a syntax node from a structured trivia. " +
+            "To specify a parent, instead use CreateStructuredTriviaSyntaxNode(SyntaxTrivia)");
+
+        return new SkippedTokensTriviaSyntax(this, new SyntaxTrivia(default, this, position), position);
+    }
 
     public override int SlotCount => 1;
 
@@ -35,13 +62,21 @@ internal class InternalSkippedTokensTriviaSyntax : InternalStructuredTriviaSynta
         };
     }
 
-    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
-    {
-        throw new NotImplementedException();
-    }
-
+    /// <inheritdoc />
     public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)
     {
-        throw new NotImplementedException();
+        return new InternalSkippedTokensTriviaSyntax(
+            tokens,
+            diagnostics,
+            GetAnnotations());
+    }
+
+    /// <inheritdoc />
+    public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)
+    {
+        return new InternalSkippedTokensTriviaSyntax(
+            tokens,
+            GetAttachedDiagnostics(),
+            annotations);
     }
 }

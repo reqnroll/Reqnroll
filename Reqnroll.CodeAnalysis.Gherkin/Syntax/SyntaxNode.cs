@@ -17,11 +17,21 @@ public abstract class SyntaxNode
 {
     private GherkinSyntaxTree? _syntaxTree;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SyntaxNode"/> class which is orphaned.
+    /// </summary>
+    /// <param name="node">The internal node to encapsulate.</param>
     internal SyntaxNode(InternalNode node)
     {
         InternalNode = node;
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SyntaxNode"/> class which is a child of the specified parent node.
+    /// </summary>
+    /// <param name="node">The inernal node to encapsulate.</param>
+    /// <param name="parent">The node which is the parent of this node.</param>
+    /// <param name="position">The position of this node.</param>
     internal SyntaxNode(InternalNode node, SyntaxNode? parent, int position)
     {
         Debug.Assert(position >= 0, "Node position cannot be negative");

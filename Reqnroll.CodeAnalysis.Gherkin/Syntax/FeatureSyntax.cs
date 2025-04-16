@@ -6,27 +6,15 @@
 [SyntaxNode(SyntaxKind.Feature)]
 public partial class FeatureSyntax : SyntaxNode
 {
-    /// <summary>
-    /// Gets the token that represents the <c>Feature:</c> keyword.
-    /// </summary>
-    [SyntaxSlot(SyntaxKind.FeatureKeyword)]
+    [SyntaxSlot(SyntaxKind.FeatureKeyword, "The token that represents the \"Feature\" keyword.")]
     public partial SyntaxToken FeatureKeyword { get; }
 
-    /// <summary>
-    /// Gets the token that represents the colon following the keyword.
-    /// </summary>
-    [SyntaxSlot(SyntaxKind.ColonToken)]
+    [SyntaxSlot(SyntaxKind.ColonToken, "The token that represents the colon following the keyword.")]
     public partial SyntaxToken ColonToken { get; }
 
-    /// <summary>
-    /// Gets the name of the feature.
-    /// </summary>
-    [SyntaxSlot(SyntaxKind.IdentifierToken)]
+    [SyntaxSlot(SyntaxKind.IdentifierToken, "The name of the feature.")]
     public partial SyntaxToken Name { get; }
 
-    /// <summary>
-    /// Gets the description of the feature.
-    /// </summary>
-    [SyntaxSlot(SyntaxKind.Description)]
+    [SyntaxSlot(SyntaxKind.Description, "The optional description of the feature.")]
     public partial DescriptionSyntax? Description { get; }
 }

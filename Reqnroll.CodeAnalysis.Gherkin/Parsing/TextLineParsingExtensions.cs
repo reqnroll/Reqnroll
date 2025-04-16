@@ -1,6 +1,7 @@
 using Microsoft.CodeAnalysis.Text;
+using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.Syntax.Internal;
+namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 using static InternalSyntaxFactory;
 

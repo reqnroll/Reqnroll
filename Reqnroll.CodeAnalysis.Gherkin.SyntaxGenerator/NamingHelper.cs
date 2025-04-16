@@ -1,5 +1,4 @@
-﻿
-using System.Text;
+﻿using System.Text;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
 
@@ -57,7 +56,10 @@ internal static class NamingHelper
 
         if (wordStartIndex < name.Length - 1)
         {
-            sb.Append(' ');
+            if (!first)
+            {
+                sb.Append(' ');
+            }
 
             foreach (var c in name.AsSpan(wordStartIndex))
             {

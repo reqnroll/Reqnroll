@@ -1,14 +1,9 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-public class LanguageCommentTriviaSyntax : CommentTriviaSyntax
+/// <summary>
+/// Represents a comment which specifies the language of the Gherkin document.
+/// </summary>
+[SyntaxNode(SyntaxKind.LanguageCommentTrivia)]
+public partial class LanguageCommentTriviaSyntax : StructuredTriviaSyntax
 {
-    internal LanguageCommentTriviaSyntax(Internal.LanguageCommentTriviaSyntax node, SyntaxNode parent, SyntaxTrivia parentTrivia, int position) 
-        : base(node, parent, parentTrivia, position)
-    {
-    }
-
-    internal override SyntaxNode? GetSlotAsSyntaxNode(int index)
-    {
-        return null;
-    }
 }
