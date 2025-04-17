@@ -66,6 +66,10 @@ internal static class SlotHelper
                     break;
             }
 
+            var parameterGroups = attributes
+                .Where(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.ParameterGroupAttribute)
+                .Select(attr => (string)attr.ConstructorArguments[0].Value!);
+
             slots.Add(
                 new BareSyntaxSlotPropertyInfo(
                     nodeType,
@@ -74,7 +78,8 @@ internal static class SlotHelper
                     property.Type.Name,
                     slotSyntaxKindValue,
                     description,
-                    isOptional));
+                    isOptional,
+                    ComparableArray.CreateRange(parameterGroups)));
         }
 
         return slots.ToImmutable();

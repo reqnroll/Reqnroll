@@ -72,7 +72,8 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             info.TypeName,
                             syntaxKinds[info.SyntaxKind],
                             info.Description, 
-                            !info.IsOptional))
+                            !info.IsOptional,
+                            info.ParameterGroups))
                         .ToImmutableArray());
             });
 
@@ -88,7 +89,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                 $"Syntax/{classInfo.ClassName}.{InternalNodeClassEmitter.ClassName}.g.cs",
                 internalSyntaxNodeEmitter.EmitRawSyntaxNodeClass());
 
-            var factoryMethodEmitter = new SyntaxFactoryMethodEmitter(classInfo);
+            var factoryMethodEmitter = new SyntaxFactoryMethodsEmitter(classInfo);
             context.AddSource(
                 $"SyntaxFactory.{classInfo.ClassName}.g.cs",
                 factoryMethodEmitter.EmitSyntaxFactoryMethod());
@@ -122,7 +123,8 @@ internal record BareSyntaxSlotPropertyInfo(
     string TypeName,
     ushort SyntaxKind,
     string? Description,
-    bool IsOptional);
+    bool IsOptional,
+    ComparableArray<string> ParameterGroups);
 
 internal record SyntaxSlotPropertyInfo(
     SyntaxNodeType NodeType,
@@ -131,7 +133,8 @@ internal record SyntaxSlotPropertyInfo(
     string TypeName,
     SyntaxKindInfo SyntaxKind,
     string? Description,
-    bool IsRequired)
+    bool IsRequired,
+    ComparableArray<string> ParameterGroups)
 {
     public bool IsInternalNodeNullable => NodeType == SyntaxNodeType.SyntaxNode || NodeType == SyntaxNodeType.SyntaxTokenList;
 }

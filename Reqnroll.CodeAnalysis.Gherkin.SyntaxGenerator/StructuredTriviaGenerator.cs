@@ -72,7 +72,8 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                             info.TypeName,
                             syntaxKinds[info.SyntaxKind],
                             info.Description,
-                            !info.IsOptional))
+                            !info.IsOptional,
+                            info.ParameterGroups))
                         .ToImmutableArray());
             });
 
@@ -91,7 +92,7 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                 $"Syntax/{classInfo.ClassName}.{InternalStructuredTriviaClassEmitter.ClassName}.g.cs",
                 internalSyntaxNodeEmitter.EmitRawSyntaxNodeClass());
 
-            var factoryMethodEmitter = new SyntaxFactoryMethodEmitter(classInfo);
+            var factoryMethodEmitter = new SyntaxFactoryMethodsEmitter(classInfo);
             context.AddSource(
                 $"SyntaxFactory.{classInfo.ClassName}.g.cs",
                 factoryMethodEmitter.EmitSyntaxFactoryMethod());
