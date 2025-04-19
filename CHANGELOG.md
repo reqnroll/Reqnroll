@@ -7,7 +7,7 @@
 * Don't crash on already released TestThreadContexts (#550)
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @gasparnagy* 
+*Contributors of this release (in alphabetical order): @304NotModified, @gasparnagy* 
 
 # v2.4.0 - 2025-03-06
 
