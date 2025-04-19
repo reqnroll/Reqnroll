@@ -2,9 +2,9 @@
 using Microsoft.CodeAnalysis.Text;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-namespace Reqnroll.CodeAnalysis.Gherkin;
+namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
-public partial class ParsingTests
+public class EmptySourceTests
 {
     [Fact]
     public void EmptySourceTextCreatesEmptyFeatureFileSyntax()

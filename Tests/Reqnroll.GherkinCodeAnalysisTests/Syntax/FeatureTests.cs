@@ -2,7 +2,7 @@
 
 using static SyntaxFactory;
 
-public class FeatureDeclarationTests
+public class FeatureTests
 {
     [Fact]
     public void ToStringReturnsTokensInDocumentOrder()
@@ -14,8 +14,17 @@ public class FeatureDeclarationTests
             Description(
                 Literal(TriviaList(), "An example feature from the Gherkin reference.", TriviaList([CarriageReturnLineFeed]))));
 
-        feature.ToString().Should().Be("Feature: Guess the word\r\n\r\nAn example feature from the Gherkin reference.");
+        feature.ToString().Should().Be(
+            "Feature: Guess the word" + 
+            Environment.NewLine + 
+            Environment.NewLine + 
+            "An example feature from the Gherkin reference.");
 
-        feature.ToFullString().Should().Be("Feature: Guess the word\r\n\r\nAn example feature from the Gherkin reference.\r\n");
+        feature.ToFullString().Should().Be(
+            "Feature: Guess the word" +
+            Environment.NewLine +
+            Environment.NewLine +
+            "An example feature from the Gherkin reference." + 
+            Environment.NewLine);
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-public class FeatureFileTests
+public class GherkinDocumentTests
 {
     [Fact]
     public void CanCreateEmptyFeatureFile()
