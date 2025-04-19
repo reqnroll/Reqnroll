@@ -249,6 +249,37 @@ public abstract class GenerationTestBase : SystemTestBase
             "AfterTestRun");
         ShouldAllScenariosPass();
     }
+
+    [TestMethod]
+    public void Async_TestRun_Feature_and_Scenario_hooks_are_executed_in_right_order()
+    {
+        var testsInFeatureFile = 3;
+        AddSimpleScenario();
+        AddSimpleScenarioOutline(testsInFeatureFile - 1);
+        AddPassingStepBinding();
+        const string waitCode = "await Task.Delay(TimeSpan.FromMilliseconds(50));";
+        AddHookBinding("BeforeTestRun", code: waitCode, asyncHook: true);
+        AddHookBinding("AfterTestRun", code: waitCode, asyncHook: true);
+        AddHookBinding("BeforeFeature", code: waitCode, asyncHook: true);
+        AddHookBinding("AfterFeature", code: waitCode, asyncHook: true);
+        AddHookBinding("BeforeScenario", code: waitCode, asyncHook: true);
+        AddHookBinding("AfterScenario", code: waitCode, asyncHook: true);
+
+        ExecuteTests();
+
+        _bindingDriver.AssertExecutedHooksEqual(
+            "BeforeTestRun",
+            "BeforeFeature",
+            "BeforeScenario",
+            "AfterScenario",
+            "BeforeScenario",
+            "AfterScenario",
+            "BeforeScenario",
+            "AfterScenario",
+            "AfterFeature",
+            "AfterTestRun");
+        ShouldAllScenariosPass();
+    }
     #endregion
 
     #region Test scenario outlines (nr of examples, params are available in ScenarioContext, allowRowTests=false, examples tags)
