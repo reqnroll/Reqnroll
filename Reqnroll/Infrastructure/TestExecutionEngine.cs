@@ -241,7 +241,7 @@ namespace Reqnroll.Infrastructure
         {
             try
             {
-                if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
+                if (_contextManager.ScenarioContext?.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
                 {
                     await FireScenarioEventsAsync(HookType.AfterScenario);
                 }
@@ -394,7 +394,7 @@ namespace Reqnroll.Infrastructure
                     currentContainer = FeatureContext.FeatureContainer;
                     break;
                 default: // scenario scoped hooks
-                    currentContainer = ScenarioContext.ScenarioContainer;
+                    currentContainer = ScenarioContext?.ScenarioContainer;
                     break;
             }
 

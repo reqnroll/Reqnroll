@@ -4,6 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
@@ -118,7 +119,7 @@ namespace Reqnroll.Generator.Generation
             var scenarioCleanupMethod = generationContext.ScenarioCleanupMethod;
 
             scenarioCleanupMethod.Attributes = MemberAttributes.Public | MemberAttributes.Final;
-            scenarioCleanupMethod.Name = GeneratorConstants.SCENARIO_CLEANUP_NAME; 
+            scenarioCleanupMethod.Name = GeneratorConstants.SCENARIO_CLEANUP_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(scenarioCleanupMethod);
 
@@ -197,7 +198,7 @@ namespace Reqnroll.Generator.Generation
             testClassInitializeMethod.Name = GeneratorConstants.TESTCLASS_INITIALIZE_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassInitializeMethod);
-            
+
             _testGeneratorProvider.SetTestClassInitializeMethod(generationContext);
         }
 
@@ -209,7 +210,7 @@ namespace Reqnroll.Generator.Generation
             testClassCleanupMethod.Name = GeneratorConstants.TESTCLASS_CLEANUP_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
-            
+
             _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);
         }
 
@@ -221,7 +222,7 @@ namespace Reqnroll.Generator.Generation
             testInitializeMethod.Name = GeneratorConstants.TEST_INITIALIZE_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testInitializeMethod);
-            
+
             _testGeneratorProvider.SetTestInitializeMethod(generationContext);
 
             // Obtain the test runner for executing a single test
@@ -232,7 +233,7 @@ namespace Reqnroll.Generator.Generation
             var getTestRunnerExpression = new CodeMethodInvokeExpression(
                 new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
                 nameof(TestRunnerManager.GetTestRunnerForAssembly),
-                _codeDomHelper.CreateOptionalArgumentExpression("featureHint", 
+                _codeDomHelper.CreateOptionalArgumentExpression("featureHint",
                     new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD)));
 
             testInitializeMethod.Statements.Add(
@@ -252,9 +253,19 @@ namespace Reqnroll.Generator.Generation
                 nameof(ITestRunner.OnFeatureEndAsync));
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureEndAsyncExpression);
 
+            // VB does not allow the use of the await keyword in a finally clause. Therefore we have to generate code specific to
+            // the language. The C# code will await OnFeatureStartAsync() while VB will call is sync and assign a variable to the resulting Task.
+            // The VB code will then call await on that task after the conclusion of the try/finally block.
+
+            // Dim onFeatureStartTask as Task = Nothing
+            if (_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
+            {
+                testInitializeMethod.Statements.Add(new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(Task)), "onFeatureStartTask", new CodePrimitiveExpression(null)));
+            }
+            // try {
             //if (testRunner.FeatureContext != null && !testRunner.FeatureContext.FeatureInfo.Equals(featureInfo))
             //  await testRunner.OnFeatureEndAsync(); // finish if different
-            testInitializeMethod.Statements.Add(
+            var conditionallyExecuteOnFeatureEndExpressionStatement =
                 new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(
                         new CodeBinaryOperatorExpression(
@@ -272,29 +283,67 @@ namespace Reqnroll.Generator.Generation
                             CodeBinaryOperatorType.ValueEquality,
                             new CodePrimitiveExpression(false))),
                     new CodeExpressionStatement(
-                        onFeatureEndAsyncExpression)));
+                        onFeatureEndAsyncExpression));
+            // } 
 
-
+            // Will Generate this for C#:
             // "Start" the feature if needed
-
-            //if (testRunner.FeatureContext == null) {
-            //  await testRunner.OnFeatureStartAsync(featureInfo);
+            // finally {
+            //  if (testRunner.FeatureContext == null) {
+            //      await testRunner.OnFeatureStartAsync(featureInfo);
+            //  }
             //}
+            CodeStatement onFeatureStartExpression;
+            var featureStartMethodInvocation = new CodeMethodInvokeExpression(
+                    testRunnerField,
+                    nameof(ITestRunner.OnFeatureStartAsync),
+                    new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
+            if (_codeDomHelper.TargetLanguage != CodeDomProviderLanguage.VB)
+            {
+                _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(featureStartMethodInvocation);
+                onFeatureStartExpression = new CodeExpressionStatement(featureStartMethodInvocation);
+            }
+            else
+            // will generate this for VB:
+            // Finally
+            //   If testRunner.FeatureContext Is Nothing Then
+            //      onFeatureStartTask = testRunner.OnFeatureStartAsync(featureInfo)
+            //   EndIf
+            //  EndTry
+            //  If onFeatureStartTask IsNot Nothing Then
+            //     Await onFeatureStartTask
+            //  EndIf
+            {
+                onFeatureStartExpression = new CodeAssignStatement(
+                    new CodeVariableReferenceExpression("onFeatureStartTask"),
+                    featureStartMethodInvocation);
+            }
 
-            var onFeatureStartExpression = new CodeMethodInvokeExpression(
-                testRunnerField,
-                nameof(ITestRunner.OnFeatureStartAsync),
-                new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
-
-            testInitializeMethod.Statements.Add(
+            var conditionallyExecuteFeatureStartExpressionStatement =
                 new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(
                         featureContextExpression,
                         CodeBinaryOperatorType.IdentityEquality,
                         new CodePrimitiveExpression(null)),
-                    new CodeExpressionStatement(
-                        onFeatureStartExpression)));
+                    onFeatureStartExpression);
+
+            testInitializeMethod.Statements.Add(
+                new CodeTryCatchFinallyStatement(
+                    [conditionallyExecuteOnFeatureEndExpressionStatement],
+                    [],
+                    [conditionallyExecuteFeatureStartExpressionStatement]));
+
+            if (_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
+            {
+                testInitializeMethod.Statements.Add(
+                    new CodeConditionStatement(
+                        new CodeBinaryOperatorExpression(
+                            new CodeVariableReferenceExpression("onFeatureStartTask"),
+                            CodeBinaryOperatorType.IdentityInequality,
+                            new CodePrimitiveExpression(null)),
+                        new CodeExpressionStatement(new CodeVariableReferenceExpression("await onFeatureStartTask"))));
+            }
+
         }
 
         private void SetupTestCleanupMethod(TestClassGenerationContext generationContext)
@@ -305,11 +354,11 @@ namespace Reqnroll.Generator.Generation
             testCleanupMethod.Name = GeneratorConstants.TEST_CLEANUP_NAME;
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testCleanupMethod);
-            
+
             _testGeneratorProvider.SetTestCleanupMethod(generationContext);
 
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
-            
+
             //await testRunner.OnScenarioEndAsync();
             var onScenarioEndCallExpression = new CodeMethodInvokeExpression(
                 testRunnerField,
@@ -358,7 +407,7 @@ namespace Reqnroll.Generator.Generation
 
             scenarioStartMethod.Attributes = MemberAttributes.Public | MemberAttributes.Final;
             scenarioStartMethod.Name = GeneratorConstants.SCENARIO_START_NAME;
-            
+
             _codeDomHelper.MarkCodeMemberMethodAsAsync(scenarioStartMethod);
 
             //await testRunner.OnScenarioStartAsync();
