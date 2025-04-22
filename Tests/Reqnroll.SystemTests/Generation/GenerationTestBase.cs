@@ -523,6 +523,9 @@ public abstract class GenerationTestBase : SystemTestBase
         hookLines.Should().HaveElementAt(0, "-> hook: BeforeTestRun", "The BeforeTestRun hook should be the first");
         hookLines.Should().HaveElementAt(hookLines.Count-1, "-> hook: AfterTestRun", "The AfterTestRun hook should be the last");
 
+        // -> hook: Feature 2/Passing scenario 2:BeforeScenario
+        hookLines.Should().NotContainMatch("-> hook: Feature 1/* scenario 1:*Scenario", "Scenarios of features with a failing before feature hook should not be executed.");
+
         _vsTestExecutionDriver.LastTestExecutionResult.Output.Should().NotContain("NullReferenceException");
         _vsTestExecutionDriver.LastTestExecutionResult.Output.Should().NotContain("The previous ScenarioContext was already disposed.");
     }
