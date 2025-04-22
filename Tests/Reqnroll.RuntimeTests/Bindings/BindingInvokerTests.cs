@@ -52,7 +52,7 @@ public class BindingInvokerTests
     {
         var contextManagerMock = new Mock<IContextManager>();
         var scenarioContainer = new ObjectContainer();
-        var scenarioContext = new ScenarioContext(scenarioContainer, new ScenarioInfo("S1", null, null, null), new TestObjectResolver());
+        var scenarioContext = new ScenarioContext(scenarioContainer, new ScenarioInfo("S1", null, null, null), null, new TestObjectResolver());
         contextManagerMock.SetupGet(ctx => ctx.ScenarioContext).Returns(scenarioContext);
         var contextManager = contextManagerMock.Object;
         return contextManager;

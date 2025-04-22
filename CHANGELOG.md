@@ -1,12 +1,13 @@
 # [vNext]
 
 ## Improvements:
+* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
 
 ## Bug fixes:
 
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
 
-*Contributors of this release (in alphabetical order): @gasparnagy* 
+*Contributors of this release (in alphabetical order):* @gasparnagy, @loraderon
 
 # v2.4.0 - 2025-03-06
 
