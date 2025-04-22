@@ -288,13 +288,19 @@ namespace Reqnroll.Generator.Generation
 
             // The following statement will be added to the finally block, to skip 
             // scenario execution of features with a failing before feature hook:
-            // if (testRunner.FeatureContext.BeforeFeatureHookFailed)
+            // if (testRunner.FeatureContext?.BeforeFeatureHookFailed)
             //   throw new ReqnrollException("[before feature hook error]");
             var throwErrorOnPreviousFeatureStartError =
                 new CodeConditionStatement(
-                    new CodePropertyReferenceExpression(
-                        featureContextExpression,
-                        nameof(FeatureContext.BeforeFeatureHookFailed)),
+                    new CodeBinaryOperatorExpression(
+                        new CodeBinaryOperatorExpression(
+                            featureContextExpression, 
+                            CodeBinaryOperatorType.IdentityInequality,
+                            new CodePrimitiveExpression(null)),
+                        CodeBinaryOperatorType.BooleanAnd,
+                        new CodePropertyReferenceExpression(
+                            featureContextExpression,
+                            nameof(FeatureContext.BeforeFeatureHookFailed))),
                     [new CodeThrowExceptionStatement(
                         new CodeObjectCreateExpression(
                             new CodeTypeReference(typeof(ReqnrollException), CodeTypeReferenceOptions.GlobalReference),
@@ -302,6 +308,8 @@ namespace Reqnroll.Generator.Generation
 
             // Will generate this for C#:
             // finally {
+            //   if (testRunner.FeatureContext?.BeforeFeatureHookFailed)
+            //     throw new ReqnrollException("[before feature hook error]");
             //   if (testRunner.FeatureContext == null) { // "Start" the feature if needed
             //     await testRunner.OnFeatureStartAsync(featureInfo);
             //   }
@@ -311,6 +319,7 @@ namespace Reqnroll.Generator.Generation
                     testRunnerField,
                     nameof(ITestRunner.OnFeatureStartAsync),
                     new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
+
             if (_codeDomHelper.TargetLanguage != CodeDomProviderLanguage.VB)
             {
                 _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(featureStartMethodInvocation);
@@ -319,6 +328,8 @@ namespace Reqnroll.Generator.Generation
             else
             // will generate this for VB:
             // Finally
+            //   If testRunner.FeatureContext?.BeforeFeatureHookFailed Then
+            //     Throw New ReqnrollException("[before feature hook error]")
             //   If testRunner.FeatureContext Is Nothing Then
             //     onFeatureStartTask = testRunner.OnFeatureStartAsync(featureInfo)
             //   EndIf
@@ -344,7 +355,7 @@ namespace Reqnroll.Generator.Generation
                 new CodeTryCatchFinallyStatement(
                     [conditionallyExecuteOnFeatureEndExpressionStatement],
                     [],
-                    [conditionallyExecuteFeatureStartExpressionStatement, throwErrorOnPreviousFeatureStartError]));
+                    [throwErrorOnPreviousFeatureStartError, conditionallyExecuteFeatureStartExpressionStatement]));
 
             if (_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
             {
