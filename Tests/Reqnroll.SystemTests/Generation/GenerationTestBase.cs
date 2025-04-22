@@ -503,12 +503,12 @@ public abstract class GenerationTestBase : SystemTestBase
 
         ExecuteTests();
 
-        var parallelLogs = _bindingDriver.GetActualLogLines("parallel").ToList();
-        parallelLogs.Should().NotBeEmpty("the scenarios should have parallel logs");
-        //parallelLogs.Should().AllSatisfy(log => log.Should().StartWith("-> parallel: False"));
-
         var hookLines = _bindingDriver.GetActualHookLines().ToList();
         TestContext.WriteLine(string.Join(Environment.NewLine, hookLines.Select((l,i) => $"#{i}: {l}")));
+
+        var parallelLogs = _bindingDriver.GetActualLogLines("parallel").ToList();
+        parallelLogs.Should().NotBeEmpty("the scenarios should have parallel logs");
+        parallelLogs.Should().AllSatisfy(log => log.Should().StartWith("-> parallel: False"));
 
         var featureOrAboveHookLines = hookLines.Where(l => l.Contains("BeforeFeature") || l.Contains("AfterFeature") || l.Contains("BeforeTestRun") || l.Contains("AfterTestRun")).ToList();
         for (int i = 1; i <= 3; i++)
