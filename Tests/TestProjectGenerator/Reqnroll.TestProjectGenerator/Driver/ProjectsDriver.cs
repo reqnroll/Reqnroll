@@ -51,23 +51,23 @@ namespace Reqnroll.TestProjectGenerator.Driver
             return projectBuilder;
         }
 
-        public void AddHookBinding(string eventType, string name, string hookTypeAttributeTagsString, string methodScopeAttributeTagsString = null, string classScopeAttributeTagsString = null, string code = "", int? order = null)
+        public void AddHookBinding(string eventType, string name, string hookTypeAttributeTagsString, string methodScopeAttributeTagsString = null, string classScopeAttributeTagsString = null, string code = "", bool? asyncHook = null, int? order = null)
         {
             var hookTypeAttributeTags = hookTypeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();
             var methodScopeAttributeTags = methodScopeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();
             var classScopeAttributeTags = classScopeAttributeTagsString?.Split(',').Select(t => t.Trim()).ToArray();
 
-            AddHookBinding(_solutionDriver.DefaultProject, eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
+            AddHookBinding(_solutionDriver.DefaultProject, eventType, name, code, asyncHook, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
-        public void AddHookBinding(string eventType, string name = null, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
+        public void AddHookBinding(string eventType, string name = null, string code = "", bool? asyncHook = null, int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null, IList<string> classScopeAttributeTags = null)
         {
-            AddHookBinding(_solutionDriver.DefaultProject, eventType, name ?? eventType, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
+            AddHookBinding(_solutionDriver.DefaultProject, eventType, name ?? eventType, code, asyncHook, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
-        private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,  IList<string> classScopeAttributeTags = null)
+        private void AddHookBinding(ProjectBuilder project, string eventType, string name, string code = "", bool? asyncHook = null, int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,  IList<string> classScopeAttributeTags = null)
         {
-            project.AddHookBinding(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
+            project.AddHookBinding(eventType, name, code, asyncHook, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags);
         }
 
         public void AddFeatureFile(string featureFileContent)

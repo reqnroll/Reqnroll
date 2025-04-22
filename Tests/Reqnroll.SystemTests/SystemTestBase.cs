@@ -258,9 +258,9 @@ public abstract class SystemTestBase
         return expectedNrOfTests;
     }
 
-    protected void AddHookBinding(string eventType, string? name = null, string code = "")
+    protected void AddHookBinding(string eventType, string? name = null, string code = "", bool? asyncHook = null)
     {
-        _projectsDriver.AddHookBinding(eventType, name, code: code);
+        _projectsDriver.AddHookBinding(eventType, name, code: code, asyncHook: asyncHook);
     }
 
     protected void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
