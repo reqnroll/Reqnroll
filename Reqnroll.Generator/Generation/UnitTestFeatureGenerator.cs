@@ -253,7 +253,7 @@ namespace Reqnroll.Generator.Generation
                 nameof(ITestRunner.OnFeatureEndAsync));
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureEndAsyncExpression);
 
-            // VB does not allow the use of the await keyword in a finally clause. Therefore we have to generate code specific to
+            // VB does not allow the use of the await keyword in a "finally" clause. Therefore, we have to generate code specific to
             // the language. The C# code will await OnFeatureStartAsync() while VB will call is sync and assign a variable to the resulting Task.
             // The VB code will then call await on that task after the conclusion of the try/finally block.
 
@@ -263,8 +263,9 @@ namespace Reqnroll.Generator.Generation
                 testInitializeMethod.Statements.Add(new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(Task)), "onFeatureStartTask", new CodePrimitiveExpression(null)));
             }
             // try {
-            //if (testRunner.FeatureContext != null && !testRunner.FeatureContext.FeatureInfo.Equals(featureInfo))
-            //  await testRunner.OnFeatureEndAsync(); // finish if different
+            //   if (testRunner.FeatureContext != null && !testRunner.FeatureContext.FeatureInfo.Equals(featureInfo))
+            //     await testRunner.OnFeatureEndAsync(); // finish if different
+            // } 
             var conditionallyExecuteOnFeatureEndExpressionStatement =
                 new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(
@@ -284,15 +285,13 @@ namespace Reqnroll.Generator.Generation
                             new CodePrimitiveExpression(false))),
                     new CodeExpressionStatement(
                         onFeatureEndAsyncExpression));
-            // } 
 
-            // Will Generate this for C#:
-            // "Start" the feature if needed
+            // Will generate this for C#:
             // finally {
-            //  if (testRunner.FeatureContext == null) {
-            //      await testRunner.OnFeatureStartAsync(featureInfo);
-            //  }
-            //}
+            //   if (testRunner.FeatureContext == null) { // "Start" the feature if needed
+            //     await testRunner.OnFeatureStartAsync(featureInfo);
+            //   }
+            // }
             CodeStatement onFeatureStartExpression;
             var featureStartMethodInvocation = new CodeMethodInvokeExpression(
                     testRunnerField,
@@ -307,12 +306,12 @@ namespace Reqnroll.Generator.Generation
             // will generate this for VB:
             // Finally
             //   If testRunner.FeatureContext Is Nothing Then
-            //      onFeatureStartTask = testRunner.OnFeatureStartAsync(featureInfo)
+            //     onFeatureStartTask = testRunner.OnFeatureStartAsync(featureInfo)
             //   EndIf
-            //  EndTry
-            //  If onFeatureStartTask IsNot Nothing Then
-            //     Await onFeatureStartTask
-            //  EndIf
+            // EndTry
+            // If onFeatureStartTask IsNot Nothing Then
+            //   Await onFeatureStartTask
+            // EndIf
             {
                 onFeatureStartExpression = new CodeAssignStatement(
                     new CodeVariableReferenceExpression("onFeatureStartTask"),
