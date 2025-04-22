@@ -154,7 +154,16 @@ namespace Reqnroll.Infrastructure
 
             // The 'FireEventsAsync' call might throw an exception if the related before feature hook fails,
             // but we can let the exception propagate to the caller.
-            await FireEventsAsync(HookType.BeforeFeature);
+            try
+            {
+                await FireEventsAsync(HookType.BeforeFeature);
+            }
+            catch (Exception e)
+            {
+                // we capture the exception here to be able to skip subsequent scenario execution in the same feature
+                _contextManager.FeatureContext.BeforeFeatureHookError = e;
+                throw;
+            }
         }
 
         public virtual async Task OnFeatureEndAsync()

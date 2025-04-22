@@ -5,7 +5,6 @@ using FluentAssertions;
 using System.Text.Json;
 using System.Collections.Generic;
 using Reqnroll.TestProjectGenerator;
-using Reqnroll.TestProjectGenerator.Driver;
 
 namespace Reqnroll.SystemTests.Generation;
 

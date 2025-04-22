@@ -286,6 +286,20 @@ namespace Reqnroll.Generator.Generation
                     new CodeExpressionStatement(
                         onFeatureEndAsyncExpression));
 
+            // The following statement will be added to the finally block, to skip 
+            // scenario execution of features with a failing before feature hook:
+            // if (testRunner.FeatureContext.BeforeFeatureHookFailed)
+            //   throw new ReqnrollException("[before feature hook error]");
+            var throwErrorOnPreviousFeatureStartError =
+                new CodeConditionStatement(
+                    new CodePropertyReferenceExpression(
+                        featureContextExpression,
+                        nameof(FeatureContext.BeforeFeatureHookFailed)),
+                    [new CodeThrowExceptionStatement(
+                        new CodeObjectCreateExpression(
+                            new CodeTypeReference(typeof(ReqnrollException), CodeTypeReferenceOptions.GlobalReference),
+                            new CodePrimitiveExpression("Scenario skipped because of previous before feature hook error")))]);
+
             // Will generate this for C#:
             // finally {
             //   if (testRunner.FeatureContext == null) { // "Start" the feature if needed
@@ -330,7 +344,7 @@ namespace Reqnroll.Generator.Generation
                 new CodeTryCatchFinallyStatement(
                     [conditionallyExecuteOnFeatureEndExpressionStatement],
                     [],
-                    [conditionallyExecuteFeatureStartExpressionStatement]));
+                    [conditionallyExecuteFeatureStartExpressionStatement, throwErrorOnPreviousFeatureStartError]));
 
             if (_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
             {
