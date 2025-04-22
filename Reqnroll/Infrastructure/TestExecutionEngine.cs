@@ -239,9 +239,15 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnScenarioEndAsync()
         {
+            // We invoke the before/after feature hooks from test setup, but we initialize the scenario context in the test method.
+            // In case the feature hooks fail, the runner will not run the test method, but the test teardown method will be called.
+            // In this case we don't have an initialized scenario context, so we don't need to call the after scenario hooks.
+            if (_contextManager.ScenarioContext == null)
+                return;
+
             try
             {
-                if (_contextManager.ScenarioContext?.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
+                if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
                 {
                     await FireScenarioEventsAsync(HookType.AfterScenario);
                 }
@@ -394,7 +400,7 @@ namespace Reqnroll.Infrastructure
                     currentContainer = FeatureContext.FeatureContainer;
                     break;
                 default: // scenario scoped hooks
-                    currentContainer = ScenarioContext?.ScenarioContainer;
+                    currentContainer = ScenarioContext.ScenarioContainer;
                     break;
             }
 

@@ -5,6 +5,7 @@ using FluentAssertions;
 using System.Text.Json;
 using System.Collections.Generic;
 using Reqnroll.TestProjectGenerator;
+using Reqnroll.TestProjectGenerator.Driver;
 
 namespace Reqnroll.SystemTests.Generation;
 
@@ -389,6 +390,8 @@ public abstract class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Before_After_Feature_hooks_execute_only_once_on_sequential_run_even_with_failing_feature_hooks()
     {
+        _solutionDriver.DefaultProject.Configuration.Generator.Value.AllowDebugGeneratedFiles = true;
+
         // After a failure, the scenario execution should properly "release" the test runner, so that 
         // the next scenario can run in the same one.
         // We verify here that only one test runner is used by logging and checking _testRunnerManager.IsMultiThreaded
@@ -468,6 +471,18 @@ public abstract class GenerationTestBase : SystemTestBase
                         Log.LogCustom("hook", featureContext.FeatureInfo.Title);
                     }
                     
+                    [BeforeScenario(Order = 0)]
+                    public void BeforeScenario(FeatureContext featureContext, ScenarioContext scenarioContext)
+                    {
+                        Log.LogCustom("hook", featureContext.FeatureInfo.Title + "/" + scenarioContext.ScenarioInfo.Title);
+                    }
+                    
+                    [AfterScenario(Order = 0)]
+                    public void AfterScenario(FeatureContext featureContext, ScenarioContext scenarioContext)
+                    {
+                        Log.LogCustom("hook", featureContext.FeatureInfo.Title + "/" + scenarioContext.ScenarioInfo.Title);
+                    }
+                    
                     [BeforeFeature("@failBefore", Order = 10)]
                     public static void FailBefore()
                     {
@@ -495,15 +510,16 @@ public abstract class GenerationTestBase : SystemTestBase
         var hookLines = _bindingDriver.GetActualHookLines().ToList();
         TestContext.WriteLine(string.Join(Environment.NewLine, hookLines.Select((l,i) => $"#{i}: {l}")));
 
+        var featureOrAboveHookLines = hookLines.Where(l => l.Contains("BeforeFeature") || l.Contains("AfterFeature") || l.Contains("BeforeTestRun") || l.Contains("AfterTestRun")).ToList();
         for (int i = 1; i <= 3; i++)
         {
-            hookLines.Should()
-                     .ContainInConsecutiveOrder(
-                         $"-> hook: Feature {i}:BeforeFeature",
-                         $"-> hook: Feature {i}:AfterFeature"
-                     );
+            featureOrAboveHookLines.Should()
+                                   .ContainInConsecutiveOrder(
+                                       $"-> hook: Feature {i}:BeforeFeature",
+                                       $"-> hook: Feature {i}:AfterFeature"
+                                   );
         }
-        hookLines.Should().OnlyHaveUniqueItems();
+        featureOrAboveHookLines.Should().OnlyHaveUniqueItems();
         hookLines.Should().HaveElementAt(0, "-> hook: BeforeTestRun", "The BeforeTestRun hook should be the first");
         hookLines.Should().HaveElementAt(hookLines.Count-1, "-> hook: AfterTestRun", "The AfterTestRun hook should be the last");
 
