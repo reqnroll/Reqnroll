@@ -172,6 +172,7 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
         {
             case SyntaxNodeType.SyntaxToken:
             case SyntaxNodeType.SyntaxTokenList:
+            case SyntaxNodeType.SyntaxList:
                 builder
                     .Append("public partial ")
                     .Append(property.TypeName)

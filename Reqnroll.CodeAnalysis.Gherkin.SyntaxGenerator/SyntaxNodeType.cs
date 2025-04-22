@@ -4,5 +4,6 @@ internal enum SyntaxNodeType
 {
     SyntaxToken,
     SyntaxTokenList,
-    SyntaxNode
+    SyntaxNode,
+    SyntaxList
 }

@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-[SyntaxNode(SyntaxKind.ScenarioOutlineDeclaration)]
+[SyntaxNode(SyntaxKind.ScenarioOutline)]
 public partial class ScenarioOutlineDeclarationSyntax : SyntaxNode
 {
 }

@@ -19,6 +19,7 @@ internal static class SlotHelper
                     .Any(reference => ((PropertyDeclarationSyntax)reference.GetSyntax(cancellationToken))
                         .Modifiers.Any(token => token.IsKind(SyntaxKind.PartialKeyword))))
             .ToList();
+
         for (var slotIndex = 0; slotIndex < partialProperties.Count; slotIndex++)
         {
             var property = partialProperties[slotIndex];
@@ -29,10 +30,36 @@ internal static class SlotHelper
                 .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.SyntaxSlotAttribute);
 
             if (slotAttribute == null ||
-                slotAttribute.ConstructorArguments.Length < 1 ||
-                slotAttribute.ConstructorArguments[0].Value is not ushort slotSyntaxKindValue)
+                slotAttribute.ConstructorArguments.Length < 1)
             {
                 continue;
+            }
+
+            ComparableArray<ushort> slotSyntaxKinds;
+
+            var kindsArgument = slotAttribute.ConstructorArguments[0];
+
+            if (kindsArgument.Kind == TypedConstantKind.Array)
+            {
+                var values = kindsArgument.Values.Select(value => value.Value).ToArray();
+
+                if (values.Any(value => value is not ushort))
+                {
+                    continue;
+                }
+
+                var slotSyntaxKindValues = values.Select(value => (ushort)value!).ToImmutableArray();
+
+                slotSyntaxKinds = new ComparableArray<ushort>(slotSyntaxKindValues);
+            }
+            else
+            {
+                if (slotAttribute.ConstructorArguments[0].Value is not ushort slotSyntaxKindValue)
+                {
+                    continue;
+                }
+
+                slotSyntaxKinds = ComparableArray.Create(slotSyntaxKindValue);
             }
 
             string? description = null;
@@ -58,6 +85,10 @@ internal static class SlotHelper
                         nodeType = SyntaxNodeType.SyntaxNode;
                         isOptional = property.Type.NullableAnnotation == NullableAnnotation.Annotated;
                     }
+                    else if (property.Type.IsSyntaxList())
+                    {
+                        nodeType = SyntaxNodeType.SyntaxList;
+                    }
                     else
                     {
                         continue;
@@ -76,7 +107,7 @@ internal static class SlotHelper
                     property.Name,
                     slotIndex,
                     property.Type.Name,
-                    slotSyntaxKindValue,
+                    slotSyntaxKinds,
                     description,
                     isOptional,
                     ComparableArray.CreateRange(parameterGroups)));

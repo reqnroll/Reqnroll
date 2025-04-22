@@ -33,6 +33,13 @@ public static partial class SyntaxFactory
     /// </summary>
     public static SyntaxTrivia CarriageReturnLineFeed { get; } = InternalSyntaxFactory.ElasticCarriageReturnLineFeed;
 
+    /// <summary>
+    /// A trivia with kind <see cref="SyntaxKind.EndOfLineTrivia"/> characters which match the current environment's newline.
+    /// </summary>
+    public static SyntaxTrivia EnvironmentNewline => Environment.NewLine == "\r\n"
+        ? CarriageReturnLineFeed
+        : LineFeed;
+
     public static SyntaxTrivia Space { get; } = InternalSyntaxFactory.Space;
 
     public static GherkinDocumentSyntax GherkinDocument() => GherkinDocument(null);
@@ -88,6 +95,10 @@ public static partial class SyntaxFactory
     public static SyntaxTokenList TokenList(SyntaxToken token) => new(token);
 
     public static SyntaxTokenList TokenList(IEnumerable<SyntaxToken> tokens) => new(tokens);
+
+    public static SyntaxList<TNode> List<TNode>() where TNode : SyntaxNode => default;
+
+    public static SyntaxList<TNode> List<TNode>(IEnumerable<TNode> nodes) where TNode : SyntaxNode => new(nodes);
 
     public static SyntaxTrivia Whitespace(string text) => InternalSyntaxFactory.Whitespace(text);
 

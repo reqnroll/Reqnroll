@@ -181,7 +181,7 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
                     switch (property.NodeType)
                     {
                         case SyntaxNodeType.SyntaxToken:
-                            builder.Append("Token(SyntaxKind.").Append(property.SyntaxKind.Name).Append(')');
+                            builder.Append("Token(SyntaxKind.").Append(property.SyntaxKinds.First().Name).Append(')');
                             break;
 
                         case SyntaxNodeType.SyntaxTokenList:
@@ -276,7 +276,7 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
                         case SyntaxNodeType.SyntaxToken:
                             builder
                                 .Append("Token(SyntaxKind.")
-                                .Append(property.SyntaxKind.Name)
+                                .Append(property.SyntaxKinds.First().Name)
                                 .Append(", ")
                                 .Append(NamingHelper.PascalCaseToCamelCase(property.Name))
                                 .Append(')');
@@ -293,11 +293,12 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
                     switch (property.NodeType)
                     {
                         case SyntaxNodeType.SyntaxToken:
-                            builder.Append("Token(SyntaxKind.").Append(property.SyntaxKind.Name).Append(')');
+                            builder.Append("Token(SyntaxKind.").Append(property.SyntaxKinds.First().Name).Append(')');
                             break;
 
                         case SyntaxNodeType.SyntaxTokenList:
                         case SyntaxNodeType.SyntaxNode:
+                        case SyntaxNodeType.SyntaxList:
                             builder.Append("default");
                             break;
                     }
@@ -386,21 +387,65 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
 
                 if (property.NodeType == SyntaxNodeType.SyntaxToken)
                 {
-                    builder
-                        .Append("if (")
-                        .Append(argumentName)
-                        .Append(".Kind != SyntaxKind.")
-                        .Append(property.SyntaxKind.Name)
-                        .AppendLine(')');
-                    builder.AppendBodyBlock(builder =>
+                    if (property.SyntaxKinds.Length == 1)
                     {
+                        var syntaxKind = property.SyntaxKinds[0];
+
                         builder
-                            .Append("throw new ArgumentException(SyntaxFactoryExceptionMessages.TokenMustBe")
-                            .Append(property.SyntaxKind.Name)
-                            .Append(", nameof(")
+                            .Append("if (")
                             .Append(argumentName)
-                            .AppendLine("));");
-                    });
+                            .Append(".Kind != SyntaxKind.")
+                            .Append(syntaxKind.Name)
+                            .AppendLine(')');
+                        builder.AppendBodyBlock(builder =>
+                        {
+                            builder
+                                .Append("throw new ArgumentException(SyntaxFactoryExceptionMessages.TokenMustBe")
+                                .Append(syntaxKind.Name)
+                                .Append(", nameof(")
+                                .Append(argumentName)
+                                .AppendLine("));");
+                        });
+                    }
+                    else
+                    {
+                        builder.Append("if (");
+
+                        bool firstCondition = true;
+                        foreach (var syntaxKind in property.SyntaxKinds)
+                        {
+                            if (firstCondition)
+                            {
+                                firstCondition = false;
+                            }
+                            else
+                            {
+                                builder.AppendLine(" &&");
+                            }
+
+                            builder
+                                .Append(argumentName)
+                                .Append(".Kind != SyntaxKind.")
+                                .Append(syntaxKind.Name);
+                        }
+
+                        builder.AppendLine(')');
+
+                        builder.AppendBodyBlock(builder =>
+                        {
+                            builder.Append("throw new ArgumentException(SyntaxFactoryExceptionMessages.TokenMustBeOneOf");
+
+                            foreach (var syntaxKind in property.SyntaxKinds)
+                            {
+                                builder.Append(syntaxKind.Name);
+                            }
+
+                            builder
+                                .Append(", nameof(")
+                                .Append(argumentName)
+                                .AppendLine("));");
+                        });
+                    }
 
                     builder.AppendLine();
                 }

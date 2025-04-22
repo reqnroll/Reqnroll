@@ -45,9 +45,44 @@ public enum SyntaxKind : ushort
     // Keywords //
 
     /// <summary>
-    /// The token is a feature keyword.
+    /// The token is a "feature" keyword.
     /// </summary>
     FeatureKeyword,
+
+    /// <summary>
+    /// The token is a "background" keyword.
+    /// </summary>
+    BackgroundKeyword,
+
+    /// <summary>
+    /// The token is a "scenario" keyword.
+    /// </summary>
+    ScenarioKeyword,
+
+    /// <summary>
+    /// The token is a "scenario outline" keyword.
+    /// </summary>
+    ScenarioOutlineKeyword,
+
+    /// <summary>
+    /// The token is a "given" keyword.
+    /// </summary>
+    GivenKeyword,
+
+    /// <summary>
+    /// The token is a "when" keyword.
+    /// </summary>
+    WhenKeyword,
+
+    /// <summary>
+    /// The token is a "then" keyword.
+    /// </summary>
+    ThenKeyword,
+
+    /// <summary>
+    /// The token is an "and" keyword.
+    /// </summary>
+    AndKeyword,
 
     // Other text-containing tokens //
 
@@ -115,20 +150,25 @@ public enum SyntaxKind : ushort
     /// <summary>
     /// The node is a rule declaration.
     /// </summary>
-    RuleDeclaration,
+    Rule,
 
     /// <summary>
     /// The node is a background declaration.
     /// </summary>
-    BackgroundDeclaration,
+    Background,
 
     /// <summary>
     /// The node is a scenario declaration.
     /// </summary>
-    ScenarioDeclaration,
+    Scenario,
 
     /// <summary>
     /// The node is a scenario outline declaration.
     /// </summary>
-    ScenarioOutlineDeclaration,
+    ScenarioOutline,
+
+    /// <summary>
+    /// The node is a step within a scenario.
+    /// </summary>
+    Step,
 }

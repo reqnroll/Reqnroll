@@ -1,4 +1,4 @@
-﻿namespace Reqnroll.CodeAnalysis.Gherkin.ParsingTests;
+﻿namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 

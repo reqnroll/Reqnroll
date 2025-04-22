@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
+
 internal class DescriptionTests
 {
 }

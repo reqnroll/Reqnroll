@@ -5,7 +5,7 @@ internal record BareSyntaxSlotPropertyInfo(
     string Name,
     int Index,
     string TypeName,
-    ushort SyntaxKind,
+    ComparableArray<ushort> SyntaxKinds,
     string? Description,
     bool IsOptional,
     ComparableArray<string> ParameterGroups);

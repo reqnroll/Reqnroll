@@ -5,7 +5,7 @@ internal record SyntaxSlotPropertyInfo(
     string Name,
     int Index,
     string TypeName,
-    SyntaxKindInfo SyntaxKind,
+    ComparableArray<SyntaxKindInfo> SyntaxKinds,
     string? Description,
     bool IsRequired,
     ComparableArray<string> ParameterGroups)

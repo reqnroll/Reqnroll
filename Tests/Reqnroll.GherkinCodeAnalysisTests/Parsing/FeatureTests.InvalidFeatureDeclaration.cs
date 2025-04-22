@@ -1,6 +1,6 @@
 ﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-namespace Reqnroll.CodeAnalysis.Gherkin.ParsingTests;
+namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 using static SyntaxFactory;
 

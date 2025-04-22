@@ -70,7 +70,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             info.Name,
                             info.Index,
                             info.TypeName,
-                            syntaxKinds[info.SyntaxKind],
+                            ComparableArray.CreateRange(info.SyntaxKinds.Select(kind => syntaxKinds[kind])),
                             info.Description, 
                             !info.IsOptional,
                             info.ParameterGroups))

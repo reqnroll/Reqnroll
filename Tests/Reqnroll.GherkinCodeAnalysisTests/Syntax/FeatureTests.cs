@@ -16,15 +16,15 @@ public class FeatureTests
 
         feature.ToString().Should().Be(
             "Feature: Guess the word" + 
-            Environment.NewLine + 
-            Environment.NewLine + 
+            "\r\n" +
+            "\r\n" + 
             "An example feature from the Gherkin reference.");
 
         feature.ToFullString().Should().Be(
             "Feature: Guess the word" +
-            Environment.NewLine +
-            Environment.NewLine +
-            "An example feature from the Gherkin reference." + 
-            Environment.NewLine);
+            "\r\n" +
+            "\r\n" +
+            "An example feature from the Gherkin reference." +
+            "\r\n");
     }
 }

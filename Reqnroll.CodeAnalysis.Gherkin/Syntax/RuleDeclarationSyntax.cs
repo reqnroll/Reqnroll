@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-[SyntaxNode(SyntaxKind.RuleDeclaration)]
+[SyntaxNode(SyntaxKind.Rule)]
 public partial class RuleDeclarationSyntax : SyntaxNode
 {
 }

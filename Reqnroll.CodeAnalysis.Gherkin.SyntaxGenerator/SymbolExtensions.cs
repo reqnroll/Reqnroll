@@ -18,4 +18,14 @@ internal static class SymbolExtensions
 
         return symbol.BaseType.IsSyntaxNode();
     }
+
+    public static bool IsSyntaxList(this ITypeSymbol symbol)
+    {
+        if (symbol.OriginalDefinition == null)
+        {
+            return false;
+        }
+
+        return symbol.OriginalDefinition.ToDisplayString() == "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxList<TNode>";
+    }
 }
