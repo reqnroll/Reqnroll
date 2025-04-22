@@ -26,9 +26,7 @@ public class VerifyRuntimePlugin : IRuntimePlugin
                 var scenarioContext = container.Resolve<ScenarioContext>();
 
                 var settings = new VerifySettings();
-                string projectDirectory = Directory.GetCurrentDirectory().Split([@"\bin\"], StringSplitOptions.RemoveEmptyEntries).First();
-
-                settings.UseDirectory(Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath));
+                settings.UseDirectory(featureContext.FeatureInfo.FolderPath);
                 settings.UseTypeName(featureContext.FeatureInfo.Title);
 
                 var methodNameBuilder = new StringBuilder(scenarioContext.ScenarioInfo.Title);
