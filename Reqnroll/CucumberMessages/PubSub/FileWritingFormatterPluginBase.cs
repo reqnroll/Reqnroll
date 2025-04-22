@@ -76,27 +76,19 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (String.IsNullOrEmpty(messagesConfiguration))
                 return;
 
-            string outputFilePath = String.Empty;
-            int colonIndex = messagesConfiguration.IndexOf(':');
-            if (colonIndex != -1)
-            {
-                int firstQuoteIndex = messagesConfiguration.IndexOf('"', colonIndex);
-                if (firstQuoteIndex != -1)
-                {
-                    int secondQuoteIndex = messagesConfiguration.IndexOf('"', firstQuoteIndex + 1);
-                    if (secondQuoteIndex != -1)
-                    {
-                        outputFilePath = messagesConfiguration.Substring(firstQuoteIndex + 1, secondQuoteIndex - firstQuoteIndex - 1);
-                    }
-                }
-            }
+            string outputFilePath = ParseConfigurationString(messagesConfiguration, _pluginName);
+
             if (String.IsNullOrEmpty(outputFilePath))
                 outputFilePath = $".\\{_defaultFileName}";
 
             string baseDirectory = Path.GetDirectoryName(outputFilePath);
-            if (!Directory.Exists(baseDirectory))
+            if (!string.IsNullOrEmpty(baseDirectory))
             {
-                Directory.CreateDirectory(baseDirectory);
+                baseDirectory = SanitizeDirectoryName(baseDirectory);
+                if (!Directory.Exists(baseDirectory))
+                {
+                    Directory.CreateDirectory(baseDirectory);
+                }
             }
 
             string fileName = SanitizeFileName(Path.GetFileName(outputFilePath));
@@ -156,6 +148,63 @@ namespace Reqnroll.CucumberMessages.PubSub
                 sanitized = sanitized.Substring(0, maxLength);
 
             return sanitized;
+        }
+
+        private string ParseConfigurationString(string messagesConfiguration, string pluginName)
+        {
+            if (string.IsNullOrWhiteSpace(messagesConfiguration))
+                return string.Empty;
+
+            try
+            {
+                using var document = System.Text.Json.JsonDocument.Parse(messagesConfiguration);
+                if (document.RootElement.TryGetProperty("outputFilePath", out var outputFilePathElement))
+                {
+                    return outputFilePathElement.GetString() ?? string.Empty;
+                }
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                trace?.WriteToolOutput($"Configuration of ${pluginName} is invalid: ${messagesConfiguration}");
+            }
+
+            return string.Empty;
+        }
+        private static string SanitizeDirectoryName(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return string.Empty;
+
+            // Get invalid characters for directory names
+            char[] invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).ToArray();
+
+            // Check if the path starts with a drive identifier (e.g., "C:\")
+            string driveIdentifier = string.Empty;
+            if (input.Length > 1 && input[1] == ':' && char.IsLetter(input[0]))
+            {
+                driveIdentifier = input.Substring(0, 2); // Extract the drive identifier (e.g., "C:")
+                input = input.Substring(2); // Remove the drive identifier from the rest of the path
+            }
+
+            // Split the remaining path into segments and sanitize each segment
+            var sanitizedSegments = input.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
+                                          .Select(segment =>
+                                          {
+                                              string sanitized = new string(segment.Select(c => invalidChars.Contains(c) ? '_' : c).ToArray());
+                                              return sanitized.Trim().Trim('.');
+                                          });
+
+            // Recombine the sanitized segments into a valid path
+            string sanitizedPath = string.Join(Path.DirectorySeparatorChar.ToString(), sanitizedSegments);
+
+            // Reattach the drive identifier if it exists
+            if (!string.IsNullOrEmpty(driveIdentifier))
+            {
+                sanitizedPath = driveIdentifier + Path.DirectorySeparatorChar + sanitizedPath;
+            }
+
+            // Ensure the sanitized path is not empty
+            return string.IsNullOrEmpty(sanitizedPath) ? "_" : sanitizedPath;
         }
     }
 }
