@@ -1,4 +1,7 @@
+using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -61,24 +64,56 @@ namespace Reqnroll.RuntimeTests
         [Binding]
         public class AfterTestRunTestBinding
         {
-            public static int AfterTestRunCallCount = 0;
+            private static readonly AsyncLocal<StrongBox<int>> _afterTestRunCallCount = new();
+
+            public static void Reset()
+            {
+                _afterTestRunCallCount.Value = new StrongBox<int>(0);
+            }
+
+            public static int AfterTestRunCallCount
+            {
+                get
+                {
+                    if (_afterTestRunCallCount.Value == null)
+                        throw new InvalidOperationException($"Invoke {nameof(AfterTestRunTestBinding)}.{nameof(Reset)} in the test arrange phase");
+                    return _afterTestRunCallCount.Value.Value;
+                }
+            }
 
             [AfterTestRun]
             public static void AfterTestRun()
             {
-                AfterTestRunCallCount++;
+                if (_afterTestRunCallCount.Value != null)
+                    _afterTestRunCallCount.Value.Value++;
             }
         }
 
         [Binding]
         public class BeforeTestRunTestBinding
         {
-            public static int BeforeTestRunCallCount = 0;
+            private static readonly AsyncLocal<StrongBox<int>> _beforeTestRunCallCount = new();
+
+            public static void Reset()
+            {
+                _beforeTestRunCallCount.Value = new StrongBox<int>(0);
+            }
+
+            public static int BeforeTestRunCallCount
+            {
+                get
+                {
+                    if (_beforeTestRunCallCount.Value == null)
+                        throw new InvalidOperationException($"Invoke {nameof(BeforeTestRunTestBinding)}.{nameof(Reset)} in the test arrange phase");
+                    return _beforeTestRunCallCount.Value.Value;
+                }
+            }
 
             [BeforeTestRun]
             public static void BeforeTestRun()
             {
-                BeforeTestRunCallCount++;
+                if (_beforeTestRunCallCount.Value != null)
+                    _beforeTestRunCallCount.Value.Value++;
             }
         }
 
@@ -89,7 +124,7 @@ namespace Reqnroll.RuntimeTests
             var testRunner = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
             TestRunnerManager.ReleaseTestRunner(testRunner);
 
-            AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
+            AfterTestRunTestBinding.Reset();
             await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
 
             AfterTestRunTestBinding.AfterTestRunCallCount.Should().Be(1);
@@ -102,7 +137,7 @@ namespace Reqnroll.RuntimeTests
             var testRunner = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
             TestRunnerManager.ReleaseTestRunner(testRunner);
 
-            AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
+            AfterTestRunTestBinding.Reset();
             await TestRunnerManager.OnTestRunEndAsync();
 
             AfterTestRunTestBinding.AfterTestRunCallCount.Should().Be(1);
@@ -115,7 +150,7 @@ namespace Reqnroll.RuntimeTests
             var testRunner = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
             TestRunnerManager.ReleaseTestRunner(testRunner);
 
-            AfterTestRunTestBinding.AfterTestRunCallCount = 0; //reset
+            AfterTestRunTestBinding.Reset();
             await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
             await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
 
@@ -136,7 +171,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task OnTestRunStart_should_fire_BeforeTestRun_events()
         {
-            BeforeTestRunTestBinding.BeforeTestRunCallCount = 0; //reset
+            BeforeTestRunTestBinding.Reset();
             await TestRunnerManager.OnTestRunStartAsync(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
 
             BeforeTestRunTestBinding.BeforeTestRunCallCount.Should().Be(1);
@@ -145,7 +180,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task OnTestRunStart_without_arguments_should_fire_BeforeTestRun_events_for_calling_assembly()
         {
-            BeforeTestRunTestBinding.BeforeTestRunCallCount = 0; //reset
+            BeforeTestRunTestBinding.Reset();
             await TestRunnerManager.OnTestRunStartAsync(containerBuilder: new RuntimeTestsContainerBuilder());
 
             BeforeTestRunTestBinding.BeforeTestRunCallCount.Should().Be(1);
@@ -154,7 +189,7 @@ namespace Reqnroll.RuntimeTests
         [Fact]
         public async Task OnTestRunStart_should_not_fire_BeforeTestRun_events_multiple_times()
         {
-            BeforeTestRunTestBinding.BeforeTestRunCallCount = 0; //reset
+            BeforeTestRunTestBinding.Reset();
             await TestRunnerManager.OnTestRunStartAsync(_anAssembly, containerBuilder: new RuntimeTestsContainerBuilder());
             await TestRunnerManager.OnTestRunStartAsync(_anAssembly);
 

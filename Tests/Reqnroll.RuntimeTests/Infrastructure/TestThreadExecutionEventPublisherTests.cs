@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
@@ -147,6 +148,28 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
+        public async Task Should_publish_scenario_finished_event_even_if_the_after_scenario_hook_fails()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+
+            var hookMock = CreateHookMock(afterScenarioEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                                    .Throws(new Exception("simulated hook error"));
+
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            await testExecutionEngine.OnScenarioStartAsync();
+            await testExecutionEngine.OnAfterLastStepAsync();
+            await FluentActions.Awaiting(testExecutionEngine.OnScenarioEndAsync)
+                         .Should().ThrowAsync<Exception>();
+            
+            _testThreadExecutionEventPublisher.Verify(te =>
+                te.PublishEvent(It.Is<ScenarioFinishedEvent>(e =>
+                                                                 e.ScenarioContext.Equals(scenarioContext) &&
+                                                                 e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
+                                                      Times.Once);
+        }
+
+        [Fact]
         public async Task Should_publish_hook_started_finished_events()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
@@ -225,7 +248,25 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
-        public async Task Should_publish_testrun_started_event()
+        public async Task Should_publish_feature_finished_event_even_if_the_after_feature_hook_fails()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+
+            var hookMock = CreateHookMock(afterFeatureEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                                    .Throws(new Exception("simulated hook error"));
+
+            await FluentActions.Awaiting(testExecutionEngine.OnFeatureEndAsync)
+                               .Should().ThrowAsync<Exception>();
+            
+            _testThreadExecutionEventPublisher.Verify(te =>
+                te.PublishEvent(It.Is<FeatureFinishedEvent>(e => 
+                                                                e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
+                                                      Times.Once);
+        }
+
+        [Fact]
+        public async Task Should_publish_test_run_started_event()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
@@ -236,7 +277,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
-        public async Task Should_publish_testrun_finished_event()
+        public async Task Should_publish_test_run_finished_event()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
@@ -244,6 +285,22 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             
             _testThreadExecutionEventPublisher.Verify(te =>
                                                           te.PublishEventAsync(It.IsAny<TestRunFinishedEvent>()), Times.Once);
+        }
+
+        [Fact]
+        public async Task Should_publish_test_run_finished_event_even_if_the_after_test_run_hook_fails()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+
+            var hookMock = CreateHookMock(afterTestRunEvents);
+            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+                                    .Throws(new Exception("simulated hook error"));
+
+            await FluentActions.Awaiting(testExecutionEngine.OnTestRunEndAsync)
+                               .Should().ThrowAsync<Exception>();
+            
+            _testThreadExecutionEventPublisher.Verify(te =>
+                                                          te.PublishEvent(It.IsAny<TestRunFinishedEvent>()), Times.Once);
         }
 
         private void AssertHookEventsForHookType(HookType hookType)

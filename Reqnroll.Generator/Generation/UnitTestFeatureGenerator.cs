@@ -6,6 +6,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages.Configuration;
@@ -365,9 +366,22 @@ namespace Reqnroll.Generator.Generation
                 nameof(ITestRunner.OnFeatureEndAsync));
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureEndAsyncExpression);
 
-            //if (testRunner.FeatureContext != null && !testRunner.FeatureContext.FeatureInfo.Equals(featureInfo))
-            //  await testRunner.OnFeatureEndAsync(); // finish if different
-            testInitializeMethod.Statements.Add(
+            // VB does not allow the use of the await keyword in a "finally" clause. Therefore, we have to generate code specific to
+            // the language. The C# code will await OnFeatureStartAsync() while VB will call the method synchronously and store the returned Task in a variable.
+            // The VB code will then call await on that task after the conclusion of the try/finally block.
+            // This construct in VB might not fully wait for a real async execution of a before feature hook in case there was an exception in the previous after feature hook,
+            // but this affects only very specific and rare cases and only apply for legacy VB usages.
+
+            // Dim onFeatureStartTask as Task = Nothing
+            if (_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
+            {
+                testInitializeMethod.Statements.Add(new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(Task)), "onFeatureStartTask", new CodePrimitiveExpression(null)));
+            }
+            // try {
+            //   if (testRunner.FeatureContext != null && !testRunner.FeatureContext.FeatureInfo.Equals(featureInfo))
+            //     await testRunner.OnFeatureEndAsync(); // finish if different
+            // } 
+            var conditionallyExecuteOnFeatureEndExpressionStatement =
                 new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(
                         new CodeBinaryOperatorExpression(
@@ -385,29 +399,90 @@ namespace Reqnroll.Generator.Generation
                             CodeBinaryOperatorType.ValueEquality,
                             new CodePrimitiveExpression(false))),
                     new CodeExpressionStatement(
-                        onFeatureEndAsyncExpression)));
+                        onFeatureEndAsyncExpression));
 
+            // The following statement will be added to the finally block, to skip 
+            // scenario execution of features with a failing before feature hook:
+            // if (testRunner.FeatureContext?.BeforeFeatureHookFailed)
+            //   throw new ReqnrollException("[before feature hook error]");
+            var throwErrorOnPreviousFeatureStartError =
+                new CodeConditionStatement(
+                    new CodeBinaryOperatorExpression(
+                        new CodeBinaryOperatorExpression(
+                            featureContextExpression, 
+                            CodeBinaryOperatorType.IdentityInequality,
+                            new CodePrimitiveExpression(null)),
+                        CodeBinaryOperatorType.BooleanAnd,
+                        new CodePropertyReferenceExpression(
+                            featureContextExpression,
+                            nameof(FeatureContext.BeforeFeatureHookFailed))),
+                    [new CodeThrowExceptionStatement(
+                        new CodeObjectCreateExpression(
+                            new CodeTypeReference(typeof(ReqnrollException), CodeTypeReferenceOptions.GlobalReference),
+                            new CodePrimitiveExpression("Scenario skipped because of previous before feature hook error")))]);
 
-            // "Start" the feature if needed
+            // Will generate this for C#:
+            // finally {
+            //   if (testRunner.FeatureContext?.BeforeFeatureHookFailed)
+            //     throw new ReqnrollException("[before feature hook error]");
+            //   if (testRunner.FeatureContext == null) { // "Start" the feature if needed
+            //     await testRunner.OnFeatureStartAsync(featureInfo);
+            //   }
+            // }
+            CodeStatement onFeatureStartExpression;
+            var featureStartMethodInvocation = new CodeMethodInvokeExpression(
+                    testRunnerField,
+                    nameof(ITestRunner.OnFeatureStartAsync),
+                    new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
 
-            //if (testRunner.FeatureContext == null) {
-            //  await testRunner.OnFeatureStartAsync(featureInfo);
-            //}
+            if (_codeDomHelper.TargetLanguage != CodeDomProviderLanguage.VB)
+            {
+                _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(featureStartMethodInvocation);
+                onFeatureStartExpression = new CodeExpressionStatement(featureStartMethodInvocation);
+            }
+            else
+            // will generate this for VB:
+            // Finally
+            //   If testRunner.FeatureContext?.BeforeFeatureHookFailed Then
+            //     Throw New ReqnrollException("[before feature hook error]")
+            //   If testRunner.FeatureContext Is Nothing Then
+            //     onFeatureStartTask = testRunner.OnFeatureStartAsync(featureInfo)
+            //   EndIf
+            // EndTry
+            // If onFeatureStartTask IsNot Nothing Then
+            //   Await onFeatureStartTask
+            // EndIf
+            {
+                onFeatureStartExpression = new CodeAssignStatement(
+                    new CodeVariableReferenceExpression("onFeatureStartTask"),
+                    featureStartMethodInvocation);
+            }
 
-            var onFeatureStartExpression = new CodeMethodInvokeExpression(
-                testRunnerField,
-                nameof(ITestRunner.OnFeatureStartAsync),
-                new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureStartExpression);
-
-            testInitializeMethod.Statements.Add(
+            var conditionallyExecuteFeatureStartExpressionStatement =
                 new CodeConditionStatement(
                     new CodeBinaryOperatorExpression(
                         featureContextExpression,
                         CodeBinaryOperatorType.IdentityEquality,
                         new CodePrimitiveExpression(null)),
-                    new CodeExpressionStatement(
-                        onFeatureStartExpression)));
+                    onFeatureStartExpression);
+
+            testInitializeMethod.Statements.Add(
+                new CodeTryCatchFinallyStatement(
+                    [conditionallyExecuteOnFeatureEndExpressionStatement],
+                    [],
+                    [throwErrorOnPreviousFeatureStartError, conditionallyExecuteFeatureStartExpressionStatement]));
+
+            if (_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
+            {
+                testInitializeMethod.Statements.Add(
+                    new CodeConditionStatement(
+                        new CodeBinaryOperatorExpression(
+                            new CodeVariableReferenceExpression("onFeatureStartTask"),
+                            CodeBinaryOperatorType.IdentityInequality,
+                            new CodePrimitiveExpression(null)),
+                        new CodeExpressionStatement(new CodeVariableReferenceExpression("await onFeatureStartTask"))));
+            }
+
         }
 
         private void SetupTestCleanupMethod(TestClassGenerationContext generationContext)
@@ -424,21 +499,27 @@ namespace Reqnroll.Generator.Generation
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
             //await testRunner.OnScenarioEndAsync();
-            var expression = new CodeMethodInvokeExpression(
+            var onScenarioEndCallExpression = new CodeMethodInvokeExpression(
                 testRunnerField,
                 nameof(ITestRunner.OnScenarioEndAsync));
-
-            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
-
-            testCleanupMethod.Statements.Add(expression);
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onScenarioEndCallExpression);
+            var onScenarioEndCallStatement = new CodeExpressionStatement(onScenarioEndCallExpression);
 
             // "Release" the TestRunner, so that other threads can pick it up
             // TestRunnerManager.ReleaseTestRunner(testRunner);
-            testCleanupMethod.Statements.Add(
+            var releaseTestRunnerCallStatement = new CodeExpressionStatement(
                 new CodeMethodInvokeExpression(
                     new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
                     nameof(TestRunnerManager.ReleaseTestRunner),
                     testRunnerField));
+
+            // add ReleaseTestRunner to the finally block of OnScenarioEndAsync 
+            testCleanupMethod.Statements.Add(
+                new CodeTryCatchFinallyStatement(
+                    [onScenarioEndCallStatement],
+                    [],
+                    [releaseTestRunnerCallStatement]
+                ));
         }
 
         private void SetupScenarioInitializeMethod(TestClassGenerationContext generationContext)

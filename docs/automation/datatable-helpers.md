@@ -149,6 +149,59 @@ public void GivenTheseProductsExist(DataTable table)
 
 The `CreateSet<T>` method returns an `IEnumerable<T>` based on the matching data in the table. It contains the values for each object, making appropriate type conversions from string to the related property. Column headers are matched to property names in the same way as `CreateInstance<T>`.
 
+## `InstanceCreationOptions`
+The `CreateInstance<T>` and `CreateSet<T>` methods have an overload with `InstanceCreationOptions` to modify creation behavior.
+
+```{code-block} csharp
+:caption: InstanceCreationOptions
+public class InstanceCreationOptions
+{
+    public bool VerifyAllColumnsBound { get; set; }
+    public bool RequireTableToProvideAllConstructorParameters { get; set; }
+}
+```
+
+### `VerifyAllColumnsBound`
+Default is `false`. If `true`, check if every column is bound. If not, it throws a `ColumnCouldNotBeBoundException`.
+
+For example, given the class:
+
+```{code-block} csharp
+:caption: C# Test object
+public class Person
+{
+    public string FirstName { get; set;}  
+    public string LastName { get; set; }
+}
+```
+
+And we feed a table with 'Name' as 'Mike':
+
+```{code-block} csharp
+:caption: C# Call
+table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
+```
+
+We get a `ColumnCouldNotBeBoundException` with the message "Member or field Name not found."
+
+Note: It won't check the other way around, e.g., we don't get an exception because FirstName is not in the table.
+
+### `RequireTableToProvideAllConstructorParameters`
+Default is `false`. If `true`, use the constructor that exactly matches the table. 
+If a matching constructor cannot be found, the helper will throw a `MissingMethodException`. If there are multiple candidates that take all members, prefer the constructor with the fewest parameters.
+
+If `false`, the constructor with the most parameters is preferred.
+
+For example:
+
+```{code-block} csharp
+:caption: C# Test object
+public record Person(string FirstName, string LastName, int Age);
+```
+
+If `RequireTableToProvideAllConstructorParameters` is `false`, `table.CreateInstance<Person>` will succeed and Age will be `0`. 
+If `RequireTableToProvideAllConstructorParameters` is `true`, we get a `System.MissingMethodException` with the message "Unable to find a suitable constructor to create an instance of ..."
+
 ## `CompareToInstance<T>`
 
 The `CompareToInstance<T>` extension method of the `DataTable` class makes it easy to compare the properties of an object to the table in your scenario. For example, you have a class like this:

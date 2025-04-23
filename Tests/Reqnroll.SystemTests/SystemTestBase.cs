@@ -250,7 +250,7 @@ public abstract class SystemTestBase
         _vsTestExecutionDriver.LastTestExecutionResult.Warnings.Should().BeEmpty();
     }
 
-    protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec)
+    protected int ConfirmAllTestsRan(int? expectedNrOfTestsSpec = null)
     {
         if (expectedNrOfTestsSpec == null && _preparedTests == 0)
             throw new ArgumentException($"If {nameof(_preparedTests)} is not set, the {nameof(expectedNrOfTestsSpec)} is mandatory.", nameof(expectedNrOfTestsSpec));
@@ -261,9 +261,9 @@ public abstract class SystemTestBase
         return expectedNrOfTests;
     }
 
-    protected void AddHookBinding(string eventType, string? name = null, string code = "")
+    protected void AddHookBinding(string eventType, string? name = null, string code = "", bool? asyncHook = null, int? order = null)
     {
-        _projectsDriver.AddHookBinding(eventType, name, code: code);
+        _projectsDriver.AddHookBinding(eventType, name, code: code, asyncHook: asyncHook, order: order);
     }
 
     protected void AddPassingStepBinding(string scenarioBlock = "StepDefinition", string stepRegex = ".*")
