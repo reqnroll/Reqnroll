@@ -87,7 +87,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                                                          te.PublishEvent(It.IsAny<StepSkippedEvent>()), Times.Once);
+                                                          te.PublishEventAsync(It.IsAny<StepSkippedEvent>()), Times.Once);
         }
         
         [Fact]
@@ -163,7 +163,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                          .Should().ThrowAsync<Exception>();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<ScenarioFinishedEvent>(e =>
+                te.PublishEventAsync(It.Is<ScenarioFinishedEvent>(e =>
                                                                  e.ScenarioContext.Equals(scenarioContext) &&
                                                                  e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
@@ -203,17 +203,17 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var testExecutionEngine = CreateTestExecutionEngine();
 
             testExecutionEngine.OnScenarioInitialize(scenarioInfo);
-            testExecutionEngine.OnScenarioSkipped();
+            await testExecutionEngine.OnScenarioSkippedAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<ScenarioStartedEvent>(e =>
+                te.PublishEventAsync(It.Is<ScenarioStartedEvent>(e =>
                                                                 e.ScenarioContext.Equals(scenarioContext) &&
                                                                 e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.IsAny<ScenarioSkippedEvent>()), Times.Once);
+                te.PublishEventAsync(It.IsAny<ScenarioSkippedEvent>()), Times.Once);
             _testThreadExecutionEventPublisher.Verify(te =>
                 te.PublishEventAsync(It.Is<ScenarioFinishedEvent>(e =>
                                                                  e.ScenarioContext.Equals(scenarioContext) &&
@@ -260,7 +260,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                .Should().ThrowAsync<Exception>();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<FeatureFinishedEvent>(e => 
+                te.PublishEventAsync(It.Is<FeatureFinishedEvent>(e => 
                                                                 e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
         }
@@ -300,7 +300,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                .Should().ThrowAsync<Exception>();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                                                          te.PublishEvent(It.IsAny<TestRunFinishedEvent>()), Times.Once);
+                                                          te.PublishEventAsync(It.IsAny<TestRunFinishedEvent>()), Times.Once);
         }
 
         private void AssertHookEventsForHookType(HookType hookType)

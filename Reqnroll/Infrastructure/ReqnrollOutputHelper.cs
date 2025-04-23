@@ -23,7 +23,7 @@ namespace Reqnroll.Infrastructure
             var featureInfo = _contextManager.FeatureContext?.FeatureInfo;
             var scenarioInfo = _contextManager.ScenarioContext?.ScenarioInfo;
 
-            _testThreadExecutionEventPublisher.PublishEvent(new OutputAddedEvent(message, featureInfo, scenarioInfo));
+            _testThreadExecutionEventPublisher.PublishEventAsync(new OutputAddedEvent(message, featureInfo, scenarioInfo));
             _traceListener.WriteTestOutput(message);
         }
 
@@ -37,7 +37,7 @@ namespace Reqnroll.Infrastructure
             var featureInfo = _contextManager.FeatureContext.FeatureInfo;
             var scenarioInfo = _contextManager.ScenarioContext?.ScenarioInfo;
 
-            _testThreadExecutionEventPublisher.PublishEvent(new AttachmentAddedEvent(filePath, featureInfo, scenarioInfo));
+            _testThreadExecutionEventPublisher.PublishEventAsync(new AttachmentAddedEvent(filePath, featureInfo, scenarioInfo));
             _reqnrollAttachmentHandler.AddAttachment(filePath);
         }
     }

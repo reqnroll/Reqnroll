@@ -11,37 +11,40 @@ namespace Reqnroll.Events
         private readonly List<IAsyncExecutionEventListener> _asyncListeners = new();
         private readonly Dictionary<Type, List<Delegate>> _handlersDictionary = new();
 
+        [Obsolete("ExecutionEvents are migrating to Async. Please migrate to PublishEventAsync", false)]
         public void PublishEvent(IExecutionEvent executionEvent)
         {
             Task.Run(async () => await PublishEventAsync(executionEvent)).Wait();
         }
 
-        private void PublishSync(IExecutionEvent executionEvent)
-        {
-            foreach (var listener in _listeners)
-            {
-                listener.OnEvent(executionEvent);
-            }
-
-            if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
-            {
-                foreach (var handler in handlers)
-                {
-                    handler.DynamicInvoke(executionEvent);
-                }
-            }
-        }
-
         public async Task PublishEventAsync(IExecutionEvent executionEvent)
         {
-            PublishSync(executionEvent);
+            Task.Run(() =>
+            {
+                foreach (var listener in _listeners)
+                {
+                    listener.OnEvent(executionEvent);
+                }
+            }).Wait();
 
             foreach (var listener in _asyncListeners)
             {
                 await listener.OnEventAsync(executionEvent);
             }
+
+            Task.Run(() =>
+            {
+                if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
+                {
+                    foreach (var handler in handlers)
+                    {
+                        handler.DynamicInvoke(executionEvent);
+                    }
+                }
+            }).Wait();
         }
 
+        [Obsolete("ExecutionEvents are migrating to Async. Please migrate to PublishEventAsync", false)]
         public void AddListener(IExecutionEventListener listener)
         {
             _listeners.Add(listener);

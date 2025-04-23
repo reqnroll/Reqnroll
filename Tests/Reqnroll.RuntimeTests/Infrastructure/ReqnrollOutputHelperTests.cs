@@ -20,7 +20,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             outputHelper.WriteLine(message);
 
-            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEvent(It.Is<OutputAddedEvent>(m => m.Text == message)), Times.Once);
+            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEventAsync(It.Is<OutputAddedEvent>(m => m.Text == message)), Times.Once);
         }
 
         [Fact]
@@ -31,7 +31,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             outputHelper.AddAttachment(filePath);
 
-            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEvent(It.Is<AttachmentAddedEvent>(m => m.FilePath == filePath)), Times.Once);
+            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEventAsync(It.Is<AttachmentAddedEvent>(m => m.FilePath == filePath)), Times.Once);
         }
 
         private ReqnrollOutputHelper CreateReqnrollOutputHelper()

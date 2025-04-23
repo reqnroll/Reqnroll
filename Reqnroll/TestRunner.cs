@@ -63,9 +63,9 @@ namespace Reqnroll
             await _executionEngine.OnScenarioEndAsync();
         }
 
-        public void SkipScenario()
+        public async Task SkipScenarioAsync()
         {
-            _executionEngine.OnScenarioSkipped();
+            await _executionEngine.OnScenarioSkippedAsync();
         }
 
         public async Task OnTestRunEndAsync()

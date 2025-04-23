@@ -347,9 +347,12 @@ namespace Reqnroll.Generator.Generation
 
         private CodeMethodInvokeExpression CreateTestRunnerSkipScenarioCall()
         {
-            return new CodeMethodInvokeExpression(
+            var callSkipScenarioExpression = new CodeMethodInvokeExpression(
                 new CodeFieldReferenceExpression(null, TESTRUNNER_FIELD),
-                nameof(TestRunner.SkipScenario));
+                nameof(TestRunner.SkipScenarioAsync));
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callSkipScenarioExpression);
+
+            return callSkipScenarioExpression;
         }
 
         private void GenerateScenarioOutlineExamplesAsIndividualMethods(

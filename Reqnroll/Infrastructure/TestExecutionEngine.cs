@@ -269,14 +269,14 @@ namespace Reqnroll.Infrastructure
             }
         }
 
-        public virtual void OnScenarioSkipped()
+        public virtual async Task OnScenarioSkippedAsync()
         {
             // after discussing the placement of message sending points, this placement causes far less effort than rewriting the whole logic
             _contextManager.ScenarioContext.ScenarioExecutionStatus = ScenarioExecutionStatus.Skipped;
 
             // in case of skipping a Scenario, the OnScenarioStart() is not called, so publish the event here
-            _testThreadExecutionEventPublisher.PublishEvent(new ScenarioStartedEvent(FeatureContext, ScenarioContext));
-            _testThreadExecutionEventPublisher.PublishEvent(new ScenarioSkippedEvent());
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new ScenarioStartedEvent(FeatureContext, ScenarioContext));
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new ScenarioSkippedEvent());
         }
 
         public virtual void Pending()
@@ -310,11 +310,11 @@ namespace Reqnroll.Infrastructure
             await FireScenarioEventsAsync(HookType.AfterStep);
         }
         
-        protected virtual void OnSkipStep()
+        protected virtual async Task OnSkipStepAsync()
         {
             _contextManager.StepContext.Status = ScenarioExecutionStatus.Skipped;
             _testTracer.TraceStepSkipped();
-            _testThreadExecutionEventPublisher.PublishEvent(new StepSkippedEvent());
+            await _testThreadExecutionEventPublisher.PublishEventAsync(new StepSkippedEvent());
 
 
             var skippedStepHandlers = _contextManager.ScenarioContext.ScenarioContainer.ResolveAll<ISkippedStepHandler>().ToArray();
@@ -495,7 +495,7 @@ namespace Reqnroll.Infrastructure
 
                 if (isStepSkipped)
                 {
-                    OnSkipStep();
+                    await OnSkipStepAsync();
                 }
                 else
                 {
