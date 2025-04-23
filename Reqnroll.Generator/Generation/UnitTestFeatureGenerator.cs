@@ -254,8 +254,10 @@ namespace Reqnroll.Generator.Generation
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(onFeatureEndAsyncExpression);
 
             // VB does not allow the use of the await keyword in a "finally" clause. Therefore, we have to generate code specific to
-            // the language. The C# code will await OnFeatureStartAsync() while VB will call is sync and assign a variable to the resulting Task.
+            // the language. The C# code will await OnFeatureStartAsync() while VB will call the method synchronously and store the returned Task in a variable.
             // The VB code will then call await on that task after the conclusion of the try/finally block.
+            // This construct in VB might not fully wait for a real async execution of a before feature hook in case there was an exception in the previous after feature hook,
+            // but this affects only very specific and rare cases and only apply for legacy VB usages.
 
             // Dim onFeatureStartTask as Task = Nothing
             if (_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB)
