@@ -119,6 +119,8 @@ namespace Reqnroll.Infrastructure
 
             _testThreadExecutionEventPublisher.PublishEvent(new TestRunStartedEvent());
 
+            // The 'FireEventsAsync' call might throw an exception if the related before test run hook fails,
+            // but we can let the exception propagate to the caller.
             await FireEventsAsync(HookType.BeforeTestRun);
         }
 
@@ -134,9 +136,14 @@ namespace Reqnroll.Infrastructure
                 _testRunnerEndExecuted = true;
             }
 
-            await FireEventsAsync(HookType.AfterTestRun);
-            
-            _testThreadExecutionEventPublisher.PublishEvent(new TestRunFinishedEvent());
+            try
+            {
+                await FireEventsAsync(HookType.AfterTestRun);
+            }
+            finally
+            {
+                _testThreadExecutionEventPublisher.PublishEvent(new TestRunFinishedEvent());
+            }
         }
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
@@ -145,23 +152,39 @@ namespace Reqnroll.Infrastructure
 
             _testThreadExecutionEventPublisher.PublishEvent(new FeatureStartedEvent(FeatureContext));
 
-            await FireEventsAsync(HookType.BeforeFeature);
+            // The 'FireEventsAsync' call might throw an exception if the related before feature hook fails,
+            // but we can let the exception propagate to the caller.
+            try
+            {
+                await FireEventsAsync(HookType.BeforeFeature);
+            }
+            catch (Exception e)
+            {
+                // we capture the exception here to be able to skip subsequent scenario execution in the same feature
+                _contextManager.FeatureContext.BeforeFeatureHookError = e;
+                throw;
+            }
         }
 
         public virtual async Task OnFeatureEndAsync()
         {
-            await FireEventsAsync(HookType.AfterFeature);
-
-            if (_reqnrollConfiguration.TraceTimings)
+            try
             {
-                FeatureContext.Stopwatch.Stop();
-                var duration = FeatureContext.Stopwatch.Elapsed;
-                _testTracer.TraceDuration(duration, "Feature: " + FeatureContext.FeatureInfo.Title);
+                await FireEventsAsync(HookType.AfterFeature);
             }
+            finally
+            {
+                if (_reqnrollConfiguration.TraceTimings)
+                {
+                    FeatureContext.Stopwatch.Stop();
+                    var duration = FeatureContext.Stopwatch.Elapsed;
+                    _testTracer.TraceDuration(duration, "Feature: " + FeatureContext.FeatureInfo.Title);
+                }
 
-            _testThreadExecutionEventPublisher.PublishEvent(new FeatureFinishedEvent(FeatureContext));
+                _testThreadExecutionEventPublisher.PublishEvent(new FeatureFinishedEvent(FeatureContext));
 
-            _contextManager.CleanupFeatureContext();
+                _contextManager.CleanupFeatureContext();
+            }
         }
 
         public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo)
@@ -225,16 +248,22 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnScenarioEndAsync()
         {
+            // We invoke the before/after feature hooks from test setup, but we initialize the scenario context in the test method.
+            // In case the feature hooks fail, the runner will not run the test method, but the test teardown method will be called.
+            // In this case we don't have an initialized scenario context, so we don't need to call the after scenario hooks.
+            if (_contextManager.ScenarioContext == null)
+                return;
+
             try
             {
                 if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
                 {
                     await FireScenarioEventsAsync(HookType.AfterScenario);
                 }
-                _testThreadExecutionEventPublisher.PublishEvent(new ScenarioFinishedEvent(FeatureContext, ScenarioContext));
             }
             finally
             {
+                _testThreadExecutionEventPublisher.PublishEvent(new ScenarioFinishedEvent(FeatureContext, ScenarioContext));
                 _contextManager.CleanupScenarioContext();
             }
         }
@@ -437,6 +466,8 @@ namespace Reqnroll.Infrastructure
 
         private async Task ExecuteStepAsync(IContextManager contextManager, StepInstance stepInstance)
         {
+            // The 'HandleBlockSwitchAsync' call might throw an exception if any related before/after block hook fails.
+            // This exception will be propagated to the caller, so we don't need to handle it here.
             await HandleBlockSwitchAsync(stepInstance.StepDefinitionType.ToScenarioBlock());
 
             _testTracer.TraceStep(stepInstance, true);
@@ -463,6 +494,8 @@ namespace Reqnroll.Infrastructure
                     _obsoleteStepHandler.Handle(match);
 
                     onStepStartExecuted = true;
+                    // Both 'OnStepStartAsync' and 'ExecuteStepMatchAsync' can throw exceptions
+                    // if the related hook or step definition fails.
                     await OnStepStartAsync();
                     await ExecuteStepMatchAsync(match, arguments, durationHolder);
                     if (_reqnrollConfiguration.TraceSuccessfulSteps)
@@ -503,6 +536,10 @@ namespace Reqnroll.Infrastructure
             {
                 if (onStepStartExecuted)
                 {
+                    // We need to have this call after the 'UpdateStatusOnStepFailure' above, because otherwise
+                    // after step hooks cannot handle step errors.
+                    // The 'OnStepEndAsync' call might throw an exception if the related after step hook fails,
+                    // but we can let the exception propagate to the caller.
                     await OnStepEndAsync();
                 }
             }
@@ -576,12 +613,21 @@ namespace Reqnroll.Infrastructure
             if (_contextManager.ScenarioContext.CurrentScenarioBlock != block)
             {
                 if (_contextManager.ScenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.OK)
+                {
+                    // The 'OnBlockEndAsync' call might throw and exception if the related hook fails,
+                    // but we can let the exception propagate to the caller, because in that case we don't 
+                    // want to execute the next block anyway.
                     await OnBlockEndAsync(_contextManager.ScenarioContext.CurrentScenarioBlock);
+                }
 
                 _contextManager.ScenarioContext.CurrentScenarioBlock = block;
 
                 if (_contextManager.ScenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.OK)
+                {
+                    // The 'OnBlockStartAsync' call might throw and exception if the related hook fails,
+                    // but we can let the exception propagate to the caller.
                     await OnBlockStartAsync(_contextManager.ScenarioContext.CurrentScenarioBlock);
+                }
             }
         }
 
