@@ -230,7 +230,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("firstname", "John");
             table.AddRow("lastname", "Galt");
 
-            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
+            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { RequireTableToProvideAllConstructorParameters = true, VerifyAllColumnsBound = true });
             act.Should().Throw<ColumnCouldNotBeBoundException>();
         }
         
@@ -241,7 +241,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("firstname", "John");
             table.AddRow("lastname", "Galt");
 
-            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { VerifyAllColumnsBound = true, CaseInsensitiveColumnVerify = true});
+            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { RequireTableToProvideAllConstructorParameters = true, VerifyAllColumnsBound = true, CaseInsensitiveColumnVerify = true});
             act.Should().NotThrow();
         }
 
