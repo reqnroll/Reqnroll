@@ -123,7 +123,7 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
             var table = new Table("firstname");
             table.AddRow("John");
             table.AddRow("Howard");     
-            Action act = () => table.CreateSet<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, CaseInsensitiveColumnVerify = true });
+            Action act = () => table.CreateSet<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, VerifyCaseInsensitive = true });
             
             act.Should().NotThrow();
         }

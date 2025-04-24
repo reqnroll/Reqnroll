@@ -63,7 +63,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
             var table = new Table("firstname");
             table.AddRow("Howard");
 
-            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, CaseInsensitiveColumnVerify = true});
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, VerifyCaseInsensitive = true});
             act.Should().NotThrow();
         }
 
@@ -207,7 +207,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("firstname", "John");
             table.AddRow("lastname", "Galt");
 
-            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, CaseInsensitiveColumnVerify = true});
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, VerifyCaseInsensitive = true});
             act.Should().NotThrow();
         }
 
@@ -241,7 +241,7 @@ namespace Reqnroll.RuntimeTests.AssistTests
             table.AddRow("firstname", "John");
             table.AddRow("lastname", "Galt");
 
-            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { RequireTableToProvideAllConstructorParameters = true, VerifyAllColumnsBound = true, CaseInsensitiveColumnVerify = true});
+            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { RequireTableToProvideAllConstructorParameters = true, VerifyAllColumnsBound = true, VerifyCaseInsensitive = true});
             act.Should().NotThrow();
         }
 
