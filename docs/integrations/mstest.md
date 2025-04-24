@@ -72,6 +72,37 @@ public class Hooks
 }
 ```
 
+## Tags on Examples Workaround
+The MsTest Generator has an open issue regarding Tags on Examples, see ['issues/4089']( https://github.com/microsoft/testfx/issues/4089) and ['issues/1043'](https://github.com/microsoft/testfx/issues/1043#issuecomment-1942279024)
+
+In short, tags on Examples are *not* send to the test execution. So @Test and @Acceptance are not available for test filtering/reporting/etc.
+``` gherkin
+Scenario: Sample Scenario  
+   Given sample step
+
+[@Test]
+Examples:  
+| User   |  
+| Tester |
+
+[@Acceptance]
+Examples:  
+| User   |  
+| Acc    |
+```
+
+The workaround for now is to add the **generator** to the reqnroll.json. Note that this does impact how tests are shown and named in the Test Explorer:
+``` json
+    {
+      "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+      "generator": {"allowRowTests" :  false},
+    
+      "bindingAssemblies": [
+      ]
+    }
+```
+
+
 ## Tags for TestClass Attributes
 
 The MsTest Generator can generate test class attributes from tags specified on a **feature**.
