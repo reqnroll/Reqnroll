@@ -107,6 +107,28 @@ namespace Reqnroll.RuntimeTests.AssistTests.TableHelperExtensionMethods
         }
 
         [Fact]
+        public void Two_instances_with_column_case_mismatch_throws_ColumnCouldNotBeBoundException_on_verify()
+        {
+            var table = new Table("firstname");
+            table.AddRow("John");
+            table.AddRow("Howard");     
+            Action act = () => table.CreateSet<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
+            
+            act.Should().Throw<ColumnCouldNotBeBoundException>();
+        }
+
+        [Fact]
+        public void Two_instances_with_column_case_mismatch_does_not_throw_when_case_insensitive_verify_is_used()
+        {
+            var table = new Table("firstname");
+            table.AddRow("John");
+            table.AddRow("Howard");     
+            Action act = () => table.CreateSet<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, CaseInsensitiveColumnVerify = true });
+            
+            act.Should().NotThrow();
+        }
+
+        [Fact]
         public void Sets_string_values_on_the_instance_when_type_is_string()
         {
             var table = CreatePersonTableHeaders();
