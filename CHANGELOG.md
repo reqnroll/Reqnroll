@@ -2,6 +2,8 @@
 
 ## Improvements:
 
+* Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
+
 ## Bug fixes:
 
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
