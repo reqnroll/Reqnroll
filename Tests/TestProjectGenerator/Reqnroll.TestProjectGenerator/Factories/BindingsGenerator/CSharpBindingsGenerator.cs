@@ -191,6 +191,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
             string hookType,
             string name,
             string code = "",
+            bool? asyncHook = null,
             int? order = null,
             IList<string> hookTypeAttributeTags = null,
             IList<string> methodScopeAttributeTags = null,
@@ -213,7 +214,9 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
             string scopeClassAttributes = ToScopeTags(classScopeAttributeTags);
             string scopeMethodAttributes = ToScopeTags(methodScopeAttributeTags);
             string staticKeyword = isStatic ? "static" : string.Empty;
-
+            
+            var asyncHookValue = asyncHook ?? DefaultAsyncHook;
+            var returnType = asyncHookValue ? "async Task" : "void";
 
             return $$"""
 
@@ -231,7 +234,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
                      {
                          [{{hookType}}({{hookTypeAttributeTagsString}})]
                          {{scopeMethodAttributes}}
-                         public {{staticKeyword}} void {{name}}()
+                         public {{staticKeyword}} {{returnType}} {{name}}()
                          {
                              {{code}}
                              global::Log.LogHook();

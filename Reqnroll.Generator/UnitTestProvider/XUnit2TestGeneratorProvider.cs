@@ -101,15 +101,56 @@ namespace Reqnroll.Generator.UnitTestProvider
                     new CodeVariableReferenceExpression(OUTPUT_INTERFACE_PARAMETER_NAME)));
         }
 
+        private CodeStatement GetTryCatchStatementWithCombinedErrors(CodeExpression tryExpression, CodeExpression catchExpression)
+        {
+            var tryStatement = new CodeExpressionStatement(tryExpression);
+            var catchStatement = new CodeExpressionStatement(catchExpression);
+
+            // try { <tryExpression>; }
+            // catch (Exception e1) {
+            //   try { <catchExpression>; }
+            //   catch (Exception e2) {
+            //     throw new AggregateException(e1.Message, e1, e2);
+            //   }
+            //   throw;
+            // }
+
+            return new CodeTryCatchFinallyStatement(
+                [tryStatement],
+                [
+                    new CodeCatchClause(
+                        "e1",
+                        new CodeTypeReference(typeof(Exception)),
+                        new CodeTryCatchFinallyStatement(
+                            [catchStatement],
+                            [
+                                new CodeCatchClause(
+                                    "e2",
+                                    new CodeTypeReference(typeof(Exception)),
+                                    new CodeThrowExceptionStatement(new CodeObjectCreateExpression(typeof(AggregateException), new CodePrimitiveExpression("Test initialization failed"), new CodeVariableReferenceExpression("e1"), new CodeVariableReferenceExpression("e2"))))
+                                ]),
+                        new CodeThrowExceptionStatement())
+                ]);
+        }
+
         protected virtual void SetTestInitializeMethod(TestClassGenerationContext generationContext, CodeMemberMethod method)
         {
             var callTestInitializeMethodExpression = new CodeMethodInvokeExpression(
                 new CodeThisReferenceExpression(),
                 generationContext.TestInitializeMethod.Name);
-
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callTestInitializeMethodExpression);
 
-            method.Statements.Add(callTestInitializeMethodExpression);
+            // xUnit (v2) does not invoke the test level dispose through the IAsyncLifetime if
+            // there is an error during the test initialization. So we need to call it manually, 
+            // otherwise the test runner will not be released.
+
+            var callDisposeException = new CodeMethodInvokeExpression(
+                new CodeCastExpression(new CodeTypeReference(IASYNCLIFETIME_INTERFACE), new CodeThisReferenceExpression()),
+                "DisposeAsync");
+            CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callDisposeException);
+
+            method.Statements.Add(
+                GetTryCatchStatementWithCombinedErrors(callTestInitializeMethodExpression, callDisposeException));
         }
 
         public virtual void SetTestMethodIgnore(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)

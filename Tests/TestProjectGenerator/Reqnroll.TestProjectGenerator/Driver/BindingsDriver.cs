@@ -105,7 +105,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
             regex.Matches(content).Count.Should().NotBe(timesExecuted);
         }
 
-        private IEnumerable<string> GetActualHookLines() => GetActualLogLines("hook");
+        public IEnumerable<string> GetActualHookLines() => GetActualLogLines("hook");
 
         public void AssertHooksExecutedInOrder(params string[] methodNames)
         {

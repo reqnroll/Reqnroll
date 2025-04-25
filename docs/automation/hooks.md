@@ -283,3 +283,24 @@ If a `BeforeScenario` throws an unhandled exception then all the scenario steps 
 ## Tag Scoping
 
 Most hooks support tag scoping. Use tag scoping to restrict hooks to only those features or scenarios that have *at least one* of the tags in the tag filter (tags are combined with OR). You can specify the tag in the attribute or using [scoped bindings](scoped-bindings).
+
+## Throwing Exceptions from Hooks
+
+The best practice is to avoid throwing exceptions in hooks, especially in the "after" hooks.
+
+**Rule 1:** When you throw an exception in a hook, the remaining hooks of the same type (e.g. the other `[BeforeScenario]` hooks) will not be executed.
+
+**Rule 2:** The "after" hooks are executed even if one of the related "before" hooks failed, therefore in the "after" hook you cannot assume that the resource you have initialized in a "before" hook has been executed. 
+
+To illustrate the exception handling behavior, consider the following example:
+
+* `[BeforeScenario]` hook 1: Initializes service A
+* `[BeforeScenario]` hook 2: Initializes service B
+* `[AfterScenario]` hook 3: Cleans up service A
+* `[AfterScenario]` hook 4: Cleans up service B
+
+When "hook 1" fails, "hook 2" will not be executed (Rule 1), so "Service B" will not be initialized. 
+However, the `[AfterScenario]` hooks ("hook 3" and "hook 4") will run, so "hook 4" will try to clean up "Service B", which was never initialized. 
+To address this problem, it is recommended to check the status of the service in the "after" hook before performing any cleanup operations.
+
+**Note:** The before/after feature hooks are handled by Reqnroll in a special way (see notes at [parallel execution](../execution/parallel-execution.md#execution-behavior)). As a result of that, the `[AfterFeature]` hooks might run "delayed" at the time of the next scenario execution in a different feature. That means that the related `[AfterFeature]` hook error will be reported at that scenario and will cause a failure of that scenario. Because of this, it is better to handle all exceptions within a `[AfterFeature]` hook.

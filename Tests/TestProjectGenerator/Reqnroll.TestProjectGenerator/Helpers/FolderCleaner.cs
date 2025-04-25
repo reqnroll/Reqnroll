@@ -6,7 +6,7 @@ namespace Reqnroll.TestProjectGenerator.Helpers;
 public class FolderCleaner
 {
     private const int MaxTestRunAgeMinutes = 60;
-    private const int MaxTestRunsToKeep = 10;
+    private const int MaxTestRunsToKeep = 2*8; // allow safely running tests with 8 test processes
 
     private static int _oldFoldersCleaned = 0;
     private readonly Folders _folders;

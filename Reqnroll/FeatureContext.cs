@@ -14,6 +14,9 @@ namespace Reqnroll
         CultureInfo BindingCulture { get; }
 
         IObjectContainer FeatureContainer { get; }
+
+        Exception BeforeFeatureHookError { get; }
+        bool BeforeFeatureHookFailed { get; }
     }
 
     public class FeatureContext : ReqnrollContext, IFeatureContext
@@ -66,5 +69,9 @@ namespace Reqnroll
         public CultureInfo BindingCulture { get; }
         public IObjectContainer FeatureContainer { get; }
         internal Stopwatch Stopwatch { get; }
+
+        // these properties are used by the generated code to skip scenario execution of features with a failing before feature hook
+        public Exception BeforeFeatureHookError { get; internal set; }
+        public bool BeforeFeatureHookFailed => BeforeFeatureHookError != null;
     }
 }

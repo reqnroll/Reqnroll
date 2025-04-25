@@ -89,6 +89,9 @@ The *Reqnroll with Rider* extension cannot work together with the *SpecFlow for 
     </ItemGroup>
     ```
    - This is a work around for a known issue found here [Content Include .feature files in .csproj](https://github.com/reqnroll/Reqnroll.Rider/issues/1)  
-  
 6. Restart Rider.
-
+7. *(optional)*: If your `.feature` files aren't recognized by the plugin:
+    - Right click on a `.feature` file in the explorer then `Associate with File Type...`
+    - Make sure `Open matching files in JetBrains Rider` is selected
+    - Select `Reqnroll file` in the list and click `OK`
+    - This will add a new File name pattern under `Settings -> Editor -> File Types -> Reqnroll file`

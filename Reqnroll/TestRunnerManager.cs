@@ -13,6 +13,7 @@ using Reqnroll.Bindings.Discovery;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using System.Runtime.ExceptionServices;
 
 namespace Reqnroll;
 
@@ -235,8 +236,9 @@ public class TestRunnerManager : ITestRunnerManager
         return testRunner;
     }
 
-    private async Task FireRemainingAfterFeatureHooks()
+    private async Task<ExceptionDispatchInfo[]> FireRemainingAfterFeatureHooks()
     {
+        var onFeatureEndErrors = new List<ExceptionDispatchInfo>();
         var testWorkerContainers = _availableTestWorkerContainers.Keys.Concat(_usedTestWorkerContainers.Keys).ToArray();
         foreach (var testWorkerContainer in testWorkerContainers)
         {
@@ -244,18 +246,35 @@ public class TestRunnerManager : ITestRunnerManager
             if (contextManager.FeatureContext != null)
             {
                 var testRunner = testWorkerContainer.Resolve<ITestRunner>();
-                await testRunner.OnFeatureEndAsync();
+                try
+                {
+                    await testRunner.OnFeatureEndAsync();
+                }
+                catch (Exception ex)
+                {
+                    _testTracer.TraceWarning("[AfterFeature] error: " + ex);
+                    onFeatureEndErrors.Add(ExceptionDispatchInfo.Capture(ex));
+                }
             }
         }
+        return onFeatureEndErrors.ToArray();
     }
 
     public virtual async Task DisposeAsync()
     {
         if (Interlocked.CompareExchange(ref _wasDisposed, 1, 0) == 0)
         {
-            await FireRemainingAfterFeatureHooks();
+            var onFeatureEndErrors = await FireRemainingAfterFeatureHooks();
+            ExceptionDispatchInfo onTestRunEndError = null;
 
-            await FireTestRunEndAsync();
+            try
+            {
+                await FireTestRunEndAsync();
+            }
+            catch (Exception ex)
+            {
+                onTestRunEndError = ExceptionDispatchInfo.Capture(ex);
+            }
 
             if (_globalTestRunner != null)
             {
@@ -284,6 +303,16 @@ public class TestRunnerManager : ITestRunnerManager
             _globalContainer.Dispose();
 
             OnTestRunnerManagerDisposed(this);
+
+            // if we have errors in [AfterFeature] and [AfterTestRun] hooks, we throw them all
+            if (onFeatureEndErrors.Any())
+            {
+                if (onTestRunEndError == null)
+                    throw new AggregateException("Errors in [AfterFeature] hooks", onFeatureEndErrors.Select(x => x.SourceException));
+                throw new AggregateException("Errors in [AfterFeature] and [AfterTestRun] hooks", onFeatureEndErrors.Select(x => x.SourceException).Concat([onTestRunEndError.SourceException]));
+            }
+            // if we have only error in [AfterTestRun] hooks, we throw it
+            onTestRunEndError?.Throw();
         }
     }
 

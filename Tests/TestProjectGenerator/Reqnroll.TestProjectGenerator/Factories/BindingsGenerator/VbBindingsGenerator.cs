@@ -147,6 +147,7 @@ namespace Reqnroll.TestProjectGenerator.Factories.BindingsGenerator
             string hookType,
             string name,
             string code = "",
+            bool? asyncHook = null,
             int? order = null,
             IList<string> hookTypeAttributeTags = null,
             IList<string> methodScopeAttributeTags = null,

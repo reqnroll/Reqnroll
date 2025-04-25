@@ -2,10 +2,13 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Reqnroll.Tracing;
 using Xunit;
+using static Reqnroll.RuntimeTests.TestRunnerManagerStaticApiTest;
 
 namespace Reqnroll.RuntimeTests;
 
@@ -136,7 +139,8 @@ public class TestRunnerManagerTests : IAsyncLifetime
         var testRunnerWithFeatureContext = _testRunnerManager.GetTestRunner();
         var testRunnerWithoutFeatureContext = _testRunnerManager.GetTestRunner();
 
-        FeatureHookTracker.AfterFeatureCalled = false;
+        FeatureHookTracker.Reset();
+        AfterTestRunTestBinding.Reset();
         await testRunnerWithFeatureContext.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
         var disposableClass1 = new DisposableClass();
         testRunnerWithFeatureContext.FeatureContext.FeatureContainer.RegisterInstanceAs(disposableClass1, dispose: true);
@@ -147,17 +151,63 @@ public class TestRunnerManagerTests : IAsyncLifetime
         await TestRunnerManager.OnTestRunEndAsync(_anAssembly);
         FeatureHookTracker.AfterFeatureCalled.Should().BeTrue();
         disposableClass1.IsDisposed.Should().BeTrue();
+        AfterTestRunTestBinding.AfterTestRunCallCount.Should().Be(1, "AfterTestRun should be called once");
+    }
+
+    [Fact]
+    public async Task Should_fire_AfterTestRun_hook_even_if_remaining_AfterFeature_hooks_fail()
+    {
+        _testRunnerManager.Initialize(_anAssembly);
+
+        var testRunnerWithFeatureContext = _testRunnerManager.GetTestRunner();
+        var testRunnerWithoutFeatureContext = _testRunnerManager.GetTestRunner();
+
+        FeatureHookTracker.Reset(shouldThrow: true);
+        AfterTestRunTestBinding.Reset();
+        await testRunnerWithFeatureContext.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+        var disposableClass1 = new DisposableClass();
+        testRunnerWithFeatureContext.FeatureContext.FeatureContainer.RegisterInstanceAs(disposableClass1, dispose: true);
+
+        TestRunnerManager.ReleaseTestRunner(testRunnerWithFeatureContext);
+        TestRunnerManager.ReleaseTestRunner(testRunnerWithoutFeatureContext);
+
+        await FluentActions.Awaiting(() => TestRunnerManager.OnTestRunEndAsync(_anAssembly))
+                     .Should()
+                     .ThrowAsync<InvalidOperationException>();
+        FeatureHookTracker.AfterFeatureCalled.Should().BeTrue();
+        disposableClass1.IsDisposed.Should().BeTrue();
+        AfterTestRunTestBinding.AfterTestRunCallCount.Should().Be(1, "AfterTestRun should be called once");
     }
 
     [Binding]
     static class FeatureHookTracker
     {
-        public static bool AfterFeatureCalled = false;
+        private static readonly AsyncLocal<StrongBox<bool>> _afterFeatureCalled = new();
+        private static readonly AsyncLocal<bool> _shouldThrow = new();
+
+        public static void Reset(bool shouldThrow = false)
+        {
+            _afterFeatureCalled.Value = new StrongBox<bool>(false);
+            _shouldThrow.Value = shouldThrow;
+        }
+
+        public static bool AfterFeatureCalled
+        {
+            get
+            {
+                if (_afterFeatureCalled.Value == null)
+                    throw new InvalidOperationException($"Invoke {nameof(FeatureHookTracker)}.{nameof(Reset)} in the test arrange phase");
+                return _afterFeatureCalled.Value.Value;
+            }
+        }
 
         [AfterFeature]
         public static void AfterFeature()
         {
-            AfterFeatureCalled = true;
+            if (_afterFeatureCalled.Value != null)
+                _afterFeatureCalled.Value.Value = true;
+            if (_shouldThrow.Value)
+                throw new InvalidOperationException("This is a test exception from AfterFeature");
         }
     }
 
