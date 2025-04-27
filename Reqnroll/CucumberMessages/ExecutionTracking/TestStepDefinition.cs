@@ -41,7 +41,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal bool Ambiguous { get { return AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Count() > 0; } }
         private IStepDefinitionBinding StepDefinitionBinding;
 
-        internal List<TestStepArgument> StepArguments { get; private set; }
+        internal List<TestStepArgument> StepArguments { get; private set; } = new();
 
 
         internal TestStepDefinition(string testStepDefinitionId, string pickleStepId, TestCaseDefinition parentTestCaseDefinition)
@@ -79,7 +79,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             var argumentValues = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.Value.ToString()).ToList() : new List<string>();
             var argumentStartOffsets = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.StartOffset).ToList() : new List<int?>();
             var argumentTypes = Bound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
-            StepArguments = new();
+
             if (Bound && !IsInputDataTableOrDocString)
             {
                 for (int i = 0; i < argumentValues.Count; i++)

@@ -17,7 +17,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// It will track info from both Feature-level and Scenario-level Execution Events for a single Test Case
     /// Individual executions will be recorded as a TestExecutionRecord.
     /// </summary>
-    internal class TestCaseTracker
+    internal class TestCaseTracker : ITestCaseTracker
     {
         internal TestCaseTracker(FeatureTracker featureTracker, string pickleId)
         {
@@ -37,10 +37,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal string PickleId { get; } = string.Empty;
         internal string TestCaseId { get; private set; }
         internal int AttemptCount { get; private set; }
-        public object TestCaseStartedTimeStamp { get; }
+        public DateTime TestCaseStartedTimeStamp { get; }
         internal bool Enabled { get; } //This will be false if the feature could not be pickled
-        internal bool Finished { get; private set; }
-        internal ScenarioExecutionStatus ScenarioExecutionStatus { get { return ExecutionHistory.Last().ScenarioExecutionStatus; } }
+        public bool Finished { get; private set; }
+        public ScenarioExecutionStatus ScenarioExecutionStatus { get { return ExecutionHistory.Last().ScenarioExecutionStatus; } }
 
 
         // ID Generator to use when generating IDs for TestCase messages and beyond
@@ -59,7 +59,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         }
 
         // Returns all of the Cucumber Messages that result from execution of the Test Case (eg, TestCase, TestCaseStarted, TestCaseFinished, TestStepStarted/Finished)
-        internal IEnumerable<Envelope> RuntimeGeneratedMessages
+        public IEnumerable<Envelope> RuntimeGeneratedMessages
         {
             get
             {
@@ -94,7 +94,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // used during TestCase creation to map from a Step Definition binding to its ID
         internal ConcurrentDictionary<string, string> StepDefinitionsByPattern;
 
-        internal void ProcessEvent(ExecutionEvent anEvent)
+        public void ProcessEvent(ExecutionEvent anEvent)
         {
             if (!Enabled) return;
             switch (anEvent)

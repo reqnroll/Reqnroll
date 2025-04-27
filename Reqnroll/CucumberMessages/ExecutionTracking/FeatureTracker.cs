@@ -34,17 +34,16 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
         // This dictionary is shared across all Features (via the Publisher)
-        // The same is true of the StepTransformations and StepDefinitionBindings used for Undefined Parameter Types
         internal ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
 
-        // This dictionary maps from (string) PickkleID to the TestCase tracker
-        private ConcurrentDictionary<string, TestCaseTracker> testCaseTrackersById = new();
+        // This maintains the list of TestCases, identified by (string) PickkleID, running within this Feature
+        internal TestCaseTrackers TestCaseTrackersById ;
 
         public string FeatureName { get; }
         public bool Enabled { get; }
 
         // This dictionary maps from (string) PickleIDIndex to (string) PickleID
-        private Dictionary<string, string> PickleIds { get; } = new();
+        internal Dictionary<string, string> PickleIds { get; } = new();
         private PickleJar PickleJar { get; set; }
 
         public bool FeatureExecutionSuccess { get; private set; }
@@ -57,7 +56,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             IDGenerator = idGenerator;
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
-            Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null ? true : false;
+            Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source != null ? true : false;
+            TestCaseTrackersById = new TestCaseTrackers(this);
             ProcessEvent(featureStartedEvent);
         }
 
@@ -67,7 +67,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             get
             {
-                return testCaseTrackersById.Values.OrderBy(tc => tc.TestCaseStartedTimeStamp).SelectMany(scenario => scenario.RuntimeGeneratedMessages);
+                return TestCaseTrackersById.GetAll().OrderBy(tc => tc.TestCaseStartedTimeStamp).SelectMany(scenario => scenario.RuntimeGeneratedMessages);
             }
         }
 
@@ -108,14 +108,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // Running this method multiple times is harmless. The FeatureExecutionSuccess property is only consumed upon the TestRunComplete event (ie, only once).
         public void ProcessEvent(FeatureFinishedEvent featureFinishedEvent)
         {
-            var testCases = testCaseTrackersById.Values.ToList();
+            var testCases = TestCaseTrackersById.GetAll().ToList();
 
             // Calculate the Feature-level Execution Status
-            FeatureExecutionSuccess = testCases.All(tc => tc.Finished) switch
-            {
-                true => testCases.All(tc => tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK),
-                _ => false
-            };
+            FeatureExecutionSuccess = testCases.All(tc => tc.Finished && tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK);
         }
 
         public void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
@@ -143,17 +139,17 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 var pickleStepSequence = PickleJar.PickleStepSequenceFor(pickleIndex);
                 scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence; ;
 
-                TestCaseTracker tct;
-                if (testCaseTrackersById.TryGetValue(pickleId, out tct))
+                if (TestCaseTrackersById.TryGet(pickleId, out var tct))
                 {
                     // This represents a re-execution of the TestCase.
                     tct.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
                 }
                 else // This is the first time this TestCase (aka, pickle) is getting executed. New up a TestCaseTracker for it.
                 {
-                    tct = new TestCaseTracker(this, pickleId);
-                    tct.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
-                    testCaseTrackersById.TryAdd(pickleId, tct);
+                    if (TestCaseTrackersById.TryAddNew(pickleId, out var newtct))
+                    {
+                        newtct.ProcessEvent((ExecutionEvent)scenarioStartedEvent);
+                    }
                 }
             }
         }
@@ -165,7 +161,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                if (TestCaseTrackersById.TryGet(pickleId, out var tccmt))
                 {
                     tccmt.ProcessEvent((ExecutionEvent)scenarioFinishedEvent);
                 }
@@ -180,7 +176,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                if (TestCaseTrackersById.TryGet(pickleId, out var tccmt))
                 {
                     tccmt.ProcessEvent((ExecutionEvent)stepStartedEvent);
                 }
@@ -194,7 +190,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             if (String.IsNullOrEmpty(pickleIndex)) return;
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                if (TestCaseTrackersById.TryGet(pickleId, out var tccmt))
                 {
                     tccmt.ProcessEvent((ExecutionEvent)stepFinishedEvent);
                 }
@@ -209,7 +205,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                if (TestCaseTrackersById.TryGet(pickleId, out var tccmt))
                     tccmt.ProcessEvent((ExecutionEvent)hookBindingStartedEvent);
             }
         }
@@ -222,7 +218,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
             {
-                if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+                if (TestCaseTrackersById.TryGet(pickleId, out var tccmt))
                     tccmt.ProcessEvent((ExecutionEvent)hookBindingFinishedEvent);
             }
         }
@@ -233,7 +229,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (String.IsNullOrEmpty(pickleId)) return;
 
-            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            if (TestCaseTrackersById.TryGet(pickleId, out var tccmt))
             {
                 tccmt.ProcessEvent((ExecutionEvent)attachmentAddedEvent);
             }
@@ -245,7 +241,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
             if (String.IsNullOrEmpty(pickleId)) return;
 
-            if (testCaseTrackersById.TryGetValue(pickleId, out var tccmt))
+            if (TestCaseTrackersById.TryGet(pickleId, out var tccmt))
             {
                 tccmt.ProcessEvent((ExecutionEvent)outputAddedEvent);
             }

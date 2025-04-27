@@ -224,7 +224,7 @@ namespace Reqnroll.Events
         public ScenarioInfo ScenarioInfo { get; }
         public string StepText { get; }
 
-        [Obsolete("Use OutputAddedEvent(string, FeatureInfo) instead")]
+        [Obsolete("Use OutputAddedEvent(string, FeatureInfo, ScenarioInfo) instead")]
         public OutputAddedEvent(string text)
         {
             Text = text;
@@ -244,7 +244,7 @@ namespace Reqnroll.Events
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
 
-        [Obsolete("Use AttachmentAddedEvent(string, FeatureInfo) instead")]
+        [Obsolete("Use AttachmentAddedEvent(string, FeatureInfo, ScenarioInfo) instead")]
         public AttachmentAddedEvent(string filePath)
         {
             FilePath = filePath;
