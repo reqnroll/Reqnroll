@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.CSharp;
 using Microsoft.VisualBasic;
+using Reqnroll.Generator.Generation;
 
 namespace Reqnroll.Generator.CodeDom
 {
@@ -134,12 +135,12 @@ namespace Reqnroll.Generator.CodeDom
             var result = new CodeTypeDeclaration(className);
             result.CustomAttributes.Add(
                 new CodeAttributeDeclaration(
-                    new CodeTypeReference(typeof(GeneratedCodeAttribute)),
+                    new CodeTypeReference(typeof(GeneratedCodeAttribute), CodeTypeReferenceOptions.GlobalReference),
                     new CodeAttributeArgument(new CodePrimitiveExpression("Reqnroll")),
                     new CodeAttributeArgument(new CodePrimitiveExpression(GetCurrentReqnrollVersion().ToString()))));
             result.CustomAttributes.Add(
                 new CodeAttributeDeclaration(
-                    new CodeTypeReference(typeof(CompilerGeneratedAttribute))));
+                    new CodeTypeReference(typeof(CompilerGeneratedAttribute), CodeTypeReferenceOptions.GlobalReference)));
 
             return result;
         }
@@ -233,9 +234,11 @@ namespace Reqnroll.Generator.CodeDom
 
         public void MarkCodeMemberMethodAsAsync(CodeMemberMethod method)
         {
+            var globalPrefix = TargetLanguage == CodeDomProviderLanguage.CSharp ? "global::" : string.Empty;
+
             if (IsVoid(method.ReturnType))
             {
-                method.ReturnType = new CodeTypeReference($"async {typeof(Task).FullName}");
+                method.ReturnType = new CodeTypeReference($"async {globalPrefix}{typeof(Task).FullName}");
                 return;
             }
 
@@ -316,6 +319,21 @@ namespace Reqnroll.Generator.CodeDom
                     return new CodeSnippetExpression($"{parameterName} := {valueExpression.VariableName}");
             }
             return valueExpression;
+        }
+
+        public IList<CodeStatement> GetFeatureFilewideUsingStatements()
+        {
+            var usingStatements = new List<CodeStatement>();
+            switch (TargetLanguage)
+            {
+                case CodeDomProviderLanguage.CSharp:
+                    usingStatements.Add(new CodeSnippetStatement($"using {GeneratorConstants.REQNROLL_NAMESPACE};"));
+                    break;
+                case CodeDomProviderLanguage.VB:
+                    usingStatements.Add(new CodeSnippetStatement($"Imports {GeneratorConstants.REQNROLL_NAMESPACE}"));
+                    break;
+            }
+            return usingStatements;
         }
     }
 }

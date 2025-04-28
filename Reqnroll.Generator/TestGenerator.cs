@@ -98,6 +98,7 @@ namespace Reqnroll.Generator
                                   };
 
                 AddReqnrollHeader(codeProvider, outputWriter);
+                AddFileWideUsingStatements(codeProvider, outputWriter);
                 codeProvider.GenerateCodeFromNamespace(codeNamespace, outputWriter, options);
                 AddReqnrollFooter(codeProvider, outputWriter);
 
@@ -203,6 +204,14 @@ namespace Reqnroll.Generator
                 return path;
 
             return featureFileInput.GetFullPath(projectSettings) + GenerationTargetLanguage.GetExtension(projectSettings.ProjectPlatformSettings.Language);
+        }
+
+        protected void AddFileWideUsingStatements(CodeDomProvider codeProvider,TextWriter outputWriter)
+        {
+            foreach(var statement in codeDomHelper.GetFeatureFilewideUsingStatements())
+            {
+                codeProvider.GenerateCodeFromStatement(statement, outputWriter, null);
+            }
         }
 
         #region Header & Footer
