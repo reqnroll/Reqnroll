@@ -3,10 +3,12 @@ using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Moq;
 using Reqnroll.Bindings;
+using Reqnroll.BoDi;
 using Reqnroll.CucumberMessages.ExecutionTracking;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
+using Reqnroll.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -95,6 +97,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
 
             // Assert
             sut.StaticMessages.Should().NotBeNull();
+            sut.StaticMessages.ToList().Count.Should().Be(3);
         }
 
         [Fact]
@@ -110,6 +113,32 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             // Assert
             sut.FeatureExecutionSuccess.Should().BeTrue(); // No test cases were added, so it should default to true
         }
+
+        [Fact]
+        public void ProcessEvent_Should_Calculate_FeatureExecutionFailure_On_FeatureFinishedEventWhenAScenarioFails()
+        {
+            // Arrange
+            var featureFinishedEventMock = new Mock<FeatureFinishedEvent>(MockBehavior.Strict, null);
+            var sut = InitializeFeatureTrackerSUT();
+            _testCaseTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.TestError);
+            _testCaseTrackerMock.Setup(t => t.Finished).Returns(true);
+            _ = sut.StaticMessages.ToList();
+            sut.TestCaseTrackersById.TryAddNew("0", out _);
+
+            var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+            var scenarioContextMock = new Mock<IScenarioContext>();
+            scenarioContextMock.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy);
+            var scenarioFinishedEventMock = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock.Object);
+
+            // Act
+            sut.ProcessEvent(scenarioFinishedEventMock.Object);
+            sut.ProcessEvent(featureFinishedEventMock.Object);
+
+            // Assert
+            sut.FeatureExecutionSuccess.Should().BeFalse(); // No test cases were added, so it should default to true
+        }
+
+
 
         [Fact]
         public void ProcessEvent_Should_Throw_Exception_For_Invalid_ScenarioStartedEvent()
@@ -213,6 +242,50 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
 
             // Assert
             _testCaseTrackerMock.Verify(t => t.ProcessEvent(stepFinishedEvent));
+        }
+
+        [Fact]
+        public void ProcessEvent_Should_Handle_HookBindingStartedEvent()
+        {
+            // Arrange
+            var sut = InitializeFeatureTrackerSUT();
+            _ = sut.StaticMessages.ToList();
+            sut.TestCaseTrackersById.TryAddNew("0", out _);
+
+            var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+
+            var contextManagerMock = new Mock<IContextManager>();
+            contextManagerMock.Setup(cm => cm.ScenarioContext).Returns(new ScenarioContext(null, scenarioInfoDummy, null));
+
+            var hookBindingStarted = new HookBindingStartedEvent(null, contextManagerMock.Object);
+
+            // Act
+            sut.ProcessEvent(hookBindingStarted);
+
+            // Assert
+            _testCaseTrackerMock.Verify(t => t.ProcessEvent(hookBindingStarted));
+        }
+
+        [Fact]
+        public void ProcessEvent_Should_Handle_HookBindingFinishedEvent()
+        {
+            // Arrange
+            var sut = InitializeFeatureTrackerSUT();
+            _ = sut.StaticMessages.ToList();
+            sut.TestCaseTrackersById.TryAddNew("0", out _);
+
+            var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+
+            var contextManagerMock = new Mock<IContextManager>();
+            contextManagerMock.Setup(cm => cm.ScenarioContext).Returns(new ScenarioContext(null, scenarioInfoDummy, null));
+
+            var hookBindingFinished = new HookBindingFinishedEvent(null, new TimeSpan(), contextManagerMock.Object);
+
+            // Act
+            sut.ProcessEvent(hookBindingFinished);
+
+            // Assert
+            _testCaseTrackerMock.Verify(t => t.ProcessEvent(hookBindingFinished));
         }
 
         [Fact]
