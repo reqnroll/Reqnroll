@@ -382,6 +382,19 @@ namespace Reqnroll.Generator.Generation
 
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
+            // Guard when calling AfterScenario when TestRunner is already released (errors or edge cases in a supported test framework)
+            // if ((testRunner == null))
+            // {
+            //     return;
+            // }
+            var testRunnerNotNullGuard =
+                new CodeConditionStatement(new CodeBinaryOperatorExpression(
+                    testRunnerField,
+                    CodeBinaryOperatorType.IdentityEquality,
+                    new CodePrimitiveExpression(null)),
+                    new CodeMethodReturnStatement());
+            testCleanupMethod.Statements.Add(testRunnerNotNullGuard);
+
             //await testRunner.OnScenarioEndAsync();
             var onScenarioEndCallExpression = new CodeMethodInvokeExpression(
                 testRunnerField,
@@ -390,19 +403,23 @@ namespace Reqnroll.Generator.Generation
             var onScenarioEndCallStatement = new CodeExpressionStatement(onScenarioEndCallExpression);
 
             // "Release" the TestRunner, so that other threads can pick it up
-            // TestRunnerManager.ReleaseTestRunner(testRunner);
+            // global::Reqnroll.TestRunnerManager.ReleaseTestRunner(testRunner);
             var releaseTestRunnerCallStatement = new CodeExpressionStatement(
                 new CodeMethodInvokeExpression(
                     new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
                     nameof(TestRunnerManager.ReleaseTestRunner),
                     testRunnerField));
 
+            // Unassign TestRunner to make sure it won't be reused if the test framework runs AfterScenario multiple times
+            // testRunner = null;
+            var unasignTestRunnerInstance = new CodeAssignStatement(testRunnerField, new CodePrimitiveExpression(null));
+
             // add ReleaseTestRunner to the finally block of OnScenarioEndAsync 
             testCleanupMethod.Statements.Add(
                 new CodeTryCatchFinallyStatement(
                     [onScenarioEndCallStatement],
                     [],
-                    [releaseTestRunnerCallStatement]
+                    [releaseTestRunnerCallStatement, unasignTestRunnerInstance]
                 ));
         }
 
