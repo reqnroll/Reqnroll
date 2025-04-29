@@ -7,9 +7,10 @@
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
 * Fix: Scenario, feature and test run finished event is not published when the related "after" hook fails (#560)
 * Fix: Inconsistent hook execution (duble execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
+* Fix: Improved test code generation to avoid name collisions with user's Project Name (#583)
 * Fix: Guard when calling AfterScenario when TestRunner is already released (#387)
 
-*Contributors of this release (in alphabetical order): @clrudolphi, @gasparnagy, @obligaron* 
+*Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy, @obligaron 
 
 # v2.4.0 - 2025-03-06
 

@@ -108,9 +108,6 @@ namespace Reqnroll.Generator.Generation
 
             var codeNamespace = new CodeNamespace(targetNamespace);
 
-            codeNamespace.Imports.Add(new CodeNamespaceImport(GeneratorConstants.REQNROLL_NAMESPACE));
-            codeNamespace.Imports.Add(new CodeNamespaceImport("System"));
-            codeNamespace.Imports.Add(new CodeNamespaceImport("System.Linq"));
             return codeNamespace;
         }
 
@@ -177,7 +174,7 @@ namespace Reqnroll.Generator.Generation
                 new CodeTypeReference(typeof(FeatureInfo), CodeTypeReferenceOptions.GlobalReference), GeneratorConstants.FEATUREINFO_FIELD);
             featureInfoField.Attributes |= MemberAttributes.Static;
             featureInfoField.InitExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(FeatureInfo), CodeTypeReferenceOptions.GlobalReference),
-                new CodeObjectCreateExpression(typeof(CultureInfo),
+                new CodeObjectCreateExpression(new CodeTypeReference(typeof(CultureInfo), CodeTypeReferenceOptions.GlobalReference),
                                                new CodePrimitiveExpression(generationContext.Feature.Language)),
                 new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
                 new CodePrimitiveExpression(generationContext.Feature.Name),
