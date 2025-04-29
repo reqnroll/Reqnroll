@@ -18,6 +18,10 @@ using Cucumber.HtmlFormatter;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
+    /// <summary>
+    /// This Cucumber Messages plugin recieves the generated Cucumber Messages and writes each Feature to disk as an HTML report
+    /// (uses the Cucumber HtmlFormatter and react components to generate the html)
+    /// </summary>
     public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
     {
         public HtmlFormatterPlugin(ICucumberMessagesConfiguration configuration) : base(configuration, "html", ".html", "reqnroll_report.html")

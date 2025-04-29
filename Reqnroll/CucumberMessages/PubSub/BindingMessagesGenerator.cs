@@ -12,6 +12,11 @@ using System.Text.RegularExpressions;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
+    /// <summary>
+    /// This class is used at test start-up to iterate through the BindingRegistry to generate Messages for each of the 
+    /// StepTransformations, StepDefinitions and Hooks.
+    /// The binding items found are also cached for use during the processing of test cases.
+    /// </summary>
     internal class BindingMessagesGenerator
     {
         public IEnumerable<Envelope> PopulateBindingCachesAndGenerateBindingMessages(IBindingRegistry bindingRegistry, 
