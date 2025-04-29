@@ -202,7 +202,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 iDGenerator.GetNewId(),
                 null,
                 sourceRef,
-                hookBinding.IsScoped ? "@{hookBinding.BindingScope.Tag}" : null,
+                hookBinding.IsScoped ? $"@{hookBinding.BindingScope.Tag}" : null,
                 ToHookType(hookBinding)
             );
             return result;
