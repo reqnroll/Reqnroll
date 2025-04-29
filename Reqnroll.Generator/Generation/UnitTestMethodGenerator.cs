@@ -152,7 +152,7 @@ namespace Reqnroll.Generator.Generation
             var featureTagsExpression = new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME);
             if (scenarioDefinitionInFeatureFile.Rule != null && scenarioDefinitionInFeatureFile.Rule.Tags.Any())
             {
-                var tagHelperReference = new CodeTypeReferenceExpression(nameof(TagHelper));
+                var tagHelperReference = new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TagHelper), CodeTypeReferenceOptions.GlobalReference));
                 var ruleTagsExpression = _scenarioPartHelper.GetStringArrayExpression(scenarioDefinitionInFeatureFile.Rule.Tags);
                 inheritedTagsExpression = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.CombineTags), featureTagsExpression, ruleTagsExpression);
             }
@@ -239,9 +239,9 @@ namespace Reqnroll.Generator.Generation
         private void AddVariableForArguments(CodeMemberMethod testMethod, ParameterSubstitution paramToIdentifier)
         {
             var argumentsExpression = new CodeVariableDeclarationStatement(
-                typeof(OrderedDictionary),
+                new CodeTypeReference(typeof(OrderedDictionary), CodeTypeReferenceOptions.GlobalReference),
                 GeneratorConstants.SCENARIO_ARGUMENTS_VARIABLE_NAME,
-                new CodeObjectCreateExpression(typeof(OrderedDictionary)));
+                new CodeObjectCreateExpression(new CodeTypeReference(typeof(OrderedDictionary), CodeTypeReferenceOptions.GlobalReference)));
 
             testMethod.Statements.Add(argumentsExpression);
 
