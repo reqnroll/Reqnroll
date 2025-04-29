@@ -2,13 +2,15 @@
 
 ## Improvements:
 
+* Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
+
 ## Bug fixes:
 
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
 * Fix: Scenario, feature and test run finished event is not published when the related "after" hook fails (#560)
 * Fix: Inconsistent hook execution (duble execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
 
-*Contributors of this release (in alphabetical order): @clrudolphi, @gasparnagy* 
+*Contributors of this release (in alphabetical order): @algirdasN, @clrudolphi, @gasparnagy* 
 
 # v2.4.0 - 2025-03-06
 

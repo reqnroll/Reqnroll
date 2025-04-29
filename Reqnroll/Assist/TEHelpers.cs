@@ -96,7 +96,8 @@ namespace Reqnroll.Assist
         {
             if (creationOptions?.VerifyAllColumnsBound == true)
             {
-                var memberNameKeys = new HashSet<string>(memberNames);
+                var comparer = creationOptions.VerifyCaseInsensitive ? StringComparer.OrdinalIgnoreCase : null;
+                var memberNameKeys = new HashSet<string>(memberNames, comparer);
                 var allIds = table.Rows.Select(r => r.Id()).ToList();
                 var missing = allIds.Where(m => !memberNameKeys.Contains(m)).ToList();
                 if (missing.Any())

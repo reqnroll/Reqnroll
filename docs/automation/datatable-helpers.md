@@ -186,6 +186,30 @@ We get a `ColumnCouldNotBeBoundException` with the message "Member or field Name
 
 Note: It won't check the other way around, e.g., we don't get an exception because FirstName is not in the table.
 
+### `VerifyCaseInsensitive`
+Default is `false`. If `true`, checking if columns are bound becomes case-insensitive. Active *only* if `VerifyAllColumnsBound` is also `true`.
+
+For example, given the class:
+
+```{code-block} csharp
+:caption: C# Test object
+public class Person
+{
+    public string FirstName { get; set;}  
+    public string LastName { get; set; }
+}
+```
+
+And we feed a table with 'firstName' as 'Mike' and 'lastName' as 'Smith':
+
+```{code-block} csharp
+:caption: C# Call
+table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, VerifyCaseInsensitive = true });
+```
+
+We do not get an exception because the table fields match the class members, ignoring case. Behaviour for invalid and missing members in the table remain unchanged when compared to `VerifyAllColumnsBound` alone.
+
+
 ### `RequireTableToProvideAllConstructorParameters`
 Default is `false`. If `true`, use the constructor that exactly matches the table. 
 If a matching constructor cannot be found, the helper will throw a `MissingMethodException`. If there are multiple candidates that take all members, prefer the constructor with the fewest parameters.
