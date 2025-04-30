@@ -1,5 +1,5 @@
 # [vNext]
-
+* Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test
 ## Improvements:
 
 ## Bug fixes:
