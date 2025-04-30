@@ -12,6 +12,8 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
     public class MsTestGeneratorProviderTests
     {
         private const string TestDescriptionAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute";
+        private const string TestMethodAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute";
+
         private const string SampleFeatureFile = @"
             Feature: Sample feature file
 
@@ -238,6 +240,23 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
             attributes.Should().NotContain(a => a.Name == "Microsoft.VisualStudio.TestTools.UnitTesting.DoNotParallelizeAttribute");
+        }
+
+        // Test for GH#588 - Generator Provider adds Friendly Name as an argument to the TestMethodAttribute on a non-paramterized test
+        [Fact]
+        public void MsTestGeneratorProvider_SimpleScenario_ShouldProvideFriendlyNameForTestMethodAttribute()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(SampleFeatureFile);
+            var sampleTestGeneratorProvider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
+
+            // ACT
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+
+            // ASSERT
+            var testMethodAttributeForFirstScenario = code.Class().Members().Single(m => m.Name == "SimpleScenario").CustomAttributes().Single(a => a.Name == TestMethodAttributeName);
+            testMethodAttributeForFirstScenario.ArgumentValues().First().Should().Be("Simple scenario");
         }
 
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)
