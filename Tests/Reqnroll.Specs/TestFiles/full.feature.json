@@ -60,7 +60,7 @@
     "Language": "en-US",
     "Keyword": "Feature",
     "Name": "Full",
-    "Description": null,
+    "Description": "",
     "Children": [
       {
         "Tags": [],
@@ -179,7 +179,7 @@
     "Language": "en-US",
     "Keyword": "Feature",
     "Name": "Full",
-    "Description": null,
+    "Description": "",
     "Children": [
       {
         "Tags": [],

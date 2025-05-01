@@ -41,13 +41,13 @@ namespace Reqnroll.PluginTests.ExternalData
 
         private ReqnrollDocument CreateReqnrollDocument(params IHasLocation[] children)
         {
-            return new(new ReqnrollFeature(new Tag[0], null, null, "Feature", "Sample feature", "", children), new Comment[0], 
+            return new(new ReqnrollFeature(new Tag[0], default, null, "Feature", "Sample feature", "", children), new Comment[0], 
                        new ReqnrollDocumentLocation(DOCUMENT_PATH));
         }
 
         private ReqnrollDocument CreateReqnrollDocumentWithFeatureTags(string[] featureTags, params IHasLocation[] children)
         {
-            return new(new ReqnrollFeature(featureTags.Select(t => new Tag(null, t)).ToArray(), null, null, "Feature", "Sample feature", "", children), new Comment[0], 
+            return new(new ReqnrollFeature(featureTags.Select(t => new Tag(default, t)).ToArray(), default, null, "Feature", "Sample feature", "", children), new Comment[0], 
                        new ReqnrollDocumentLocation(DOCUMENT_PATH));
         }
 
@@ -55,32 +55,32 @@ namespace Reqnroll.PluginTests.ExternalData
             CreateScenarioOutline(
                 new[]
                 {
-                    new Examples(new Tag[] { new(null, "@extag1") }, null, "Examples", "1", "", new TableRow(null, new[] { new TableCell(null, "product") }), Array.Empty<TableRow>()),
-                    new Examples(new Tag[] { new(null, "@extag2") }, null, "Examples", "2", "", new TableRow(null, new[] { new TableCell(null, "product") }), Array.Empty<TableRow>())
+                    new Examples(new Tag[] { new(default, "@extag1") }, default, "Examples", "1", "", new TableRow(default, new[] { new TableCell(default, "product") }), Array.Empty<TableRow>()),
+                    new Examples(new Tag[] { new(default, "@extag2") }, default, "Examples", "2", "", new TableRow(default, new[] { new TableCell(default, "product") }), Array.Empty<TableRow>())
                 });
 
 
         private ScenarioOutline CreateScenarioOutline(Examples[] examples)
         {
             return new(
-                new Tag[] { new(null, "@sotag") },
-                null,
+                new Tag[] { new(default, "@sotag") },
+                default,
                 "Scenario Outline",
                 "SO 1",
                 null,
-                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has <product>", null) },
+                new[] { new Step(default, "Given ", StepKeywordType.Context, "the customer has <product>", null) },
                 examples);
         }
 
         private Scenario CreateScenario()
         {
             return new(
-                new Tag[] { new(null, "@stag") },
-                null,
+                new Tag[] { new(default, "@stag") },
+                default,
                 "Scenario",
                 "S 1",
                 null,
-                new[] { new Step(null, "Given ", StepKeywordType.Context, "the customer has stuff", null) },
+                new[] { new Step(default, "Given ", StepKeywordType.Context, "the customer has stuff", null) },
                 null);
         }
 

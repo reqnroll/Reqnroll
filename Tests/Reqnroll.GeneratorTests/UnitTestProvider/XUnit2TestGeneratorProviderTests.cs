@@ -175,7 +175,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 document: new ReqnrollDocument(
                     feature: new ReqnrollFeature(
                         tags: null,
-                        location: null,
+                        location: default,
                         language: null,
                         keyword: null,
                         name: "",
@@ -272,7 +272,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 document: new Parser.ReqnrollDocument(
                     feature: new ReqnrollFeature(
                         tags: null,
-                        location: null,
+                        location: default,
                         language: null,
                         keyword: null,
                         name: "",
