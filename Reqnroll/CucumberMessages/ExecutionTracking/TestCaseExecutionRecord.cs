@@ -22,20 +22,20 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal DateTime TestCaseStartedTimeStamp { get; private set; }
         internal DateTime TestCaseFinishedTimeStamp { get; private set; }
         internal ScenarioExecutionStatus ScenarioExecutionStatus { get; private set; }
-        internal TestCaseTracker TestCaseTracker { get; }
 
         internal List<StepExecutionTrackerBase> StepExecutionTrackers { get; }
         internal StepExecutionTrackerBase CurrentStep { get { return StepExecutionTrackers.Last(); } }
+        internal string _testCaseId;
+        internal TestCaseDefinition _testCaseDefinition;
 
-
-
-        internal TestCaseExecutionRecord(int attemptId, string testCaseStartedId, TestCaseTracker testCaseTracker)
+        internal TestCaseExecutionRecord(int attemptId, string testCaseStartedId, string testCaseId, TestCaseDefinition testCaseDefinition)
         {
             AttemptId = attemptId;
             TestCaseStartedId = testCaseStartedId;
             WillBeRetried = false;
             StepExecutionTrackers = new();
-            TestCaseTracker = testCaseTracker;
+            _testCaseId = testCaseId;
+            _testCaseDefinition = testCaseDefinition;
         }
 
         internal IEnumerable<Envelope> RuntimeMessages
@@ -84,10 +84,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                     // On subsequent retries we do not.
                     if (AttemptId == 0)
                     {
-                        var testCase = CucumberMessageFactory.ToTestCase(TestCaseTracker.TestCaseDefinition);
+                        var testCase = CucumberMessageFactory.ToTestCase(_testCaseDefinition);
                         yield return Envelope.Create(testCase);
                     }
-                    var testCaseStarted = CucumberMessageFactory.ToTestCaseStarted(this, TestCaseTracker.TestCaseId);
+                    var testCaseStarted = CucumberMessageFactory.ToTestCaseStarted(this, _testCaseId);
                     yield return Envelope.Create(testCaseStarted);
                     break;
                 case ScenarioFinishedEvent scenarioFinishedEvent:

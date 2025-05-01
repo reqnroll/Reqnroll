@@ -27,13 +27,13 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 var hookId = ParentTestCase.StepDefinitionsByPattern[HookBindingSignature];
                 var testStepId = ParentTestCase.IDGenerator.GetNewId();
                 Definition = new HookStepDefinition(testStepId, hookId, ParentTestCase.TestCaseDefinition);
-                ParentTestCase.TestCaseDefinition.StepDefinitions.Add(Definition);
+                ParentTestCase.TestCaseDefinition.AddStepDefinition(Definition);
             }
             else
             {
                 HookBindingSignature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
                 var hookId = ParentTestCase.StepDefinitionsByPattern[HookBindingSignature];
-                Definition = ParentTestCase.TestCaseDefinition.StepDefinitions.OfType<HookStepDefinition>().Where(hd => hd.HookId == hookId).First();
+                Definition = ParentTestCase.TestCaseDefinition.FindHookStepDefByHookId(hookId);
             }
         }
 

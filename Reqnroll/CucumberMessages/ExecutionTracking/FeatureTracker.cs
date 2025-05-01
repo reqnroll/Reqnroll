@@ -225,6 +225,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
         {
+
             var pickleId = attachmentAddedEvent.FeatureInfo?.CucumberMessages_PickleId;
 
             if (String.IsNullOrEmpty(pickleId)) return;

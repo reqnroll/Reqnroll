@@ -30,20 +30,25 @@ namespace Reqnroll.CucumberMessages.PubSub
     {
         private IObjectContainer _objectContainer;
 
-        public bool Enabled => RegisteredSinks.Value.ToList().Count > 0;
+        public bool Enabled => ActiveSinks.Value.ToList().Count > 0;
 
-        private Lazy<IEnumerable<ICucumberMessageSink>> RegisteredSinks;
+        private Lazy<IEnumerable<ICucumberMessageSink>> ActiveSinks;
 
         public CucumberMessageBroker(IObjectContainer objectContainer)
         {
             _objectContainer = objectContainer;
-            RegisteredSinks = new Lazy<IEnumerable<ICucumberMessageSink>>(() => _objectContainer.ResolveAll<ICucumberMessageSink>());
+            ActiveSinks = new Lazy<IEnumerable<ICucumberMessageSink>>(() => _objectContainer.ResolveAll<ICucumberMessageSink>());
         }
         public async Task PublishAsync(Envelope message)
         {
-            foreach (var sink in RegisteredSinks.Value)
+            foreach (var sink in ActiveSinks.Value)
             {
-                await sink.PublishAsync(message);
+                // Will catch and swallow any exceptions thrown by sinks so that all get a chance to process each message
+                try
+                {
+                    await sink.PublishAsync(message);
+                }
+                finally { }
             }
         }
 

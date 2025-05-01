@@ -11,7 +11,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     {
         internal ConcurrentDictionary<string, ITestCaseTracker> TestCaseTrackersById = new();
 
-        internal Func<FeatureTracker, string, ITestCaseTracker> TestCaseTrackerFactory = (ft, pickleId) => { return new TestCaseTracker(ft, pickleId); };
+        internal Func<FeatureTracker, string, ITestCaseTracker> TestCaseTrackerFactory = 
+            (ft, pickleId) => { return new TestCaseTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IDGenerator, ft.StepDefinitionsByPattern); };
         private FeatureTracker _parentFeature;
 
         public TestCaseTrackers(FeatureTracker parentFeature)

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Io.Cucumber.Messages.Types;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
@@ -24,6 +26,20 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal string FindStepDefIDByStepPattern(string canonicalizedStepPattern)
         {
             return Tracker.StepDefinitionsByPattern[canonicalizedStepPattern];
+        }
+
+        internal void AddStepDefinition(TestStepDefinition definition)
+        {
+            StepDefinitions.Add(definition);
+        }
+        internal TestStepDefinition FindTestStepDefByPickleId(string pickleId)
+        {
+            return StepDefinitions.OfType<TestStepDefinition>().First(sd => sd.PickleStepID == pickleId);
+        }
+
+        internal HookStepDefinition FindHookStepDefByHookId(string hookId)
+        {
+            return StepDefinitions.OfType<HookStepDefinition>().First(sd => sd.HookId == hookId);
         }
     }
 }
