@@ -134,70 +134,19 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             SharedIDGenerator = new GuidIdGenerator();
             _testRunStartedId = SharedIDGenerator.GetNewId();
+            var bmg = new BindingMessagesGenerator();
 
             Task.Run(async () =>
             {
                 await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now, _testRunStartedId)) );
                 await _broker.PublishAsync(CucumberMessageFactory.ToMeta(args.ObjectContainer) );
-                foreach (var msg in PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer))
+                foreach (var msg in bmg.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>(), SharedIDGenerator, _stepArgumentTransforms, _undefinedParameterTypeBindings, StepDefinitionsByPattern))
                 {
                     // this publishes StepDefinition, Hook, StepArgumentTransform messages
                     await _broker.PublishAsync(msg);
                 }
             }).Wait();
         }
-        private IEnumerable<Envelope> PopulateBindingCachesAndGenerateBindingMessages(IObjectContainer objectContainer)
-        {
-            var bindingRegistry = objectContainer.Resolve<IBindingRegistry>();
-
-            foreach (var stepTransform in bindingRegistry.GetStepTransformations())
-            {
-                if (_stepArgumentTransforms.Contains(stepTransform))
-                    continue;
-                _stepArgumentTransforms.Add(stepTransform);
-                var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, SharedIDGenerator);
-                yield return Envelope.Create(parameterType);
-            }
-
-            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => !sd.IsValid))
-            {
-                var errmsg = binding.ErrorMessage;
-                if (errmsg.Contains("Undefined parameter type"))
-                {
-                    var paramName = Regex.Match(errmsg, "Undefined parameter type '(.*)'").Groups[1].Value;
-                    if (_undefinedParameterTypeBindings.Contains(binding))
-                        continue;
-                    _undefinedParameterTypeBindings.Add(binding);
-                    var undefinedParameterType = CucumberMessageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, SharedIDGenerator);
-                    yield return Envelope.Create(undefinedParameterType);
-                }
-            }
-
-            foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
-            {
-                var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
-                if (StepDefinitionsByPattern.ContainsKey(pattern))
-                    continue;
-                var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, SharedIDGenerator);
-                if (StepDefinitionsByPattern.TryAdd(pattern, stepDefinition.Id))
-                {
-                    yield return Envelope.Create(stepDefinition);
-                }
-            }
-
-            foreach (var hookBinding in bindingRegistry.GetHooks())
-            {
-                var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
-                if (StepDefinitionsByPattern.ContainsKey(hookId))
-                    continue;
-                var hook = CucumberMessageFactory.ToHook(hookBinding, SharedIDGenerator);
-                if (StepDefinitionsByPattern.TryAdd(hookId, hook.Id))
-                {
-                    yield return Envelope.Create(hook);
-                };
-            }
-        }
-
         private DateTime RetrieveDateTime(Envelope e)
         {
             if (e.Attachment == null)

@@ -40,12 +40,12 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 var testStepId = ParentTestCase.IDGenerator.GetNewId();
                 var pickleStepID = stepStartedEvent.StepContext.StepInfo.PickleStepId;
                 Definition = new(testStepId, pickleStepID, ParentTestCase.TestCaseDefinition);
-                ParentTestCase.TestCaseDefinition.StepDefinitions.Add(Definition);
+                ParentTestCase.TestCaseDefinition.AddStepDefinition(Definition);
             }
             else
             {
                 // On retries of the TestCase, find the Definition previously created.
-                Definition = ParentTestCase.TestCaseDefinition.StepDefinitions.OfType<TestStepDefinition>().Where(sd => sd.PickleStepID == stepStartedEvent.StepContext.StepInfo.PickleStepId).First();
+                Definition = ParentTestCase.TestCaseDefinition.FindTestStepDefByPickleId(stepStartedEvent.StepContext.StepInfo.PickleStepId);
             }
         }
 
