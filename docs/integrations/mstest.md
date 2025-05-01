@@ -72,34 +72,35 @@ public class Hooks
 }
 ```
 
-## Tags on Examples Workaround
-The MsTest Generator has an open issue regarding Tags on Examples, see ['issues/4089']( https://github.com/microsoft/testfx/issues/4089) and ['issues/1043'](https://github.com/microsoft/testfx/issues/1043#issuecomment-1942279024)
+## Tags on Examples - Workaround
+The MsTest Generator MsTest does not support applying tags (categories) to specific entries of parameterized tests, see ['issues/4089']( https://github.com/microsoft/testfx/issues/4089) and ['issues/1043'](https://github.com/microsoft/testfx/issues/1043#issuecomment-1942279024)
 
 In short, tags on Examples are *not* send to the test execution. So @Test and @Acceptance are not available for test filtering/reporting/etc.
 ``` gherkin
 Scenario: Sample Scenario  
    Given sample step
 
-[@Test]
+@Test
 Examples:  
 | User   |  
 | Tester |
 
-[@Acceptance]
+@Acceptance
 Examples:  
 | User   |  
 | Acc    |
 ```
 
-The workaround for now is to add the **generator** to the reqnroll.json. Note that this does impact how tests are shown and named in the Test Explorer:
+The workaround for now is to disable the "row tests". Note that this does impact how tests names are displayed:
 ``` json
-    {
-      "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
-      "generator": {"allowRowTests" :  false},
-    
-      "bindingAssemblies": [
-      ]
-    }
+{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+  // add the line below
+  "generator": {"allowRowTests" :  false},
+
+  "bindingAssemblies": [
+  ]
+}
 ```
 
 
