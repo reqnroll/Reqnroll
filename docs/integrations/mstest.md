@@ -73,9 +73,9 @@ public class Hooks
 ```
 
 ## Tags on Examples - Workaround
-The MsTest Generator MsTest does not support applying tags (categories) to specific entries of parameterized tests, see ['issues/4089']( https://github.com/microsoft/testfx/issues/4089) and ['issues/1043'](https://github.com/microsoft/testfx/issues/1043#issuecomment-1942279024)
+The MsTest Generator MsTest does not support applying tags (categories) to specific entries of parameterized tests, see [issues 4089]( https://github.com/microsoft/testfx/issues/4089) and [issues 1043](https://github.com/microsoft/testfx/issues/1043#issuecomment-1942279024)
 
-In short, tags on Examples are *not* send to the test execution. So @Test and @Acceptance are not available for test filtering/reporting/etc.
+In short, tags on Examples are *not* send to the test execution. So `@Test` and `@Acceptance` are not available for test filtering/reporting/etc.
 ``` gherkin
 Scenario: Sample Scenario  
    Given sample step
@@ -91,7 +91,7 @@ Examples:
 | Acc    |
 ```
 
-The workaround for now is to disable the "row tests". Note that this does impact how tests names are displayed:
+The workaround for now is to disable the _row tests_. Note that this does impact how tests names are displayed:
 ``` json
 {
   "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
