@@ -16,7 +16,7 @@
 
   <!-- build time dependencies -->
   <ItemGroup>
-    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.10.0" />
+    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.10.1" />
     <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
   </ItemGroup>
 
@@ -27,7 +27,7 @@
   <ItemGroup>
     <PackageReference Include="Gherkin" Version="30.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
-    <PackageReference Include="Cucumber.Messages" Version="27.0.0" />
+    <PackageReference Include="Cucumber.Messages" Version="27.0.2" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
     <!-- System.Runtime.Loader is used for .NET Core based frameworks (.NET 6+) only. 
          From .NET 6+, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
