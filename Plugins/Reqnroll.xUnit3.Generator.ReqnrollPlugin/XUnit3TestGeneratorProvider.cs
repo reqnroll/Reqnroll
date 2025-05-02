@@ -2,9 +2,11 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.BoDi;
+using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.UnitTestProvider;
 
-namespace Reqnroll.Generator.UnitTestProvider;
+namespace Reqnroll.xUnit3.Generator.ReqnrollPlugin;
 
 public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     : IUnitTestGeneratorProvider
