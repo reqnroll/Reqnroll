@@ -4,11 +4,19 @@
 
 ## Bug fixes:
 
+*Contributors of this release (in alphabetical order):* 
+
+# v2.4.1 - 2025-04-29
+
+## Bug fixes:
+
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
 * Fix: Scenario, feature and test run finished event is not published when the related "after" hook fails (#560)
 * Fix: Inconsistent hook execution (duble execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
+* Fix: Namespace collisions in generated code when Reqnroll project namespace contains "System" (#583)
+* Fix: InvalidOperationException when calling test teardown method after the Reqnroll test runner has been released (#387)
 
-*Contributors of this release (in alphabetical order): @clrudolphi, @gasparnagy* 
+*Contributors of this release (in alphabetical order):* @304NotModified, @clrudolphi, @gasparnagy, @obligaron 
 
 # v2.4.0 - 2025-03-06
 
