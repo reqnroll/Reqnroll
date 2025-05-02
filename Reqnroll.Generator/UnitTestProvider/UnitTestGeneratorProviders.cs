@@ -9,7 +9,6 @@ namespace Reqnroll.Generator
         {
             container.RegisterTypeAs<NUnit3TestGeneratorProvider, IUnitTestGeneratorProvider>("nunit");
             container.RegisterTypeAs<XUnit2TestGeneratorProvider, IUnitTestGeneratorProvider>("xunit");
-            container.RegisterTypeAs<XUnit3TestGeneratorProvider, IUnitTestGeneratorProvider>("xunit3");
             container.RegisterTypeAs<MsTestV2GeneratorProvider, IUnitTestGeneratorProvider>("mstest");
         }
     }
