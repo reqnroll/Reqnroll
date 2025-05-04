@@ -216,6 +216,10 @@ jobs:
   specs:
     runs-on: ubuntu-latest
     needs: build
+    env:
+      # Disable telemetry, because we use many small projects
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      REQNROLL_TELEMETRY_ENABLED: 0
 
     steps:
     - uses: actions/checkout@v4
@@ -245,6 +249,9 @@ jobs:
       DOTNET_INSTALL_DIR: D:\dotnet
       REQNROLL_TEST_TEMPFOLDER: D:\testrundata
       NUGET_PACKAGES: D:\nuget\packages
+      # Disable telemetry, because we use many small projects
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      REQNROLL_TELEMETRY_ENABLED: 0
 
     steps:
     - uses: actions/checkout@v4
@@ -274,6 +281,10 @@ jobs:
   system-tests-linux:
     runs-on: ubuntu-latest
     needs: build
+    env:
+      # Disable telemetry, because we use many small projects
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      REQNROLL_TELEMETRY_ENABLED: 0
 
     steps:
     - uses: actions/checkout@v4
