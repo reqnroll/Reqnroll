@@ -223,6 +223,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Set Runner ImageVersion to Env
+      shell: pwsh
+      run: |
+        Write-Output "ImageVersion=$env:ImageVersion" >> $env:GITHUB_ENV
+    - name: Cache RRC folder
+      uses: actions/cache@v4
+      with:
+        path: /tmp/RRC
+        key: RRC-Specs-${{ runner.os }}-${{ env.ImageVersion }} # Use the runner version as key, so if new dependencies get installed we get a new cache entry
     - name: Restore dependencies
       run: dotnet restore
     - name: Install Test Report Dependencies
@@ -255,6 +264,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Set Runner ImageVersion to Env
+      shell: pwsh
+      run: |
+        Write-Output "ImageVersion=$env:ImageVersion" >> $env:GITHUB_ENV
+    - name: Cache RRC folder
+      uses: actions/cache@v4
+      with:
+        path: ${{ env.REQNROLL_TEST_TEMPFOLDER }}/RRC
+        key: RRC-SystemTests-${{ runner.os }}-${{ env.ImageVersion }} # Use the runner version as key, so if new dependencies get installed we get a new cache entry
     - name: .NET Information
       run: |
         dotnet --list-sdks
@@ -288,6 +306,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+    - name: Set Runner ImageVersion to Env
+      shell: pwsh
+      run: |
+        Write-Output "ImageVersion=$env:ImageVersion" >> $env:GITHUB_ENV
+    - name: Cache RRC folder
+      uses: actions/cache@v4
+      with:
+        path: /tmp/RRC
+        key: RRC-SystemTests-${{ runner.os }}-${{ env.ImageVersion }} # Use the runner version as key, so if new dependencies get installed we get a new cache entry
     - name: .NET Information
       run: |
         dotnet --list-sdks
