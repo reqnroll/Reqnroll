@@ -240,6 +240,11 @@ jobs:
   system-tests-windows:
     runs-on: windows-latest
     needs: build
+    env:
+      # D:\ (temporary) drive has better performance then C:\ (remote) drive on the Github Runner, so place all temporary files on D:\, see https://github.com/actions/setup-dotnet/issues/260
+      DOTNET_INSTALL_DIR: D:\dotnet
+      REQNROLL_TEST_TEMPFOLDER: D:\testrundata
+      NUGET_PACKAGES: D:\nuget\packages
 
     steps:
     - uses: actions/checkout@v4
