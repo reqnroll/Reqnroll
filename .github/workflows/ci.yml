@@ -183,14 +183,6 @@ jobs:
         [System.IO.File]::WriteAllText("CHANGELOG.md", $content)
     - name: Restore dependencies
       run: dotnet restore
-    - name: Install Test Report Dependencies
-      run: | 
-        dotnet add ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj package GitHubActionsTestLogger
-        dotnet add ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj package GitHubActionsTestLogger
-        dotnet add ./Tests/Reqnroll.GeneratorTests/Reqnroll.GeneratorTests.csproj package GitHubActionsTestLogger
-        dotnet add ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj package GitHubActionsTestLogger
-        dotnet add ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj package GitHubActionsTestLogger
-        dotnet add ./Tests/Reqnroll.Specs/Reqnroll.Specs.csproj package GitHubActionsTestLogger
     - name: Build
       run: dotnet build --no-restore ${{ steps.build_params.outputs.main_build_params }}
     - name: Runtime Tests
