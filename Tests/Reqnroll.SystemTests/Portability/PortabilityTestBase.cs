@@ -42,6 +42,8 @@ public abstract class PortabilityTestBase : SystemTestBase
         {
             if (!new ConfigurationDriver().PipelineMode)
                 Assert.Inconclusive(ex.ToString());
+            else
+                throw;
         }
     }
 
