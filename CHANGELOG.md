@@ -7,6 +7,7 @@
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
+* Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 
 *Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron
 
