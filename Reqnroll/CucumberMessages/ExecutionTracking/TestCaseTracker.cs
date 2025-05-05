@@ -3,6 +3,7 @@ using Io.Cucumber.Messages.Types;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
+using Reqnroll.Time;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// </summary>
     internal class TestCaseTracker : ITestCaseTracker
     {
-        internal TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByPattern)
+        internal TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByPattern, DateTime instant)
         {
             TestRunStartedId = testRunStartedId;
             PickleId = pickleId;
@@ -28,7 +29,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             IDGenerator = idGenerator;
             StepDefinitionsByPattern = stepDefinitionsByPattern;
             AttemptCount = -1;
-            TestCaseStartedTimeStamp = DateTime.Now;
+            TestCaseStartedTimeStamp = instant;
         }
 
         // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases

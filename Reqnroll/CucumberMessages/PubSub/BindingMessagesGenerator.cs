@@ -70,7 +70,6 @@ namespace Reqnroll.CucumberMessages.PubSub
                 {
                     yield return Envelope.Create(hook);
                 }
-                ;
             }
         }
 

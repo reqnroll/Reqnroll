@@ -18,6 +18,7 @@ using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Cucumber.Messages;
 using System.Diagnostics;
+using Reqnroll.Time;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -64,12 +65,18 @@ namespace Reqnroll.CucumberMessages.PubSub
         }
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
+            runtimePluginEvents.RegisterGlobalDependencies += (sender, args) =>
+            {
+                args.ObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
+            };
+
             runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
             {
                 var pluginLifecycleEvents = args.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
                 pluginLifecycleEvents.BeforeTestRun += PublisherStartup;
                 pluginLifecycleEvents.AfterTestRun += PublisherTestRunComplete;
             };
+
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
               {
                   _testThreadObjectContainer = args.ObjectContainer;
@@ -132,13 +139,13 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            SharedIDGenerator = new GuidIdGenerator();
+            SharedIDGenerator = _testThreadObjectContainer.Resolve<IIdGenerator>();
             _testRunStartedId = SharedIDGenerator.GetNewId();
             var bmg = new BindingMessagesGenerator();
-
+            var clock = _testThreadObjectContainer.Resolve<IClock>();
             Task.Run(async () =>
             {
-                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(DateTime.Now, _testRunStartedId)) );
+                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)) );
                 await _broker.PublishAsync(CucumberMessageFactory.ToMeta(args.ObjectContainer) );
                 foreach (var msg in bmg.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>(), SharedIDGenerator, _stepArgumentTransforms, _undefinedParameterTypeBindings, StepDefinitionsByPattern))
                 {
@@ -168,6 +175,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             // sort the remaining Messages by timestamp
             var executionMessages = _messages.Except(testCaseMessages).OrderBy(e => RetrieveDateTime(e)).ToList();
 
+            var clock = _testThreadObjectContainer.Resolve<IClock>();
             // publish them in order to the broker
             Task.Run(async () =>
             {
@@ -181,7 +189,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                     await _broker.PublishAsync(env);
                 }
 
-                await _broker.PublishAsync( Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, DateTime.Now, _testRunStartedId)) );
+                await _broker.PublishAsync( Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, clock.GetNowDateAndTime(), _testRunStartedId)) );
             }).Wait();
 
             _startedFeatures.Clear();

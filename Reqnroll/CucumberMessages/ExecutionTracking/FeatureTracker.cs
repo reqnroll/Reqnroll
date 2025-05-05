@@ -4,6 +4,7 @@ using Reqnroll.Bindings;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
+using Reqnroll.Time;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -57,7 +58,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
             Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source != null ? true : false;
-            TestCaseTrackersById = new TestCaseTrackers(this);
+            TestCaseTrackersById = new TestCaseTrackers(this, featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IClock>());
             ProcessEvent(featureStartedEvent);
         }
 

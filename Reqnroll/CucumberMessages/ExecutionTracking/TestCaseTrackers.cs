@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Reqnroll.Time;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +11,17 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     internal class TestCaseTrackers
     {
         internal ConcurrentDictionary<string, ITestCaseTracker> TestCaseTrackersById = new();
+        internal IClock _clock;
 
-        internal Func<FeatureTracker, string, ITestCaseTracker> TestCaseTrackerFactory = 
-            (ft, pickleId) => { return new TestCaseTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IDGenerator, ft.StepDefinitionsByPattern); };
+        internal Func<FeatureTracker, string, ITestCaseTracker> TestCaseTrackerFactory; 
         private FeatureTracker _parentFeature;
 
-        public TestCaseTrackers(FeatureTracker parentFeature)
+        public TestCaseTrackers(FeatureTracker parentFeature, IClock clock)
         {
             _parentFeature = parentFeature;
+            _clock = clock;
+            TestCaseTrackerFactory = (ft, pickleId) => { return new TestCaseTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IDGenerator, ft.StepDefinitionsByPattern, _clock.GetNowDateAndTime()); };
+
         }
 
         internal bool TryAddNew(string pickleId, out ITestCaseTracker testCaseTracker)
