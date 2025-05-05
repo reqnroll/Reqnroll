@@ -214,5 +214,10 @@ namespace Reqnroll.GeneratorTests
                 throw new ArgumentException("Illegal characters in path", "searchPattern");
             }
         }
+
+        public void CreateDirectory(string path)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

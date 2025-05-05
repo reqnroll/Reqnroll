@@ -14,6 +14,7 @@ using Reqnroll.CucumberMessages.PayloadProcessing;
 using System.Text;
 using System.Collections.Concurrent;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.Utils;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -21,37 +22,40 @@ namespace Reqnroll.CucumberMessages.PubSub
     {
         private Task? fileWritingTask;
 
-        protected readonly BlockingCollection<Envelope> _postedMessages = new();
+        internal readonly BlockingCollection<Envelope> _postedMessages = new();
         private readonly string _defaultFileType;
         private readonly string _defaultFileName;
+        private readonly IFileSystem _fileSystem;
         private ICucumberMessagesConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
         private readonly string _pluginName;
 
         private ITraceListener? trace => traceListener.Value;
-        private IObjectContainer? testThreadObjectContainer;
-        private IObjectContainer? globalObjectContainer;
+        private IObjectContainer? _testThreadObjectContainer;
+        private IObjectContainer? _globalObjectContainer;
 
-        public FileWritingFormatterPluginBase(ICucumberMessagesConfiguration configuration, string pluginName, string defaultFileType, string defaultFileName)
+        public FileWritingFormatterPluginBase(ICucumberMessagesConfiguration configuration, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem)
         {
             _configuration = configuration;
-            traceListener = new Lazy<ITraceListener>(() => testThreadObjectContainer!.Resolve<ITraceListener>());
+            traceListener = new Lazy<ITraceListener>(() => _testThreadObjectContainer!.Resolve<ITraceListener>());
             _pluginName = pluginName;
             _defaultFileType = defaultFileType;
             _defaultFileName = defaultFileName;
+            _fileSystem = fileSystem;
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
             runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
             {
-                globalObjectContainer = args.ObjectContainer;
+                _globalObjectContainer = args.ObjectContainer;
             };
 
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
                 var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                testThreadObjectContainer = args.ObjectContainer;
+                _testThreadObjectContainer = args.ObjectContainer;
+
                 testThreadExecutionEventPublisher.AddHandler<TestRunStartedEvent>(LaunchFileSink);
                 testThreadExecutionEventPublisher.AddHandler<TestRunFinishedEvent>(Close);
             };
@@ -63,7 +67,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         }
 
         protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
-        private void LaunchFileSink(TestRunStartedEvent testRunStarted)
+        internal void LaunchFileSink(TestRunStartedEvent testRunStarted)
         {
             ICucumberMessagesConfiguration config = _configuration;
 
@@ -82,16 +86,19 @@ namespace Reqnroll.CucumberMessages.PubSub
                 outputFilePath = $".\\{_defaultFileName}";
 
             string baseDirectory = Path.GetDirectoryName(outputFilePath);
-            if (!string.IsNullOrEmpty(baseDirectory))
+            var validFile = FileFilter.GetValidFiles([outputFilePath]).Count == 1;
+            if (string.IsNullOrEmpty(baseDirectory) || !validFile)
             {
-                baseDirectory = SanitizeDirectoryName(baseDirectory);
-                if (!Directory.Exists(baseDirectory))
-                {
-                    Directory.CreateDirectory(baseDirectory);
-                }
+                throw new InvalidOperationException($"Path of configured output Messages file: ${outputFilePath} is invalid or missing.");
             }
 
-            string fileName = SanitizeFileName(Path.GetFileName(outputFilePath));
+            if (!_fileSystem.DirectoryExists(baseDirectory))
+            {
+                _fileSystem.CreateDirectory(baseDirectory);
+            }
+
+
+            string fileName = Path.GetFileName(outputFilePath);
             if (!fileName.EndsWith(_defaultFileType, StringComparison.OrdinalIgnoreCase))
             {
                 fileName += _defaultFileType;
@@ -100,7 +107,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             string outputPath = Path.Combine(baseDirectory, fileName);
             fileWritingTask = Task.Factory.StartNew(() => ConsumeAndWriteToFilesBackgroundTask(outputPath), TaskCreationOptions.LongRunning);
 
-            globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, _pluginName, true);
+            _globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, _pluginName, true);
         }
 
         public async Task PublishAsync(Envelope message)
@@ -108,11 +115,11 @@ namespace Reqnroll.CucumberMessages.PubSub
             await Task.Run(() => _postedMessages.Add(message));
         }
 
-        protected abstract void ConsumeAndWriteToFilesBackgroundTask(string outputPath);
+        internal abstract void ConsumeAndWriteToFilesBackgroundTask(string outputPath);
 
         private bool disposedValue = false;
 
-        protected virtual void Dispose(bool disposing)
+        internal virtual void Dispose(bool disposing)
         {
             if (!disposedValue)
             {
@@ -133,24 +140,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             GC.SuppressFinalize(this);
         }
 
-        private static string SanitizeFileName(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return string.Empty;
-
-            char[] invalidChars = Path.GetInvalidFileNameChars();
-            string sanitized = new string(input.Select(c => invalidChars.Contains(c) ? '_' : c).ToArray());
-            sanitized = sanitized.Trim().Trim('.');
-            if (string.IsNullOrEmpty(sanitized))
-                return "_";
-            const int maxLength = 255;
-            if (sanitized.Length > maxLength)
-                sanitized = sanitized.Substring(0, maxLength);
-
-            return sanitized;
-        }
-
-        private string ParseConfigurationString(string messagesConfiguration, string pluginName)
+        internal string ParseConfigurationString(string messagesConfiguration, string pluginName)
         {
             if (string.IsNullOrWhiteSpace(messagesConfiguration))
                 return string.Empty;
@@ -169,42 +159,6 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
 
             return string.Empty;
-        }
-        private static string SanitizeDirectoryName(string input)
-        {
-            if (string.IsNullOrEmpty(input))
-                return string.Empty;
-
-            // Get invalid characters for directory names
-            char[] invalidChars = Path.GetInvalidPathChars().Concat(Path.GetInvalidFileNameChars()).ToArray();
-
-            // Check if the path starts with a drive identifier (e.g., "C:\")
-            string driveIdentifier = string.Empty;
-            if (input.Length > 1 && input[1] == ':' && char.IsLetter(input[0]))
-            {
-                driveIdentifier = input.Substring(0, 2); // Extract the drive identifier (e.g., "C:")
-                input = input.Substring(2); // Remove the drive identifier from the rest of the path
-            }
-
-            // Split the remaining path into segments and sanitize each segment
-            var sanitizedSegments = input.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar)
-                                          .Select(segment =>
-                                          {
-                                              string sanitized = new string(segment.Select(c => invalidChars.Contains(c) ? '_' : c).ToArray());
-                                              return sanitized.Trim().Trim('.');
-                                          });
-
-            // Recombine the sanitized segments into a valid path
-            string sanitizedPath = string.Join(Path.DirectorySeparatorChar.ToString(), sanitizedSegments);
-
-            // Reattach the drive identifier if it exists
-            if (!string.IsNullOrEmpty(driveIdentifier))
-            {
-                sanitizedPath = driveIdentifier + Path.DirectorySeparatorChar + sanitizedPath;
-            }
-
-            // Ensure the sanitized path is not empty
-            return string.IsNullOrEmpty(sanitizedPath) ? "_" : sanitizedPath;
         }
     }
 }

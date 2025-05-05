@@ -48,7 +48,9 @@ namespace Reqnroll.CucumberMessages.PubSub
                 {
                     await sink.PublishAsync(message);
                 }
-                finally { }
+                catch {
+                // TODO: What should be done here? Log the exception to the tool output?
+                }
             }
         }
 

@@ -14,6 +14,7 @@ using Reqnroll.CucumberMessages.PayloadProcessing;
 using System.Text;
 using System.Collections.Concurrent;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.Utils;
 
 
 namespace Reqnroll.CucumberMessages.PubSub
@@ -26,11 +27,11 @@ namespace Reqnroll.CucumberMessages.PubSub
     public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
     {
 
-        public MessagesFormatterPlugin(ICucumberMessagesConfiguration configuration) : base(configuration, "messages", ".ndjson", "reqnroll_report.ndjson")
+        public MessagesFormatterPlugin(ICucumberMessagesConfiguration configuration, IFileSystem fileSystem) : base(configuration, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
         {
         }
 
-        protected override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+        internal override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
         {
             byte[] nl = Encoding.UTF8.GetBytes(Environment.NewLine);
 

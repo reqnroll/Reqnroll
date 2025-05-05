@@ -18,6 +18,7 @@ using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PubSub;
+using Reqnroll.Utils;
 
 namespace Reqnroll.Infrastructure
 {
@@ -103,6 +104,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
 
             //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
             container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
             container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");

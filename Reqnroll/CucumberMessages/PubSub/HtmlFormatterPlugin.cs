@@ -14,6 +14,7 @@ using System.Text;
 using System.Collections.Concurrent;
 using Io.Cucumber.Messages.Types;
 using Cucumber.HtmlFormatter;
+using Reqnroll.Utils;
 
 
 namespace Reqnroll.CucumberMessages.PubSub
@@ -24,11 +25,11 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// </summary>
     public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
     {
-        public HtmlFormatterPlugin(ICucumberMessagesConfiguration configuration) : base(configuration, "html", ".html", "reqnroll_report.html")
+        public HtmlFormatterPlugin(ICucumberMessagesConfiguration configuration, IFileSystem fileSystem) : base(configuration, "html", ".html", "reqnroll_report.html", fileSystem)
         {
         }
 
-        protected override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+        internal override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
         {
             using var fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
             using var htmlWriter = new MessagesToHtmlWriter(fileStream,
