@@ -16,12 +16,42 @@ namespace Reqnroll.RuntimeTests.BoDi
         }
 
         [Fact]
-        public void ContainerShouldThrowExceptionWhenDisposed()
+        public void ContainerShouldThrowExceptionWhenDisposedAndCallingResolve()
         {
             var container = new ObjectContainer();
             container.Dispose();
 
             Action act = () => container.Resolve<IObjectContainer>();
+            act.Should().ThrowExactly<ObjectContainerException>("Object container disposed");
+        }
+
+        [Fact]
+        public void ContainerShouldThrowExceptionWhenDisposedAndCallingRegisterInstanceAs()
+        {
+            var container = new ObjectContainer();
+            container.Dispose();
+
+            Action act = () => container.RegisterInstanceAs<IDisposableClass>(new DisposableClass1());
+            act.Should().ThrowExactly<ObjectContainerException>("Object container disposed");
+        }
+
+        [Fact]
+        public void ContainerShouldThrowExceptionWhenDisposedAndCallingRegisterFactoryAs()
+        {
+            var container = new ObjectContainer();
+            container.Dispose();
+
+            Action act = () => container.RegisterFactoryAs<IDisposableClass>(() => new DisposableClass1());
+            act.Should().ThrowExactly<ObjectContainerException>("Object container disposed");
+        }
+
+        [Fact]
+        public void ContainerShouldThrowExceptionWhenDisposedAndCallingRegisterTypeAs()
+        {
+            var container = new ObjectContainer();
+            container.Dispose();
+
+            Action act = () => container.RegisterTypeAs<IDisposableClass>(typeof(DisposableClass1));
             act.Should().ThrowExactly<ObjectContainerException>("Object container disposed");
         }
 

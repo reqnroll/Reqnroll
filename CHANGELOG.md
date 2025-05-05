@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
+
+*Contributors of this release (in alphabetical order):* @obligaron
 
 # v2.4.1 - 2025-04-29
 
