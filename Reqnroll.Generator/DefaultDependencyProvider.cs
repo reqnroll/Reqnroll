@@ -1,3 +1,4 @@
+using Reqnroll.Analytics.UserId;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages.Configuration;
@@ -51,6 +52,7 @@ namespace Reqnroll.Generator
             container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
 
             // Section of registrations added for Cucumber Messages
+            container.RegisterTypeAs<FileService, IFileService>();
             container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
             container.RegisterTypeAs<FileBasedConfigurationResolver, ICucumberMessagesConfigurationResolver>("fileBasedResolver");
             container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesConfigurationResolver>("environmentBasedResolver");
