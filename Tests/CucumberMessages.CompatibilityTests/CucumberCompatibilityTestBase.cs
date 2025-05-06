@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using Io.Cucumber.Messages.Types;
 using Moq;
+using Reqnroll.Analytics.UserId;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.CucumberMessages.Configuration;
@@ -9,6 +10,7 @@ using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.SystemTests;
 using Reqnroll.Tracing;
+using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -48,8 +50,8 @@ namespace CucumberMessages.Tests
                 ndjsonFileName = Path.Combine(path!, ndjsonFileName);
                 htmlFileName = Path.Combine(path!, htmlFileName);
             }
-            string formatters = "{\"messages\" : { \"outputFilePath\" : \"" + ndjsonFileName.Replace("\\", "\\\\") + "\" }," +
-                " \"html\" : { \"outputFilePath\" : \"" + htmlFileName.Replace("\\", "\\\\") + "\" } }";
+            string formatters = "{\"formatters\" : {\"messages\" : { \"outputFilePath\" : \"" + ndjsonFileName.Replace("\\", "\\\\") + "\" }," +
+                " \"html\" : { \"outputFilePath\" : \"" + htmlFileName.Replace("\\", "\\\\") + "\" } } }";
 
             Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE, formatters);
         }
@@ -141,8 +143,12 @@ namespace CucumberMessages.Tests
             objectContainerMock.Setup(x => x.Resolve<ITraceListener>()).Returns(tracerMock.Object);
             var env = new EnvironmentWrapper();
             var jsonConfigFileLocator = new ReqnrollJsonLocator();
-            CucumberConfiguration configuration = new CucumberConfiguration(objectContainerMock.Object, env, jsonConfigFileLocator);
-            string messagesConfiguration = configuration.FormatterConfiguration("messages");
+            var fileSystem = new FileSystem();
+            var fileService = new FileService();
+            var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
+            var configEnvResolver = new EnvironmentConfigurationResolver(env);
+            CucumberConfiguration configuration = new CucumberConfiguration([configFileResolver, configEnvResolver], new EnvVariableEnableFlagParser(env));
+            string messagesConfiguration = configuration.GetFormatterConfigurationByName("messages");
             string outputFilePath = String.Empty;
             int colonIndex = messagesConfiguration.IndexOf(':');
             if (colonIndex != -1)

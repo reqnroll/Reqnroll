@@ -1,6 +1,8 @@
-﻿using Reqnroll.CommonModels;
+﻿using Reqnroll.Analytics.UserId;
+using Reqnroll.CommonModels;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
+using Reqnroll.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,17 +11,21 @@ using System.Text.Json;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
-    public class ConfigFile_ConfigurationSource : IConfigurationSource
+    public class FileBasedConfigurationResolver : ICucumberMessagesConfigurationResolver
     {
         private const string FORMATTERS_KEY = "formatters";
         private IReqnrollJsonLocator _configFileLocator;
+        private IFileSystem _fileSystem;
+        private IFileService _fileService;
 
-        public ConfigFile_ConfigurationSource(IReqnrollJsonLocator configurationFileLocator)
+        public FileBasedConfigurationResolver(IReqnrollJsonLocator configurationFileLocator, IFileSystem fileSystem, IFileService fileService)
         {
             _configFileLocator = configurationFileLocator;
+            _fileSystem = fileSystem;
+            _fileService = fileService;
         }
 
-        public IDictionary<string, string> GetConfiguration()
+        public IDictionary<string, string> Resolve()
         {
             var jsonOptions = new JsonSerializerOptions
             {
@@ -31,9 +37,9 @@ namespace Reqnroll.CucumberMessages.Configuration
 
             var result = new Dictionary<string, string>();
 
-            if (File.Exists(fileName))
+            if (_fileSystem.FileExists(fileName))
             {
-                var jsonFileContent = File.ReadAllText(fileName);
+                var jsonFileContent = _fileService.ReadAllText(fileName);
                 using JsonDocument reqnrollConfigDoc = JsonDocument.Parse(jsonFileContent, new JsonDocumentOptions()
                 {
                     CommentHandling = JsonCommentHandling.Skip

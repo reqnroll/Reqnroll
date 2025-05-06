@@ -11,6 +11,7 @@ using Reqnroll.Parser;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
+using System.Collections.Generic;
 
 namespace Reqnroll.Generator
 {
@@ -47,7 +48,20 @@ namespace Reqnroll.Generator
 
             container.RegisterTypeAs<ConfigurationLoader, IConfigurationLoader>();
 
-            container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();    
+            container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
+
+            // Section of registrations added for Cucumber Messages
+            container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
+            container.RegisterTypeAs<FileBasedConfigurationResolver, ICucumberMessagesConfigurationResolver>("fileBasedResolver");
+            container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesConfigurationResolver>("environmentBasedResolver");
+            container.RegisterFactoryAs<IEnumerable<ICucumberMessagesConfigurationResolver>>(() =>
+            {
+                var collection = new List<ICucumberMessagesConfigurationResolver>();
+                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("fileBasedResolver"));
+                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("environmentBasedResolver"));
+                return collection;
+            });
+
             container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
 
             container.RegisterTypeAs<ReqnrollGherkinParserFactory, IGherkinParserFactory>();

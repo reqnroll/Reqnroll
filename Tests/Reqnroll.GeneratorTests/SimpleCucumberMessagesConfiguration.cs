@@ -11,7 +11,7 @@ namespace Reqnroll.GeneratorTests
     {
         public bool Enabled => false;
 
-        public string FormatterConfiguration(string formatterName)
+        public string GetFormatterConfigurationByName(string formatterName)
         {
             return "\"outputFilePath\" : \"reqnroll_report.ndjson\"";
         }

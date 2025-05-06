@@ -20,40 +20,35 @@ namespace Reqnroll.CucumberMessages.Configuration
     /// When any consumer of this class asks for one of the properties of ICucumberConfiguration,
     /// the class will resolve the configuration (only once).
     /// 
-    /// A default configuration is provided (by DefaultConfigurationSource). 
-    /// It is supplemented by one or more profiles from the configuration file. (ConfigFile_ConfigurationSource)
+    /// One or more profiles may be read from the configuration file. (FileBasedConfigurationResolver)
     /// Then Environmment Variable Overrides are applied.
     /// </summary>
     public class CucumberConfiguration : ICucumberMessagesConfiguration
     {
         public static ICucumberMessagesConfiguration Current { get; private set; }
-        public bool Enabled => _enablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
+        public bool Enabled => _runtimeEnablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
 
-        private readonly IObjectContainer _objectContainer;
-        private Lazy<ITraceListener> _traceListenerLazy;
-        private IEnvironmentWrapper _environmentWrapper;
-        private IReqnrollJsonLocator _reqnrollJsonLocator;
+        private IEnumerable<ICucumberMessagesConfigurationResolver> _resolvers;
         private Lazy<ResolvedConfiguration> _resolvedConfiguration;
-        private bool _enablementOverrideFlag = true;
+        private IEnvVariableEnableFlagParser _envVariableEnableFlagParser;
+        private bool _runtimeEnablementOverrideFlag = true;
 
-        public CucumberConfiguration(IObjectContainer objectContainer, IEnvironmentWrapper environmentWrapper, IReqnrollJsonLocator configurationFileLocator)
+        public CucumberConfiguration(IEnumerable<ICucumberMessagesConfigurationResolver> resolvers, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
         {
-            _objectContainer = objectContainer;
-            _traceListenerLazy = new Lazy<ITraceListener>(() => _objectContainer.Resolve<ITraceListener>());
-            _environmentWrapper = environmentWrapper;
-            _reqnrollJsonLocator = configurationFileLocator;
+            _resolvers = resolvers;
             _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
+            _envVariableEnableFlagParser = envVariableEnableFlagParser;
             Current = this;
         }
 
         #region Override API
         public void SetEnabled(bool value)
         {
-            _enablementOverrideFlag = value;
+            _runtimeEnablementOverrideFlag = value;
         }
         #endregion
 
-        public string FormatterConfiguration(string formatterName)
+        public string GetFormatterConfigurationByName(string formatterName)
         {
             var config = _resolvedConfiguration.Value;
             if (config.Formatters.TryGetValue(formatterName, out var formatterConfig))
@@ -63,55 +58,22 @@ namespace Reqnroll.CucumberMessages.Configuration
 
         private ResolvedConfiguration ResolveConfiguration()
         {
-            var config = ApplyHierarchicalConfiguration();
-            var resolved = ApplyEnvironmentOverrides(config);
+            var combinedConfig = new Dictionary<string, string>();
 
-            return resolved;
-        }
-        private ResolvedConfiguration ApplyHierarchicalConfiguration()
-        {
-            var defaultConfigurationProvider = new DefaultConfigurationSource(_environmentWrapper);
-            var fileBasedConfigurationProvider = new ConfigFile_ConfigurationSource(_reqnrollJsonLocator);
-
-            var defaultConfigEntries = defaultConfigurationProvider.GetConfiguration();
-            var fileBasedConfigEntries = fileBasedConfigurationProvider.GetConfiguration();
-
-            foreach (var entry in fileBasedConfigEntries)
-                defaultConfigEntries.Add(entry.Key, entry.Value);
-
-            ResolvedConfiguration result = new() { Formatters = defaultConfigEntries, Enabled = defaultConfigEntries.Count > 0 };
-            return result;
-        }
-
-        private ResolvedConfiguration ApplyEnvironmentOverrides(ResolvedConfiguration config)
-        {
-            //Debugger.Launch();
-
-            var formatters = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE);
-            // treating formatters as a json string containing an object, iterate over the properties and add them to the configuration, replacing all existing values;
-            if (formatters is Success<string> formattersSuccess)
+            foreach (var resolver in _resolvers)
             {
-                config.Formatters.Clear();
-                var jsonOptions = new JsonSerializerOptions
+                foreach (var entry in resolver.Resolve())
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                    ReadCommentHandling = JsonCommentHandling.Skip
-                };
-                using JsonDocument formattersDoc = JsonDocument.Parse(formattersSuccess.Result, new JsonDocumentOptions()
-                {
-                    CommentHandling = JsonCommentHandling.Skip
-                });
-                var formattersEntry = formattersDoc.RootElement;
-                foreach (JsonProperty jsonProperty in formattersEntry.EnumerateObject())
-                {
-                    config.Formatters[jsonProperty.Name] = jsonProperty.Value.GetRawText();
+                    combinedConfig[entry.Key] = entry.Value;
                 }
             }
+            bool enabledVariableValue = _envVariableEnableFlagParser.Parse();
 
-            var enabledVariable = _environmentWrapper.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE);
-            var enabledVariableValue = enabledVariable is Success<string> ? Convert.ToBoolean(((Success<string>)enabledVariable).Result) : config.Enabled;
-            config.Enabled = config.Enabled && enabledVariableValue;
-            return config;
+            return new ResolvedConfiguration
+            {
+                Formatters = combinedConfig,
+                Enabled = combinedConfig.Count > 0 && enabledVariableValue
+            };
         }
     }
 }

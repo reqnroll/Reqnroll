@@ -85,7 +85,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             // Arrange
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.FormatterConfiguration("testPlugin")).Returns("{\"outputFilePath\": \"invalid|path\"}");
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"invalid|path\"}");
 
             // Act & Assert
             Assert.Throws<InvalidOperationException>(() =>
@@ -97,7 +97,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             // Arrange
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.FormatterConfiguration("testPlugin")).Returns("{\"outputFilePath\": \"\"}");
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"\"}");
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -113,7 +113,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             // Arrange
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.FormatterConfiguration("testPlugin")).Returns("{\"outputFilePath\": \"\"}");
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"\"}");
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1,0), "started"));
@@ -158,7 +158,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             // Arrange
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.FormatterConfiguration("testPlugin")).Returns("{\"outputFilePath\": \"C:\\\\valid\\\\path\\\\output.txt\"}");
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"C:\\\\valid\\\\path\\\\output.txt\"}");
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act

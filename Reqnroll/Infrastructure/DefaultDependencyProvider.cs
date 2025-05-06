@@ -19,6 +19,7 @@ using Reqnroll.PlatformCompatibility;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PubSub;
 using Reqnroll.Utils;
+using System.Collections.Generic;
 
 namespace Reqnroll.Infrastructure
 {
@@ -105,6 +106,16 @@ namespace Reqnroll.Infrastructure
 
             //Support for publishing Cucumber Messages
             container.RegisterTypeAs<FileSystem, IFileSystem>();
+            container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
+            container.RegisterTypeAs<FileBasedConfigurationResolver, ICucumberMessagesConfigurationResolver>("fileBasedResolver");
+            container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesConfigurationResolver>("environmentBasedResolver");
+            container.RegisterFactoryAs<IEnumerable<ICucumberMessagesConfigurationResolver>>(() =>
+            {
+                var collection = new List<ICucumberMessagesConfigurationResolver>();
+                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("fileBasedResolver"));
+                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("environmentBasedResolver"));
+                return collection;
+            });
             container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
             container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
             container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");

@@ -75,7 +75,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 return;
             }
-            string messagesConfiguration = config.FormatterConfiguration(_pluginName);
+            string messagesConfiguration = config.GetFormatterConfigurationByName(_pluginName);
 
             if (String.IsNullOrEmpty(messagesConfiguration))
                 return;
