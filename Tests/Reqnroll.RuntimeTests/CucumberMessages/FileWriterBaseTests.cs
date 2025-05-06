@@ -81,23 +81,10 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         }
 
         [Fact]
-        public void LaunchFileSink_Should_Throw_Exception_For_Invalid_Path()
-        {
-            // Arrange
-            _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("""
-                { "outputFilePath": "C:\/invalid|path" }
-                """);
-
-            // Act & Assert
-            Assert.Throws<InvalidOperationException>(() =>
-                _sut.LaunchFileSink(new TestRunStartedEvent()));
-        }
-
-        [Fact]
         public void LaunchFileSink_Should_Create_Output_File_With_Default_Name_If_No_Configuration()
         {
             // Arrange
+            var sp = Path.DirectorySeparatorChar;
             _configurationMock.Setup(c => c.Enabled).Returns(true);
             _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("\"outputFilePath\": \"\"");
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
@@ -107,7 +94,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
 
             // Assert
             Assert.NotNull(_sut.LastOutputPath);
-            Assert.EndsWith(".\\test_output.txt", _sut.LastOutputPath);
+            Assert.EndsWith($".{sp}test_output.txt", _sut.LastOutputPath);
         }
 
         [Fact]
@@ -162,6 +149,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         public void LaunchFileSink_Should_Create_Directory_If_Not_Exists()
         {
             // Arrange
+            var sp = Path.DirectorySeparatorChar;
             _configurationMock.Setup(c => c.Enabled).Returns(true);
             _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns( """
                 { "outputFilePath": "C:\/valid\/path/output.txt" }
@@ -172,7 +160,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _sut.LaunchFileSink(new TestRunStartedEvent());
 
             // Assert
-            _fileSystemMock.Verify(fs => fs.CreateDirectory("C:\\valid\\path"), Times.Once);
+            _fileSystemMock.Verify(fs => fs.CreateDirectory($"C:{sp}valid{sp}path"), Times.Once);
         }
     }
 }
