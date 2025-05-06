@@ -9,6 +9,7 @@ using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
+using Reqnroll.Time;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -29,6 +30,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
         private ConcurrentDictionary<string, string> _stepDefinitionsByPattern;
         private int idCounter;
         private FeatureInfo _featureInfoDummy;
+        private Mock<IClock> _clockMock;
+        private Mock<IObjectContainer> _featureContainer;
 
         //private Mock<IBindingRegistry> _bindingRegistryMock;
 
@@ -41,15 +44,11 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             idCounter = 10;
             _idGeneratorMock = new Mock<IIdGenerator>();
             _idGeneratorMock.Setup(g => g.GetNewId()).Returns(() => { return (idCounter++).ToString(); });
+            _clockMock = new Mock<IClock>();
+            _clockMock.Setup(clock => clock.GetNowDateAndTime()).Returns(DateTime.UnixEpoch);
 
-            //_bindingRegistryMock = new Mock<IBindingRegistry>();
-            //_bindingRegistryMock.Setup(b => b.GetHooks()).Returns([]);
-            //_bindingRegistryMock.Setup(b => b.GetStepTransformations()).Returns([]);
-            //_bindingRegistryMock.Setup(b => b.GetStepDefinitions()).Returns([
-            //    new StepDefinitionBinding(StepDefinitionType.Given, null, null, "cucumber", "I eat a cuke", null)
-            //    ]);
-
-
+            _featureContainer = new Mock<IObjectContainer>();
+            _featureContainer.Setup(c => c.Resolve<IClock>()).Returns(_clockMock.Object);
             var mockFeatureContext = new Mock<IFeatureContext>();
             _mockFeatureContext = mockFeatureContext.Object;
 
@@ -64,6 +63,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
 
             _featureInfoDummy = new FeatureInfo(CultureInfo.InvariantCulture, null, "Test Feature", null, ProgrammingLanguage.CSharp, null, featureLevelCucumberMessagesDummy);
             mockFeatureContext.Setup(m => m.FeatureInfo).Returns(_featureInfoDummy);
+            mockFeatureContext.Setup(m => m.FeatureContainer).Returns(_featureContainer.Object);
+
             _featureStartedEventDummy = new FeatureStartedEvent(mockFeatureContext.Object);
 
             // Initialize the FeatureTracker
