@@ -89,7 +89,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             var validFile = FileFilter.GetValidFiles([outputFilePath]).Count == 1;
             if (string.IsNullOrEmpty(baseDirectory) || !validFile)
             {
-                throw new InvalidOperationException($"Path of configured output Messages file: ${outputFilePath} is invalid or missing.");
+                throw new InvalidOperationException($"Path of configured output Messages file: {outputFilePath} is invalid or missing.");
             }
 
             if (!_fileSystem.DirectoryExists(baseDirectory))
