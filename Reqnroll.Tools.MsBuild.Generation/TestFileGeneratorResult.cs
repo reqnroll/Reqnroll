@@ -19,6 +19,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             Errors = generatorResult.Errors;
             IsUpToDate = generatorResult.IsUpToDate;
             GeneratedTestCode = generatorResult.GeneratedTestCode;
+            Warnings = generatorResult.Warnings;
         }
 
         /// <summary>
@@ -38,6 +39,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public bool Success => Errors == null || !Errors.Any();
 
+        public IEnumerable<string> Warnings { get; }
         public string Filename { get; }
     }
 }

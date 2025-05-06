@@ -16,6 +16,10 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
+using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.CucumberMessages.PubSub;
+using Reqnroll.Utils;
+using System.Collections.Generic;
 
 namespace Reqnroll.Infrastructure
 {
@@ -71,6 +75,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<ObsoleteStepHandler, IObsoleteStepHandler>();
 
             container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
+            container.RegisterTypeAs<EnvironmentInfoProvider, IEnvironmentInfoProvider>();
             container.RegisterTypeAs<BinaryFileAccessor, IBinaryFileAccessor>();
             container.RegisterTypeAs<TestPendingMessageFactory, ITestPendingMessageFactory>();
             container.RegisterTypeAs<TestUndefinedMessageFactory, ITestUndefinedMessageFactory>();
@@ -98,6 +103,24 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEventEmitter, IRuntimePluginTestExecutionLifecycleEventEmitter>();
 
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
+
+            //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<FileSystem, IFileSystem>();
+            container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
+            container.RegisterTypeAs<FileBasedConfigurationResolver, ICucumberMessagesConfigurationResolver>("fileBasedResolver");
+            container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesConfigurationResolver>("environmentBasedResolver");
+            container.RegisterFactoryAs<IEnumerable<ICucumberMessagesConfigurationResolver>>(() =>
+            {
+                var collection = new List<ICucumberMessagesConfigurationResolver>();
+                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("fileBasedResolver"));
+                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("environmentBasedResolver"));
+                return collection;
+            });
+            container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
+            container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
+            container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");
+            container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
+            container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)

@@ -6,6 +6,7 @@ using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
+using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {
@@ -19,7 +20,7 @@ namespace Reqnroll.GeneratorTests
             runtimeConfiguration.AllowRowTests = true;
             runtimeConfiguration.AllowDebugGeneratedFiles = true;
 
-            return new UnitTestFeatureGenerator(testGeneratorProvider, codeDomHelper, runtimeConfiguration, new DecoratorRegistryStub());
+            return new UnitTestFeatureGenerator(testGeneratorProvider, codeDomHelper, runtimeConfiguration, new DecoratorRegistryStub(), new SimpleCucumberMessagesConfiguration());
         }
 
         public static IFeatureGenerator CreateFeatureGenerator(this IUnitTestGeneratorProvider testGeneratorProvider, string[] addNonParallelizableMarkerForTags = null)
