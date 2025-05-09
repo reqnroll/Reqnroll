@@ -34,7 +34,7 @@ namespace Reqnroll.Infrastructure
 
         public void AddAttachment(string filePath)
         {
-            var featureInfo = _contextManager.FeatureContext.FeatureInfo;
+            var featureInfo = _contextManager.FeatureContext?.FeatureInfo;
             var scenarioInfo = _contextManager.ScenarioContext?.ScenarioInfo;
 
             _testThreadExecutionEventPublisher.PublishEventAsync(new AttachmentAddedEvent(filePath, featureInfo, scenarioInfo));

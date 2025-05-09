@@ -215,7 +215,7 @@ namespace Reqnroll.Generator.Generation
             string sourceFileLocation;
             sourceFileLocation = Path.Combine(generationContext.Document.DocumentLocation.FeatureFolderPath, generationContext.Document.DocumentLocation.SourceFilePath);
 
-            // Adding three static methods to the test class: one each as Factory methods for source, gherkinDocument, and pickles Messages
+            // Adding three static methods to the test class: one each as factory methods for source, gherkinDocument, and pickles Messages
             // Bodies of these methods are added later inside the try/catch block
             sourceFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<Io.Cucumber.Messages.Types.Source>), CodeTypeReferenceOptions.GlobalReference), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "SourceFunc");
             var sourceFactoryMethod = new CodeMemberMethod();

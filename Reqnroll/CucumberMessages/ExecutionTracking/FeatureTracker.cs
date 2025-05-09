@@ -19,11 +19,11 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// FeatureTracker is responsible for tracking the execution of a Feature.
     /// There will be one instance of this class per gherkin Feature.
     /// </summary>
-    public class FeatureTracker
+    public class FeatureTracker : IFeatureTracker
     {
         // Static Messages are those generated during code generation (Source, GherkinDocument & Pickles)
         // and the StepTransformations, StepDefinitions and Hook messages which are global to the entire Solution.
-        internal IEnumerable<Envelope> StaticMessages => _staticMessages.Value;
+        public IEnumerable<Envelope> StaticMessages => _staticMessages.Value;
         private Lazy<IEnumerable<Envelope>> _staticMessages;
 
         // ID Generator to use when generating IDs for TestCase messages and beyond
@@ -38,7 +38,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
 
         // This maintains the list of TestCases, identified by (string) PickkleID, running within this Feature
-        internal TestCaseTrackers TestCaseTrackersById ;
+        internal TestCaseTrackers TestCaseTrackersById;
 
         public string FeatureName { get; }
         public bool Enabled { get; }

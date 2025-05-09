@@ -10,7 +10,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     internal class AttachmentTracker
     {
 
-        private List<ExecutionEvent> _attacheds = new();
+        internal List<ExecutionEvent> _attacheds = new();
 
         internal void RecordAttachment(AttachmentAddedEvent attachmentEvent)
         {

@@ -32,33 +32,41 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// </summary>
     public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventListener
     {
-        private Lazy<ICucumberMessageBroker> _brokerFactory;
-        private ICucumberMessageBroker _broker;
-        private IObjectContainer _testThreadObjectContainer;
+        internal Lazy<ICucumberMessageBroker> _brokerFactory;
+        internal ICucumberMessageBroker _broker;
+        internal IObjectContainer _testThreadObjectContainer;
 
         public static object _lock = new object();
 
         // Started Features by name
-        private ConcurrentDictionary<string, FeatureTracker> _startedFeatures = new();
+        internal ConcurrentDictionary<string, IFeatureTracker> _startedFeatures = new();
+        internal BindingMessagesGenerator _bindingCaches;
 
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
         // shared to each Feature tracker so that we keep a single list
-        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern { get; } = new();
-        private ConcurrentBag<IStepArgumentTransformationBinding> _stepArgumentTransforms = new();
-        private ConcurrentBag<IStepDefinitionBinding> _undefinedParameterTypeBindings = new();
+        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern
+        {
+            get
+            {
+                return _bindingCaches.StepDefinitionIdByMethodSignaturePatternCache;
+            }
+        }
         public IIdGenerator SharedIDGenerator { get; private set; }
 
         private string _testRunStartedId;
-        bool _enabled = false;
+        internal bool _enabled = false;
 
         // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
-        private readonly ConcurrentDictionary<string, TestRunHookTracker> _testRunHookTrackers = new();
+        internal readonly ConcurrentDictionary<string, TestRunHookTracker> _testRunHookTrackers = new();
         // This tracks all Attachments and Output Events; used during publication to sequence them in the correct order.
-        private readonly AttachmentTracker _attachmentTracker = new();
+        internal readonly AttachmentTracker _attachmentTracker = new();
 
         // Holds all Messages that are pending publication (collected from Feature Trackers as each Feature completes)
-        private List<Envelope> _messages = new();
+        internal List<Envelope> _messages = new();
+
+
+        internal CucumberMessageFactory _messageFactory = new();
 
         public CucumberMessagePublisher()
         {
@@ -68,6 +76,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) =>
             {
                 args.ObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
+                args.ObjectContainer.RegisterInstanceAs<CucumberMessageFactory>(_messageFactory);
             };
 
             runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
@@ -128,7 +137,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         // This method will get called after TestRunStartedEvent has been published and after any BeforeTestRun hooks have been called
         // The TestRunStartedEvent will be used by the MessagesFormatterPlugin to launch the File writing thread and establish Messages configuration
         // Running this after the BeforeTestRun hooks will allow them to programmatically configure CucumberMessages
-        private void PublisherStartup(object sender, RuntimePluginBeforeTestRunEventArgs args)
+        internal void PublisherStartup(object sender, RuntimePluginBeforeTestRunEventArgs args)
         {
             _broker = _brokerFactory.Value;
 
@@ -139,15 +148,15 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            SharedIDGenerator = _testThreadObjectContainer.Resolve<IIdGenerator>();
+            SharedIDGenerator = args.ObjectContainer.Resolve<IIdGenerator>();
             _testRunStartedId = SharedIDGenerator.GetNewId();
-            var bmg = new BindingMessagesGenerator();
-            var clock = _testThreadObjectContainer.Resolve<IClock>();
+            _bindingCaches = new BindingMessagesGenerator(SharedIDGenerator);
+            var clock = args.ObjectContainer.Resolve<IClock>();
             Task.Run(async () =>
             {
                 await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)) );
-                await _broker.PublishAsync(CucumberMessageFactory.ToMeta(args.ObjectContainer) );
-                foreach (var msg in bmg.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>(), SharedIDGenerator, _stepArgumentTransforms, _undefinedParameterTypeBindings, StepDefinitionsByPattern))
+                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToMeta(args.ObjectContainer)) );
+                foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>()))
                 {
                     // this publishes StepDefinition, Hook, StepArgumentTransform messages
                     await _broker.PublishAsync(msg);
@@ -165,7 +174,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             return _attachmentTracker.FindMatchingAttachment(e.Attachment).Timestamp.ToUniversalTime();
         }
 
-        private void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs e)
+        internal void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs args)
         {
             if (!_enabled)
                 return;
@@ -175,7 +184,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             // sort the remaining Messages by timestamp
             var executionMessages = _messages.Except(testCaseMessages).OrderBy(e => RetrieveDateTime(e)).ToList();
 
-            var clock = _testThreadObjectContainer.Resolve<IClock>();
+            var clock = args.ObjectContainer.Resolve<IClock>();
             // publish them in order to the broker
             Task.Run(async () =>
             {
@@ -201,12 +210,10 @@ namespace Reqnroll.CucumberMessages.PubSub
         // When one of these calls the Broker, that method is async; otherwise these are sync methods that return a completed Task (to allow them to be called async from the TestThreadExecutionEventPublisher)
         private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
         {
-            _broker = _brokerFactory.Value;
             var traceListener = _testThreadObjectContainer.Resolve<ITraceListener>();
 
             var featureName = featureStartedEvent.FeatureContext?.FeatureInfo?.Title;
 
-            _enabled = _broker.Enabled;
             if (!_enabled || String.IsNullOrEmpty(featureName))
             {
                 return;

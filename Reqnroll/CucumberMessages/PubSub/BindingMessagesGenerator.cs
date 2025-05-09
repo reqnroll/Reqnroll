@@ -17,19 +17,18 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// StepTransformations, StepDefinitions and Hooks.
     /// The binding items found are also cached for use during the processing of test cases.
     /// </summary>
-    internal class BindingMessagesGenerator
+    internal class BindingMessagesGenerator(IIdGenerator idGenerator)
     {
-        public IEnumerable<Envelope> PopulateBindingCachesAndGenerateBindingMessages(IBindingRegistry bindingRegistry, 
-            IIdGenerator idGenerator,
-            ConcurrentBag<IStepArgumentTransformationBinding> stepArgumentTransformCache,
-            ConcurrentBag<IStepDefinitionBinding> undefinedParameterTypeBindingsCache,
-            ConcurrentDictionary<string, string> stepDefinitionsByPatternCache)
+        public ConcurrentBag<IStepArgumentTransformationBinding> StepArgumentTransformCache = new();
+        public ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypeBindingsCache = new();
+        public ConcurrentDictionary<string, string> StepDefinitionIdByMethodSignaturePatternCache = new();
+        public IEnumerable<Envelope> PopulateBindingCachesAndGenerateBindingMessages(IBindingRegistry bindingRegistry)
         {
             foreach (var stepTransform in bindingRegistry.GetStepTransformations())
             {
-                if (stepArgumentTransformCache.Contains(stepTransform))
+                if (StepArgumentTransformCache.Contains(stepTransform))
                     continue;
-                stepArgumentTransformCache.Add(stepTransform);
+                StepArgumentTransformCache.Add(stepTransform);
                 var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, idGenerator);
                 yield return Envelope.Create(parameterType);
             }
@@ -40,9 +39,9 @@ namespace Reqnroll.CucumberMessages.PubSub
                 if (errmsg.Contains("Undefined parameter type"))
                 {
                     var paramName = Regex.Match(errmsg, "Undefined parameter type '(.*)'").Groups[1].Value;
-                    if (undefinedParameterTypeBindingsCache.Contains(binding))
+                    if (UndefinedParameterTypeBindingsCache.Contains(binding))
                         continue;
-                    undefinedParameterTypeBindingsCache.Add(binding);
+                    UndefinedParameterTypeBindingsCache.Add(binding);
                     var undefinedParameterType = CucumberMessageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, idGenerator);
                     yield return Envelope.Create(undefinedParameterType);
                 }
@@ -51,10 +50,10 @@ namespace Reqnroll.CucumberMessages.PubSub
             foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
             {
                 var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
-                if (stepDefinitionsByPatternCache.ContainsKey(pattern))
+                if (StepDefinitionIdByMethodSignaturePatternCache.ContainsKey(pattern))
                     continue;
                 var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, idGenerator);
-                if (stepDefinitionsByPatternCache.TryAdd(pattern, stepDefinition.Id))
+                if (StepDefinitionIdByMethodSignaturePatternCache.TryAdd(pattern, stepDefinition.Id))
                 {
                     yield return Envelope.Create(stepDefinition);
                 }
@@ -63,10 +62,10 @@ namespace Reqnroll.CucumberMessages.PubSub
             foreach (var hookBinding in bindingRegistry.GetHooks())
             {
                 var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
-                if (stepDefinitionsByPatternCache.ContainsKey(hookId))
+                if (StepDefinitionIdByMethodSignaturePatternCache.ContainsKey(hookId))
                     continue;
                 var hook = CucumberMessageFactory.ToHook(hookBinding, idGenerator);
-                if (stepDefinitionsByPatternCache.TryAdd(hookId, hook.Id))
+                if (StepDefinitionIdByMethodSignaturePatternCache.TryAdd(hookId, hook.Id))
                 {
                     yield return Envelope.Create(hook);
                 }
