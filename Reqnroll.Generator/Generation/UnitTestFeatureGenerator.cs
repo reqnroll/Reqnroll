@@ -206,6 +206,17 @@ namespace Reqnroll.Generator.Generation
             testClassCleanupMethod.Attributes = MemberAttributes.Public;
             testClassCleanupMethod.Name = GeneratorConstants.TESTCLASS_CLEANUP_NAME;
 
+            // Make sure that OnFeatureEndAsync is called on all associated TestRunners.
+            // await global::Reqnroll.TestRunnerManager.ReleaseFeatureAsync(featureInfo);
+            var releaseFeature = new CodeMethodInvokeExpression(
+                    new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
+                    nameof(TestRunnerManager.ReleaseFeatureAsync),
+                    new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
+
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(releaseFeature);
+
+            testClassCleanupMethod.Statements.Add(releaseFeature);
+
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
 
             _testGeneratorProvider.SetTestClassCleanupMethod(generationContext);

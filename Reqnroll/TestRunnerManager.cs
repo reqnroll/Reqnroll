@@ -111,6 +111,33 @@ public class TestRunnerManager : ITestRunnerManager
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was released twice");
     }
 
+    public virtual async Task ReleaseFeatureForTestRunnersAsync(FeatureInfo featureInfo)
+    {
+        var items = _availableTestWorkerContainers.ToArray();
+        foreach (var item in items)
+        {
+            if (!ReferenceEquals(featureInfo, item.Value.LastUsedFeatureInfo))
+                continue;
+            if (!_availableTestWorkerContainers.TryRemove(item.Key, out _))
+                continue; // Container was already taken by another thread
+            var testThreadContainer = item.Key;
+            if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, new TestWorkerContainerHint(featureInfo, null)))
+                throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} is already in usage");
+
+            var testRunner = testThreadContainer.Resolve<ITestRunner>();
+            try
+            {
+                // The feature info in the hint (item.Value.LastUsedFeatureInfo) may be outdated, so we need to check against the TestRunner instance
+                if (testRunner.FeatureContext != null && ReferenceEquals(testRunner.FeatureContext.FeatureInfo, featureInfo))
+                    await testRunner.OnFeatureEndAsync();
+            }
+            finally
+            {
+                ReleaseTestThreadContext(testRunner.TestThreadContext);
+            }
+        }
+    }
+
     protected virtual void InitializeBindingRegistry(ITestRunner testRunner)
     {
         BindingAssemblies = _bindingRegistryBuilder.GetBindingAssemblies(TestAssembly);
@@ -413,6 +440,13 @@ public class TestRunnerManager : ITestRunnerManager
     public static void ReleaseTestRunner(ITestRunner testRunner)
     {
         testRunner.TestThreadContext.TestThreadContainer.Resolve<ITestRunnerManager>().ReleaseTestThreadContext(testRunner.TestThreadContext);
+    }
+
+    public static async Task ReleaseFeatureAsync(FeatureInfo featureInfo, Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
+    {
+        testAssembly ??= GetCallingAssembly();
+        var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);
+        await testRunnerManager.ReleaseFeatureForTestRunnersAsync(featureInfo);
     }
 
     internal static async Task ResetAsync()
