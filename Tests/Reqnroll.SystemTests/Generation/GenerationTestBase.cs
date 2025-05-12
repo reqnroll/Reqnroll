@@ -529,6 +529,94 @@ public abstract class GenerationTestBase : SystemTestBase
         _vsTestExecutionDriver.LastTestExecutionResult.Output.Should().NotContain("The previous ScenarioContext was already disposed.");
     }
 
+    [TestMethod]
+    public void After_Feature_hooks_exception_handled_on_correct_time()
+    {
+        AddFeatureFile(
+            """
+            Feature: Feature 1
+            
+            Scenario: Passing scenario 1
+            When the step passes
+            """);
+        AddFeatureFile(
+            """
+            @failAfter
+            Feature: Feature 2
+            
+            Scenario: Failing scenario 2
+            When the step passes
+            """);
+        AddFeatureFile(
+            """
+            Feature: Feature 3
+            
+            Scenario: Passing scenario 3
+            When the step passes
+            """);
+
+        AddBindingClass(
+            """
+            namespace ReqnrollExecution.StepDefinitions
+            {
+                class MySampleFailAfterException : Exception
+                { }
+
+                [Binding]
+                public class ReqnrollExecutionBindings
+                {
+                    private readonly ITestRunnerManager _testRunnerManager;
+                    
+                    public ReqnrollExecutionBindings(ITestRunnerManager testRunnerManager)
+                    {
+                        _testRunnerManager = testRunnerManager;
+                    }
+                    
+                    [When("the step passes")]
+                    public void WhenTheStepPasses()
+                    {
+                        global::Log.LogStep();
+                        Log.LogCustom("parallel", _testRunnerManager.IsMultiThreaded.ToString());
+                    }
+                    
+                    [AfterFeature(Order = 0)]
+                    public static void AfterFeature(FeatureContext featureContext)
+                    {
+                        Log.LogCustom("hook", "AfterFeature");
+                    }
+                    
+                    [AfterFeature("@failAfter", Order = 10)]
+                    public static void FailAfter()
+                    {
+                        Log.LogCustom("hook", "FailAfter");
+                        throw new MySampleFailAfterException();
+                    }
+                }
+            }
+            """);
+
+        ExecuteTests();
+
+        var parallelLogs = _bindingDriver.GetActualLogLines("parallel").ToList();
+        parallelLogs.Should().NotBeEmpty("the scenarios should have parallel logs");
+        parallelLogs.Should().AllSatisfy(log => log.Should().StartWith("-> parallel: False"));
+
+        _bindingDriver.CheckIsHookExecuted("AfterFeature", 3);
+        _bindingDriver.CheckIsHookExecuted("FailAfter", 1);
+        _vsTestExecutionDriver.CheckOutputContainsText("MySampleFailAfterException");
+
+        // Note: the used test frameworks handle exception in AfterFeature differently (e.g. xUnit creates another test run result), that's why the checks here are not 100% exact.
+        _vsTestExecutionDriver.LastTestExecutionResult.Succeeded.Should().BeGreaterThanOrEqualTo(2);
+        _vsTestExecutionDriver.LastTestExecutionResult.Failed.Should().BeLessThanOrEqualTo(1);
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+            .Should().ContainSingle(tr => tr.TestName.StartsWith("Passing") && tr.TestName.EndsWith('1'))
+            .Which.Outcome.Should().Be("Passed");
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+            .Should().Contain(tr => tr.TestName.StartsWith("Failing") && tr.TestName.EndsWith('2'));
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+            .Should().ContainSingle(tr => tr.TestName.StartsWith("Passing") && tr.TestName.EndsWith('3'))
+            .Which.Outcome.Should().Be("Passed");
+    }
 
     #endregion
 
