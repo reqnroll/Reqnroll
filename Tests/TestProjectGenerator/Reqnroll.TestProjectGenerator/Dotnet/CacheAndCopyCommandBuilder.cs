@@ -35,7 +35,7 @@ public class CacheAndCopyCommandBuilder : CommandBuilder
         }
 
         var sdkSpecifier = _sdk == null ? "" : $"_{_sdk.Version}";
-        return Path.Combine(Path.GetTempPath(), "RRC", $"RRC{sdkSpecifier}_{argsCleaned}{suffix}", directoryName);
+        return Path.Combine(new ConfigurationDriver().TempFolderPath, "RRC", $"RRC{sdkSpecifier}_{argsCleaned}{suffix}", directoryName);
     }
 
     public override CommandResult Execute(Func<Exception, Exception> exceptionFunction)
