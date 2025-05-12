@@ -8,7 +8,7 @@
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi @obligaron
+*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron
 
 # v2.4.1 - 2025-04-29
 
