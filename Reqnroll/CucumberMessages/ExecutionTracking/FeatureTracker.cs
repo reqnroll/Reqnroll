@@ -59,7 +59,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
             Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source != null ? true : false;
             TestCaseTrackersById = new TestCaseTrackers(this, featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IClock>());
-            ProcessEvent(featureStartedEvent);
+            _staticMessages = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent)); 
         }
 
         // At the completion of Feature execution, this is called to generate all non-static Messages
@@ -70,13 +70,6 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             {
                 return TestCaseTrackersById.GetAll().OrderBy(tc => tc.TestCaseStartedTimeStamp).SelectMany(scenario => scenario.RuntimeGeneratedMessages);
             }
-        }
-
-        internal void ProcessEvent(FeatureStartedEvent featureStartedEvent)
-        {
-            if (!Enabled) return;
-            // This has side-effects needed for proper execution of subsequent events; eg, the Ids of the static messages get generated and then subsequent events generate Ids that follow
-            _staticMessages = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
         }
 
         // This method is used to generate the static messages (Source, GherkinDocument & Pickles) and the StepTransformations, StepDefinitions and Hook messages which are global to the entire Solution

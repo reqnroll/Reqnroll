@@ -152,26 +152,32 @@ namespace Reqnroll.CucumberMessages.PubSub
             _testRunStartedId = SharedIDGenerator.GetNewId();
             _bindingCaches = new BindingMessagesGenerator(SharedIDGenerator);
             var clock = args.ObjectContainer.Resolve<IClock>();
+            var traceListener = args.ObjectContainer.Resolve<ITraceListener>();
             Task.Run(async () =>
             {
-                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)) );
-                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToMeta(args.ObjectContainer)) );
-                foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>()))
+                try
                 {
-                    // this publishes StepDefinition, Hook, StepArgumentTransform messages
-                    await _broker.PublishAsync(msg);
+                    await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)));
+                    await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToMeta(args.ObjectContainer)));
+                    foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>()))
+                    {
+                        // this publishes StepDefinition, Hook, StepArgumentTransform messages
+                        await _broker.PublishAsync(msg);
+                    }
+                }
+                catch (System.Exception ex)
+                {
+                    traceListener.WriteToolOutput($"Error publishing messages: {ex.Message}");
                 }
             }).Wait();
         }
         private DateTime RetrieveDateTime(Envelope e)
         {
-            if (e.Attachment == null)
-                return Converters.ToDateTime(e.Timestamp());
-            // what remains is an Attachment.
-            // match it up with an AttachmentAddedEvent in the AttachmentTracker
-            // and use that event's timestamp as a proxy for the timestamp of the Attachment
-            // Adjust the Reqnroll ExecutionEvent's DateTime to UTC to make it comparable to the Event's timestamp (which are all in UTC)
-            return _attachmentTracker.FindMatchingAttachment(e.Attachment).Timestamp.ToUniversalTime();
+            return e.Content() switch
+            {
+                Attachment attachment => _attachmentTracker.FindMatchingAttachment(attachment).Timestamp.ToUniversalTime(),
+                _ => Converters.ToDateTime(e.Timestamp())
+            };
         }
 
         internal void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs args)
@@ -198,7 +204,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                     await _broker.PublishAsync(env);
                 }
 
-                await _broker.PublishAsync( Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, clock.GetNowDateAndTime(), _testRunStartedId)) );
+                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, clock.GetNowDateAndTime(), _testRunStartedId)));
             }).Wait();
 
             _startedFeatures.Clear();
@@ -228,29 +234,21 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            await Task.Run(() =>
+            var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern);
+            if (_startedFeatures.TryAdd(featureName, ft) && ft.Enabled)
             {
-                lock (_lock)
+                try
                 {
-                    // This will add a FeatureTracker to the _startedFeatures dictionary only once, and if it is enabled, it will publish the static messages shared by all steps.
-
-                    // We publish the messages before adding the featureTracker to the _startedFeatures dictionary b/c other parallel scenario threads might be running. 
-                    //   We don't want them to run until after the static messages have been published (and the PickleJar has been populated as a result).
-                    if (!_startedFeatures.ContainsKey(featureName))
+                    foreach (var msg in ft.StaticMessages) // Static Messages == known at compile-time (Source, Gerkhin Document, and Pickle messages)
                     {
-                        var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern);
-                        if (ft.Enabled)
-                            Task.Run(async () =>
-                            {
-                                foreach (var msg in ft.StaticMessages) // Static Messages == known at compile-time (Source, Gerkhin Document, and Pickle messages)
-                                {
-                                    await _broker.PublishAsync(msg);
-                                }
-                            }).Wait();
-                        _startedFeatures.TryAdd(featureName, ft);
+                        await _broker.PublishAsync(msg);
                     }
                 }
-            });
+                catch (System.Exception ex)
+                {
+                    traceListener.WriteToolOutput($"Error publishing messages: {ex.Message}");
+                }
+            }
         }
 
         private Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
@@ -280,68 +278,60 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         private Task ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
         {
-            var featureName = scenarioStartedEvent.FeatureContext?.FeatureInfo?.Title;
-            if (!_enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
-            var traceListener = _testThreadObjectContainer.Resolve<ITraceListener>();
-            if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
-            {
-                if (featureTracker.Enabled)
-                {
-                    featureTracker.ProcessEvent(scenarioStartedEvent);
-                }
-                else
-                {
-                    return Task.CompletedTask;
-                }
-            }
-            else
-            {
-                traceListener.WriteTestOutput($"Cucumber Message Publisher: ScenarioStartedEventHandler: {featureName} FeatureTracker not available");
-                throw new ApplicationException("FeatureTracker not available");
-            }
+            var featuretracker = GetFeatureTracker<ScenarioStartedEvent>(scenarioStartedEvent);
+            featuretracker?.ProcessEvent(scenarioStartedEvent);
 
             return Task.CompletedTask;
         }
 
+        private IFeatureTracker GetFeatureTracker<T>(T eventData) where T : IExecutionEvent
+        {
+            var featureName = GetFeatureName(eventData);
+
+            if (!_enabled || string.IsNullOrEmpty(featureName))
+                return null;
+
+            if (_startedFeatures.TryGetValue(featureName, out var featureTracker) && featureTracker.Enabled)
+            {
+                return featureTracker;
+            }
+
+            return null;
+        }
+
+        // Helper method to extract feature name from different event types
+        private string GetFeatureName(IExecutionEvent eventData)
+        {
+            return eventData switch
+            {
+                ScenarioStartedEvent sse => sse.FeatureContext?.FeatureInfo?.Title,
+                ScenarioFinishedEvent sfe => sfe.FeatureContext?.FeatureInfo?.Title,
+                StepStartedEvent stse => stse.FeatureContext?.FeatureInfo?.Title,
+                StepFinishedEvent stfe => stfe.FeatureContext?.FeatureInfo?.Title,
+                _ => null
+            };
+        }
+
         private Task ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
         {
-            var featureName = scenarioFinishedEvent.FeatureContext?.FeatureInfo?.Title;
+            var featuretracker = GetFeatureTracker<ScenarioFinishedEvent>(scenarioFinishedEvent);
+            featuretracker?.ProcessEvent(scenarioFinishedEvent);
 
-            if (!_enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
-            if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
-            {
-                featureTracker.ProcessEvent(scenarioFinishedEvent);
-            }
             return Task.CompletedTask;
         }
 
         private Task StepStartedEventHandler(StepStartedEvent stepStartedEvent)
         {
-            var featureName = stepStartedEvent.FeatureContext?.FeatureInfo?.Title;
-
-            if (!_enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
-
-            if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
-            {
-                featureTracker.ProcessEvent(stepStartedEvent);
-            }
+            var featuretracker = GetFeatureTracker<StepStartedEvent>(stepStartedEvent);
+            featuretracker?.ProcessEvent(stepStartedEvent);
 
             return Task.CompletedTask;
         }
 
         private Task StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
         {
-            var featureName = stepFinishedEvent.FeatureContext?.FeatureInfo?.Title;
-            if (!_enabled || String.IsNullOrEmpty(featureName))
-                return Task.CompletedTask;
-
-            if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
-            {
-                featureTracker.ProcessEvent(stepFinishedEvent);
-            }
+            var featuretracker = GetFeatureTracker<StepFinishedEvent>(stepFinishedEvent);
+            featuretracker?.ProcessEvent(stepFinishedEvent);
 
             return Task.CompletedTask;
         }

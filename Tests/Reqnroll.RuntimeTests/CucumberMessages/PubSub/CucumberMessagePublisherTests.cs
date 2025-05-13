@@ -160,11 +160,13 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             var msgFactory = new PublisherStartup_FactoryStub();
             CucumberMessageFactory.inner = msgFactory;
 
+            var traceListen = new Mock<ITraceListener>();
             _brokerMock.Setup(b => b.Enabled).Returns(true);
             objectContainerStub.RegisterInstanceAs<ICucumberMessageBroker>(_brokerMock.Object);
             objectContainerStub.RegisterInstanceAs<IIdGenerator>(_idGeneratorMock.Object);
             objectContainerStub.RegisterInstanceAs<IClock>(_clockMock.Object);
             objectContainerStub.RegisterInstanceAs<IBindingRegistry>(_bindingRegistryMock.Object);
+            objectContainerStub.RegisterInstanceAs<ITraceListener>(traceListen.Object);
 
             _sut._brokerFactory = new Lazy<ICucumberMessageBroker>(() => _brokerMock.Object);
             _sut._testThreadObjectContainer = objectContainerStub;
@@ -456,33 +458,6 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _sut._messages.Should().Contain(fakeMessages);
         }
 
-        // ScenarioStartedEvent handles not finding a matching FeatureTracker
-        [Fact]
-        public async Task ScenarioStarted_Should_HandleNoMatchingFeatureTracker()
-        {
-            // Arrange
-            var featureContextMock = new Mock<IFeatureContext>();
-            var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDE", "desc");
-
-            featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
-
-            var tlMock = new Mock<ITraceListener>();
-            var containerStub = new ObjectContainer();
-            containerStub.RegisterInstanceAs<ITraceListener>(tlMock.Object);
-
-            var scenarioContextMock = new Mock<IScenarioContext>();
-            var scenarioStartedEvent = new ScenarioStartedEvent(featureContextMock.Object, scenarioContextMock.Object);
-            _sut._testThreadObjectContainer = containerStub;
-            _sut._enabled = true;
-
-            // Act 
-            var act = async () => await _sut.OnEventAsync(scenarioStartedEvent);
-
-            // Assert
-            await act.Should().ThrowAsync<ApplicationException>();
-            tlMock.Verify(tl => tl.WriteTestOutput(It.IsAny<string>()));
-
-        }
 
         // ScenarioStartedEvent forwards event to the FeatureTracker
         [Theory]
@@ -586,6 +561,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             objectContainerStub.RegisterInstanceAs<IIdGenerator>(_idGeneratorMock.Object);
             objectContainerStub.RegisterInstanceAs<IClock>(_clockMock.Object);
             objectContainerStub.RegisterInstanceAs<IBindingRegistry>(_bindingRegistryMock.Object);
+            var traceListen = new Mock<ITraceListener>();
+            objectContainerStub.RegisterInstanceAs<ITraceListener>(traceListen.Object);
             _idGeneratorMock.Setup(ig => ig.GetNewId()).Returns("x");
             _clockMock.Setup(c => c.GetNowDateAndTime()).Returns(DateTime.UtcNow);
 
