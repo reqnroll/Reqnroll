@@ -1,10 +1,12 @@
 # [vNext]
-
+* Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test
 ## Improvements:
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
+
+*Contributors of this release (in alphabetical order):* @obligaron
 
 # v2.4.1 - 2025-04-29
 
