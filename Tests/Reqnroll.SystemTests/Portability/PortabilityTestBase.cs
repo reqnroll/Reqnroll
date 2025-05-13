@@ -20,6 +20,7 @@ public abstract class PortabilityTestBase : SystemTestBase
             [UnitTestProvider.MSTest],
             [UnitTestProvider.NUnit3],
             [UnitTestProvider.xUnit],
+            [UnitTestProvider.TUnit],
         ];
     }
 

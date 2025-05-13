@@ -1,5 +1,4 @@
-﻿using Reqnroll.Generator.Interfaces;
-using Reqnroll.Generator.Plugins;
+﻿using Reqnroll.Generator.Plugins;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Infrastructure;
 using Reqnroll.UnitTestProvider;
