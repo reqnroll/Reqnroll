@@ -159,7 +159,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
     public void SetTestMethodIgnore(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
     {
         // Ignore an individual test.
-        CodeDomHelper.AddAttribute(testMethod, SKIP_ATTR, "Ignored test");
+        CodeDomHelper.AddAttribute(testMethod, SKIP_ATTR, "Ignored scenario");
     }
 
     public void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)

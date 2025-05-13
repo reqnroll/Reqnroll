@@ -8,8 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="TUnit.Core" Version="0.19.86" />
-    <PackageReference Include="StrongNamer" Version="0.2.5" />
+    <PackageReference Include="TUnit.Core" Version="0.19.148" />
   </ItemGroup>
 
   <ItemGroup>
