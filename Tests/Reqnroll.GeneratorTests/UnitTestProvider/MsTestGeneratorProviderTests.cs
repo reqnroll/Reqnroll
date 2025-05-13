@@ -252,7 +252,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethodAttributeForFirstScenario = code.Class().Members().Single(m => m.Name == "SimpleScenario").CustomAttributes().Single(a => a.Name == TestMethodAttributeName);
