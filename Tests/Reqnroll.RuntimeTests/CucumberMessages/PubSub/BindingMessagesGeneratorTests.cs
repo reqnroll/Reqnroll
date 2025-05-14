@@ -24,7 +24,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _bindingRegistryMock = new Mock<IBindingRegistry>();
             _idGeneratorMock = new Mock<IIdGenerator>();
             _idGeneratorMock.Setup(i => i.GetNewId()).Returns(CurrentId++.ToString());
-            _sut = new BindingMessagesGenerator(_idGeneratorMock.Object);
+            _sut = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory());
         }
 
         [Fact]
@@ -103,7 +103,6 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             hookBinding.Setup(sd => sd.Method.Parameters).Returns([]);
 
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new[] { hookBinding.Object });
-            CucumberMessageFactory.inner = new CucumberMessageFactoryInner();
             // Act
             var messages = _sut.PopulateBindingCachesAndGenerateBindingMessages(_bindingRegistryMock.Object).ToList();
 

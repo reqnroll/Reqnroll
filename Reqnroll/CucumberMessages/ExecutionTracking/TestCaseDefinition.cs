@@ -8,7 +8,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// <summary>
     /// Data class that holds information about an executed TestCase that is discovered the first time the Scenario/TestCase is executed
     /// </summary>
-    internal class TestCaseDefinition
+    public class TestCaseDefinition
     {
         internal string TestCaseId { get; }
         internal string PickleId { get; }

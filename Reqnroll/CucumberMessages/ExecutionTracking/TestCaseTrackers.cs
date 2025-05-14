@@ -16,11 +16,11 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal Func<FeatureTracker, string, ITestCaseTracker> TestCaseTrackerFactory; 
         private FeatureTracker _parentFeature;
 
-        public TestCaseTrackers(FeatureTracker parentFeature, IClock clock)
+        public TestCaseTrackers(FeatureTracker parentFeature, IClock clock, ICucumberMessageFactory messageFactory)
         {
             _parentFeature = parentFeature;
             _clock = clock;
-            TestCaseTrackerFactory = (ft, pickleId) => { return new TestCaseTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IDGenerator, ft.StepDefinitionsByPattern, _clock.GetNowDateAndTime()); };
+            TestCaseTrackerFactory = (ft, pickleId) => { return new TestCaseTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IDGenerator, ft.StepDefinitionsByPattern, _clock.GetNowDateAndTime(), messageFactory); };
 
         }
 

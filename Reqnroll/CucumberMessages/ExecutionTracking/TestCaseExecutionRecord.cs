@@ -11,8 +11,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// Data class that holds information about a single execution of a TestCase.
     /// There will be mulitple of these for a given TestCase if it is Retried.
     /// </summary>
-    internal class TestCaseExecutionRecord : IGenerateMessage
+    public class TestCaseExecutionRecord : IGenerateMessage
     {
+        private ICucumberMessageFactory _messageFactory;
+
         internal int AttemptId { get; }
         internal bool WillBeRetried { get; set; }
 
@@ -28,8 +30,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal string _testCaseId;
         internal TestCaseDefinition _testCaseDefinition;
 
-        internal TestCaseExecutionRecord(int attemptId, string testCaseStartedId, string testCaseId, TestCaseDefinition testCaseDefinition)
+        internal TestCaseExecutionRecord(ICucumberMessageFactory messageFactory, int attemptId, string testCaseStartedId, string testCaseId, TestCaseDefinition testCaseDefinition)
         {
+            _messageFactory = messageFactory;
             AttemptId = attemptId;
             TestCaseStartedId = testCaseStartedId;
             WillBeRetried = false;
@@ -84,14 +87,14 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                     // On subsequent retries we do not.
                     if (AttemptId == 0)
                     {
-                        var testCase = CucumberMessageFactory.ToTestCase(_testCaseDefinition);
+                        var testCase = _messageFactory.ToTestCase(_testCaseDefinition);
                         yield return Envelope.Create(testCase);
                     }
-                    var testCaseStarted = CucumberMessageFactory.ToTestCaseStarted(this, _testCaseId);
+                    var testCaseStarted = _messageFactory.ToTestCaseStarted(this, _testCaseId);
                     yield return Envelope.Create(testCaseStarted);
                     break;
                 case ScenarioFinishedEvent scenarioFinishedEvent:
-                    yield return Envelope.Create(CucumberMessageFactory.ToTestCaseFinished(this));
+                    yield return Envelope.Create(_messageFactory.ToTestCaseFinished(this));
                     break;
                 default:
                     break;

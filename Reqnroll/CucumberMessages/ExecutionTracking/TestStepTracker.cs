@@ -14,9 +14,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// <summary>
     /// This class is used to track the execution of Test StepDefinitionBinding Methods
     /// </summary>
-    internal class TestStepTracker : StepExecutionTrackerBase, IGenerateMessage
+    public class TestStepTracker : StepExecutionTrackerBase, IGenerateMessage
     {
-        internal TestStepTracker(TestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord) : base(parentTracker, parentExecutionRecord)
+        internal TestStepTracker(TestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory) : base(parentTracker, parentExecutionRecord, messageFactory)
         {
         }
 
@@ -24,8 +24,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             return executionEvent switch
             {
-                StepStartedEvent started => [Envelope.Create(CucumberMessageFactory.ToTestStepStarted(this))],
-                StepFinishedEvent finished => [Envelope.Create(CucumberMessageFactory.ToTestStepFinished(this))],
+                StepStartedEvent started => [Envelope.Create(_messageFactory.ToTestStepStarted(this))],
+                StepFinishedEvent finished => [Envelope.Create(_messageFactory.ToTestStepFinished(this))],
                 _ => Enumerable.Empty<Envelope>()
             };
         }
@@ -39,7 +39,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             {
                 var testStepId = ParentTestCase.IDGenerator.GetNewId();
                 var pickleStepID = stepStartedEvent.StepContext.StepInfo.PickleStepId;
-                Definition = new(testStepId, pickleStepID, ParentTestCase.TestCaseDefinition);
+                Definition = new(testStepId, pickleStepID, ParentTestCase.TestCaseDefinition, _messageFactory);
                 ParentTestCase.TestCaseDefinition.AddStepDefinition(Definition);
             }
             else

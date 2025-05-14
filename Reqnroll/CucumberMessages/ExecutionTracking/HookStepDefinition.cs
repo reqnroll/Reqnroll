@@ -4,11 +4,11 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
-    internal class HookStepDefinition : TestStepDefinition
+    public class HookStepDefinition : TestStepDefinition
     {
         internal string HookId { get; }
 
-        internal HookStepDefinition(string testStepDefinitionId, string hookId, TestCaseDefinition parentTestCaseDefinition) : base(testStepDefinitionId, hookId, parentTestCaseDefinition)
+        internal HookStepDefinition(string testStepDefinitionId, string hookId, TestCaseDefinition parentTestCaseDefinition, ICucumberMessageFactory messageFactory) : base(testStepDefinitionId, hookId, parentTestCaseDefinition, messageFactory)
         {
             HookId = hookId;
         }

@@ -22,29 +22,29 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
     /// 
     /// These are typically called after execution is completed for a Feature.
     /// </summary>
-    internal class CucumberMessageFactoryInner //: ICucumberMessageFactory
+    public class CucumberMessageFactoryInner : ICucumberMessageFactory
     {
-        internal virtual TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
+        public virtual TestRunStarted ToTestRunStarted(DateTime timestamp, string id)
         {
             return new TestRunStarted(Converters.ToTimestamp(timestamp.ToUniversalTime()), id);
         }
 
-        internal virtual TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId)
+        public virtual TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId)
         {
             return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp.ToUniversalTime()), null, testRunStartedId);
         }
 
-        internal virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookTracker hookTracker)
+        public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookTracker hookTracker)
         {
             return new TestRunHookStarted(hookTracker.TestRunHookId, hookTracker.TestRunID, hookTracker.TestRunHook_HookId, Converters.ToTimestamp(hookTracker.TimeStamp.ToUniversalTime()));
         }
 
-        internal virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker)
+        public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker)
         {
             return new TestRunHookFinished(hookTracker.TestRunHookId, ToTestStepResult(hookTracker), Converters.ToTimestamp(hookTracker.TimeStamp.ToUniversalTime()));
         }
 
-        internal virtual TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
+        public virtual TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
         {
             var testSteps = new List<TestStep>();
 
@@ -73,7 +73,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             );
             return testCase;
         }
-        internal virtual TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId)
+        public virtual TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId)
         {
             return new TestCaseStarted(
                 testCaseExecution.AttemptId,
@@ -82,14 +82,14 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 null,
                 Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp.ToUniversalTime()));
         }
-        internal virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
+        public virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
         {
             return new TestCaseFinished(
                 testCaseExecution.TestCaseStartedId,
                 Converters.ToTimestamp(testCaseExecution.TestCaseFinishedTimeStamp.ToUniversalTime()),
                 false);
         }
-        internal virtual StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
+        public virtual StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)
         {
             StepDefinitionPattern stepDefinitionPattern = ToStepDefinitionPattern(binding);
             SourceReference sourceRef = ToSourceRef(binding);
@@ -103,7 +103,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return result;
         }
 
-        internal virtual StepDefinitionPattern ToStepDefinitionPattern(IStepDefinitionBinding binding)
+        public virtual StepDefinitionPattern ToStepDefinitionPattern(IStepDefinitionBinding binding)
         {
             var bindingSourceText = binding.SourceExpression;
             var expressionType = binding.ExpressionType;
@@ -115,12 +115,12 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             var stepDefinitionPattern = new StepDefinitionPattern(bindingSourceText, stepDefinitionPatternType);
             return stepDefinitionPattern;
         }
-        internal virtual UndefinedParameterType ToUndefinedParameterType(string expression, string paramName, IIdGenerator iDGenerator)
+        public virtual UndefinedParameterType ToUndefinedParameterType(string expression, string paramName, IIdGenerator iDGenerator)
         {
             return new UndefinedParameterType(expression, paramName);
         }
 
-        internal virtual ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator iDGenerator)
+        public virtual ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator iDGenerator)
         {
             var regex = stepTransform.Regex;
             var regexPattern = regex == null ? null : regex.ToString();
@@ -147,7 +147,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return sourceRef;
         }
 
-        internal virtual TestStep ToPickleTestStep(TestStepDefinition stepDef)
+        public virtual TestStep ToPickleTestStep(TestStepDefinition stepDef)
         {
             bool bound = stepDef.Bound;
             bool ambiguous = stepDef.Ambiguous;
@@ -167,7 +167,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return result;
         }
 
-        internal virtual StepMatchArgument ToStepMatchArgument(TestStepArgument argument)
+        public virtual StepMatchArgument ToStepMatchArgument(TestStepArgument argument)
         {
             return new StepMatchArgument(
                 new Group(
@@ -177,7 +177,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                     ),
                 NormalizePrimitiveTypeNamesToCucumberTypeNames(argument.Type));
         }
-        internal virtual TestStepStarted ToTestStepStarted(TestStepTracker stepState)
+        public virtual TestStepStarted ToTestStepStarted(TestStepTracker stepState)
         {
             return new TestStepStarted(
                 stepState.TestCaseStartedID,
@@ -185,7 +185,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 Converters.ToTimestamp(stepState.StepStarted.ToUniversalTime()));
         }
 
-        internal virtual TestStepFinished ToTestStepFinished(TestStepTracker stepState)
+        public virtual TestStepFinished ToTestStepFinished(TestStepTracker stepState)
         {
             return new TestStepFinished(
                 stepState.TestCaseStartedID,
@@ -194,7 +194,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 Converters.ToTimestamp(stepState.StepFinished.ToUniversalTime()));
         }
 
-        internal virtual Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
+        public virtual Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
         {
             SourceReference sourceRef = ToSourceRef(hookBinding);
 
@@ -209,7 +209,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             return result;
         }
 
-        internal virtual Io.Cucumber.Messages.Types.HookType ToHookType(IHookBinding hookBinding)
+        public virtual Io.Cucumber.Messages.Types.HookType ToHookType(IHookBinding hookBinding)
         {
             return hookBinding.HookType switch
             {
@@ -227,7 +227,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             };
         }
 
-        internal virtual TestStep ToHookTestStep(HookStepDefinition hookStepDefinition)
+        public virtual TestStep ToHookTestStep(HookStepDefinition hookStepDefinition)
         {
             var hookId = hookStepDefinition.HookId;
 
@@ -238,21 +238,21 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 null,
                 null);
         }
-        internal virtual TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor)
+        public virtual TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor)
         {
             return new TestStepStarted(hookStepProcessor.TestCaseStartedID,
                 hookStepProcessor.Definition.TestStepId,
                 Converters.ToTimestamp(hookStepProcessor.StepStarted.ToUniversalTime()));
         }
 
-        internal virtual TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor)
+        public virtual TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor)
         {
             return new TestStepFinished(hookStepProcessor.TestCaseStartedID,
                 hookStepProcessor.Definition.TestStepId,
                 ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookStepProcessor.StepFinished.ToUniversalTime()));
         }
 
-        internal virtual Attachment ToAttachment(AttachmentAddedEventWrapper tracker)
+        public virtual Attachment ToAttachment(AttachmentAddedEventWrapper tracker)
         {
             var attEvent = tracker.AttachmentAddedEvent;
             return new Attachment(
@@ -266,7 +266,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
                 null,
                 tracker.TestRunStartedId);
         }
-        internal virtual Attachment ToAttachment(OutputAddedEventWrapper tracker)
+        public virtual Attachment ToAttachment(OutputAddedEventWrapper tracker)
         {
             var outputAddedEvent = tracker.OutputAddedEvent;
             return new Attachment(
@@ -325,7 +325,7 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
             };
         }
 
-        internal virtual Meta ToMeta(IObjectContainer container)
+        public virtual Meta ToMeta(IObjectContainer container)
         {
             var environmentInfoProvider = container.Resolve<IEnvironmentInfoProvider>();
             var environmentWrapper = container.Resolve<IEnvironmentWrapper>();
@@ -389,14 +389,14 @@ namespace Reqnroll.CucumberMessages.PayloadProcessing.Cucumber
         }
 
         #region utility methods
-        internal virtual string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition)
+        public virtual string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition)
         {
             string signature = GenerateSignature(stepDefinition);
 
             return $"{stepDefinition.Method.Type.AssemblyName}.{stepDefinition.Method.Type.FullName}.{stepDefinition.Method.Name}({signature})";
         }
 
-        internal virtual string CanonicalizeHookBinding(IHookBinding hookBinding)
+        public virtual string CanonicalizeHookBinding(IHookBinding hookBinding)
         {
             string signature = GenerateSignature(hookBinding);
             return $"{hookBinding.Method.Type.AssemblyName}.{hookBinding.Method.Type.FullName}.{hookBinding.Method.Name}({signature})";

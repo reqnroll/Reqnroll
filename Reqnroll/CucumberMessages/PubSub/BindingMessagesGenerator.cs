@@ -17,7 +17,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// StepTransformations, StepDefinitions and Hooks.
     /// The binding items found are also cached for use during the processing of test cases.
     /// </summary>
-    internal class BindingMessagesGenerator(IIdGenerator idGenerator)
+    internal class BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessageFactory messageFactory)
     {
         public ConcurrentBag<IStepArgumentTransformationBinding> StepArgumentTransformCache = new();
         public ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypeBindingsCache = new();
@@ -29,7 +29,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 if (StepArgumentTransformCache.Contains(stepTransform))
                     continue;
                 StepArgumentTransformCache.Add(stepTransform);
-                var parameterType = CucumberMessageFactory.ToParameterType(stepTransform, idGenerator);
+                var parameterType = messageFactory.ToParameterType(stepTransform, idGenerator);
                 yield return Envelope.Create(parameterType);
             }
 
@@ -42,17 +42,17 @@ namespace Reqnroll.CucumberMessages.PubSub
                     if (UndefinedParameterTypeBindingsCache.Contains(binding))
                         continue;
                     UndefinedParameterTypeBindingsCache.Add(binding);
-                    var undefinedParameterType = CucumberMessageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, idGenerator);
+                    var undefinedParameterType = messageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, idGenerator);
                     yield return Envelope.Create(undefinedParameterType);
                 }
             }
 
             foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
             {
-                var pattern = CucumberMessageFactory.CanonicalizeStepDefinitionPattern(binding);
+                var pattern = messageFactory.CanonicalizeStepDefinitionPattern(binding);
                 if (StepDefinitionIdByMethodSignaturePatternCache.ContainsKey(pattern))
                     continue;
-                var stepDefinition = CucumberMessageFactory.ToStepDefinition(binding, idGenerator);
+                var stepDefinition = messageFactory.ToStepDefinition(binding, idGenerator);
                 if (StepDefinitionIdByMethodSignaturePatternCache.TryAdd(pattern, stepDefinition.Id))
                 {
                     yield return Envelope.Create(stepDefinition);
@@ -61,10 +61,10 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             foreach (var hookBinding in bindingRegistry.GetHooks())
             {
-                var hookId = CucumberMessageFactory.CanonicalizeHookBinding(hookBinding);
+                var hookId = messageFactory.CanonicalizeHookBinding(hookBinding);
                 if (StepDefinitionIdByMethodSignaturePatternCache.ContainsKey(hookId))
                     continue;
-                var hook = CucumberMessageFactory.ToHook(hookBinding, idGenerator);
+                var hook = messageFactory.ToHook(hookBinding, idGenerator);
                 if (StepDefinitionIdByMethodSignaturePatternCache.TryAdd(hookId, hook.Id))
                 {
                     yield return Envelope.Create(hook);

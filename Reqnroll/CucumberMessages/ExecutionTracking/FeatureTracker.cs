@@ -50,7 +50,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public bool FeatureExecutionSuccess { get; private set; }
 
         // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
-        public FeatureTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns)
+        public FeatureTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns, ICucumberMessageFactory messageFactory)
         {
             TestRunStartedId = testRunStartedId;
             StepDefinitionsByPattern = stepDefinitionPatterns;
@@ -58,7 +58,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
             Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source != null ? true : false;
-            TestCaseTrackersById = new TestCaseTrackers(this, featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IClock>());
+            TestCaseTrackersById = new TestCaseTrackers(this, featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IClock>(), messageFactory);
             _staticMessages = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent)); 
         }
 

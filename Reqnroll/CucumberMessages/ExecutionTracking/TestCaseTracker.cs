@@ -20,7 +20,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// </summary>
     internal class TestCaseTracker : ITestCaseTracker
     {
-        internal TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByPattern, DateTime instant)
+        internal TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByPattern, DateTime instant, ICucumberMessageFactory messageFactory)
         {
             TestRunStartedId = testRunStartedId;
             PickleId = pickleId;
@@ -30,6 +30,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             StepDefinitionsByPattern = stepDefinitionsByPattern;
             AttemptCount = -1;
             TestCaseStartedTimeStamp = instant;
+            _messageFactory = messageFactory;
         }
 
         // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
@@ -39,6 +40,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         internal string TestCaseId { get; private set; }
         internal int AttemptCount { get; private set; }
         public DateTime TestCaseStartedTimeStamp { get; }
+
+        internal ICucumberMessageFactory _messageFactory;
+
         internal bool Enabled { get; } //This will be false if the feature could not be pickled
         public bool Finished { get; private set; }
         public ScenarioExecutionStatus ScenarioExecutionStatus { get { return ExecutionHistory.Last().ScenarioExecutionStatus; } }
@@ -144,7 +148,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 Finished = false;
                 Current_Execution = null;
             }
-            var testCaseExec = new TestCaseExecutionRecord(AttemptCount, IDGenerator.GetNewId(), TestCaseId, TestCaseDefinition);
+            var testCaseExec = new TestCaseExecutionRecord(_messageFactory, AttemptCount, IDGenerator.GetNewId(), TestCaseId, TestCaseDefinition);
             SetExecutionRecordAsCurrentlyExecuting(testCaseExec);
             testCaseExec.RecordStart(scenarioStartedEvent);
         }
@@ -158,7 +162,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         private void ProcessEvent(StepStartedEvent stepStartedEvent)
         {
-            var stepState = new TestStepTracker(this, Current_Execution);
+            var stepState = new TestStepTracker(this, Current_Execution, _messageFactory);
 
             stepState.ProcessEvent(stepStartedEvent);
             Current_Execution.StepExecutionTrackers.Add(stepState);
@@ -177,7 +181,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             // At this point we only care about hooks that wrap scenarios or steps; Before/AfterTestRun hooks were processed earlier by the Publisher
             if (hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun || hookBindingStartedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun)
                 return;
-            var hookStepStateTracker = new HookStepTracker(this, Current_Execution);
+            var hookStepStateTracker = new HookStepTracker(this, Current_Execution, _messageFactory);
             hookStepStateTracker.ProcessEvent(hookBindingStartedEvent);
             Current_Execution.StepExecutionTrackers.Add(hookStepStateTracker);
             Current_Execution.StoreMessageGenerator(hookStepStateTracker, hookBindingStartedEvent);
@@ -198,7 +202,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 attachmentAddedEvent,
                 TestRunStartedId,
                 Current_Execution.TestCaseStartedId,
-                Current_Execution.CurrentStep.Definition.TestStepId);
+                Current_Execution.CurrentStep.Definition.TestStepId, 
+                _messageFactory);
             Current_Execution.StoreMessageGenerator(attachmentExecutionEventWrapper, attachmentAddedEvent);
         }
         private void ProcessEvent(OutputAddedEvent outputAddedEvent)
@@ -207,7 +212,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
                 outputAddedEvent,
                 TestRunStartedId,
                 Current_Execution.TestCaseStartedId,
-                Current_Execution.CurrentStep.Definition.TestStepId);
+                Current_Execution.CurrentStep.Definition.TestStepId,
+                _messageFactory);
 
             Current_Execution.StoreMessageGenerator(outputExecutionEventWrapper, outputAddedEvent);
         }

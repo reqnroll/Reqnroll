@@ -68,7 +68,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             _featureStartedEventDummy = new FeatureStartedEvent(mockFeatureContext.Object);
 
             // Initialize the FeatureTracker
-            var ft = new FeatureTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByPattern);
+            var ft = new FeatureTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByPattern, new CucumberMessageFactory());
 
             _testCaseTrackerMock = new Mock<ITestCaseTracker>();
             _testCaseTrackerMock.Setup(t => t.TestCaseStartedTimeStamp).Returns(DateTime.Now);

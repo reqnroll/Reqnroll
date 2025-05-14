@@ -9,15 +9,11 @@ using System.Linq;
 using Reqnroll.CucumberMessages.ExecutionTracking;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.CucumberMessages.RuntimeSupport;
-using Reqnroll.CucumberMessages.Configuration;
 using Gherkin.CucumberMessages;
 using Reqnroll.Bindings;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 using System.Collections.Generic;
 using Cucumber.Messages;
-using System.Diagnostics;
 using Reqnroll.Time;
 
 namespace Reqnroll.CucumberMessages.PubSub
@@ -66,7 +62,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         internal List<Envelope> _messages = new();
 
 
-        internal CucumberMessageFactory _messageFactory = new();
+        internal ICucumberMessageFactory _messageFactory;
 
         public CucumberMessagePublisher()
         {
@@ -76,7 +72,10 @@ namespace Reqnroll.CucumberMessages.PubSub
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) =>
             {
                 args.ObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
-                args.ObjectContainer.RegisterInstanceAs<CucumberMessageFactory>(_messageFactory);
+                if (!args.ObjectContainer.IsRegistered<ICucumberMessageFactory>())
+                {
+                    args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>( () => { return new CucumberMessageFactory(); });
+                }
             };
 
             runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
@@ -149,16 +148,17 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
 
             SharedIDGenerator = args.ObjectContainer.Resolve<IIdGenerator>();
+            _messageFactory = args.ObjectContainer.Resolve<ICucumberMessageFactory>();
             _testRunStartedId = SharedIDGenerator.GetNewId();
-            _bindingCaches = new BindingMessagesGenerator(SharedIDGenerator);
+            _bindingCaches = new BindingMessagesGenerator(SharedIDGenerator, _messageFactory);
             var clock = args.ObjectContainer.Resolve<IClock>();
             var traceListener = args.ObjectContainer.Resolve<ITraceListener>();
             Task.Run(async () =>
             {
                 try
                 {
-                    await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)));
-                    await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToMeta(args.ObjectContainer)));
+                    await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)));
+                    await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(args.ObjectContainer)));
                     foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>()))
                     {
                         // this publishes StepDefinition, Hook, StepArgumentTransform messages
@@ -204,7 +204,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                     await _broker.PublishAsync(env);
                 }
 
-                await _broker.PublishAsync(Envelope.Create(CucumberMessageFactory.ToTestRunFinished(status, clock.GetNowDateAndTime(), _testRunStartedId)));
+                await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(status, clock.GetNowDateAndTime(), _testRunStartedId)));
             }).Wait();
 
             _startedFeatures.Clear();
@@ -234,7 +234,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern);
+            var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern, _messageFactory);
             if (_startedFeatures.TryAdd(featureName, ft) && ft.Enabled)
             {
                 try
@@ -348,9 +348,9 @@ namespace Reqnroll.CucumberMessages.PubSub
                 case Bindings.HookType.BeforeFeature:
                 case Bindings.HookType.AfterFeature:
                     string hookRunStartedId = SharedIDGenerator.GetNewId();
-                    var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
+                    var signature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
                     var hookId = StepDefinitionsByPattern[signature];
-                    var hookTracker = new TestRunHookTracker(hookRunStartedId, hookId, hookBindingStartedEvent.Timestamp, _testRunStartedId);
+                    var hookTracker = new TestRunHookTracker(hookRunStartedId, hookId, hookBindingStartedEvent.Timestamp, _testRunStartedId, _messageFactory);
                     _testRunHookTrackers.TryAdd(signature, hookTracker);
                     _messages.AddRange(hookTracker.GenerateFrom(hookBindingStartedEvent));
                     return Task.CompletedTask;
@@ -381,7 +381,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 case Bindings.HookType.AfterTestRun:
                 case Bindings.HookType.BeforeFeature:
                 case Bindings.HookType.AfterFeature:
-                    var signature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
+                    var signature = _messageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
                     if (!_testRunHookTrackers.TryGetValue(signature, out var hookTracker)) // should not happen
                         return Task.CompletedTask;
                     hookTracker.Duration = hookBindingFinishedEvent.Duration;
@@ -417,7 +417,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (String.IsNullOrEmpty(featureName) || String.IsNullOrEmpty(attachmentAddedEvent.ScenarioInfo?.Title))
             {
                 // This is a TestRun-level attachment (not tied to any feature)
-                _messages.Add(Envelope.Create(CucumberMessageFactory.ToAttachment(new AttachmentAddedEventWrapper(attachmentAddedEvent, _testRunStartedId, null, null))));
+                _messages.Add(Envelope.Create(_messageFactory.ToAttachment(new AttachmentAddedEventWrapper(attachmentAddedEvent, _testRunStartedId, null, null, _messageFactory))));
                 return Task.CompletedTask;
             }
             if (_startedFeatures.TryGetValue(featureName, out var featureTracker))
@@ -439,7 +439,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             if (String.IsNullOrEmpty(featureName) || String.IsNullOrEmpty(outputAddedEvent.ScenarioInfo?.Title))
             {
                 // This is a TestRun-level attachment (not tied to any feature) or is an Output coming from a Before/AfterFeature hook
-                _messages.Add(Envelope.Create(CucumberMessageFactory.ToAttachment(new OutputAddedEventWrapper(outputAddedEvent, _testRunStartedId, null, null))));
+                _messages.Add(Envelope.Create(_messageFactory.ToAttachment(new OutputAddedEventWrapper(outputAddedEvent, _testRunStartedId, null, null, _messageFactory))));
                 return Task.CompletedTask;
             }
 

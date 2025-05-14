@@ -10,11 +10,11 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// This class is used to track execution of Hook Steps
     /// 
     /// </summary>
-    internal class HookStepTracker : StepExecutionTrackerBase, IGenerateMessage
+    public class HookStepTracker : StepExecutionTrackerBase, IGenerateMessage
     {
         internal string HookBindingSignature { get; private set; }
         internal HookBindingFinishedEvent HookBindingFinishedEvent { get; private set; }
-        internal HookStepTracker(TestCaseTracker tracker, TestCaseExecutionRecord testCaseExecutionRecord) : base(tracker, testCaseExecutionRecord)
+        internal HookStepTracker(TestCaseTracker tracker, TestCaseExecutionRecord testCaseExecutionRecord, ICucumberMessageFactory messageFactory) : base(tracker, testCaseExecutionRecord, messageFactory)
         {
         }
 
@@ -23,15 +23,15 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             StepStarted = hookBindingStartedEvent.Timestamp;
             if (ParentTestCase.AttemptCount == 0)
             {
-                HookBindingSignature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
+                HookBindingSignature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
                 var hookId = ParentTestCase.StepDefinitionsByPattern[HookBindingSignature];
                 var testStepId = ParentTestCase.IDGenerator.GetNewId();
-                Definition = new HookStepDefinition(testStepId, hookId, ParentTestCase.TestCaseDefinition);
+                Definition = new HookStepDefinition(testStepId, hookId, ParentTestCase.TestCaseDefinition, _messageFactory);
                 ParentTestCase.TestCaseDefinition.AddStepDefinition(Definition);
             }
             else
             {
-                HookBindingSignature = CucumberMessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
+                HookBindingSignature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
                 var hookId = ParentTestCase.StepDefinitionsByPattern[HookBindingSignature];
                 Definition = ParentTestCase.TestCaseDefinition.FindHookStepDefByHookId(hookId);
             }
@@ -49,8 +49,8 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             return executionEvent switch
             {
-                HookBindingStartedEvent started => [Envelope.Create(CucumberMessageFactory.ToTestStepStarted(this))],
-                HookBindingFinishedEvent finished => [Envelope.Create(CucumberMessageFactory.ToTestStepFinished(this))],
+                HookBindingStartedEvent started => [Envelope.Create(_messageFactory.ToTestStepStarted(this))],
+                HookBindingFinishedEvent finished => [Envelope.Create(_messageFactory.ToTestStepFinished(this))],
                 _ => Enumerable.Empty<Envelope>()
             };
         }

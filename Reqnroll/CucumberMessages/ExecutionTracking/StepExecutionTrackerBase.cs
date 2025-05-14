@@ -5,7 +5,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// <summary>
     /// Base class for tracking execution of steps (StepDefinitionBinding Methods and Hooks)
     /// </summary>
-    internal class StepExecutionTrackerBase
+    public class StepExecutionTrackerBase
     {
         internal string TestCaseStartedID => ParentExecutionRecord.TestCaseStartedId;
         internal ScenarioExecutionStatus Status { get; set; }
@@ -21,10 +21,13 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal TestCaseExecutionRecord ParentExecutionRecord { get; }
 
-        internal StepExecutionTrackerBase(TestCaseTracker parentScenario, TestCaseExecutionRecord parentExecutionRecord)
+        internal ICucumberMessageFactory _messageFactory;
+
+        internal StepExecutionTrackerBase(TestCaseTracker parentScenario, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory)
         {
             ParentTestCase = parentScenario;
             ParentExecutionRecord = parentExecutionRecord;
+            _messageFactory = messageFactory;
         }
     }
 }
