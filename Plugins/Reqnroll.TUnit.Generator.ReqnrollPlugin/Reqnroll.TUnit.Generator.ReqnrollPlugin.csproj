@@ -33,7 +33,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-    <ProjectReference Include="..\Reqnroll.TUnit.ReqnrollPlugin\Reqnroll.TUnit.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\Reqnroll.TUnit.ReqnrollPlugin\Reqnroll.TUnit.ReqnrollPlugin.csproj">
+      <!-- Reqnroll.TUnit.ReqnrollPlugin is referenced only to be included in the NuGet package. -->
+      <!-- Do not add it as a normal reference, as the TUnit SourceGenerator adds generated code that depends on TUnit.Core. -->
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ProjectReference>
   </ItemGroup>
 
   <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
