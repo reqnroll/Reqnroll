@@ -11,23 +11,51 @@ using System.Linq;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
-
     /// <summary>
-    /// This class is used to track the execution of Test Cases
-    /// There will be one instance of this class per gherkin Pickle/TestCase. 
-    /// It will track info from both Feature-level and Scenario-level Execution Events for a single Test Case
-    /// Individual executions will be recorded as a TestExecutionRecord.
+    /// Tracks the execution lifecycle and state of a single Gherkin scenario (Pickle/TestCase).
+    /// <para>
+    /// <b>Responsibilities:</b>
+    /// <list type="bullet">
+    ///   <item>Maintains scenario-level and feature-level execution data for a single test case.</item>
+    ///   <item>Records each execution attempt (including retries) as a <see cref="TestCaseExecutionRecord"/>.</item>
+    ///   <item>Processes and responds to all relevant execution events (scenario, step, hook, attachment, output).</item>
+    ///   <item>Generates Cucumber messages.</item>
+    ///   <item>Tracks step definitions and their mapping to execution steps within the scenario.</item>
+    /// </list>
+    /// </para>
+    /// <para>
+    /// There is one <c>TestCaseTracker</c> instance per scenario (Pickle) in a feature. It is created and managed by <see cref="TestCaseTrackers"/>.
+    /// </para>
     /// </summary>
     internal class TestCaseTracker : ITestCaseTracker
     {
-        internal TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByPattern, DateTime instant, ICucumberMessageFactory messageFactory)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TestCaseTracker"/> class for a specific scenario (Pickle).
+        /// </summary>
+        /// <param name="pickleId">The unique identifier of the scenario (Pickle) being tracked.</param>
+        /// <param name="testRunStartedId">The identifier of the test run this scenario belongs to.</param>
+        /// <param name="featureName">The name of the feature containing this scenario.</param>
+        /// <param name="enabled">Indicates whether this test case is enabled for execution.</param>
+        /// <param name="idGenerator">
+        /// The ID generator used to create unique IDs for test case messages and related entities.
+        /// </param>
+        /// <param name="stepDefinitionsByMethodSignature">
+        /// A thread-safe dictionary mapping step definition patterns to their unique IDs, 
+        /// used to resolve step bindings during execution.
+        /// </param>
+        /// <param name="instant">The timestamp marking when the test case started execution.</param>
+        /// <param name="messageFactory">
+        /// The factory responsible for creating Cucumber message objects.
+        /// </param>
+
+        internal TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByMethodSignature, DateTime instant, ICucumberMessageFactory messageFactory)
         {
             TestRunStartedId = testRunStartedId;
             PickleId = pickleId;
             FeatureName = featureName;
             Enabled = enabled;
             IDGenerator = idGenerator;
-            StepDefinitionsByPattern = stepDefinitionsByPattern;
+            StepDefinitionsByMethodSignature = stepDefinitionsByMethodSignature;
             AttemptCount = -1;
             TestCaseStartedTimeStamp = instant;
             _messageFactory = messageFactory;
@@ -97,7 +125,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
-        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern;
+        internal ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature;
 
         public void ProcessEvent(ExecutionEvent anEvent)
         {

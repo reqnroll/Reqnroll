@@ -35,7 +35,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
         // This dictionary is shared across all Features (via the Publisher)
-        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern = new();
+        internal ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature = new();
 
         // This maintains the list of TestCases, identified by (string) PickkleID, running within this Feature
         internal TestCaseTrackers TestCaseTrackersById;
@@ -53,7 +53,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public FeatureTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns, ICucumberMessageFactory messageFactory)
         {
             TestRunStartedId = testRunStartedId;
-            StepDefinitionsByPattern = stepDefinitionPatterns;
+            StepDefinitionsByMethodSignature = stepDefinitionPatterns;
             IDGenerator = idGenerator;
             FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
             var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;

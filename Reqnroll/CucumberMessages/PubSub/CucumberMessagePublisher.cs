@@ -41,7 +41,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
         // shared to each Feature tracker so that we keep a single list
-        internal ConcurrentDictionary<string, string> StepDefinitionsByPattern
+        internal ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature
         {
             get
             {
@@ -234,7 +234,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByPattern, _messageFactory);
+            var ft = new FeatureTracker(featureStartedEvent, _testRunStartedId, SharedIDGenerator, StepDefinitionsByMethodSignature, _messageFactory);
             if (_startedFeatures.TryAdd(featureName, ft) && ft.Enabled)
             {
                 try
@@ -349,7 +349,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                 case Bindings.HookType.AfterFeature:
                     string hookRunStartedId = SharedIDGenerator.GetNewId();
                     var signature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-                    var hookId = StepDefinitionsByPattern[signature];
+                    var hookId = StepDefinitionsByMethodSignature[signature];
                     var hookTracker = new TestRunHookTracker(hookRunStartedId, hookId, hookBindingStartedEvent.Timestamp, _testRunStartedId, _messageFactory);
                     _testRunHookTrackers.TryAdd(signature, hookTracker);
                     _messages.AddRange(hookTracker.GenerateFrom(hookBindingStartedEvent));

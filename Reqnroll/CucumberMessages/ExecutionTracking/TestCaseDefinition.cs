@@ -25,7 +25,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal string FindStepDefIDByStepPattern(string canonicalizedStepPattern)
         {
-            return Tracker.StepDefinitionsByPattern[canonicalizedStepPattern];
+            return Tracker.StepDefinitionsByMethodSignature[canonicalizedStepPattern];
         }
 
         internal void AddStepDefinition(TestStepDefinition definition)

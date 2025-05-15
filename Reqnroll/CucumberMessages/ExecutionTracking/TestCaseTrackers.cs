@@ -8,6 +8,20 @@ using System.Text;
 
 namespace Reqnroll.CucumberMessages.ExecutionTracking
 {
+    /// <summary>
+    /// Manages the lifecycle and lookup of <see cref="ITestCaseTracker"/> instances for a given feature.
+    /// <para>
+    /// <b>Responsibilities:</b>
+    /// <list type="bullet">
+    ///   <item>Creates and stores <see cref="ITestCaseTracker"/> objects, each representing a scenario (test case) within a feature.</item>
+    ///   <item>Provides thread-safe access to trackers via a concurrent dictionary keyed by pickle (scenario) ID.</item>
+    ///   <item>Supports retrieval and enumeration of all test case trackers for reporting or execution tracking.</item>
+    /// </list>
+    /// </para>
+    /// <para>
+    /// Typically, one <c>TestCaseTrackers</c> instance exists per <see cref="FeatureTracker"/>.
+    /// </para>
+    /// </summary>
     internal class TestCaseTrackers
     {
         internal ConcurrentDictionary<string, ITestCaseTracker> TestCaseTrackersById = new();
@@ -20,7 +34,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         {
             _parentFeature = parentFeature;
             _clock = clock;
-            TestCaseTrackerFactory = (ft, pickleId) => { return new TestCaseTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IDGenerator, ft.StepDefinitionsByPattern, _clock.GetNowDateAndTime(), messageFactory); };
+            TestCaseTrackerFactory = (ft, pickleId) => { return new TestCaseTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IDGenerator, ft.StepDefinitionsByMethodSignature, _clock.GetNowDateAndTime(), messageFactory); };
 
         }
 

@@ -27,7 +27,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
         private IFeatureContext _mockFeatureContext;
         private Mock<ITestCaseTracker> _testCaseTrackerMock;
 
-        private ConcurrentDictionary<string, string> _stepDefinitionsByPattern;
+        private ConcurrentDictionary<string, string> _stepDefinitionsByMethodSignature;
         private int idCounter;
         private FeatureInfo _featureInfoDummy;
         private Mock<IClock> _clockMock;
@@ -53,8 +53,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             _mockFeatureContext = mockFeatureContext.Object;
 
 
-            _stepDefinitionsByPattern = new ConcurrentDictionary<string, string>();
-            _stepDefinitionsByPattern.TryAdd("dummyMethodSignature", "step1");
+            _stepDefinitionsByMethodSignature = new ConcurrentDictionary<string, string>();
+            _stepDefinitionsByMethodSignature.TryAdd("dummyMethodSignature", "step1");
             var featureLevelCucumberMessagesDummy = new FeatureLevelCucumberMessages(
                 () => new Source("c:\\file", "Feature test", Io.Cucumber.Messages.Types.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN),
                 () => new GherkinDocument("", new Feature(new Location(0, 0), [], "en", "Feature", "Dummy Feature", "", new List<FeatureChild>()), []),
@@ -68,7 +68,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             _featureStartedEventDummy = new FeatureStartedEvent(mockFeatureContext.Object);
 
             // Initialize the FeatureTracker
-            var ft = new FeatureTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByPattern, new CucumberMessageFactory());
+            var ft = new FeatureTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByMethodSignature, new CucumberMessageFactory());
 
             _testCaseTrackerMock = new Mock<ITestCaseTracker>();
             _testCaseTrackerMock.Setup(t => t.TestCaseStartedTimeStamp).Returns(DateTime.Now);
@@ -86,7 +86,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             sut.Enabled.Should().BeTrue();
             sut.FeatureName.Should().Be("Test Feature");
             sut.TestRunStartedId.Should().Be("TestRunId");
-            sut.StepDefinitionsByPattern.Should().BeSameAs(_stepDefinitionsByPattern);
+            sut.StepDefinitionsByMethodSignature.Should().BeSameAs(_stepDefinitionsByMethodSignature);
         }
 
         [Fact]

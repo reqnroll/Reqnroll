@@ -24,7 +24,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             if (ParentTestCase.AttemptCount == 0)
             {
                 HookBindingSignature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-                var hookId = ParentTestCase.StepDefinitionsByPattern[HookBindingSignature];
+                var hookId = ParentTestCase.StepDefinitionsByMethodSignature[HookBindingSignature];
                 var testStepId = ParentTestCase.IDGenerator.GetNewId();
                 Definition = new HookStepDefinition(testStepId, hookId, ParentTestCase.TestCaseDefinition, _messageFactory);
                 ParentTestCase.TestCaseDefinition.AddStepDefinition(Definition);
@@ -32,7 +32,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
             else
             {
                 HookBindingSignature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-                var hookId = ParentTestCase.StepDefinitionsByPattern[HookBindingSignature];
+                var hookId = ParentTestCase.StepDefinitionsByMethodSignature[HookBindingSignature];
                 Definition = ParentTestCase.TestCaseDefinition.FindHookStepDefByHookId(hookId);
             }
         }
