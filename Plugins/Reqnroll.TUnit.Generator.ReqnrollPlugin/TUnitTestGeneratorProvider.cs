@@ -24,16 +24,16 @@ namespace Reqnroll.TUnit.Generator.ReqnrollPlugin;
 [SuppressMessage("ReSharper", "BitwiseOperatorOnEnumWithoutFlags")]
 public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
 {
-    protected internal const string TEST_ATTR = "global::TUnit.Core.TestAttribute";
-    protected internal const string BEFORE_ATTR = "global::TUnit.Core.BeforeAttribute";
-    protected internal const string AFTER_ATTR = "global::TUnit.Core.AfterAttribute";
-    protected internal const string SKIP_ATTR = "global::TUnit.Core.SkipAttribute";
-    protected internal const string CATEGORY_ATTR = "global::TUnit.Core.CategoryAttribute";
-    protected internal const string DISPLAYNAME_ATTR = "global::TUnit.Core.DisplayNameAttribute";
-    protected internal const string ARGUMENTS_ATTR = "global::TUnit.Core.ArgumentsAttribute";
-    protected internal const string NOTINPARALLEL_ATTR = "global::TUnit.Core.NotInParallelAttribute";
-    protected internal const string TESTCONTEXT_TYPE = "global::TUnit.Core.TestContext";
-    protected internal const string TESTCONTEXT_INSTANCE = "global::TUnit.Core.TestContext.Current";
+    protected internal const string TEST_ATTR = "TUnit.Core.TestAttribute";
+    protected internal const string BEFORE_ATTR = "TUnit.Core.BeforeAttribute";
+    protected internal const string AFTER_ATTR = "TUnit.Core.AfterAttribute";
+    protected internal const string SKIP_ATTR = "TUnit.Core.SkipAttribute";
+    protected internal const string CATEGORY_ATTR = "TUnit.Core.CategoryAttribute";
+    protected internal const string DISPLAYNAME_ATTR = "TUnit.Core.DisplayNameAttribute";
+    protected internal const string ARGUMENTS_ATTR = "TUnit.Core.ArgumentsAttribute";
+    protected internal const string NOTINPARALLEL_ATTR = "TUnit.Core.NotInParallelAttribute";
+    protected internal const string TESTCONTEXT_TYPE = "TUnit.Core.TestContext";
+    protected internal const string TESTCONTEXT_INSTANCE = "TUnit.Core.TestContext.Current";
 
 
     public TUnitTestGeneratorProvider(CodeDomHelper codeDomHelper)
@@ -170,22 +170,19 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
 
     public void SetRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> arguments, IEnumerable<string> tags, bool isIgnored)
     {
-        // Create attribute arguments for inline data.
-        var args = arguments.Select(arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
+        var args = arguments.Select(
+            arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
 
-        // If any tags are provided, add them as an array parameter.
-        if (tags.Any())
-        {
-            var tagArray = new CodeArrayCreateExpression(typeof(string),
-                                                         tags.Select(t => new CodePrimitiveExpression(t)).ToArray());
-            args.Add(new CodeAttributeArgument(tagArray));
-        }
+        var tagsArray = tags.ToArray();
 
-        if (isIgnored)
-        {
-            // If this row should be ignored, add a Skip parameter.
-            args.Add(new CodeAttributeArgument("Skip", new CodePrimitiveExpression("Ignored by inline tag")));
-        }
+        // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://youtrack.jetbrains.com/issue/RSRP-279138
+        var hasExampleTags = tagsArray.Any();
+        var exampleTagExpressionList = tagsArray.Select(t => (CodeExpression)new CodePrimitiveExpression(t));
+        var exampleTagsExpression = hasExampleTags
+            ? new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray())
+            : (CodeExpression)new CodePrimitiveExpression(null);
+
+        args.Add(new CodeAttributeArgument(exampleTagsExpression));
 
         CodeDomHelper.AddAttribute(testMethod, ARGUMENTS_ATTR, args.ToArray());
     }
