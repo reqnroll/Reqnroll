@@ -3,6 +3,7 @@
 ## Improvements:
 
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
 
 ## Bug fixes:
 
