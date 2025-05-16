@@ -2,6 +2,7 @@ using FluentAssertions;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
+using System.CodeDom;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -197,6 +198,54 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                                                            x.ArgumentValues().OfType<string>().ElementAt(1) == "blue");
             testCaseAttributes.Should().ContainSingle(x => x.ArgumentValues().OfType<string>().ElementAt(0) == "2" &&
                                                            x.ArgumentValues().OfType<string>().ElementAt(1) == "black");
+        }
+
+        [Fact]
+        public void MsTestV2GeneratorProvider_WithScenarioOutline_ShouldGenerateDisplayNamePropertyOfEachDataRow()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            Scenario Outline: Add items
+                Given there are <count> <color> items
+
+                Examples:
+                    | count | color |
+                    |     1 | red   |
+                    |     2 | blue  |");
+
+            var provider = new MsTestV2GeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator();
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+
+            // ASSERT
+            var testMethod = code.Class().Members().Single(m => m.Name == "AddItems");
+            var dataRows = testMethod.CustomAttributes().Where(a => a.Name == TestCaseAttributeName).ToList();
+
+            dataRows.Should().HaveCount(2);
+
+            var row0arguments = dataRows[0].Arguments.Cast<CodeAttributeArgument>()
+                .Where(arg => !string.IsNullOrEmpty(arg.Name))
+                .ToDictionary(arg => arg.Name, arg => arg.Value);
+
+
+            var row1arguments = dataRows[1].Arguments.Cast<CodeAttributeArgument>()
+                .Where(arg => !string.IsNullOrEmpty(arg.Name))
+                .ToDictionary(arg => arg.Name, arg => arg.Value);
+
+            row0arguments.Should().ContainKey("DisplayName");
+            row1arguments.Should().ContainKey("DisplayName");
+
+            var ArgValue = row0arguments["DisplayName"] as CodePrimitiveExpression;
+            var stringValue = ArgValue?.Value as string;
+            stringValue.Should().Be("Add items(1,red)");
+
+            ArgValue = row1arguments["DisplayName"] as CodePrimitiveExpression;
+            stringValue = ArgValue?.Value as string;
+            stringValue.Should().Be("Add items(2,blue)");
         }
 
         [Fact]
