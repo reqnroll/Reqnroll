@@ -16,13 +16,8 @@
 
 
   <PropertyGroup>
-
-    <_Reqnroll_TUnitGeneratorPlugin>netstandard2.0</_Reqnroll_TUnitGeneratorPlugin>
-    <_Reqnroll_TUnitGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_TUnitGeneratorPlugin)\Reqnroll.TUnit.Generator.ReqnrollPlugin.dll</_Reqnroll_TUnitGeneratorPluginPath>
-
-    <_Reqnroll_TUnitRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' OR ( '$(TargetFramework)' != 'net8.0' AND '$(TargetFramework)' != 'net9.0' ) ">netstandard2.0</_Reqnroll_TUnitRuntimePlugin>
-    <_Reqnroll_TUnitRuntimePlugin Condition=" '$(TargetFramework)' == 'net8.0' OR '$(TargetFramework)' == 'net9.0' ">net8.0</_Reqnroll_TUnitRuntimePlugin>
-    <_Reqnroll_TUnitRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_TUnitRuntimePlugin)\Reqnroll.TUnit.ReqnrollPlugin.dll</_Reqnroll_TUnitRuntimePluginPath>
+    <_Reqnroll_TUnitGeneratorPluginPath>$(MSBuildThisFileDirectory)\netstandard2.0\Reqnroll.TUnit.Generator.ReqnrollPlugin.dll</_Reqnroll_TUnitGeneratorPluginPath>
+    <_Reqnroll_TUnitRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\netstandard2.0\Reqnroll.TUnit.ReqnrollPlugin.dll</_Reqnroll_TUnitRuntimePluginPath>
 
     <SourceReqnrollAssemblyHooksFile Condition="'$(SourceReqnrollAssemblyHooksFile)' == ''">$(MSBuildThisFileDirectory)TUnit.AssemblyHooks$(DefaultLanguageSourceExtension)</SourceReqnrollAssemblyHooksFile>
     <GenerateReqnrollAssemblyHooksFile Condition="'$(GenerateReqnrollAssemblyHooksFile)' == ''">true</GenerateReqnrollAssemblyHooksFile>

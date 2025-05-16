@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0;net8.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.TUnit.nuspec</NuspecFile>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
@@ -14,6 +14,13 @@
      <!--adjust path/version as needed--> 
     <MSBuildAdditionalTasksPath>$(NuGetPackageRoot)\msbuild.additionaltasks\0.1.36</MSBuildAdditionalTasksPath>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
+      <!-- Do not add it as a normal reference, we just need this as a package dependency. -->
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
 
   <!--<Import Project="$(MSBuildAdditionalTasksPath)\build\MSBuild.AdditionalTasks.targets" />-->
 
