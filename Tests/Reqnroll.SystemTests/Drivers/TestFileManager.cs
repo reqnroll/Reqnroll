@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using FluentAssertions;
+using Assembly = System.Reflection.Assembly;
 
 namespace Reqnroll.SystemTests.Drivers;
 

@@ -114,7 +114,11 @@ namespace Reqnroll.TestProjectGenerator
             string output = processResult.CombinedOutput;
 
             var lines = output.SplitByString(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
-            var trxFilePaths = FindFilePath(lines, ".trx", BeginOfTrxFileLine).ToArray();
+            string[] trxFilePaths;
+            if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
+                trxFilePaths = FindFilePath(lines, ".trx", "- ").ToArray();
+            else
+                trxFilePaths = FindFilePath(lines, ".trx", BeginOfTrxFileLine).ToArray();
             var logFiles = FindFilePath(lines, ".log", BeginOfLogFileLine).ToArray();
 
             string logFileContent =
@@ -159,7 +163,6 @@ namespace Reqnroll.TestProjectGenerator
         {
             var argumentsBuilder = new StringBuilder("--no-build ");
 
-            argumentsBuilder.Append(GenerateTrxLoggerParameter());
             argumentsBuilder.Append($" {GenerateVerbosityParameter("n")}");
 
             string additionalPackagesFoldersParameters = GenerateAdditionalPackagesFoldersParameters();
@@ -183,11 +186,15 @@ namespace Reqnroll.TestProjectGenerator
             //argumentsBuilder.Append($@" ""{pathToReqnrollProject}""");
             argumentsBuilder.Append($@" ""{_testProjectFolders.PathToSolutionFile}""");
 
+            argumentsBuilder.Append($" {GenerateTrxLoggerParameter()}");
+
             return argumentsBuilder.ToString();
         }
 
         public string GenerateTrxLoggerParameter()
         {
+            if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
+                return "-- -report-trx";
             return "--logger trx";
         }
 
