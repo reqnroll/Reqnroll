@@ -26,12 +26,12 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
     {
         private readonly Mock<IIdGenerator> _mockIdGenerator;
         private readonly Mock<ICucumberMessageFactory> _mockMessageFactory;
-        private readonly FeatureInfo _featureInfoStub;
-        private readonly FeatureContext _featureContextStub;
-        private readonly ScenarioInfo _scenarioInfoStub;
-        private readonly ScenarioContext _scenarioContextSub;
-        private readonly Mock<IScenarioStepContext> _mockStepContext;
-        private readonly Mock<IContextManager> _mockContextManager;
+        private FeatureInfo _featureInfoStub;
+        private FeatureContext _featureContextStub;
+        private ScenarioInfo _scenarioInfoStub;
+        private ScenarioContext _scenarioContextSub;
+        private Mock<IScenarioStepContext> _mockStepContext;
+        private Mock<IContextManager> _mockContextManager;
         private readonly Mock<IHookBinding> _mockHookBinding;
         private readonly ConcurrentDictionary<string, string> _stepDefinitionsByMethodSignature;
         private readonly Timestamp _testTime = new Timestamp(0, 1);
@@ -44,19 +44,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
 
             _mockMessageFactory = new Mock<ICucumberMessageFactory>();
 
-            _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "Test Feature", "");
-            _featureContextStub = new FeatureContext(objectContainerStub, _featureInfoStub, ConfigurationLoader.GetDefault());
-
-            _scenarioInfoStub = new ScenarioInfo("Test Scenario", "", [], null);
-            _scenarioContextSub = new ScenarioContext(objectContainerStub, _scenarioInfoStub, null);
-
-            _mockStepContext = new Mock<IScenarioStepContext>();
-            _mockStepContext.Setup(x => x.StepInfo).Returns(new StepInfo(StepDefinitionType.Given, "a test step", null, null, "pickleStepId"));
-
-            _mockContextManager = new Mock<IContextManager>();
-            _mockContextManager.Setup(x => x.FeatureContext).Returns(_featureContextStub);
-            _mockContextManager.Setup(x => x.ScenarioContext).Returns(_scenarioContextSub);
-            //_mockContextManager.Setup(x => x.StepContext).Returns(_mockStepContext.Object);
+            SetupMockContexts();
 
             _mockHookBinding = new Mock<IHookBinding>();
 
@@ -104,6 +92,23 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
                 .Setup(m => m.CanonicalizeHookBinding(It.IsAny<IHookBinding>()))
                 .Returns("hookBinding-method-signature");
             _stepDefinitionsByMethodSignature.TryAdd("hookBinding-method-signature", "hook-id");
+        }
+
+        private void SetupMockContexts()
+        {
+            _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "Test Feature", "");
+            _featureContextStub = new FeatureContext(objectContainerStub, _featureInfoStub, ConfigurationLoader.GetDefault());
+
+            _scenarioInfoStub = new ScenarioInfo("Test Scenario", "", [], null);
+            _scenarioContextSub = new ScenarioContext(objectContainerStub, _scenarioInfoStub, null);
+
+            _mockStepContext = new Mock<IScenarioStepContext>();
+            _mockStepContext.Setup(x => x.StepInfo).Returns(new StepInfo(StepDefinitionType.Given, "a test step", null, null, "pickleStepId"));
+
+            _mockContextManager = new Mock<IContextManager>();
+            _mockContextManager.Setup(x => x.FeatureContext).Returns(_featureContextStub);
+            _mockContextManager.Setup(x => x.ScenarioContext).Returns(_scenarioContextSub);
+            //_mockContextManager.Setup(x => x.StepContext).Returns(_mockStepContext.Object);
         }
 
         [Fact]
