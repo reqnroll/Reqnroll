@@ -20,7 +20,7 @@ namespace Reqnroll.Infrastructure
         Task OnAfterLastStepAsync();
         Task OnScenarioEndAsync();
 
-        void OnScenarioSkipped();
+        Task OnScenarioSkippedAsync();
 
         Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg);
 
