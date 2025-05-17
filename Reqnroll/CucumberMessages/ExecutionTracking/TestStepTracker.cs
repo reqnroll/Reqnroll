@@ -16,7 +16,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     /// </summary>
     public class TestStepTracker : StepExecutionTrackerBase, IGenerateMessage
     {
-        internal TestStepTracker(TestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory) : base(parentTracker, parentExecutionRecord, messageFactory)
+        internal TestStepTracker(ITestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory) : base(parentTracker, parentExecutionRecord, messageFactory)
         {
         }
 

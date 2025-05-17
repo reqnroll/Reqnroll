@@ -48,7 +48,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         /// The factory responsible for creating Cucumber message objects.
         /// </param>
 
-        internal TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByMethodSignature, DateTime instant, ICucumberMessageFactory messageFactory)
+        public TestCaseTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByMethodSignature, DateTime instant, ICucumberMessageFactory messageFactory)
         {
             TestRunStartedId = testRunStartedId;
             PickleId = pickleId;
@@ -63,10 +63,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
         internal string FeatureName { get; }
-        internal string TestRunStartedId { get; }
+        public string TestRunStartedId { get; }
         internal string PickleId { get; } = string.Empty;
         internal string TestCaseId { get; private set; }
-        internal int AttemptCount { get; private set; }
+        public int AttemptCount { get; private set; }
         public DateTime TestCaseStartedTimeStamp { get; }
 
         internal ICucumberMessageFactory _messageFactory;
@@ -75,13 +75,9 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public bool Finished { get; private set; }
         public ScenarioExecutionStatus ScenarioExecutionStatus { get { return ExecutionHistory.Last().ScenarioExecutionStatus; } }
 
+        public IIdGenerator IDGenerator { get; set; }
 
-        // ID Generator to use when generating IDs for TestCase messages and beyond
-        // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
-        // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
-        internal IIdGenerator IDGenerator { get; set; }
-
-        internal TestCaseDefinition TestCaseDefinition { get; private set; }
+        public TestCaseDefinition TestCaseDefinition { get; private set; }
         private List<TestCaseExecutionRecord> ExecutionHistory = new();
         private TestCaseExecutionRecord Current_Execution;
         private void SetExecutionRecordAsCurrentlyExecuting(TestCaseExecutionRecord executionRecord)
@@ -125,7 +121,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         // This dictionary tracks the StepDefintions(ID) by their method signature
         // used during TestCase creation to map from a Step Definition binding to its ID
-        internal ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature;
+        public ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature { get; private set; }
 
         public void ProcessEvent(ExecutionEvent anEvent)
         {

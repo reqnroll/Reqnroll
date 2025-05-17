@@ -12,10 +12,10 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
     {
         internal string TestCaseId { get; }
         internal string PickleId { get; }
-        internal TestCaseTracker Tracker { get; }
+        internal ITestCaseTracker Tracker { get; }
         internal List<TestStepDefinition> StepDefinitions { get; }
 
-        internal TestCaseDefinition(string testCaseID, string pickleId, TestCaseTracker owner)
+        internal TestCaseDefinition(string testCaseID, string pickleId, ITestCaseTracker owner)
         {
             TestCaseId = testCaseID;
             PickleId = pickleId;

@@ -17,13 +17,13 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         internal TestStepDefinition Definition { get; set; }
 
-        internal TestCaseTracker ParentTestCase { get; }
+        internal ITestCaseTracker ParentTestCase { get; }
 
         internal TestCaseExecutionRecord ParentExecutionRecord { get; }
 
         internal ICucumberMessageFactory _messageFactory;
 
-        internal StepExecutionTrackerBase(TestCaseTracker parentScenario, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory)
+        internal StepExecutionTrackerBase(ITestCaseTracker parentScenario, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory)
         {
             ParentTestCase = parentScenario;
             ParentExecutionRecord = parentExecutionRecord;
