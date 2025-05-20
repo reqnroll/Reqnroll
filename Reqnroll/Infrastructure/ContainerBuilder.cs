@@ -1,8 +1,11 @@
-using Reqnroll.BoDi;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Reqnroll.Bindings;
+using Reqnroll.BoDi;
+using Reqnroll.CommonModels;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
@@ -19,6 +22,8 @@ namespace Reqnroll.Infrastructure
 
     public class ContainerBuilder : IContainerBuilder
     {
+        internal const string DryRunEnvVarName = "REQNROLL_DRY_RUN";
+
         public static IDefaultDependencyProvider DefaultDependencyProvider = new DefaultDependencyProvider();
 
         private readonly IDefaultDependencyProvider _defaultDependencyProvider;
@@ -171,6 +176,20 @@ namespace Reqnroll.Infrastructure
         protected virtual void RegisterDefaults(ObjectContainer container)
         {
             _defaultDependencyProvider.RegisterGlobalContainerDefaults(container);
+
+            // Check for dry run environment variable and optionally register the dry run binding invoker
+            var environment = container.Resolve<IEnvironmentWrapper>();
+            if (environment.GetEnvironmentVariable(DryRunEnvVarName) is ISuccess<string> dryRunEnvVar
+                && bool.TryParse(dryRunEnvVar.Result, out bool useDryRun)
+                && useDryRun)
+            {
+                container.RegisterTypeAs<DryRunBindingInvoker, IAsyncBindingInvoker>();
+#pragma warning disable CS0618
+                container.RegisterTypeAs<DryRunBindingInvoker, IBindingInvoker>();
+#pragma warning restore CS0618
+
+                //container.Resolve<IReqnrollOutputHelper>().WriteLine($"{DryRunEnvVarName} is specified. Test run will use dry run binding invoker.");
+            }
         }
     }
 }
