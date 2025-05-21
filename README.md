@@ -6,7 +6,7 @@
 
 Reqnroll is an open-source .NET test automation tool to practice [Behavior Driven Development (BDD)](https://cucumber.io/docs/bdd/).
 
-Reqnroll is a .NET port of [Cucumber](https://cucumber.io/) and it is based on the [SpecFlow](https://www.specflow.org/) framework and code base. You can find more information about the goal of the Reqnroll project and the motivations to create it on the [Reqnroll website](https://reqnroll.net/).
+Reqnroll is a .NET port of [Cucumber](https://cucumber.io/) and it is based on the SpecFlow framework and code base. You can find more information about the goal of the Reqnroll project and the motivations to create it on the [Reqnroll website](https://reqnroll.net/).
 
 Reqnroll enables writing executable specifications for BDD using [Gherkin](https://cucumber.io/docs/gherkin/), the widely-accepted *feature file* specification format. With that you can define the requirements using *Given-When-Then* style *scenarios* and turn them to automated tests in order to verify their implementation.
 
@@ -40,6 +40,6 @@ See all sponsors and information about sponsorship on the [Sponsorship page](htt
 
 Reqnroll for VisualStudio is licensed under the [BSD 3-Clause License](LICENSE).
 
-Copyright (c) 2024 Reqnroll
+Copyright (c) 2024-2025 Reqnroll
 
-This project is based on the [SpecFlow](https://github.com/SpecFlowOSS/SpecFlow) framework.
+This project is based on the SpecFlow framework.
