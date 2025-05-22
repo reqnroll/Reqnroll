@@ -285,7 +285,7 @@ jobs:
       run: dotnet build --no-restore ${{ needs.build.outputs.build_params }}
     - name: System Tests
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj --filter "TestCategory!=MsBuild&TestCategory!=Net481" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx"  ${{ needs.build.outputs.test_params }} 
+      run: dotnet test ./Tests/Reqnroll.SystemTests/Reqnroll.SystemTests.csproj --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx"  ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
