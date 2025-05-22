@@ -26,6 +26,10 @@ namespace Reqnroll.Generator.Interfaces
 
         public bool Success { get { return Errors == null || !Errors.Any(); } }
 
+        /// <summary>
+        /// Warning messages from code generation, if any.
+        /// </summary>
+        public IEnumerable<string> Warnings { get; private set; }
         public TestGeneratorResult(params TestGenerationError[] errors)
             : this((IEnumerable<TestGenerationError>)errors)
         {
@@ -37,12 +41,16 @@ namespace Reqnroll.Generator.Interfaces
             if (errors.Count() == 0) throw new ArgumentException("no errors provided", "errors");
 
             Errors = errors.ToArray();
+            Warnings = new List<string>();
         }
 
-        public TestGeneratorResult(string generatedTestCode, bool isUpToDate)
+        public TestGeneratorResult(string generatedTestCode, bool isUpToDate, IEnumerable<string> warnings)
         {
             IsUpToDate = isUpToDate;
             GeneratedTestCode = generatedTestCode;
+            Warnings = new List<string>();
+            if (warnings != null)
+                Warnings = warnings.ToList();
         }
     }
 }
