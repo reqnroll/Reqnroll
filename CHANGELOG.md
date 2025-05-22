@@ -3,12 +3,13 @@
 ## Improvements:
 
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Improvement: Introducing the ability to specify env var "REQNROLL_DRY_RUN=true" to use the DryRunBindingInvoker when executing tests (#614)
 
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron
+*Contributors of this release (in alphabetical order):* @clrudolphi, @DrEsteban, @obligaron
 
 # v2.4.1 - 2025-04-29
 

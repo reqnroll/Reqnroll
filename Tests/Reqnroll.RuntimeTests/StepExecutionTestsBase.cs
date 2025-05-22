@@ -124,12 +124,7 @@ namespace Reqnroll.RuntimeTests
             StepArgumentTypeConverterStub = new Mock<IStepArgumentTypeConverter>();
         }
 
-        protected TestRunner GetTestRunnerFor(params Type[] bindingTypes)
-        {
-            return GetTestRunnerFor(null, bindingTypes);
-        }
-
-        protected TestRunner GetTestRunnerFor(Action<IObjectContainer> registerMocks, params Type[] bindingTypes)
+        protected TestRunner GetTestRunnerFor(Action<IObjectContainer> registerMocks, IDefaultDependencyProvider defaultDependencyProvider, params Type[] bindingTypes)
         {
             return TestObjectFactories.CreateTestRunner(
                 container =>
@@ -143,22 +138,23 @@ namespace Reqnroll.RuntimeTests
                         builder.BuildingCompleted();
 
                         registerMocks?.Invoke(container);
-                    });
+                    },
+                defaultDependencyProvider: defaultDependencyProvider);
         }
 
-        protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>() where TBinding : class 
+        protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>(IDefaultDependencyProvider defaultDependencyProvider = null) where TBinding : class 
         {
-            return GetTestRunnerWithConverterStub<TBinding>(null);
+            return GetTestRunnerWithConverterStub<TBinding>(null, defaultDependencyProvider);
         }
 
         protected (TestRunner, Mock<TBinding>) GetTestRunnerWithConverterStub<TBinding>() where TBinding : class
         {
-            return GetTestRunnerWithConverterStub<TBinding>(c => c.RegisterInstanceAs(StepArgumentTypeConverterStub.Object));
+            return GetTestRunnerWithConverterStub<TBinding>(c => c.RegisterInstanceAs(StepArgumentTypeConverterStub.Object), null);
         }
 
-        private (TestRunner, Mock<TBinding>) GetTestRunnerWithConverterStub<TBinding>(Action<IObjectContainer> registerMocks) where TBinding : class
+        private (TestRunner, Mock<TBinding>) GetTestRunnerWithConverterStub<TBinding>(Action<IObjectContainer> registerMocks, IDefaultDependencyProvider defaultDependencyProvider) where TBinding : class
         {
-            TestRunner testRunner = GetTestRunnerFor(registerMocks, typeof(TBinding));
+            TestRunner testRunner = GetTestRunnerFor(registerMocks, defaultDependencyProvider, typeof(TBinding));
 
             var bindingInstance = new Mock<TBinding>();
             testRunner.ScenarioContext.SetBindingInstance(typeof(TBinding), bindingInstance.Object);
