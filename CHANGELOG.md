@@ -3,6 +3,7 @@
 ## Improvements:
 
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
 
 ## Bug fixes:
 

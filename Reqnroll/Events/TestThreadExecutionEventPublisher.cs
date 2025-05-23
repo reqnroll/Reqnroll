@@ -1,32 +1,56 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Events
 {
     public class TestThreadExecutionEventPublisher : ITestThreadExecutionEventPublisher
     {
         private readonly List<IExecutionEventListener> _listeners = new();
+        private readonly List<IAsyncExecutionEventListener> _asyncListeners = new();
         private readonly Dictionary<Type, List<Delegate>> _handlersDictionary = new();
 
         public void PublishEvent(IExecutionEvent executionEvent)
         {
-            foreach (var listener in _listeners)
+            Task.Run(async () => await PublishEventAsync(executionEvent)).Wait();
+        }
+
+        public async Task PublishEventAsync(IExecutionEvent executionEvent)
+        {
+            Task.Run(() =>
             {
-                listener.OnEvent(executionEvent);
+                foreach (var listener in _listeners)
+                {
+                    listener.OnEvent(executionEvent);
+                }
+            }).Wait();
+
+            foreach (var listener in _asyncListeners)
+            {
+                await listener.OnEventAsync(executionEvent);
             }
 
-            if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
+            Task.Run(() =>
             {
-                foreach (var handler in handlers)
+                if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
                 {
-                    handler.DynamicInvoke(executionEvent);
+                    foreach (var handler in handlers)
+                    {
+                        handler.DynamicInvoke(executionEvent);
+                    }
                 }
-            }
+            }).Wait();
         }
 
         public void AddListener(IExecutionEventListener listener)
         {
             _listeners.Add(listener);
+        }
+
+        public void AddAsyncListener(IAsyncExecutionEventListener listener)
+        {
+            _asyncListeners.Add(listener);
         }
 
         public void AddHandler<TEvent>(Action<TEvent> handler) where TEvent : IExecutionEvent
