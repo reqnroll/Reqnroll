@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.ErrorHandling;
+using Reqnroll.Assist;
 
 namespace Reqnroll.Infrastructure
 {
@@ -75,7 +76,7 @@ namespace Reqnroll.Infrastructure
             if (useScopeMatching && stepDefinitionBinding.IsScoped && stepInstance.StepContext != null && !stepDefinitionBinding.BindingScope.Match(stepInstance.StepContext, out scopeMatches))
                 return BindingMatch.NonMatching;
 
-            var arguments = match == null ? Array.Empty<object>() : _matchArgumentCalculator.CalculateArguments(match, stepInstance, stepDefinitionBinding);
+            var arguments = match == null ? Array.Empty<MatchArgument>() : _matchArgumentCalculator.CalculateArguments(match, stepInstance, stepDefinitionBinding);
 
             if (useParamMatching)
             {
@@ -88,7 +89,7 @@ namespace Reqnroll.Infrastructure
 
                 // Check if regex & extra arguments can be converted to the method parameters
                 //if (arguments.Zip(bindingParameters, (arg, parameter) => CanConvertArg(arg, parameter.Type)).Any(canConvert => !canConvert))
-                if (arguments.Where((arg, argIndex) => !CanConvertArg(arg, bindingParameters[argIndex].Type, bindingCulture)).Any())
+                if (arguments.Where((arg, argIndex) => !CanConvertArg(arg.Value, bindingParameters[argIndex].Type, bindingCulture)).Any())
                     return BindingMatch.NonMatching;
             }
 
