@@ -3,7 +3,7 @@
 ## Improvements:
 
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
-
+* Improvement: Added a CreateDirectory() function to the Reqnroll.Utils/IFileSystem (#623)
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
