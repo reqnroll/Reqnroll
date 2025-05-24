@@ -159,7 +159,6 @@ namespace Reqnroll.Generator
             var featureGenerator = featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
 
             var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out var generatedWarnings);
-            generationWarnings = generatedWarnings;
             return codeNamespace;
         }
 
