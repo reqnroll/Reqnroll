@@ -217,7 +217,10 @@ namespace Reqnroll.GeneratorTests
 
         public void CreateDirectory(string path)
         {
-            throw new NotImplementedException();
+            if (!DirectoryExists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
         }
     }
 }
