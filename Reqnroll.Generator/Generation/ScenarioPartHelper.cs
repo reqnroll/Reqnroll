@@ -225,7 +225,7 @@ namespace Reqnroll.Generator.Generation
                 return new CodePrimitiveExpression(text);
             }
 
-            var formatArguments = new List<CodeExpression> {new CodePrimitiveExpression(formatText) };
+            var formatArguments = new List<CodeExpression> { new CodePrimitiveExpression(formatText) };
             formatArguments.AddRange(arguments.Select(id => new CodeVariableReferenceExpression(id)));
 
             return new CodeMethodInvokeExpression(
