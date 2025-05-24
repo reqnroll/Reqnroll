@@ -48,9 +48,7 @@ namespace Reqnroll.Generator.Interfaces
         {
             IsUpToDate = isUpToDate;
             GeneratedTestCode = generatedTestCode;
-            Warnings = new List<string>();
-            if (warnings != null)
-                Warnings = warnings.ToList();
+            Warnings = warnings is null ? Array.Empty<string>() : warnings.ToList();
         }
     }
 }
