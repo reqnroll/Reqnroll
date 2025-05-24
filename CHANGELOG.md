@@ -3,7 +3,7 @@
 ## Improvements:
 
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
-
+* Refactored UnitTestFeatureGenerator to provide an output parameter that contains warnings (#624)
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)

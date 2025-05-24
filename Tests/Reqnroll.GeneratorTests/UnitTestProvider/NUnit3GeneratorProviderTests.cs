@@ -68,7 +68,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -109,7 +109,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -156,7 +156,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -201,7 +201,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -268,7 +268,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
 
                 var featureGenerator = CreateFeatureGenerator(parallelCode, addNonParallelizableMarkerForTags);
 
-                code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+                code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
             }
 
             return code;
@@ -295,7 +295,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var parser = new ReqnrollGherkinParser(parserCultureInfo ?? new CultureInfo("en-US"));
             using (var reader = new StringReader(documentSource))
             {
-                var document = parser.Parse(reader, null);
+                var document = parser.Parse(reader, new ReqnrollDocumentLocation($"dummy_ReqnrollLocation_for_{nameof(NUnit3GeneratorProviderTests)}"));
                 document.Should().NotBeNull();
                 return document;
             }
