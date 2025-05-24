@@ -142,7 +142,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             tracker.TestCaseId.Should().Be("test-id");
             tracker.TestCaseDefinition.Should().NotBeNull();
             tracker.Finished.Should().BeFalse();
-            _featureContextStub.FeatureInfo.CucumberMessages_PickleId.Should().Be("test-pickle-id");
+            _scenarioInfoStub.PickleId.Should().Be("test-pickle-id");
         }
 
         [Fact]

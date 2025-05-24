@@ -220,7 +220,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
         {
 
-            var pickleId = attachmentAddedEvent.FeatureInfo?.CucumberMessages_PickleId;
+            var pickleId = attachmentAddedEvent.ScenarioInfo?.PickleId;
 
             if (String.IsNullOrEmpty(pickleId)) return;
 
@@ -232,7 +232,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
 
         public void ProcessEvent(OutputAddedEvent outputAddedEvent)
         {
-            var pickleId = outputAddedEvent.FeatureInfo?.CucumberMessages_PickleId;
+            var pickleId = outputAddedEvent.ScenarioInfo?.PickleId;
 
             if (String.IsNullOrEmpty(pickleId)) return;
 

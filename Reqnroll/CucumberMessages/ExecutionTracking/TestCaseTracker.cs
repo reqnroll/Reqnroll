@@ -159,7 +159,7 @@ namespace Reqnroll.CucumberMessages.ExecutionTracking
         private void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
         {
             AttemptCount++;
-            scenarioStartedEvent.FeatureContext.FeatureInfo.CucumberMessages_PickleId = PickleId;
+            scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId = PickleId;
             // on the first time this Scenario is executed, create a TestCaseDefinition
             if (AttemptCount == 0)
             {

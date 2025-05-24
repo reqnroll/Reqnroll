@@ -294,11 +294,11 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
         {
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
-            _featureInfoDummy.CucumberMessages_PickleId = "0";
             _ = sut.StaticMessages.ToList();
             sut.TestCaseTrackersById.TryAddNew("0", out _);
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+            scenarioInfoDummy.PickleId = "0";
 
             var attachmentAddedEvent = new AttachmentAddedEvent("attachmentFileName.png", _mockFeatureContext.FeatureInfo,  scenarioInfoDummy);
 
@@ -314,11 +314,12 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
         {
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
-            _featureInfoDummy.CucumberMessages_PickleId = "0";
             _ = sut.StaticMessages.ToList();
             sut.TestCaseTrackersById.TryAddNew("0", out _);
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+            scenarioInfoDummy.PickleId = "0";
+
             var outputAddedEvent = new OutputAddedEvent("sample output text", _featureInfoDummy, scenarioInfoDummy);
 
             // Act
