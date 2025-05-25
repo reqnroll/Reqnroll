@@ -20,7 +20,7 @@ namespace Reqnroll
 
 
         // This holds the cucumber messages at the feature level created by the test class generator; populated when the FeatureStartedEvent is fired
-        public FeatureLevelCucumberMessages FeatureCucumberMessages { get; set; }
+        internal FeatureLevelCucumberMessages FeatureCucumberMessages { get; set; }
 
         public FeatureInfo(CultureInfo language, string folderPath, string title, string description, params string[] tags)
             : this(language, folderPath, title, description, ProgrammingLanguage.CSharp, tags)
