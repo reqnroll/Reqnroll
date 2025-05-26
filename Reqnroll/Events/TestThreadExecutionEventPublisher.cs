@@ -18,29 +18,23 @@ namespace Reqnroll.Events
 
         public async Task PublishEventAsync(IExecutionEvent executionEvent)
         {
-            Task.Run(() =>
+            foreach (var listener in _listeners)
             {
-                foreach (var listener in _listeners)
-                {
-                    listener.OnEvent(executionEvent);
-                }
-            }).Wait();
+                listener.OnEvent(executionEvent);
+            }
 
             foreach (var listener in _asyncListeners)
             {
                 await listener.OnEventAsync(executionEvent);
             }
 
-            Task.Run(() =>
+            if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
             {
-                if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
+                foreach (var handler in handlers)
                 {
-                    foreach (var handler in handlers)
-                    {
-                        handler.DynamicInvoke(executionEvent);
-                    }
+                    handler.DynamicInvoke(executionEvent);
                 }
-            }).Wait();
+            }
         }
 
         public void AddListener(IExecutionEventListener listener)
@@ -48,7 +42,7 @@ namespace Reqnroll.Events
             _listeners.Add(listener);
         }
 
-        public void AddAsyncListener(IAsyncExecutionEventListener listener)
+        public void AddListener(IAsyncExecutionEventListener listener)
         {
             _asyncListeners.Add(listener);
         }

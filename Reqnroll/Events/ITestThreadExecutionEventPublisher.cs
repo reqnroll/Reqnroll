@@ -11,7 +11,7 @@ namespace Reqnroll.Events
 
         void AddListener(IExecutionEventListener listener);
 
-        void AddAsyncListener(IAsyncExecutionEventListener listener);
+        void AddListener(IAsyncExecutionEventListener listener);
 
         void AddHandler<TEvent>(Action<TEvent> handler) where TEvent: IExecutionEvent;
     }
