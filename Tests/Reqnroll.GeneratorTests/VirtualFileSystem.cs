@@ -217,10 +217,7 @@ namespace Reqnroll.GeneratorTests
 
         public void CreateDirectory(string path)
         {
-            if (!DirectoryExists(path))
-            {
-                Directory.CreateDirectory(path);
-            }
+            Directory.CreateDirectory(path);
         }
     }
 }
