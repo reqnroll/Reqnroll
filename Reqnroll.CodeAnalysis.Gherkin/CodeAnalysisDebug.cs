@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax;
+using System.Diagnostics;
 
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
@@ -12,4 +13,8 @@ internal static class CodeAnalysisDebug
     [Conditional("DEBUG")]
     public static void Assert(bool condition, string message, string detailMessageFormat, params object[] args) => 
         Debug.Assert(condition, message, detailMessageFormat, args);
+
+    [Conditional("DEBUG")]
+    public static void AssertNotNull(object? o, string name) => 
+        Assert(o is not null, $"{name} cannot be null.");
 }

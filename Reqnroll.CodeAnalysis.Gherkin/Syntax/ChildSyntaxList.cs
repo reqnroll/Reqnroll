@@ -55,26 +55,26 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
             // If the current node is not a list, or we have exhausted the list, advance to the next slot.
             for(_slotIndex++; _slotIndex < parent.InternalNode.SlotCount; _slotIndex++)
             {
-                var slot = parent.InternalNode.GetSlot(_slotIndex);
+                var slotContent = parent.InternalNode.GetSlot(_slotIndex);
 
                 // If the slot is empty, we advance the enumerator.
-                if (slot == null)
+                if (slotContent == null)
                 {
                     continue;
                 }
 
                 // If the slot is a token, we return the raw token wrapped in a public type.
-                if (slot.IsToken)
+                if (slotContent.IsToken)
                 {
-                    _current = new SyntaxToken(parent, slot, _position);
-                    _position += slot.FullWidth;
+                    _current = new SyntaxToken(slotContent, parent, _position);
+                    _position += slotContent.FullWidth;
                     return true;
                 }
 
                 var node = parent.GetSlotAsSyntaxNode(_slotIndex);
 
                 // If the slot contains a list, we move to the next item in the list.
-                if (slot.IsList)
+                if (slotContent.IsList)
                 {
                     _slotIndex = -1;
 
@@ -82,7 +82,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
                     // We can return the slot as a syntax token.
                     if (node == null)
                     {
-                        if (MoveNextSyntaxTokenListSlot(slot))
+                        if (MoveNextSyntaxTokenListSlot(slotContent))
                         {
                             return true;
                         }
@@ -106,7 +106,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
 
                 // Otherwise, assume a syntax node.
                 _current = node;
-                _position += slot.FullWidth;
+                _position += slotContent.FullWidth;
                 return true;
             }
 
@@ -121,7 +121,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
 
                 if (listChild != null)
                 {
-                    _current = new SyntaxToken(parent, listChild, _position);
+                    _current = new SyntaxToken(listChild, parent, _position);
                     _position += listChild.FullWidth;
                     return true;
                 }
@@ -140,7 +140,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
                 {
                     if (listChild.IsToken)
                     {
-                        _current = new SyntaxToken(parent, listChild, _position);
+                        _current = new SyntaxToken(listChild, parent, _position);
                     }
                     else
                     {

@@ -36,7 +36,7 @@ public class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
     /// <summary>
     /// Gets the tokens which were skipped.
     /// </summary>
-    public SyntaxTokenList Tokens => new(this, InternalNode.tokens, InternalNode.GetSlotOffset(0));
+    public SyntaxTokenList Tokens => new(InternalNode.tokens, this, InternalNode.GetSlotOffset(0));
 
     internal override SyntaxNode? GetSlotAsSyntaxNode(int index) => null;
 }

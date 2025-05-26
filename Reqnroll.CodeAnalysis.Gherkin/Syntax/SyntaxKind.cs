@@ -38,6 +38,16 @@ public enum SyntaxKind : ushort
     AtToken,
 
     /// <summary>
+    /// The token is the less-than symbol <c>&lt;</c>
+    /// </summary>
+    LessThanToken,
+
+    /// <summary>
+    /// The token is the greater-than symbol <c>&gt;</c>
+    /// </summary>
+    GreaterThanToken,
+
+    /// <summary>
     /// The token marks the end of the file.
     /// </summary>
     EndOfFileToken, // This is assumed to be the last textless syntax token.
@@ -87,14 +97,19 @@ public enum SyntaxKind : ushort
     // Other text-containing tokens //
 
     /// <summary>
-    /// The token is an identifier, such as the name of a feature or scenario.
+    /// The token is an identifier.
     /// </summary>
     IdentifierToken,
 
     /// <summary>
-    /// The token is a section of text which has no additional syntatic meaning. 
+    /// The token is literal text as part of a description.
     /// </summary>
-    TextLiteralToken, // This is assumed to be the last syntax token.
+    DescriptionLiteralToken,
+
+    /// <summary>
+    /// The token is literal text as part of a step's text.
+    /// </summary>
+    StepTextLiteralToken, // This is assumed to be the last syntax token.
 
     // Trivia tokens //
 
@@ -122,23 +137,6 @@ public enum SyntaxKind : ushort
     /// The trivia is one or more tokens which have been skipped by the parser. This is typically due to an error in syntax.
     /// </summary>
     SkippedTokensTrivia,
-
-    // Components // 
-
-    /// <summary>
-    /// The node is a tag.
-    /// </summary>
-    Tag,
-
-    /// <summary>
-    /// The node is one or more tags applied to a declaration.
-    /// </summary>
-    TagList,
-
-    /// <summary>
-    /// The node is a description.
-    /// </summary>
-    Description,
 
     // Declarations //
 
@@ -168,7 +166,42 @@ public enum SyntaxKind : ushort
     ScenarioOutline,
 
     /// <summary>
+    /// The node is a tag.
+    /// </summary>
+    Tag,
+
+    /// <summary>
+    /// The node is a name.
+    /// </summary>
+    Name,
+
+    /// <summary>
+    /// The node is a description.
+    /// </summary>
+    Description,
+
+    /// <summary>
     /// The node is a step within a scenario.
     /// </summary>
     Step,
+
+    /// <summary>
+    /// The node is the text of a step which does not include any parameters.
+    /// </summary>
+    LiteralStepText,
+
+    /// <summary>
+    /// The node is the text of a step which includes one or more parameters.
+    /// </summary>
+    InterpolatedStepText,
+
+    /// <summary>
+    /// The node is a literal string within an interpolated step text.
+    /// </summary>
+    InterpolatedStepTextString,
+
+    /// <summary>
+    /// The node is a parameter within an interpolated step text.
+    /// </summary>
+    InterpolatedStepTextParameter
 }

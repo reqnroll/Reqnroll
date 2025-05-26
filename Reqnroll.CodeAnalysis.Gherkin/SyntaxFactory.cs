@@ -44,8 +44,6 @@ public static partial class SyntaxFactory
 
     public static GherkinDocumentSyntax GherkinDocument() => GherkinDocument(null);
 
-    public static DescriptionSyntax Description(SyntaxToken text) => new(InternalSyntaxFactory.Description(text.InternalNode));
-
     /// <summary>
     /// Creates a trivia from a <see cref="StructuredTriviaSyntax"/> node.
     /// </summary>
@@ -78,11 +76,11 @@ public static partial class SyntaxFactory
     public static SyntaxToken Identifier(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.Identifier(leading.InternalNode, text, trailing.InternalNode);
 
-    public static SyntaxToken Literal(string text) =>
-        InternalSyntaxFactory.Literal(null, text, null);
+    //public static SyntaxToken Literal(string text) =>
+    //    InternalSyntaxFactory.Literal(null, text, null);
 
-    public static SyntaxToken Literal(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.Literal(leading.InternalNode, text, trailing.InternalNode);
+    //public static SyntaxToken Literal(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
+    //    InternalSyntaxFactory.Literal(leading.InternalNode, text, trailing.InternalNode);
 
     public static SyntaxTriviaList TriviaList() => default;
 

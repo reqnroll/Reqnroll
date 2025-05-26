@@ -47,10 +47,12 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                 var syntaxKindValue = (ushort)context.Attributes.First().ConstructorArguments[0].Value!;
 
                 return new BareSyntaxNodeClassInfo(
-                    context.TargetSymbol.ContainingNamespace.ToDisplayString(),
-                    context.TargetSymbol.Name,
+                    symbol.ContainingNamespace.ToDisplayString(),
+                    symbol.Name,
                     syntaxKindValue,
-                    slots);
+                    symbol.BaseType?.ToDisplayString() ?? "",
+                    slots,
+                    symbol.IsAbstract);
             });
 
         var structuredTriviaClasses = bareStructuredTriviaClasses.Where(syntax => syntax != null).Combine(syntaxKinds)
@@ -64,6 +66,7 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                     syntaxClass.ClassNamespace,
                     syntaxClass.ClassName,
                     syntaxKind,
+                    syntaxClass.BaseClassName,
                     syntaxClass.SlotProperties
                         .Select(info => new SyntaxSlotPropertyInfo(
                             info.NodeType,
@@ -73,6 +76,7 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                             ComparableArray.CreateRange(info.SyntaxKinds.Select(kind => syntaxKinds[kind])),
                             info.Description,
                             !info.IsOptional,
+                            info.IsInherited,
                             info.ParameterGroups))
                         .ToImmutableArray());
             });

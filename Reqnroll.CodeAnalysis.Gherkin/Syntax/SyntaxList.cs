@@ -1,6 +1,6 @@
-﻿using Microsoft.CodeAnalysis.Operations;
-using Microsoft.CodeAnalysis.Text;
+﻿using Microsoft.CodeAnalysis.Text;
 using System.Collections;
+using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
@@ -30,24 +30,66 @@ public static class SyntaxList
 public readonly struct SyntaxList<TNode> : IEquatable<SyntaxList<TNode>>, IReadOnlyList<TNode>
     where TNode : SyntaxNode
 {
-    private readonly InternalNode? _node;
+    private readonly SyntaxNode? _parent;
 
-    private SyntaxList(InternalNode? node)
+    internal SyntaxList(InternalNode? node, SyntaxNode parent, int position)
     {
-        _node = node;
+        InternalNode = node;
+        _parent = parent;
+        Position = position;
     }
 
     public SyntaxList(TNode node)
     {
+        InternalNode = node.InternalNode;
     }
 
     public SyntaxList(IEnumerable<TNode> nodes)
     {
+        InternalNode = InternalNode.CreateList(nodes.Select(node => node.InternalNode).ToImmutableArray());
     }
 
-    public TNode this[int index] => throw new NotImplementedException();
+    public int Position { get; }
 
-    public int Count => throw new NotImplementedException();
+    internal InternalNode? InternalNode { get; }
+
+    public TNode this[int index]
+    {
+        get
+        {
+            if (InternalNode == null)
+            {
+                throw new ArgumentOutOfRangeException(nameof(index));
+            }
+
+            if (InternalNode.IsList)
+            {
+                if (index < InternalNode.SlotCount)
+                {
+                    return (TNode)InternalNode.GetSlot(index)!.CreateSyntaxNode(_parent, Position + InternalNode.GetSlotOffset(index));
+                }
+            }
+            else if (index == 0)
+            {
+                return (TNode)InternalNode.CreateSyntaxNode(_parent, Position + InternalNode.GetSlotOffset(index));
+            }
+
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+    }
+
+    public int Count
+    {
+        get
+        {
+            if (InternalNode == null)
+            {
+                return 0;
+            }
+
+            return InternalNode.IsList ? InternalNode.SlotCount : 1;
+        }
+    }
 
     /// <summary>
     /// The absolute span of the list elements in characters, including the leading and trailing trivia of the 
@@ -91,7 +133,7 @@ public readonly struct SyntaxList<TNode> : IEquatable<SyntaxList<TNode>>, IReadO
     /// The string representation of the nodes in this list, not including 
     /// the first node's leading trivia and the last node's trailing trivia.
     /// </returns>
-    public override string ToString() => _node?.ToString() ?? string.Empty;
+    public override string ToString() => InternalNode?.ToString() ?? string.Empty;
 
     /// <summary>
     /// Returns the full string representation of the nodes in this list including 
@@ -101,7 +143,7 @@ public readonly struct SyntaxList<TNode> : IEquatable<SyntaxList<TNode>>, IReadO
     /// The full string representation of the nodes in this list including 
     /// the first node's leading trivia and the last node's trailing trivia.
     /// </returns>
-    public string ToFullString() => _node?.ToFullString() ?? string.Empty;
+    public string ToFullString() => InternalNode?.ToFullString() ?? string.Empty;
 
     public bool Equals(SyntaxList<TNode> other)
     {
@@ -110,7 +152,7 @@ public readonly struct SyntaxList<TNode> : IEquatable<SyntaxList<TNode>>, IReadO
 
     public override bool Equals([NotNullWhen(true)] object? obj) => obj is SyntaxList<TNode> other && Equals(other);
 
-    public override int GetHashCode() => _node?.GetHashCode() ?? 0;
+    public override int GetHashCode() => InternalNode?.GetHashCode() ?? 0;
 
     public IEnumerator<TNode> GetEnumerator()
     {

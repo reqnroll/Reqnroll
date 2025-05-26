@@ -5,7 +5,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyList<SyntaxToken>
 {
-    internal SyntaxTokenList(SyntaxNode? parent, InternalNode? node, int position)
+    internal SyntaxTokenList(InternalNode? node, SyntaxNode? parent, int position)
     {
         Parent = parent;
         InternalNode = node;
@@ -19,7 +19,7 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
         Position = token.Position;
     }
 
-    public SyntaxTokenList(IEnumerable<SyntaxToken> tokens) : this(null, CreateNode(tokens), 0)
+    public SyntaxTokenList(IEnumerable<SyntaxToken> tokens) : this(CreateNode(tokens), null, 0)
     {
     }
 
@@ -45,6 +45,8 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
     public SyntaxNode? Parent { get; }
 
     internal InternalNode? InternalNode { get; }
+
+    public static SyntaxTokenList Empty => default;
 
     public struct Enumerator(SyntaxTokenList list) : IEnumerator<SyntaxToken>
     {
@@ -82,12 +84,12 @@ public readonly struct SyntaxTokenList : IEquatable<SyntaxTokenList>, IReadOnlyL
             {
                 if (index < InternalNode.SlotCount)
                 {
-                    return new(Parent!, InternalNode.GetSlot(index), Position + InternalNode.GetSlotOffset(index));
+                    return new(InternalNode.GetSlot(index), Parent!, Position + InternalNode.GetSlotOffset(index));
                 }
             }
             else if (index == 0)
             {
-                return new(Parent, InternalNode, Position);
+                return new(InternalNode, Parent, Position);
             }
 
             throw new ArgumentOutOfRangeException(nameof(index));

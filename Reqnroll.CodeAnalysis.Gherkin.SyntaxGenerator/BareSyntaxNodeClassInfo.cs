@@ -4,4 +4,6 @@ internal record BareSyntaxNodeClassInfo(
     string ClassNamespace,
     string ClassName,
     ushort SyntaxKind,
-    ComparableArray<BareSyntaxSlotPropertyInfo> SlotProperties);
+    string BaseClassName,
+    ComparableArray<BareSyntaxSlotPropertyInfo> SlotProperties,
+    bool IsAbstract);

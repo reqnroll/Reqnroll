@@ -1,12 +1,14 @@
-﻿namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
+﻿using System.Collections.Generic;
 
-internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
+namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
+
+internal class BaseInternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
 {
     public const string ClassName = "Internal";
 
-    private const string InternalNodeClassName = "InternalNode";
+    public const string InternalNodeClassName = "InternalNode";
 
-    public string EmitInternalSyntaxNodeClass()
+    public string EmitRawSyntaxNodeClass()
     {
         var builder = new CSharpBuilder();
 
@@ -20,7 +22,7 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
 
         builder.Append("namespace ").Append(classInfo.ClassNamespace).AppendLine(';');
 
-        builder.Append("public partial class ").AppendLine(classInfo.ClassName);
+        builder.Append("public abstract partial class ").AppendLine(classInfo.ClassName);
         builder.AppendBodyBlock(AppendInnerNodeClassTo);
 
         return builder.ToString();
@@ -30,23 +32,25 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
     {
 
         builder.AppendLine("/// <summary>");
-        builder.Append("/// Represents the internal state of a ").Append(classInfo.SyntaxKind.Name).AppendLine(" node.");
+        builder.Append("/// Represents the internal state of a ").Append(classInfo.ClassName).AppendLine(" instance.");
         builder.AppendLine("/// </summary>");
 
-        bool isBaseNode = classInfo.BaseClassName == "SyntaxNode";
-        string baseClassName;
-
-        if (isBaseNode)
+        if (classInfo.BaseClassName != "SyntaxNode")
         {
-            baseClassName = "InternalNode";
-        }
-        else
-        {
-            baseClassName = $"{classInfo.BaseClassName}.Internal";
             builder.Append("new ");
         }
 
-        builder.Append("internal class ").Append(ClassName).Append(" : ").AppendLine(baseClassName);
+        builder.Append("internal abstract class ").Append(ClassName).Append(" : ");
+
+        if (classInfo.BaseClassName == "SyntaxNode")
+        {
+            builder.Append(InternalNodeClassName);
+        }
+        else
+        {
+            builder.Append(classInfo.BaseClassName).AppendLine(".Internal");
+        }
+
         builder.AppendBodyBlock(builder =>
         {
             AppendSlotFieldsTo(builder);
@@ -62,15 +66,6 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             builder.AppendLine();
 
             AppendGetSlotMethodTo(builder);
-            builder.AppendLine();
-
-            AppendCreateSyntaxNodeMethodTo(builder);
-            builder.AppendLine();
-
-            AppendWithDiagnosticsMethodTo(builder); 
-            builder.AppendLine();
-
-            AppendWithAnnotationsMethodTo(builder);
         });
     }
 
@@ -96,48 +91,6 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
         });
     }
 
-    private void AppendWithAnnotationsMethodTo(CSharpBuilder builder)
-    {
-        builder.AppendLine("/// <inheritdoc />");
-        builder.AppendLine("public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations)");
-        builder.AppendBodyBlock(builder =>
-        {
-            builder.Append("return new ").Append(ClassName).AppendLine('(');
-            builder.BeginBlock();
-
-            foreach (var property in classInfo.SlotProperties)
-            {
-                builder.Append(NamingHelper.PascalCaseToCamelCase(property.Name)).AppendLine(',');
-            }
-
-            builder.AppendLine("GetAttachedDiagnostics(),");
-            builder.AppendLine("annotations);");
-
-            builder.EndBlock();
-        });
-    }
-
-    private void AppendWithDiagnosticsMethodTo(CSharpBuilder builder)
-    {
-        builder.AppendLine("/// <inheritdoc />");
-        builder.AppendLine("public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics)");
-        builder.AppendBodyBlock(builder =>
-        {
-            builder.Append("return new ").Append(ClassName).AppendLine('(');
-            builder.BeginBlock();
-
-            foreach (var property in classInfo.SlotProperties)
-            {
-                builder.Append(NamingHelper.PascalCaseToCamelCase(property.Name)).AppendLine(',');
-            }
-
-            builder.AppendLine("diagnostics,");
-            builder.AppendLine("GetAnnotations());");
-
-            builder.EndBlock();
-        });
-    }
-
     private void AppendSlotCountPropertyTo(CSharpBuilder builder)
     {
         builder.AppendLine("/// <inheritdoc />");
@@ -147,20 +100,11 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             .AppendLine(';');
     }
 
-    private void AppendCreateSyntaxNodeMethodTo(CSharpBuilder builder)
-    {
-        builder.AppendLine("/// <inheritdoc />");
-        builder.AppendLine("internal override SyntaxNode CreateSyntaxNode(SyntaxNode? parent, int position)");
-        builder.AppendBodyBlock(builder =>
-        {
-            builder.Append("return new ").Append(classInfo.ClassName).AppendLine("(this, parent, position);");
-        });
-    }
-
     private void AppendDiagnosticsAndAnnotationsConstructorTo(CSharpBuilder builder)
     {
-        builder.Append("private ").Append(ClassName).AppendLine('(');
+        builder.Append("protected ").Append(ClassName).AppendLine('(');
         builder.BeginBlock();
+        builder.AppendLine("SyntaxKind kind,");
 
         foreach (var property in classInfo.SlotProperties)
         {
@@ -178,7 +122,7 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
         builder.AppendLine("ImmutableArray<SyntaxAnnotation> annotations) : base(");
         builder.BeginBlock();
 
-        builder.Append("SyntaxKind.").Append(classInfo.SyntaxKind.Name).AppendLine(',');
+        builder.AppendLine("kind,");
 
         foreach (var property in classInfo.SlotProperties.Where(property => property.IsInherited))
         {
@@ -233,18 +177,11 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
         builder.Append("public ").Append(ClassName).AppendLine('(');
         builder.BeginBlock();
 
-        var first = true;
+        builder.Append("SyntaxKind kind");
 
         foreach (var property in classInfo.SlotProperties)
         {
-            if (first)
-            {
-                first = false;
-            }
-            else
-            {
-                builder.AppendLine(',');
-            }
+            builder.AppendLine(',');
 
             builder.Append(InternalNodeClassName);
 
@@ -258,8 +195,7 @@ internal class InternalNodeClassEmitter(SyntaxNodeClassInfo classInfo)
 
         builder.AppendLine(") : base(");
         builder.BeginBlock();
-
-        builder.Append("SyntaxKind.").Append(classInfo.SyntaxKind.Name);
+        builder.Append("kind");
 
         foreach (var property in classInfo.SlotProperties.Where(property => property.IsInherited))
         {

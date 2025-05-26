@@ -150,9 +150,6 @@ internal static partial class InternalSyntaxFactory
         string text,
         InternalNode? trailingTrivia) => InternalSyntaxToken.Create(kind, text, leadingTrivia, trailingTrivia);
 
-    public static InternalSyntaxToken Literal(InternalNode? leadingTrivia, string text, InternalNode? trailingTrivia) => 
-        InternalSyntaxToken.Create(SyntaxKind.TextLiteralToken, text, leadingTrivia, trailingTrivia);
-
     public static InternalSyntaxToken MissingToken(SyntaxKind kind) => InternalSyntaxToken.CreateMissing(
         kind,
         ElasticZeroSpace,

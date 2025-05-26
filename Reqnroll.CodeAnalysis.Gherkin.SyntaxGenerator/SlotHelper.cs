@@ -11,108 +11,170 @@ internal static class SlotHelper
         ITypeSymbol symbol,
         CancellationToken cancellationToken)
     {
-        var slots = ImmutableArray.CreateBuilder<BareSyntaxSlotPropertyInfo>();
+        var slots = new List<(IPropertySymbol Property, AttributeData Attribute)>();
 
-        var partialProperties = symbol.GetMembers().OfType<IPropertySymbol>()
-            .Where(property => property.DeclaredAccessibility == Accessibility.Public &&
-                property.DeclaringSyntaxReferences
-                    .Any(reference => ((PropertyDeclarationSyntax)reference.GetSyntax(cancellationToken))
-                        .Modifiers.Any(token => token.IsKind(SyntaxKind.PartialKeyword))))
-            .ToList();
-
-        for (var slotIndex = 0; slotIndex < partialProperties.Count; slotIndex++)
+        // By default we consider the properties of base types as appearing "before" more specific types.
+        // Push the type hierarchy to a stack, so the most base type appears first.
+        var hierarchy = new Stack<ITypeSymbol>();
+        var typeSymbol = symbol;
+        while (typeSymbol != null)
         {
-            var property = partialProperties[slotIndex];
+            hierarchy.Push(typeSymbol);
+            typeSymbol = typeSymbol.BaseType;
+        }
 
-            var attributes = property.GetAttributes();
+        while (hierarchy.Count > 0)
+        {
+            typeSymbol = hierarchy.Pop();
+            slots.AddRange(EnumerateSlotProperties(typeSymbol, cancellationToken));
+        }
 
-            var slotAttribute = attributes
-                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.SyntaxSlotAttribute);
+        // Re-order the slots based on any "LocatedAfter" values.
+        foreach (var (property, attribute) in slots.ToList())
+        {
+            var locatedAfter = attribute.NamedArguments.FirstOrDefault(arg => arg.Key == "LocatedAfter").Value;
 
-            if (slotAttribute == null ||
-                slotAttribute.ConstructorArguments.Length < 1)
+            if (locatedAfter.Kind != TypedConstantKind.Primitive)
             {
                 continue;
             }
 
-            ComparableArray<ushort> slotSyntaxKinds;
+            var locatedAfterName = (string)locatedAfter.Value!;
+            var locatedAfterProperty = slots.FirstOrDefault(slot => slot.Property.Name == locatedAfterName);
 
-            var kindsArgument = slotAttribute.ConstructorArguments[0];
-
-            if (kindsArgument.Kind == TypedConstantKind.Array)
+            if (locatedAfterProperty == default)
             {
-                var values = kindsArgument.Values.Select(value => value.Value).ToArray();
+                continue;
+            }
 
-                if (values.Any(value => value is not ushort))
-                {
-                    continue;
-                }
+            // Remove and re-insert the property after the designated property.
+            var destinationIndex = slots.IndexOf(locatedAfterProperty) + 1;
+            slots.Remove((property, attribute));
 
-                var slotSyntaxKindValues = values.Select(value => (ushort)value!).ToImmutableArray();
-
-                slotSyntaxKinds = new ComparableArray<ushort>(slotSyntaxKindValues);
+            if (destinationIndex > slots.Count)
+            {
+                slots.Add((property, attribute));
             }
             else
             {
-                if (slotAttribute.ConstructorArguments[0].Value is not ushort slotSyntaxKindValue)
-                {
-                    continue;
-                }
-
-                slotSyntaxKinds = ComparableArray.Create(slotSyntaxKindValue);
+                slots.Insert(destinationIndex, (property, attribute));
             }
-
-            string? description = null;
-            if (slotAttribute.ConstructorArguments.Length > 1)
-            {
-                description = slotAttribute.ConstructorArguments[1].Value as string;
-            }
-
-            SyntaxNodeType nodeType;
-            bool isOptional = false;
-
-            switch (property.Type.ToDisplayString())
-            {
-                case SyntaxTypes.SyntaxToken:
-                    nodeType = SyntaxNodeType.SyntaxToken;
-                    break;
-                case SyntaxTypes.SyntaxTokenList:
-                    nodeType = SyntaxNodeType.SyntaxTokenList;
-                    break;
-                default:
-                    if (property.Type.IsSyntaxNode())
-                    {
-                        nodeType = SyntaxNodeType.SyntaxNode;
-                        isOptional = property.Type.NullableAnnotation == NullableAnnotation.Annotated;
-                    }
-                    else if (property.Type.IsSyntaxList())
-                    {
-                        nodeType = SyntaxNodeType.SyntaxList;
-                    }
-                    else
-                    {
-                        continue;
-                    }
-
-                    break;
-            }
-
-            var parameterGroups = attributes
-                .Where(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.ParameterGroupAttribute)
-                .Select(attr => (string)attr.ConstructorArguments[0].Value!);
-
-            slots.Add(
-                new BareSyntaxSlotPropertyInfo(
-                    nodeType,
-                    property.Name,
-                    slotIndex,
-                    property.Type.Name,
-                    slotSyntaxKinds,
-                    description,
-                    isOptional,
-                    ComparableArray.CreateRange(parameterGroups)));
         }
 
-        return slots.ToImmutable();
+        // Create syntax property info.
+        return slots
+            .Select((tuple, index) => CreateBaseSyntaxSlotPropertyInfo(index, symbol, tuple.Property, tuple.Attribute)!)
+            .Where(info => info != default)
+            .ToImmutableArray();
+    }
+
+    private static BareSyntaxSlotPropertyInfo? CreateBaseSyntaxSlotPropertyInfo(
+        int index,
+        ITypeSymbol symbol,
+        IPropertySymbol property,
+        AttributeData slotAttribute)
+    {
+        ComparableArray<ushort> slotSyntaxKinds;
+
+        var kindsArgument = slotAttribute.ConstructorArguments[0];
+
+        if (kindsArgument.Kind == TypedConstantKind.Array)
+        {
+            var values = kindsArgument.Values.Select(value => value.Value).ToArray();
+
+            if (values.Any(value => value is not ushort))
+            {
+                return default;
+            }
+
+            var slotSyntaxKindValues = values.Select(value => (ushort)value!).ToImmutableArray();
+
+            slotSyntaxKinds = new ComparableArray<ushort>(slotSyntaxKindValues);
+        }
+        else
+        {
+            if (slotAttribute.ConstructorArguments[0].Value is not ushort slotSyntaxKindValue)
+            {
+                return default;
+            }
+
+            slotSyntaxKinds = ComparableArray.Create(slotSyntaxKindValue);
+        }
+
+        string? description = null;
+        if (slotAttribute.ConstructorArguments.Length > 1)
+        {
+            description = slotAttribute.ConstructorArguments[1].Value as string;
+        }
+
+        SyntaxNodeType nodeType;
+        string typeName = property.Type.Name;
+        bool isOptional = false;
+
+        switch (property.Type.ToDisplayString())
+        {
+            case SyntaxTypes.SyntaxToken:
+                nodeType = SyntaxNodeType.SyntaxToken;
+                break;
+            case SyntaxTypes.SyntaxTokenList:
+                nodeType = SyntaxNodeType.SyntaxTokenList;
+                break;
+            default:
+                if (property.Type.IsSyntaxNode())
+                {
+                    nodeType = SyntaxNodeType.SyntaxNode;
+                    isOptional = property.Type.NullableAnnotation == NullableAnnotation.Annotated;
+                }
+                else if (property.Type.IsSyntaxList())
+                {
+                    nodeType = SyntaxNodeType.SyntaxList;
+                    typeName = $"SyntaxList<{((INamedTypeSymbol)property.Type).TypeArguments[0].Name}>";
+                }
+                else
+                {
+                    return null;
+                }
+
+                break;
+        }
+
+        var attributes = property.GetAttributes();
+        var parameterGroups = attributes
+            .Where(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.ParameterGroupAttribute)
+            .Select(attr => (string)attr.ConstructorArguments[0].Value!);
+
+        return new BareSyntaxSlotPropertyInfo(
+            nodeType,
+            property.Name,
+            index,
+            typeName,
+            slotSyntaxKinds,
+            description,
+            isOptional,
+            !SymbolEqualityComparer.Default.Equals(property.ContainingType, symbol),
+            ComparableArray.CreateRange(parameterGroups));
+    }
+
+    private static IEnumerable<(IPropertySymbol Property, AttributeData Attribute)> EnumerateSlotProperties(
+        ITypeSymbol symbol,
+        CancellationToken cancellationToken)
+    {
+        var properties = symbol.GetMembers().OfType<IPropertySymbol>()
+            .Where(property => property.DeclaredAccessibility == Accessibility.Public &&
+                property.DeclaringSyntaxReferences
+                    .Any(reference => ((PropertyDeclarationSyntax)reference.GetSyntax(cancellationToken))
+                        .Modifiers.Any(token => token.IsKind(SyntaxKind.PartialKeyword))));
+
+        foreach (var property in properties)
+        {
+            var attributes = property.GetAttributes();
+            var slotAttribute = attributes
+                .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.SyntaxSlotAttribute);
+
+            if (slotAttribute != null && slotAttribute.ConstructorArguments.Length > 0)
+            {
+                yield return (property, slotAttribute);
+            }
+        }
     }
 }

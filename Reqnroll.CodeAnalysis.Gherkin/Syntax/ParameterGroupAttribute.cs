@@ -5,7 +5,7 @@
 /// </summary>
 /// <param name="groupName">The name of the property group. Other properties with this group name will be 
 /// considered together.</param>
-[AttributeUsage(AttributeTargets.Property)]
+[AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 internal class ParameterGroupAttribute(string groupName) : Attribute
 {
     public string GroupName { get; } = groupName;

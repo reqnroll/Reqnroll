@@ -50,7 +50,7 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
     {
         if (_token != null)
         {
-            return new SyntaxToken(_node, _token, _position);
+            return new SyntaxToken(_token, _node, _position);
         }
 
         return default;

@@ -10,10 +10,10 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 [DebuggerDisplay("{GetDebuggerDisplay(), nq}")]
 public readonly struct SyntaxToken : IEquatable<SyntaxToken>
 {
-    internal SyntaxToken(SyntaxNode? parent, InternalNode? syntaxToken, int position)
+    internal SyntaxToken(InternalNode? syntaxToken, SyntaxNode? parent, int position)
     {
-        Parent = parent;
         InternalNode = syntaxToken;
+        Parent = parent;
         Position = position;
     }
 
@@ -240,8 +240,8 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
         }
 
         return new SyntaxToken(
-            null,
             InternalNode.WithLeadingTrivia(InternalNode.CreateList(trivia.Select(static t => t.RequireRawNode()))),
+            null,
             position: 0);
     }
 
@@ -257,8 +257,8 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
         }
 
         return new SyntaxToken(
-            null,
             InternalNode.WithTrailingTrivia(InternalNode.CreateList(trivia.Select(static t => t.RequireRawNode()))),
+            null,
             position: 0);
     }
 

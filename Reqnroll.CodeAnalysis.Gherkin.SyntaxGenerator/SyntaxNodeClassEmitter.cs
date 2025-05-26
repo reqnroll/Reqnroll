@@ -24,9 +24,9 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             AppendInternalNodePropertyTo(builder);
             builder.AppendLine();
 
-            foreach (var property in classInfo.SlotProperties)
+            foreach (var property in classInfo.SlotProperties.Where(property => !property.IsInherited))
             {
-                AppendSlotPropertyTo(builder, property);
+                new SlotPropertyEmitter(property).EmitSlotPropertyTo(builder);
                 builder.AppendLine();
             }
 
@@ -46,6 +46,9 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
                 }
 
                 AppendWithMethodTo(builder, property);
+
+                // TODO: For lists of tokens or syntax, add methods to add to those lists.
+                // e.g. WithTags should have AddTags method
             }
         });
 
@@ -155,60 +158,6 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
                 builder.AppendLine("_ => null");
             }, "};");
         });
-    }
-
-    private void AppendSlotPropertyTo(CSharpBuilder builder, SyntaxSlotPropertyInfo property)
-    {
-        var summary = property.Description;
-
-        if (summary != null)
-        {
-            builder.AppendLine("/// <summary>");
-            builder.Append("/// Gets ").Append(char.ToLowerInvariant(summary[0])).AppendLine(summary.AsSpan(1));
-            builder.AppendLine("/// </summary>");
-        }
-
-        switch (property.NodeType)
-        {
-            case SyntaxNodeType.SyntaxToken:
-            case SyntaxNodeType.SyntaxTokenList:
-            case SyntaxNodeType.SyntaxList:
-                builder
-                    .Append("public partial ")
-                    .Append(property.TypeName)
-                    .Append(' ')
-                    .Append(property.Name)
-                    .Append(" => new (this, InternalNode.")
-                    .Append(NamingHelper.PascalCaseToCamelCase(property.Name))
-                    .Append(", Position + InternalNode.GetSlotOffset(")
-                    .Append(property.Index.ToString())
-                    .AppendLine("));");
-                break;
-
-            case SyntaxNodeType.SyntaxNode:
-                builder
-                    .Append("private ")
-                    .Append(property.TypeName)
-                    .Append("? _")
-                    .Append(NamingHelper.PascalCaseToCamelCase(property.Name))
-                    .AppendLine(";");
-
-                builder
-                    .Append("public partial ")
-                    .Append(property.TypeName)
-                    .Append("? ")
-                    .Append(property.Name)
-                    .Append(" => GetSyntaxNode(ref _")
-                    .Append(NamingHelper.PascalCaseToCamelCase(property.Name))
-                    .Append(", ")
-                    .Append(property.Index.ToString())
-                    .AppendLine(");");
-                break;
-
-            default:
-                throw new NotImplementedException(
-                    $"Support for syntax node type {property.NodeType} has not been added.");
-        }
     }
 
     private void AppendParentalConstructorTo(CSharpBuilder builder)

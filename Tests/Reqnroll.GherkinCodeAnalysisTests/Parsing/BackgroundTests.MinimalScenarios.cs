@@ -58,6 +58,7 @@ public partial class BackgroundTests
                                 TriviaList(),
                                 "a simple background",
                                 TriviaList([EnvironmentNewline])),
+                            default,
                             List([
                                 Step(
                                     Token(

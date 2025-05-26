@@ -127,6 +127,13 @@ public abstract class SyntaxNode
     public Location GetLocation() => SyntaxTree.GetLocation(Span);
 
     /// <summary>
+    /// Gets the position of the specified slot in this syntax node.
+    /// </summary>
+    /// <param name="slot">The index of the slot.</param>
+    /// <returns>The position of the slot.</returns>
+    protected int GetSlotPosition(int slot) => Position + InternalNode.GetSlotOffset(slot);
+
+    /// <summary>
     /// Gets the list of syntax trivia which leads this syntax node.
     /// </summary>
     /// <returns>The list of syntax trivia leading this node.</returns>
@@ -152,6 +159,20 @@ public abstract class SyntaxNode
     }
 
     public ChildSyntaxList ChildNodesAndTokens() => new(this);
+
+    protected TNode GetRequiredSyntaxNode<TNode>(ref TNode? field, int slot) where TNode : SyntaxNode
+    {
+        if (field == null)
+        {
+            var node = InternalNode.GetSlot(slot);
+
+            CodeAnalysisDebug.AssertNotNull(node, nameof(node));
+
+            field = (TNode)node!.CreateSyntaxNode(this, InternalNode.GetSlotOffset(slot));
+        }
+
+        return field;
+    }
 
     internal TNode? GetSyntaxNode<TNode>(ref TNode? field, int slot) where TNode : SyntaxNode
     {

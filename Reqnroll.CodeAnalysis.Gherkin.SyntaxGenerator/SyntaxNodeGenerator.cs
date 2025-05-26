@@ -37,23 +37,46 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
             {
                 var symbol = (ITypeSymbol)context.TargetSymbol;
 
-                if (symbol.BaseType?.ToDisplayString() != SyntaxTypes.SyntaxNode)
+                ImmutableArray<BareSyntaxSlotPropertyInfo> slots;
+
+                switch (symbol.BaseType?.ToDisplayString())
                 {
-                    return null;
+                    case SyntaxTypes.StructuredTriviaSyntax:
+                        return null;
+
+                    case SyntaxTypes.SyntaxNode:
+                        slots = SlotHelper.GetSlotProperties(symbol, cancellationToken);
+                        break;
+
+                    default:
+                        if (!symbol.IsSyntaxNode())
+                        {
+                            return null;
+                        }
+
+                        slots = SlotHelper.GetSlotProperties(symbol, cancellationToken);
+
+                        break;
                 }
 
-                var slots = SlotHelper.GetSlotProperties(symbol, cancellationToken);
+                var syntaxNodeAttribute = context.Attributes[0];
 
-                var syntaxKindValue = (ushort)context.Attributes.First().ConstructorArguments[0].Value!;
+                var syntaxKindValue = syntaxNodeAttribute.ConstructorArguments.Length == 0 ?
+                    (ushort)0 :
+                    syntaxNodeAttribute.ConstructorArguments[0].Value as ushort? ?? 0;
 
                 return new BareSyntaxNodeClassInfo(
-                    context.TargetSymbol.ContainingNamespace.ToDisplayString(),
-                    context.TargetSymbol.Name,
+                    symbol.ContainingNamespace.ToDisplayString(),
+                    symbol.Name,
                     syntaxKindValue,
-                    slots);
+                    symbol.BaseType?.Name!,
+                    slots,
+                    symbol.IsAbstract);
             });
 
-        var syntaxNodeClasses = bareSyntaxNodeClasses.Where(syntax => syntax != null).Combine(syntaxKinds)
+        var syntaxNodeClasses = bareSyntaxNodeClasses
+            .Where(syntax => syntax != null && !syntax.IsAbstract)
+            .Combine(syntaxKinds)
             .Select((tuple, _) =>
             {
                 var (syntaxClass, syntaxKinds) = tuple;
@@ -64,6 +87,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                     syntaxClass.ClassNamespace,
                     syntaxClass.ClassName,
                     syntaxKind,
+                    syntaxClass.BaseClassName,
                     syntaxClass.SlotProperties
                         .Select(info => new SyntaxSlotPropertyInfo(
                             info.NodeType,
@@ -73,31 +97,67 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             ComparableArray.CreateRange(info.SyntaxKinds.Select(kind => syntaxKinds[kind])),
                             info.Description, 
                             !info.IsOptional,
+                            info.IsInherited,
+                            info.ParameterGroups))
+                        .ToImmutableArray());
+            });
+
+        var baseSyntaxNodeClasses = bareSyntaxNodeClasses
+            .Where(syntax => syntax != null && syntax.IsAbstract)
+            .Combine(syntaxKinds)
+            .Select((tuple, _) =>
+            {
+                var (syntaxClass, syntaxKinds) = tuple;
+
+                var syntaxKind = syntaxKinds[syntaxClass!.SyntaxKind];
+
+                return new SyntaxNodeClassInfo(
+                    syntaxClass.ClassNamespace,
+                    syntaxClass.ClassName,
+                    syntaxKind,
+                    syntaxClass.BaseClassName,
+                    syntaxClass.SlotProperties
+                        .Select(info => new SyntaxSlotPropertyInfo(
+                            info.NodeType,
+                            info.Name,
+                            info.Index,
+                            info.TypeName,
+                            ComparableArray.CreateRange(info.SyntaxKinds.Select(kind => syntaxKinds[kind])),
+                            info.Description,
+                            !info.IsOptional,
+                            info.IsInherited,
                             info.ParameterGroups))
                         .ToImmutableArray());
             });
 
         context.RegisterSourceOutput(syntaxNodeClasses, static (context, classInfo) =>
         {
-            var syntaxNodeEmitter = new SyntaxNodeClassEmitter(classInfo);
             context.AddSource(
                 $"Syntax/{classInfo.ClassName}.g.cs",
-                syntaxNodeEmitter.EmitSyntaxNodeClass());
+                new SyntaxNodeClassEmitter(classInfo).EmitSyntaxNodeClass());
 
-            var internalSyntaxNodeEmitter = new InternalNodeClassEmitter(classInfo);
             context.AddSource(
                 $"Syntax/{classInfo.ClassName}.{InternalNodeClassEmitter.ClassName}.g.cs",
-                internalSyntaxNodeEmitter.EmitRawSyntaxNodeClass());
+                new InternalNodeClassEmitter(classInfo).EmitInternalSyntaxNodeClass());
 
-            var factoryMethodEmitter = new SyntaxFactoryMethodsEmitter(classInfo);
             context.AddSource(
                 $"SyntaxFactory.{classInfo.ClassName}.g.cs",
-                factoryMethodEmitter.EmitSyntaxFactoryMethod());
+                new SyntaxFactoryMethodsEmitter(classInfo).EmitSyntaxFactoryMethod());
 
-            var internalFactoryMethodEmitter = new InternalSyntaxFactoryMethodEmitter(classInfo);
             context.AddSource(
                 $"Syntax/InternalSyntaxFactory.{classInfo.ClassName}.g.cs",
-                internalFactoryMethodEmitter.EmitInternalSyntaxFactoryMethod());
+                new InternalSyntaxFactoryMethodEmitter(classInfo).EmitInternalSyntaxFactoryMethod());
+        });
+
+        context.RegisterSourceOutput(baseSyntaxNodeClasses, static (context, classInfo) =>
+        {
+            context.AddSource(
+                $"Syntax/{classInfo.ClassName}.g.cs",
+                new BaseSyntaxNodeClassEmitter(classInfo).EmitSyntaxNodeClass());
+
+            context.AddSource(
+                $"Syntax/{classInfo.ClassName}.{InternalNodeClassEmitter.ClassName}.g.cs",
+                new BaseInternalNodeClassEmitter(classInfo).EmitRawSyntaxNodeClass());
         });
     }
 }

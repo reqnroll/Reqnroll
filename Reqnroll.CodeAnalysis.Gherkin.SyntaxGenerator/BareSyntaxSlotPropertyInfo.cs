@@ -8,4 +8,5 @@ internal record BareSyntaxSlotPropertyInfo(
     ComparableArray<ushort> SyntaxKinds,
     string? Description,
     bool IsOptional,
+    bool IsInherited,
     ComparableArray<string> ParameterGroups);

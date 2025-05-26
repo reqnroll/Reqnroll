@@ -202,5 +202,5 @@ internal partial class InternalSyntaxToken : InternalNode
         return new InternalSyntaxToken(Kind, _text, _leading, _trailing, diagnostics, GetAnnotations());
     }
 
-    public static implicit operator SyntaxToken(InternalSyntaxToken token) => new(null, token, 0);
+    public static implicit operator SyntaxToken(InternalSyntaxToken token) => new(token, null, 0);
 }
