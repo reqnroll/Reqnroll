@@ -673,7 +673,6 @@ namespace Reqnroll.Infrastructure
                 ? GetCurrentBindingType()
                 : (StepDefinitionType) stepDefinitionKeyword;
             _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg));
-            _testThreadExecutionEventPublisher.PublishEvent(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
