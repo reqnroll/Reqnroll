@@ -12,6 +12,8 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
     public class MsTestGeneratorProviderTests
     {
         private const string TestDescriptionAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute";
+        private const string TestMethodAttributeName = "Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute";
+
         private const string SampleFeatureFile = @"
             Feature: Sample feature file
 
@@ -119,13 +121,15 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_Something").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
             descriptionAttributeForFirstScenarioOutline.ArgumentValues().First().Should().Be("Simple Scenario Outline: something");
             var descriptionAttributeForSecondScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_SomethingElse").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
             descriptionAttributeForSecondScenarioOutline.ArgumentValues().First().Should().Be("Simple Scenario Outline: something else");
+
+            generationWarnings.Should().BeEmpty();
         }
 
         [Fact]
@@ -137,7 +141,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_Variant0").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
@@ -155,7 +159,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_Something").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
@@ -173,7 +177,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_ExampleSet0_Something").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
@@ -212,7 +216,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new[] { "nonparallelizable" });
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
@@ -233,11 +237,28 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: ["nonparallelizable"]);
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
             attributes.Should().NotContain(a => a.Name == "Microsoft.VisualStudio.TestTools.UnitTesting.DoNotParallelizeAttribute");
+        }
+
+        // Test for GH#588 - Generator Provider adds Friendly Name as an argument to the TestMethodAttribute on a non-paramterized test
+        [Fact]
+        public void MsTestGeneratorProvider_SimpleScenario_ShouldProvideFriendlyNameForTestMethodAttribute()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(SampleFeatureFile);
+            var sampleTestGeneratorProvider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
+
+            // ACT
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
+
+            // ASSERT
+            var testMethodAttributeForFirstScenario = code.Class().Members().Single(m => m.Name == "SimpleScenario").CustomAttributes().Single(a => a.Name == TestMethodAttributeName);
+            testMethodAttributeForFirstScenario.ArgumentValues().First().Should().Be("Simple scenario");
         }
 
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)
@@ -245,7 +266,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var parser = new ReqnrollGherkinParser(parserCultureInfo ?? new CultureInfo("en-US"));
             using (var reader = new StringReader(documentSource))
             {
-                var document = parser.Parse(reader, null);
+                var document = parser.Parse(reader, new ReqnrollDocumentLocation($"dummy_Reqnroll_Location_for{nameof(MsTestGeneratorProviderTests)}"));
                 document.Should().NotBeNull();
                 return document;
             }

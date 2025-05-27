@@ -20,7 +20,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit4TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit4TestAdapterPackageVersion = "4.6.0";
         private const string XUnitPackageVersion = "2.8.1";
-        private const string MSTestPackageVersion = "2.2.8";
+        private const string MSTestPackageVersion = "2.2.10";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -113,13 +113,13 @@ namespace Reqnroll.TestProjectGenerator
             _project.AddFile(bindingsGenerator.GenerateLoggingStepDefinition(methodName, attributeName, regex, ParameterType.DocString, "docStringArg"));
         }
 
-        public void AddHookBinding(string eventType, string name, string code = "", int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,
+        public void AddHookBinding(string eventType, string name, string code = "", bool? asyncHook = null, int? order = null, IList<string> hookTypeAttributeTags = null, IList<string> methodScopeAttributeTags = null,
             IList<string> classScopeAttributeTags = null)
         {
             EnsureProjectExists();
 
             var bindingsGenerator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
-            _project.AddFile(bindingsGenerator.GenerateHookBinding(eventType, name, code, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags));
+            _project.AddFile(bindingsGenerator.GenerateHookBinding(eventType, name, code, asyncHook, order, hookTypeAttributeTags, methodScopeAttributeTags, classScopeAttributeTags));
         }
 
         public void AddStepBinding(string bindingCode)

@@ -11,6 +11,7 @@ namespace Reqnroll
         bool IsMultiThreaded { get; }
         ITestRunner GetTestRunner(FeatureInfo featureHint = null);
         void ReleaseTestThreadContext(ITestThreadContext testThreadContext);
+        Task ReleaseFeatureForTestRunnersAsync(FeatureInfo featureInfo);
         void Initialize(Assembly testAssembly);
         Task FireTestRunEndAsync();
         Task FireTestRunStartAsync();

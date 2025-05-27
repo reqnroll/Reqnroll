@@ -13,6 +13,7 @@ using Reqnroll.Bindings.Discovery;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using System.Runtime.ExceptionServices;
 
 namespace Reqnroll;
 
@@ -108,6 +109,33 @@ public class TestRunnerManager : ITestRunnerManager
         var containerHint = new TestWorkerContainerHint(usedContainerHint?.LastUsedFeatureInfo, Thread.CurrentThread.ManagedThreadId);
         if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, containerHint))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was released twice");
+    }
+
+    public virtual async Task ReleaseFeatureForTestRunnersAsync(FeatureInfo featureInfo)
+    {
+        var items = _availableTestWorkerContainers.ToArray();
+        foreach (var item in items)
+        {
+            if (!ReferenceEquals(featureInfo, item.Value.LastUsedFeatureInfo))
+                continue;
+            if (!_availableTestWorkerContainers.TryRemove(item.Key, out _))
+                continue; // Container was already taken by another thread
+            var testThreadContainer = item.Key;
+            if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, new TestWorkerContainerHint(featureInfo, null)))
+                throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} is already in usage");
+
+            var testRunner = testThreadContainer.Resolve<ITestRunner>();
+            try
+            {
+                // The feature info in the hint (item.Value.LastUsedFeatureInfo) may be outdated, so we need to check against the TestRunner instance
+                if (testRunner.FeatureContext != null && ReferenceEquals(testRunner.FeatureContext.FeatureInfo, featureInfo))
+                    await testRunner.OnFeatureEndAsync();
+            }
+            finally
+            {
+                ReleaseTestThreadContext(testRunner.TestThreadContext);
+            }
+        }
     }
 
     protected virtual void InitializeBindingRegistry(ITestRunner testRunner)
@@ -235,8 +263,9 @@ public class TestRunnerManager : ITestRunnerManager
         return testRunner;
     }
 
-    private async Task FireRemainingAfterFeatureHooks()
+    private async Task<ExceptionDispatchInfo[]> FireRemainingAfterFeatureHooks()
     {
+        var onFeatureEndErrors = new List<ExceptionDispatchInfo>();
         var testWorkerContainers = _availableTestWorkerContainers.Keys.Concat(_usedTestWorkerContainers.Keys).ToArray();
         foreach (var testWorkerContainer in testWorkerContainers)
         {
@@ -244,18 +273,35 @@ public class TestRunnerManager : ITestRunnerManager
             if (contextManager.FeatureContext != null)
             {
                 var testRunner = testWorkerContainer.Resolve<ITestRunner>();
-                await testRunner.OnFeatureEndAsync();
+                try
+                {
+                    await testRunner.OnFeatureEndAsync();
+                }
+                catch (Exception ex)
+                {
+                    _testTracer.TraceWarning("[AfterFeature] error: " + ex);
+                    onFeatureEndErrors.Add(ExceptionDispatchInfo.Capture(ex));
+                }
             }
         }
+        return onFeatureEndErrors.ToArray();
     }
 
     public virtual async Task DisposeAsync()
     {
         if (Interlocked.CompareExchange(ref _wasDisposed, 1, 0) == 0)
         {
-            await FireRemainingAfterFeatureHooks();
+            var onFeatureEndErrors = await FireRemainingAfterFeatureHooks();
+            ExceptionDispatchInfo onTestRunEndError = null;
 
-            await FireTestRunEndAsync();
+            try
+            {
+                await FireTestRunEndAsync();
+            }
+            catch (Exception ex)
+            {
+                onTestRunEndError = ExceptionDispatchInfo.Capture(ex);
+            }
 
             if (_globalTestRunner != null)
             {
@@ -284,6 +330,16 @@ public class TestRunnerManager : ITestRunnerManager
             _globalContainer.Dispose();
 
             OnTestRunnerManagerDisposed(this);
+
+            // if we have errors in [AfterFeature] and [AfterTestRun] hooks, we throw them all
+            if (onFeatureEndErrors.Any())
+            {
+                if (onTestRunEndError == null)
+                    throw new AggregateException("Errors in [AfterFeature] hooks", onFeatureEndErrors.Select(x => x.SourceException));
+                throw new AggregateException("Errors in [AfterFeature] and [AfterTestRun] hooks", onFeatureEndErrors.Select(x => x.SourceException).Concat([onTestRunEndError.SourceException]));
+            }
+            // if we have only error in [AfterTestRun] hooks, we throw it
+            onTestRunEndError?.Throw();
         }
     }
 
@@ -384,6 +440,13 @@ public class TestRunnerManager : ITestRunnerManager
     public static void ReleaseTestRunner(ITestRunner testRunner)
     {
         testRunner.TestThreadContext.TestThreadContainer.Resolve<ITestRunnerManager>().ReleaseTestThreadContext(testRunner.TestThreadContext);
+    }
+
+    public static async Task ReleaseFeatureAsync(FeatureInfo featureInfo, Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
+    {
+        testAssembly ??= GetCallingAssembly();
+        var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);
+        await testRunnerManager.ReleaseFeatureForTestRunnersAsync(featureInfo);
     }
 
     internal static async Task ResetAsync()

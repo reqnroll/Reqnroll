@@ -2,9 +2,34 @@
 
 ## Improvements:
 
+* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
+* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
+* Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
+* Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
+* Refactored UnitTestFeatureGenerator to provide an output parameter that contains warnings (#624)
+* Improvement: Added a CreateDirectory() function to the Reqnroll.Utils/IFileSystem (#623)
+* Improvement: Ambiguous binding situations now return the list of Binding Matches that caused the AmbiguousMatchException (#622)
+* Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
+* Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
+
+*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @loraderon, @obligaron
+
+# v2.4.1 - 2025-04-29
+
+## Bug fixes:
+
+* Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
+* Fix: Scenario, feature and test run finished event is not published when the related "after" hook fails (#560)
+* Fix: Inconsistent hook execution (duble execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
+* Fix: Namespace collisions in generated code when Reqnroll project namespace contains "System" (#583)
+* Fix: InvalidOperationException when calling test teardown method after the Reqnroll test runner has been released (#387)
+
+*Contributors of this release (in alphabetical order):* @304NotModified, @clrudolphi, @gasparnagy, @obligaron 
 
 # v2.4.0 - 2025-03-06
 
