@@ -39,7 +39,7 @@ namespace Reqnroll.Generator.Generation
                         .Where(child => child is not Background)
                         .Select(sd => new ScenarioDefinitionInFeatureFile(sd, feature, rule));
 
-            return 
+            return
                 GetScenarioDefinitionsOfRule(feature.Children, null)
                     .Concat(feature.Children.OfType<Rule>().SelectMany(rule => GetScenarioDefinitionsOfRule(rule.Children, rule)));
         }
@@ -138,10 +138,10 @@ namespace Reqnroll.Generator.Generation
             //ScenarioInfo scenarioInfo = new ScenarioInfo("xxxx", tags...);
             CodeExpression inheritedTagsExpression;
             var featureTagsExpression = new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME);
+            var ruleTagsExpression = _scenarioPartHelper.GetStringArrayExpression(scenarioDefinitionInFeatureFile.Rule?.Tags ?? []);
             if (scenarioDefinitionInFeatureFile.Rule != null && scenarioDefinitionInFeatureFile.Rule.Tags.Any())
             {
                 var tagHelperReference = new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TagHelper), CodeTypeReferenceOptions.GlobalReference));
-                var ruleTagsExpression = _scenarioPartHelper.GetStringArrayExpression(scenarioDefinitionInFeatureFile.Rule.Tags);
                 inheritedTagsExpression = new CodeMethodInvokeExpression(tagHelperReference, nameof(TagHelper.CombineTags), featureTagsExpression, ruleTagsExpression);
             }
             else
@@ -199,6 +199,18 @@ namespace Reqnroll.Generator.Generation
                         new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_ARGUMENTS_VARIABLE_NAME),
                         inheritedTagsExpression)));
 
+            AddVariableForRuleTags(testMethod, ruleTagsExpression);
+
+            testMethod.Statements.Add(
+                new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference), "ruleInfo",
+                    scenarioDefinitionInFeatureFile.Rule == null
+                        ? new CodePrimitiveExpression(null)
+                        : new CodeObjectCreateExpression(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference),
+                            new CodePrimitiveExpression(scenarioDefinitionInFeatureFile.Rule.Name),
+                            new CodePrimitiveExpression(scenarioDefinitionInFeatureFile.Rule.Description),
+                            new CodeVariableReferenceExpression(GeneratorConstants.RULE_TAGS_VARIABLE_NAME))
+            ));
+
             GenerateScenarioInitializeCall(generationContext, scenarioDefinition, testMethod);
 
             GenerateTestMethodBody(generationContext, scenarioDefinitionInFeatureFile, testMethod, paramToIdentifier, feature);
@@ -236,6 +248,13 @@ namespace Reqnroll.Generator.Generation
                     testMethod.Statements.Add(addArgumentExpression);
                 }
             }
+        }
+
+        private void AddVariableForRuleTags(CodeMemberMethod testMethod, CodeExpression tagsExpression)
+        {
+            var tagVariable = new CodeVariableDeclarationStatement(typeof(string[]), GeneratorConstants.RULE_TAGS_VARIABLE_NAME, tagsExpression);
+
+            testMethod.Statements.Add(tagVariable);
         }
 
         internal void GenerateTestMethodBody(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinition, CodeMemberMethod testMethod, ParameterSubstitution paramToIdentifier, ReqnrollFeature feature)
@@ -305,7 +324,8 @@ namespace Reqnroll.Generator.Generation
                     new CodeMethodInvokeExpression(
                         new CodeThisReferenceExpression(),
                         generationContext.ScenarioInitializeMethod.Name,
-                        new CodeVariableReferenceExpression("scenarioInfo"))));
+                        new CodeVariableReferenceExpression("scenarioInfo"),
+                        new CodeVariableReferenceExpression("ruleInfo"))));
             }
 
             testMethod.Statements.AddRange(statements.ToArray());
@@ -322,7 +342,7 @@ namespace Reqnroll.Generator.Generation
 
             testMethod.Statements.Add(expression);
         }
-        
+
         private CodeMethodInvokeExpression CreateTestRunnerSkipScenarioCall()
         {
             return new CodeMethodInvokeExpression(
@@ -434,7 +454,7 @@ namespace Reqnroll.Generator.Generation
             testMethod.Name = string.Format(GeneratorConstants.TEST_NAME_FORMAT, scenarioOutline.Name.ToIdentifier());
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testMethod);
-            
+
             foreach (var pair in paramToIdentifier)
             {
                 testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), pair.Value));
@@ -456,12 +476,12 @@ namespace Reqnroll.Generator.Generation
             string variantName)
         {
             var testMethod = CreateTestMethod(generationContext, scenarioOutline, exampleSetTags, variantName, exampleSetIdentifier);
-            
+
             //call test implementation with the params
             var argumentExpressions = row.Cells.Select(paramCell => new CodePrimitiveExpression(paramCell.Value)).Cast<CodeExpression>().ToList();
 
             argumentExpressions.Add(_scenarioPartHelper.GetStringArrayExpression(exampleSetTags));
-            
+
             var statements = new List<CodeStatement>();
 
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, scenarioOutline.Location))
@@ -475,7 +495,7 @@ namespace Reqnroll.Generator.Generation
 
                 statements.Add(new CodeExpressionStatement(callTestMethodExpression));
             }
-            
+
             testMethod.Statements.AddRange(statements.ToArray());
 
             //_linePragmaHandler.AddLineDirectiveHidden(testMethod.Statements);

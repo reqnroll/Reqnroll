@@ -1,8 +1,9 @@
 # [vNext]
 
 ## Improvements:
-* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 
+* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
+* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 * Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
 * Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
@@ -16,7 +17,7 @@
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 
-*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @obligaron
+*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 

@@ -187,9 +187,9 @@ namespace Reqnroll.Infrastructure
             }
         }
 
-        public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo)
+        public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
-            _contextManager.InitializeScenarioContext(scenarioInfo);
+            _contextManager.InitializeScenarioContext(scenarioInfo, ruleInfo);
         }
 
         public virtual async Task OnScenarioStartAsync()

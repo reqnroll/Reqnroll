@@ -16,7 +16,7 @@ namespace Reqnroll
         void OnFeatureStart(FeatureInfo featureInfo);
         void OnFeatureEnd();
 
-        void OnScenarioInitialize(ScenarioInfo scenarioInfo);
+        void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
         void OnScenarioStart();
 
         void CollectScenarioErrors();

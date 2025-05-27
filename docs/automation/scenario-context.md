@@ -270,6 +270,63 @@ public void AfterScenario()
 
 In this case, MvcContrib is used to capture a screenshot of the failing test and name the screenshot after the title of the scenario.
 
+## ScenarioContext.RuleInfo
+
+`ScenarioContext.RuleInfo` allows you to access information about the rule for the scenario currently being executed, such as its title and tags:
+
+In the .feature file:
+
+```{code-block} gherkin
+:caption: Feature File
+
+@feature_tag
+Feature: My feature
+
+@rule_tag
+Rule: My rule
+
+@scenario_tag1 @scenario_tag2
+Scenario: Showing information of the scenario
+
+When I execute any scenario
+Then the RuleInfo contains the following information
+    | Field         | Value    |
+    | Title         | My rule  |
+    | Tags          | rule_tag |
+```
+
+and in the step definition:
+
+```{code-block} csharp
+:caption: Step Definition File
+
+private class RuleInformation
+{
+    public string Title { get; set; }
+    public string[] Tags { get; set; }
+}
+
+[When(@"I execute any scenario")]
+public void ExecuteAnyScenario(){}
+
+[Then(@"the RuleInfo contains the following information")]
+public void RuleInfoContainsInterestingInformation(DataTable table)
+{
+    // Create our small DTO for the info from the step
+    var fromStep = table.CreateInstance<RuleInformation>();
+    fromStep.Tags =  table.Rows[0]["Value"].Split(',');
+
+    // Short-hand to the ruleInfo
+    var ri = _scenarioContext.RuleInfo;
+
+    // Assertions
+    ri.Title.Should().Equal(fromStep.Title);
+    ri.Tags.Should().BeEquivalentTo(fromStep.Tags);
+}
+```
+
+`ScenarioContext.RuleInfo` will be null if there is no valid `Rule` in the feature file.
+
 ## ScenarioContext.CurrentScenarioBlock
 
 Use `ScenarioContext.CurrentScenarioBlock` to query the “type” of step (Given, When or Then). This can be used to execute additional setup/cleanup code right before or after Given, When or Then blocks.
