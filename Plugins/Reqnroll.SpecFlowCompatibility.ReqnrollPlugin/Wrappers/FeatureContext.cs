@@ -20,4 +20,8 @@ public class FeatureContext(Reqnroll.FeatureContext originalContext) : IFeatureC
     public CultureInfo BindingCulture => originalContext.BindingCulture;
 
     public IObjectContainer FeatureContainer => originalContext.FeatureContainer;
+
+    public Exception BeforeFeatureHookError => originalContext.BeforeFeatureHookError;
+
+    public bool BeforeFeatureHookFailed => originalContext.BeforeFeatureHookFailed;
 }
