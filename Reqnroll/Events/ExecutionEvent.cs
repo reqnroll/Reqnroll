@@ -216,7 +216,6 @@ namespace Reqnroll.Events
         public string Text { get; }
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
-        public string StepText { get; }
 
         public OutputAddedEvent(string text)
         {

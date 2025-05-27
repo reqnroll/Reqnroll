@@ -3,6 +3,16 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Infrastructure
 {
+    /// <summary>
+    /// Provides methods for writing test output and adding attachments during test execution.
+    /// </summary>
+    /// <remarks>This class is designed to facilitate the logging of test output and the management of
+    /// test-related attachments. It integrates with the test execution event publisher, trace listener, and attachment
+    /// handler to ensure that output and attachments are properly handled and recorded.
+    /// 
+    /// This class needs further refactoring to make it asynchronous so that the TestThreadExecutionEventPublisher can be
+    /// invoked asynchronously.
+    /// </remarks>
     public class ReqnrollOutputHelper : IReqnrollOutputHelper
     {
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
