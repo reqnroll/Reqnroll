@@ -65,7 +65,7 @@ namespace Reqnroll.Parser.CucmberMessageSupport
             return new Examples(e.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(), PatchLocation(e.Location), e.Keyword, e.Name, e.Description, tableHeader, rows);
         }
 
-        private static Location PatchLocation(Location l)
+        private static Location PatchLocation(Location? l)
         {
             return l ?? new Location(0, 0);
         }

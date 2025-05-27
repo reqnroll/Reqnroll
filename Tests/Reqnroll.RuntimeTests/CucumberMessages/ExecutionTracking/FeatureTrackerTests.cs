@@ -255,8 +255,9 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
 
+            var testOjbResolverMock = new Mock<ITestObjectResolver>();
             var contextManagerMock = new Mock<IContextManager>();
-            contextManagerMock.Setup(cm => cm.ScenarioContext).Returns(new ScenarioContext(null, scenarioInfoDummy, null));
+            contextManagerMock.Setup(cm => cm.ScenarioContext).Returns(new ScenarioContext(null, scenarioInfoDummy, null, testOjbResolverMock.Object));
 
             var hookBindingStarted = new HookBindingStartedEvent(null, contextManagerMock.Object);
 
@@ -277,8 +278,10 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
 
+            var testOjbResolverMock = new Mock<ITestObjectResolver>();
+
             var contextManagerMock = new Mock<IContextManager>();
-            contextManagerMock.Setup(cm => cm.ScenarioContext).Returns(new ScenarioContext(null, scenarioInfoDummy, null));
+            contextManagerMock.Setup(cm => cm.ScenarioContext).Returns(new ScenarioContext(null, scenarioInfoDummy, null, testOjbResolverMock.Object));
 
             var hookBindingFinished = new HookBindingFinishedEvent(null, new TimeSpan(), contextManagerMock.Object);
 

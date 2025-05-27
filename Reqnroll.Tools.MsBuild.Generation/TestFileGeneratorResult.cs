@@ -39,7 +39,6 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public bool Success => Errors == null || !Errors.Any();
 
-        public IEnumerable<string> Warnings { get; }
         public string Filename { get; }
 
         public IEnumerable<string> Warnings { get; }

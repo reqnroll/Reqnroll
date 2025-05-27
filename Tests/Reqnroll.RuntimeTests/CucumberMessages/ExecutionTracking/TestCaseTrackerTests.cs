@@ -96,11 +96,13 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
 
         private void SetupMockContexts()
         {
+            var testOjbResolverMock = new Mock<ITestObjectResolver>();
+
             _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "Test Feature", "");
             _featureContextStub = new FeatureContext(objectContainerStub, _featureInfoStub, ConfigurationLoader.GetDefault());
 
             _scenarioInfoStub = new ScenarioInfo("Test Scenario", "", [], null);
-            _scenarioContextSub = new ScenarioContext(objectContainerStub, _scenarioInfoStub, null);
+            _scenarioContextSub = new ScenarioContext(objectContainerStub, _scenarioInfoStub, null, testOjbResolverMock.Object);
 
             _mockStepContext = new Mock<IScenarioStepContext>();
             _mockStepContext.Setup(x => x.StepInfo).Returns(new StepInfo(StepDefinitionType.Given, "a test step", null, null, "pickleStepId"));

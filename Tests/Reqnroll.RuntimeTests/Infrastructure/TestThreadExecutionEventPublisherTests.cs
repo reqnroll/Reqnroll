@@ -203,7 +203,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var testExecutionEngine = CreateTestExecutionEngine();
 
             testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
-            testExecutionEngine.OnScenarioSkippedAsync();
+            await testExecutionEngine.OnScenarioSkippedAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();
             
