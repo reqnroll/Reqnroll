@@ -9,7 +9,7 @@ namespace Reqnroll.Parser
         {
         }
 
-        public override GherkinDialect GetDialect(string language, Location location)
+        public override GherkinDialect GetDialect(string language, Location? location)
         {
             if (language.Contains("-"))
             {

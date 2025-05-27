@@ -37,7 +37,7 @@ namespace Reqnroll.GeneratorTests
             Action act = () => parser.Parse(new StringReader(feature), null);
 
             act.Should().Throw<SemanticParserException>().WithMessage("(2:29): Scenario Outline 'No Examples' has no examples defined")
-                .And.Location.Line.Should().Be(2);
+                .And.Location?.Line.Should().Be(2);
         }
 
         [Fact]
@@ -56,7 +56,7 @@ namespace Reqnroll.GeneratorTests
             Action act = () => parser.Parse(new StringReader(feature), null);
 
             act.Should().Throw<SemanticParserException>().WithMessage("(2:29): Scenario Outline 'No Examples' has no examples defined")
-                .And.Location.Line.Should().Be(2);
+                .And.Location?.Line.Should().Be(2);
         }
 
         [Fact]
@@ -108,7 +108,7 @@ namespace Reqnroll.GeneratorTests
             Action act = () => parser.Parse(new StringReader(feature), null);
 
             act.Should().Throw<SemanticParserException>().WithMessage("(2:29): Scenario Outline 'Duplicate Examples table headers' already contains an example column with header 'acting'")
-               .And.Location.Line.Should().Be(2);
+               .And.Location?.Line.Should().Be(2);
         }
     }
 }

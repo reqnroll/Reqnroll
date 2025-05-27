@@ -21,7 +21,7 @@ namespace Reqnroll.Generator
             catch (ParserException parserException)
             {
                 return new TestGeneratorResult(parserException.GetParserExceptions().Select(
-                    ex => new TestGenerationError(ex.Location == null ? 0 : ex.Location.Line, ex.Location == null ? 0 : ex.Location.Column, ex.Message)));
+                    ex => new TestGenerationError(ex.Location?.Line ?? 0, ex.Location?.Column ?? 0, ex.Message)));
             }
             catch (Exception exception)
             {

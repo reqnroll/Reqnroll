@@ -11,6 +11,7 @@
 * Improvement: Added a CreateDirectory() function to the Reqnroll.Utils/IFileSystem (#623)
 * Improvement: Ambiguous binding situations now return the list of Binding Matches that caused the AmbiguousMatchException (#622)
 * Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
+* Upgrade to Gherkin v32 from v30 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#489)
 
 ## Bug fixes:
 

@@ -1,10 +1,11 @@
 using Gherkin.Ast;
+using System.Collections.Generic;
 
 namespace Reqnroll.Parser
 {
     public class ReqnrollDocument : GherkinDocument
     {
-        public ReqnrollDocument(ReqnrollFeature feature, Comment[] comments, ReqnrollDocumentLocation documentLocation) : base(feature, comments)
+        public ReqnrollDocument(ReqnrollFeature feature, IEnumerable<Comment> comments, ReqnrollDocumentLocation documentLocation) : base(feature, comments)
         {
             DocumentLocation = documentLocation;
         }
