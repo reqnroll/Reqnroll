@@ -68,7 +68,7 @@ namespace Reqnroll.GeneratorTests
 
                 var sampleTestGeneratorProvider = new SimpleTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
                 var converter = CreateUnitTestConverter(sampleTestGeneratorProvider);
-                CodeNamespace code = converter.GenerateUnitTestFixture(feature, null, null);
+                CodeNamespace code = converter.GenerateUnitTestFixture(feature, null, null, out var generationWarnings);
 
                 code.Should().NotBeNull();
                 
