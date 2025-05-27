@@ -156,7 +156,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
                                     .Throws(new Exception("simulated hook error"));
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await FluentActions.Awaiting(testExecutionEngine.OnScenarioEndAsync)
