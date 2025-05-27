@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 
 * Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
