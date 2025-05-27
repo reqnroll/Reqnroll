@@ -1,6 +1,8 @@
 using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -61,18 +63,18 @@ namespace Reqnroll.Generator
             {
                 preliminaryUpToDateCheckResult = testUpToDateChecker.IsUpToDatePreliminary(featureFileInput, generatedTestFullPath, settings.UpToDateCheckingMethod);
                 if (preliminaryUpToDateCheckResult == true)
-                    return new TestGeneratorResult(null, true);
+                    return new TestGeneratorResult(null, true, null);
             }
 
-            string generatedTestCode = GetGeneratedTestCode(featureFileInput);
+            string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings);
             if(string.IsNullOrEmpty(generatedTestCode))
-                return new TestGeneratorResult(null, true);
+                return new TestGeneratorResult(null, true, generatedWarnings);
 
             if (settings.CheckUpToDate && preliminaryUpToDateCheckResult != false)
             {
                 var isUpToDate = testUpToDateChecker.IsUpToDate(featureFileInput, generatedTestFullPath, generatedTestCode, settings.UpToDateCheckingMethod);
                 if (isUpToDate)
-                    return new TestGeneratorResult(null, true);
+                    return new TestGeneratorResult(null, true, generatedWarnings);
             }
 
             if (settings.WriteResultToFile)
@@ -80,16 +82,16 @@ namespace Reqnroll.Generator
                 File.WriteAllText(generatedTestFullPath, generatedTestCode, Encoding.UTF8);
             }
 
-            return new TestGeneratorResult(generatedTestCode, false);
+            return new TestGeneratorResult(generatedTestCode, false, generatedWarnings);
         }
 
-        protected string GetGeneratedTestCode(FeatureFileInput featureFileInput)
+        protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
         {
+            generationWarnings = Array.Empty<string>();
             using (var outputWriter = new IndentProcessingWriter(new StringWriter()))
             {
                 var codeProvider = codeDomHelper.CreateCodeDomProvider();
-                var codeNamespace = GenerateTestFileCode(featureFileInput);
-
+                var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings);
                 if (codeNamespace == null) return "";
 
                 var options = new CodeGeneratorOptions
@@ -139,8 +141,9 @@ namespace Reqnroll.Generator
             return result;
         }
         
-        private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput)
+        private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
         {
+            generationWarnings = Array.Empty<string>();
             string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
 
             var parser = gherkinParserFactory.Create(reqnrollConfiguration.FeatureLanguage);
@@ -154,7 +157,7 @@ namespace Reqnroll.Generator
 
             var featureGenerator = featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
 
-            var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace);
+            var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out generationWarnings);
             return codeNamespace;
         }
 

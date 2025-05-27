@@ -15,6 +15,11 @@ namespace Reqnroll.Utils
             return Directory.Exists(path);
         }
 
+        public void CreateDirectory(string path)
+        {
+            Directory.CreateDirectory(path);
+        }
+
         public string[] GetDirectories(string path)
         {
             return Directory.GetDirectories(path);

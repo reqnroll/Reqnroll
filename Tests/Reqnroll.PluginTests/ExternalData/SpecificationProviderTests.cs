@@ -30,7 +30,7 @@ namespace Reqnroll.PluginTests.ExternalData
         {
             var sut = CreateSut();
 
-            var result = sut.GetSpecification(new[] { new Tag(null, @"@other-tag") }, SOURCE_FILE_PATH);
+            var result = sut.GetSpecification(new[] { new Tag(default, @"@other-tag") }, SOURCE_FILE_PATH);
             
             Assert.Null(result);
         }
@@ -44,7 +44,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
             Assert.Throws<ExternalDataPluginException>(() => sut.GetSpecification(new[]
             {
-                new Tag(null, tag)
+                new Tag(default, tag)
             }, SOURCE_FILE_PATH));
         }
 
@@ -57,8 +57,8 @@ namespace Reqnroll.PluginTests.ExternalData
 
             Assert.Throws<ExternalDataPluginException>(() => sut.GetSpecification(new[]
             {
-                new Tag(null, "@DataSource:foo"),
-                new Tag(null, tag)
+                new Tag(default, "@DataSource:foo"),
+                new Tag(default, tag)
             }, SOURCE_FILE_PATH));
         }
 
@@ -69,7 +69,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv")
+                new Tag(default, @"@DataSource:path\to\file.csv")
             }, SOURCE_FILE_PATH);
             
             Assert.NotNull(result);
@@ -83,8 +83,8 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, @"@DisableDataSource")
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, @"@DisableDataSource")
             }, SOURCE_FILE_PATH);
 
             Assert.Null(result);
@@ -97,8 +97,8 @@ namespace Reqnroll.PluginTests.ExternalData
 
             sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file1.csv"),
-                new Tag(null, @"@DataSource:path\to\file2.csv")
+                new Tag(default, @"@DataSource:path\to\file1.csv"),
+                new Tag(default, @"@DataSource:path\to\file2.csv")
             }, SOURCE_FILE_PATH);
 
             _dataSourceLoaderMock.Verify(l => 
@@ -110,7 +110,7 @@ namespace Reqnroll.PluginTests.ExternalData
         {
             var sut = CreateSut();
 
-            var result = sut.GetSpecification(new[] { new Tag(null, @"@DataSource:path\to\file.csv") }, SOURCE_FILE_PATH);
+            var result = sut.GetSpecification(new[] { new Tag(default, @"@DataSource:path\to\file.csv") }, SOURCE_FILE_PATH);
             
             Assert.NotNull(result);
             _dataSourceLoaderMock.Verify(l => l.LoadDataSource(It.IsAny<string>(), SOURCE_FILE_PATH));
@@ -123,7 +123,7 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv")
+                new Tag(default, @"@DataSource:path\to\file.csv")
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
@@ -137,8 +137,8 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, @"@DataFormat:csv")
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, @"@DataFormat:csv")
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
@@ -152,9 +152,9 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, @"@DataFormat:xlsx"),
-                new Tag(null, @"@DataFormat:csv")
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, @"@DataFormat:xlsx"),
+                new Tag(default, @"@DataFormat:csv")
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
@@ -170,8 +170,8 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, @"@DataField:target_field=source_field"),
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, @"@DataField:target_field=source_field"),
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
@@ -187,9 +187,9 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, @"@DataField:target_field=source_field1"),
-                new Tag(null, @"@DataField:target_field=source_field2"),
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, @"@DataField:target_field=source_field1"),
+                new Tag(default, @"@DataField:target_field=source_field2"),
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
@@ -207,8 +207,8 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, dataFieldTag)
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, dataFieldTag)
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
@@ -224,8 +224,8 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, @"@DataSet:data-set-name"),
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, @"@DataSet:data-set-name"),
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);
@@ -240,9 +240,9 @@ namespace Reqnroll.PluginTests.ExternalData
 
             var result = sut.GetSpecification(new[]
             {
-                new Tag(null, @"@DataSource:path\to\file.csv"),
-                new Tag(null, @"@DataSet:data-set-name1"),
-                new Tag(null, @"@DataSet:data-set-name2"),
+                new Tag(default, @"@DataSource:path\to\file.csv"),
+                new Tag(default, @"@DataSet:data-set-name1"),
+                new Tag(default, @"@DataSet:data-set-name2"),
             }, SOURCE_FILE_PATH);
 
             Assert.NotNull(result);

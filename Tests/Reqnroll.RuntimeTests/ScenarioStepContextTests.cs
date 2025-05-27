@@ -286,7 +286,7 @@ namespace Reqnroll.RuntimeTests
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             //// Do not call CleanupStepContext, in order to simulate an inconsistent state
-            contextManager.InitializeScenarioContext(new ScenarioInfo("the next scenario", "description of the next scenario", null, null));
+            contextManager.InitializeScenarioContext(new ScenarioInfo("the next scenario", "description of the next scenario", null, null), null);
 
             var actualCurrentTopLevelStepDefinitionType = contextManager.CurrentTopLevelStepDefinitionType;
 

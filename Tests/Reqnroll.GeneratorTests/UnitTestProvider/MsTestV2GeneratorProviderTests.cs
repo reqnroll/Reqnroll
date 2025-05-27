@@ -2,6 +2,7 @@ using FluentAssertions;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
+using System.CodeDom;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -31,7 +32,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             code.Class().CustomAttributes().Any(a => a.Name == TestDeploymentItemAttributeName).Should().BeFalse();
@@ -54,7 +55,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var deploymentItemAttributeForClass = code.Class().CustomAttributes().Single(a => a.Name == TestDeploymentItemAttributeName);
@@ -87,7 +88,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
@@ -111,7 +112,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
@@ -139,7 +140,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenario");
@@ -160,7 +161,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenario");
@@ -186,7 +187,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethods = code.Class().Members().Where(x => x.CustomAttributes().Any(a => a.Name == TestMethodAttributeName)).ToList();
@@ -197,6 +198,54 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                                                            x.ArgumentValues().OfType<string>().ElementAt(1) == "blue");
             testCaseAttributes.Should().ContainSingle(x => x.ArgumentValues().OfType<string>().ElementAt(0) == "2" &&
                                                            x.ArgumentValues().OfType<string>().ElementAt(1) == "black");
+        }
+
+        [Fact]
+        public void MsTestV2GeneratorProvider_WithScenarioOutline_ShouldGenerateDisplayNamePropertyOfEachDataRow()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            Scenario Outline: Add items
+                Given there are <count> <color> items
+
+                Examples:
+                    | count | color |
+                    |     1 | red   |
+                    |     2 | blue  |");
+
+            var provider = new MsTestV2GeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator();
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out _);
+
+            // ASSERT
+            var testMethod = code.Class().Members().Single(m => m.Name == "AddItems");
+            var dataRows = testMethod.CustomAttributes().Where(a => a.Name == TestCaseAttributeName).ToList();
+
+            dataRows.Should().HaveCount(2);
+
+            var row0arguments = dataRows[0].Arguments.Cast<CodeAttributeArgument>()
+                .Where(arg => !string.IsNullOrEmpty(arg.Name))
+                .ToDictionary(arg => arg.Name, arg => arg.Value);
+
+
+            var row1arguments = dataRows[1].Arguments.Cast<CodeAttributeArgument>()
+                .Where(arg => !string.IsNullOrEmpty(arg.Name))
+                .ToDictionary(arg => arg.Name, arg => arg.Value);
+
+            row0arguments.Should().ContainKey("DisplayName");
+            row1arguments.Should().ContainKey("DisplayName");
+
+            var ArgValue = row0arguments["DisplayName"] as CodePrimitiveExpression;
+            var stringValue = ArgValue?.Value as string;
+            stringValue.Should().Be("Add items(1,red)");
+
+            ArgValue = row1arguments["DisplayName"] as CodePrimitiveExpression;
+            stringValue = ArgValue?.Value as string;
+            stringValue.Should().Be("Add items(2,blue)");
         }
 
         [Fact]
@@ -222,7 +271,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings);
 
             // ASSERT
             var testMethods = code.Class().Members().Where(x => x.CustomAttributes().Any(a => a.Name == TestMethodAttributeName)).ToList();
@@ -237,7 +286,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var parser = new ReqnrollGherkinParser(parserCultureInfo ?? new CultureInfo("en-US"));
             using (var reader = new StringReader(documentSource))
             {
-                var document = parser.Parse(reader, null);
+                var document = parser.Parse(reader, new ReqnrollDocumentLocation($"dummy_Location_for_{nameof(MsTestV2GeneratorProviderTests)}"));
                 document.Should().NotBeNull();
                 return document;
             }

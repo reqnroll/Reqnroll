@@ -48,6 +48,26 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void Create_instance_will_set_values_with_a_vertical_table_and_column_case_mismatch_throws_ColumnCouldNotBeBoundException_on_verify()
+        {
+            var table = new Table("firstname");
+            table.AddRow("Howard");
+
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
+            act.Should().Throw<ColumnCouldNotBeBoundException>().WithMessage("Member or field firstname not found");
+        }
+
+        [Fact]
+        public void Create_instance_will_set_values_with_a_vertical_table_and_column_case_mismatch_does_not_throw_when_case_insensitive_verify_is_used()
+        {
+            var table = new Table("firstname");
+            table.AddRow("Howard");
+
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, VerifyCaseInsensitive = true});
+            act.Should().NotThrow();
+        }
+
+        [Fact]
         public void Create_instance_will_use_strict_constructor_binding_when_option_use_strict_constructor_binding_is_true()
         {
             var table = new Table("MessageCreatedAt", "ProductCode", "ProductName", "StartOfSale");
@@ -170,6 +190,28 @@ namespace Reqnroll.RuntimeTests.AssistTests
         }
 
         [Fact]
+        public void Sets_string_values_column_case_mismatch_throws_ColumnCouldNotBeBoundException_on_verify()
+        {
+            var table = new Table("Field", "Value");
+            table.AddRow("firstname", "John");
+            table.AddRow("lastname", "Galt");
+
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
+            act.Should().Throw<ColumnCouldNotBeBoundException>();
+        }
+        
+        [Fact]
+        public void Sets_string_values_column_case_mismatch_does_not_throw_when_case_insensitive_verify_is_used()
+        {
+            var table = new Table("Field", "Value");
+            table.AddRow("firstname", "John");
+            table.AddRow("lastname", "Galt");
+
+            Action act = () => table.CreateInstance<Person>(new InstanceCreationOptions { VerifyAllColumnsBound = true, VerifyCaseInsensitive = true});
+            act.Should().NotThrow();
+        }
+
+        [Fact]
         public void SetConstructor_unbound_column_throws_ColumnCouldNotBeBoundException_on_verify()
         {
             var table = new Table("Field", "Value");
@@ -178,6 +220,29 @@ namespace Reqnroll.RuntimeTests.AssistTests
 
             Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { VerifyAllColumnsBound = true });
             act.Should().Throw<ColumnCouldNotBeBoundException>();
+        }
+        
+        
+        [Fact]
+        public void SetConstructor_column_case_mismatch_throws_ColumnCouldNotBeBoundException_on_verify()
+        {
+            var table = new Table("Field", "Value");
+            table.AddRow("firstname", "John");
+            table.AddRow("lastname", "Galt");
+
+            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { RequireTableToProvideAllConstructorParameters = true, VerifyAllColumnsBound = true });
+            act.Should().Throw<ColumnCouldNotBeBoundException>();
+        }
+        
+        [Fact]
+        public void SetConstructor_column_case_mismatch_does_not_throw_when_case_insensitive_verify_is_used()
+        {
+            var table = new Table("Field", "Value");
+            table.AddRow("firstname", "John");
+            table.AddRow("lastname", "Galt");
+
+            Action act = () => table.CreateInstance<PersonWithMandatoryLastName>(new InstanceCreationOptions { RequireTableToProvideAllConstructorParameters = true, VerifyAllColumnsBound = true, VerifyCaseInsensitive = true});
+            act.Should().NotThrow();
         }
 
         [Fact]
