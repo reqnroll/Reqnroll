@@ -153,8 +153,6 @@ public class ObjectContainer : IObjectContainer
             return result;
         }
 
-
-
         protected override object ResolvePerDependency(ObjectContainer container, RegistrationKey keyToResolve, ResolutionList resolutionPath)
         {
             var typeToConstruct = GetTypeToConstruct(keyToResolve);
@@ -440,6 +438,8 @@ public class ObjectContainer : IObjectContainer
 
     private IStrategyRegistration RegisterTypeAsInternal(Type implementationType, Type interfaceType, string name)
     {
+        AssertNotDisposed();
+
         var registrationKey = new RegistrationKey(interfaceType, name);
         AssertNotResolved(registrationKey);
 
@@ -454,6 +454,9 @@ public class ObjectContainer : IObjectContainer
     {
         if (instance == null)
             throw new ArgumentNullException(nameof(instance));
+
+        AssertNotDisposed();
+
         var registrationKey = new RegistrationKey(interfaceType, name);
         AssertNotResolved(registrationKey);
 
@@ -491,6 +494,8 @@ public class ObjectContainer : IObjectContainer
     {
         if (factoryDelegate == null) throw new ArgumentNullException(nameof(factoryDelegate));
         if (interfaceType == null) throw new ArgumentNullException(nameof(interfaceType));
+
+        AssertNotDisposed();
 
         var registrationKey = new RegistrationKey(interfaceType, name);
         AssertNotResolved(registrationKey);
@@ -741,6 +746,9 @@ public class ObjectContainer : IObjectContainer
 
     public void Dispose()
     {
+        if (_isDisposed)
+            return;
+
         _isDisposed = true;
 
         foreach (var obj in _objectPool.Values.OfType<IDisposable>().Where(o => !ReferenceEquals(o, this)))
