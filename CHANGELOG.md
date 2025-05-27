@@ -2,6 +2,7 @@
 
 ## Improvements:
 
+* Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
 * Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
 * Refactored UnitTestFeatureGenerator to provide an output parameter that contains warnings (#624)
@@ -14,7 +15,7 @@
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron
+*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @obligaron
 
 # v2.4.1 - 2025-04-29
 
