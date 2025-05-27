@@ -59,8 +59,6 @@ namespace Reqnroll.Tools.MsBuild.Generation
                 {
                     Log.LogWarning(warning);
                 }
-
-
                 string targetFilePath = _filePathGenerator.GenerateFilePath(
                     projectFolder,
                     outputPath,
