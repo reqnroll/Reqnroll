@@ -1,16 +1,17 @@
-using System;
-using System.CodeDom;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 using Reqnroll.Tracing;
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Generator.Generation
 {
@@ -42,7 +43,7 @@ namespace Reqnroll.Generator.Generation
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";
 
-        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
+        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> generationWarnings)
         {
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
@@ -66,6 +67,7 @@ namespace Reqnroll.Generator.Generation
 
             //before returning the generated code, call the provider's method in case the generated code needs to be customized            
             _testGeneratorProvider.FinalizeTestClass(generationContext);
+            generationWarnings = generationContext.GenerationWarnings;
             return codeNamespace;
         }
 
@@ -108,9 +110,6 @@ namespace Reqnroll.Generator.Generation
 
             var codeNamespace = new CodeNamespace(targetNamespace);
 
-            codeNamespace.Imports.Add(new CodeNamespaceImport(GeneratorConstants.REQNROLL_NAMESPACE));
-            codeNamespace.Imports.Add(new CodeNamespaceImport("System"));
-            codeNamespace.Imports.Add(new CodeNamespaceImport("System.Linq"));
             return codeNamespace;
         }
 
@@ -177,7 +176,7 @@ namespace Reqnroll.Generator.Generation
                 new CodeTypeReference(typeof(FeatureInfo), CodeTypeReferenceOptions.GlobalReference), GeneratorConstants.FEATUREINFO_FIELD);
             featureInfoField.Attributes |= MemberAttributes.Static;
             featureInfoField.InitExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(FeatureInfo), CodeTypeReferenceOptions.GlobalReference),
-                new CodeObjectCreateExpression(typeof(CultureInfo),
+                new CodeObjectCreateExpression(new CodeTypeReference(typeof(CultureInfo), CodeTypeReferenceOptions.GlobalReference),
                                                new CodePrimitiveExpression(generationContext.Feature.Language)),
                 new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
                 new CodePrimitiveExpression(generationContext.Feature.Name),
@@ -208,6 +207,17 @@ namespace Reqnroll.Generator.Generation
 
             testClassCleanupMethod.Attributes = MemberAttributes.Public;
             testClassCleanupMethod.Name = GeneratorConstants.TESTCLASS_CLEANUP_NAME;
+
+            // Make sure that OnFeatureEndAsync is called on all associated TestRunners.
+            // await global::Reqnroll.TestRunnerManager.ReleaseFeatureAsync(featureInfo);
+            var releaseFeature = new CodeMethodInvokeExpression(
+                    new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
+                    nameof(TestRunnerManager.ReleaseFeatureAsync),
+                    new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
+
+            _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(releaseFeature);
+
+            testClassCleanupMethod.Statements.Add(releaseFeature);
 
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testClassCleanupMethod);
 
@@ -385,6 +395,19 @@ namespace Reqnroll.Generator.Generation
 
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
 
+            // Guard when calling AfterScenario when TestRunner is already released (errors or edge cases in a supported test framework)
+            // if ((testRunner == null))
+            // {
+            //     return;
+            // }
+            var testRunnerNotNullGuard =
+                new CodeConditionStatement(new CodeBinaryOperatorExpression(
+                    testRunnerField,
+                    CodeBinaryOperatorType.IdentityEquality,
+                    new CodePrimitiveExpression(null)),
+                    new CodeMethodReturnStatement());
+            testCleanupMethod.Statements.Add(testRunnerNotNullGuard);
+
             //await testRunner.OnScenarioEndAsync();
             var onScenarioEndCallExpression = new CodeMethodInvokeExpression(
                 testRunnerField,
@@ -393,19 +416,23 @@ namespace Reqnroll.Generator.Generation
             var onScenarioEndCallStatement = new CodeExpressionStatement(onScenarioEndCallExpression);
 
             // "Release" the TestRunner, so that other threads can pick it up
-            // TestRunnerManager.ReleaseTestRunner(testRunner);
+            // global::Reqnroll.TestRunnerManager.ReleaseTestRunner(testRunner);
             var releaseTestRunnerCallStatement = new CodeExpressionStatement(
                 new CodeMethodInvokeExpression(
                     new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRunnerManager), CodeTypeReferenceOptions.GlobalReference)),
                     nameof(TestRunnerManager.ReleaseTestRunner),
                     testRunnerField));
 
+            // Unassign TestRunner to make sure it won't be reused if the test framework runs AfterScenario multiple times
+            // testRunner = null;
+            var unasignTestRunnerInstance = new CodeAssignStatement(testRunnerField, new CodePrimitiveExpression(null));
+
             // add ReleaseTestRunner to the finally block of OnScenarioEndAsync 
             testCleanupMethod.Statements.Add(
                 new CodeTryCatchFinallyStatement(
                     [onScenarioEndCallStatement],
                     [],
-                    [releaseTestRunnerCallStatement]
+                    [releaseTestRunnerCallStatement, unasignTestRunnerInstance]
                 ));
         }
 

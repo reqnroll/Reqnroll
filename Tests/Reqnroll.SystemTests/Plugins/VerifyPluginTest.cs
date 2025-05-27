@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.TestProjectGenerator;
 
@@ -37,6 +38,8 @@ public class VerifyPluginTest : PluginsTestBase
 
         // to avoid popup of diff tool
         Environment.SetEnvironmentVariable("DiffEngine_Disabled", "true", EnvironmentVariableTarget.Process);
+        // verify has a feature to detect running with NCrunch, but this detects the project folder incorrectly when the Reqnroll tests are run with NCrunch
+        Environment.SetEnvironmentVariable("NCrunch.OriginalProjectPath", _testProjectFolders.ProjectFolder + Path.DirectorySeparatorChar, EnvironmentVariableTarget.Process);
 
         ExecuteTests();
 
