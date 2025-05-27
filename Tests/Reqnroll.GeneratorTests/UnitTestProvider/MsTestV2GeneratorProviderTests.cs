@@ -219,7 +219,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out _);
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "AddItems");
