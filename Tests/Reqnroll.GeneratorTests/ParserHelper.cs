@@ -32,7 +32,7 @@ namespace Reqnroll.GeneratorTests
 
             var scenario1 = new ScenarioOutline(GetTags(scenarioOutlineTags), new Location(0), "Scenario Outline", "scenario outline1 title", "", new Step[0], new []
             {
-                new Examples(GetTags(examplesTags), null, "Examples", "examples name", "", new Gherkin.Ast.TableRow(null, new []{ new TableCell(null, "col1"), }), new Gherkin.Ast.TableRow[0])
+                new Examples(GetTags(examplesTags), default, "Examples", "examples name", "", new Gherkin.Ast.TableRow(default, new []{ new TableCell(default, "col1"), }), new Gherkin.Ast.TableRow[0])
             });
 
             var reqnrollFeature = new ReqnrollFeature(GetTags(tags), new Location(0), "en", "feature", "title", "desc", new StepsContainer[] {scenario1});

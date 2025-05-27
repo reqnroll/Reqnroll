@@ -41,5 +41,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public IEnumerable<string> Warnings { get; }
         public string Filename { get; }
+
+        public IEnumerable<string> Warnings { get; }
     }
 }

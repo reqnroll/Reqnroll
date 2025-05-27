@@ -20,7 +20,7 @@ namespace Reqnroll.Generator.CodeDom
             _statements = statements;
             _location = location;
 
-            if (_location == null || _reqnrollConfiguration.AllowDebugGeneratedFiles)
+            if (_location.Line <= 0 || _reqnrollConfiguration.AllowDebugGeneratedFiles)
             {
                 return;
             }
@@ -30,7 +30,7 @@ namespace Reqnroll.Generator.CodeDom
 
         public void Dispose()
         {
-            if (_location == null || _reqnrollConfiguration.AllowDebugGeneratedFiles)
+            if (_location.Line <= 0 || _reqnrollConfiguration.AllowDebugGeneratedFiles)
             {
                 return;
             }

@@ -1,6 +1,5 @@
 using System.CodeDom;
 using System.Collections.Generic;
-using System.Transactions;
 using Reqnroll.Parser;
 
 namespace Reqnroll.Generator.UnitTestConverter

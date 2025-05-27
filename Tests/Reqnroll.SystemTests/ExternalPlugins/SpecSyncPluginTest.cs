@@ -17,6 +17,8 @@ public class SpecSyncPluginTest : ExternalPluginsTestBase
     }
 
     [TestMethod]
+    //TODO: remove Ignore attribute once incompatibility is resolved
+    [Ignore("The SpecSync.AzureDevOps.TestSuiteBasedExecution.Reqnroll plugin is not compatible with Gherkin v32")]
     public void SpecSync_should_work_with_Reqnroll()
     {
         AddFeatureFileFromResource("SpecSyncPlugin/SpecSyncTestFeature.feature", resourceGroup: "ExternalPlugins");
@@ -30,6 +32,8 @@ public class SpecSyncPluginTest : ExternalPluginsTestBase
 
     [TestMethod]
     [TestCategory("MsBuild")]
+    //TODO: remove Ignore attribute once incompatibility is resolved
+    [Ignore("The SpecSync.AzureDevOps.TestSuiteBasedExecution.Reqnroll plugin is not compatible with Gherkin v32")]
     public void SpecSync_should_work_with_Reqnroll_on_DotNetFramework_generation()
     {
         // compiling with MsBuild forces the generation to run with .NET Framework

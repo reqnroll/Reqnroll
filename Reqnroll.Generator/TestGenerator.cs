@@ -87,12 +87,11 @@ namespace Reqnroll.Generator
 
         protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
         {
-            generationWarnings = new List<string>();
+            generationWarnings = Array.Empty<string>();
             using (var outputWriter = new IndentProcessingWriter(new StringWriter()))
             {
                 var codeProvider = codeDomHelper.CreateCodeDomProvider();
-                var codeNamespace = GenerateTestFileCode(featureFileInput, out IEnumerable<string> generatedWarnings);
-                generationWarnings = generatedWarnings;
+                var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings);
                 if (codeNamespace == null) return "";
 
                 var options = new CodeGeneratorOptions
@@ -144,7 +143,7 @@ namespace Reqnroll.Generator
         
         private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
         {
-            generationWarnings = new List<string>();
+            generationWarnings = Array.Empty<string>();
             string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
 
             var parser = gherkinParserFactory.Create(reqnrollConfiguration.FeatureLanguage);
@@ -158,8 +157,7 @@ namespace Reqnroll.Generator
 
             var featureGenerator = featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
 
-            var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out var generatedWarnings);
-            generationWarnings = generatedWarnings;
+            var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out generationWarnings);
             return codeNamespace;
         }
 

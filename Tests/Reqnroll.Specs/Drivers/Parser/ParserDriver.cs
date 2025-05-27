@@ -108,7 +108,7 @@ namespace Reqnroll.Specs.Drivers.Parser
                 string message = expectedError.Error.ToLower();
 
                 var errorDetail =
-                    ParsingErrors.FirstOrDefault(ed => ed.Location != null && ed.Location.Line == expectedError.Line &&
+                    ParsingErrors.FirstOrDefault(ed => ed.Location != null && ed.Location?.Line == expectedError.Line &&
                         ed.Message.ToLower().Contains(message));
 
                 errorDetail.Should().NotBeNull("no such error: {0}", message);

@@ -41,7 +41,7 @@ namespace Reqnroll.Generator.Interfaces
             if (errors.Count() == 0) throw new ArgumentException("no errors provided", "errors");
 
             Errors = errors.ToArray();
-            Warnings = new List<string>();
+            Warnings = Array.Empty<string>();
         }
 
         public TestGeneratorResult(string generatedTestCode, bool isUpToDate, IEnumerable<string> warnings)

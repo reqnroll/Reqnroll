@@ -17,6 +17,14 @@ using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 using Reqnroll.Parser.CucmberMessageSupport;
 using Reqnroll.Tracing;
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Generator.Generation
 {
@@ -555,14 +563,17 @@ namespace Reqnroll.Generator.Generation
             scenarioInitializeMethod.Name = GeneratorConstants.SCENARIO_INITIALIZE_NAME;
             scenarioInitializeMethod.Parameters.Add(
                 new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(ScenarioInfo), CodeTypeReferenceOptions.GlobalReference), "scenarioInfo"));
+            scenarioInitializeMethod.Parameters.Add(
+                new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference), "ruleInfo"));
 
-            //testRunner.OnScenarioInitialize(scenarioInfo);
+            //testRunner.OnScenarioInitialize(scenarioInfo, ruleInfo);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
             scenarioInitializeMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
                     testRunnerField,
                     nameof(ITestRunner.OnScenarioInitialize),
-                    new CodeVariableReferenceExpression("scenarioInfo")));
+                    new CodeVariableReferenceExpression("scenarioInfo"),
+                    new CodeVariableReferenceExpression("ruleInfo")));
         }
 
         private void SetupScenarioStartMethod(TestClassGenerationContext generationContext)

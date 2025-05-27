@@ -217,7 +217,7 @@ namespace Reqnroll.GeneratorTests
 
         public void CreateDirectory(string path)
         {
-            throw new NotImplementedException();
+            Directory.CreateDirectory(path);
         }
     }
 }
