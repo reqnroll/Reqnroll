@@ -187,9 +187,9 @@ namespace Reqnroll.Infrastructure
             }
         }
 
-        public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo)
+        public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
-            _contextManager.InitializeScenarioContext(scenarioInfo);
+            _contextManager.InitializeScenarioContext(scenarioInfo, ruleInfo);
         }
 
         public virtual async Task OnScenarioStartAsync()
@@ -641,7 +641,7 @@ namespace Reqnroll.Infrastructure
 
             for (var i = 0; i < match.Arguments.Length; i++)
             {
-                arguments[i] = await ConvertArg(match.Arguments[i], bindingParameters[i].Type);
+                arguments[i] = await ConvertArg(match.Arguments[i].Value, bindingParameters[i].Type);
             }
 
             return arguments;

@@ -13,6 +13,8 @@ namespace Reqnroll
     {
         ScenarioInfo ScenarioInfo { get; }
 
+        RuleInfo RuleInfo { get; }
+
         ScenarioBlock CurrentScenarioBlock { get; }
 
         IObjectContainer ScenarioContainer { get; }
@@ -55,6 +57,7 @@ namespace Reqnroll
         #endregion
 
         public ScenarioInfo ScenarioInfo { get; }
+        public RuleInfo RuleInfo { get; }
         public ScenarioBlock CurrentScenarioBlock { get; internal set; }
         public IObjectContainer ScenarioContainer { get; }
 
@@ -65,7 +68,7 @@ namespace Reqnroll
 
         private readonly ITestObjectResolver testObjectResolver;
 
-        internal ScenarioContext(IObjectContainer scenarioContainer, ScenarioInfo scenarioInfo, ITestObjectResolver testObjectResolver)
+        internal ScenarioContext(IObjectContainer scenarioContainer, ScenarioInfo scenarioInfo, RuleInfo ruleInfo, ITestObjectResolver testObjectResolver)
         {
             this.ScenarioContainer = scenarioContainer;
             this.testObjectResolver = testObjectResolver;
@@ -75,6 +78,7 @@ namespace Reqnroll
 
             CurrentScenarioBlock = ScenarioBlock.None;
             ScenarioInfo = scenarioInfo;
+            RuleInfo = ruleInfo;
             ScenarioExecutionStatus = ScenarioExecutionStatus.OK;
             PendingSteps = new List<string>();
             MissingSteps = new List<StepInstance>();

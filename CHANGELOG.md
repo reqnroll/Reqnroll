@@ -2,13 +2,23 @@
 
 ## Improvements:
 
+* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
+* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
+* Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
+* Refactored UnitTestFeatureGenerator to provide an output parameter that contains warnings (#624)
+* Improvement: Added a CreateDirectory() function to the Reqnroll.Utils/IFileSystem (#623)
+* Improvement: Ambiguous binding situations now return the list of Binding Matches that caused the AmbiguousMatchException (#622)
+* Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
+* Upgrade to Gherkin v32 from v30 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#489)
 
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
+* Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @obligaron
+*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 

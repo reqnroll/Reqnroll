@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Gherkin.Ast;
@@ -8,7 +9,7 @@ namespace Reqnroll.Parser
     public class ReqnrollFeature : Feature
     {
 
-        public ReqnrollFeature(Tag[] tags, Location location, string language, string keyword, string name, string description, IHasLocation[] children)
+        public ReqnrollFeature(IEnumerable<Tag> tags, Location location, string language, string keyword, string name, string description, IEnumerable<IHasLocation> children)
             : base(tags, location, language, keyword, name, description, children)
         {
 
