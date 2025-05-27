@@ -3,7 +3,9 @@
 ## Improvements:
 
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Improvement: Ambiguous binding situations now return the list of Binding Matches that caused the AmbiguousMatchException (#622)
 * Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
+
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
