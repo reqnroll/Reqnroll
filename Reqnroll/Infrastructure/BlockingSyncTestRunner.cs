@@ -27,7 +27,7 @@ public class BlockingSyncTestRunner : ISyncTestRunner
 
     public void SkipScenario()
     {
-        _testRunner.SkipScenario();
+        SyncWrapper(() =>  _testRunner.SkipScenarioAsync()); 
     }
 
     public void Pending()

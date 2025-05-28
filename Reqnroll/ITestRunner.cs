@@ -28,7 +28,7 @@ namespace Reqnroll
         Task CollectScenarioErrorsAsync();
         Task OnScenarioEndAsync();
 
-        void SkipScenario();
+        Task SkipScenarioAsync();
 
         Task GivenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
         Task WhenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);

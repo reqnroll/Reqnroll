@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Events
 {
@@ -6,7 +7,11 @@ namespace Reqnroll.Events
     {
         void PublishEvent(IExecutionEvent executionEvent);
 
+        Task PublishEventAsync(IExecutionEvent executionEvent);
+
         void AddListener(IExecutionEventListener listener);
+
+        void AddListener(IAsyncExecutionEventListener listener);
 
         void AddHandler<TEvent>(Action<TEvent> handler) where TEvent: IExecutionEvent;
     }
