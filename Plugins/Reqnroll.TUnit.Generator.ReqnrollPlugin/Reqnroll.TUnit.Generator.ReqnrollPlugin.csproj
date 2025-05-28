@@ -8,6 +8,7 @@
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <PackageId>Reqnroll.TUnit</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
