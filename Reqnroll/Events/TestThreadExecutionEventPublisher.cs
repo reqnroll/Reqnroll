@@ -11,7 +11,13 @@ namespace Reqnroll.Events
         private readonly List<IAsyncExecutionEventListener> _asyncListeners = new();
         private readonly Dictionary<Type, List<Delegate>> _handlersDictionary = new();
 
-        [Obsolete("ExecutionEvents are migrating to Async. Please migrate to PublishEventAsync", false)]
+        /// <summary>
+        /// Publishes the specified execution event to the appropriate handlers or subscribers.
+        /// </summary>
+        /// <remarks>This method blocks the calling thread until the event is published asynchronously. 
+        /// NOTE: This method should be retired when we can make all callers of the 
+        ///       TestThreadExecutionEventPublisher asynchronous (such as ReqnrollOutputHelper).</remarks>
+        /// <param name="executionEvent">The execution event to be published. Cannot be <see langword="null"/>.</param>
         public void PublishEvent(IExecutionEvent executionEvent)
         {
             Task.Run(async () => await PublishEventAsync(executionEvent)).Wait();
@@ -19,29 +25,23 @@ namespace Reqnroll.Events
 
         public async Task PublishEventAsync(IExecutionEvent executionEvent)
         {
-            Task.Run(() =>
+            foreach (var listener in _listeners)
             {
-                foreach (var listener in _listeners)
-                {
-                    listener.OnEvent(executionEvent);
-                }
-            }).Wait();
+                listener.OnEvent(executionEvent);
+            }
 
             foreach (var listener in _asyncListeners)
             {
                 await listener.OnEventAsync(executionEvent);
             }
 
-            Task.Run(() =>
+            if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
             {
-                if (_handlersDictionary.TryGetValue(executionEvent.GetType(), out var handlers))
+                foreach (var handler in handlers)
                 {
-                    foreach (var handler in handlers)
-                    {
-                        handler.DynamicInvoke(executionEvent);
-                    }
+                    handler.DynamicInvoke(executionEvent);
                 }
-            }).Wait();
+            }
         }
 
         [Obsolete("ExecutionEvents are migrating to Async. Please migrate to PublishEventAsync", false)]
@@ -50,7 +50,7 @@ namespace Reqnroll.Events
             _listeners.Add(listener);
         }
 
-        public void AddAsyncListener(IAsyncExecutionEventListener listener)
+        public void AddListener(IAsyncExecutionEventListener listener)
         {
             _asyncListeners.Add(listener);
         }

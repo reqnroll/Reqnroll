@@ -12,7 +12,7 @@ namespace Reqnroll.Events
     {
         public DateTime Timestamp { get; }
 
-        public ExecutionEvent() => Timestamp = DateTime.Now;
+        public ExecutionEvent() => Timestamp = DateTime.UtcNow;
     }
 
     public class TestRunStartedEvent : ExecutionEvent
