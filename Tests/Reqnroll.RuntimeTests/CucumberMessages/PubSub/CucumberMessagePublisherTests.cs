@@ -139,7 +139,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(objectContainerStub);
 
             // Assert
-            _eventPublisherMock.Verify(e => e.AddAsyncListener(_sut), Times.Once);
+            _eventPublisherMock.Verify(e => e.AddListener(_sut), Times.Once);
             _sut._brokerFactory.Value.Should().Be(_brokerMock.Object);
         }
 

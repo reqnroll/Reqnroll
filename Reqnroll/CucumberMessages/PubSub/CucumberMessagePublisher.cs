@@ -90,7 +90,7 @@ namespace Reqnroll.CucumberMessages.PubSub
                   _testThreadObjectContainer = args.ObjectContainer;
                   _brokerFactory = new Lazy<ICucumberMessageBroker>(() => _testThreadObjectContainer.Resolve<ICucumberMessageBroker>());
                   var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                  testThreadExecutionEventPublisher.AddAsyncListener(this);
+                  testThreadExecutionEventPublisher.AddListener(this);
               };
         }
 
