@@ -344,7 +344,7 @@ jobs:
     - name: Cache Reqnroll Resource Cache (RRC) folder
       uses: actions/cache@v4
       with:
-        path: ${{ env.REQNROLL_TEST_TEMPFOLDER }}/RRC
+        path: /tmp/RRC
         # Use the runner version in the key, so if new dependencies get installed we get a new cache entry
         # Also add week number so that if new tests require new cached templates they should eventually get into the RRC
         key: RRC-SystemTests-${{ runner.os }}-${{ env.ImageVersion }}-W${{ env.WeekNumber }}
