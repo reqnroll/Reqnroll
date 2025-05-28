@@ -20,14 +20,14 @@ public class BlockingSyncTestRunner : ISyncTestRunner
     public FeatureContext FeatureContext => _testRunner.FeatureContext;
     public ScenarioContext ScenarioContext => _testRunner.ScenarioContext;
 
-    public void OnScenarioInitialize(ScenarioInfo scenarioInfo)
+    public void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
     {
-        _testRunner.OnScenarioInitialize(scenarioInfo);
+        _testRunner.OnScenarioInitialize(scenarioInfo, ruleInfo);
     }
 
     public void SkipScenario()
     {
-        _testRunner.SkipScenario();
+        SyncWrapper(() =>  _testRunner.SkipScenarioAsync()); 
     }
 
     public void Pending()

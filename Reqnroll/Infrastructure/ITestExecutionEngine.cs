@@ -15,12 +15,12 @@ namespace Reqnroll.Infrastructure
         Task OnFeatureStartAsync(FeatureInfo featureInfo);
         Task OnFeatureEndAsync();
 
-        void OnScenarioInitialize(ScenarioInfo scenarioInfo);
+        void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
         Task OnScenarioStartAsync();
         Task OnAfterLastStepAsync();
         Task OnScenarioEndAsync();
 
-        void OnScenarioSkipped();
+        Task OnScenarioSkippedAsync();
 
         Task StepAsync(StepDefinitionKeyword stepDefinitionKeyword, string keyword, string text, string multilineTextArg, Table tableArg);
 

@@ -79,8 +79,8 @@ namespace Reqnroll.RuntimeTests
         protected virtual CultureInfo GetFeatureLanguage()
         {
             return new CultureInfo("en-US", false);
-        }     
-        
+        }
+
         protected virtual CultureInfo GetBindingCulture()
         {
             return new CultureInfo("en-US", false);
@@ -119,7 +119,7 @@ namespace Reqnroll.RuntimeTests
 
             ContextManagerStub = new ContextManager(new Mock<ITestTracer>().Object, TestThreadContainer, ContainerBuilderStub);
             ContextManagerStub.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, string.Empty, "test feature", null));
-            ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null));
+            ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null), null);
 
             StepArgumentTypeConverterStub = new Mock<IStepArgumentTypeConverter>();
         }
@@ -142,7 +142,7 @@ namespace Reqnroll.RuntimeTests
                 defaultDependencyProvider: defaultDependencyProvider);
         }
 
-        protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>(IDefaultDependencyProvider defaultDependencyProvider = null) where TBinding : class 
+        protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>(IDefaultDependencyProvider defaultDependencyProvider = null) where TBinding : class
         {
             return GetTestRunnerWithConverterStub<TBinding>(null, defaultDependencyProvider);
         }

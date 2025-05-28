@@ -118,7 +118,7 @@
         },
         "Keyword": "Scenario Outline",
         "Name": "a simple scenario outline",
-        "Description": null,
+        "Description": "",
         "Steps": [
           {
             "ScenarioBlock": 1,
@@ -283,7 +283,7 @@
         },
         "Keyword": "Scenario Outline",
         "Name": "a simple scenario outline",
-        "Description": null,
+        "Description": "",
         "Steps": [
           {
             "ScenarioBlock": 1,
@@ -445,7 +445,7 @@
         },
         "Keyword": "Scenario Outline",
         "Name": "a simple scenario outline",
-        "Description": null,
+        "Description": "",
         "Steps": [
           {
             "ScenarioBlock": 1,
@@ -610,7 +610,7 @@
         },
         "Keyword": "Scenario Outline",
         "Name": "a simple scenario outline",
-        "Description": null,
+        "Description": "",
         "Steps": [
           {
             "ScenarioBlock": 1,

@@ -14,6 +14,7 @@ public class ScenarioContext(Reqnroll.ScenarioContext originalContext) : IScenar
 
     public Exception TestError => originalContext.TestError;
     public ScenarioInfo ScenarioInfo => originalContext.ScenarioInfo;
+    public RuleInfo RuleInfo => originalContext.RuleInfo;
     public ScenarioBlock CurrentScenarioBlock => originalContext.CurrentScenarioBlock;
     public IObjectContainer ScenarioContainer => originalContext.ScenarioContainer;
     public ScenarioExecutionStatus ScenarioExecutionStatus => originalContext.ScenarioExecutionStatus;

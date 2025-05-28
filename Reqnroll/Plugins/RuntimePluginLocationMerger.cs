@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -32,7 +33,13 @@ namespace Reqnroll.Plugins
                 }
             }
 
-            return modifiedList ?? pluginPaths;
+            return SortPluginPaths(modifiedList ?? [.. pluginPaths]);
+        }
+
+        private static IReadOnlyList<string> SortPluginPaths(List<string> pluginPaths)
+        {
+            pluginPaths.Sort((x, y) => string.Compare(Path.GetFileName(x), Path.GetFileName(y), StringComparison.OrdinalIgnoreCase));
+            return pluginPaths;
         }
 
         private static List<string> CopyUntilIndex(IReadOnlyList<string> pluginPaths, int index)

@@ -1,6 +1,6 @@
+using FluentAssertions;
 using System;
 using System.Text.RegularExpressions;
-using FluentAssertions;
 
 namespace Reqnroll.TestProjectGenerator.Driver
 {
@@ -40,6 +40,9 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 if (failOnError && !_compilationResultDriver.CompileResult.IsSuccessful)
                 {
                     var missingSdk = Regex.Match(_compilationResultDriver.CompileResult.Output, @"(MSB3644: .* not found\.)");
+                    if (missingSdk.Success)
+                        throw new DotNetSdkNotInstalledException(missingSdk.Value);
+                    missingSdk = Regex.Match(_compilationResultDriver.CompileResult.Output, @"Install the .* \.NET SDK");
                     if (missingSdk.Success)
                         throw new DotNetSdkNotInstalledException(missingSdk.Value);
                     _compilationResultDriver.CompileResult.IsSuccessful.Should().BeTrue($"Compilation should succeed. Build errors: {Environment.NewLine}{_compilationResultDriver.CompileResult.ErrorLines}");

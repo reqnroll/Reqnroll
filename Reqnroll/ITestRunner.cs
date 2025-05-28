@@ -22,13 +22,13 @@ namespace Reqnroll
         Task OnFeatureStartAsync(FeatureInfo featureInfo);
         Task OnFeatureEndAsync();
 
-        void OnScenarioInitialize(ScenarioInfo scenarioInfo);
+        void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
         Task OnScenarioStartAsync();
 
         Task CollectScenarioErrorsAsync();
         Task OnScenarioEndAsync();
 
-        void SkipScenario();
+        Task SkipScenarioAsync();
 
         Task GivenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
         Task WhenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);

@@ -72,6 +72,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<ObsoleteStepHandler, IObsoleteStepHandler>();
 
             container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
+            container.RegisterTypeAs<EnvironmentInfoProvider, IEnvironmentInfoProvider>();
             container.RegisterTypeAs<BinaryFileAccessor, IBinaryFileAccessor>();
             container.RegisterTypeAs<TestPendingMessageFactory, ITestPendingMessageFactory>();
             container.RegisterTypeAs<TestUndefinedMessageFactory, ITestUndefinedMessageFactory>();

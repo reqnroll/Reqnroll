@@ -43,9 +43,9 @@ namespace Reqnroll
             await _executionEngine.OnFeatureEndAsync();
         }
 
-        public void OnScenarioInitialize(ScenarioInfo scenarioInfo)
+        public void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
-            _executionEngine.OnScenarioInitialize(scenarioInfo);
+            _executionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
         }
 
         public async Task OnScenarioStartAsync()
@@ -63,9 +63,9 @@ namespace Reqnroll
             await _executionEngine.OnScenarioEndAsync();
         }
 
-        public void SkipScenario()
+        public async Task SkipScenarioAsync()
         {
-            _executionEngine.OnScenarioSkipped();
+            await _executionEngine.OnScenarioSkippedAsync();
         }
 
         public async Task OnTestRunEndAsync()

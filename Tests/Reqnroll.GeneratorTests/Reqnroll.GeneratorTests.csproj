@@ -26,6 +26,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.Build.Framework" Version="17.11.4" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />

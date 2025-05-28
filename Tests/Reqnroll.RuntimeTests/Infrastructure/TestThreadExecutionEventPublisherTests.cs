@@ -21,7 +21,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                    te.PublishEvent(It.Is<StepStartedEvent>(e => e.ScenarioContext.Equals(scenarioContext) &&
+                    te.PublishEventAsync(It.Is<StepStartedEvent>(e => e.ScenarioContext.Equals(scenarioContext) &&
                                                                  e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()) &&
                                                                  e.StepContext.Equals(contextManagerStub.Object.StepContext))), 
                                                       Times.Once);
@@ -36,7 +36,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
 
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<StepBindingStartedEvent>(e => 
+                te.PublishEventAsync(It.Is<StepBindingStartedEvent>(e => 
                                                                    e.StepDefinitionBinding.Equals(stepDef))),
                                                       Times.Once);
         }
@@ -55,7 +55,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
 
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<StepBindingFinishedEvent>(e =>
+                te.PublishEventAsync(It.Is<StepBindingFinishedEvent>(e =>
                                                                     e.StepDefinitionBinding.Equals(stepDef) && 
                                                                     e.Duration.Equals(expectedDuration))),
                                                       Times.Once);
@@ -69,7 +69,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<StepFinishedEvent>(e => 
+                te.PublishEventAsync(It.Is<StepFinishedEvent>(e => 
                                                              e.ScenarioContext.Equals(scenarioContext) &&
                                                              e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()) &&
                                                              e.StepContext.Equals(contextManagerStub.Object.StepContext))),
@@ -87,7 +87,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                                                          te.PublishEvent(It.IsAny<StepSkippedEvent>()), Times.Once);
+                                                          te.PublishEventAsync(It.IsAny<StepSkippedEvent>()), Times.Once);
         }
         
         [Fact]
@@ -105,11 +105,11 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.InvokeHookAsync(methodBindingInvokerMock.Object, expectedHookBinding, hookType);
 
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<HookBindingStartedEvent>(e =>
+                te.PublishEventAsync(It.Is<HookBindingStartedEvent>(e =>
                                                                    e.HookBinding.Equals(expectedHookBinding))),
                                                       Times.Once);
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<HookBindingFinishedEvent>(e =>
+                te.PublishEventAsync(It.Is<HookBindingFinishedEvent>(e =>
                                                                     e.HookBinding.Equals(expectedHookBinding) &&
                                                                     e.Duration.Equals(expectedDuration))),
                                                       Times.Once);
@@ -120,11 +120,11 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
 
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<ScenarioStartedEvent>(e =>
+                te.PublishEventAsync(It.Is<ScenarioStartedEvent>(e =>
                                                                 e.ScenarioContext.Equals(scenarioContext) &&
                                                                 e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
@@ -135,13 +135,13 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<ScenarioFinishedEvent>(e =>
+                te.PublishEventAsync(It.Is<ScenarioFinishedEvent>(e =>
                                                                  e.ScenarioContext.Equals(scenarioContext) &&
                                                                  e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
@@ -156,14 +156,14 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
                                     .Throws(new Exception("simulated hook error"));
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await FluentActions.Awaiting(testExecutionEngine.OnScenarioEndAsync)
                          .Should().ThrowAsync<Exception>();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<ScenarioFinishedEvent>(e =>
+                te.PublishEventAsync(It.Is<ScenarioFinishedEvent>(e =>
                                                                  e.ScenarioContext.Equals(scenarioContext) &&
                                                                  e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
@@ -178,7 +178,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.OnTestRunStartAsync();
             await testExecutionEngine.OnFeatureStartAsync(featureInfo);
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
             await testExecutionEngine.OnAfterLastStepAsync();
@@ -202,20 +202,20 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo);
-            testExecutionEngine.OnScenarioSkipped();
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, null);
+            await testExecutionEngine.OnScenarioSkippedAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<ScenarioStartedEvent>(e =>
+                te.PublishEventAsync(It.Is<ScenarioStartedEvent>(e =>
                                                                 e.ScenarioContext.Equals(scenarioContext) &&
                                                                 e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.IsAny<ScenarioSkippedEvent>()), Times.Once);
+                te.PublishEventAsync(It.IsAny<ScenarioSkippedEvent>()), Times.Once);
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<ScenarioFinishedEvent>(e =>
+                te.PublishEventAsync(It.Is<ScenarioFinishedEvent>(e =>
                                                                  e.ScenarioContext.Equals(scenarioContext) &&
                                                                  e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
@@ -229,7 +229,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.OnFeatureStartAsync(featureInfo);
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<FeatureStartedEvent>(e =>
+                te.PublishEventAsync(It.Is<FeatureStartedEvent>(e =>
                                                                e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
         }
@@ -242,7 +242,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.OnFeatureEndAsync();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<FeatureFinishedEvent>(e => 
+                te.PublishEventAsync(It.Is<FeatureFinishedEvent>(e => 
                                                                 e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
         }
@@ -260,7 +260,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                .Should().ThrowAsync<Exception>();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                te.PublishEvent(It.Is<FeatureFinishedEvent>(e => 
+                te.PublishEventAsync(It.Is<FeatureFinishedEvent>(e => 
                                                                 e.FeatureContext.Equals(featureContainer.Resolve<FeatureContext>()))),
                                                       Times.Once);
         }
@@ -273,7 +273,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.OnTestRunStartAsync();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                                                          te.PublishEvent(It.IsAny<TestRunStartedEvent>()), Times.Once);
+                                                          te.PublishEventAsync(It.IsAny<TestRunStartedEvent>()), Times.Once);
         }
 
         [Fact]
@@ -284,7 +284,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.OnTestRunEndAsync();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                                                          te.PublishEvent(It.IsAny<TestRunFinishedEvent>()), Times.Once);
+                                                          te.PublishEventAsync(It.IsAny<TestRunFinishedEvent>()), Times.Once);
         }
 
         [Fact]
@@ -300,18 +300,18 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                                .Should().ThrowAsync<Exception>();
             
             _testThreadExecutionEventPublisher.Verify(te =>
-                                                          te.PublishEvent(It.IsAny<TestRunFinishedEvent>()), Times.Once);
+                                                          te.PublishEventAsync(It.IsAny<TestRunFinishedEvent>()), Times.Once);
         }
 
         private void AssertHookEventsForHookType(HookType hookType)
         {
             _testThreadExecutionEventPublisher.Verify(
                 te =>
-                    te.PublishEvent(It.Is<HookStartedEvent>(e => e.HookType == hookType)),
+                    te.PublishEventAsync(It.Is<HookStartedEvent>(e => e.HookType == hookType)),
                 Times.Once);
             _testThreadExecutionEventPublisher.Verify(
                 te =>
-                    te.PublishEvent(It.Is<HookFinishedEvent>(e => e.HookType == hookType)),
+                    te.PublishEventAsync(It.Is<HookFinishedEvent>(e => e.HookType == hookType)),
                 Times.Once);
         }
     }
