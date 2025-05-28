@@ -192,7 +192,6 @@ jobs:
     - name: Build
       run: dotnet build --no-restore ${{ steps.build_params.outputs.main_build_params }}
     - name: List TUnit folders
-      shell: pwsh
       if: always()
       run: |
         cd ./Plugins/Reqnroll.TUnit.Generator.ReqnrollPlugin
