@@ -264,6 +264,7 @@ jobs:
     needs: build
     env:
       # D:\ (temporary) drive has better performance then C:\ (remote) drive on the Github Runner, so place all temporary files on D:\, see https://github.com/actions/setup-dotnet/issues/260
+      # It is faster to install all required .NET versions to D: drive than installing only the missing one to C: drive and use it from there.
       DOTNET_INSTALL_DIR: D:\dotnet
       REQNROLL_TEST_TEMPFOLDER: D:\testrundata
       NUGET_PACKAGES: D:\nuget\packages
@@ -279,7 +280,7 @@ jobs:
         Write-Output "ImageVersion=$env:ImageVersion" >> $env:GITHUB_ENV
         $WeekNumber = Get-Date -UFormat %V
         Write-Output "WeekNumber=$WeekNumber" >> $env:GITHUB_ENV
-    - name: Cache Reqnroll Resources Cache (RRC) folder
+    - name: Cache Reqnroll Resource Cache (RRC) folder
       uses: actions/cache@v4
       with:
         path: ${{ env.REQNROLL_TEST_TEMPFOLDER }}/RRC
@@ -300,7 +301,7 @@ jobs:
       run: |
         dotnet --list-sdks
         dotnet --list-runtimes
-    - name: Setup dotnet
+    - name: Setup required .NET SDKs
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: | 
@@ -353,6 +354,10 @@ jobs:
       with:
         name: SystemTests
         path: Tests/Reqnroll.SystemTests/bin/
+    - name: .NET Information (before setup-dotnet)
+      run: |
+        dotnet --list-sdks
+        dotnet --list-runtimes
     - name: Setup dotnet
       uses: actions/setup-dotnet@v4
       with:
