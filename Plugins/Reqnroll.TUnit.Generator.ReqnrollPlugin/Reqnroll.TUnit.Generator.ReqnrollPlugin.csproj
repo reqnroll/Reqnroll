@@ -8,6 +8,8 @@
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <PackageId>Reqnroll.TUnit</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <!-- build incorrectly detects a missing content in the 'lib' folder, we need to skip this warning -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
