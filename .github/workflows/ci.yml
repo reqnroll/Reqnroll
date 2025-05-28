@@ -191,6 +191,12 @@ jobs:
         dotnet add ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj package GitHubActionsTestLogger
     - name: Build
       run: dotnet build --no-restore ${{ steps.build_params.outputs.main_build_params }}
+    - name: List TUnit folders
+      shell: pwsh
+      if: always()
+      run: |
+        cd ./Plugins/Reqnroll.TUnit.Generator.ReqnrollPlugin
+        la -r
     - name: Runtime Tests
       run: dotnet test ./Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/runtimetests-results.trx" ${{ steps.build_params.outputs.test_params }}
     - name: Generator Tests
