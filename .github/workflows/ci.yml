@@ -292,6 +292,10 @@ jobs:
       with:
         name: SystemTests
         path: Tests/Reqnroll.SystemTests/bin/
+    - name: .NET Information (before setup-dotnet)
+      run: |
+        dotnet --list-sdks
+        dotnet --list-runtimes
     - name: Setup dotnet
       uses: actions/setup-dotnet@v4
       with:
