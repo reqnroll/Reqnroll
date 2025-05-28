@@ -17,7 +17,7 @@
     <tags>reqnroll TUnit</tags>
     <copyright>$copyright$</copyright>
     <dependencies>
-      <group targetFramework=".NETStandard2.0">
+      <group targetFramework="netstandard2.0">
         <dependency id="Reqnroll" version="[$version$]" />
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
         <dependency id="TUnit.Core" version="0.20.0" />
@@ -28,6 +28,7 @@
   <files>
     <file src="build\**\*" exclude="build\*.template.*" target="build" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.TUnit.ReqnrollPlugin.*" target="lib\netstandard2.0" />
+    
     <file src="bin\$config$\netstandard2.0\Reqnroll.TUnit.Generator.ReqnrollPlugin.dll" target="build\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.TUnit.Generator.ReqnrollPlugin.pdb" target="build\netstandard2.0" />
 
