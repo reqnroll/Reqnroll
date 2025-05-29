@@ -13,6 +13,7 @@
 * Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
 * Upgrade to Gherkin v32 from v30 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#489)
 * Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
+* Improved test execution time by decoupling the telemetry sending from the execution. (#629)
 
 ## Bug fixes:
 
