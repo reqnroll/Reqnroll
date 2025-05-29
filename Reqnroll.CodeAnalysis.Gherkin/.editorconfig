@@ -1,0 +1,19 @@
+[*]
+insert_final_newline = true
+indent_size = 4
+indent_style = space
+
+[*.{csproj,targets,props}]
+indent_size = 2
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped
+
+# IDE0305: Simplify collection initialization
+dotnet_style_prefer_collection_expression = never
+
+# CA1510: Use ArgumentNullException throw helper
+dotnet_diagnostic.CA1510.severity = none
+
+# IDE0057: Use range operator
+dotnet_diagnostic.IDE0057.severity = none
