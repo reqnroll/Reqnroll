@@ -103,7 +103,16 @@ namespace Reqnroll.Infrastructure
 
             if (_analyticsTransmitter.IsEnabled)
             {
-                _ = Task.Run(TryTransmitReqnrollProjectRunningEventAsync);
+                try
+                {
+                    var testAssemblyName = _testRunnerManager.TestAssembly.GetName().Name;
+                    var projectRunningEvent = _analyticsEventProvider.CreateProjectRunningEvent(testAssemblyName);
+                    await _analyticsTransmitter.TransmitReqnrollProjectRunningEventAsync(projectRunningEvent);
+                }
+                catch (Exception)
+                {
+                    // catch all exceptions since we do not want to break anything
+                }
             }
 
             _testRunnerStartExecuted = true;
@@ -113,21 +122,6 @@ namespace Reqnroll.Infrastructure
             // The 'FireEventsAsync' call might throw an exception if the related before test run hook fails,
             // but we can let the exception propagate to the caller.
             await FireEventsAsync(HookType.BeforeTestRun);
-        }
-
-        async Task TryTransmitReqnrollProjectRunningEventAsync()
-        {
-            try
-            {
-                var testAssemblyName = _testRunnerManager.TestAssembly.GetName().Name;
-                var projectRunningEvent = _analyticsEventProvider.CreateProjectRunningEvent(testAssemblyName);
-                await _analyticsTransmitter.TransmitReqnrollProjectRunningEventAsync(projectRunningEvent);
-            }
-            catch (Exception ex)
-            {
-                // catch all exceptions since we do not want to break anything
-                Debug.WriteLine(ex, "Sending telemetry failed");
-            }
         }
 
         public virtual async Task OnTestRunEndAsync()
