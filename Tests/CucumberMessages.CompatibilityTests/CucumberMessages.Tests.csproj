@@ -200,6 +200,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Cucumber.Messages" Version="27.0.2" />
     <PackageReference Include="FluentAssertions" Version="6.12.0" />
