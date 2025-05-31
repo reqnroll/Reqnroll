@@ -1,19 +1,18 @@
-using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Reqnroll.BoDi;
 using FluentAssertions;
 using Moq;
-using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using Xunit;
 
 namespace Reqnroll.RuntimeTests
 {
@@ -115,7 +114,7 @@ namespace Reqnroll.RuntimeTests
 
             stepTransformationBinding.Regex.IsMatch("user xyz").Should().BeTrue();
 
-            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker());
+            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker(), new EnvironmentWrapperStub());
             var result = await invoker.InvokeBindingAsync(stepTransformationBinding, contextManagerStub.Object, new object[] { "xyz" }, new Mock<ITestTracer>().Object, new DurationHolder());
             Assert.NotNull(result);
             result.Should().BeOfType<User>();
@@ -131,7 +130,7 @@ namespace Reqnroll.RuntimeTests
 
             Assert.Matches(stepTransformationBinding.Regex, "string xyz");
 
-            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker());
+            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker(), new EnvironmentWrapperStub());
             var result  = await invoker.InvokeBindingAsync(stepTransformationBinding, contextManagerStub.Object, new object[] { "xyz" }, new Mock<ITestTracer>().Object, new DurationHolder());
             Assert.NotNull(result);
             result.GetType().Should().Be<string>();
@@ -145,7 +144,7 @@ namespace Reqnroll.RuntimeTests
             var transformMethod = stepTransformationInstance.GetType().GetMethod("StringToStringConvert");
             var stepTransformationBinding = CreateStepTransformationBinding(@"", transformMethod);
 
-            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker());
+            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker(), new EnvironmentWrapperStub());
             var result = await invoker.InvokeBindingAsync(stepTransformationBinding, contextManagerStub.Object, new object[] { "xyz" }, new Mock<ITestTracer>().Object, new DurationHolder());
             Assert.NotNull(result);
             result.GetType().Should().Be<string>();
@@ -159,7 +158,7 @@ namespace Reqnroll.RuntimeTests
             var transformMethod = stepTransformationInstance.GetType().GetMethod("TableToTableConvert");
             var stepTransformationBinding = CreateStepTransformationBinding(@"", transformMethod);
 
-            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker());
+            var invoker = new BindingInvoker(ConfigurationLoader.GetDefault(), new Mock<IErrorProvider>().Object, new BindingDelegateInvoker(), new EnvironmentWrapperStub());
             var result = await invoker.InvokeBindingAsync(stepTransformationBinding, contextManagerStub.Object, new object[] { new Table("h1") }, new Mock<ITestTracer>().Object, new DurationHolder());
             Assert.NotNull(result);
 

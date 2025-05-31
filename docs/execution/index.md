@@ -9,6 +9,7 @@ executing-reqnroll-scenarios
 executing-specific-scenarios
 mark-steps-as-not-implemented
 skipping-scenarios
+dry-run
 test-results
 parallel-execution
 debugging
