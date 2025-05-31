@@ -16,7 +16,6 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
-using Reqnroll.InternalPlugins;
 
 namespace Reqnroll.Infrastructure
 {
@@ -100,9 +99,6 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEventEmitter, IRuntimePluginTestExecutionLifecycleEventEmitter>();
 
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
-
-            // Internal plugins
-            container.RegisterTypeAs<DryRunBindingInvokerPlugin, IRuntimePlugin>("dryrun");
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
