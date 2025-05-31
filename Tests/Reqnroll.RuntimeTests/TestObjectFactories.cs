@@ -8,25 +8,25 @@ namespace Reqnroll.RuntimeTests
 {
     public static class TestObjectFactories
     {
-        internal static TestRunner CreateTestRunner(out IObjectContainer createThreadContainer, Action<IObjectContainer> registerTestThreadMocks = null, Action<IObjectContainer> registerGlobalMocks = null, IDefaultDependencyProvider defaultDependencyProvider = null)
+        internal static TestRunner CreateTestRunner(out IObjectContainer createThreadContainer, Action<IObjectContainer> registerTestThreadMocks = null, Action<IObjectContainer> registerGlobalMocks = null)
         {
-            createThreadContainer = CreateDefaultTestThreadContainer(registerTestThreadMocks: registerTestThreadMocks, registerGlobalMocks: registerGlobalMocks, defaultDependencyProvider: defaultDependencyProvider);
+            createThreadContainer = CreateDefaultTestThreadContainer(registerTestThreadMocks: registerTestThreadMocks, registerGlobalMocks: registerGlobalMocks);
             return (TestRunner)createThreadContainer.Resolve<ITestRunner>();
         }
 
-        internal static TestRunner CreateTestRunner(Action<IObjectContainer> registerTestThreadMocks = null, Action<IObjectContainer> registerGlobalMocks = null, IDefaultDependencyProvider defaultDependencyProvider = null)
+        internal static TestRunner CreateTestRunner(Action<IObjectContainer> registerTestThreadMocks = null, Action<IObjectContainer> registerGlobalMocks = null)
         {
-            return CreateTestRunner(out _, registerTestThreadMocks, registerGlobalMocks, defaultDependencyProvider);
+            return CreateTestRunner(out _, registerTestThreadMocks, registerGlobalMocks);
         }
 
-        internal static IObjectContainer CreateDefaultGlobalContainer(IRuntimeConfigurationProvider configurationProvider = null, Action<IObjectContainer> registerGlobalMocks = null, IDefaultDependencyProvider defaultDependencyProvider = null)
+        internal static IObjectContainer CreateDefaultGlobalContainer(IRuntimeConfigurationProvider configurationProvider = null, Action<IObjectContainer> registerGlobalMocks = null)
         {
-            return CreateDefaultGlobalContainer(configurationProvider, registerGlobalMocks, new RuntimeTestsContainerBuilder(defaultDependencyProvider));
+            return CreateDefaultGlobalContainer(configurationProvider, registerGlobalMocks, new RuntimeTestsContainerBuilder());
         }
 
-        internal static IObjectContainer CreateDefaultTestThreadContainer(IRuntimeConfigurationProvider configurationProvider = null, Action<IObjectContainer> registerGlobalMocks = null, Action<IObjectContainer> registerTestThreadMocks = null, IDefaultDependencyProvider defaultDependencyProvider = null)
+        internal static IObjectContainer CreateDefaultTestThreadContainer(IRuntimeConfigurationProvider configurationProvider = null, Action<IObjectContainer> registerGlobalMocks = null, Action<IObjectContainer> registerTestThreadMocks = null)
         {
-            return CreateDefaultTestThreadContainer(configurationProvider, registerGlobalMocks, registerTestThreadMocks, new RuntimeTestsContainerBuilder(defaultDependencyProvider));
+            return CreateDefaultTestThreadContainer(configurationProvider, registerGlobalMocks, registerTestThreadMocks, new RuntimeTestsContainerBuilder());
         }
 
         internal static IObjectContainer CreateDefaultFeatureContainer(IRuntimeConfigurationProvider configurationHolder, IDefaultDependencyProvider defaultDependencyProvider = null)
