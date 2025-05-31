@@ -43,7 +43,7 @@ public class BindingInvokerTests
 
     private Task<object> InvokeBindingAsync(BindingInvoker sut, IContextManager contextManager, Type stepDefType, string methodName, params object[] args)
     {
-        return InvokeBindingAsync(sut, contextManager, stepDefType, methodName, new DurationHolder());
+        return InvokeBindingAsync(sut, contextManager, stepDefType, methodName, new DurationHolder(), args);
     }
 
     private async Task<object> InvokeBindingAsync(BindingInvoker sut, IContextManager contextManager, Type stepDefType, string methodName, DurationHolder durationHolder, params object[] args)
@@ -500,7 +500,7 @@ public class BindingInvokerTests
     public async Task ShouldSkipExecutingStepsWhenDryRunEnabled(string value)
     {
         var envStub = new EnvironmentWrapperStub();
-        envStub.Environment.Add(BindingInvoker.DryRunEnvVarName, value);
+        envStub.EnvironmentVariables.Add(BindingInvoker.DryRunEnvVarName, value);
         var sut = CreateSut(environmentWrapperStub: envStub);
         var contextManager = CreateContextManagerWith();
         var durationHolder = new DurationHolder();
@@ -526,7 +526,7 @@ public class BindingInvokerTests
     public async Task ShouldExecuteStepsWhenDryRunDisabled(string value)
     {
         var envStub = new EnvironmentWrapperStub();
-        envStub.Environment.Add(BindingInvoker.DryRunEnvVarName, value);
+        envStub.EnvironmentVariables.Add(BindingInvoker.DryRunEnvVarName, value);
         var sut = CreateSut(environmentWrapperStub: envStub);
         var contextManager = CreateContextManagerWith();
         var durationHolder = new DurationHolder();

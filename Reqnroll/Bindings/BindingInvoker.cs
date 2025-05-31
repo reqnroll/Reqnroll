@@ -40,6 +40,7 @@ namespace Reqnroll.Bindings
             this.bindingDelegateInvoker = bindingDelegateInvoker;
             this.environmentWrapper = environmentWrapper;
 
+            // Don't want to evaluate too early in case the user overrides the EnvironmentWrapper, so use Lazy
             isDryRunLazy = new Lazy<bool>(() =>
                 environmentWrapper.GetEnvironmentVariable(DryRunEnvVarName) is ISuccess<string> dryRunEnvVar
                        && bool.TryParse(dryRunEnvVar.Result, out bool isDryRun)
