@@ -103,7 +103,16 @@ namespace Reqnroll.Infrastructure
 
             if (_analyticsTransmitter.IsEnabled)
             {
-                _ = Task.Run(TryTransmitReqnrollProjectRunningEventAsync);
+                try
+                {
+                    var testAssemblyName = _testRunnerManager.TestAssembly.GetName().Name;
+                    var projectRunningEvent = _analyticsEventProvider.CreateProjectRunningEvent(testAssemblyName);
+                    await _analyticsTransmitter.TransmitReqnrollProjectRunningEventAsync(projectRunningEvent);
+                }
+                catch (Exception)
+                {
+                    // catch all exceptions since we do not want to break anything
+                }
             }
 
             _testRunnerStartExecuted = true;
@@ -113,21 +122,6 @@ namespace Reqnroll.Infrastructure
             // The 'FireEventsAsync' call might throw an exception if the related before test run hook fails,
             // but we can let the exception propagate to the caller.
             await FireEventsAsync(HookType.BeforeTestRun);
-        }
-
-        async Task TryTransmitReqnrollProjectRunningEventAsync()
-        {
-            try
-            {
-                var testAssemblyName = _testRunnerManager.TestAssembly.GetName().Name;
-                var projectRunningEvent = _analyticsEventProvider.CreateProjectRunningEvent(testAssemblyName);
-                await _analyticsTransmitter.TransmitReqnrollProjectRunningEventAsync(projectRunningEvent);
-            }
-            catch (Exception ex)
-            {
-                // catch all exceptions since we do not want to break anything
-                Debug.WriteLine(ex, "Sending telemetry failed");
-            }
         }
 
         public virtual async Task OnTestRunEndAsync()
@@ -399,6 +393,7 @@ namespace Reqnroll.Infrastructure
             catch (Exception exception)
             {
                 // This exception is caught in order to be able to inform consumers of the HookBindingFinishedEvent;
+                // This is used by CucumberMessages to include information about the exception in the hook TestStepResult
                 // The throw; statement ensures that the exception is propagated up to the FireEventsAsync method
                 exceptionthrown = exception;
                 throw;
@@ -678,8 +673,10 @@ namespace Reqnroll.Infrastructure
             StepDefinitionType stepDefinitionType = stepDefinitionKeyword == StepDefinitionKeyword.And || stepDefinitionKeyword == StepDefinitionKeyword.But
                 ? GetCurrentBindingType()
                 : (StepDefinitionType) stepDefinitionKeyword;
-            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg));
+            var stepSequenceIdentifiers = ScenarioContext.ScenarioInfo.PickleStepSequence;
+            var pickleStepId = stepSequenceIdentifiers?.CurrentPickleStepId ?? "";
 
+            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg, pickleStepId));
             await _testThreadExecutionEventPublisher.PublishEventAsync(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
             try
@@ -690,6 +687,7 @@ namespace Reqnroll.Infrastructure
             finally
             {
                 await _testThreadExecutionEventPublisher.PublishEventAsync(new StepFinishedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
+                stepSequenceIdentifiers?.NextStep();
                 _contextManager.CleanupStepContext();
             }
         }

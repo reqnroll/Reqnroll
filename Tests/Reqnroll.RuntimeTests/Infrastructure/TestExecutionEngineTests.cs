@@ -1,26 +1,25 @@
-using FluentAssertions;
-using Moq;
-using Reqnroll.Analytics;
-using Reqnroll.Bindings;
-using Reqnroll.Bindings.Reflection;
-using Reqnroll.BindingSkeletons;
-using Reqnroll.BoDi;
-using Reqnroll.CommonModels;
-using Reqnroll.Configuration;
-using Reqnroll.ErrorHandling;
-using Reqnroll.Events;
-using Reqnroll.Infrastructure;
-using Reqnroll.Plugins;
-using Reqnroll.TestFramework;
-using Reqnroll.Tracing;
-using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Reqnroll.BoDi;
+using Moq;
 using Xunit;
+using Reqnroll.BindingSkeletons;
+using Reqnroll.Bindings;
+using Reqnroll.Bindings.Reflection;
+using Reqnroll.Configuration;
+using Reqnroll.ErrorHandling;
+using Reqnroll.Infrastructure;
+using Reqnroll.Tracing;
+using Reqnroll.UnitTestProvider;
+using FluentAssertions;
+using Reqnroll.Analytics;
+using Reqnroll.Events;
+using Reqnroll.Plugins;
+using Reqnroll.TestFramework;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
 {
@@ -679,21 +678,11 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public async Task Should_TryToSend_ProjectRunningEvent()
         {
-            var tcs = new TaskCompletionSource();
-
             _analyticsTransmitter.SetupGet(at => at.IsEnabled).Returns(true);
-            _analyticsTransmitter.Setup(at => at.TransmitReqnrollProjectRunningEventAsync(It.IsAny<ReqnrollProjectRunningEvent>()))
-                .Returns(() =>
-                {
-                    tcs.SetResult();
-                    return Task.FromResult(Result.Success());
-                });
 
             var testExecutionEngine = CreateTestExecutionEngine();
 
             await testExecutionEngine.OnTestRunStartAsync();
-
-            await Task.WhenAny(tcs.Task, Task.Delay(60_000));
 
             _analyticsTransmitter.Verify(at => at.TransmitReqnrollProjectRunningEventAsync(It.IsAny<ReqnrollProjectRunningEvent>()), Times.Once);
         }

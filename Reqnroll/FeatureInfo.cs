@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using Reqnroll.CucumberMessages.RuntimeSupport;
 using Reqnroll.Tracing;
 
 namespace Reqnroll
@@ -16,6 +17,10 @@ namespace Reqnroll
         public string Title { get; private set; }
         public string Description { get; private set; }
         public CultureInfo Language { get; private set; }
+
+
+        // This holds the cucumber messages at the feature level created by the test class generator; populated when the FeatureStartedEvent is fired
+        internal FeatureLevelCucumberMessages FeatureCucumberMessages { get; set; }
 
         public FeatureInfo(CultureInfo language, string folderPath, string title, string description, params string[] tags)
             : this(language, folderPath, title, description, ProgrammingLanguage.CSharp, tags)
@@ -37,6 +42,12 @@ namespace Reqnroll
             Description = description;
             GenerationTargetLanguage = programmingLanguage;
             Tags = tags ?? Array.Empty<string>();
+        }
+
+        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, string[] tags, FeatureLevelCucumberMessages featureLevelCucumberMessages = null)
+            : this(language, folderPath, title, description, programmingLanguage, tags)
+        {
+            FeatureCucumberMessages = featureLevelCucumberMessages;
         }
     }
 }
