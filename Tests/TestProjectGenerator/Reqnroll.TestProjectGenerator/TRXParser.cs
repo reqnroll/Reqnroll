@@ -105,6 +105,8 @@ namespace Reqnroll.TestProjectGenerator
                 case UnitTestProvider.NUnit3: 
                 case UnitTestProvider.NUnit4: 
                     return CalculateNUnitTestExecutionResult(testExecutionResult);
+                case UnitTestProvider.TUnit:
+                    return CalculateTUnitTestExecutionResult(testExecutionResult);
                 default: throw new NotSupportedException($"The specified unit test provider is not supported: {testRunConfiguration.UnitTestProvider}");
             }
         }
@@ -136,6 +138,14 @@ namespace Reqnroll.TestProjectGenerator
             testExecutionResult.Pending = GetXUnitPendingCount(trx.Element(_testRunElementName)?.Element(_resultsElementName));
             testExecutionResult.Failed -= testExecutionResult.Pending;
             testExecutionResult.Ignored = testExecutionResult.Total - testExecutionResult.Executed;
+
+            return testExecutionResult;
+        }
+
+        private TestExecutionResult CalculateTUnitTestExecutionResult(TestExecutionResult testExecutionResult)
+        {
+            testExecutionResult.Ignored = GetTUnitIgnoredCount(testExecutionResult);
+            testExecutionResult.Pending = testExecutionResult.Total - testExecutionResult.Executed - testExecutionResult.Ignored;
 
             return testExecutionResult;
         }
@@ -232,6 +242,14 @@ namespace Reqnroll.TestProjectGenerator
                 select _xunitPendingOrInconclusiveRegex;
 
             return pendingOrInconclusiveTests.Count();
+        }
+
+        private int GetTUnitIgnoredCount(TestExecutionResult testExecutionResult)
+        {
+            return testExecutionResult.TestResults.Count(
+                r => r.Outcome == "NotExecuted"
+                     && (r.ErrorMessage?.Contains("Ignored scenario") == true
+                         || r.ErrorMessage?.Contains("Ignored feature") == true));
         }
     }
 }
