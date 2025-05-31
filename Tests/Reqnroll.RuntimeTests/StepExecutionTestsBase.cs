@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Reqnroll.BoDi;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
@@ -139,7 +139,9 @@ namespace Reqnroll.RuntimeTests
 
                     var builder = (RuntimeBindingRegistryBuilder)container.Resolve<IRuntimeBindingRegistryBuilder>();
                     foreach (var bindingType in bindingTypes)
+                    {
                         builder.BuildBindingsFromType(bindingType);
+                    }
                     builder.BuildingCompleted();
 
                     registerMocks?.Invoke(container);
