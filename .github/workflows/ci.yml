@@ -279,15 +279,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set Runner ImageVersion to Env
+    - name: Set Runner ImageVersion and Week number to Env
       shell: pwsh
       run: |
         Write-Output "ImageVersion=$env:ImageVersion" >> $env:GITHUB_ENV
-    - name: Cache RRC folder
+        $WeekNumber = Get-Date -UFormat %V
+        Write-Output "WeekNumber=$WeekNumber" >> $env:GITHUB_ENV
+    - name: Cache Reqnroll Resource Cache (RRC) folder
       uses: actions/cache@v4
       with:
         path: ${{ env.REQNROLL_TEST_TEMPFOLDER }}/RRC
-        key: RRC-SystemTests-${{ runner.os }}-${{ env.ImageVersion }} # Use the runner version as key, so if new dependencies get installed we get a new cache entry
+        # Use the runner version in the key, so if new dependencies get installed we get a new cache entry
+        # Also add week number so that if new tests require new cached templates they should eventually get into the RRC
+        key: RRC-SystemTests-${{ runner.os }}-${{ env.ImageVersion }}-W${{ env.WeekNumber }}
     - name: Download packages
       uses: actions/download-artifact@v4
       with:
@@ -303,7 +307,8 @@ jobs:
       with:
         name: CucumberMessages
         path: Tests/CucumberMessages.CompatibilityTests/bin/
-    - name: Setup dotnet
+    - name: Setup required .NET SDKs
+      # It is faster to install all required .NET versions to D: drive than installing only the missing one to C: drive and use it from there.
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: | 
@@ -340,15 +345,19 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Set Runner ImageVersion to Env
+    - name: Set Runner ImageVersion and Week number to Env
       shell: pwsh
       run: |
         Write-Output "ImageVersion=$env:ImageVersion" >> $env:GITHUB_ENV
-    - name: Cache RRC folder
+        $WeekNumber = Get-Date -UFormat %V
+        Write-Output "WeekNumber=$WeekNumber" >> $env:GITHUB_ENV
+    - name: Cache Reqnroll Resource Cache (RRC) folder
       uses: actions/cache@v4
       with:
         path: /tmp/RRC
-        key: RRC-SystemTests-${{ runner.os }}-${{ env.ImageVersion }} # Use the runner version as key, so if new dependencies get installed we get a new cache entry
+        # Use the runner version in the key, so if new dependencies get installed we get a new cache entry
+        # Also add week number so that if new tests require new cached templates they should eventually get into the RRC
+        key: RRC-SystemTests-${{ runner.os }}-${{ env.ImageVersion }}-W${{ env.WeekNumber }}
     - name: Download packages
       uses: actions/download-artifact@v4
       with:
@@ -364,7 +373,8 @@ jobs:
       with:
         name: CucumberMessages
         path: Tests/CucumberMessages.CompatibilityTests/bin/
-    - name: Setup dotnet
+    - name: Setup required .NET SDKs
+      # The default image contains .NET 8 only, but reusing it would not provide much performance benefit
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: | 
