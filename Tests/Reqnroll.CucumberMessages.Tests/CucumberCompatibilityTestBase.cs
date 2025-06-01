@@ -202,10 +202,13 @@ namespace CucumberMessages.Tests
             };
         }
 
-        protected static string[] GetExpectedJsonText(string testName, string featureFileName)
+        protected string[] GetExpectedJsonText(string testName, string featureFileName)
         {
-            var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
-            var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
+            var fileName = featureFileName + "." + featureFileName + ".feature.ndjson";
+            var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
+            var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            //var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
+            //var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
             return expectedJsonText;
         }
 
