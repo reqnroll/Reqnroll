@@ -223,7 +223,7 @@ jobs:
       with:
         name: CucumberMessages
         if-no-files-found: error
-        path: Tests/CucumberMessages.CompatibilityTests/bin/
+        path: Tests/Reqnroll.CucumberMessages.Tests/bin/
 
   specs:
     runs-on: ubuntu-latest
@@ -306,7 +306,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: CucumberMessages
-        path: Tests/CucumberMessages.CompatibilityTests/bin/
+        path: Tests/Reqnroll.CucumberMessages.Tests/bin/
     - name: Setup required .NET SDKs
       # It is faster to install all required .NET versions to D: drive than installing only the missing one to C: drive and use it from there.
       uses: actions/setup-dotnet@v4
@@ -325,7 +325,7 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }}
     - name: CucumberMessages Tests
       shell: pwsh
-      run: dotnet test ./Tests/CucumberMessages.CompatibilityTests/bin/${{ needs.build.outputs.product_configuration }}/*/CucumberMessages.Tests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/cucumbermessagestests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
+      run: dotnet test ./Tests/Reqnroll.CucumberMessages.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.CucumberMessages.Tests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/cucumbermessagestests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
@@ -372,7 +372,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: CucumberMessages
-        path: Tests/CucumberMessages.CompatibilityTests/bin/
+        path: Tests/Reqnroll.CucumberMessages.Tests/bin/
     - name: Setup required .NET SDKs
       # The default image contains .NET 8 only, but reusing it would not provide much performance benefit
       uses: actions/setup-dotnet@v4
@@ -391,7 +391,7 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx" ${{ needs.build.outputs.test_params }}
     - name: CucumberMessages Tests
       shell: pwsh
-      run: dotnet test ./Tests/CucumberMessages.CompatibilityTests/bin/${{ needs.build.outputs.product_configuration }}/*/CucumberMessages.Tests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/cucumbermessagestests-linux-results.trx" ${{ needs.build.outputs.test_params }} 
+      run: dotnet test ./Tests/Reqnroll.CucumberMessages.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.CucumberMessages.Tests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/cucumbermessagestests-linux-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
