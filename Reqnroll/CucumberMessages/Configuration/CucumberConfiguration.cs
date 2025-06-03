@@ -67,12 +67,12 @@ namespace Reqnroll.CucumberMessages.Configuration
                     combinedConfig[entry.Key] = entry.Value;
                 }
             }
-            bool enabledVariableValue = _envVariableEnableFlagParser.Parse();
+            bool enabled = combinedConfig.Count > 0 ? _envVariableEnableFlagParser.Parse() : false;
 
             return new ResolvedConfiguration
             {
                 Formatters = combinedConfig,
-                Enabled = combinedConfig.Count > 0 && enabledVariableValue
+                Enabled = combinedConfig.Count > 0 && enabled
             };
         }
     }
