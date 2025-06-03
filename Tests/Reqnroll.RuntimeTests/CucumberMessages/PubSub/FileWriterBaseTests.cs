@@ -91,6 +91,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
 
             // Act
             _sut.LaunchFileSink(new TestRunStartedEvent());
+            _sut.Dispose();
 
             // Assert
             Assert.NotNull(_sut.LastOutputPath);
@@ -158,6 +159,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
 
             // Act
             _sut.LaunchFileSink(new TestRunStartedEvent());
+            _sut.Dispose();
 
             // Assert
             _fileSystemMock.Verify(fs => fs.CreateDirectory($"C:{sp}valid{sp}path"), Times.Once);
