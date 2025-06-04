@@ -1,9 +1,9 @@
 ﻿using FluentAssertions;
-using Io.Cucumber.Messages.Types;
-using System.ComponentModel.Design;
+using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
-using System.Reflection;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
+using System.Reflection;
 
 namespace CucumberMessages.Tests
 {
@@ -27,13 +27,11 @@ namespace CucumberMessages.Tests
         {
             get
             {
-                var ect = CucumberMessageExtensions.EnvelopeContentTypes;
+                var ect = CucumberMessageExtensions.EnvelopeContentTypes.ToList();
                 ect.Remove(typeof(Meta));
-                return ect.ToList();
+                return ect;
             }
         }
-
-
 
         public CucumberMessagesValidator(IEnumerable<Envelope> actual, IEnumerable<Envelope> expected)
         {
@@ -44,21 +42,20 @@ namespace CucumberMessages.Tests
             SetupCrossReferences(expected, expecteds_IDsByType, expecteds_elementsByType, expecteds_elementsByID);
 
             FA_CustomCucumberMessagesPropertySelector = new FluentAsssertionCucumberMessagePropertySelectionRule(expecteds_elementsByType.Keys.ToList());
-            ArrangeGlobalFluentAssertionOptions();
         }
 
         private void SetupCrossReferences(IEnumerable<Envelope> messages, Dictionary<Type, HashSet<string>> IDsByType, Dictionary<Type, HashSet<object>> elementsByType, Dictionary<string, object> elementsByID)
         {
             var xrefBuilder = new CrossReferenceBuilder(msg =>
-                {
-                    InsertIntoElementsByType(msg, elementsByType);
+            {
+                InsertIntoElementsByType(msg, elementsByType);
 
-                    if (msg.HasId())
-                    {
-                        InsertIntoElementsById(msg, elementsByID);
-                        InsertIntoIDsByType(msg, IDsByType);
-                    }
-                });
+                if (msg.HasId())
+                {
+                    InsertIntoElementsById(msg, elementsByID);
+                    InsertIntoIDsByType(msg, IDsByType);
+                }
+            });
             foreach (var message in messages)
             {
                 var msg = message.Content();
@@ -117,11 +114,11 @@ namespace CucumberMessages.Tests
             else
                 actual = new List<T>();
 
-            expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList(); ;
+            expected = expecteds_elementsByType[typeof(T)].AsEnumerable().OfType<T>().ToList();
 
             if (!(typeof(T) == typeof(TestStepFinished)))
             {
-                actual.Should().BeEquivalentTo(expected, options => options.WithTracing(), "When comparing " + typeof(T).Name + "s");
+                actual.Should().BeEquivalentTo(expected, options => ArrangeFluentAssertionOptions(options).WithTracing(), "When comparing " + typeof(T).Name + "s");
             }
             else
             {
@@ -136,9 +133,9 @@ namespace CucumberMessages.Tests
                 var expected_hookRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId != null).ToList();
                 var expected_stepRelatedTestStepFinished = expected.OfType<TestStepFinished>().Where(tsf => expecteds_elementsByID[tsf.TestStepId].As<TestStep>().HookId == null).ToList();
 
-                actual_stepRelatedTestStepFinished.Should().BeEquivalentTo(expected_stepRelatedTestStepFinished, options => options.WithTracing(), "when comparing TestStepFinished messages");
+                actual_stepRelatedTestStepFinished.Should().BeEquivalentTo(expected_stepRelatedTestStepFinished, options => ArrangeFluentAssertionOptions(options).WithTracing(), "when comparing TestStepFinished messages");
 
-                actual_hookRelatedTestStepFinished.Should().BeEquivalentTo(expected_hookRelatedTestStepFinished, options => options.WithoutStrictOrdering().WithTracing(), "when comparing Hook TestStepFinished messages");
+                actual_hookRelatedTestStepFinished.Should().BeEquivalentTo(expected_hookRelatedTestStepFinished, options => ArrangeFluentAssertionOptions(options).WithoutStrictOrdering().WithTracing(), "when comparing Hook TestStepFinished messages");
             }
         }
 
@@ -354,179 +351,178 @@ namespace CucumberMessages.Tests
             }
         }
 
-        private void ArrangeGlobalFluentAssertionOptions()
+        EquivalencyAssertionOptions<T> ArrangeFluentAssertionOptions<T>(EquivalencyAssertionOptions<T> options)
         {
-            AssertionOptions.AssertEquivalencyUsing(options => options
-                                                                    // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal wwhen comparing instances
-                                                                    .ComparingByMembers<Attachment>()
-                                                                    .ComparingByMembers<Background>()
-                                                                    .ComparingByMembers<Ci>()
-                                                                    .ComparingByMembers<Comment>()
-                                                                    .ComparingByMembers<DataTable>()
-                                                                    .ComparingByMembers<DocString>()
-                                                                    .ComparingByMembers<Envelope>()
-                                                                    .ComparingByMembers<Examples>()
-                                                                    .ComparingByMembers<Feature>()
-                                                                    .ComparingByMembers<FeatureChild>()
-                                                                    .ComparingByMembers<GherkinDocument>()
-                                                                    .ComparingByMembers<Group>()
-                                                                    .ComparingByMembers<Hook>()
-                                                                    .ComparingByMembers<Location>()
-                                                                    .ComparingByMembers<Meta>()
-                                                                    .ComparingByMembers<ParameterType>()
-                                                                    .ComparingByMembers<ParseError>()
-                                                                    .ComparingByMembers<Pickle>()
-                                                                    .ComparingByMembers<PickleDocString>()
-                                                                    .ComparingByMembers<PickleStep>()
-                                                                    .ComparingByMembers<PickleStepArgument>()
-                                                                    .ComparingByMembers<PickleTable>()
-                                                                    .ComparingByMembers<PickleTableCell>()
-                                                                    .ComparingByMembers<PickleTableRow>()
-                                                                    .ComparingByMembers<PickleTag>()
-                                                                    .ComparingByMembers<Product>()
-                                                                    .ComparingByMembers<Rule>()
-                                                                    .ComparingByMembers<RuleChild>()
-                                                                    .ComparingByMembers<Scenario>()
-                                                                    .ComparingByMembers<Source>()
-                                                                    .ComparingByMembers<SourceReference>()
-                                                                    .ComparingByMembers<Step>()
-                                                                    .ComparingByMembers<StepDefinition>()
-                                                                    .ComparingByMembers<StepDefinitionPattern>()
-                                                                    .ComparingByMembers<StepMatchArgument>()
-                                                                    .ComparingByMembers<StepMatchArgumentsList>()
-                                                                    .ComparingByMembers<TableCell>()
-                                                                    .ComparingByMembers<TableRow>()
-                                                                    .ComparingByMembers<Tag>()
-                                                                    .ComparingByMembers<TestCase>()
-                                                                    .ComparingByMembers<TestCaseFinished>()
-                                                                    .ComparingByMembers<TestCaseStarted>()
-                                                                    .ComparingByMembers<TestRunFinished>()
-                                                                    .ComparingByMembers<TestRunStarted>()
-                                                                    .ComparingByMembers<TestStep>()
-                                                                    .ComparingByMembers<TestStepFinished>()
-                                                                    .ComparingByMembers<TestStepResult>()
-                                                                    .ComparingByMembers<TestStepStarted>()
-                                                                    .ComparingByMembers<UndefinedParameterType>()
-                                                                    .ComparingByMembers<TestRunHookStarted>()
-                                                                    .ComparingByMembers<TestRunHookFinished>()
+            // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal wwhen comparing instances
+            return options
+                .ComparingByMembers<Attachment>()
+                .ComparingByMembers<Background>()
+                .ComparingByMembers<Ci>()
+                .ComparingByMembers<Comment>()
+                .ComparingByMembers<DataTable>()
+                .ComparingByMembers<DocString>()
+                .ComparingByMembers<Envelope>()
+                .ComparingByMembers<Examples>()
+                .ComparingByMembers<Feature>()
+                .ComparingByMembers<FeatureChild>()
+                .ComparingByMembers<GherkinDocument>()
+                .ComparingByMembers<Group>()
+                .ComparingByMembers<Hook>()
+                .ComparingByMembers<Location>()
+                .ComparingByMembers<Meta>()
+                .ComparingByMembers<ParameterType>()
+                .ComparingByMembers<ParseError>()
+                .ComparingByMembers<Pickle>()
+                .ComparingByMembers<PickleDocString>()
+                .ComparingByMembers<PickleStep>()
+                .ComparingByMembers<PickleStepArgument>()
+                .ComparingByMembers<PickleTable>()
+                .ComparingByMembers<PickleTableCell>()
+                .ComparingByMembers<PickleTableRow>()
+                .ComparingByMembers<PickleTag>()
+                .ComparingByMembers<Product>()
+                .ComparingByMembers<Rule>()
+                .ComparingByMembers<RuleChild>()
+                .ComparingByMembers<Scenario>()
+                .ComparingByMembers<Source>()
+                .ComparingByMembers<SourceReference>()
+                .ComparingByMembers<Step>()
+                .ComparingByMembers<StepDefinition>()
+                .ComparingByMembers<StepDefinitionPattern>()
+                .ComparingByMembers<StepMatchArgument>()
+                .ComparingByMembers<StepMatchArgumentsList>()
+                .ComparingByMembers<TableCell>()
+                .ComparingByMembers<TableRow>()
+                .ComparingByMembers<Tag>()
+                .ComparingByMembers<TestCase>()
+                .ComparingByMembers<TestCaseFinished>()
+                .ComparingByMembers<TestCaseStarted>()
+                .ComparingByMembers<TestRunFinished>()
+                .ComparingByMembers<TestRunStarted>()
+                .ComparingByMembers<TestStep>()
+                .ComparingByMembers<TestStepFinished>()
+                .ComparingByMembers<TestStepResult>()
+                .ComparingByMembers<TestStepStarted>()
+                .ComparingByMembers<UndefinedParameterType>()
+                .ComparingByMembers<TestRunHookStarted>()
+                .ComparingByMembers<TestRunHookFinished>()
 
-                                                                    // Using a custom Property Selector so that we can ignore the  properties that are not comparable
-                                                                    .Using(FA_CustomCucumberMessagesPropertySelector)
+                // Using a custom Property Selector so that we can ignore the properties that are not comparable
+                .Using(FA_CustomCucumberMessagesPropertySelector)
 
-                                                                    // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
-                                                                    .Using<string>(ctx =>
-                                                                    {
-                                                                        var actual = ctx.Subject.Split("-")[0];
-                                                                        var expected = ctx.Expectation.Split("-")[0];
-                                                                        actual.Should().Be(expected);
-                                                                    })
-                                                                    .When(info => info.Path.EndsWith("Language"))
+                // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
+                .Using<string>(ctx =>
+                {
+                    var actual = ctx.Subject.Split("-")[0];
+                    var expected = ctx.Expectation.Split("-")[0];
+                    actual.Should().Be(expected);
+                })
+                .When(info => info.Path.EndsWith("Language"))
 
-                                                                    // Using special logic to compare regular expression strings (ignoring the differences of the regex anchor characters)
-                                                                    .Using<List<string>>(ctx =>
-                                                                    {
-                                                                        var subjects = ctx.Subject;
-                                                                        var expectations = ctx.Expectation;
-                                                                        subjects.Should().HaveSameCount(expectations);
-                                                                        int count = subjects.Count;
-                                                                        for (int i = 0; i < count; i++)
-                                                                        {
-                                                                            string subject = subjects[i];
-                                                                            string expectation = expectations[i];
-                                                                            if (subject.Length > 0 && subject[0] == '^' || expectation.Length > 0 && expectation[0] == '^' ||
-                                                                                subject.Length > 0 && subject[subject.Length - 1] == '$' || expectation.Length > 0 && expectation[expectation.Length - 1] == '$')
-                                                                            {
-                                                                                // If the first or last character is '^' or '$', remove it before comparing
-                                                                                subject = subject.Length > 0 && subject[0] == '^' ? subject.Substring(1) : subject;
-                                                                                subject = subject.Length > 0 && subject[subject.Length - 1] == '$' ? subject.Substring(0, subject.Length - 1) : subject;
-                                                                                expectation = expectation.Length > 0 && expectation[0] == '^' ? expectation.Substring(1) : expectation;
-                                                                                expectation = expectation.Length > 0 && expectation[expectation.Length - 1] == '$' ? expectation.Substring(0, expectation.Length - 1) : expectation;
-                                                                            }
-                                                                            subject.Should().Be(expectation);
-                                                                        }
-                                                                    })
-                                                                    .When(info => info.Path.EndsWith("RegularExpressions"))
+                // Using special logic to compare regular expression strings (ignoring the differences of the regex anchor characters)
+                .Using<List<string>>(ctx =>
+                {
+                    var subjects = ctx.Subject;
+                    var expectations = ctx.Expectation;
+                    subjects.Should().HaveSameCount(expectations);
+                    int count = subjects.Count;
+                    for (int i = 0; i < count; i++)
+                    {
+                        string subject = subjects[i];
+                        string expectation = expectations[i];
+                        if (subject.Length > 0 && subject[0] == '^' || expectation.Length > 0 && expectation[0] == '^' ||
+                            subject.Length > 0 && subject[subject.Length - 1] == '$' || expectation.Length > 0 && expectation[expectation.Length - 1] == '$')
+                        {
+                            // If the first or last character is '^' or '$', remove it before comparing
+                            subject = subject.Length > 0 && subject[0] == '^' ? subject.Substring(1) : subject;
+                            subject = subject.Length > 0 && subject[subject.Length - 1] == '$' ? subject.Substring(0, subject.Length - 1) : subject;
+                            expectation = expectation.Length > 0 && expectation[0] == '^' ? expectation.Substring(1) : expectation;
+                            expectation = expectation.Length > 0 && expectation[expectation.Length - 1] == '$' ? expectation.Substring(0, expectation.Length - 1) : expectation;
+                        }
+                        subject.Should().Be(expectation);
+                    }
+                })
+                .When(info => info.Path.EndsWith("RegularExpressions"))
 
-                                                                   // Using special logic to ignore ParameterTypeName except when the value is one of the basic types
-                                                                   .Using<string>((ctx) =>
-                                                                   {
-                                                                       if (ctx.Expectation == "string" || ctx.Expectation == "int" || ctx.Expectation == "long" || ctx.Expectation == "double" || ctx.Expectation == "float"
-                                                                            || ctx.Expectation == "short" || ctx.Expectation == "byte" || ctx.Expectation == "biginteger")
-                                                                       {
-                                                                           ctx.Subject.Should().Be(ctx.Expectation);
-                                                                       }
-                                                                       // Any other ParameterTypeName should be ignored, including {word} (no .NET equivalent) and custom type names
-                                                                       else
-                                                                       {
-                                                                           1.Should().Be(1);
-                                                                       }
-                                                                   })
-                                                                   .When(info => info.Path.EndsWith("ParameterTypeName"))
+                // Using special logic to ignore ParameterTypeName except when the value is one of the basic types
+                .Using<string>((ctx) =>
+                {
+                    if (ctx.Expectation == "string" || ctx.Expectation == "int" || ctx.Expectation == "long" || ctx.Expectation == "double" || ctx.Expectation == "float"
+                        || ctx.Expectation == "short" || ctx.Expectation == "byte" || ctx.Expectation == "biginteger")
+                    {
+                        ctx.Subject.Should().Be(ctx.Expectation);
+                    }
+                    // Any other ParameterTypeName should be ignored, including {word} (no .NET equivalent) and custom type names
+                    else
+                    {
+                        1.Should().Be(1);
+                    }
+                })
+                .When(info => info.Path.EndsWith("ParameterTypeName"))
 
-                                                                   // Using a custom string comparison to ignore the differences in platform line endings
-                                                                   .Using<string>((ctx) =>
-                                                                   {
-                                                                       var subject = ctx.Subject ?? string.Empty;
-                                                                       var expectation = ctx.Expectation ?? string.Empty;
-                                                                       subject = subject.Replace("\r\n", "\n");
-                                                                       expectation = expectation.Replace("\r\n", "\n");
-                                                                       subject.Should().Be(expectation);
-                                                                   })
-                                                                    .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data"))
+                // Using a custom string comparison to ignore the differences in platform line endings
+                .Using<string>((ctx) =>
+                {
+                    var subject = ctx.Subject ?? string.Empty;
+                    var expectation = ctx.Expectation ?? string.Empty;
+                    subject = subject.Replace("\r\n", "\n");
+                    expectation = expectation.Replace("\r\n", "\n");
+                    subject.Should().Be(expectation);
+                })
+                .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data"))
 
-                                                                    // The list of hooks should contain at least as many items as the list of expected hooks
-                                                                    // Because Reqnroll does not support Tag Expressions, these are represented in RnR as multiple Hooks or multiple Tags on Hooks Binding methods
-                                                                    // which result in multiple Hook messages.
-                                                                    .Using<List<Hook>>(ctx =>
-                                                                    {
-                                                                        if (ctx.SelectedNode.IsRoot)
-                                                                        {
-                                                                            var actualList = ctx.Subject;
-                                                                            var expectedList = ctx.Expectation;
+                // The list of hooks should contain at least as many items as the list of expected hooks
+                // Because Reqnroll does not support Tag Expressions, these are represented in RnR as multiple Hooks or multiple Tags on Hooks Binding methods
+                // which result in multiple Hook messages.
+                .Using<List<Hook>>(ctx =>
+                {
+                    if (ctx.SelectedNode.IsRoot)
+                    {
+                        var actualList = ctx.Subject;
+                        var expectedList = ctx.Expectation;
 
-                                                                            if (expectedList == null || !expectedList.Any())
-                                                                            {
-                                                                                return; // If expected is null or empty, we don't need to check anything
-                                                                            }
+                        if (expectedList == null || !expectedList.Any())
+                        {
+                            return; // If expected is null or empty, we don't need to check anything
+                        }
 
-                                                                            actualList.Should().NotBeNull();
-                                                                            actualList.Should().HaveCountGreaterThanOrEqualTo(expectedList.Count,
-                                                                                "actual collection should have at least as many items as expected");
+                        actualList.Should().NotBeNull();
+                        actualList.Should().HaveCountGreaterThanOrEqualTo(expectedList.Count,
+                            "actual collection should have at least as many items as expected");
 
-                                                                            // Impossible to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
-                                                                            // and the Scope tags won't line up because the CCK uses tag expressions and RnR does not support them)
-                                                                            // and After Hook execution ordering is different between Reqnroll and CCK.
-                                                                            /*
-                                                                                                                                                        foreach (var expectedItem in expectedList)
-                                                                                                                                                        {
-                                                                                                                                                            actualList.Should().Contain(actualItem =>
-                                                                                                                                                                AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
-                                                                                                                                                                "actual collection should contain an item equivalent to {0}", expectedItem);
-                                                                                                                                                        }
-                                                                            */
-                                                                        }
-                                                                    })
-                                                                    .WhenTypeIs<List<Hook>>()
+                        // Impossible to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
+                        // and the Scope tags won't line up because the CCK uses tag expressions and RnR does not support them)
+                        // and After Hook execution ordering is different between Reqnroll and CCK.
+                        /*
+                                                                                                    foreach (var expectedItem in expectedList)
+                                                                                                    {
+                                                                                                        actualList.Should().Contain(actualItem =>
+                                                                                                            AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
+                                                                                                            "actual collection should contain an item equivalent to {0}", expectedItem);
+                                                                                                    }
+                        */
+                    }
+                })
+                .WhenTypeIs<List<Hook>>()
 
-                                                                    // Groups are nested self-referential objects inside of StepMatchArgument(s). Other Cucumber implementations support a more sophisticated
-                                                                    // version of this structure in which multiple regex capture groups are conveyed inside of a single StepMatchArgument
-                                                                    // For Reqnroll, we will only compare the outermost Group; the only property we care about is the Value.
-                                                                    .Using<Group>((ctx) =>
-                                                                    {
-                                                                        ctx.Subject.Value.Should().Be(ctx.Expectation.Value);
-                                                                    })
-                                                                    .WhenTypeIs<Group>()
+                // Groups are nested self-referential objects inside of StepMatchArgument(s). Other Cucumber implementations support a more sophisticated
+                // version of this structure in which multiple regex capture groups are conveyed inside of a single StepMatchArgument
+                // For Reqnroll, we will only compare the outermost Group; the only property we care about is the Value.
+                .Using<Group>((ctx) =>
+                {
+                    ctx.Subject.Value.Should().Be(ctx.Expectation.Value);
+                })
+                .WhenTypeIs<Group>()
 
-                                                                    // A bit of trickery here to tell FluentAssertions that Timestamps are always equal
-                                                                    // We can't simply omit Timestamp from comparison because then TestRunStarted has nothing else to compare (which causes an error)
-                                                                    .Using<Timestamp>(ctx => 1.Should().Be(1))
-                                                                    .WhenTypeIs<Timestamp>()
+                // A bit of trickery here to tell FluentAssertions that Timestamps are always equal
+                // We can't simply omit Timestamp from comparison because then TestRunStarted has nothing else to compare (which causes an error)
+                .Using<Timestamp>(ctx => 1.Should().Be(1))
+                .WhenTypeIs<Timestamp>()
 
-                                                                    .AllowingInfiniteRecursion()
-                                                                    //.RespectingRuntimeTypes()
-                                                                    .ExcludingFields()
-                                                                    .WithStrictOrdering()
-                                                                    );
+                .AllowingInfiniteRecursion()
+                //.RespectingRuntimeTypes()
+                .ExcludingFields()
+                .WithStrictOrdering();
         }
 
     }
