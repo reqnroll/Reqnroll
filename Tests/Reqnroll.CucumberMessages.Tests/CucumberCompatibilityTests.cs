@@ -6,7 +6,6 @@ namespace CucumberMessages.Tests
     [TestClass]
     public class CucumberCompatibilityTests : CucumberCompatibilityTestBase
     {
-
         [TestMethod]
         [DataRow("minimal", "minimal")]
         [DataRow("cdata", "cdata")]
@@ -102,8 +101,6 @@ namespace CucumberMessages.Tests
             _projectsDriver.AddNuGetPackage(plugin, version);
             var testName = $"retry-{pluginName}";
             CCKScenarios(testName, testName);
-
         }
     }
-
 }

@@ -21,6 +21,7 @@ public abstract class SystemTestBase
     protected ExecutionDriver _executionDriver = null!;
     protected VSTestExecutionDriver _vsTestExecutionDriver = null!;
     protected ConfigurationFileDriver _configurationFileDriver = null!;
+    protected TestSuiteInitializationDriver _testSuiteInitializationDriver = null!;
     protected TestFileManager _testFileManager = new();
     protected FolderCleaner _folderCleaner = null!;
     protected IServiceProvider _testContainer = null!;
@@ -94,6 +95,7 @@ public abstract class SystemTestBase
         _bindingDriver = GetServiceSafe<BindingsDriver>();
         _jsonConfigurationLoaderDriver = GetServiceSafe<JsonConfigurationLoaderDriver>();
         _configurationFileDriver = GetServiceSafe<ConfigurationFileDriver>();
+        _testSuiteInitializationDriver = GetServiceSafe<TestSuiteInitializationDriver>();
     }
 
 

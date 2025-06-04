@@ -368,7 +368,7 @@ Features.Generated/
 GitExtensions.settings.backup
 
 /Tests/Reqnroll.MsBuildNetSdk.IntegrationTests/Features/dummy.feature.cs
-/Tests/CucumberMessages.CompatibilityTests/Samples/CucumberMessages/*
+/Tests/Reqnroll.CucumberMessages.Tests/Samples/CucumberMessages/*
 *.feature.cs
 *.AssemblyHooks.cs
 *.AssemblyHooks.vb

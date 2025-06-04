@@ -11,15 +11,7 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.SystemTests;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
-using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using System.Linq;
-using System.Net.WebSockets;
 using System.Reflection;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace CucumberMessages.Tests
 {
@@ -34,7 +26,7 @@ namespace CucumberMessages.Tests
 
         protected void EnableCucumberMessages()
         {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, "true");
+            _testSuiteInitializationDriver.OverrideCucumberEnable = true;
         }
 
         protected void SetCucumberMessagesOutputFileName(string fileName)
@@ -53,12 +45,12 @@ namespace CucumberMessages.Tests
             string formatters = "{\"formatters\" : {\"messages\" : { \"outputFilePath\" : \"" + ndjsonFileName.Replace("\\", "\\\\") + "\" }," +
                 " \"html\" : { \"outputFilePath\" : \"" + htmlFileName.Replace("\\", "\\\\") + "\" } } }";
 
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE, formatters);
+            _testSuiteInitializationDriver.OverrideCucumberMessagesFormatters = formatters;
         }
 
         protected void DisableCucumberMessages()
         {
-            Environment.SetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE, "false");
+            _testSuiteInitializationDriver.OverrideCucumberEnable = false;
         }
 
         protected void ResetCucumberMessages(string? fileToDelete = null)

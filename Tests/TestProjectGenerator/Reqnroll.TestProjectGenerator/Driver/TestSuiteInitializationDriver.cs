@@ -14,5 +14,8 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
         public DateTime? OverrideTestCaseFinishedTime { get; set; }
 
+        public bool? OverrideCucumberEnable { get; set; }
+
+        public string OverrideCucumberMessagesFormatters { get; set; }
     }
 }
