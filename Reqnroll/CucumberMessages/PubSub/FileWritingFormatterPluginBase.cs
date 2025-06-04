@@ -25,16 +25,28 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         internal override void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigurationString)
         {
+            string defaultBaseDirectory = $".{Path.DirectorySeparatorChar}";
+
             string outputFilePath = ParseConfigurationString(formatterConfigurationString, _pluginName);
-
-            if (String.IsNullOrEmpty(outputFilePath))
-                outputFilePath = $".{Path.DirectorySeparatorChar}{_defaultFileName}";
-
+            string fileName = Path.GetFileName(outputFilePath);
             string baseDirectory = Path.GetDirectoryName(outputFilePath);
-            var validFile = FileFilter.GetValidFiles([outputFilePath]).Count == 1;
-            if (string.IsNullOrEmpty(baseDirectory) || !validFile)
+
+            if (baseDirectory.IsNullOrEmpty())
+                baseDirectory = defaultBaseDirectory;
+
+            if (fileName.IsNullOrEmpty())
+                fileName = _defaultFileName;
+
+            if (!fileName.EndsWith(_defaultFileType, StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidOperationException($"Path of configured output Messages file: {outputFilePath} is invalid or missing.");
+                fileName += _defaultFileType;
+            }
+
+            string outputPath = Path.Combine(baseDirectory, fileName);
+            var validFile = FileFilter.GetValidFiles([outputPath]).Count == 1;
+            if (!validFile)
+            {
+                throw new InvalidOperationException($"Path of configured formatter output file: {outputPath} is invalid or missing.");
             }
 
             if (!_fileSystem.DirectoryExists(baseDirectory))
@@ -42,14 +54,6 @@ namespace Reqnroll.CucumberMessages.PubSub
                 _fileSystem.CreateDirectory(baseDirectory);
             }
 
-
-            string fileName = Path.GetFileName(outputFilePath);
-            if (!fileName.EndsWith(_defaultFileType, StringComparison.OrdinalIgnoreCase))
-            {
-                fileName += _defaultFileType;
-            }
-
-            string outputPath = Path.Combine(baseDirectory, fileName);
             ConsumeAndWriteToFilesBackgroundTask(outputPath);
         }
 

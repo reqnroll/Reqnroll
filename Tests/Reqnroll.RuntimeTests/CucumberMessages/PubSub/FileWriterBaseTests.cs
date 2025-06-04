@@ -86,7 +86,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             // Arrange
             var sp = Path.DirectorySeparatorChar;
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("\"outputFilePath\": \"\"");
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"\"}");
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -98,6 +98,23 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             Assert.EndsWith($".{sp}test_output.txt", _sut.LastOutputPath);
         }
 
+        [Fact]
+        public void LaunchFileSink_Should_Create_Local_Path_When_No_Path_Provided_in_Configuration()
+        {
+            // Arrange
+            var sp = Path.DirectorySeparatorChar;
+            _configurationMock.Setup(c => c.Enabled).Returns(true);
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"aFileName.txt\"}");
+            _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+            // Act
+            _sut.LaunchFileSink(new TestRunStartedEvent());
+            _sut.Dispose();
+
+            // Assert
+            Assert.NotNull(_sut.LastOutputPath);
+            Assert.Equal($".{sp}aFileName.txt", _sut.LastOutputPath);
+        }
         [Fact]
         public async Task PublishAsync_Should_Write_Envelopes()
         {
