@@ -12,7 +12,7 @@ namespace Reqnroll
         public BindingMatch BindingMatch { get; set; }
         public StepInstance StepInstance { get; set; }
 
-        public string PickleStepId { get; }
+        internal string PickleStepId { get; }
 
         public StepInfo(StepDefinitionType stepDefinitionType, string text, Table table, string multilineText, string pickleStepId = null)
         {

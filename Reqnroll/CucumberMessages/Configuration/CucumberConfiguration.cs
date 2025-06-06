@@ -1,15 +1,5 @@
-﻿using Reqnroll.BoDi;
-using Reqnroll.CommonModels;
-using Reqnroll.Configuration;
-using Reqnroll.EnvironmentAccess;
-using Reqnroll.Tracing;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Dynamic;
-using System.IO;
-using System.Linq;
-using System.Text.Json;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
@@ -33,9 +23,9 @@ namespace Reqnroll.CucumberMessages.Configuration
         private IEnvVariableEnableFlagParser _envVariableEnableFlagParser;
         private bool _runtimeEnablementOverrideFlag = true;
 
-        public CucumberConfiguration(IEnumerable<ICucumberMessagesConfigurationResolver> resolvers, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
+        public CucumberConfiguration(IDictionary<string, ICucumberMessagesConfigurationResolver> resolvers, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
         {
-            _resolvers = resolvers;
+            _resolvers = [resolvers["fileBasedResolver"], resolvers["environmentBasedResolver"]];
             _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
             _envVariableEnableFlagParser = envVariableEnableFlagParser;
             Current = this;

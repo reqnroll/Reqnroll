@@ -109,13 +109,6 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
             container.RegisterTypeAs<FileBasedConfigurationResolver, ICucumberMessagesConfigurationResolver>("fileBasedResolver");
             container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesConfigurationResolver>("environmentBasedResolver");
-            container.RegisterFactoryAs<IEnumerable<ICucumberMessagesConfigurationResolver>>(() =>
-            {
-                var collection = new List<ICucumberMessagesConfigurationResolver>();
-                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("fileBasedResolver"));
-                collection.Add(container.Resolve<ICucumberMessagesConfigurationResolver>("environmentBasedResolver"));
-                return collection;
-            });
             container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
             container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
             container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");

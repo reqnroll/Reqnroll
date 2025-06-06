@@ -19,10 +19,10 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
             _fileResolverMock = new Mock<ICucumberMessagesConfigurationResolver>();
             _environmentResolverMock = new Mock<ICucumberMessagesConfigurationResolver>();
 
-            var resolvers = new List<ICucumberMessagesConfigurationResolver>
+            var resolvers = new Dictionary<string, ICucumberMessagesConfigurationResolver>
             {
-                _fileResolverMock.Object,
-                _environmentResolverMock.Object
+                {"fileBasedResolver", _fileResolverMock.Object },
+                {"environmentBasedResolver", _environmentResolverMock.Object }
             };
 
             _sut = new CucumberConfiguration(resolvers, _envVariableEnableFlagParserMock.Object);
@@ -77,6 +77,27 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
             // Assert
             Assert.Equal(@"c:\html\html_report.html", result);
         }
+
+        [Fact]
+        public void GetFormatterConfigurationByName_Should_Respect_Formatter_Given_By_EnvironmentVariable_Override()
+        {
+            // Arrange
+            var configFileSetup = new Dictionary<string, string>();
+            configFileSetup.Add("html", @"c:\html\html_report.html");
+            _fileResolverMock.Setup(r => r.Resolve()).Returns(configFileSetup);
+
+            var envVarSetup = new Dictionary<string, string>();
+            envVarSetup.Add("html", @"c:\html\html_overridden_name.html");
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(envVarSetup);
+            _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
+
+            // Act
+            var result = _sut.GetFormatterConfigurationByName("html");
+
+            // Assert
+            Assert.Equal(@"c:\html\html_overridden_name.html", result);
+        }
+
 
         [Fact]
         public void GetFormatterConfigurationByName_Should_Return_Empty_For_Nonexistent_Formatter()
