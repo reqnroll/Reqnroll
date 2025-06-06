@@ -4,6 +4,10 @@ using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Events
 {
+    // Cucumber Messages implementation note: Added various forms of context information to 
+    // many of the ExecutionEvents. This allows the CucumberMessages implementation to
+    // align events with the Scenarios and Features to which they belong.
+
     public class ExecutionEvent : IExecutionEvent
     {
         public DateTime Timestamp { get; }
@@ -173,6 +177,7 @@ namespace Reqnroll.Events
         public IHookBinding HookBinding { get; }
         public IContextManager ContextManager { get; private set; }
 
+        [Obsolete("Use HookBindingStartedEvent(IHookBinding, IContextManager) instead")]
         public HookBindingStartedEvent(IHookBinding hookBinding)
         {
             HookBinding = hookBinding;
@@ -193,6 +198,7 @@ namespace Reqnroll.Events
         public IContextManager ContextManager { get; private set; }
         public Exception HookException { get; private set; }
 
+        [Obsolete("Use HookBindingFinishedEvent(IHookBinding, TimeSpan, IContextManager) instead")]
         public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration)
         {
             HookBinding = hookBinding;
@@ -217,6 +223,7 @@ namespace Reqnroll.Events
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
 
+        [Obsolete("Use OutputAddedEvent(string, FeatureInfo, ScenarioInfo) instead")]
         public OutputAddedEvent(string text)
         {
             Text = text;
@@ -236,6 +243,7 @@ namespace Reqnroll.Events
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
 
+        [Obsolete("Use AttachmentAddedEvent(string, FeatureInfo, ScenarioInfo) instead")]
         public AttachmentAddedEvent(string filePath)
         {
             FilePath = filePath;

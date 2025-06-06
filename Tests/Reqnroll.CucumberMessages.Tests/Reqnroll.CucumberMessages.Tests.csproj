@@ -1,0 +1,206 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Samples\Resources\**\*cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="Samples\Resources\**\*.feature" />
+    <None Remove="Samples\Resources\**\*.feature.ndjson" />
+    <None Remove="products.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Samples\Resources\ambiguous\ambiguous.feature" />
+    <EmbeddedResource Include="Samples\Resources\ambiguous\ambiguous.cs" />
+    <EmbeddedResource Include="Samples\Resources\attachments\attachments.cs" />
+    <EmbeddedResource Include="Samples\Resources\attachments\attachments.feature" />
+    <EmbeddedResource Include="Samples\Resources\ambiguous\ambiguous.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\attachments\attachments.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\background\background.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\empty\empty.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\examples-tables-attachment\examples_tables_attachment.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\hooks-attachment\hooks_attachment.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\hooks-conditional\hooks_conditional.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\hooks-named\hooks_named.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\test-run-hooks\test_run_hooks.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\examples-tables-attachment\examples_tables_attachment.cs" />
+    <EmbeddedResource Include="Samples\Resources\examples-tables-attachment\examples_tables_attachment.feature" />
+    <EmbeddedResource Include="Samples\Resources\external-data\external_data.cs" />
+    <EmbeddedResource Include="Samples\Resources\external-data\external_data.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-attachment\hooks_attachment.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-attachment\hooks_attachment.cs" />
+    <EmbeddedResource Include="Samples\Resources\hooks-conditional\hooks_conditional.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-conditional\hooks_conditional.cs" />
+    <EmbeddedResource Include="Samples\Resources\hooks-named\hooks_named.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks-named\hooks_named.cs" />
+    <EmbeddedResource Include="Samples\Resources\hooks\hooks.cs" />
+    <EmbeddedResource Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.cs" />
+    <EmbeddedResource Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\background\background.cs" />
+    <EmbeddedResource Include="Samples\Resources\background\background.feature" />
+    <EmbeddedResource Include="Samples\Resources\cdata\cdata.cs" />
+    <EmbeddedResource Include="Samples\Resources\cdata\cdata.feature" />
+    <EmbeddedResource Include="Samples\Resources\cdata\cdata.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\data-tables\data_tables.cs" />
+    <EmbeddedResource Include="Samples\Resources\data-tables\data_tables.feature" />
+    <EmbeddedResource Include="Samples\Resources\data-tables\data_tables.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\empty\empty.cs" />
+    <EmbeddedResource Include="Samples\Resources\empty\empty.feature" />
+    <EmbeddedResource Include="Samples\Resources\examples-tables\examples_tables.cs" />
+    <EmbeddedResource Include="Samples\Resources\examples-tables\examples_tables.feature" />
+    <EmbeddedResource Include="Samples\Resources\examples-tables\examples_tables.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\ExternalBindingAssemblies\ExternalBinding.feature" />
+    <EmbeddedResource Include="Samples\Resources\ExternalBindingAssemblies\SampleExternalBindingClass.cs" />
+    <EmbeddedResource Include="Samples\Resources\ExternalBindingAssemblies\SampleInternalBindingClass.cs" />
+    <EmbeddedResource Include="Samples\Resources\hooks\hooks.feature" />
+    <EmbeddedResource Include="Samples\Resources\hooks\hooks.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\minimal\minimal.cs" />
+    <EmbeddedResource Include="Samples\Resources\minimal\minimal.feature" />
+    <EmbeddedResource Include="Samples\Resources\minimal\minimal.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\parameter-types\parameter_types.cs" />
+    <EmbeddedResource Include="Samples\Resources\pending\pending.cs" />
+    <EmbeddedResource Include="Samples\Resources\pending\pending.feature" />
+    <EmbeddedResource Include="Samples\Resources\pending\pending.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\parameter-types\parameter_types.feature" />
+    <EmbeddedResource Include="Samples\Resources\parameter-types\parameter_types.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\retry-NUnitRetry\retry_NUnitRetry.feature" />
+    <EmbeddedResource Include="Samples\Resources\retry-xRetry\retry_xRetry.cs" />
+    <EmbeddedResource Include="Samples\Resources\retry-xRetry\retry_xRetry.feature" />
+    <EmbeddedResource Include="Samples\Resources\retry-xRetry\retry_xRetry.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\rules\rules.cs" />
+    <EmbeddedResource Include="Samples\Resources\rules\rules.feature" />
+    <EmbeddedResource Include="Samples\Resources\rules\rules.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\skipped\skipped.cs" />
+    <EmbeddedResource Include="Samples\Resources\skipped\skipped.feature" />
+    <EmbeddedResource Include="Samples\Resources\skipped\skipped.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\stack-traces\stack_traces.cs" />
+    <EmbeddedResource Include="Samples\Resources\stack-traces\stack_traces.feature" />
+    <EmbeddedResource Include="Samples\Resources\stack-traces\stack_traces.feature.ndjson" />
+    <EmbeddedResource Include="Samples\Resources\test-run-hooks\test_run_hooks.cs" />
+    <EmbeddedResource Include="Samples\Resources\test-run-hooks\test_run_hooks.feature" />
+    <EmbeddedResource Include="Samples\Resources\undefined\undefined.cs" />
+    <EmbeddedResource Include="Samples\Resources\undefined\undefined.feature" />
+    <EmbeddedResource Include="Samples\Resources\undefined\undefined.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\unknown-parameter-type\unknown_parameter_type.cs" />
+    <EmbeddedResource Include="Samples\Resources\unknown-parameter-type\unknown_parameter_type.feature" />
+    <EmbeddedResource Include="Samples\Resources\external-data\products.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\unknown-parameter-type\unknown_parameter_type.feature.ndjson">
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Cucumber.Messages" Version="27.0.2" />
+    <PackageReference Include="FluentAssertions" Version="6.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.5.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.5.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference Include="..\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Properties\" />
+    <Folder Include="Samples\CucumberMessages\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="reqnroll_withHtmlOutput.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="reqnrollConfigurationWithExternalAssembly.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="reqnroll.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\attachments\cucumber.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\attachments\cucumber.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\attachments\document.pdf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\examples-tables-attachment\cucumber.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\examples-tables-attachment\cucumber.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Samples\Resources\hooks-attachment\cucumber.svg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="partialConfiguration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>
