@@ -1,10 +1,11 @@
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
 using Reqnroll.BoDi;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Reqnroll.xUnit3.Generator.ReqnrollPlugin;
 
@@ -15,6 +16,8 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     private readonly CodeTypeReference _objectCodeTypeReference = new(typeof(object));
     private readonly CodeDomHelper _codeDomHelper = codeDomHelper;
 
+    const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
+
     public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests;
 
     public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
@@ -23,7 +26,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         
         // have to add the explicit object base class because of VB.NET
         _currentFixtureDataTypeDeclaration.BaseTypes.Add(typeof(object));
-        var asyncLifetimeInterface = new CodeTypeReference("Xunit.IAsyncLifetime");
+        var asyncLifetimeInterface = new CodeTypeReference(IASYNCLIFETIME_INTERFACE);
         _currentFixtureDataTypeDeclaration.BaseTypes.Add(asyncLifetimeInterface);
         
         generationContext.TestClass.Members.Add(_currentFixtureDataTypeDeclaration);
@@ -277,7 +280,39 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
                 new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "_testOutputHelper"),
                 new CodeVariableReferenceExpression("testOutputHelper")));
     }
-    
+
+    private CodeStatement GetTryCatchStatementWithCombinedErrors(CodeExpression tryExpression, CodeExpression catchExpression)
+    {
+        var tryStatement = new CodeExpressionStatement(tryExpression);
+        var catchStatement = new CodeExpressionStatement(catchExpression);
+
+        // try { <tryExpression>; }
+        // catch (Exception e1) {
+        //   try { <catchExpression>; }
+        //   catch (Exception e2) {
+        //     throw new AggregateException(e1.Message, e1, e2);
+        //   }
+        //   throw;
+        // }
+
+        return new CodeTryCatchFinallyStatement(
+            [tryStatement],
+            [
+                new CodeCatchClause(
+                        "e1",
+                        new CodeTypeReference(typeof(Exception)),
+                        new CodeTryCatchFinallyStatement(
+                            [catchStatement],
+                            [
+                                new CodeCatchClause(
+                                    "e2",
+                                    new CodeTypeReference(typeof(Exception)),
+                                    new CodeThrowExceptionStatement(new CodeObjectCreateExpression(typeof(AggregateException), new CodePrimitiveExpression("Test initialization failed"), new CodeVariableReferenceExpression("e1"), new CodeVariableReferenceExpression("e2"))))
+                                ]),
+                        new CodeThrowExceptionStatement())
+            ]);
+    }
+
     private void SetTestInitializeMethod(TestClassGenerationContext generationContext, CodeMemberMethod method)
     {
         var callTestInitializeMethodExpression = new CodeMethodInvokeExpression(
@@ -285,13 +320,22 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             generationContext.TestInitializeMethod.Name);
 
         // Skip awaiting for VB when the method returns ValueTask
-        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB &&
              method.ReturnType.BaseType.Contains("ValueTask")))
         {
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callTestInitializeMethodExpression);
         }
 
-        method.Statements.Add(callTestInitializeMethodExpression);
+        // xUnit (v3) does not invoke the test level dispose through the IAsyncLifetime if
+        // there is an error during the test initialization. So we need to call it manually, 
+        // otherwise the test runner will not be released.
+        var callDisposeException = new CodeMethodInvokeExpression(
+            new CodeCastExpression(new CodeTypeReference(IASYNCLIFETIME_INTERFACE), new CodeThisReferenceExpression()),
+            "DisposeAsync");
+        _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callDisposeException);
+
+        method.Statements.Add(
+            GetTryCatchStatementWithCombinedErrors(callTestInitializeMethodExpression, callDisposeException));
     }
     
     private void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
