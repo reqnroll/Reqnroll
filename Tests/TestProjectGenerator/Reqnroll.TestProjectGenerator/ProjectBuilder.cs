@@ -376,13 +376,12 @@ namespace Reqnroll.TestProjectGenerator
             switch (Configuration.UnitTestProvider)
             {
                 case UnitTestProvider.xUnit when !_parallelTestExecution:
+                case UnitTestProvider.xUnit3 when !_parallelTestExecution:
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
                     break;
                 case UnitTestProvider.xUnit:
-                    _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
-                    break;
                 case UnitTestProvider.xUnit3:
-                    _project.AddFile(new ProjectFile("XUnit3Configuration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
+                    _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
                     break;
                 case UnitTestProvider.NUnit3 when _parallelTestExecution:
                 case UnitTestProvider.NUnit4 when _parallelTestExecution:
