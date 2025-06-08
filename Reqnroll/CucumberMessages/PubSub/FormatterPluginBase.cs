@@ -73,9 +73,10 @@ namespace Reqnroll.CucumberMessages.PubSub
             _globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, _pluginName, true);
         }
 
-        public async Task PublishAsync(Envelope message)
+        public Task PublishAsync(Envelope message)
         {
-            await Task.Run(() => _postedMessages.Add(message));
+            _postedMessages.Add(message);
+            return Task.CompletedTask;
         }
 
         internal abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString);

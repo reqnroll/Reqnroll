@@ -86,12 +86,12 @@ namespace Reqnroll.CucumberMessages.PubSub
             };
 
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
-              {
-                  _testThreadObjectContainer = args.ObjectContainer;
-                  _brokerFactory = new Lazy<ICucumberMessageBroker>(() => _testThreadObjectContainer.Resolve<ICucumberMessageBroker>());
-                  var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                  testThreadExecutionEventPublisher.AddListener(this);
-              };
+            {
+                _testThreadObjectContainer = args.ObjectContainer;
+                _brokerFactory = new Lazy<ICucumberMessageBroker>(() => _testThreadObjectContainer.Resolve<ICucumberMessageBroker>());
+                var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
+                testThreadExecutionEventPublisher.AddListener(this);
+            };
         }
 
         public async Task OnEventAsync(IExecutionEvent executionEvent)
