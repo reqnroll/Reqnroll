@@ -50,8 +50,8 @@ The settings discussed above can be overriden by setting an Environment Variable
 
 The available Environment Variables are:
 
-* REQNROLL__CUCUMBER_MESSAGES__ENABLED
-* REQNROLL__CUCUMBER_MESSAGES__FORMATTERS
+* REQNROLL_CUCUMBER_MESSAGES_ENABLED
+* REQNROLL_CUCUMBER_MESSAGES_FORMATTERS
 
 ```{note}
 When using an environment variable to override the Formatters section of the reqnroll.json configuration file, the value of the environment variable replaces the Formatters element in its entirety.

@@ -130,6 +130,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             // Act
             _sut.LaunchFileSink(new TestRunStartedEvent());
             await _sut.PublishAsync(message);
+            _sut.Dispose();
 
             // Assert
             postedEnvelopes.Should().Contain(message);
