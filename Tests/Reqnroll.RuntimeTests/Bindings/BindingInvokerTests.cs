@@ -9,6 +9,7 @@ using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Infrastructure;
 using Reqnroll.RuntimeTests.ErrorHandling;
 using Reqnroll.Tracing;
@@ -31,7 +32,9 @@ public class BindingInvokerTests
 
     private BindingInvoker CreateSut(EnvironmentWrapperStub environmentWrapperStub = null)
     {
-        return new BindingInvoker(ConfigurationLoader.GetDefault(), new StubErrorProvider(), new BindingDelegateInvoker(), environmentWrapperStub ?? new EnvironmentWrapperStub());
+        var mockContainer = new Mock<IObjectContainer>();
+        mockContainer.Setup(ctx => ctx.Resolve<IEnvironmentWrapper>()).Returns(environmentWrapperStub ?? new EnvironmentWrapperStub());
+        return new BindingInvoker(ConfigurationLoader.GetDefault(), new StubErrorProvider(), new BindingDelegateInvoker(), mockContainer.Object);
     }
 
     class TestableMethodBinding : MethodBinding

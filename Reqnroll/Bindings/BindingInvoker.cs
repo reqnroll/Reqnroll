@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.CommonModels;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
@@ -33,16 +34,16 @@ namespace Reqnroll.Bindings
             ReqnrollConfiguration reqnrollConfiguration,
             IErrorProvider errorProvider,
             IBindingDelegateInvoker bindingDelegateInvoker,
-            IEnvironmentWrapper environmentWrapper)
+            IObjectContainer objectContainer)
         {
             this.reqnrollConfiguration = reqnrollConfiguration;
             this.errorProvider = errorProvider;
             this.bindingDelegateInvoker = bindingDelegateInvoker;
-            this.environmentWrapper = environmentWrapper;
 
             // Don't want to evaluate too early in case the user overrides the EnvironmentWrapper, so use Lazy
             isDryRunLazy = new Lazy<bool>(() =>
-                environmentWrapper.GetEnvironmentVariable(DryRunEnvVarName) is ISuccess<string> dryRunEnvVar
+                objectContainer.Resolve<IEnvironmentWrapper>()
+                    .GetEnvironmentVariable(DryRunEnvVarName) is ISuccess<string> dryRunEnvVar
                        && bool.TryParse(dryRunEnvVar.Result, out bool isDryRun)
                        && isDryRun);
         }
