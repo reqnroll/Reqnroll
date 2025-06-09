@@ -26,7 +26,6 @@ namespace Reqnroll.Bindings
         protected readonly ReqnrollConfiguration reqnrollConfiguration;
         protected readonly IErrorProvider errorProvider;
         protected readonly IBindingDelegateInvoker bindingDelegateInvoker;
-        protected readonly IEnvironmentWrapper environmentWrapper;
 
         private readonly Lazy<bool> isDryRunLazy;
 
