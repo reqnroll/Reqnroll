@@ -19,6 +19,7 @@
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
+* Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 
 *Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @loraderon, @obligaron
 
