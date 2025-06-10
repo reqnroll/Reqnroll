@@ -369,7 +369,7 @@ namespace Reqnroll.Infrastructure
 
             //Note: plugin-hooks are still executed even if a user-hook failed with an exception
             //A plugin-hook should not throw an exception under normal circumstances, exceptions are not handled/caught here
-            FireRuntimePluginTestExecutionLifecycleEvents(hookType);
+            await FireRuntimePluginTestExecutionLifecycleEventsAsync(hookType);
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new HookFinishedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext, hookException));
 
@@ -377,11 +377,11 @@ namespace Reqnroll.Infrastructure
             if (hookException != null) ExceptionDispatchInfo.Capture(hookException).Throw();
         }
 
-        private void FireRuntimePluginTestExecutionLifecycleEvents(HookType hookType)
+        private async Task FireRuntimePluginTestExecutionLifecycleEventsAsync(HookType hookType)
         {
             //We pass a container corresponding the type of event
             var container = GetHookContainer(hookType);
-            _runtimePluginTestExecutionLifecycleEventEmitter.RaiseExecutionLifecycleEvent(hookType, container);
+            await _runtimePluginTestExecutionLifecycleEventEmitter.RaiseExecutionLifecycleEventAsync(hookType, container);
         }
 
         public virtual async Task InvokeHookAsync(IAsyncBindingInvoker invoker, IHookBinding hookBinding, HookType hookType)
