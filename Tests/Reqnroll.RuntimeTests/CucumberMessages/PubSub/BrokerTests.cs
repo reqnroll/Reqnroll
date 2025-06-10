@@ -31,8 +31,15 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         }
 
         [Fact]
-        public void Enabled_Should_Return_True_When_Sinks_Are_Registered()
+        public async Task Enabled_Should_Return_True_When_Sinks_Are_Registered()
         {
+            // Arrange
+            await _sut.RegisterSinkAsync(_sinkMock1.Object);
+
+            Assert.False(_sut.Enabled); // should nto be enabled until after both sinks are registered
+
+            await _sut.RegisterSinkAsync(_sinkMock2.Object);
+
             // Act
             var result = _sut.Enabled;
 
@@ -61,6 +68,9 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         public async Task PublishAsync_Should_Invoke_PublishAsync_On_All_Sinks()
         {
             // Arrange
+            await _sut.RegisterSinkAsync(_sinkMock1.Object);
+            await _sut.RegisterSinkAsync(_sinkMock2.Object);
+
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
             // Act
@@ -75,6 +85,9 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         public async Task PublishAsync_Should_Swallow_Exceptions_From_Sinks()
         {
             // Arrange
+            await _sut.RegisterSinkAsync(_sinkMock1.Object);
+            await _sut.RegisterSinkAsync(_sinkMock2.Object);
+
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
             _sinkMock1

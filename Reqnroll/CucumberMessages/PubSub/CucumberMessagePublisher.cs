@@ -1,20 +1,21 @@
-﻿using Reqnroll.BoDi;
-using Reqnroll.Events;
-using Reqnroll.Tracing;
-using Reqnroll.Plugins;
-using Reqnroll.UnitTestProvider;
-using System.Collections.Concurrent;
-using System;
-using System.Linq;
+﻿using Cucumber.Messages;
+using Gherkin.CucumberMessages;
+using Io.Cucumber.Messages.Types;
+using Reqnroll.Bindings;
+using Reqnroll.BoDi;
 using Reqnroll.CucumberMessages.ExecutionTracking;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
-using Io.Cucumber.Messages.Types;
-using Gherkin.CucumberMessages;
-using Reqnroll.Bindings;
-using System.Threading.Tasks;
-using System.Collections.Generic;
-using Cucumber.Messages;
+using Reqnroll.Events;
+using Reqnroll.Plugins;
 using Reqnroll.Time;
+using Reqnroll.Tracing;
+using Reqnroll.UnitTestProvider;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
@@ -28,7 +29,6 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// </summary>
     public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventListener
     {
-        internal Lazy<ICucumberMessageBroker> _brokerFactory;
         internal ICucumberMessageBroker _broker;
         internal IObjectContainer _testThreadObjectContainer;
 
@@ -64,9 +64,12 @@ namespace Reqnroll.CucumberMessages.PubSub
 
         internal ICucumberMessageFactory _messageFactory;
 
-        public CucumberMessagePublisher()
+        public CucumberMessagePublisher(ICucumberMessageBroker broker)
         {
+            _broker = broker;
+            _broker.BrokerReadyEvent += PublisherStartupAsync;
         }
+
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
             runtimePluginEvents.RegisterGlobalDependencies += (sender, args) =>
@@ -74,21 +77,14 @@ namespace Reqnroll.CucumberMessages.PubSub
                 args.ObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
                 if (!args.ObjectContainer.IsRegistered<ICucumberMessageFactory>())
                 {
-                    args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>( () => { return new CucumberMessageFactory(); });
+                    args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>(() => { return new CucumberMessageFactory(); });
                 }
             };
 
-            runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
-            {
-                var pluginLifecycleEvents = args.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
-                pluginLifecycleEvents.BeforeTestRun += PublisherStartup;
-                pluginLifecycleEvents.AfterTestRun += PublisherTestRunComplete;
-            };
 
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
                 _testThreadObjectContainer = args.ObjectContainer;
-                _brokerFactory = new Lazy<ICucumberMessageBroker>(() => _testThreadObjectContainer.Resolve<ICucumberMessageBroker>());
                 var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
                 testThreadExecutionEventPublisher.AddListener(this);
             };
@@ -98,6 +94,9 @@ namespace Reqnroll.CucumberMessages.PubSub
         {
             switch (executionEvent)
             {
+                case TestRunFinishedEvent testRunFinishedEvent:
+                    await PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(_testThreadObjectContainer));
+                    break;
                 case FeatureStartedEvent featureStartedEvent:
                     await FeatureStartedEventHandler(featureStartedEvent);
                     break;
@@ -133,13 +132,8 @@ namespace Reqnroll.CucumberMessages.PubSub
             }
         }
 
-        // This method will get called after TestRunStartedEvent has been published and after any BeforeTestRun hooks have been called
-        // The TestRunStartedEvent will be used by the MessagesFormatterPlugin to launch the File writing thread and establish Messages configuration
-        // Running this after the BeforeTestRun hooks will allow them to programmatically configure CucumberMessages
-        internal void PublisherStartup(object sender, RuntimePluginBeforeTestRunEventArgs args)
+        internal async Task PublisherStartupAsync(object sender, BrokerReadyEventArgs args)
         {
-            _broker = _brokerFactory.Value;
-
             _enabled = _broker.Enabled;
 
             if (!_enabled)
@@ -147,29 +141,26 @@ namespace Reqnroll.CucumberMessages.PubSub
                 return;
             }
 
-            SharedIDGenerator = args.ObjectContainer.Resolve<IIdGenerator>();
-            _messageFactory = args.ObjectContainer.Resolve<ICucumberMessageFactory>();
+            SharedIDGenerator = _testThreadObjectContainer.Resolve<IIdGenerator>();
+            _messageFactory = _testThreadObjectContainer.Resolve<ICucumberMessageFactory>();
             _testRunStartedId = SharedIDGenerator.GetNewId();
             _bindingCaches = new BindingMessagesGenerator(SharedIDGenerator, _messageFactory);
-            var clock = args.ObjectContainer.Resolve<IClock>();
-            var traceListener = args.ObjectContainer.Resolve<ITraceListener>();
-            Task.Run(async () =>
+            var clock = _testThreadObjectContainer.Resolve<IClock>();
+            var traceListener = _testThreadObjectContainer.Resolve<ITraceListener>();
+            try
             {
-                try
+                await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)));
+                await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_testThreadObjectContainer)));
+                foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(_testThreadObjectContainer.Resolve<IBindingRegistry>()))
                 {
-                    await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(clock.GetNowDateAndTime(), _testRunStartedId)));
-                    await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(args.ObjectContainer)));
-                    foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(args.ObjectContainer.Resolve<IBindingRegistry>()))
-                    {
-                        // this publishes StepDefinition, Hook, StepArgumentTransform messages
-                        await _broker.PublishAsync(msg);
-                    }
+                    // this publishes StepDefinition, Hook, StepArgumentTransform messages
+                    await _broker.PublishAsync(msg);
                 }
-                catch (System.Exception ex)
-                {
-                    traceListener.WriteToolOutput($"Error publishing messages: {ex.Message}");
-                }
-            }).Wait();
+            }
+            catch (System.Exception ex)
+            {
+                traceListener.WriteToolOutput($"Error publishing messages: {ex.Message}");
+            }
         }
         private DateTime RetrieveDateTime(Envelope e)
         {
@@ -180,7 +171,7 @@ namespace Reqnroll.CucumberMessages.PubSub
             };
         }
 
-        internal void PublisherTestRunComplete(object sender, RuntimePluginAfterTestRunEventArgs args)
+        internal async Task PublisherTestRunCompleteAsync(object sender, RuntimePluginAfterTestRunEventArgs args)
         {
             if (!_enabled)
                 return;
@@ -192,20 +183,17 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             var clock = args.ObjectContainer.Resolve<IClock>();
             // publish them in order to the broker
-            Task.Run(async () =>
+            foreach (var env in testCaseMessages)
             {
-                foreach (var env in testCaseMessages)
-                {
-                    await _broker.PublishAsync(env);
-                }
+                await _broker.PublishAsync(env);
+            }
 
-                foreach (var env in executionMessages)
-                {
-                    await _broker.PublishAsync(env);
-                }
+            foreach (var env in executionMessages)
+            {
+                await _broker.PublishAsync(env);
+            }
 
-                await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(status, clock.GetNowDateAndTime(), _testRunStartedId)));
-            }).Wait();
+            await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(status, clock.GetNowDateAndTime(), _testRunStartedId)));
 
             _startedFeatures.Clear();
         }

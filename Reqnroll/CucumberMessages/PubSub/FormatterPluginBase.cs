@@ -10,24 +10,26 @@ using System.Threading.Tasks;
 using Reqnroll.CucumberMessages.Configuration;
 using System.Collections.Concurrent;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.CucumberMessages.PubSub
 {
-    public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, IRuntimePlugin
+    public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, IRuntimePlugin, IAsyncExecutionEventListener
     {
         private Task? formatterTask;
 
         internal readonly BlockingCollection<Envelope> _postedMessages = new();
+        private ICucumberMessageBroker _broker;
         private ICucumberMessagesConfiguration _configuration;
         private Lazy<ITraceListener> traceListener;
         internal readonly string _pluginName;
 
         internal ITraceListener? trace => traceListener.Value;
         internal IObjectContainer? _testThreadObjectContainer;
-        internal IObjectContainer? _globalObjectContainer;
 
-        public FormatterPluginBase(ICucumberMessagesConfiguration configuration, string pluginName)
+        public FormatterPluginBase(ICucumberMessagesConfiguration configuration, ICucumberMessageBroker broker, string pluginName)
         {
+            _broker = broker;
             _configuration = configuration;
             traceListener = new Lazy<ITraceListener>(() => _testThreadObjectContainer!.Resolve<ITraceListener>());
             _pluginName = pluginName;
@@ -37,25 +39,41 @@ namespace Reqnroll.CucumberMessages.PubSub
         {
             runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
             {
-                _globalObjectContainer = args.ObjectContainer;
+                var globalObjectContainer = args.ObjectContainer;
+
+                // The act of registering itself with the container serves as a marker to the Broker that it should expect to hear from it via the RegisterSink method
+                globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, _pluginName, true);
             };
 
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
-                var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
                 _testThreadObjectContainer = args.ObjectContainer;
-
-                testThreadExecutionEventPublisher.AddHandler<TestRunStartedEvent>(LaunchFileSink);
-                testThreadExecutionEventPublisher.AddHandler<TestRunFinishedEvent>(Close);
+                var testThreadExecEventPublisher = _testThreadObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
+                testThreadExecEventPublisher.AddListener(this);
             };
         }
 
-        private void Close(TestRunFinishedEvent @event)
+
+        public async Task OnEventAsync(IExecutionEvent executionEvent)
         {
-            Dispose(true);
+            switch (executionEvent)
+            {
+                case TestRunStartedEvent testRunStartedEvent:
+                    await LaunchFileSinkAsync();
+                    break;
+                default:
+                    break;
+            }
         }
 
-        internal void LaunchFileSink(TestRunStartedEvent testRunStarted)
+        internal async Task CloseAsync()
+        {
+            _postedMessages.CompleteAdding();
+            if (formatterTask != null) await formatterTask!;
+            formatterTask = null;
+        }
+
+        internal async Task LaunchFileSinkAsync()
         {
             ICucumberMessagesConfiguration config = _configuration;
 
@@ -70,13 +88,17 @@ namespace Reqnroll.CucumberMessages.PubSub
 
             formatterTask = Task.Factory.StartNew(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration), TaskCreationOptions.LongRunning);
 
-            _globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, _pluginName, true);
+            await _broker.RegisterSinkAsync(this);
         }
 
-        public Task PublishAsync(Envelope message)
+        public async Task PublishAsync(Envelope message)
         {
             _postedMessages.Add(message);
-            return Task.CompletedTask;
+
+            // IF the publisher sends the TestRunFinished message, then we can safely shut down
+            if (message.Content() is TestRunFinished)
+                await CloseAsync();
+            return ;
         }
 
         internal abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString);
@@ -89,9 +111,6 @@ namespace Reqnroll.CucumberMessages.PubSub
             {
                 if (disposing)
                 {
-                    _postedMessages.CompleteAdding();
-                    formatterTask?.Wait();
-                    formatterTask = null;
                     _postedMessages.Dispose();
                 }
                 disposedValue = true;

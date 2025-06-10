@@ -26,9 +26,10 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
 
             public TestFileWritingFormatterPlugin(
                 ICucumberMessagesConfiguration configuration,
+                ICucumberMessageBroker broker,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
-                : base(configuration, "testPlugin", ".txt", "test_output.txt", fileSystem)
+                : base(configuration, broker, "testPlugin", ".txt", "test_output.txt", fileSystem)
             {
                 FileSystem = fileSystem;
                 _messageCollector = messageCollector;
@@ -58,6 +59,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
 
         private readonly Mock<ICucumberMessagesConfiguration> _configurationMock;
         private readonly Mock<IFileSystem> _fileSystemMock;
+        private readonly Mock<ICucumberMessageBroker> _brokerMock;
         private readonly TestFileWritingFormatterPlugin _sut;
         private List<Envelope> postedEnvelopes = new();
 
@@ -69,19 +71,20 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _tracerMock = new Mock<ITraceListener>();
             _configurationMock = new Mock<ICucumberMessagesConfiguration>();
             _fileSystemMock = new Mock<IFileSystem>();
+            _brokerMock = new Mock<ICucumberMessageBroker>();
 
             _testThreadObjContainerStub.RegisterInstanceAs<ITestThreadExecutionEventPublisher>(_eventPublisherMock.Object);
             _testThreadObjContainerStub.RegisterInstanceAs<ITraceListener>(_tracerMock.Object);
 
 
-            _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _fileSystemMock.Object, postedEnvelopes);
+            _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _brokerMock.Object, _fileSystemMock.Object, postedEnvelopes);
             _sut.Initialize(_rtpe, _rtpp, new UnitTestProvider.UnitTestProviderConfiguration());
             _rtpe.RaiseCustomizeGlobalDependencies(_globalObjContainerStub as ObjectContainer, null);
             _rtpe.RaiseCustomizeTestThreadDependencies(_testThreadObjContainerStub as ObjectContainer);
         }
 
         [Fact]
-        public void LaunchFileSink_Should_Create_Output_File_With_Default_Name_If_No_Configuration()
+        public async Task LaunchFileSink_Should_Create_Output_File_With_Default_Name_If_No_Configuration()
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
@@ -90,8 +93,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            _sut.LaunchFileSink(new TestRunStartedEvent());
-            _sut.Dispose();
+            await _sut.LaunchFileSinkAsync();
+            await _sut.CloseAsync();
 
             // Assert
             Assert.NotNull(_sut.LastOutputPath);
@@ -99,7 +102,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         }
 
         [Fact]
-        public void LaunchFileSink_Should_Create_Local_Path_When_No_Path_Provided_in_Configuration()
+        public async Task LaunchFileSink_Should_Create_Local_Path_When_No_Path_Provided_in_Configuration()
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
@@ -108,8 +111,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            _sut.LaunchFileSink(new TestRunStartedEvent());
-            _sut.Dispose();
+            await _sut.LaunchFileSinkAsync();
+            await _sut.CloseAsync();
 
             // Assert
             Assert.NotNull(_sut.LastOutputPath);
@@ -128,9 +131,9 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
 
             // Act
-            _sut.LaunchFileSink(new TestRunStartedEvent());
+            await _sut.LaunchFileSinkAsync();
             await _sut.PublishAsync(message);
-            _sut.Dispose();
+            await _sut.CloseAsync();
 
             // Assert
             postedEnvelopes.Should().Contain(message);
@@ -165,19 +168,19 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         }
 
         [Fact]
-        public void LaunchFileSink_Should_Create_Directory_If_Not_Exists()
+        public async Task LaunchFileSink_Should_Create_Directory_If_Not_Exists()
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns( """
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("""
                 { "outputFilePath": "C:\/valid\/path/output.txt" }
                 """);
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act
-            _sut.LaunchFileSink(new TestRunStartedEvent());
-            _sut.Dispose();
+            await _sut.LaunchFileSinkAsync();
+            await _sut.CloseAsync();
 
             // Assert
             _fileSystemMock.Verify(fs => fs.CreateDirectory($"C:{sp}valid{sp}path"), Times.Once);

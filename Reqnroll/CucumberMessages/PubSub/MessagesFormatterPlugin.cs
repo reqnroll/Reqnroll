@@ -1,20 +1,11 @@
 ﻿#nullable enable
 
-using Reqnroll.Plugins;
-using Reqnroll.UnitTestProvider;
-using Reqnroll.Events;
-using Reqnroll.Tracing;
-using Reqnroll.BoDi;
-using System;
-using System.Threading.Tasks;
-using System.IO;
-using System.Linq;
 using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.CucumberMessages.PayloadProcessing;
-using System.Text;
-using System.Collections.Concurrent;
-using Io.Cucumber.Messages.Types;
 using Reqnroll.Utils;
+using System;
+using System.IO;
+using System.Text;
 
 
 namespace Reqnroll.CucumberMessages.PubSub
@@ -27,7 +18,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
     {
 
-        public MessagesFormatterPlugin(ICucumberMessagesConfiguration configuration, IFileSystem fileSystem) : base(configuration, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
+        public MessagesFormatterPlugin(ICucumberMessagesConfiguration configuration, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configuration, broker, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
         {
         }
 

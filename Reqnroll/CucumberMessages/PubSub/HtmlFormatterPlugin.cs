@@ -25,7 +25,7 @@ namespace Reqnroll.CucumberMessages.PubSub
     /// </summary>
     public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
     {
-        public HtmlFormatterPlugin(ICucumberMessagesConfiguration configuration, IFileSystem fileSystem) : base(configuration, "html", ".html", "reqnroll_report.html", fileSystem)
+        public HtmlFormatterPlugin(ICucumberMessagesConfiguration configuration, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configuration, broker, "html", ".html", "reqnroll_report.html", fileSystem)
         {
         }
 

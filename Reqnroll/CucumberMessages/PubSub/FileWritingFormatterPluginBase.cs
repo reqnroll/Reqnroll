@@ -13,7 +13,7 @@ namespace Reqnroll.CucumberMessages.PubSub
         private readonly string _defaultFileName;
         private readonly IFileSystem _fileSystem;
 
-        public FileWritingFormatterPluginBase(ICucumberMessagesConfiguration configuration, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configuration, pluginName)
+        public FileWritingFormatterPluginBase(ICucumberMessagesConfiguration configuration, ICucumberMessageBroker broker, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configuration, broker, pluginName)
         {
             _defaultFileType = defaultFileType;
             _defaultFileName = defaultFileName;

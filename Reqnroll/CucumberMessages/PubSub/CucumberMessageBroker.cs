@@ -1,6 +1,7 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.BoDi;
 using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
+using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using System;
 using System.Collections.Concurrent;
@@ -18,6 +19,13 @@ namespace Reqnroll.CucumberMessages.PubSub
     {
         bool Enabled { get; }
         Task PublishAsync(Envelope featureMessages);
+        Task RegisterSinkAsync(ICucumberMessageSink formatterPluginBase);
+
+        public event AsyncEventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
+    }
+
+    public class BrokerReadyEventArgs
+    {
     }
 
     /// <summary>
@@ -30,18 +38,50 @@ namespace Reqnroll.CucumberMessages.PubSub
     {
         private IObjectContainer _objectContainer;
 
-        public bool Enabled => ActiveSinks.Value.ToList().Count > 0;
+        public bool Enabled { get; private set; }
 
-        private Lazy<IEnumerable<ICucumberMessageSink>> ActiveSinks;
+        private Lazy<int> ResolvedSinks;
+        private IList<ICucumberMessageSink> _registeredSinks = new List<ICucumberMessageSink>();
+
+        public event AsyncEventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
 
         public CucumberMessageBroker(IObjectContainer objectContainer)
         {
             _objectContainer = objectContainer;
-            ActiveSinks = new Lazy<IEnumerable<ICucumberMessageSink>>(() => _objectContainer.ResolveAll<ICucumberMessageSink>());
+            Enabled = false;
+
+            // We want to know how many Sinks exist in the container, but we can't enumerate them now (during this constructor)
+            ResolvedSinks =  new Lazy<int>( () => _objectContainer.ResolveAll<ICucumberMessageSink>().Count());
         }
+
+        // This method is called by the sinks during TestRunStarted event handling. By then, all Sinks will have registered themselves in the object container
+        // (which happened during Plugin Initialize() )
+        public async Task RegisterSinkAsync(ICucumberMessageSink formatterPluginBase)
+        {
+            _registeredSinks.Add(formatterPluginBase);
+
+            // If all known sinks have registered then we can consider the broker Enabled
+            if (_registeredSinks.Count == ResolvedSinks.Value)
+            {
+                Enabled = true;
+                await RaiseBrokerReadyEvent();
+            }
+        }
+
+        private async Task RaiseBrokerReadyEvent()
+        {
+            if (BrokerReadyEvent is null)
+                return;
+            foreach (var subscriber in BrokerReadyEvent.GetInvocationList())
+            {
+                var asyncSubscriber = (AsyncEventHandler<BrokerReadyEventArgs>)subscriber;
+                await asyncSubscriber.Invoke(this, new BrokerReadyEventArgs());
+            }
+        }
+
         public async Task PublishAsync(Envelope message)
         {
-            foreach (var sink in ActiveSinks.Value)
+            foreach (var sink in _registeredSinks)
             {
                 // Will catch and swallow any exceptions thrown by sinks so that all get a chance to process each message
                 try
