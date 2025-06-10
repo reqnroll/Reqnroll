@@ -13,12 +13,14 @@
 * Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
 * Upgrade to Gherkin v32 from v30 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#489)
 * Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
+* Provide AsyncEventHandler in RuntimePluginTestExecutionLifecycleEvents (#634)
 * Improved test execution time by decoupling the telemetry sending from the execution. (#629)
 
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
+* Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 
 *Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @loraderon, @obligaron
 

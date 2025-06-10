@@ -1,11 +1,12 @@
 using Reqnroll.BoDi;
 using Reqnroll.Bindings;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Plugins
 {
     public interface IRuntimePluginTestExecutionLifecycleEventEmitter
     {
-        void RaiseExecutionLifecycleEvent(HookType hookType, IObjectContainer container);
+        Task RaiseExecutionLifecycleEventAsync(HookType hookType, IObjectContainer container);
     }
 
     public class RuntimePluginTestExecutionLifecycleEventEmitter : IRuntimePluginTestExecutionLifecycleEventEmitter
@@ -17,33 +18,33 @@ namespace Reqnroll.Plugins
             _events = events;
         }
 
-        public void RaiseExecutionLifecycleEvent(HookType hookType, IObjectContainer container)
+        public async Task RaiseExecutionLifecycleEventAsync(HookType hookType, IObjectContainer container)
         {
             switch (hookType)
             {
                 case HookType.BeforeTestRun:
-                    _events.RaiseBeforeTestRun(container);
+                    await _events.RaiseBeforeTestRunAsync(container);
                     break;
                 case HookType.AfterTestRun:
-                    _events.RaiseAfterTestRun(container);
+                    await _events.RaiseAfterTestRunAsync(container);
                     break;
                 case HookType.BeforeFeature:
-                    _events.RaiseBeforeFeature(container);
+                    await _events.RaiseBeforeFeatureAsync(container);
                     break;
                 case HookType.AfterFeature:
-                    _events.RaiseAfterFeature(container);
+                    await _events.RaiseAfterFeatureAsync(container);
                     break;
                 case HookType.BeforeScenario:
-                    _events.RaiseBeforeScenario(container);
+                    await _events.RaiseBeforeScenarioAsync(container);
                     break;
                 case HookType.AfterScenario:
-                    _events.RaiseAfterScenario(container);
+                    await _events.RaiseAfterScenarioAsync(container);
                     break;
                 case HookType.BeforeStep:
-                    _events.RaiseBeforeStep(container);
+                    await _events.RaiseBeforeStepAsync(container);
                     break;
                 case HookType.AfterStep:
-                    _events.RaiseAfterStep(container);
+                    await _events.RaiseAfterStepAsync(container);
                     break;
                 default: break;
             }

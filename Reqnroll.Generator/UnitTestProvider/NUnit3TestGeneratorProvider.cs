@@ -75,7 +75,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClass, DESCRIPTION_ATTR, featureTitle);
             CodeDomHelper.AddAttribute(generationContext.TestClass, FIXTURELIFECYCLE_ATTR, 
                 new CodeAttributeArgument(
-                    new CodeSnippetExpression($"{LIFECYCLE_CLASS}.{LIFECYCLE_INSTANCEPERTESTCASE}")));
+                    new CodeSnippetExpression(CodeDomHelper.GetGlobalizedName($"{LIFECYCLE_CLASS}.{LIFECYCLE_INSTANCEPERTESTCASE}"))));
         }
 
         public void SetTestClassCategories(TestClassGenerationContext generationContext, IEnumerable<string> featureCategories)
@@ -95,11 +95,11 @@ namespace Reqnroll.Generator.UnitTestProvider
                                 nameof(ScenarioContext)),
                             nameof(ScenarioContext.ScenarioContainer)),
                         nameof(IObjectContainer.RegisterInstanceAs),
-                        new CodeTypeReference(TESTCONTEXT_TYPE)),
+                        new CodeTypeReference(TESTCONTEXT_TYPE, CodeTypeReferenceOptions.GlobalReference)),
                     GetTestContextExpression()));
         }
 
-        private CodeExpression GetTestContextExpression() => new CodeVariableReferenceExpression(TESTCONTEXT_INSTANCE);
+        private CodeExpression GetTestContextExpression() => new CodeVariableReferenceExpression(CodeDomHelper.GetGlobalizedName(TESTCONTEXT_INSTANCE));
 
         public void SetTestInitializeMethod(TestClassGenerationContext generationContext)
         {
