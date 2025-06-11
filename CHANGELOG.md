@@ -6,6 +6,7 @@
 * Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 * Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Improvement: Introducing the ability to specify env var "REQNROLL_DRY_RUN=true" to skip invocation of step handlers at runtime (#614)
 * Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
 * Refactored UnitTestFeatureGenerator to provide an output parameter that contains warnings (#624)
 * Improvement: Added a CreateDirectory() function to the Reqnroll.Utils/IFileSystem (#623)
@@ -22,7 +23,7 @@
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 
-*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 

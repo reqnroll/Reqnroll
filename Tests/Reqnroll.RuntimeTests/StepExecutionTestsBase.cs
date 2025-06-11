@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Threading.Tasks;
-using Reqnroll.BoDi;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
@@ -133,17 +133,19 @@ namespace Reqnroll.RuntimeTests
         {
             return TestObjectFactories.CreateTestRunner(
                 container =>
+                {
+                    container.RegisterTypeAs<DummyTestTracer, ITestTracer>();
+                    container.RegisterInstanceAs(ContextManagerStub);
+
+                    var builder = (RuntimeBindingRegistryBuilder)container.Resolve<IRuntimeBindingRegistryBuilder>();
+                    foreach (var bindingType in bindingTypes)
                     {
-                        container.RegisterTypeAs<DummyTestTracer, ITestTracer>();
-                        container.RegisterInstanceAs(ContextManagerStub);
+                        builder.BuildBindingsFromType(bindingType);
+                    }
+                    builder.BuildingCompleted();
 
-                        var builder = (RuntimeBindingRegistryBuilder)container.Resolve<IRuntimeBindingRegistryBuilder>();
-                        foreach (var bindingType in bindingTypes)
-                            builder.BuildBindingsFromType(bindingType);
-                        builder.BuildingCompleted();
-
-                        registerMocks?.Invoke(container);
-                    });
+                    registerMocks?.Invoke(container);
+                });
         }
 
         protected (TestRunner, Mock<TBinding>) GetTestRunnerFor<TBinding>() where TBinding : class
