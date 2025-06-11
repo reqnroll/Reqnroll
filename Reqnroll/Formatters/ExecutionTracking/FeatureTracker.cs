@@ -27,8 +27,6 @@ namespace Reqnroll.Formatters.ExecutionTracking
         private Lazy<IEnumerable<Envelope>> _staticMessages;
 
         // ID Generator to use when generating IDs for TestCase messages and beyond
-        // If gherkin feature was generated using integer IDs, then we will use an integer ID generator seeded with the last known integer ID
-        // otherwise we'll use a GUID ID generator. We can't know ahead of time which type of ID generator to use, therefore this is not set by the constructor.
         public IIdGenerator IDGenerator { get; set; }
         public string TestRunStartedId { get; }
 
@@ -73,7 +71,7 @@ namespace Reqnroll.Formatters.ExecutionTracking
         }
 
         // This method is used to generate the static messages (Source, GherkinDocument & Pickles) and the StepTransformations, StepDefinitions and Hook messages which are global to the entire Solution
-        // This should be called only once per Feature. As such, it relies on the use of a lock section within the Publisher to ensure that only a single instance of the FeatureTracker is created per Feature
+        // This should be called only once per Feature. 
         private IEnumerable<Envelope> GenerateStaticMessages(FeatureStartedEvent featureStartedEvent)
         {
             var gd = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument();

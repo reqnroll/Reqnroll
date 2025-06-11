@@ -1,5 +1,5 @@
 ﻿{
-    "description": "This class holds configuration information from a configuration source for Reqnroll Cucumber Message Generation.\n",
+    "description": "This class holds configuration information from a configuration source for Reqnroll Formatters.\n",
     "properties": {
         "Enabled": {
             "type": "boolean"

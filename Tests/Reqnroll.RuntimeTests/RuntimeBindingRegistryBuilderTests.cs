@@ -42,7 +42,7 @@ namespace Reqnroll.RuntimeTests
 
         private BindingSourceProcessorStub bindingSourceProcessorStub;
 
-        /*        StepsByEvent that are feature scoped               */
+        /*        Steps that are feature scoped               */
 
         [Binding]
         public class ScopedStepTransformationExample

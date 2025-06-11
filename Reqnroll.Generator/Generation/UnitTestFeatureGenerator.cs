@@ -31,7 +31,7 @@ namespace Reqnroll.Generator.Generation
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
         private readonly UnitTestMethodGenerator _unitTestMethodGenerator;
         private readonly LinePragmaHandler _linePragmaHandler;
-        private readonly IFormattersConfiguration _cucumberConfiguration;
+        private readonly IFormattersConfiguration _formattersConfiguration;
         private CodeMemberMethod _cucumberMessagesInitializeMethod;
 
         public UnitTestFeatureGenerator(
@@ -39,8 +39,8 @@ namespace Reqnroll.Generator.Generation
             CodeDomHelper codeDomHelper,
             ReqnrollConfiguration reqnrollConfiguration,
             IDecoratorRegistry decoratorRegistry,
-            // Adding a dependency on the Cucumber configuration subsystem. Eventually remove this as Cucumber Config is folded into overall Reqnroll Config.
-            IFormattersConfiguration cucumberConfiguration)
+            // Adding a dependency on the Formatters configuration subsystem. Eventually remove this as Formatters Config is folded into overall Reqnroll Config.
+            IFormattersConfiguration formattersConfiguration)
         {
             _testGeneratorProvider = testGeneratorProvider;
             _codeDomHelper = codeDomHelper;
@@ -49,7 +49,7 @@ namespace Reqnroll.Generator.Generation
             _linePragmaHandler = new LinePragmaHandler(_reqnrollConfiguration, _codeDomHelper);
             _scenarioPartHelper = new ScenarioPartHelper(_reqnrollConfiguration, _codeDomHelper);
             _unitTestMethodGenerator = new UnitTestMethodGenerator(testGeneratorProvider, decoratorRegistry, _codeDomHelper, _scenarioPartHelper, _reqnrollConfiguration);
-            _cucumberConfiguration = cucumberConfiguration;
+            _formattersConfiguration = formattersConfiguration;
         }
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";

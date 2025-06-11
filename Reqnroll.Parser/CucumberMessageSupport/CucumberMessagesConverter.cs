@@ -7,7 +7,7 @@ namespace Reqnroll.Parser.CucmberMessageSupport
 {
      /// <summary>
      /// Utility class that converts Reqnroll AST types in to CucumberMessages.Types types.
-     /// It uses two classes from the Gherking project: AstMessagesConverter and PickleCompiler
+     /// It uses two classes from the Gherkin project: AstMessagesConverter and PickleCompiler
      /// 
      /// Once the Gherkin project implementation directly emits CucumberMessages (eliminating the use of the Gherkin.CucumberMessages.Types namespace), this class can be removed
      /// </summary>
