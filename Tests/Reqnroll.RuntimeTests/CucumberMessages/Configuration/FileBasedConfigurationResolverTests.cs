@@ -2,7 +2,7 @@ using FluentAssertions;
 using Moq;
 using Reqnroll.Analytics.UserId;
 using Reqnroll.Configuration;
-using Reqnroll.CucumberMessages.Configuration;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;

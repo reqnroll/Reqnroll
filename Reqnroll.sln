@@ -121,7 +121,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.Assist.Dynamic.Spe
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Assist.Dynamic", "Assist.Dynamic", "{D93DD6F6-7AA0-402C-845C-A7FDF722D0A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.CucumberMessages.Tests", "Tests\Reqnroll.CucumberMessages.Tests\Reqnroll.CucumberMessages.Tests.csproj", "{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.Formatters.Tests", "Tests\Reqnroll.CucumberMessages.Tests\Reqnroll.Formatters.Tests.csproj", "{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

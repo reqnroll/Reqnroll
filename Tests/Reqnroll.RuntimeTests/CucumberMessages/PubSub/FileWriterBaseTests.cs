@@ -1,6 +1,5 @@
 ﻿using Moq;
-using Reqnroll.CucumberMessages.Configuration;
-using Reqnroll.CucumberMessages.PubSub;
+using Reqnroll.Formatters.PubSub;
 using Reqnroll.Utils;
 using System;
 using System.Collections.Concurrent;
@@ -15,6 +14,7 @@ using FluentAssertions;
 using Reqnroll.BoDi;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
 {
@@ -25,7 +25,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             public string LastOutputPath { get; private set; }
 
             public TestFileWritingFormatterPlugin(
-                ICucumberMessagesConfiguration configuration,
+                IFormattersConfiguration configuration,
                 ICucumberMessageBroker broker,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
@@ -57,7 +57,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         private RuntimePluginEvents _rtpe = new();
         private RuntimePluginParameters _rtpp = new();
 
-        private readonly Mock<ICucumberMessagesConfiguration> _configurationMock;
+        private readonly Mock<IFormattersConfiguration> _configurationMock;
         private readonly Mock<IFileSystem> _fileSystemMock;
         private readonly Mock<ICucumberMessageBroker> _brokerMock;
         private readonly TestFileWritingFormatterPlugin _sut;
@@ -69,7 +69,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _testThreadObjContainerStub = new ObjectContainer(_globalObjContainerStub);
             _eventPublisherMock = new Mock<ITestThreadExecutionEventPublisher>();
             _tracerMock = new Mock<ITraceListener>();
-            _configurationMock = new Mock<ICucumberMessagesConfiguration>();
+            _configurationMock = new Mock<IFormattersConfiguration>();
             _fileSystemMock = new Mock<IFileSystem>();
             _brokerMock = new Mock<ICucumberMessageBroker>();
 

@@ -1,4 +1,4 @@
-﻿using Reqnroll.CucumberMessages.Configuration;
+﻿using Reqnroll.Formatters.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Reqnroll.GeneratorTests
 {
-    internal class SimpleCucumberMessagesConfiguration : ICucumberMessagesConfiguration
+    internal class SimpleCucumberMessagesConfiguration : IFormattersConfiguration
     {
         public bool Enabled => false;
 

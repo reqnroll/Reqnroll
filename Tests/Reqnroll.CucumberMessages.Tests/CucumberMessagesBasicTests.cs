@@ -1,29 +1,15 @@
 using Io.Cucumber.Messages.Types;
-using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
-using Newtonsoft.Json.Bson;
-using Reqnroll;
 using System.Reflection;
 using FluentAssertions;
-using System.Text.Json;
-using System.ComponentModel;
-using Reqnroll.TestProjectGenerator;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Reqnroll.TestProjectGenerator.Driver;
-using Moq;
-using Reqnroll.Tracing;
-using Reqnroll.EnvironmentAccess;
-using Microsoft.VisualBasic.FileIO;
-using Reqnroll.CucumberMessages.PayloadProcessing;
-using Reqnroll.CommonModels;
-using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.TestProjectGenerator.Data;
-using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.SystemTests;
 
-namespace CucumberMessages.Tests
+namespace Reqnroll.Formatters.Tests
 {
     [TestClass]
-    public class CucumberMessagesBasicTests : CucumberCompatibilityTestBase
+    public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
     {
         [TestMethod]
         public void PartialConfigurationIsCorrectlyHandled()
@@ -234,7 +220,7 @@ namespace CucumberMessages.Tests
         [TestMethod]
         public void CanGenerateVB()
         {
-            _testRunConfiguration.ProgrammingLanguage = Reqnroll.TestProjectGenerator.ProgrammingLanguage.VB;
+            _testRunConfiguration.ProgrammingLanguage = TestProjectGenerator.ProgrammingLanguage.VB;
             ResetCucumberMessages("VB Generation Test");
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName("VB Generation Test.ndjson");

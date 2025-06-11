@@ -16,10 +16,10 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
-using Reqnroll.CucumberMessages.Configuration;
-using Reqnroll.CucumberMessages.PubSub;
+using Reqnroll.Formatters.PubSub;
 using Reqnroll.Utils;
 using System.Collections.Generic;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.Infrastructure
 {
@@ -107,9 +107,9 @@ namespace Reqnroll.Infrastructure
             //Support for publishing Cucumber Messages
             container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
-            container.RegisterTypeAs<FileBasedConfigurationResolver, ICucumberMessagesConfigurationResolver>("fileBasedResolver");
-            container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesEnvironmentOverrideConfigurationResolver>();
-            container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
+            container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
+            container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
+            container.RegisterTypeAs<FormatterConfiguration, IFormattersConfiguration>();
             container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
             container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();

@@ -44,14 +44,14 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 envVariables.Add("Reqnroll_Messages_TestCaseFinishedTimeOverride", $"{testCaseFinishedTime:O}");
             }
 
-            if (_testSuiteInitializationDriver.OverrideCucumberEnable is bool cucumberEnable)
+            if (_testSuiteInitializationDriver.OverrideCucumberEnable is bool formattersEnable)
             {
-                envVariables.Add("REQNROLL_CUCUMBER_MESSAGES_ENABLED", cucumberEnable ? "true" : "false");
+                envVariables.Add("REQNROLL_FORMATTERS_ENABLED", formattersEnable ? "true" : "false");
             }
 
             if (_testSuiteInitializationDriver.OverrideCucumberMessagesFormatters is string cucumberMessagesFormatters)
             {
-                envVariables.Add("REQNROLL_CUCUMBER_MESSAGES_FORMATTERS", cucumberMessagesFormatters);
+                envVariables.Add("REQNROLL_FORMATTERS", cucumberMessagesFormatters);
             }
 
             return envVariables;

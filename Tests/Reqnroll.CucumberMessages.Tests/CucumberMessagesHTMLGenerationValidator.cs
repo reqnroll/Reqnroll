@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Execution;
 
-namespace CucumberMessages.Tests
+namespace Reqnroll.Formatters.Tests
 {
     internal class CucumberMessagesHTMLGenerationValidator
     {

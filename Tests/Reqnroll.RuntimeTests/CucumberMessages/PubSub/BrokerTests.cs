@@ -1,6 +1,6 @@
 ﻿using Moq;
 using Reqnroll.BoDi;
-using Reqnroll.CucumberMessages.PubSub;
+using Reqnroll.Formatters.PubSub;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;

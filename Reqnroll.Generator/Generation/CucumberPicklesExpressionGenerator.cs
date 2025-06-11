@@ -1,5 +1,5 @@
 ﻿using Io.Cucumber.Messages.Types;
-using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Generator.CodeDom;
 using System;
 using System.CodeDom;

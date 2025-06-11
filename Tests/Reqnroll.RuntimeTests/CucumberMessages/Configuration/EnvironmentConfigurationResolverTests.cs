@@ -1,8 +1,8 @@
 using FluentAssertions;
 using Moq;
 using Reqnroll.CommonModels;
-using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.EnvironmentAccess;
+using Reqnroll.Formatters.Configuration;
 using System.Collections.Generic;
 using Xunit;
 
@@ -45,7 +45,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
                 }
             }";
             _environmentWrapperMock
-                .Setup(e => e.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE))
+                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
                 .Returns(new Success<string>(json));
 
             // Act
@@ -67,7 +67,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
                 }
                 """;
             _environmentWrapperMock
-                .Setup(e => e.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_FORMATTERS_ENVIRONMENT_VARIABLE))
+                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
                 .Returns(new Success<string>(json));
 
             // Act

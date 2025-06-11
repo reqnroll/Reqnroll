@@ -9,8 +9,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Gherkin.CucumberMessages;
 using Reqnroll.Configuration;
-using Reqnroll.CucumberMessages.Configuration;
-using Reqnroll.CucumberMessages.RuntimeSupport;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
@@ -31,7 +31,7 @@ namespace Reqnroll.Generator.Generation
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
         private readonly UnitTestMethodGenerator _unitTestMethodGenerator;
         private readonly LinePragmaHandler _linePragmaHandler;
-        private readonly ICucumberMessagesConfiguration _cucumberConfiguration;
+        private readonly IFormattersConfiguration _cucumberConfiguration;
         private CodeMemberMethod _cucumberMessagesInitializeMethod;
 
         public UnitTestFeatureGenerator(
@@ -40,7 +40,7 @@ namespace Reqnroll.Generator.Generation
             ReqnrollConfiguration reqnrollConfiguration,
             IDecoratorRegistry decoratorRegistry,
             // Adding a dependency on the Cucumber configuration subsystem. Eventually remove this as Cucumber Config is folded into overall Reqnroll Config.
-            ICucumberMessagesConfiguration cucumberConfiguration)
+            IFormattersConfiguration cucumberConfiguration)
         {
             _testGeneratorProvider = testGeneratorProvider;
             _codeDomHelper = codeDomHelper;
@@ -262,11 +262,11 @@ namespace Reqnroll.Generator.Generation
             try
             {
                 var messageConverter = new CucumberMessagesConverter(new GuidIdGenerator());
-                var featureSource = Reqnroll.CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(messageConverter.ConvertToCucumberMessagesSource(generationContext.Document));
+                var featureSource = Reqnroll.Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(messageConverter.ConvertToCucumberMessagesSource(generationContext.Document));
                 var featureGherkinDocument = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
                 var featurePickles = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocument);
-                var featureGherkinDocumentMessage = CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToGherkinDocument(featureGherkinDocument);
-                var featurePickleMessages = CucumberMessages.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToPickles(featurePickles);
+                var featureGherkinDocumentMessage = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToGherkinDocument(featureGherkinDocument);
+                var featurePickleMessages = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToPickles(featurePickles);
 
                 // generate a CodeDom expression to create the Source object from the featureSourceMessage
                 sourceExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.Source), CodeTypeReferenceOptions.GlobalReference),

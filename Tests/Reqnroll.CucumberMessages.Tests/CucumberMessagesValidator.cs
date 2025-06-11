@@ -2,10 +2,10 @@
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using System.Reflection;
 
-namespace CucumberMessages.Tests
+namespace Reqnroll.Formatters.Tests
 {
     public class CucumberMessagesValidator
     {
@@ -27,7 +27,7 @@ namespace CucumberMessages.Tests
         {
             get
             {
-                var ect = CucumberMessageExtensions.EnvelopeContentTypes.ToList();
+                var ect = EnvelopeExtensions.EnvelopeContentTypes.ToList();
                 ect.Remove(typeof(Meta));
                 return ect;
             }
@@ -331,7 +331,7 @@ namespace CucumberMessages.Tests
                 actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
 
                 // This checks that each top level Envelope content type present in the actual is present in the expected in the same number (except for hooks)
-                foreach (var messageType in CucumberMessageExtensions.EnvelopeContentTypes)
+                foreach (var messageType in EnvelopeExtensions.EnvelopeContentTypes)
                 {
                     if (actuals_elementsByType.ContainsKey(messageType) && !expecteds_elementsByType.ContainsKey(messageType))
                     {
@@ -359,7 +359,7 @@ namespace CucumberMessages.Tests
                 .ComparingByMembers<Background>()
                 .ComparingByMembers<Ci>()
                 .ComparingByMembers<Comment>()
-                .ComparingByMembers<DataTable>()
+                .ComparingByMembers<Io.Cucumber.Messages.Types.DataTable>()
                 .ComparingByMembers<DocString>()
                 .ComparingByMembers<Envelope>()
                 .ComparingByMembers<Examples>()

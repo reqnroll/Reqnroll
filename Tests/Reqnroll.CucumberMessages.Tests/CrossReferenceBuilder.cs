@@ -1,13 +1,7 @@
 ﻿using Io.Cucumber.Messages.Types;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Reqnroll.CucumberMessages.PayloadProcessing.Cucumber;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
-namespace CucumberMessages.Tests
+namespace Reqnroll.Formatters.Tests
 {
     internal class CrossReferenceBuilder : CucumberMessage_TraversalVisitorBase
     {
@@ -197,7 +191,7 @@ namespace CucumberMessages.Tests
             base.OnVisiting(docString);
         }
 
-        public override void OnVisiting(DataTable dataTable)
+        public override void OnVisiting(Io.Cucumber.Messages.Types.DataTable dataTable)
         {
             buildCrossReferences(dataTable);
             base.OnVisiting(dataTable);

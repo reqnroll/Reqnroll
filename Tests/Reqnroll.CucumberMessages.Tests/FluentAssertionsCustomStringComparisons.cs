@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CucumberMessages.Tests
+namespace Reqnroll.Formatters.Tests
 {
     public class FluentAssertionsCustomStringComparisons : IEqualityComparer<string>
     {

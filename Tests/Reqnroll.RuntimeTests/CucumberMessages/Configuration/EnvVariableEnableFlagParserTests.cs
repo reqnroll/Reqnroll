@@ -1,7 +1,7 @@
 using Moq;
 using Reqnroll.CommonModels;
-using Reqnroll.CucumberMessages.Configuration;
 using Reqnroll.EnvironmentAccess;
+using Reqnroll.Formatters.Configuration;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
@@ -22,7 +22,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
         {
             // Arrange
             _environmentWrapperMock
-                .Setup(e => e.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE))
+                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE))
                 .Returns(new Success<string>("true"));
 
             // Act
@@ -37,7 +37,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
         {
             // Arrange
             _environmentWrapperMock
-                .Setup(e => e.GetEnvironmentVariable(CucumberConfigurationConstants.REQNROLL_CUCUMBER_MESSAGES_ENABLE_ENVIRONMENT_VARIABLE))
+                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE))
                 .Returns(new Success<string>("false"));
 
             // Act

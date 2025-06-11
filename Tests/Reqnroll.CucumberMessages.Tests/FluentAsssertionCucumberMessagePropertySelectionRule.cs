@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using FluentAssertions.Equivalency;
 
-namespace CucumberMessages.Tests
+namespace Reqnroll.Formatters.Tests
 {
     /// <summary>
     /// Fluent Asssertion Cucumber Message Property Selection Rule
