@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
-    public class EnvironmentConfigurationResolver : ICucumberMessagesConfigurationResolver
+    public class EnvironmentConfigurationResolver : ICucumberMessagesEnvironmentOverrideConfigurationResolver
     {
         private readonly IEnvironmentWrapper _environmentWrapper;
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Reqnroll.CucumberMessages.Configuration
 {
@@ -18,14 +19,15 @@ namespace Reqnroll.CucumberMessages.Configuration
         public static ICucumberMessagesConfiguration Current { get; private set; }
         public bool Enabled => _runtimeEnablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
 
-        private IEnumerable<ICucumberMessagesConfigurationResolver> _resolvers;
+        private IList<ICucumberMessagesConfigurationResolverBase> _resolvers;
         private Lazy<ResolvedConfiguration> _resolvedConfiguration;
         private IEnvVariableEnableFlagParser _envVariableEnableFlagParser;
         private bool _runtimeEnablementOverrideFlag = true;
 
-        public CucumberConfiguration(IDictionary<string, ICucumberMessagesConfigurationResolver> resolvers, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
+        public CucumberConfiguration(IDictionary<string, ICucumberMessagesConfigurationResolver> resolvers, ICucumberMessagesEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
         {
-            _resolvers = [resolvers["fileBasedResolver"], resolvers["environmentBasedResolver"]];
+            _resolvers = resolvers.Values.Cast<ICucumberMessagesConfigurationResolverBase>().ToList();
+            _resolvers.Add(environmentOverrideConfigurationResolver);
             _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
             _envVariableEnableFlagParser = envVariableEnableFlagParser;
             Current = this;

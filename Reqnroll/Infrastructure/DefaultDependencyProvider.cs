@@ -108,7 +108,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
             container.RegisterTypeAs<FileBasedConfigurationResolver, ICucumberMessagesConfigurationResolver>("fileBasedResolver");
-            container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesConfigurationResolver>("environmentBasedResolver");
+            container.RegisterTypeAs<EnvironmentConfigurationResolver, ICucumberMessagesEnvironmentOverrideConfigurationResolver>();
             container.RegisterTypeAs<CucumberConfiguration, ICucumberMessagesConfiguration>();
             container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
             container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");

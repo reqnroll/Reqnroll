@@ -139,13 +139,12 @@ namespace CucumberMessages.Tests
             var fileService = new FileService();
             var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
             var configEnvResolver = new EnvironmentConfigurationResolver(env);
-            var resolverDictionary = new Dictionary<string, ICucumberMessagesConfigurationResolver>
+            var resolvers = new Dictionary<string, ICucumberMessagesConfigurationResolver>
             {
-                { "fileBasedResolver", configFileResolver },
-                { "environmentBasedResolver", configEnvResolver }
+                {"fileBased",  configFileResolver }
             };
 
-            CucumberConfiguration configuration = new CucumberConfiguration(resolverDictionary, new EnvVariableEnableFlagParser(env));
+            CucumberConfiguration configuration = new CucumberConfiguration(resolvers, configEnvResolver, new EnvVariableEnableFlagParser(env));
             string messagesConfiguration = configuration.GetFormatterConfigurationByName("messages");
             string outputFilePath = String.Empty;
             int colonIndex = messagesConfiguration.IndexOf(':');
