@@ -44,6 +44,7 @@ namespace Reqnroll.Events
             }
         }
 
+        [Obsolete("ExecutionEvents are migrating to Async. Please migrate to PublishEventAsync", false)]
         public void AddListener(IExecutionEventListener listener)
         {
             _listeners.Add(listener);

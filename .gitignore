@@ -368,6 +368,8 @@ Features.Generated/
 GitExtensions.settings.backup
 
 /Tests/Reqnroll.MsBuildNetSdk.IntegrationTests/Features/dummy.feature.cs
+/Tests/Reqnroll.CucumberMessages.Tests/Samples/CucumberMessages/*
+/Tests/Reqnroll.Formatters.Tests/Samples/CucumberMessages/*
 *.feature.cs
 *.AssemblyHooks.cs
 *.AssemblyHooks.vb
@@ -386,3 +388,4 @@ docs/_build/*
 nCrunchTemp*.csproj
 
 *.received.*
+

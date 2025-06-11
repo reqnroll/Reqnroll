@@ -399,6 +399,7 @@ namespace Reqnroll.Infrastructure
             catch (Exception exception)
             {
                 // This exception is caught in order to be able to inform consumers of the HookBindingFinishedEvent;
+                // This is used by CucumberMessages to include information about the exception in the hook TestStepResult
                 // The throw; statement ensures that the exception is propagated up to the FireEventsAsync method
                 exceptionthrown = exception;
                 throw;
@@ -678,8 +679,10 @@ namespace Reqnroll.Infrastructure
             StepDefinitionType stepDefinitionType = stepDefinitionKeyword == StepDefinitionKeyword.And || stepDefinitionKeyword == StepDefinitionKeyword.But
                 ? GetCurrentBindingType()
                 : (StepDefinitionType) stepDefinitionKeyword;
-            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg));
+            var stepSequenceIdentifiers = ScenarioContext.ScenarioInfo.PickleStepSequence;
+            var pickleStepId = stepSequenceIdentifiers?.CurrentPickleStepId ?? "";
 
+            _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg, pickleStepId));
             await _testThreadExecutionEventPublisher.PublishEventAsync(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
             try
@@ -690,6 +693,7 @@ namespace Reqnroll.Infrastructure
             finally
             {
                 await _testThreadExecutionEventPublisher.PublishEventAsync(new StepFinishedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
+                stepSequenceIdentifiers?.NextStep();
                 _contextManager.CleanupStepContext();
             }
         }
