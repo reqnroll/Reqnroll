@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Io.Cucumber.Messages.Types;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
+namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class CucumberMessageBrokerTests
     {

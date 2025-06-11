@@ -16,7 +16,7 @@ using System.Globalization;
 using System.Linq;
 using Xunit;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
+namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
     public class HookStepTrackerTests
     {

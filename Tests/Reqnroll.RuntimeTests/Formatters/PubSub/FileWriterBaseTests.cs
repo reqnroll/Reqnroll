@@ -16,7 +16,7 @@ using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.Formatters.Configuration;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
+namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class FileWritingFormatterPluginBaseTests
     {
@@ -73,8 +73,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             _fileSystemMock = new Mock<IFileSystem>();
             _brokerMock = new Mock<ICucumberMessageBroker>();
 
-            _testThreadObjContainerStub.RegisterInstanceAs<ITestThreadExecutionEventPublisher>(_eventPublisherMock.Object);
-            _testThreadObjContainerStub.RegisterInstanceAs<ITraceListener>(_tracerMock.Object);
+            _testThreadObjContainerStub.RegisterInstanceAs(_eventPublisherMock.Object);
+            _testThreadObjContainerStub.RegisterInstanceAs(_tracerMock.Object);
 
 
             _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _brokerMock.Object, _fileSystemMock.Object, postedEnvelopes);

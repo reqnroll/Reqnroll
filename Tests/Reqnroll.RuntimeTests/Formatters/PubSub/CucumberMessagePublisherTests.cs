@@ -1,33 +1,28 @@
 using FluentAssertions;
+using Gherkin.CucumberMessages;
+using Io.Cucumber.Messages.Types;
 using Moq;
+using Reqnroll.Bindings;
 using Reqnroll.BoDi;
-using Reqnroll.Formatters.Configuration;
+using Reqnroll.Configuration;
+using Reqnroll.Events;
 using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
-using Reqnroll.Events;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Infrastructure;
+using Reqnroll.Plugins;
+using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Xunit;
-using Io.Cucumber.Messages.Types;
-using Reqnroll.Bindings;
-using Gherkin.CucumberMessages;
-using Reqnroll.Time;
-using Reqnroll.Plugins;
-using System.Reflection.Metadata.Ecma335;
-using System.Reflection;
-using Reqnroll.EnvironmentAccess;
-using Reqnroll.Formatters.RuntimeSupport;
-using System.CodeDom;
-using Reqnroll.Infrastructure;
-using Reqnroll.Configuration;
-using System.Collections.Specialized;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
+namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class CucumberMessagePublisherTests
     {
@@ -61,7 +56,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             var container = new ObjectContainer();
             _brokerMock.Setup(b => b.Enabled).Returns(brokerEnabled);
-            container.RegisterInstanceAs<ICucumberMessageBroker>(_brokerMock.Object);
+            container.RegisterInstanceAs(_brokerMock.Object);
             return container;
         }
 
@@ -69,9 +64,9 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             _clockMock.Setup(c => c.GetNowDateAndTime()).Returns(DateTime.UtcNow);
 
-            container.RegisterInstanceAs<IIdGenerator>(_idGeneratorMock.Object);
-            container.RegisterInstanceAs<IClock>(_clockMock.Object);
-            container.RegisterInstanceAs<IBindingRegistry>(_bindingRegistryMock.Object);
+            container.RegisterInstanceAs(_idGeneratorMock.Object);
+            container.RegisterInstanceAs(_clockMock.Object);
+            container.RegisterInstanceAs(_bindingRegistryMock.Object);
         }
         private FeatureInfo CreateFeatureInfo(string title = "Feature", string description = "desc", string id = "ABCDE")
         {
@@ -104,8 +99,8 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             // Arrange
             var objectContainerStub = new ObjectContainer();
-            objectContainerStub.RegisterInstanceAs<ITestThreadExecutionEventPublisher>(_eventPublisherMock.Object);
-            objectContainerStub.RegisterInstanceAs<ICucumberMessageBroker>(_brokerMock.Object);
+            objectContainerStub.RegisterInstanceAs(_eventPublisherMock.Object);
+            objectContainerStub.RegisterInstanceAs(_brokerMock.Object);
 
             // Act
             _sut.Initialize(_runtimePluginEvents, _runtimePluginParameters, _unitTestProviderConfiguration);
@@ -155,7 +150,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             // nb. This approach required as Moq can't mock types from Io.Cucumber.Messages.Types (as they're not visibleTo as well as sealed)
             var msgFactory = new CucumberMessageFactory(new PublisherStartup_FactoryStub());
             var traceListen = new Mock<ITraceListener>();
-            objectContainerStub.RegisterInstanceAs<ITraceListener>(traceListen.Object);
+            objectContainerStub.RegisterInstanceAs(traceListen.Object);
             objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(msgFactory);
 
             _sut._testThreadObjectContainer = objectContainerStub;
@@ -320,7 +315,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
         {
             // Arrange
             var objectContainerStub = new ObjectContainer();
-            objectContainerStub.RegisterInstanceAs<ITraceListener>(new Mock<ITraceListener>().Object);
+            objectContainerStub.RegisterInstanceAs(new Mock<ITraceListener>().Object);
             var featureContextMock = new Mock<IFeatureContext>();
 
             _sut._enabled = false;
@@ -341,7 +336,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(true);
             SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterInstanceAs<ITraceListener>(new Mock<ITraceListener>().Object);
+            objectContainerStub.RegisterInstanceAs(new Mock<ITraceListener>().Object);
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDEF", null);
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
@@ -368,7 +363,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(true);
             SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterInstanceAs<ITraceListener>(new Mock<ITraceListener>().Object);
+            objectContainerStub.RegisterInstanceAs(new Mock<ITraceListener>().Object);
 
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDEF", null);
@@ -463,7 +458,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
 
             var tlMock = new Mock<ITraceListener>();
             var containerStub = new ObjectContainer();
-            containerStub.RegisterInstanceAs<ITraceListener>(tlMock.Object);
+            containerStub.RegisterInstanceAs(tlMock.Object);
 
             var scenarioContextMock = new Mock<IScenarioContext>();
             var stepContextMock = new Mock<IScenarioStepContext>();
@@ -544,7 +539,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
             objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(new CucumberMessageFactory(new HookBindingTest_CucumberMessageFactoryInnerStub()));
 
             var traceListen = new Mock<ITraceListener>();
-            objectContainerStub.RegisterInstanceAs<ITraceListener>(traceListen.Object);
+            objectContainerStub.RegisterInstanceAs(traceListen.Object);
             _idGeneratorMock.Setup(ig => ig.GetNewId()).Returns("x");
 
             var hookBindingMock = new Mock<IHookBinding>();

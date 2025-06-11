@@ -4,7 +4,7 @@ using Reqnroll.Formatters.Configuration;
 using System.Collections.Generic;
 using Xunit;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
+namespace Reqnroll.RuntimeTests.Formatters.Configuration
 {
     public class CucumberConfigurationTests
     {

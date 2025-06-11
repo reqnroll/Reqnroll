@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Xunit;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.PubSub
+namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class BindingMessagesGeneratorTests
     {

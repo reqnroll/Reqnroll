@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using Xunit;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
+namespace Reqnroll.RuntimeTests.Formatters.Configuration
 {
     public class FileBasedConfigurationResolverTests
     {

@@ -47,8 +47,4 @@
     </None>
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="CucumberMessages\Configuration\" />
-  </ItemGroup>
-
 </Project>

@@ -18,7 +18,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Xunit;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
+namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
     public class FeatureTrackerTests
     {
@@ -43,7 +43,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
         {
             idCounter = 10;
             _idGeneratorMock = new Mock<IIdGenerator>();
-            _idGeneratorMock.Setup(g => g.GetNewId()).Returns(() => { return (idCounter++).ToString(); });
+            _idGeneratorMock.Setup(g => g.GetNewId()).Returns(() => { return idCounter++.ToString(); });
             _clockMock = new Mock<IClock>();
             _clockMock.Setup(clock => clock.GetNowDateAndTime()).Returns(DateTime.UnixEpoch);
 
@@ -56,7 +56,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
             _stepDefinitionsByMethodSignature = new ConcurrentDictionary<string, string>();
             _stepDefinitionsByMethodSignature.TryAdd("dummyMethodSignature", "step1");
             var featureLevelCucumberMessagesDummy = new FeatureLevelCucumberMessages(
-                () => new Source("c:\\file", "Feature test", Io.Cucumber.Messages.Types.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN),
+                () => new Source("c:\\file", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN),
                 () => new GherkinDocument("", new Feature(new Location(0, 0), [], "en", "Feature", "Dummy Feature", "", new List<FeatureChild>()), []),
                 () => new List<Pickle>([new Pickle("0", "", "", "en", [new PickleStep(null, [], "step1", PickleStepType.ACTION, "I eat a cuke")], [], [])]),
                 "location0");

@@ -4,7 +4,7 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using Xunit;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
+namespace Reqnroll.RuntimeTests.Formatters.Configuration
 {
     public class EnvVariableEnableFlagParserTests
     {

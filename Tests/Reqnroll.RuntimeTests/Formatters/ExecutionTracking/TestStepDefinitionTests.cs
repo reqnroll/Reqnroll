@@ -12,7 +12,7 @@ using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Xunit;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
+namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
     public class TestStepDefinitionTests
     {

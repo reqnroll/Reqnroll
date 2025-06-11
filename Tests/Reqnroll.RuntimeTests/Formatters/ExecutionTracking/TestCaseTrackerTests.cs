@@ -20,7 +20,7 @@ using System.Linq;
 using Xunit;
 using HookType = Reqnroll.Bindings.HookType;
 
-namespace Reqnroll.RuntimeTests.CucumberMessages.ExecutionTracking
+namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
     public class TestCaseTrackerTests
     {
