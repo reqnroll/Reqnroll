@@ -14,7 +14,7 @@ namespace Reqnroll.Formatters.Configuration
     /// One or more profiles may be read from the configuration file. (FileBasedConfigurationResolver)
     /// Then Environmment Variable Overrides are applied.
     /// </summary>
-    public class FormatterConfiguration : IFormattersConfiguration
+    public class FormattersConfiguration : IFormattersConfiguration
     {
         public static IFormattersConfiguration Current { get; private set; }
         public bool Enabled => _runtimeEnablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
@@ -24,10 +24,10 @@ namespace Reqnroll.Formatters.Configuration
         private IEnvVariableEnableFlagParser _envVariableEnableFlagParser;
         private bool _runtimeEnablementOverrideFlag = true;
 
-        public FormatterConfiguration(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
+        public FormattersConfiguration(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
         {
-            _resolvers = resolvers.Values.Cast<IFormattersConfigurationResolverBase>().ToList();
-            _resolvers.Add(environmentOverrideConfigurationResolver);
+            var fileResolver = resolvers["fileBasedResolver"];
+            _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
             _resolvedConfiguration = new Lazy<ResolvedConfiguration>(ResolveConfiguration);
             _envVariableEnableFlagParser = envVariableEnableFlagParser;
             Current = this;

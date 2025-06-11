@@ -141,10 +141,10 @@ namespace Reqnroll.Formatters.Tests
             var configEnvResolver = new EnvironmentConfigurationResolver(env);
             var resolvers = new Dictionary<string, IFormattersConfigurationResolver>
             {
-                {"fileBased",  configFileResolver }
+                {"fileBasedResolver",  configFileResolver }
             };
 
-            FormatterConfiguration configuration = new FormatterConfiguration(resolvers, configEnvResolver, new EnvVariableEnableFlagParser(env));
+            FormattersConfiguration configuration = new FormattersConfiguration(resolvers, configEnvResolver, new EnvVariableEnableFlagParser(env));
             string messagesConfiguration = configuration.GetFormatterConfigurationByName("messages");
             string outputFilePath = string.Empty;
             int colonIndex = messagesConfiguration.IndexOf(':');

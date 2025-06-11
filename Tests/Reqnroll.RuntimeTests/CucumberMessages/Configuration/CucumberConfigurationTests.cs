@@ -11,7 +11,7 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
         private readonly Mock<IEnvVariableEnableFlagParser> _envVariableEnableFlagParserMock;
         private readonly Mock<IFormattersConfigurationResolver> _fileResolverMock;
         private readonly Mock<IFormattersEnvironmentOverrideConfigurationResolver> _environmentResolverMock;
-        private readonly FormatterConfiguration _sut;
+        private readonly FormattersConfiguration _sut;
 
         public CucumberConfigurationTests()
         {
@@ -21,10 +21,10 @@ namespace Reqnroll.RuntimeTests.CucumberMessages.Configuration
 
             var resolvers = new Dictionary<string, IFormattersConfigurationResolver>
             {
-                {"filebased",  _fileResolverMock.Object }
+                {"fileBasedResolver",  _fileResolverMock.Object }
             };
 
-            _sut = new FormatterConfiguration(resolvers, _environmentResolverMock.Object, _envVariableEnableFlagParserMock.Object);
+            _sut = new FormattersConfiguration(resolvers, _environmentResolverMock.Object, _envVariableEnableFlagParserMock.Object);
         }
 
         [Fact]

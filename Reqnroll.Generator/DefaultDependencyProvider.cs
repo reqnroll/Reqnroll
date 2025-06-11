@@ -57,7 +57,7 @@ namespace Reqnroll.Generator
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
             container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
 
-            container.RegisterTypeAs<FormatterConfiguration, IFormattersConfiguration>();
+            container.RegisterTypeAs<FormattersConfiguration, IFormattersConfiguration>();
 
             container.RegisterTypeAs<ReqnrollGherkinParserFactory, IGherkinParserFactory>();
             
