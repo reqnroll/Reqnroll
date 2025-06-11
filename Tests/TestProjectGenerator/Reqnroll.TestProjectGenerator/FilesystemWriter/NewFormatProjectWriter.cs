@@ -51,6 +51,15 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 
             WriteProjectFiles(project, projRootPath);
 
+            if (project.ProjectType == ProjectType.Exe && project.NuGetPackages.Any(n => n.Name.StartsWith("xunit.v3")))
+            {
+                string programMainFilePath = Path.Combine(projRootPath, $"Program.{project.ProgrammingLanguage.ToCodeFileExtension()}");
+                if (File.Exists(programMainFilePath))
+                {
+                    File.Delete(programMainFilePath);
+                }
+            }
+
             return projectFilePath;
         }
 
