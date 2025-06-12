@@ -35,7 +35,7 @@ public class TestRunnerManager : ITestRunnerManager
     {
         public FeatureInfo LastUsedFeatureInfo { get; } = lastUsedFeatureInfo;
 
-        private int? ReleasedOnManagedThreadId { get; } = releasedOnManagedThreadId;
+        public int? ReleasedOnManagedThreadId { get; } = releasedOnManagedThreadId;
 
         /// <summary>
         /// Returns information about how optimal the provided hint for the current situation. Smaller number means more optimal.
@@ -53,16 +53,6 @@ public class TestRunnerManager : ITestRunnerManager
 
     private readonly ConcurrentDictionary<IObjectContainer, TestWorkerContainerHint> _availableTestWorkerContainers = new();
     private readonly ConcurrentDictionary<IObjectContainer, TestWorkerContainerHint> _usedTestWorkerContainers = new();
-    /// <summary>
-    /// Reserves and remembers the last used test runner for a feature.
-    /// </summary>
-    /// <remarks>
-    /// The reservation ensures that an "before" or "after" feature hook is only executed once when scenario parallelization is disabled.
-    /// This is useful when the test framework doesn't guarantee the order of test execution, or when a race condition occurs when fetching a test runner from <see cref="_availableTestWorkerContainers"/>.
-    /// The reservation is lifted when a feature is finished (see <see cref="ReleaseFeatureAsync(FeatureInfo, Assembly, IContainerBuilder)"/>).
-    /// Note: Only one test runner is reserved per feature, because when scenario parallelization runs there can be multiple parallel runs anyway and we could reserve too many test runners.
-    /// </remarks>
-    private readonly ConcurrentDictionary<FeatureInfo, IObjectContainer> _reservedTestWorkerContainersForFeatureInfo = new();
     private int _nextTestWorkerContainerId;
 
     public bool IsTestRunInitialized { get; private set; }
@@ -111,35 +101,31 @@ public class TestRunnerManager : ITestRunnerManager
         return testRunner;
     }
 
-    public virtual void ReleaseTestRunnerToManager(ITestRunner testRunner)
+    public virtual void ReleaseTestRunnerToPool(ITestRunner testRunner)
     {
         var testThreadContainer = testRunner.TestThreadContext.TestThreadContainer;
-        if (!_usedTestWorkerContainers.TryRemove(testThreadContainer, out var usedContainerHint))
+        if (!_usedTestWorkerContainers.TryRemove(testThreadContainer, out _))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was already released");
-        var featureInfo = testRunner.FeatureContext?.FeatureInfo;
-        if (featureInfo is not null && _reservedTestWorkerContainersForFeatureInfo.TryAdd(featureInfo, testThreadContainer))
-            return; // The test runner was reserved. Do not allow other features to select it (do not add it to the list of available test runners).
-        var containerHint = new TestWorkerContainerHint(usedContainerHint?.LastUsedFeatureInfo, Thread.CurrentThread.ManagedThreadId);
+        // We construct the container hint based on the current feature context of the runner. If the runner performed the feature closing procedure already, that will be null
+        var containerHint = new TestWorkerContainerHint(testRunner.FeatureContext?.FeatureInfo, Thread.CurrentThread.ManagedThreadId);
         if (!_availableTestWorkerContainers.TryAdd(testThreadContainer, containerHint))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} was released twice");
     }
 
-    public virtual async Task ReleaseFeatureForTestRunnersAsync(FeatureInfo featureInfo)
+    public virtual async Task EndFeatureForAvailableTestRunnersAsync(FeatureInfo featureInfo)
     {
         var items = _availableTestWorkerContainers.ToArray();
         foreach (var item in items)
         {
             if (!ReferenceEquals(featureInfo, item.Value.LastUsedFeatureInfo))
-                continue;
+                continue; // This is for a different feature
             if (!_availableTestWorkerContainers.TryRemove(item.Key, out _))
                 continue; // Container was already taken by another thread
             await EndFeatureForTestRunnerAsync(item.Key, featureInfo);
         }
-        if (_reservedTestWorkerContainersForFeatureInfo.TryRemove(featureInfo, out var testThreadContainer))
-            await EndFeatureForTestRunnerAsync(testThreadContainer, featureInfo);
     }
 
-    async Task EndFeatureForTestRunnerAsync(IObjectContainer testThreadContainer, FeatureInfo featureInfo)
+    private async Task EndFeatureForTestRunnerAsync(IObjectContainer testThreadContainer, FeatureInfo featureInfo)
     {
         if (!_usedTestWorkerContainers.TryAdd(testThreadContainer, new TestWorkerContainerHint(featureInfo, null)))
             throw new InvalidOperationException($"TestThreadContext with id {TestThreadContainerInfo.GetId(testThreadContainer)} is already in usage");
@@ -153,7 +139,7 @@ public class TestRunnerManager : ITestRunnerManager
         }
         finally
         {
-            ReleaseTestRunnerToManager(testRunner);
+            ReleaseTestRunnerToPool(testRunner);
         }
     }
 
@@ -224,17 +210,36 @@ public class TestRunnerManager : ITestRunnerManager
             if (items.Length == 0)
                 return false; // No Containers are available
 
-            var prioritizedContainers = items
+            // take all containers that are bound to our feature or not bound to any
+            var sameFeatureOrUnboundContainers = items
+                .Where(it => it.Value.LastUsedFeatureInfo == featureHint || it.Value.LastUsedFeatureInfo == null);
+
+            // take all from others, except one from each that is "reserved" to finish that feature
+            var otherContainers = items
+              .Where(it => it.Value.LastUsedFeatureInfo != featureHint && it.Value.LastUsedFeatureInfo != null)
+              .GroupBy(it => it.Value.LastUsedFeatureInfo)
+              .SelectMany(g => g.OrderByDescending(it => TestWorkerContainerHint.GetDistance(it.Value, featureHint)).Skip(1));
+
+            // put all these to a priority list
+            var prioritizedContainers = sameFeatureOrUnboundContainers.Concat(otherContainers)
                 .OrderBy(it => TestWorkerContainerHint.GetDistance(it.Value, featureHint))
                 .Select(it => it.Key);
 
+            bool containersTested = false;
+
             foreach (var container in prioritizedContainers)
             {
+                containersTested = true;
                 if (!_availableTestWorkerContainers.TryRemove(container, out _))
                     continue; // Container was already taken by another thread
                 testThreadContainer = container;
+                Debug.WriteLine($"{container.Resolve<ITestRunner>().TestWorkerId} - {container.Resolve<ITestRunner>().FeatureContext?.FeatureInfo.Title}", "chosen");
                 return true;
             }
+
+            // if there was no item in 'prioritizedContainers', we don't even retry
+            if (!containersTested) 
+                return false;
         }
         
         return false;
@@ -242,12 +247,7 @@ public class TestRunnerManager : ITestRunnerManager
 
     protected virtual ITestRunner GetOrCreateTestRunnerInstance(FeatureInfo featureHint = null)
     {
-        IObjectContainer testThreadContainer = null;
-        if (featureHint is not null && _reservedTestWorkerContainersForFeatureInfo.TryRemove(featureHint, out testThreadContainer))
-        {
-            // We found a reserved test runner for this feature. Select this test runner to prevent a new feature (context) and test threead context from being created.
-        }
-        else if (TryGetTestRunnerFromAvailableTestWorkerContainers(featureHint, out testThreadContainer))
+        if (TryGetTestRunnerFromAvailableTestWorkerContainers(featureHint, out var testThreadContainer))
         {
             // We found an available test runner. Select it to prevent a new test thread context from being created.
         }
@@ -301,7 +301,7 @@ public class TestRunnerManager : ITestRunnerManager
     private async Task<ExceptionDispatchInfo[]> FireRemainingAfterFeatureHooks()
     {
         var onFeatureEndErrors = new List<ExceptionDispatchInfo>();
-        var testWorkerContainers = _availableTestWorkerContainers.Keys.Concat(_usedTestWorkerContainers.Keys).Concat(_reservedTestWorkerContainersForFeatureInfo.Values).ToArray();
+        var testWorkerContainers = _availableTestWorkerContainers.Keys.Concat(_usedTestWorkerContainers.Keys).ToArray();
         foreach (var testWorkerContainer in testWorkerContainers)
         {
             var contextManager = testWorkerContainer.Resolve<IContextManager>();
@@ -340,7 +340,7 @@ public class TestRunnerManager : ITestRunnerManager
 
             if (_globalTestRunner != null)
             {
-                ReleaseTestRunnerToManager(_globalTestRunner);
+                ReleaseTestRunnerToPool(_globalTestRunner);
             }
 
             var testWorkerContainers = _availableTestWorkerContainers.ToArray();
@@ -474,14 +474,14 @@ public class TestRunnerManager : ITestRunnerManager
 
     public static void ReleaseTestRunner(ITestRunner testRunner)
     {
-        testRunner.TestThreadContext.TestThreadContainer.Resolve<ITestRunnerManager>().ReleaseTestRunnerToManager(testRunner);
+        testRunner.TestThreadContext.TestThreadContainer.Resolve<ITestRunnerManager>().ReleaseTestRunnerToPool(testRunner);
     }
 
     public static async Task ReleaseFeatureAsync(FeatureInfo featureInfo, Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);
-        await testRunnerManager.ReleaseFeatureForTestRunnersAsync(featureInfo);
+        await testRunnerManager.EndFeatureForAvailableTestRunnersAsync(featureInfo);
     }
 
     internal static async Task ResetAsync()
