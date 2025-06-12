@@ -210,6 +210,12 @@ public class TestRunnerManager : ITestRunnerManager
             if (items.Length == 0)
                 return false; // No Containers are available
 
+            var featuresInUse = _usedTestWorkerContainers
+                .Select(it => it.Value.LastUsedFeatureInfo)
+                .Where(fi => fi != null)
+                .Distinct()
+                .ToArray();
+
             // take all containers that are bound to our feature or not bound to any
             var sameFeatureOrUnboundContainers = items
                 .Where(it => it.Value.LastUsedFeatureInfo == featureHint || it.Value.LastUsedFeatureInfo == null);
@@ -218,7 +224,9 @@ public class TestRunnerManager : ITestRunnerManager
             var otherContainers = items
               .Where(it => it.Value.LastUsedFeatureInfo != featureHint && it.Value.LastUsedFeatureInfo != null)
               .GroupBy(it => it.Value.LastUsedFeatureInfo)
-              .SelectMany(g => g.OrderByDescending(it => TestWorkerContainerHint.GetDistance(it.Value, featureHint)).Skip(1));
+              .SelectMany(g => featuresInUse.Contains(g.Key) ? 
+                g : // if the feature is in use, we anyway have the "reserved" runner already
+                g.OrderByDescending(it => TestWorkerContainerHint.GetDistance(it.Value, featureHint)).Skip(1));
 
             // put all these to a priority list
             var prioritizedContainers = sameFeatureOrUnboundContainers.Concat(otherContainers)
