@@ -513,7 +513,7 @@ public abstract class GenerationTestBase : SystemTestBase
         for (int i = 1; i <= 3; i++)
         {
             featureOrAboveHookLines.Should()
-                                   .ContainInConsecutiveOrder(
+                                   .ContainInOrder(
                                        $"-> hook: Feature {i}:BeforeFeature",
                                        $"-> hook: Feature {i}:AfterFeature"
                                    );

@@ -16,6 +16,7 @@
 * Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
 * Provide AsyncEventHandler in RuntimePluginTestExecutionLifecycleEvents (#634)
 * Improved test execution time by decoupling the telemetry sending from the execution. (#629)
+* Support out-of-order feature execution (#638)
 
 ## Bug fixes:
 

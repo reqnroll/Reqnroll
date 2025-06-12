@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Reqnroll.Tracing;
 using Xunit;
+using Xunit.Abstractions;
 using static Reqnroll.RuntimeTests.TestRunnerManagerStaticApiTest;
 
 namespace Reqnroll.RuntimeTests;
@@ -76,16 +78,34 @@ public class TestRunnerManagerTests : IAsyncLifetime
     }
 
     [Fact]
-    public void Should_use_test_runner_that_was_active_last_time_on_the_same_thread_if_possible()
+    public async Task Should_use_test_runner_that_was_active_last_time_on_the_same_thread_if_possible()
     {
+        async Task<ITestRunner> GetBoundTestRunner(FeatureInfo featureInfo)
+        {
+            var testRunner = TestRunnerManager.GetTestRunnerForAssembly(featureHint: featureInfo);
+            if (featureInfo != null)
+                await testRunner.OnFeatureStartAsync(featureInfo);
+            return testRunner;
+        }
+
+        async Task<List<ITestRunner>> GetBoundTestRunners(FeatureInfo featureInfo, int count)
+        {
+            List<ITestRunner> result = new(count);
+            for (int i = 0; i < count; i++)
+                result.Add(await GetBoundTestRunner(featureInfo));
+            return result;
+        }
+
         var ourFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "F1", null);
         var otherFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "F2", null);
 
-        var otherRunners1 = Enumerable.Range(0, 5).Select(_ => TestRunnerManager.GetTestRunnerForAssembly(featureHint: otherFeatureInfo)).ToList();
-        var otherRunners2 = Enumerable.Range(0, 5).Select(_ => TestRunnerManager.GetTestRunnerForAssembly(featureHint: otherFeatureInfo)).ToList();
-        var runnerOnDifferentFeatureSameThread = TestRunnerManager.GetTestRunnerForAssembly(featureHint: otherFeatureInfo);
-        var runnerOnSameFeatureDifferentThread = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
-        var ourRunner = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
+        const int otherRunnerCount = 10;
+        var otherRunners1 = await GetBoundTestRunners(otherFeatureInfo, otherRunnerCount / 2);
+        var otherRunners2 = await GetBoundTestRunners(otherFeatureInfo, otherRunnerCount / 2);
+        var runnerOnDifferentFeatureSameThread = await GetBoundTestRunner(otherFeatureInfo);
+        var runnerOnSameFeatureDifferentThread = await GetBoundTestRunner(ourFeatureInfo);
+        var notBoundRunner = await GetBoundTestRunner(null);
+        var ourRunner = await GetBoundTestRunner(ourFeatureInfo);
 
         void RunOnOtherThreadAndWait(Action action)
         {
@@ -97,6 +117,7 @@ public class TestRunnerManagerTests : IAsyncLifetime
         
         // release the selected runners
         TestRunnerManager.ReleaseTestRunner(ourRunner);
+        TestRunnerManager.ReleaseTestRunner(notBoundRunner);
         TestRunnerManager.ReleaseTestRunner(runnerOnDifferentFeatureSameThread);
         RunOnOtherThreadAndWait(() => TestRunnerManager.ReleaseTestRunner(runnerOnSameFeatureDifferentThread));
 
@@ -106,8 +127,10 @@ public class TestRunnerManagerTests : IAsyncLifetime
         // Priority:
         // 1. Same feature, same thread
         // 2. Same feature, different thread
-        // 3. Other feature, same thread
-        // 4. Other feature, other thread
+        // 3. Not bound to a Feature
+        // 4. Other feature, same thread
+        // 5. Other feature, other thread
+        // 6. Create a new one if only the "reserved" is remaining from the other feature
 
         // Priority 1: from the same feature & same thread, we should get our test runner first
         var ourRunnerAgain = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
@@ -117,13 +140,25 @@ public class TestRunnerManagerTests : IAsyncLifetime
         var runnerOnSameFeatureDifferentThreadAgain = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
         runnerOnSameFeatureDifferentThreadAgain.TestWorkerId.Should().Be(runnerOnSameFeatureDifferentThread.TestWorkerId);
 
-        // Priority 3: from the different feature & same thread
+        // Priority 3: not bound to a Feature 
+        var notBoundRunnerAgain = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
+        notBoundRunnerAgain.TestWorkerId.Should().Be(notBoundRunner.TestWorkerId);
+
+        // Priority 4: from the different feature & same thread
         var runnerOnDifferentFeatureSameThreadAgain = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
         runnerOnDifferentFeatureSameThreadAgain.TestWorkerId.Should().Be(runnerOnDifferentFeatureSameThread.TestWorkerId);
 
-        // Priority 4: if there is no from the same thread, just provide one of the others
+        // Priority 5: if there is no from the same thread, just provide one of the others
         var otherRunnerWithoutHint = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
         otherRunnerWithoutHint.TestWorkerId.Should().NotBe(ourRunner.TestWorkerId);
+
+        // use up all "other" runners, except one (one has been used already for Priority 5 test)
+        for (int i = 0; i < otherRunnerCount - 2; i++)
+            TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
+
+        // 6. Create a new one if only the "reserved" is remaining from the other feature
+        var newRunner = TestRunnerManager.GetTestRunnerForAssembly(featureHint: ourFeatureInfo);
+        newRunner.TestWorkerId.Should().Be((int.Parse(ourRunner.TestWorkerId) + 1).ToString());
 
         TestRunnerManager.ReleaseTestRunner(ourRunnerAgain);
         TestRunnerManager.ReleaseTestRunner(runnerOnSameFeatureDifferentThreadAgain);
@@ -270,5 +305,45 @@ public class TestRunnerManagerTests : IAsyncLifetime
 
         TestRunnerManager.ReleaseTestRunner(testRunner1);
         TestRunnerManager.ReleaseTestRunner(testRunner2);
+    }
+
+    [Fact]
+    public async Task Should_support_out_of_order_feature_execution()
+    {
+        var feature1 = new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "feat1", "some text");
+        var feature2 = new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "feat2", "other text");
+
+        // Feature 1 started
+        var testRunnerFeature1Scenario = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder(), featureHint: feature1);
+        await testRunnerFeature1Scenario.OnFeatureStartAsync(feature1);
+        testRunnerFeature1Scenario.OnScenarioInitialize(new ScenarioInfo("foo1.1", "foo_desc", null, null), null);
+        await testRunnerFeature1Scenario.OnScenarioStartAsync();
+        await testRunnerFeature1Scenario.OnScenarioEndAsync();
+        TestRunnerManager.ReleaseTestRunner(testRunnerFeature1Scenario);
+        // Feature 1 "paused" (no active test runner)
+
+        // Feature 2 started out-of-order, because Feature 1 is not resumed yet
+        var testRunnerFeature2Scenario = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder(), featureHint: feature2);
+        testRunnerFeature2Scenario.Should().NotBeSameAs(testRunnerFeature1Scenario, because: "because one testrunner should be reserved for feature1");
+        await testRunnerFeature2Scenario.OnFeatureStartAsync(feature2);
+        testRunnerFeature2Scenario.OnScenarioInitialize(new ScenarioInfo("foo2.1", "foo_desc", null, null), null);
+        await testRunnerFeature2Scenario.OnScenarioStartAsync();
+        await testRunnerFeature2Scenario.OnScenarioEndAsync();
+        TestRunnerManager.ReleaseTestRunner(testRunnerFeature2Scenario);
+        // Feature 2 "paused" (no active test runner)
+
+        // Feature 1 end
+        var testRunnerFeature1End = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder(), featureHint: feature1);
+        testRunnerFeature1End.Should().BeSameAs(testRunnerFeature1Scenario, because: "because reserved testrunner should used");
+        testRunnerFeature1End.FeatureContext?.FeatureInfo.Should().BeSameAs(feature1, because: "because reused feature should already be started");
+        await testRunnerFeature1End.OnFeatureEndAsync();
+        TestRunnerManager.ReleaseTestRunner(testRunnerFeature1End);
+
+        // Feature 2 end
+        var testRunnerFeature2End = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder(), featureHint: feature2);
+        testRunnerFeature2End.Should().BeSameAs(testRunnerFeature2Scenario, because: "because reserved testrunner should used");
+        testRunnerFeature2End.FeatureContext?.FeatureInfo.Should().BeSameAs(feature2, because: "because reused feature should already be started");
+        await testRunnerFeature2End.OnFeatureEndAsync();
+        TestRunnerManager.ReleaseTestRunner(testRunnerFeature2End);
     }
 }
