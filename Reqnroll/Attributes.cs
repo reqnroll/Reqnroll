@@ -17,7 +17,7 @@ namespace Reqnroll
         public StepDefinitionType[] Types { get; }
 
         /// <summary>
-        /// A cucumber expression or regular expression (regex) that matches the step text.
+        /// A cucumber expression or a regular expression (regex) that matches the step text.
         /// </summary>
         public string Expression { get; set; }
 
