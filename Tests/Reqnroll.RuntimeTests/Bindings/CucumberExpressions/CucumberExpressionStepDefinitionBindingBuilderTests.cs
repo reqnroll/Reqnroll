@@ -1,4 +1,3 @@
-using CucumberExpressions;
 using FluentAssertions;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.CucumberExpressions;
@@ -59,12 +58,12 @@ public class CucumberExpressionStepDefinitionBindingBuilderTests
         var sut = CreateSut("I have eaten cucumbers on {DateTime}");
 
         var result = sut.BuildSingle();
-        
+
         result.ExpressionType.Should().Be(StepDefinitionExpressionTypes.CucumberExpression);
         result.Regex?.ToString().Should().Be(@"^I have eaten cucumbers on (.*)$");
         result.Expression.Should().BeOfType<ReqnrollCucumberExpression>().Which.ParameterTypes.FirstOrDefault()?.ParameterType.Should().Be(typeof(DateTime));
     }
-    
+
     [Fact]
     public void Should_build_from_expression_with_string_param()
     {
