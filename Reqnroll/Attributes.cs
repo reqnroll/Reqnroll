@@ -15,7 +15,11 @@ namespace Reqnroll
     public abstract class StepDefinitionBaseAttribute : Attribute
     {
         public StepDefinitionType[] Types { get; }
-        public string Regex { get; set; }
+
+        /// <summary>
+        /// A cucumber expression or a regular expression (regex) that matches the step text.
+        /// </summary>
+        public string Expression { get; set; }
 
         /// <summary>
         /// additional information in which culture the step is written
@@ -24,17 +28,17 @@ namespace Reqnroll
         /// </summary>
         public string Culture { get; set; }
 
-        internal StepDefinitionBaseAttribute(string regex, StepDefinitionType type)
-            : this(regex, new[] { type })
+        internal StepDefinitionBaseAttribute(string expression, StepDefinitionType type)
+            : this(expression, new[] { type })
         {
         }
 
-        protected StepDefinitionBaseAttribute(string regex, StepDefinitionType[] types)
+        protected StepDefinitionBaseAttribute(string expression, StepDefinitionType[] types)
         {
             if (types == null) throw new ArgumentNullException(nameof(types));
             if (types.Length == 0) throw new ArgumentException("List cannot be empty", nameof(types));
 
-            Regex = regex;
+            Expression = expression;
             Types = types;
         }
     }
@@ -49,13 +53,13 @@ namespace Reqnroll
         }
 
 
-        public GivenAttribute(string regex)
-            : base(regex, StepDefinitionType.Given)
+        public GivenAttribute(string expression)
+            : base(expression, StepDefinitionType.Given)
         {
         }
 
-        public GivenAttribute(string regex, string culture)
-            : this(regex)
+        public GivenAttribute(string expression, string culture)
+            : this(expression)
         {
             Culture = culture;
         }
@@ -71,13 +75,13 @@ namespace Reqnroll
         {
         }
 
-        public WhenAttribute(string regex)
-            : base(regex, StepDefinitionType.When)
+        public WhenAttribute(string expression)
+            : base(expression, StepDefinitionType.When)
         {
         }
 
-        public WhenAttribute(string regex, string culture)
-            : this(regex)
+        public WhenAttribute(string expression, string culture)
+            : this(expression)
         {
             Culture = culture;
         }
@@ -92,13 +96,13 @@ namespace Reqnroll
         {
         }
 
-        public ThenAttribute(string regex)
-            : base(regex, StepDefinitionType.Then)
+        public ThenAttribute(string expression)
+            : base(expression, StepDefinitionType.Then)
         {
         }
 
-        public ThenAttribute(string regex, string culture)
-            : this(regex)
+        public ThenAttribute(string expression, string culture)
+            : this(expression)
         {
             Culture = culture;
         }
@@ -114,13 +118,13 @@ namespace Reqnroll
         {
         }
 
-        public StepDefinitionAttribute(string regex)
-            : base(regex, new[] { StepDefinitionType.Given, StepDefinitionType.When, StepDefinitionType.Then })
+        public StepDefinitionAttribute(string expression)
+            : base(expression, new[] { StepDefinitionType.Given, StepDefinitionType.When, StepDefinitionType.Then })
         {
         }
 
-        public StepDefinitionAttribute(string regex, string culture)
-            : this(regex)
+        public StepDefinitionAttribute(string expression, string culture)
+            : this(expression)
         {
             Culture = culture;
         }
