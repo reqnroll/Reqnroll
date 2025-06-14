@@ -30,10 +30,11 @@ public partial class FeatureTests
                         TriviaList(),
                         SyntaxKind.ColonToken,
                         TriviaList([Space])),
-                    Identifier(
-                        TriviaList(),
-                        "Guess the word",
-                        TriviaList([CarriageReturnLineFeed]))),
+                    LiteralText(
+                        Literal(
+                            TriviaList(),
+                            "Guess the word",
+                            TriviaList([CarriageReturnLineFeed])))),
                 Token(
                     TriviaList([Whitespace("    "), CarriageReturnLineFeed]),
                     SyntaxKind.EndOfFileToken,

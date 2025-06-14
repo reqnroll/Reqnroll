@@ -44,7 +44,7 @@ public class SkippedTokensTriviaTests
             TriviaList([
                 Trivia(
                     SkippedTokensTrivia(
-                        TokenList([ Literal(TriviaList(), "invalid", TriviaList([ Space ])) ])))
+                        TokenList([Literal(TriviaList(), "invalid", TriviaList([ Space ])) ])))
                 ]),
             SyntaxKind.ColonToken,
             TriviaList());

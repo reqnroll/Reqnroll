@@ -76,11 +76,72 @@ public static partial class SyntaxFactory
     public static SyntaxToken Identifier(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.Identifier(leading.InternalNode, text, trailing.InternalNode);
 
-    //public static SyntaxToken Literal(string text) =>
-    //    InternalSyntaxFactory.Literal(null, text, null);
+    public static SyntaxToken Literal(string value) =>
+        InternalSyntaxFactory.Literal(null, LiteralEncoding.EncodeLiteralForDisplay(value), value, null);
 
-    //public static SyntaxToken Literal(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
-    //    InternalSyntaxFactory.Literal(leading.InternalNode, text, trailing.InternalNode);
+    public static SyntaxToken Literal(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.Literal(
+            leading.InternalNode,
+            LiteralEncoding.EncodeLiteralForDisplay(value),
+            value,
+            trailing.InternalNode);
+
+    public static SyntaxToken Literal(string text, string value) =>
+        InternalSyntaxFactory.Literal(null, text, value, null);
+
+    public static SyntaxToken Literal(SyntaxTriviaList leading, string text, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.Literal(leading.InternalNode, text, value, trailing.InternalNode);
+
+    public static LiteralTextSyntax LiteralText(string text) => LiteralText(TokenList([Literal(text)]));
+
+    public static LiteralTextSyntax LiteralText(SyntaxToken text) => LiteralText(TokenList([text]));
+
+    /// <summary>
+    /// Creates a new <see cref="FeatureSyntax"/> instance.
+    /// </summary>
+    /// <param name="featureKeyword">The "Feature" keyword.</param>
+    /// <param name="name">The name of the feature.</param>
+    /// <returns>A new <see cref="FeatureSyntax"/> instance.</returns>
+    public static FeatureSyntax Feature(string featureKeyword, string name) => Feature(
+        Token(SyntaxKind.FeatureKeyword, featureKeyword),
+        LiteralText(name));
+
+    /// <summary>
+    /// Creates a new <see cref="ScenarioSyntax"/> instance.
+    /// </summary>
+    /// <param name="scenarioKeyword">The token that represents the "Scenario" keyword.</param>
+    /// <param name="name">The name of the scenario.</param>
+    /// <param name="steps">The steps of the scenario.</param>
+    /// <returns>A new <see cref="ScenarioSyntax"/> instance.</returns>
+    public static ScenarioSyntax Scenario(
+        string scenarioKeyword,
+        string name,
+        SyntaxList<StepSyntax> steps = default) => Scenario(
+            Token(SyntaxKind.ScenarioKeyword, scenarioKeyword),
+            LiteralText(name),
+            steps: steps);
+
+    public static SyntaxToken StepTextLiteral(string text) =>
+        InternalSyntaxFactory.StepTextLiteral(null, text, null);
+
+    public static SyntaxToken StepTextLiteral(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.StepTextLiteral(leading.InternalNode, text, trailing.InternalNode);
+
+    public static SyntaxToken TableLiteral(string value) =>
+        InternalSyntaxFactory.TableLiteral(null, LiteralEncoding.EncodeTableLiteralForDisplay(value), value, null);
+
+    public static SyntaxToken TableLiteral(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.TableLiteral(
+            leading.InternalNode,
+            LiteralEncoding.EncodeTableLiteralForDisplay(value),
+            value,
+            trailing.InternalNode);
+
+    public static SyntaxToken TableLiteral(string text, string value) =>
+        InternalSyntaxFactory.TableLiteral(null, text, value, null);
+
+    public static SyntaxToken TableLiteral(SyntaxTriviaList leading, string text, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.TableLiteral(leading.InternalNode, text, value, trailing.InternalNode);
 
     public static SyntaxTriviaList TriviaList() => default;
 
@@ -97,6 +158,12 @@ public static partial class SyntaxFactory
     public static SyntaxList<TNode> List<TNode>() where TNode : SyntaxNode => default;
 
     public static SyntaxList<TNode> List<TNode>(IEnumerable<TNode> nodes) where TNode : SyntaxNode => new(nodes);
+
+    public static SeparatedSyntaxList<TNode> SeparatedList<TNode>()
+        where TNode : SyntaxNode => new();
+
+    public static SeparatedSyntaxList<TNode> SeparatedList<TNode>(IEnumerable<SyntaxNodeOrToken> nodes) 
+        where TNode : SyntaxNode => new(nodes);
 
     public static SyntaxTrivia Whitespace(string text) => InternalSyntaxFactory.Whitespace(text);
 

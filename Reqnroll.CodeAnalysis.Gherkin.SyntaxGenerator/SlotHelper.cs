@@ -129,6 +129,13 @@ internal static class SlotHelper
                 {
                     nodeType = SyntaxNodeType.SyntaxList;
                     typeName = $"SyntaxList<{((INamedTypeSymbol)property.Type).TypeArguments[0].Name}>";
+                    isOptional = true;
+                }
+                else if (property.Type.IsSeparatedSyntaxList())
+                {
+                    nodeType = SyntaxNodeType.SyntaxList;
+                    typeName = $"SeparatedSyntaxList<{((INamedTypeSymbol)property.Type).TypeArguments[0].Name}>";
+                    isOptional = true;
                 }
                 else
                 {

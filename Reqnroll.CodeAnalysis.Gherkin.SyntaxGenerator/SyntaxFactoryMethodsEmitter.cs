@@ -136,7 +136,7 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
 
             builder.Append(property.TypeName);
 
-            if (property.NodeType == SyntaxNodeType.SyntaxNode)
+            if (property.NodeType == SyntaxNodeType.SyntaxNode && !property.IsRequired)
             {
                 builder.Append('?');
             }
@@ -236,7 +236,11 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
                     builder.Append(property.TypeName);
                     break;
                 case SyntaxNodeType.SyntaxNode:
-                    builder.Append(property.TypeName).Append('?');
+                    builder.Append(property.TypeName);
+                    if (!property.IsRequired)
+                    {
+                        builder.Append('?');
+                    }
                     break;
             }
 
@@ -360,7 +364,7 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
 
             builder.Append(property.TypeName);
 
-            if (property.NodeType == SyntaxNodeType.SyntaxNode)
+            if (property.NodeType == SyntaxNodeType.SyntaxNode && !property.IsRequired)
             {
                 builder.Append('?');
             }
@@ -411,7 +415,7 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
 
                 builder.Append(NamingHelper.PascalCaseToCamelCase(property.Name));
 
-                if (property.NodeType == SyntaxNodeType.SyntaxNode)
+                if (property.NodeType == SyntaxNodeType.SyntaxNode && !property.IsRequired)
                 {
                     builder.Append('?');
                 }

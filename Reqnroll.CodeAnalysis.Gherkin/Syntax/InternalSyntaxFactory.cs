@@ -104,6 +104,15 @@ internal static partial class InternalSyntaxFactory
         return buffer.ToString();
     }
 
+    public static InternalSyntaxToken StepTextLiteral(string text) =>
+        new(SyntaxKind.LiteralToken, text);
+
+    public static InternalSyntaxToken StepTextLiteral(
+        InternalNode? leadingTrivia,
+        string text,
+        InternalNode? trailingTrivia) =>
+        new(SyntaxKind.LiteralToken, text, leadingTrivia, trailingTrivia);
+
     public static InternalSyntaxTrivia Whitespace(string text, bool elastic = false)
     {
         var node = new InternalSyntaxTrivia(SyntaxKind.WhitespaceTrivia, text);
@@ -160,8 +169,15 @@ internal static partial class InternalSyntaxFactory
         SyntaxKind kind,
         InternalNode? trailingTrivia) => InternalSyntaxToken.CreateMissing(kind, leadingTrivia, trailingTrivia);
 
-    public static InternalSyntaxToken Identifier(InternalNode? leadingTrivia, string text, InternalNode? trailingTrivia) =>
+    internal static SyntaxToken Identifier(InternalNode? leadingTrivia, string text, InternalNode? trailingTrivia) =>
         InternalSyntaxToken.Create(SyntaxKind.IdentifierToken, text, leadingTrivia, trailingTrivia);
+
+    public static InternalSyntaxToken Literal(
+        InternalNode? leadingTrivia,
+        string text,
+        string value,
+        InternalNode? trailingTrivia) =>
+        InternalSyntaxToken.Create(SyntaxKind.LiteralToken, text, value, leadingTrivia, trailingTrivia);
 
     /// <summary>
     /// Reads characters from source text as whitespace trivia.
@@ -186,4 +202,13 @@ internal static partial class InternalSyntaxFactory
     }
 
     public static InternalSkippedTokensTriviaSyntax SkippedTokensTrivia(InternalNode? tokens) => new(tokens);
+
+    internal static SyntaxToken TableLiteral(
+        InternalNode? leadingTrivia,
+        string text,
+        string value,
+        InternalNode? trailingTrivia)
+    {
+        return InternalSyntaxToken.Create(SyntaxKind.TableLiteralToken, text, value, leadingTrivia, trailingTrivia);
+    }
 }

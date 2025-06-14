@@ -34,7 +34,12 @@ public class TriviaTests
     public void CanCreateSkippedTokensTrivia()
     {
         var skippedTokens = SkippedTokensTrivia(
-            TokenList([ Literal("fibble"), Literal("wibble"), Literal("bibble"), Literal("bobble") ]));
+            TokenList([ 
+                Literal("fibble"),
+                Literal("wibble"),
+                Literal("bibble"),
+                Literal("bobble")
+            ]));
 
         var trivia = Trivia(skippedTokens);
 

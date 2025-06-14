@@ -11,9 +11,11 @@ internal class FeatureHeaderRuleHandler() : ParsingRuleHandler(RuleType.FeatureH
 {
     private DescriptionRuleHandler? _descriptionRuleHandler;
 
-    public InternalNode? keyword;
-    public InternalNode? colon;
-    public InternalNode? name;
+    public InternalNode? Keyword { get; private set; }
+
+    public InternalNode? Colon { get; private set; }
+
+    public InternalNode? Name { get; private set; }
 
     protected override void AppendFeatureLine(Token token, TextLine line, ParsingContext context)
     {
@@ -30,8 +32,8 @@ internal class FeatureHeaderRuleHandler() : ParsingRuleHandler(RuleType.FeatureH
         var colonPosition = line.Start + token.Line.Indent + token.MatchedKeyword.Length;
         var colonWhitespace = context.SourceText.ConsumeWhitespace(colonPosition + 1, line.End);
 
-        keyword = Token(context.ConsumeLeadingTrivia(), SyntaxKind.FeatureKeyword, token.MatchedKeyword, null);
-        colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
+        Keyword = Token(context.ConsumeLeadingTrivia(), SyntaxKind.FeatureKeyword, token.MatchedKeyword, null);
+        Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
 
         // Extract any whitespace between the end of the feature name and the end of the line.
         var featureNameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
@@ -40,7 +42,8 @@ internal class FeatureHeaderRuleHandler() : ParsingRuleHandler(RuleType.FeatureH
 
         nameWhitespace += line.GetEndOfLineTrivia();
 
-        name = Identifier(null, token.MatchedText, nameWhitespace);
+        Name = LiteralText(
+            Literal(null, LiteralEncoding.EncodeLiteralForDisplay(token.MatchedText), token.MatchedText, nameWhitespace));
     }
 
     public override ParsingRuleHandler StartChildRule(RuleType ruleType)
@@ -54,5 +57,5 @@ internal class FeatureHeaderRuleHandler() : ParsingRuleHandler(RuleType.FeatureH
         return base.StartChildRule(ruleType);
     }
 
-    public DescriptionSyntax.Internal? CreateDescriptionSyntax() => _descriptionRuleHandler?.CreateDescriptionSyntax();
+    //public DescriptionSyntax.Internal? Description => _descriptionRuleHandler?.CreateDescriptionSyntax();
 }

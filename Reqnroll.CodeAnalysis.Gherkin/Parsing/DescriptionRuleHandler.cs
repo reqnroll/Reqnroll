@@ -19,7 +19,7 @@ internal class DescriptionRuleHandler() : ParsingRuleHandler(RuleType.Descriptio
 
         // Description lines have the following layout:
         //
-        // [text-literal] [end-of-line]
+        // [description-literal] [end-of-line]
 
         InternalNode? trailing;
 
@@ -44,18 +44,20 @@ internal class DescriptionRuleHandler() : ParsingRuleHandler(RuleType.Descriptio
         trailing = context.SourceText.ConsumeWhitespace(line.Start + token.Line.Indent + text.Length, line.End) +
             line.GetEndOfLineTrivia();
 
-        _description.Add(Literal(context.ConsumeLeadingTrivia(), text, trailing));
+        throw new NotImplementedException("I forgot how this works.");
+
+        //_description.Add(Literal(context.ConsumeLeadingTrivia(), text, trailing));
     }
 
-    public DescriptionSyntax.Internal? CreateDescriptionSyntax()
-    {
-        var text = InternalNode.CreateList(_description);
+    //public DescriptionSyntax.Internal? CreateDescriptionSyntax()
+    //{
+    //    var text = InternalNode.CreateList(_description);
 
-        if (text == null)
-        {
-            return null;
-        }
+    //    if (text == null)
+    //    {
+    //        return null;
+    //    }
 
-        return Description(text);
-    }
+    //    return Description(text);
+    //}
 }

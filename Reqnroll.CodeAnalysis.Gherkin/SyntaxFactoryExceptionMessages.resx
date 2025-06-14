@@ -117,25 +117,64 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="TokenMustBeAtToken" xml:space="preserve">
+    <value>Value must be an at ("@") token.</value>
+  </data>
   <data name="TokenMustBeBackgroundKeyword" xml:space="preserve">
     <value>Value must be a "background" keyword token.</value>
   </data>
   <data name="TokenMustBeColonToken" xml:space="preserve">
-    <value>Value must be a colon token.</value>
+    <value>Value must be a colon (":") token.</value>
+  </data>
+  <data name="TokenMustBeDocStringDelimiterToken" xml:space="preserve">
+    <value>Value must be a Doc String delimiter token.</value>
   </data>
   <data name="TokenMustBeEndOfFileToken" xml:space="preserve">
     <value>Value must be an end-of-file token.</value>
   </data>
+  <data name="TokenMustBeExamplesKeyword" xml:space="preserve">
+    <value>Value must be an "examples" keyword token.</value>
+  </data>
   <data name="TokenMustBeFeatureKeyword" xml:space="preserve">
     <value>Value must be a "feature" keyword token.</value>
+  </data>
+  <data name="TokenMustBeGreaterThanToken" xml:space="preserve">
+    <value>Value must be a greater-than ("&gt;") token.</value>
+  </data>
+  <data name="TokenMustBeHashToken" xml:space="preserve">
+    <value>Value must be a hash ("#") token.</value>
   </data>
   <data name="TokenMustBeIdentifierToken" xml:space="preserve">
     <value>Value must be an identifier token.</value>
   </data>
-  <data name="TokenMustBeOneOfGivenKeywordWhenKeywordThenKeywordAndKeyword" xml:space="preserve">
-    <value>Value must be one of a "given", "when", "then" or "and" token.</value>
+  <data name="TokenMustBeLanguageKeyword" xml:space="preserve">
+    <value>Value must be a "language" keyword token.</value>
+  </data>
+  <data name="TokenMustBeLessThanToken" xml:space="preserve">
+    <value>Value must be a less-than ("&lt;") token.</value>
+  </data>
+  <data name="TokenMustBeLiteralToken" xml:space="preserve">
+    <value>Value must be a literal token.</value>
+  </data>
+  <data name="TokenMustBeOneOfGivenKeywordWhenKeywordThenKeywordAndKeywordButKeywordAsterixToken" xml:space="preserve">
+    <value>Value must be one of a "given", "when", "then", "and" or "but" keyword tokens or an asterisk ("*") token.</value>
+  </data>
+  <data name="TokenMustBeOneOfInterpolatedLiteralTokenInterpolatedTableLiteralToken" xml:space="preserve">
+    <value>Value must be an interpolated literal token.</value>
+  </data>
+  <data name="TokenMustBeRuleKeyword" xml:space="preserve">
+    <value>Value must be a "rule" keyword token.</value>
   </data>
   <data name="TokenMustBeScenarioKeyword" xml:space="preserve">
     <value>Value must be a "scenario" keyword token.</value>
+  </data>
+  <data name="TokenMustBeTableLiteralToken" xml:space="preserve">
+    <value>Value must be a table literal token.</value>
+  </data>
+  <data name="TokenMustBeTextLiteralToken" xml:space="preserve">
+    <value>Value must be a text literal token.</value>
+  </data>
+  <data name="TokenMustBeVerticalBarToken" xml:space="preserve">
+    <value>Value must be a vertical bar ("|") token.</value>
   </data>
 </root>

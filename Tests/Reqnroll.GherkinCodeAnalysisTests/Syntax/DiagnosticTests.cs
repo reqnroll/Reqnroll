@@ -11,11 +11,11 @@ public class DiagnosticTests
     public void CanAttachDiagnosticsToSyntaxToken()
     {
         const string text = "Descriptive, eh?";
-        var token = Token(null, SyntaxKind.TextLiteralToken, text, null)
+        var token = Literal(null, text, text, null)
             .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag) ]);
 
         // Create a sytax node to attach the token to a tree.
-        var description = (DescriptionSyntax)Description(token).CreateSyntaxNode();
+        var description = (LiteralTextSyntax)LiteralText(token).CreateSyntaxNode();
 
         var textToken = description.Text[0];
 
@@ -37,7 +37,7 @@ public class DiagnosticTests
     public void CanAttachDiagnosticsToFloatingSyntaxToken()
     {
         const string text = "Descriptive, eh?";
-        var token = Token(null, SyntaxKind.TextLiteralToken, text, null)
+        var token = Token(null, SyntaxKind.LiteralToken, text, null)
             .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)]);
 
         var textToken = new SyntaxToken(token);
@@ -60,8 +60,8 @@ public class DiagnosticTests
 
         // Create a token and syntax node to attach the trivia to a tree.
         const string text = "Descriptive, eh?";
-        var token = Token(leading, SyntaxKind.TextLiteralToken, text, trailing);
-        var description = (DescriptionSyntax)Description(token).CreateSyntaxNode();
+        var token = Token(leading, SyntaxKind.LiteralToken, text, trailing);
+        var description = (LiteralTextSyntax)LiteralText(token).CreateSyntaxNode();
 
         var textToken = description.Text.Single();
 
@@ -110,7 +110,7 @@ public class DiagnosticTests
     {
         const string text = "Descriptive, eh?";
 
-        var description = (DescriptionSyntax)Description(Token(null, SyntaxKind.TextLiteralToken, text, null))
+        var description = (LiteralTextSyntax)LiteralText(Token(null, SyntaxKind.LiteralToken, text, null))
             .WithDiagnostics([InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag)])
             .CreateSyntaxNode();
 
@@ -135,10 +135,20 @@ public class DiagnosticTests
         var diagnostic2 = InternalDiagnostic.Create(descriptor2);
 
         var feature = (FeatureSyntax)Feature(
+            default,
             Token(SyntaxKind.FeatureKeyword, "Feature").WithDiagnostics([diagnostic2]),
             Token(null, SyntaxKind.ColonToken, Whitespace(" ").WithDiagnostics([diagnostic1])).WithDiagnostics([diagnostic2]),
-            Identifier(null, "Guess the word", CarriageReturnLineFeed),
-            Description(Literal(CarriageReturnLineFeed, "An example feature from the Gherkin reference.", CarriageReturnLineFeed)))
+            LiteralText(
+                Literal(null, "Guess the word", "Guess the word", CarriageReturnLineFeed)),
+            LiteralText(
+                Literal(
+                    CarriageReturnLineFeed,
+                    "An example feature from the Gherkin reference.",
+                    "An example feature from the Gherkin reference.",
+                    CarriageReturnLineFeed)),
+            default,
+            default,
+            default)
             .WithDiagnostics([diagnostic1, diagnostic2])
             .CreateSyntaxNode();
 

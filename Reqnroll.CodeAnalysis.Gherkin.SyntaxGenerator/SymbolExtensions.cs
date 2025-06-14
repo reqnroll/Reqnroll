@@ -28,4 +28,14 @@ internal static class SymbolExtensions
 
         return symbol.OriginalDefinition.ToDisplayString() == "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxList<TNode>";
     }
+
+    public static bool IsSeparatedSyntaxList(this ITypeSymbol symbol)
+    {
+        if (symbol.OriginalDefinition == null)
+        {
+            return false;
+        }
+
+        return symbol.OriginalDefinition.ToDisplayString() == "Reqnroll.CodeAnalysis.Gherkin.Syntax.SeparatedSyntaxList<TNode>";
+    }
 }

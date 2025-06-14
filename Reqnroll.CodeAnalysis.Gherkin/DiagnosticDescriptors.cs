@@ -2,6 +2,8 @@ using Microsoft.CodeAnalysis;
 using System.Resources;
 using System.Runtime.CompilerServices;
 
+#pragma warning disable RS2008 // Enable analyzer release tracking
+
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
 internal static class DiagnosticDescriptors
@@ -13,6 +15,7 @@ internal static class DiagnosticDescriptors
         new(resourceKey, ResourceManager, typeof(DiagnosticDescriptor));
 
     public static readonly DiagnosticDescriptor ErrorExpectedFeatureOrTag = new(
+
         id: DiagnosticIds.ErrorExpectedFeatureOrTag,
         title: GetLocalizableResourceString("ErrorExpectedFeatureOrTagTitle"),
         messageFormat: GetLocalizableResourceString("ErrorExpectedFeatureOrTagMessage"),

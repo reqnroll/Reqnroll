@@ -145,34 +145,36 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
 
     private void AddUnexpectedToken(UnexpectedTokenException exception, string message)
     {
-        // Unexpected tokens are the parser's way of indicating it doesn't know how to interpret the current line.
-        // A misspelled keyword or incorrect formatting of a line can cause this.
-        // Although there are some scenarios the parser could examine in more depth (like missing a colon after a keyword)
-        // for now we'll treat all these errors generically and treat them as skipped tokens.
-        var token = exception.ReceivedToken;
-        var line = _context.SourceText.Lines[token.Line.LineNumber - 1];
-        var contentSpan = TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End);
+        throw new NotImplementedException();
 
-        InternalNode? leadingTrivia = Whitespace(_context.SourceText, line.Start, token.MatchedIndent);
-        var leadingWhitespace = _context.SourceText.ConsumeWhitespace(contentSpan);
+        //// Unexpected tokens are the parser's way of indicating it doesn't know how to interpret the current line.
+        //// A misspelled keyword or incorrect formatting of a line can cause this.
+        //// Although there are some scenarios the parser could examine in more depth (like missing a colon after a keyword)
+        //// for now we'll treat all these errors generically and treat them as skipped tokens.
+        //var token = exception.ReceivedToken;
+        //var line = _context.SourceText.Lines[token.Line.LineNumber - 1];
+        //var contentSpan = TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End);
 
-        leadingTrivia += leadingWhitespace;
+        //InternalNode? leadingTrivia = Whitespace(_context.SourceText, line.Start, token.MatchedIndent);
+        //var leadingWhitespace = _context.SourceText.ConsumeWhitespace(contentSpan);
 
-        var trailingWhitespace = _context.SourceText.ReverseConsumeWhitespace(contentSpan);
-        InternalNode? trailingTrivia = trailingWhitespace + line.GetEndOfLineTrivia();
+        //leadingTrivia += leadingWhitespace;
 
-        // All text remaining between any whitespace we'll treat as a literal.
-        var literalSpan = TextSpan.FromBounds(
-            contentSpan.Start + (leadingWhitespace?.Width ?? 0),
-            contentSpan.End - (trailingWhitespace?.Width ?? 0));
+        //var trailingWhitespace = _context.SourceText.ReverseConsumeWhitespace(contentSpan);
+        //InternalNode? trailingTrivia = trailingWhitespace + line.GetEndOfLineTrivia();
 
-        var literal = Literal(leadingTrivia, _context.SourceText.ToString(literalSpan) , trailingTrivia);
+        //// All text remaining between any whitespace we'll treat as a literal.
+        //var literalSpan = TextSpan.FromBounds(
+        //    contentSpan.Start + (leadingWhitespace?.Width ?? 0),
+        //    contentSpan.End - (trailingWhitespace?.Width ?? 0));
 
-        // Add the skipped tokens to be included as leading trivia in the next token.
-        // Inkeeping with the CS compiler error codes, we'll create a unique error for each combination of expected tokens.
-        var diagnostic = GetUnexpectedTokenDiagnostic(exception.ExpectedTokenTypes);
+        //var literal = Literal(leadingTrivia, _context.SourceText.ToString(literalSpan) , trailingTrivia);
 
-        _context.AddSkippedToken(literal, diagnostic);
+        //// Add the skipped tokens to be included as leading trivia in the next token.
+        //// Inkeeping with the CS compiler error codes, we'll create a unique error for each combination of expected tokens.
+        //var diagnostic = GetUnexpectedTokenDiagnostic(exception.ExpectedTokenTypes);
+
+        //_context.AddSkippedToken(literal, diagnostic);
     }
 
     private static InternalDiagnostic GetUnexpectedTokenDiagnostic(string[] expectedTokenTypes)

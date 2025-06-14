@@ -28,6 +28,11 @@ public enum SyntaxKind : ushort
     // Textless syntax tokens //
 
     /// <summary>
+    /// The token is the "language" keyword.
+    /// </summary>
+    LanguageKeyword,
+
+    /// <summary>
     /// The token is a colon <c>:</c>
     /// </summary>
     ColonToken, // This is assumed to be the first textless syntax token.
@@ -38,6 +43,11 @@ public enum SyntaxKind : ushort
     AtToken,
 
     /// <summary>
+    /// The token is the asterisk symbol <c>*</c>
+    /// </summary>
+    AsterixToken,
+
+    /// <summary>
     /// The token is the less-than symbol <c>&lt;</c>
     /// </summary>
     LessThanToken,
@@ -46,6 +56,16 @@ public enum SyntaxKind : ushort
     /// The token is the greater-than symbol <c>&gt;</c>
     /// </summary>
     GreaterThanToken,
+
+    /// <summary>
+    /// The token is a vertical bar <c>|</c>
+    /// </summary>
+    VerticalBarToken,
+
+    /// <summary>
+    /// The token is a hash symbol <c>#</c>
+    /// </summary>
+    HashToken,
 
     /// <summary>
     /// The token marks the end of the file.
@@ -65,14 +85,19 @@ public enum SyntaxKind : ushort
     BackgroundKeyword,
 
     /// <summary>
+    /// The token is a "rule" keyword.
+    /// </summary>
+    RuleKeyword,
+
+    /// <summary>
     /// The token is a "scenario" keyword.
     /// </summary>
     ScenarioKeyword,
 
     /// <summary>
-    /// The token is a "scenario outline" keyword.
+    /// The token is an "examples" keyword.
     /// </summary>
-    ScenarioOutlineKeyword,
+    ExamplesKeyword,
 
     /// <summary>
     /// The token is a "given" keyword.
@@ -94,7 +119,32 @@ public enum SyntaxKind : ushort
     /// </summary>
     AndKeyword,
 
+    /// <summary>
+    /// The token is a "but" keyword.
+    /// </summary>
+    ButKeyword,
+
     // Other text-containing tokens //
+
+    /// <summary>
+    /// The token is a delimiter that marks the start or end of a Doc String, typically """ or ```.
+    /// </summary>
+    DocStringDelimiterToken,
+
+    /// <summary>
+    /// The token is the identifier of a Doc String content type, such as "json" or "xml".
+    /// </summary>
+    DocStringContentTypeIdentifierToken,
+
+    /// <summary>
+    /// The token is a literal string within an interpolated text.
+    /// </summary>
+    InterpolatedLiteralToken,
+
+    /// <summary>
+    /// The token is a literal string within an interpolated text in a table.
+    /// </summary>
+    InterpolatedTableLiteralToken,
 
     /// <summary>
     /// The token is an identifier.
@@ -102,14 +152,14 @@ public enum SyntaxKind : ushort
     IdentifierToken,
 
     /// <summary>
-    /// The token is literal text as part of a description.
+    /// The token is text from inside a table.
     /// </summary>
-    DescriptionLiteralToken,
+    TableLiteralToken,
 
     /// <summary>
-    /// The token is literal text as part of a step's text.
+    /// The token is literal text.
     /// </summary>
-    StepTextLiteralToken, // This is assumed to be the last syntax token.
+    LiteralToken, // This is assumed to be the last syntax token.
 
     // Trivia tokens //
 
@@ -166,42 +216,67 @@ public enum SyntaxKind : ushort
     ScenarioOutline,
 
     /// <summary>
+    /// The node is a declaration of examples for an outline scenario.
+    /// </summary>
+    Examples,
+
+    /// <summary>
     /// The node is a tag.
     /// </summary>
     Tag,
 
     /// <summary>
-    /// The node is a name.
-    /// </summary>
-    Name,
-
-    /// <summary>
-    /// The node is a description.
-    /// </summary>
-    Description,
-
-    /// <summary>
-    /// The node is a step within a scenario.
+    /// The node is a step.
     /// </summary>
     Step,
 
     /// <summary>
-    /// The node is the text of a step which does not include any parameters.
+    /// The node is a table within a step.
     /// </summary>
-    LiteralStepText,
+    StepTable,
 
     /// <summary>
-    /// The node is the text of a step which includes one or more parameters.
+    /// The node is a docstring within a step.
     /// </summary>
-    InterpolatedStepText,
+    StepDocString,
 
     /// <summary>
-    /// The node is a literal string within an interpolated step text.
+    /// The node is text with no additional meaning.
     /// </summary>
-    InterpolatedStepTextString,
+    LiteralText,
 
     /// <summary>
-    /// The node is a parameter within an interpolated step text.
+    /// The node is text which includes one or more parameters.
     /// </summary>
-    InterpolatedStepTextParameter
+    InterpolatedText,
+
+    /// <summary>
+    /// The node is a literal text within an interpolated text.
+    /// </summary>
+    InterpolatedTextLiteral,
+
+    /// <summary>
+    /// The node is a parameter interpolation within an interpolated text.
+    /// </summary>
+    Interpolation,
+
+    /// <summary>
+    /// The node is a table.
+    /// </summary>
+    Table,
+
+    /// <summary>
+    /// The node is a data row within a table.
+    /// </summary>
+    TableRow,
+
+    /// <summary>
+    /// The node is a Doc String, a delimited, multi-line block of text.
+    /// </summary>
+    DocString,
+
+    /// <summary>
+    /// The node is the content-type identifier of a Doc String, such as "json" or "xml".
+    /// </summary>
+    DocStringContentType,
 }

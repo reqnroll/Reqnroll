@@ -1,6 +1,5 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
-using Microsoft.CodeAnalysis;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 using static SyntaxFactory;
 
@@ -9,6 +8,7 @@ public partial class BackgroundTests
     [Fact]
     public void BackgroundIsRepresentedInTree()
     {
+        // Taken from good/background.feature
         const string source =
             """
             Feature: Background
@@ -39,38 +39,103 @@ public partial class BackgroundTests
                         TriviaList(),
                         SyntaxKind.ColonToken,
                         TriviaList([Space])),
-                    Identifier(
-                        TriviaList(),
-                        "Background",
-                        TriviaList([EnvironmentNewline])),
-                    List([
-                        Background(
+                    LiteralText(
+                        Literal(
+                            TriviaList(),
+                            "Background",
+                            TriviaList([EnvironmentNewline]))),
+                    background: Background(
+                        Token(
+                            TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                            SyntaxKind.BackgroundKeyword,
+                            "Background",
+                            TriviaList()),
+                        Token(
+                            TriviaList(),
+                            SyntaxKind.ColonToken,
+                            TriviaList([Space])),
+                        LiteralText(
+                            Literal(
+                                TriviaList(),
+                                "a simple background",
+                                TriviaList([EnvironmentNewline]))),
+                        steps: List([
+                            Step(
+                                Token(
+                                    TriviaList([Whitespace("    ")]),
+                                    SyntaxKind.GivenKeyword,
+                                    "Given",
+                                    TriviaList([Space])),
+                                LiteralText(
+                                    TokenList(
+                                        Token(
+                                            TriviaList(),
+                                            SyntaxKind.LiteralToken,
+                                            "the minimalism inside a background",
+                                            TriviaList([EnvironmentNewline])))))
+                            ])),
+                    scenarios: List([
+                        Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
-                                SyntaxKind.BackgroundKeyword,
-                                "Background",
+                                TriviaList([EnvironmentNewline, EnvironmentNewline]),
+                                SyntaxKind.ScenarioKeyword,
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
                                 SyntaxKind.ColonToken,
                                 TriviaList([Space])),
-                            Identifier(
-                                TriviaList(),
-                                "a simple background",
-                                TriviaList([EnvironmentNewline])),
-                            default,
-                            List([
+                            LiteralText(
+                                Literal(
+                                    TriviaList(),
+                                    "minimalistic",
+                                    TriviaList([EnvironmentNewline]))),
+                            steps : List([
                                 Step(
                                     Token(
-                                        TriviaList([Whitespace("    ")]),
+                                        TriviaList([Whitespace("  ")]),
                                         SyntaxKind.GivenKeyword,
                                         "Given",
-                                        TriviaList()),
-                                    TokenList(
-                                        Literal(
-                                            TriviaList([Space]),
-                                            "the minimalism inside a background",
-                                            TriviaList([EnvironmentNewline])))),
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        TokenList([
+                                            Token(
+                                                TriviaList(),
+                                                SyntaxKind.LiteralToken,
+                                                "the minimalism",
+                                                TriviaList([EnvironmentNewline]))
+                                            ])))
+                                ])),
+                        Scenario(
+                            Token(
+                                TriviaList([EnvironmentNewline, EnvironmentNewline]),
+                                SyntaxKind.ScenarioKeyword,
+                                "Scenario",
+                                TriviaList()),
+                            Token(
+                                TriviaList(),
+                                SyntaxKind.ColonToken,
+                                TriviaList([Space])),
+                            LiteralText(
+                                Literal(
+                                    TriviaList(),
+                                    "also minimalistic",
+                                    TriviaList([EnvironmentNewline]))),
+                            steps : List([
+                                Step(
+                                    Token(
+                                        TriviaList([Whitespace("  ")]),
+                                        SyntaxKind.GivenKeyword,
+                                        "Given",
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        TokenList([
+                                            Token(
+                                                TriviaList(),
+                                                SyntaxKind.LiteralToken,
+                                                "the minimalism",
+                                                TriviaList([EnvironmentNewline]))
+                                            ])))
                             ]))
                     ])),
                 Token(

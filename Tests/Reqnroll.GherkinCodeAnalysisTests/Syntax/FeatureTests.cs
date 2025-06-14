@@ -8,11 +8,15 @@ public class FeatureTests
     public void ToStringReturnsTokensInDocumentOrder()
     {
         var feature = Feature(
+            default,
             Token(SyntaxKind.FeatureKeyword, "Feature"),
             Token(TriviaList(), SyntaxKind.ColonToken, TriviaList([Whitespace(" ")])),
-            Identifier(TriviaList(), "Guess the word", TriviaList([CarriageReturnLineFeed, CarriageReturnLineFeed])),
-            Description(
-                Literal(TriviaList(), "An example feature from the Gherkin reference.", TriviaList([CarriageReturnLineFeed]))));
+            LiteralText(Literal(TriviaList(), "Guess the word", TriviaList([CarriageReturnLineFeed, CarriageReturnLineFeed]))),
+            LiteralText(
+                Literal(
+                    TriviaList(),
+                    "An example feature from the Gherkin reference.",
+                    TriviaList([CarriageReturnLineFeed]))));
 
         feature.ToString().Should().Be(
             "Feature: Guess the word" + 

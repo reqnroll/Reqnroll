@@ -9,6 +9,7 @@ public class EmptySourceTests
     [Fact]
     public void EmptySourceTextCreatesEmptyFeatureFileSyntax()
     {
+        // Taken from good/empty.feature
         var tree = GherkinSyntaxTree.ParseText("");
 
         var root = tree.GetRoot();

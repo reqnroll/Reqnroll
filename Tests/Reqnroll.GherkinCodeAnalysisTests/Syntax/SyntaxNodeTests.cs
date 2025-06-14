@@ -13,7 +13,7 @@ public class SyntaxNodeTests
     [Fact]
     public void GetText_ReturnsSourceTextContainingNodeSyntax()
     {
-        var node = Description(Literal("test"));
+        var node = LiteralText(Literal("test"));
 
         var text = node.GetText();
 

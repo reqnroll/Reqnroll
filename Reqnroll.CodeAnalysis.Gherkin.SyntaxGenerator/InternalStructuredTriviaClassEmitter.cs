@@ -4,6 +4,8 @@ internal class InternalStructuredTriviaClassEmitter(SyntaxNodeClassInfo classInf
 {
     public const string ClassName = "Internal";
 
+    private const string InternalSyntaxNodeName = "InternalNode";
+
     public string BaseClassName { get; set; } = "InternalStructuredTriviaSyntax";
 
     public string EmitRawSyntaxNodeClass()
@@ -140,7 +142,7 @@ internal class InternalStructuredTriviaClassEmitter(SyntaxNodeClassInfo classInf
 
         foreach (var property in classInfo.SlotProperties)
         {
-            builder.Append(BaseClassName);
+            builder.Append(InternalSyntaxNodeName);
 
             if (property.IsInternalNodeNullable)
             {
@@ -216,7 +218,7 @@ internal class InternalStructuredTriviaClassEmitter(SyntaxNodeClassInfo classInf
                 builder.AppendLine(',');
             }
 
-            builder.Append(BaseClassName);
+            builder.Append(InternalSyntaxNodeName);
 
             if (property.IsInternalNodeNullable)
             {
@@ -241,7 +243,7 @@ internal class InternalStructuredTriviaClassEmitter(SyntaxNodeClassInfo classInf
     {
         foreach (var property in classInfo.SlotProperties)
         {
-            builder.Append("public readonly ").Append(BaseClassName);
+            builder.Append("public readonly ").Append(InternalSyntaxNodeName);
 
             if (property.IsInternalNodeNullable)
             {

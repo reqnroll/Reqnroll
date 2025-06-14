@@ -120,4 +120,7 @@
   <data name="CannotCreateSyntaxNodeFromSyntaxToken" xml:space="preserve">
     <value>Cannot create a syntax node from a syntax token.</value>
   </data>
+  <data name="String1" xml:space="preserve">
+    <value>Cool</value>
+  </data>
 </root>

@@ -146,6 +146,21 @@ internal partial class InternalSyntaxToken : InternalNode
             ImmutableArray<SyntaxAnnotation>.Empty);
     }
 
+    internal static InternalSyntaxToken Create(
+        SyntaxKind kind,
+        string text,
+        string value,
+        InternalNode? leading,
+        InternalNode? trailing)
+    {
+        if (!kind.IsToken())
+        {
+            throw new ArgumentOutOfRangeException(nameof(kind), kind, "This method can only be used to create tokens.");
+        }
+
+        return new InternalSyntaxTokenWithValue<string>(kind, text, value, leading, trailing);
+    }
+
     private static string GetText(SyntaxKind kind)
     {
         return kind switch

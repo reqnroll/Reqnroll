@@ -1,0 +1,1214 @@
+using Reqnroll.CodeAnalysis.Gherkin.Syntax;
+
+namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
+
+using static SyntaxFactory;
+
+public partial class FeatureTests
+{
+    [Fact]
+    public void VeryLongFeatureIsRepresentedInTree()
+    {
+        // Taken from good/very_long.feature
+        const string source =
+            """
+            Feature: Long feature file
+              This is a long feature file
+
+              Scenario: scenario 01
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 02
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 03
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 04
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 05
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 06
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 07
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 08
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 09
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 10
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 11
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 12
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 13
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 14
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 15
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 16
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 17
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 18
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 19
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 20
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 21
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 22
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 23
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 24
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 25
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 26
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 27
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 28
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 29
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 30
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 31
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 32
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 33
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 34
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 35
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 36
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 37
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 38
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 39
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 40
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 41
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 42
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 43
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 44
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 45
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 46
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 47
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 48
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 49
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+              Scenario: scenario 50
+                Given a simple data table
+                  | foo | bar |
+                  | boz | boo |
+                And a data table with a single cell
+                  | foo |
+                And a data table with different fromatting
+                  |   foo|bar|    boz    |
+                And a data table with an empty cell
+                  |foo||boz|
+                And a data table with comments and newlines inside
+                  | foo | bar |
+
+                  | boz  | boo  |
+                  # this is a comment
+                  | boz2 | boo2 |
+
+            """;
+
+        var tree = GherkinSyntaxTree.ParseText(source);
+
+        tree.GetRoot().Should().BeEquivalentTo(
+            GherkinDocument(
+                Feature(
+                    Token(
+                        TriviaList(),
+                        SyntaxKind.FeatureKeyword,
+                        "Feature",
+                        TriviaList()),
+                    Token(
+                        TriviaList(),
+                        SyntaxKind.ColonToken,
+                        TriviaList([Space])),
+                    LiteralText(
+                        TokenList([
+                            Literal(
+                                TriviaList(),
+                                "Long feature file",
+                                TriviaList([EnvironmentNewline, Whitespace("  ")])),
+                            Literal(
+                                TriviaList(),
+                                "This is a long feature file",
+                                TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                        ])),
+                    scenarios: List([
+                        Scenario(
+                            Token(
+                                TriviaList([Whitespace("  ")]),
+                                SyntaxKind.ScenarioKeyword,
+                                "Scenario",
+                                TriviaList()),
+                            Token(
+                                TriviaList(),
+                                SyntaxKind.ColonToken,
+                                TriviaList([Space])),
+                            LiteralText(
+                                Literal(
+                                    TriviaList(),
+                                    "scenario 01",
+                                    TriviaList([EnvironmentNewline]))),
+                            steps: List([
+                                Step(
+                                    Token(
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.GivenKeyword,
+                                        "Given",
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        Literal(
+                                            TriviaList(),
+                                            "a simple data table",
+                                            TriviaList([EnvironmentNewline]))),
+                                    StepTable(
+                                        Table(
+                                            List([
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList()),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList([Space]),
+                                                                "foo",
+                                                                TriviaList([Space]))),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList()),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList([Space]),
+                                                                "bar",
+                                                                TriviaList([Space]))
+                                                        )
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline]))),
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList()),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList([Space]),
+                                                                "boz",
+                                                                TriviaList([Space]))),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList([Space])),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "boo",
+                                                                TriviaList([Space]))
+                                                        )
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline])))
+                                            ])))),
+                                Step(
+                                    Token(
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.AndKeyword,
+                                        "And",
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        Literal(
+                                            TriviaList(),
+                                            "a data table with a single cell",
+                                            TriviaList([EnvironmentNewline]))),
+                                    StepTable(
+                                        Table(
+                                            List([
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([Space])),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "foo",
+                                                                TriviaList([Space]))
+                                                        )
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline])))
+                                            ])))),
+                                Step(
+                                    Token(
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.AndKeyword,
+                                        "And",
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        Literal(
+                                            TriviaList(),
+                                            "a data table with different fromatting",
+                                            TriviaList([EnvironmentNewline]))),
+                                    StepTable(
+                                        Table(
+                                            List([
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([Space, Space, Space])),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "foo",
+                                                                TriviaList())),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList()),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "bar",
+                                                                TriviaList())),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList([Space, Space, Space, Space])),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "boz",
+                                                                TriviaList([Space, Space, Space, Space]))
+                                                        )
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline])))
+                                            ])))),
+                                Step(
+                                    Token(
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.AndKeyword,
+                                        "And",
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        Literal(
+                                            TriviaList(),
+                                            "a data table with an empty cell",
+                                            TriviaList([EnvironmentNewline]))),
+                                    StepTable(
+                                        Table(
+                                            List([
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList()),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "foo",
+                                                                TriviaList())),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList()),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "",
+                                                                TriviaList())),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList()),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "boz",
+                                                                TriviaList()))
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline])))
+                                            ])))),
+                                Step(
+                                    Token(
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.AndKeyword,
+                                        "And",
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        Literal(
+                                            TriviaList(),
+                                            "a data table with comments and newlines inside",
+                                            TriviaList([EnvironmentNewline]))),
+                                    StepTable(
+                                        Table(
+                                            List([
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([Space])),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "foo",
+                                                                TriviaList([Space]))),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList([Space])),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "bar",
+                                                                TriviaList([Space]))
+                                                        )
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline, EnvironmentNewline]))),
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([Space])),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "boz",
+                                                                TriviaList([Space, Space]))),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList([Space])),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "boo",
+                                                                TriviaList([Space, Space]))
+                                                        )
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline, Comment("# this is a comment"), EnvironmentNewline]))),
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([Space])),
+                                                    SeparatedList<PlainTextSyntax>([
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "boz2",
+                                                                TriviaList([Space]))),
+                                                        Token(
+                                                            TriviaList(),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList([Space])),
+                                                        LiteralText(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                "boo2",
+                                                                TriviaList([Space]))
+                                                        )
+                                                    ]),
+                                                    Token(
+                                                        TriviaList(),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewline])))
+                                            ]))))
+                            ])
+                        )
+                        // ... (Repeat for all 50 scenarios)
+                    ])),
+                Token(
+                    TriviaList(),
+                    SyntaxKind.EndOfFileToken,
+                    TriviaList())));
+
+        tree.ToString().Should().Be(source);
+    }
+}

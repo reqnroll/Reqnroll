@@ -79,7 +79,7 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             .Append('(')
             .Append(property.TypeName);
 
-        if (property.NodeType == SyntaxNodeType.SyntaxNode)
+        if (property.NodeType == SyntaxNodeType.SyntaxNode && !property.IsRequired)
         {
             builder.Append('?');
         }
