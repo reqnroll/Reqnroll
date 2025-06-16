@@ -27,6 +27,9 @@ namespace Reqnroll.Formatters.PubSub
         internal ITraceListener? trace => traceListener.Value;
         internal IObjectContainer? _testThreadObjectContainer;
 
+        public string Name { get => _pluginName; }
+
+
         public FormatterPluginBase(IFormattersConfiguration configuration, ICucumberMessageBroker broker, string pluginName)
         {
             _broker = broker;
@@ -79,16 +82,20 @@ namespace Reqnroll.Formatters.PubSub
 
             if (!config.Enabled)
             {
+                await _broker.RegisterDisabledSinkAsync(this);
                 return;
             }
             string formatterConfiguration = config.GetFormatterConfigurationByName(_pluginName);
 
             if (String.IsNullOrEmpty(formatterConfiguration))
+            {
+                await _broker.RegisterDisabledSinkAsync(this);
                 return;
+            }
 
             formatterTask = Task.Factory.StartNew(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration), TaskCreationOptions.LongRunning);
 
-            await _broker.RegisterSinkAsync(this);
+            await _broker.RegisterEnabledSinkAsync(this);
         }
 
         public async Task PublishAsync(Envelope message)
@@ -98,7 +105,7 @@ namespace Reqnroll.Formatters.PubSub
             // IF the publisher sends the TestRunFinished message, then we can safely shut down
             if (message.Content() is TestRunFinished)
                 await CloseAsync();
-            return ;
+            return;
         }
 
         internal abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString);

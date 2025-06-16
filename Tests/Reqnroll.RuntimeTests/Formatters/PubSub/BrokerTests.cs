@@ -19,7 +19,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             _objectContainerMock = new Mock<IObjectContainer>();
             _sinkMock1 = new Mock<ICucumberMessageSink>();
+            _sinkMock1.Setup(s => s.Name).Returns("sink1");
             _sinkMock2 = new Mock<ICucumberMessageSink>();
+            _sinkMock2.Setup(s => s.Name).Returns("sink2");
 
             // Setup the object container to resolve multiple sinks
             _objectContainerMock
@@ -34,11 +36,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task Enabled_Should_Return_True_When_Sinks_Are_Registered()
         {
             // Arrange
-            await _sut.RegisterSinkAsync(_sinkMock1.Object);
+            await _sut.RegisterEnabledSinkAsync(_sinkMock1.Object);
 
-            Assert.False(_sut.Enabled); // should nto be enabled until after both sinks are registered
+            Assert.False(_sut.Enabled); // should not be enabled until after both sinks are registered
 
-            await _sut.RegisterSinkAsync(_sinkMock2.Object);
+            await _sut.RegisterEnabledSinkAsync(_sinkMock2.Object);
 
             // Act
             var result = _sut.Enabled;
@@ -68,8 +70,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublishAsync_Should_Invoke_PublishAsync_On_All_Sinks()
         {
             // Arrange
-            await _sut.RegisterSinkAsync(_sinkMock1.Object);
-            await _sut.RegisterSinkAsync(_sinkMock2.Object);
+            await _sut.RegisterEnabledSinkAsync(_sinkMock1.Object);
+            await _sut.RegisterEnabledSinkAsync(_sinkMock2.Object);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
@@ -85,8 +87,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublishAsync_Should_Swallow_Exceptions_From_Sinks()
         {
             // Arrange
-            await _sut.RegisterSinkAsync(_sinkMock1.Object);
-            await _sut.RegisterSinkAsync(_sinkMock2.Object);
+            await _sut.RegisterEnabledSinkAsync(_sinkMock1.Object);
+            await _sut.RegisterEnabledSinkAsync(_sinkMock2.Object);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
