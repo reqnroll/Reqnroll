@@ -16,6 +16,7 @@
 * Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
 * Provide AsyncEventHandler in RuntimePluginTestExecutionLifecycleEvents (#634)
 * Improved test execution time by decoupling the telemetry sending from the execution. (#629)
+* Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
 
 ## Bug fixes:
 
@@ -23,7 +24,7 @@
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 
-*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):*  @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 
