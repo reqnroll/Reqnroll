@@ -22,9 +22,9 @@ To match for a simple text, just use the text as cucumber expression.
 
 ### Parameters
 
-Parameters can be defined using the `{parameter-type}` syntax. The typing name is case-sensitive. The `parameter-type` can be any of the following:
+Parameters can be defined using the `{parameter-type}` syntax. The type name is case-sensitive. The `parameter-type` can be any of the following:
 
-* The types: `{int}`, `{long}`, `{byte}`, `{float}`, `{double}`, `{decimal}`, `{float}`, `{DateTime}`, `{Guid}`
+* The types: `{int}`, `{long}`, `{byte}`, `{float}`, `{double}`, `{decimal}`, `{DateTime}`, `{Guid}`
 * Quoted strings: `{string}`. The text should have single or double quotes. E.g., `[Given("a user {string}")]` matches to `Given a user "Marvin"` or `Given a user 'Zaphod Beeblebrox'`.
 * A single word without quotes, `{word}`. E.g., `[Given("a user {word}")]` matches to `Given a user Marvin`.
 * Any other type, `{}`, like `(.*)` when using regex

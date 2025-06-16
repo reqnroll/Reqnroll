@@ -22,7 +22,7 @@ namespace Reqnroll
         public string Expression { get; set; }
 
         /// <summary>
-        /// Additional information in which culture the step is written. Tt does not affect the matching of the step, it is only for tooling support needed
+        /// Additional information in which culture the step is written. It does not affect the matching of the step, it is only for tooling support needed
         /// </summary>
         public string Culture { get; set; }
 
