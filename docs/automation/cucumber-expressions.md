@@ -22,10 +22,10 @@ To match for a simple text, just use the text as cucumber expression.
 
 ### Parameters
 
-Parameters can be defined using the `{parameter-type}` syntax. The typing name is case-sensitive. Where `parameter-type` can be any of the following:
+Parameters can be defined using the `{parameter-type}` syntax. The typing name is case-sensitive. The `parameter-type` can be any of the following:
 
-* The types: `{int}`, `{long}`, `{byte}`, `{float}`, `{double}`, `{decimal}`, `{float}`, `{DateTime}` (could also be used with `DateOnly` types), `{Guid}`
-* Quotes string: `{string}`. The text should have single or double quotes. E.g., `[Given("a user {string}")]` matches to `Given a user "Marvin"` or `Given a user 'Zaphod Beeblebrox'`.
+* The types: `{int}`, `{long}`, `{byte}`, `{float}`, `{double}`, `{decimal}`, `{float}`, `{DateTime}`, `{Guid}`
+* Quoted strings: `{string}`. The text should have single or double quotes. E.g., `[Given("a user {string}")]` matches to `Given a user "Marvin"` or `Given a user 'Zaphod Beeblebrox'`.
 * A single word without quotes, `{word}`. E.g., `[Given("a user {word}")]` matches to `Given a user Marvin`.
 * Any other type, `{}`, like `(.*)` when using regex
 * An enum type, with our without a namespace. E.g. `[When("I have {CustomColor} cucumbers in my belly")]` matches to `When I have green cucumbers in my belly` if `CustomColor` is an enum with `Green` as a value.
@@ -40,9 +40,12 @@ These have no built-in support for:
 
 For `TimeSpan`, `TimeOnly` and `DateOnly` types, `{}` could be used. 
 
-### Optionals, alternatives
+### Optional parameters and alternatives
 
-Cucumber expressions use the parentheses (`(...)`) for optionals and the `/` character to define alternatives. The step definition 
+Parameters that are optional should be wrapped with parentheses (`(...)`).
+The `/` character could be used to provide alternatives.
+
+For example, this step definition:
 
 ```{code-block} csharp
 :caption: Step Definition File
