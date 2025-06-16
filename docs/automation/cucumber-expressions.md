@@ -29,7 +29,7 @@ Parameters can be defined using the `{parameter-type}` syntax. The typing name i
 * A single word without quotes, `{word}`. E.g., `[Given("a user {word}")]` matches to `Given a user Marvin`.
 * Any other type, `{}`, like `(.*)` when using regex
 * An enum type, with our without a namespace. E.g. `[When("I have {CustomColor} cucumbers in my belly")]` matches to `When I have green cucumbers in my belly` if `CustomColor` is an enum with `Green` as a value.
-* [Step Argument Transformations](step-argument-conversions#step-argument-transformation) with a name, E.g., With `[StepArgumentTransformation("v(.*)", Name = "my_version")]`, you can define a step as `[When("I download the release {my_version} of the application")]` that matches to `When I download the release v1.2.3 of the application`.
+* [Step Argument Transformations](step-argument-conversions) with a name, E.g., With `[StepArgumentTransformation("v(.*)", Name = "my_version")]`, you can define a step as `[When("I download the release {my_version} of the application")]` that matches to `When I download the release v1.2.3 of the application`.
 
 #### Not supported
 
