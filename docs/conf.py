@@ -19,7 +19,7 @@ import sys
 
 
 project = 'Reqnroll'
-copyright = '2024, Reqnroll'
+copyright = '2024-2025, Reqnroll'
 author = 'Reqnroll'
 
 
