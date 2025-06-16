@@ -342,12 +342,10 @@ namespace Reqnroll.Formatters.PayloadProcessing.Cucumber
                 Architecture.Arm64 => new Product("arm64", null),
                 Architecture.X86 => new Product("x86", null),
                 Architecture.X64 => new Product("x64", null),
-                _ => new Product(null, null),
+                _ => new Product("unknown", null),
             };
 
-            var ci_name = environmentInfoProvider.GetBuildServerName();
-
-            var ci = ToCi(ci_name, environmentInfoProvider, environmentWrapper);
+            var ci = ToCi(environmentInfoProvider, environmentWrapper);
 
             return new Meta(
                     ProtocolVersion.Version.Split('+')[0],
@@ -358,11 +356,12 @@ namespace Reqnroll.Formatters.PayloadProcessing.Cucumber
                     ci);
         }
 
-        private static Ci ToCi(string ci_name, IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environmentWrapper)
+        private static Ci ToCi(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environmentWrapper)
         {
             //TODO: Find a way to abstract how various CI systems convey links to builds and build numbers.
             //      Until then, these will be hard coded as null
-            if (string.IsNullOrEmpty(ci_name)) return null;
+           var ci_name = environmentInfoProvider.GetBuildServerName();
+           if (string.IsNullOrEmpty(ci_name)) return null;
 
             var git = ToGit(environmentWrapper);
 
