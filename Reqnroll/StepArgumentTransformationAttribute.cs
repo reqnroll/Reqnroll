@@ -10,6 +10,7 @@ namespace Reqnroll
     {
         /// <summary>
         /// The regular expression that have to match the step argument. The entire argument is passed to the method if omitted.
+        /// Please note that Cucumber Expressions are not supported for step argument transformations.
         /// </summary>
         public string Regex { get; set; }
         /// <summary>
