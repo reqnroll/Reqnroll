@@ -36,7 +36,7 @@ namespace Reqnroll.Formatters.Configuration
                 {
                     foreach (JsonProperty jsonProperty in formattersEntry.EnumerateObject())
                     {
-                        result.Add(jsonProperty.Name, jsonProperty.Value.GetRawText());
+                        result[jsonProperty.Name] = jsonProperty.Value.GetRawText();
                     }
                 }
             }
