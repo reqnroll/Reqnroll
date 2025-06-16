@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Gherkin.Ast;
+using Reqnroll.Parser.CucmberMessageSupport;
 
-namespace Reqnroll.Parser.CucmberMessageSupport
+namespace Reqnroll.Parser.CucumberMessageSupport
 {
     abstract class ScenarioTransformationVisitor : GherkinDocumentVisitor
     {
