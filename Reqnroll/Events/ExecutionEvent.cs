@@ -4,7 +4,7 @@ using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Events
 {
-    // Formattres implementation note: Added various forms of context information to 
+    // Formatters implementation note: Added various forms of context information to 
     // many of the ExecutionEvents. This allows the Formatters implementation to
     // align events with the Scenarios and Features to which they belong.
 
