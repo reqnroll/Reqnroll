@@ -65,6 +65,18 @@ public class CucumberExpressionStepDefinitionBindingBuilderTests
     }
 
     [Fact]
+    public void Should_build_from_expression_with_Guid_param()
+    {
+        var sut = CreateSut("I've named my cucumber the unique name {Guid}");
+
+        var result = sut.BuildSingle();
+
+        result.ExpressionType.Should().Be(StepDefinitionExpressionTypes.CucumberExpression);
+        result.Regex?.ToString().Should().Be(@"^I've named my cucumber the unique name (.*)$");
+        result.Expression.Should().BeOfType<ReqnrollCucumberExpression>().Which.ParameterTypes.FirstOrDefault()?.ParameterType.Should().Be(typeof(Guid));
+    }
+
+    [Fact]
     public void Should_build_from_expression_with_string_param()
     {
         var sut = CreateSut("there is a user {string} registered");
