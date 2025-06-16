@@ -131,7 +131,7 @@ namespace Reqnroll
         }
         
         /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
-        /// <param name="culture">Additional information in which culture the step is written. Tt does not affect the matching of the step, it is only for tooling support needed</param>
+        /// <param name="culture">Additional information in which culture the step is written. It does not affect the matching of the step, it is only for tooling support needed</param>
         public StepDefinitionAttribute(string expression, string culture)
             : this(expression)
         {
