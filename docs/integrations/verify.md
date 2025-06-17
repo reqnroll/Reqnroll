@@ -1,6 +1,6 @@
 # Verify
 
-Reqnroll supports Verify.Xuint 24.2.0 or later.  
+Reqnroll supports Verify.Xunit 24.2.0 or later.  
 
 Documentation for Verify can be found [here](https://github.com/VerifyTests/Verify).
 
