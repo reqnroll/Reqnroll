@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using System.Threading.Tasks;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Utils;
 
@@ -23,7 +24,7 @@ namespace Reqnroll.Formatters.PubSub
 
         protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-        internal override void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigurationString)
+        internal override void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigurationString, Func<bool, Task> onInitialized)
         {
             string defaultBaseDirectory = $".{Path.DirectorySeparatorChar}";
 
@@ -46,6 +47,7 @@ namespace Reqnroll.Formatters.PubSub
             var validFile = FileFilter.GetValidFiles([outputPath]).Count == 1;
             if (!validFile)
             {
+                onInitialized(false);
                 throw new InvalidOperationException($"Path of configured formatter output file: {outputPath} is invalid or missing.");
             }
 
@@ -54,6 +56,7 @@ namespace Reqnroll.Formatters.PubSub
                 _fileSystem.CreateDirectory(baseDirectory);
             }
 
+            onInitialized(true);
             ConsumeAndWriteToFilesBackgroundTask(outputPath);
         }
 

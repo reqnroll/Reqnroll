@@ -40,13 +40,7 @@ namespace Reqnroll.Formatters.PubSub
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
-            runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
-            {
-                var globalObjectContainer = args.ObjectContainer;
-
-                // The act of registering itself with the container serves as a marker to the Broker that it should expect to hear from it via the RegisterSink method
-                globalObjectContainer!.RegisterInstanceAs<ICucumberMessageSink>(this, _pluginName, true);
-            };
+            _broker.RegisterSink(this);
 
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
@@ -82,20 +76,24 @@ namespace Reqnroll.Formatters.PubSub
 
             if (!config.Enabled)
             {
-                await _broker.RegisterDisabledSinkAsync(this);
+                await _broker.SinkInitializedAsync(this, enabled: false);
                 return;
             }
             string formatterConfiguration = config.GetFormatterConfigurationByName(_pluginName);
 
             if (String.IsNullOrEmpty(formatterConfiguration))
             {
-                await _broker.RegisterDisabledSinkAsync(this);
+                await _broker.SinkInitializedAsync(this, enabled: false);
                 return;
             }
 
-            formatterTask = Task.Factory.StartNew(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration), TaskCreationOptions.LongRunning);
+            formatterTask = Task.Factory.StartNew(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized), TaskCreationOptions.LongRunning);
 
-            await _broker.RegisterEnabledSinkAsync(this);
+        }
+
+        private async Task ReportInitialized(bool status)
+        {
+            await _broker.SinkInitializedAsync(this, enabled: status);
         }
 
         public async Task PublishAsync(Envelope message)
@@ -108,7 +106,7 @@ namespace Reqnroll.Formatters.PubSub
             return;
         }
 
-        internal abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString);
+        internal abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString, Func<bool, Task> onAfterInitialization);
 
         private bool disposedValue = false;
 

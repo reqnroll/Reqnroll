@@ -21,8 +21,9 @@ namespace Reqnroll.Formatters.PubSub
     {
         bool Enabled { get; }
         Task PublishAsync(Envelope featureMessages);
-        Task RegisterEnabledSinkAsync(ICucumberMessageSink formatterSink);
-        Task RegisterDisabledSinkAsync(ICucumberMessageSink formatterSink);
+
+        void RegisterSink(ICucumberMessageSink sink);
+        Task SinkInitializedAsync(ICucumberMessageSink formatterSink, bool enabled);
 
         public event AsyncEventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
     }
@@ -44,9 +45,9 @@ namespace Reqnroll.Formatters.PubSub
         public bool Enabled { get; private set; }
 
         // This is the number of sinks that we expect to register. This number is determined by the number of sinks that add themselves to the global container during plugin startup.
-        private Lazy<int> NumberOfSinksExpected;
+        private int NumberOfSinksExpected;
 
-        // As sinks register, this number is incremented. When we reach the expected number of sinks, then we know that all have registered
+        // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
         // and the Broker can be Enabled.
         private int NumberOfSinksRegistered = 0;
 
@@ -61,32 +62,26 @@ namespace Reqnroll.Formatters.PubSub
         {
             _objectContainer = objectContainer;
             Enabled = false;
+        }
 
-            // We want to know how many Sinks exist in the container, but we can't enumerate them now (during this constructor)
-            NumberOfSinksExpected =  new Lazy<int>( () => _objectContainer.ResolveAll<ICucumberMessageSink>().Count());
+        // This method is called by the sinks during their Plugin initialization. This tells the broker how many plugin Sinks to expect.
+        public void RegisterSink(ICucumberMessageSink sink)
+        {
+            Interlocked.Increment(ref NumberOfSinksExpected);
         }
 
         // This method is called by the sinks during TestRunStarted event handling. By then, all Sinks will have registered themselves in the object container
         // (which happened during Plugin Initialize() )
-        public async Task RegisterEnabledSinkAsync(ICucumberMessageSink formatterSink)
+        public async Task SinkInitializedAsync(ICucumberMessageSink formatterSink, bool enabled)
         {
-            _registeredSinks.TryAdd(formatterSink.Name, formatterSink);
+            if (enabled) 
+                _registeredSinks.TryAdd(formatterSink.Name, formatterSink);
 
-            await RegisterSink();
-        }
-
-        public async Task RegisterDisabledSinkAsync(ICucumberMessageSink formatterSink)
-        {
-            await RegisterSink();
-        }
-
-        private async Task RegisterSink()
-        {
             Interlocked.Increment(ref NumberOfSinksRegistered);
 
             // If all known sinks have registered then we can inform the Publisher
             // The system is enabled if we have at least one registered sink that is Enabled
-            if (NumberOfSinksRegistered == NumberOfSinksExpected.Value)
+            if (NumberOfSinksRegistered == NumberOfSinksExpected)
             {
                 Enabled = _registeredSinks.Values.Count > 0;
                 await RaiseBrokerReadyEvent();
