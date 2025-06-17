@@ -110,7 +110,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _eventPublisherMock.Verify(e => e.AddListener(_sut), Times.Once);
         }
 
-        // PublisherStartupAsync/BeforeTestRun causes no side-effects when broker is disabled
+        // BrokerReady/BeforeTestRun causes no side-effects when broker is disabled
         [Fact]
         public async Task PublisherStartup_Should_Not_Perform_Actions_When_Broker_Is_Disabled()
         {
@@ -119,8 +119,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
 
             // Act
-            await _sut.PublisherStartupAsync(null, new BrokerReadyEventArgs());
-
+            _sut.BrokerReady(null, new BrokerReadyEventArgs());
+            await _sut.PublisherStartup(new TestRunStartedEvent());
 
             // Assert
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Never);
@@ -139,7 +139,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
         }
 
-        // PublisherStartupAsync populates binding caches and publishes startup messages
+        // BrokerReady populates binding caches and publishes startup messages
         [Fact]
         public async Task PublisherStartup_Should_Populate_BindingCaches_And_Publish_Startup_Messages()
         {
@@ -160,7 +160,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
 
             // Act
-            await _sut.PublisherStartupAsync(null, new BrokerReadyEventArgs());
+            _sut.BrokerReady(null, new BrokerReadyEventArgs());
+            await _sut.PublisherStartup(new TestRunStartedEvent());
 
             // Assert
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.AtLeast(2)); // TestRunStarted and Meta messages
@@ -179,7 +180,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
 
             // Act
-            await _sut.PublisherStartupAsync(null, new BrokerReadyEventArgs());
+            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(objectContainerStub));
 
 
@@ -215,7 +216,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._messageFactory = new CucumberMessageFactory();
 
             // Act
-            //_sut.PublisherStartupAsync(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
+            //_sut.BrokerReady(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
             await _sut.PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(objectContainerStub));
 
             // Assert
@@ -257,7 +258,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._messageFactory = new CucumberMessageFactory();
 
             // Act
-            //_sut.PublisherStartupAsync(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
+            //_sut.BrokerReady(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
             await _sut.PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(objectContainerStub));
 
             // Assert
@@ -532,7 +533,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task HookBindingStartedEvent_ForNonScenarioHooks_Should_CreateAHookTracker(Reqnroll.Bindings.HookType hookType)
         {
             // Arrange
-            // Hack: Re-using code from a prior test to invoke the PublisherStartupAsync and get the sut set-up for this test.
             var objectContainerStub = CreateObjectContainerWithBroker(true);
             SetupCommonMocks(objectContainerStub);
 
@@ -552,7 +552,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new List<IHookBinding>([hookBindingMock.Object]));
 
-            await _sut.PublisherStartupAsync(null, new BrokerReadyEventArgs());
+            _sut.BrokerReady(null, new BrokerReadyEventArgs());
+            await _sut.PublisherStartup(new TestRunStartedEvent());
             var cmMock = new Mock<IContextManager>();
             var featureContextStub = new FeatureContext(null, featureInfoStub, ConfigurationLoader.GetDefault());
             cmMock.Setup(cm => cm.FeatureContext).Returns(featureContextStub);
@@ -575,7 +576,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task HookBindingFinishedEvent_ForNonScenarioHooks_Should_EmitAHookFinishedMessage(Reqnroll.Bindings.HookType hookType)
         {
             // Arrange
-            // Hack: Re-using code from a prior test to invoke the PublisherStartupAsync and get the sut set-up for this test.
+            // Hack: Re-using code from a prior test to invoke the BrokerReady and get the sut set-up for this test.
             var objectContainerStub = CreateObjectContainerWithBroker(true);
             SetupCommonMocks(objectContainerStub);
             var messageFactory = new CucumberMessageFactory(new HookBindingTest_CucumberMessageFactoryInnerStub());

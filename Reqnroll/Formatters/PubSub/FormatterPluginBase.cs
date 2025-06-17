@@ -14,7 +14,7 @@ using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.Formatters.PubSub
 {
-    public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, IRuntimePlugin, IAsyncExecutionEventListener
+    public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, IRuntimePlugin
     {
         private Task? formatterTask;
 
@@ -42,25 +42,12 @@ namespace Reqnroll.Formatters.PubSub
         {
             _broker.RegisterSink(this);
 
+            LaunchSinkAsync();
+
             runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
             {
                 _testThreadObjectContainer = args.ObjectContainer;
-                var testThreadExecEventPublisher = _testThreadObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
-                testThreadExecEventPublisher.AddListener(this);
             };
-        }
-
-
-        public async Task OnEventAsync(IExecutionEvent executionEvent)
-        {
-            switch (executionEvent)
-            {
-                case TestRunStartedEvent testRunStartedEvent:
-                    await LaunchFileSinkAsync();
-                    break;
-                default:
-                    break;
-            }
         }
 
         internal async Task CloseAsync()
@@ -70,20 +57,20 @@ namespace Reqnroll.Formatters.PubSub
             formatterTask = null;
         }
 
-        internal async Task LaunchFileSinkAsync()
+        internal void LaunchSinkAsync()
         {
             IFormattersConfiguration config = _configuration;
 
             if (!config.Enabled)
             {
-                await _broker.SinkInitializedAsync(this, enabled: false);
+                _broker.SinkInitialized(this, enabled: false);
                 return;
             }
             string formatterConfiguration = config.GetFormatterConfigurationByName(_pluginName);
 
             if (String.IsNullOrEmpty(formatterConfiguration))
             {
-                await _broker.SinkInitializedAsync(this, enabled: false);
+                _broker.SinkInitialized(this, enabled: false);
                 return;
             }
 
@@ -91,9 +78,9 @@ namespace Reqnroll.Formatters.PubSub
 
         }
 
-        private async Task ReportInitialized(bool status)
+        private void ReportInitialized(bool status)
         {
-            await _broker.SinkInitializedAsync(this, enabled: status);
+            _broker.SinkInitialized(this, enabled: status);
         }
 
         public async Task PublishAsync(Envelope message)
@@ -106,7 +93,7 @@ namespace Reqnroll.Formatters.PubSub
             return;
         }
 
-        internal abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString, Func<bool, Task> onAfterInitialization);
+        internal abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString, Action<bool> onAfterInitialization);
 
         private bool disposedValue = false;
 

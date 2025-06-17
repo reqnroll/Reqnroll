@@ -24,7 +24,7 @@ namespace Reqnroll.Formatters.PubSub
 
         protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-        internal override void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigurationString, Func<bool, Task> onInitialized)
+        internal override void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigurationString, Action<bool> onInitialized)
         {
             string defaultBaseDirectory = $".{Path.DirectorySeparatorChar}";
 

@@ -93,7 +93,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            await _sut.LaunchFileSinkAsync();
+            _sut.LaunchSinkAsync();
             await _sut.CloseAsync();
 
             // Assert
@@ -111,7 +111,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            await _sut.LaunchFileSinkAsync();
+            _sut.LaunchSinkAsync();
             await _sut.CloseAsync();
 
             // Assert
@@ -131,7 +131,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
 
             // Act
-            await _sut.LaunchFileSinkAsync();
+            _sut.LaunchSinkAsync();
             await _sut.PublishAsync(message);
             await _sut.CloseAsync();
 
@@ -179,7 +179,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act
-            await _sut.LaunchFileSinkAsync();
+            _sut.LaunchSinkAsync();
             await _sut.CloseAsync();
 
             // Assert

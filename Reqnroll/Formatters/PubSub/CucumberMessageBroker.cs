@@ -23,9 +23,9 @@ namespace Reqnroll.Formatters.PubSub
         Task PublishAsync(Envelope featureMessages);
 
         void RegisterSink(ICucumberMessageSink sink);
-        Task SinkInitializedAsync(ICucumberMessageSink formatterSink, bool enabled);
+        void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled);
 
-        public event AsyncEventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
+        public event EventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
     }
 
     public class BrokerReadyEventArgs
@@ -49,14 +49,14 @@ namespace Reqnroll.Formatters.PubSub
 
         // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
         // and the Broker can be Enabled.
-        private int NumberOfSinksRegistered = 0;
+        private int NumberOfSinksInitialized = 0;
 
         // This holds the list of regiestered and Enabled sinks to which Messages will be routed.
         // Using a Concurrent collection as the sinks may be registering in parallel threads
         private ConcurrentDictionary<string, ICucumberMessageSink> _registeredSinks = new();
 
         // This event gets fired when all Sinks have registered and indicates to the Publisher that it can start Publishing messages.
-        public event AsyncEventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
+        public event EventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
 
         public CucumberMessageBroker(IObjectContainer objectContainer)
         {
@@ -72,30 +72,30 @@ namespace Reqnroll.Formatters.PubSub
 
         // This method is called by the sinks during TestRunStarted event handling. By then, all Sinks will have registered themselves in the object container
         // (which happened during Plugin Initialize() )
-        public async Task SinkInitializedAsync(ICucumberMessageSink formatterSink, bool enabled)
+        public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
         {
             if (enabled) 
                 _registeredSinks.TryAdd(formatterSink.Name, formatterSink);
 
-            Interlocked.Increment(ref NumberOfSinksRegistered);
+            Interlocked.Increment(ref NumberOfSinksInitialized);
 
             // If all known sinks have registered then we can inform the Publisher
             // The system is enabled if we have at least one registered sink that is Enabled
-            if (NumberOfSinksRegistered == NumberOfSinksExpected)
+            if (NumberOfSinksInitialized == NumberOfSinksExpected)
             {
                 Enabled = _registeredSinks.Values.Count > 0;
-                await RaiseBrokerReadyEvent();
+                RaiseBrokerReadyEvent();
             }
         }
 
-        private async Task RaiseBrokerReadyEvent()
+        private void RaiseBrokerReadyEvent()
         {
             if (BrokerReadyEvent is null)
                 return;
             foreach (var subscriber in BrokerReadyEvent.GetInvocationList())
             {
-                var asyncSubscriber = (AsyncEventHandler<BrokerReadyEventArgs>)subscriber;
-                await asyncSubscriber.Invoke(this, new BrokerReadyEventArgs());
+                var Subscriber = (EventHandler<BrokerReadyEventArgs>)subscriber;
+                Subscriber.Invoke(this, new BrokerReadyEventArgs());
             }
         }
 

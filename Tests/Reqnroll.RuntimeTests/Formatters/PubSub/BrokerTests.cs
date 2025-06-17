@@ -33,11 +33,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task Enabled_Should_Return_True_When_Sinks_Are_Registered()
         {
             // Arrange
-            await _sut.SinkInitializedAsync(_sinkMock1.Object, true);
+            _sut.SinkInitialized(_sinkMock1.Object, true);
 
             Assert.False(_sut.Enabled); // should not be enabled until after both sinks are registered
 
-            await _sut.SinkInitializedAsync(_sinkMock2.Object, true);
+            _sut.SinkInitialized(_sinkMock2.Object, true);
 
             // Act
             var result = _sut.Enabled;
@@ -63,8 +63,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublishAsync_Should_Invoke_PublishAsync_On_All_Sinks()
         {
             // Arrange
-            await _sut.SinkInitializedAsync(_sinkMock1.Object, true);
-            await _sut.SinkInitializedAsync(_sinkMock2.Object, true);
+            _sut.SinkInitialized(_sinkMock1.Object, true);
+            _sut.SinkInitialized(_sinkMock2.Object, true);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
@@ -80,8 +80,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublishAsync_Should_Swallow_Exceptions_From_Sinks()
         {
             // Arrange
-            await _sut.SinkInitializedAsync(_sinkMock1.Object, true);
-            await _sut.SinkInitializedAsync(_sinkMock2.Object, true);
+            _sut.SinkInitialized(_sinkMock1.Object, true);
+            _sut.SinkInitialized(_sinkMock2.Object, true);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 

@@ -32,8 +32,6 @@ namespace Reqnroll.Formatters.PubSub
         internal ICucumberMessageBroker _broker;
         internal IObjectContainer _testThreadObjectContainer;
 
-        public static object _lock = new object();
-
         // Started Features by name
         internal ConcurrentDictionary<string, IFeatureTracker> _startedFeatures = new();
         internal BindingMessagesGenerator _bindingCaches;
@@ -63,11 +61,12 @@ namespace Reqnroll.Formatters.PubSub
 
 
         internal ICucumberMessageFactory _messageFactory;
+        private bool _startupCompleted = false;
 
         public CucumberMessagePublisher(ICucumberMessageBroker broker)
         {
             _broker = broker;
-            _broker.BrokerReadyEvent += PublisherStartupAsync;
+            _broker.BrokerReadyEvent += BrokerReady;
         }
 
         public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
@@ -94,6 +93,9 @@ namespace Reqnroll.Formatters.PubSub
         {
             switch (executionEvent)
             {
+                case TestRunStartedEvent testRunStartedEvent:
+                    await PublisherStartup(testRunStartedEvent);
+                    break;
                 case TestRunFinishedEvent testRunFinishedEvent:
                     await PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(_testThreadObjectContainer));
                     break;
@@ -132,14 +134,20 @@ namespace Reqnroll.Formatters.PubSub
             }
         }
 
-        internal async Task PublisherStartupAsync(object sender, BrokerReadyEventArgs args)
+        internal void BrokerReady(object sender, BrokerReadyEventArgs args)
         {
             _enabled = _broker.Enabled;
+
+        }
+
+        internal async Task PublisherStartup(IExecutionEvent executionEvent) { 
 
             if (!_enabled)
             {
                 return;
             }
+            if (_startupCompleted)
+                return;
 
             SharedIDGenerator = _testThreadObjectContainer.Resolve<IIdGenerator>();
             _messageFactory = _testThreadObjectContainer.Resolve<ICucumberMessageFactory>();
@@ -161,6 +169,8 @@ namespace Reqnroll.Formatters.PubSub
             {
                 traceListener.WriteToolOutput($"Error publishing messages: {ex.Message}");
             }
+
+            _startupCompleted = true;
         }
         private DateTime RetrieveDateTime(Envelope e)
         {
