@@ -12,6 +12,7 @@ using System.Collections;
 using System.Collections.Generic;
 using FluentAssertions;
 using Reqnroll.BoDi;
+using Reqnroll.Formatters;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.Formatters.Configuration;
@@ -35,10 +36,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _messageCollector = messageCollector;
             }
 
-            internal override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+            protected override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
             {
                 LastOutputPath = outputPath;
-                foreach (var message in _postedMessages.GetConsumingEnumerable())
+                foreach (var message in PostedMessages.GetConsumingEnumerable())
                 {
                     // Simulate writing to a file
                     _messageCollector.Add(message);
@@ -48,6 +49,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             public IFileSystem FileSystem { get; }
 
             private ICollection<Envelope> _messageCollector;
+
+            public new string ParseConfiguredOutputFilePath(string messagesConfiguration) 
+                => base.ParseConfiguredOutputFilePath(messagesConfiguration);
         }
 
         private IObjectContainer _globalObjContainerStub;
@@ -148,7 +152,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 { "outputFilePath": "C:\\valid/path/output.txt" }
                 """;
             // Act
-            var result = _sut.ParseConfigurationString(validConfig, "testPlugin");
+            var result = _sut.ParseConfiguredOutputFilePath(validConfig);
 
             // Assert
             Assert.Equal(@"C:\valid/path/output.txt", result);
@@ -161,7 +165,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var invalidConfig = "invalid_json";
 
             // Act
-            var result = _sut.ParseConfigurationString(invalidConfig, "testPlugin");
+            var result = _sut.ParseConfiguredOutputFilePath(invalidConfig);
 
             // Assert
             Assert.Equal(string.Empty, result);

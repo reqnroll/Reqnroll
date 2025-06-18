@@ -397,7 +397,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._broker = _brokerMock.Object;
             _sut._testThreadObjectContainer = objectContainerStub;
             _sut._bindingCaches = new BindingMessagesGenerator(_idGeneratorMock.Object, messageFactory);
-            _sut._bindingCaches.StepDefinitionIdByMethodSignaturePatternCache = new ConcurrentDictionary<string, string>();
+            _sut._bindingCaches.StepDefinitionIdByMethodSignaturePatternCache.Clear();
             _sut._enabled = true;
 
             // Act

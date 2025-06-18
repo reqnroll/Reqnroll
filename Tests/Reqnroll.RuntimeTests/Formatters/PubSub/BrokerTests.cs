@@ -24,7 +24,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sinkMock2.Setup(s => s.Name).Returns("sink2");
 
             // Initialize the system under test (SUT)
-            _sut = new CucumberMessageBroker(_objectContainerMock.Object);
+            _sut = new CucumberMessageBroker();
             _sut.RegisterSink(_sinkMock1.Object);
             _sut.RegisterSink(_sinkMock2.Object);
         }
@@ -50,7 +50,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public void Enabled_Should_Return_False_When_No_Sinks_Are_Registered()
         {
 
-            var sut = new CucumberMessageBroker(_objectContainerMock.Object);
+            var sut = new CucumberMessageBroker();
 
             // Act
             var result = sut.Enabled;

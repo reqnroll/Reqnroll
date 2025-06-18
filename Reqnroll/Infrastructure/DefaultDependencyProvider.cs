@@ -19,6 +19,8 @@ using Reqnroll.PlatformCompatibility;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Utils;
 using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.Html;
+using Reqnroll.Formatters.Messages;
 
 namespace Reqnroll.Infrastructure
 {
