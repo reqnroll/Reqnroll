@@ -1,33 +1,27 @@
 ﻿using Io.Cucumber.Messages.Types;
 using System.Linq;
 
-namespace Reqnroll.Formatters.RuntimeSupport
+namespace Reqnroll.Formatters.RuntimeSupport;
+
+public class PickleStepSequence(bool hasPickles, Pickle pickle)
 {
-    public class PickleStepSequence
+    public bool HasPickles { get; } = hasPickles;
+
+    public Pickle CurrentPickle { get; } = pickle;
+
+    private int _pickleStepCounter = 0;
+
+    public void NextStep()
     {
-        public bool HasPickles { get; }
-        public Pickle CurrentPickle { get; }
+        _pickleStepCounter++;
+    }
 
-        private int _PickleStepCounter;
-
-        public PickleStepSequence(bool hasPickles, Pickle pickle)
+    public string CurrentPickleStepId
+    {
+        get
         {
-            HasPickles = hasPickles;
-            CurrentPickle = pickle;
-            _PickleStepCounter = 0;
+            if (!HasPickles) return null;
+            return CurrentPickle.Steps.ElementAt(_pickleStepCounter).Id;
         }
-        public void NextStep()
-        {
-            _PickleStepCounter++;
-        }
-        public string CurrentPickleStepId
-        {
-            get
-            {
-                if (!HasPickles) return null;
-                return CurrentPickle.Steps.ElementAt(_PickleStepCounter).Id;
-            }
-        }
-
     }
 }
