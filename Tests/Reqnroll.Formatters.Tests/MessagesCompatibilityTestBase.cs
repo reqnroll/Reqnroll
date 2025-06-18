@@ -144,8 +144,8 @@ namespace Reqnroll.Formatters.Tests
                 {"fileBasedResolver",  configFileResolver }
             };
 
-            FormattersConfiguration configuration = new FormattersConfiguration(resolvers, configEnvResolver, new EnvVariableEnableFlagParser(env));
-            string messagesConfiguration = configuration.GetFormatterConfigurationByName("messages");
+            FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new EnvVariableEnableFlagParser(env));
+            string messagesConfiguration = configurationProvider.GetFormatterConfigurationByName("messages");
             string outputFilePath = string.Empty;
             int colonIndex = messagesConfiguration.IndexOf(':');
             if (colonIndex != -1)

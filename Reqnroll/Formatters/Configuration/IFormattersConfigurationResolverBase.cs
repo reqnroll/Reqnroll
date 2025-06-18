@@ -1,18 +1,12 @@
-﻿using Reqnroll.Configuration;
-using Reqnroll.EnvironmentAccess;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Reqnroll.Formatters.Configuration
+namespace Reqnroll.Formatters.Configuration;
+
+public interface IFormattersConfigurationResolverBase
 {
-    public interface IFormattersConfigurationResolverBase
-    {
-        IDictionary<string, string> Resolve();
-    }
-
-    public interface IFormattersConfigurationResolver : IFormattersConfigurationResolverBase 
-    { }
-    public interface IFormattersEnvironmentOverrideConfigurationResolver : IFormattersConfigurationResolverBase
-    { }
+    IDictionary<string, string> Resolve();
 }
+
+public interface IFormattersConfigurationResolver : IFormattersConfigurationResolverBase;
+
+public interface IFormattersEnvironmentOverrideConfigurationResolver : IFormattersConfigurationResolverBase;

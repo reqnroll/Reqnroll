@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Reqnroll.GeneratorTests
 {
-    internal class SimpleCucumberMessagesConfiguration : IFormattersConfiguration
+    internal class SimpleCucumberMessagesConfigurationProvider : IFormattersConfigurationProvider
     {
         public bool Enabled => false;
 

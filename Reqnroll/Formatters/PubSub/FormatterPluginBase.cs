@@ -20,7 +20,7 @@ namespace Reqnroll.Formatters.PubSub
 
         internal readonly BlockingCollection<Envelope> _postedMessages = new();
         private ICucumberMessageBroker _broker;
-        private IFormattersConfiguration _configuration;
+        private IFormattersConfigurationProvider _configurationProvider;
         private Lazy<ITraceListener> traceListener;
         internal readonly string _pluginName;
 
@@ -30,10 +30,10 @@ namespace Reqnroll.Formatters.PubSub
         public string Name { get => _pluginName; }
 
 
-        public FormatterPluginBase(IFormattersConfiguration configuration, ICucumberMessageBroker broker, string pluginName)
+        public FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, string pluginName)
         {
             _broker = broker;
-            _configuration = configuration;
+            _configurationProvider = configurationProvider;
             traceListener = new Lazy<ITraceListener>(() => _testThreadObjectContainer!.Resolve<ITraceListener>());
             _pluginName = pluginName;
         }
@@ -59,7 +59,7 @@ namespace Reqnroll.Formatters.PubSub
 
         internal void LaunchSinkAsync()
         {
-            IFormattersConfiguration config = _configuration;
+            IFormattersConfigurationProvider config = _configurationProvider;
 
             if (!config.Enabled)
             {

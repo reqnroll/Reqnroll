@@ -25,7 +25,7 @@ namespace Reqnroll.Formatters.PubSub
     /// </summary>
     public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
     {
-        public HtmlFormatterPlugin(IFormattersConfiguration configuration, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configuration, broker, "html", ".html", "reqnroll_report.html", fileSystem)
+        public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configurationProvider, broker, "html", ".html", "reqnroll_report.html", fileSystem)
         {
         }
 

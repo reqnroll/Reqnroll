@@ -18,7 +18,7 @@ namespace Reqnroll.Formatters.PubSub
     public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
     {
 
-        public MessagesFormatterPlugin(IFormattersConfiguration configuration, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configuration, broker, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
+        public MessagesFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configurationProvider, broker, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
         {
         }
 

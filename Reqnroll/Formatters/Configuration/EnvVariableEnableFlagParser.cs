@@ -1,30 +1,21 @@
 ﻿using Reqnroll.CommonModels;
 using Reqnroll.EnvironmentAccess;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace Reqnroll.Formatters.Configuration
+namespace Reqnroll.Formatters.Configuration;
+
+public class EnvVariableEnableFlagParser : IEnvVariableEnableFlagParser
 {
-    public class EnvVariableEnableFlagParser : IEnvVariableEnableFlagParser
+    private readonly IEnvironmentWrapper _environmentWrapper;
+
+    public EnvVariableEnableFlagParser(IEnvironmentWrapper environmentWrapper)
     {
-        private readonly IEnvironmentWrapper environmentWrapper;
-
-        public EnvVariableEnableFlagParser(IEnvironmentWrapper _environmentWrapper)
-        {
-            environmentWrapper = _environmentWrapper;
-        }
-
-        public bool Parse()
-        {
-            var enabledVariable = environmentWrapper.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE);
-            var enabledVariableValue = enabledVariable is Success<string> ? Convert.ToBoolean(((Success<string>)enabledVariable).Result) : true;
-            return enabledVariableValue;
-        }
+        _environmentWrapper = environmentWrapper;
     }
 
-    public interface IEnvVariableEnableFlagParser
+    public bool Parse()
     {
-        bool Parse();
+        var enabledVariable = _environmentWrapper.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE);
+        var enabledVariableValue = enabledVariable is Success<string> envVarSuccess && bool.TryParse(envVarSuccess.Result, out bool result) ? result : true;
+        return enabledVariableValue;
     }
 }

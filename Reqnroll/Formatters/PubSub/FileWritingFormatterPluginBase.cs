@@ -14,7 +14,7 @@ namespace Reqnroll.Formatters.PubSub
         private readonly string _defaultFileName;
         private readonly IFileSystem _fileSystem;
 
-        public FileWritingFormatterPluginBase(IFormattersConfiguration configuration, ICucumberMessageBroker broker, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configuration, broker, pluginName)
+        public FileWritingFormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, broker, pluginName)
         {
             _defaultFileType = defaultFileType;
             _defaultFileName = defaultFileName;

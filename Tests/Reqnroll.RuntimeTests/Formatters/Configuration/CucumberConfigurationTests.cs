@@ -11,7 +11,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         private readonly Mock<IEnvVariableEnableFlagParser> _envVariableEnableFlagParserMock;
         private readonly Mock<IFormattersConfigurationResolver> _fileResolverMock;
         private readonly Mock<IFormattersEnvironmentOverrideConfigurationResolver> _environmentResolverMock;
-        private readonly FormattersConfiguration _sut;
+        private readonly FormattersConfigurationProvider _sut;
 
         public CucumberConfigurationTests()
         {
@@ -24,7 +24,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
                 {"fileBasedResolver",  _fileResolverMock.Object }
             };
 
-            _sut = new FormattersConfiguration(resolvers, _environmentResolverMock.Object, _envVariableEnableFlagParserMock.Object);
+            _sut = new FormattersConfigurationProvider(resolvers, _environmentResolverMock.Object, _envVariableEnableFlagParserMock.Object);
         }
 
         [Fact]
