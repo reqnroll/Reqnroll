@@ -1,186 +1,177 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
-using Reqnroll.Generator.CodeDom;
-using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace Reqnroll.Generator.Generation
+namespace Reqnroll.Generator.Generation;
+
+/// <summary>
+/// Generates a CodeDom expression to create a list of Cucumber Pickles
+/// </summary>
+internal class CucumberPicklesExpressionGenerator : CucumberMessage_TraversalVisitorBase
 {
-    /// <summary>
-    /// Generates a CodeDom expression to create a list of Cucumber Pickles
-    /// </summary>
-    internal class CucumberPicklesExpressionGenerator : CucumberMessage_TraversalVisitorBase
+    private List<CodeExpression> _pickleList;
+    private List<CodeExpression> _pickleSteps;
+    private List<CodeExpression> _pickleTags;
+    private CodeExpression _pickleStepArgument;
+    private CodeExpression _pickleDocString;
+    private CodeExpression _pickleTable;
+    private List<CodeExpression> _tableRows;
+    private List<CodeExpression> _pickleCells;
+
+    private static readonly string GenericList = typeof(List<>).FullName;
+
+    private void Reset()
     {
-        private List<CodeExpression> _PickleList;
-        private List<CodeExpression> _PickleSteps;
-        private List<CodeExpression> _PickleTags;
-        CodeExpression _PickleStepArgument;
-        CodeExpression _PickleDocString;
-        CodeExpression _PickleTable;
-        private List<CodeExpression> _TableRows;
-        private List<CodeExpression> _PickleCells;
+        _pickleList = new();
+        _pickleSteps = new();
+        _pickleTags = new();
+        _pickleStepArgument = null;
+        _pickleDocString = null;
+        _pickleTable = null;
+    }
 
-        private static readonly string GENERICLIST = typeof(List<>).FullName;
-
-
-        public CucumberPicklesExpressionGenerator()
+    public CodeExpression GeneratePicklesExpression(IEnumerable<Pickle> pickles)
+    {
+        Reset();
+        foreach (var pickle in pickles)
         {
+            Visit(pickle);
         }
 
-        private void Reset()
-        {
-            _PickleList = new List<CodeExpression>();
-            _PickleSteps = new List<CodeExpression>();
-            _PickleTags = new List<CodeExpression>();
-            _PickleStepArgument = null;
-            _PickleDocString = null;
-            _PickleTable = null;
-        }
+        var pickleCodeTypeRef = new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference);
+        var commentsListExpr = new CodeTypeReference(GenericList, pickleCodeTypeRef);
+        var initializer = new CodeArrayCreateExpression(pickleCodeTypeRef, _pickleList.ToArray());
 
-        public CodeExpression GeneratePicklesExpression(IEnumerable<Pickle> pickles)
-        {
-            Reset();
-            foreach (var pickle in pickles)
-            {
-                Visit(pickle);
-            }
+        return new CodeObjectCreateExpression(commentsListExpr, initializer);
+    }
 
-            var pickleCodeTypeRef = new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference);
-            var commentsListExpr = new CodeTypeReference(GENERICLIST, pickleCodeTypeRef);
-            var initializer = new CodeArrayCreateExpression(pickleCodeTypeRef, _PickleList.ToArray());
+    public override void Visit(Pickle pickle)
+    {
+        var steps = _pickleSteps;
+        _pickleSteps = new();
 
-            return new CodeObjectCreateExpression(commentsListExpr, initializer);
-        }
+        var tags = _pickleTags;
+        _pickleTags = new();
 
-        public override void Visit(Pickle pickle)
-        {
-            var steps = _PickleSteps;
-            _PickleSteps = new List<CodeExpression>();
+        base.Visit(pickle);
 
-            var tags = _PickleTags;
-            _PickleTags = new List<CodeExpression>();
+        var pStepTypeRef = new CodeTypeReference(typeof(PickleStep), CodeTypeReferenceOptions.GlobalReference);
+        var stepsExpr = new CodeTypeReference(GenericList, pStepTypeRef);
+        var stepsInitializer = new CodeArrayCreateExpression(pStepTypeRef, _pickleSteps.ToArray());
 
-            base.Visit(pickle);
+        var tagsTypeRef = new CodeTypeReference(typeof(PickleTag), CodeTypeReferenceOptions.GlobalReference);
+        var tagsExpr = new CodeTypeReference(GenericList, tagsTypeRef);
+        var tagsInitializer = new CodeArrayCreateExpression(tagsTypeRef, _pickleTags.ToArray());
 
-            var pStepTypeRef = new CodeTypeReference(typeof(PickleStep), CodeTypeReferenceOptions.GlobalReference);
-            var stepsExpr = new CodeTypeReference(GENERICLIST, pStepTypeRef);
-            var stepsinitializer = new CodeArrayCreateExpression(pStepTypeRef, _PickleSteps.ToArray());
+        var astIdsExpr = new CodeTypeReference(typeof(List<string>));
+        var astIdsInitializer = new CodeArrayCreateExpression(typeof(string), pickle.AstNodeIds.Select(s => new CodePrimitiveExpression(s)).ToArray());
 
-            var tagsTypeRef = new CodeTypeReference(typeof(PickleTag), CodeTypeReferenceOptions.GlobalReference);
-            var tagsExpr = new CodeTypeReference(GENERICLIST, tagsTypeRef);
-            var tagsinitializer = new CodeArrayCreateExpression(tagsTypeRef, _PickleTags.ToArray());
+        _pickleList.Add(new CodeObjectCreateExpression(
+                            new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference),
+                            new CodePrimitiveExpression(pickle.Id),
+                            new CodePrimitiveExpression(pickle.Uri),
+                            new CodePrimitiveExpression(pickle.Name),
+                            new CodePrimitiveExpression(pickle.Language),
+                            new CodeObjectCreateExpression(stepsExpr, stepsInitializer),
+                            new CodeObjectCreateExpression(tagsExpr, tagsInitializer),
+                            new CodeObjectCreateExpression(astIdsExpr, astIdsInitializer)
+                        ));
 
-            var astIdsExpr = new CodeTypeReference(typeof(List<string>));
-            var astIdsInitializer = new CodeArrayCreateExpression(typeof(string), pickle.AstNodeIds.Select(s => new CodePrimitiveExpression(s)).ToArray());
+        _pickleSteps = steps;
+        _pickleTags = tags;
+    }
 
-            _PickleList.Add(new CodeObjectCreateExpression(
-                                new CodeTypeReference(typeof(Pickle), CodeTypeReferenceOptions.GlobalReference),
-                                new CodePrimitiveExpression(pickle.Id),
-                                new CodePrimitiveExpression(pickle.Uri),
-                                new CodePrimitiveExpression(pickle.Name),
-                                new CodePrimitiveExpression(pickle.Language),
-                                new CodeObjectCreateExpression(stepsExpr, stepsinitializer),
-                                new CodeObjectCreateExpression(tagsExpr, tagsinitializer),
-                                new CodeObjectCreateExpression(astIdsExpr, astIdsInitializer)
-                            ));
+    public override void Visit(PickleStep step)
+    {
+        var arg = _pickleStepArgument;
+        _pickleStepArgument = null;
 
-            _PickleSteps = steps;
-            _PickleTags = tags;
-        }
+        base.Visit(step);
 
-        public override void Visit(PickleStep step)
-        {
-            var arg = _PickleStepArgument;
-            _PickleStepArgument = null;
+        var astIdsExpr = new CodeTypeReference(typeof(List<string>));
+        var astIdsInitializer = new CodeArrayCreateExpression(typeof(string), step.AstNodeIds.Select(s => (CodeExpression)new CodePrimitiveExpression(s)).ToArray());
 
-            base.Visit(step);
+        _pickleSteps.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleStep), CodeTypeReferenceOptions.GlobalReference),
+                                                        _pickleStepArgument ?? new CodePrimitiveExpression(null),
+                                                        new CodeObjectCreateExpression(astIdsExpr, astIdsInitializer),
+                                                        new CodePrimitiveExpression(step.Id),
+                                                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(PickleStepType), CodeTypeReferenceOptions.GlobalReference)), step.Type.ToString()),
+                                                        new CodePrimitiveExpression(step.Text)));
 
-            var astIdsExpr = new CodeTypeReference(typeof(List<string>));
-            var astIdsInitializer = new CodeArrayCreateExpression(typeof(string), step.AstNodeIds.Select(s => new CodePrimitiveExpression(s)).ToArray());
+        _pickleStepArgument = arg;
+    }
 
-            _PickleSteps.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleStep), CodeTypeReferenceOptions.GlobalReference),
-                _PickleStepArgument ?? new CodePrimitiveExpression(null),
-                new CodeObjectCreateExpression(astIdsExpr, astIdsInitializer),
-                new CodePrimitiveExpression(step.Id),
-                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(PickleStepType), CodeTypeReferenceOptions.GlobalReference)), step.Type.ToString()),
-                new CodePrimitiveExpression(step.Text)));
+    public override void Visit(PickleDocString docString)
+    {
+        _pickleDocString = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleDocString), CodeTypeReferenceOptions.GlobalReference),
+                                                          new CodePrimitiveExpression(docString.MediaType),
+                                                          new CodePrimitiveExpression(docString.Content));
+    }
 
-            _PickleStepArgument = arg;
-        }
+    public override void Visit(PickleStepArgument argument)
+    {
+        var docString = _pickleDocString;
+        var table = _pickleTable;
 
-        public override void Visit(PickleDocString docString)
-        {
-            _PickleDocString = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleDocString), CodeTypeReferenceOptions.GlobalReference),
-                new CodePrimitiveExpression(docString.MediaType),
-                new CodePrimitiveExpression(docString.Content));
-        }
+        _pickleDocString = null;
+        _pickleTable = null;
 
-        public override void Visit(PickleStepArgument argument)
-        {
-            var docString = _PickleDocString;
-            var table = _PickleTable;
+        base.Visit(argument);
 
-            _PickleDocString = null;
-            _PickleTable = null;
+        _pickleStepArgument = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleStepArgument), CodeTypeReferenceOptions.GlobalReference),
+                                                             _pickleDocString ?? new CodePrimitiveExpression(null),
+                                                             _pickleTable ?? new CodePrimitiveExpression(null));
 
-            base.Visit(argument);
+        _pickleDocString = docString;
+        _pickleTable = table;
+    }
 
-            _PickleStepArgument = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleStepArgument), CodeTypeReferenceOptions.GlobalReference),
-                _PickleDocString ?? new CodePrimitiveExpression(null),
-                _PickleTable ?? new CodePrimitiveExpression(null));
+    public override void Visit(PickleTable pickleTable)
+    {
+        var rows = _tableRows;
+        _tableRows = new();
 
-            _PickleDocString = docString;
-            _PickleTable = table;
-        }
+        base.Visit(pickleTable);
 
-        public override void Visit(PickleTable pickleTable)
-        {
-            var rows = _TableRows;
-            _TableRows = new List<CodeExpression>();
+        var pickleTableRowTypeRef = new CodeTypeReference(typeof(PickleTableRow), CodeTypeReferenceOptions.GlobalReference);
+        var rowsExpr = new CodeTypeReference(GenericList, pickleTableRowTypeRef);
+        var rowsInitializer = new CodeArrayCreateExpression(pickleTableRowTypeRef, _tableRows.ToArray());
 
-            base.Visit(pickleTable);
+        _pickleTable = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTable), CodeTypeReferenceOptions.GlobalReference),
+                                                      new CodeObjectCreateExpression(rowsExpr, rowsInitializer));
 
-            var pickleTableRowTypeRef = new CodeTypeReference(typeof(PickleTableRow), CodeTypeReferenceOptions.GlobalReference);
-            var rowsExpr = new CodeTypeReference(GENERICLIST, pickleTableRowTypeRef);
-            var rowsInitializer = new CodeArrayCreateExpression(pickleTableRowTypeRef, _TableRows.ToArray());
+        _tableRows = rows;
+    }
 
-            _PickleTable = new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTable), CodeTypeReferenceOptions.GlobalReference),
-                new CodeObjectCreateExpression(rowsExpr, rowsInitializer));
+    public override void Visit(PickleTableRow row)
+    {
+        var cells = _pickleCells;
+        _pickleCells = new();
 
-            _TableRows = rows;
-        }
+        base.Visit(row);
 
-        public override void Visit(PickleTableRow row)
-        {
-            var cells = _PickleCells;
-            _PickleCells = new List<CodeExpression>();
+        var pickleTableCellTypeRef = new CodeTypeReference(typeof(PickleTableCell), CodeTypeReferenceOptions.GlobalReference);
+        var cellsExpr = new CodeTypeReference(GenericList, pickleTableCellTypeRef);
+        var cellsInitializer = new CodeArrayCreateExpression(pickleTableCellTypeRef, _pickleCells.ToArray());
 
-            base.Visit(row);
+        _tableRows.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTableRow), CodeTypeReferenceOptions.GlobalReference),
+                                                      new CodeObjectCreateExpression(cellsExpr, cellsInitializer)));
 
-            var pickleTableCellTypeRef = new CodeTypeReference(typeof(PickleTableCell), CodeTypeReferenceOptions.GlobalReference);
-            var cellsExpr = new CodeTypeReference(GENERICLIST, pickleTableCellTypeRef);
-            var cellsInitializer = new CodeArrayCreateExpression(pickleTableCellTypeRef, _PickleCells.ToArray());
+        _pickleCells = cells;
+    }
 
-            _TableRows.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTableRow), CodeTypeReferenceOptions.GlobalReference),
-                new CodeObjectCreateExpression(cellsExpr, cellsInitializer)));
+    public override void Visit(PickleTableCell cell)
+    {
+        _pickleCells.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTableCell), CodeTypeReferenceOptions.GlobalReference),
+                                                        new CodePrimitiveExpression(cell.Value)));
+    }
 
-            _PickleCells = cells;
-        }
-
-        public override void Visit(PickleTableCell cell)
-        {
-            _PickleCells.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTableCell), CodeTypeReferenceOptions.GlobalReference),
-                new CodePrimitiveExpression(cell.Value)));
-        }
-
-        public override void Visit(PickleTag tag)
-        {
-            _PickleTags.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTag), CodeTypeReferenceOptions.GlobalReference),
-                new CodePrimitiveExpression(tag.Name),
-                new CodePrimitiveExpression(tag.AstNodeId)));
-        }
+    public override void Visit(PickleTag tag)
+    {
+        _pickleTags.Add(new CodeObjectCreateExpression(new CodeTypeReference(typeof(PickleTag), CodeTypeReferenceOptions.GlobalReference),
+                                                       new CodePrimitiveExpression(tag.Name),
+                                                       new CodePrimitiveExpression(tag.AstNodeId)));
     }
 }

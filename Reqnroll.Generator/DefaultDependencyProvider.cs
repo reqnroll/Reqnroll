@@ -1,8 +1,5 @@
-using Reqnroll.Analytics.UserId;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
-using Reqnroll.EnvironmentAccess;
-using Reqnroll.Formatters.Configuration;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
@@ -12,7 +9,6 @@ using Reqnroll.Parser;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
-using System.Collections.Generic;
 
 namespace Reqnroll.Generator
 {
@@ -48,16 +44,6 @@ namespace Reqnroll.Generator
             container.RegisterInstanceAs(GenerationTargetLanguage.CreateCodeDomHelper(GenerationTargetLanguage.VB), GenerationTargetLanguage.VB, dispose: true);
 
             container.RegisterTypeAs<ConfigurationLoader, IConfigurationLoader>();
-
-            container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
-
-            // Section of registrations added for Cucumber Messages
-            container.RegisterTypeAs<FileService, IFileService>();
-            container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
-            container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
-            container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
-
-            container.RegisterTypeAs<FormattersConfiguration, IFormattersConfiguration>();
 
             container.RegisterTypeAs<ReqnrollGherkinParserFactory, IGherkinParserFactory>();
             

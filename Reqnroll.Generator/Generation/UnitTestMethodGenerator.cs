@@ -26,7 +26,8 @@ namespace Reqnroll.Generator.Generation
         // When generating test methods, the pickle index tells the runtime which Pickle this test method/case corresponds to.
         // The index is used during Cucumber Message generation to look up the PickleID and include it in the emitted Cucumber Messages.
         // As test methods are generated, the pickle index is incremented.
-        private int _pickleIndex = 0;
+        // As this class is recreated for every feature generation, the pickle index will be restarted (and local) for each feature.
+        //private int _pickleIndex;
 
         public UnitTestMethodGenerator(IUnitTestGeneratorProvider unitTestGeneratorProvider, IDecoratorRegistry decoratorRegistry, CodeDomHelper codeDomHelper, ScenarioPartHelper scenarioPartHelper, ReqnrollConfiguration reqnrollConfiguration)
         {
@@ -51,14 +52,15 @@ namespace Reqnroll.Generator.Generation
 
         public void CreateUnitTests(ReqnrollFeature feature, TestClassGenerationContext generationContext)
         {
-            _pickleIndex = 0;
+            // This method is only called once, but for safety we reset the pickle index.
+            var pickleIndex = 0;
             foreach (var scenarioDefinition in GetScenarioDefinitions(feature))
             {
-                CreateUnitTest(generationContext, scenarioDefinition);
+                CreateUnitTest(generationContext, scenarioDefinition, ref pickleIndex);
             }
         }
 
-        private void CreateUnitTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile)
+        private void CreateUnitTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile, ref int pickleIndex)
         {
             if (string.IsNullOrEmpty(scenarioDefinitionInFeatureFile.ScenarioDefinition.Name))
             {
@@ -67,16 +69,16 @@ namespace Reqnroll.Generator.Generation
 
             if (scenarioDefinitionInFeatureFile.IsScenarioOutline)
             {
-                GenerateScenarioOutlineTest(generationContext, scenarioDefinitionInFeatureFile);
+                GenerateScenarioOutlineTest(generationContext, scenarioDefinitionInFeatureFile, ref pickleIndex);
             }
             else
             {
-                GenerateTest(generationContext, scenarioDefinitionInFeatureFile);
-                _pickleIndex++;
+                GenerateTest(generationContext, scenarioDefinitionInFeatureFile, pickleIndex);
+                pickleIndex++;
             }
         }
 
-        private void GenerateScenarioOutlineTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile)
+        private void GenerateScenarioOutlineTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile, ref int pickleIndex)
         {
             var scenarioOutline = scenarioDefinitionInFeatureFile.ScenarioOutline;
             ValidateExampleSetConsistency(scenarioOutline);
@@ -87,20 +89,20 @@ namespace Reqnroll.Generator.Generation
             var exampleTagsParam = new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_OUTLINE_EXAMPLE_TAGS_PARAMETER);
             if (generationContext.GenerateRowTests)
             {
-                GenerateScenarioOutlineExamplesAsRowTests(generationContext, scenarioOutline, scenarioOutlineTestMethod);
+                GenerateScenarioOutlineExamplesAsRowTests(generationContext, scenarioOutline, scenarioOutlineTestMethod, ref pickleIndex);
             }
             else
             {
-                GenerateScenarioOutlineExamplesAsIndividualMethods(scenarioOutline, generationContext, scenarioOutlineTestMethod, paramToIdentifier);
+                GenerateScenarioOutlineExamplesAsIndividualMethods(scenarioOutline, generationContext, scenarioOutlineTestMethod, paramToIdentifier, ref pickleIndex);
             }
 
             GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, scenarioOutlineTestMethod, exampleTagsParam, paramToIdentifier, true);
         }
 
-        private void GenerateTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile)
+        private void GenerateTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile, int pickleIndex)
         {
             var testMethod = CreateTestMethod(generationContext, scenarioDefinitionInFeatureFile.ScenarioDefinition, null);
-            GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, testMethod);
+            GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, testMethod, pickleIndex: pickleIndex);
         }
 
         private void ValidateExampleSetConsistency(ScenarioOutline scenarioOutline)
@@ -141,8 +143,12 @@ namespace Reqnroll.Generator.Generation
 
             // This flag indicates whether the pickleIndex will be given to the method as an argument (coming from a RowTest) (if true)
             // or should be generated as a local variable (if false).
-            bool pickleIdIncludedInParameters = false)
+            bool pickleIdIncludedInParameters = false,
+            int? pickleIndex = null)
         {
+            if (!pickleIdIncludedInParameters && pickleIndex == null)
+                throw new ArgumentNullException(nameof(pickleIndex));
+
             var scenarioDefinition = scenarioDefinitionInFeatureFile.ScenarioDefinition;
             var feature = scenarioDefinitionInFeatureFile.Feature;
 
@@ -205,7 +211,7 @@ namespace Reqnroll.Generator.Generation
             // Cucumber Messages support uses a new variables: pickleIndex
             // The pickleIndex tells the runtime which Pickle this test corresponds to. 
             // When Backgrounds and Rule Backgrounds are used, we don't know ahead of time how many Steps there are in the Pickle.
-            AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, _pickleIndex);
+            AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, pickleIndex);
 
             testMethod.Statements.Add(
                 new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(ScenarioInfo), CodeTypeReferenceOptions.GlobalReference), "scenarioInfo",
@@ -236,7 +242,7 @@ namespace Reqnroll.Generator.Generation
             GenerateScenarioCleanupMethodCall(generationContext, testMethod);
         }
 
-        internal void AddVariableForPickleIndex(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, int pickleIndex)
+        internal void AddVariableForPickleIndex(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, int? pickleIndex)
         {
             _scenarioPartHelper.AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, pickleIndex);
         }
@@ -315,7 +321,6 @@ namespace Reqnroll.Generator.Generation
                 _scenarioPartHelper.GenerateStep(generationContext, statementsWhenScenarioIsExecuted, scenarioStep, paramToIdentifier);
             }
 
-            var tagsOfScenarioVariableReferenceExpression = new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_TAGS_VARIABLE_NAME);
             var featureFileTagFieldReferenceExpression = new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME);
 
             var scenarioCombinedTagsPropertyExpression = new CodePropertyReferenceExpression(new CodeVariableReferenceExpression("scenarioInfo"), "CombinedTags");
@@ -378,7 +383,9 @@ namespace Reqnroll.Generator.Generation
         private void GenerateScenarioOutlineExamplesAsIndividualMethods(
             ScenarioOutline scenarioOutline,
             TestClassGenerationContext generationContext,
-            CodeMemberMethod scenarioOutlineTestMethod, ParameterSubstitution paramToIdentifier)
+            CodeMemberMethod scenarioOutlineTestMethod, 
+            ParameterSubstitution paramToIdentifier,
+            ref int pickleIndex)
         {
             var exampleSetIndex = 0;
 
@@ -406,28 +413,28 @@ namespace Reqnroll.Generator.Generation
 
                 foreach (var example in exampleSet.TableBody.Select((r, i) => new { Row = r, Index = i }))
                 {
-                    var variantName = useFirstColumnAsName ? example.Row.Cells.First().Value : string.Format("Variant {0}", example.Index);
-                    GenerateScenarioOutlineTestVariant(generationContext, scenarioOutline, scenarioOutlineTestMethod, paramToIdentifier, exampleSet.Name ?? "", exampleSetIdentifier, example.Row, _pickleIndex, exampleSet.Tags.ToArray(), variantName);
-                    _pickleIndex++;
+                    var variantName = useFirstColumnAsName ? example.Row.Cells.First().Value : $"Variant {example.Index}";
+                    GenerateScenarioOutlineTestVariant(generationContext, scenarioOutline, scenarioOutlineTestMethod, paramToIdentifier, exampleSet.Name ?? "", exampleSetIdentifier, example.Row, pickleIndex, exampleSet.Tags.ToArray(), variantName);
+                    pickleIndex++;
                 }
 
                 exampleSetIndex++;
             }
         }
 
-        private void GenerateScenarioOutlineExamplesAsRowTests(TestClassGenerationContext generationContext, ScenarioOutline scenarioOutline, CodeMemberMethod scenatioOutlineTestMethod)
+        private void GenerateScenarioOutlineExamplesAsRowTests(TestClassGenerationContext generationContext, ScenarioOutline scenarioOutline, CodeMemberMethod scenarioOutlineTestMethod, ref int pickleIndex)
         {
-            SetupTestMethod(generationContext, scenatioOutlineTestMethod, scenarioOutline, null, null, null, true);
+            SetupTestMethod(generationContext, scenarioOutlineTestMethod, scenarioOutline, null, null, null, true);
 
             foreach (var examples in scenarioOutline.Examples)
             {
                 foreach (var row in examples.TableBody)
                 {
-                    var arguments = row.Cells.Select(c => c.Value).Concat<string>(new[] { _pickleIndex.ToString() });
+                    var arguments = row.Cells.Select(c => c.Value).Concat([pickleIndex.ToString()]);
 
-                    _unitTestGeneratorProvider.SetRow(generationContext, scenatioOutlineTestMethod, arguments, GetNonIgnoreTags(examples.Tags), HasIgnoreTag(examples.Tags));
+                    _unitTestGeneratorProvider.SetRow(generationContext, scenarioOutlineTestMethod, arguments, GetNonIgnoreTags(examples.Tags), HasIgnoreTag(examples.Tags));
 
-                    _pickleIndex++;
+                    pickleIndex++;
                 }
             }
         }
@@ -464,7 +471,7 @@ namespace Reqnroll.Generator.Generation
         }
 
 
-        private bool CanUseFirstColumnAsName(IEnumerable<Gherkin.Ast.TableRow> tableBody)
+        private bool CanUseFirstColumnAsName(IEnumerable<TableRow> tableBody)
         {
             var tableBodyArray = tableBody.ToArray();
             if (tableBodyArray.Any(r => !r.Cells.Any()))
@@ -500,7 +507,7 @@ namespace Reqnroll.Generator.Generation
             IEnumerable<KeyValuePair<string, string>> paramToIdentifier,
             string exampleSetTitle,
             string exampleSetIdentifier,
-            Gherkin.Ast.TableRow row,
+            TableRow row,
             int pickleIndex,
             Tag[] exampleSetTags,
             string variantName)
