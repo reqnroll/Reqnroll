@@ -4,10 +4,6 @@ using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Events
 {
-    // Formatters implementation note: Added various forms of context information to 
-    // many of the ExecutionEvents. This allows the Formatters implementation to
-    // align events with the Scenarios and Features to which they belong.
-
     public class ExecutionEvent : IExecutionEvent
     {
         public DateTime Timestamp { get; }
@@ -177,12 +173,6 @@ namespace Reqnroll.Events
         public IHookBinding HookBinding { get; }
         public IContextManager ContextManager { get; private set; }
 
-        [Obsolete("Use HookBindingStartedEvent(IHookBinding, IContextManager) instead")]
-        public HookBindingStartedEvent(IHookBinding hookBinding)
-        {
-            HookBinding = hookBinding;
-        }
-
         public HookBindingStartedEvent(IHookBinding hookBinding, IContextManager contextManager) 
         {
             HookBinding = hookBinding;
@@ -197,13 +187,6 @@ namespace Reqnroll.Events
         public TimeSpan Duration { get; }
         public IContextManager ContextManager { get; private set; }
         public Exception HookException { get; private set; }
-
-        [Obsolete("Use HookBindingFinishedEvent(IHookBinding, TimeSpan, IContextManager) instead")]
-        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration)
-        {
-            HookBinding = hookBinding;
-            Duration = duration;
-        }
 
         public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager, Exception hookException = null) 
         {
@@ -223,12 +206,6 @@ namespace Reqnroll.Events
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
 
-        [Obsolete("Use OutputAddedEvent(string, FeatureInfo, ScenarioInfo) instead")]
-        public OutputAddedEvent(string text)
-        {
-            Text = text;
-        }
-
         public OutputAddedEvent(string text, FeatureInfo featureInfo, ScenarioInfo scenarioInfo)
         {
             Text = text;
@@ -242,12 +219,6 @@ namespace Reqnroll.Events
         public string FilePath { get; }
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
-
-        [Obsolete("Use AttachmentAddedEvent(string, FeatureInfo, ScenarioInfo) instead")]
-        public AttachmentAddedEvent(string filePath)
-        {
-            FilePath = filePath;
-        }
 
         public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo, ScenarioInfo scenarioInfo)
         {

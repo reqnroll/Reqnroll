@@ -19,7 +19,9 @@ namespace Reqnroll
         public CultureInfo Language { get; private set; }
 
 
-        // This holds the cucumber messages at the feature level created by the test class generator; populated when the FeatureStartedEvent is fired
+        /// <summary>
+        /// This property holds the cucumber messages at the feature level created by the test class generator; populated when the FeatureStartedEvent is fired. Used internally.
+        /// </summary>
         internal FeatureLevelCucumberMessages FeatureCucumberMessages { get; set; }
 
         public FeatureInfo(CultureInfo language, string folderPath, string title, string description, params string[] tags)

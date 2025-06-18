@@ -18,7 +18,6 @@ using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Utils;
-using System.Collections.Generic;
 using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.Infrastructure

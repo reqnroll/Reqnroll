@@ -38,18 +38,19 @@ namespace Reqnroll
         public string Description { get; }
 
         /// <summary>
-        /// The PickleIdIndex of the test Scenario when exported as a Cucumber Message "pickle".
+        /// The PickleIdIndex of the test scenario when exported as a Cucumber Messages "pickle". Used internally.
         /// The index is the sequential number of the pickle in the list of pickles generated from the feature file.
+        /// The index is "replaced" by real unique identifiers (<see cref="PickleId"/>) during <see cref="Events.ScenarioStartedEvent"/> event.
         /// </summary>
         internal string PickleIdIndex { get; }
 
         /// <summary>
-        /// The list of step PickleIds in the step sequence for this test case.
+        /// The list of step PickleIds in the step sequence for this test. Used internally at runtime.
         /// </summary>
         internal PickleStepSequence PickleStepSequence { get; set; }
 
         /// <summary>
-        /// This holds the unique identifier for for this Test Case (at runtime). 
+        /// This holds the unique identifier for the test ("pickle") represented by this scenario info. Used internally at runtime.
         /// </summary>
         internal string PickleId { get; set; }
 
