@@ -3,7 +3,7 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.Formatters.Tests
 {
-    internal class CrossReferenceBuilder : CucumberMessage_TraversalVisitorBase
+    internal class CrossReferenceBuilder : CucumberMessageVisitorBase
     {
         private Action<object> buildCrossReferences;
         public CrossReferenceBuilder(Action<object> buildCrossReferences)
@@ -124,10 +124,10 @@ namespace Reqnroll.Formatters.Tests
             buildCrossReferences(pickleTableCell);
             base.OnVisiting(pickleTableCell);
         }
-        public override void OnVisiting(PickleTag pickelTag)
+        public override void OnVisiting(PickleTag pickleTag)
         {
-            buildCrossReferences(pickelTag);
-            base.OnVisiting(pickelTag);
+            buildCrossReferences(pickleTag);
+            base.OnVisiting(pickleTag);
         }
         public override void OnVisiting(Product product)
         {

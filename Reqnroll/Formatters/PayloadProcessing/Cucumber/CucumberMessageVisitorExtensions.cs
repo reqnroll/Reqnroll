@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
 using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
-public class CucumberMessageVisitor
+public static class CucumberMessageVisitorExtensions
 {
-    public static void Accept(ICucumberMessageVisitor visitor, object message)
+    public static void AcceptMessage(this ICucumberMessageVisitor visitor, object message)
     {
         switch (message)
         {

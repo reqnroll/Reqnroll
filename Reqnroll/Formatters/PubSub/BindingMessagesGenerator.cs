@@ -5,6 +5,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.Formatters.PubSub;
 

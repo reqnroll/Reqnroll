@@ -14,7 +14,7 @@ namespace Reqnroll.Formatters.PubSub;
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
-    public bool Enabled { get; private set; }
+    public bool Enabled { get; private set; } = false;
 
     // This is the number of sinks that we expect to register. This number is determined by the number of sinks that add themselves to the global container during plugin startup.
     private int _numberOfSinksExpected;
@@ -29,11 +29,6 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     // This event gets fired when all Sinks have registered and indicates to the Publisher that it can start Publishing messages.
     public event EventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
-
-    public CucumberMessageBroker()
-    {
-        Enabled = false;
-    }
 
     // This method is called by the sinks during their plugin initialization. This tells the broker how many plugin sinks to expect.
     public void RegisterSink(ICucumberMessageSink sink)

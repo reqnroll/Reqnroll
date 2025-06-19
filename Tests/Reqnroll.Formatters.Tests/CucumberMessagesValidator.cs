@@ -59,7 +59,7 @@ namespace Reqnroll.Formatters.Tests
             foreach (var message in messages)
             {
                 var msg = message.Content();
-                CucumberMessageVisitor.Accept(xrefBuilder, msg);
+                xrefBuilder.Accept(msg);
             }
         }
         private static void InsertIntoIDsByType(object msg, Dictionary<Type, HashSet<string>> IDsByType)

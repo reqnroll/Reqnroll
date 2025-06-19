@@ -9,7 +9,7 @@ namespace Reqnroll.Generator.Generation;
 /// <summary>
 /// Generates a CodeDom expression to create a list of Cucumber Pickles
 /// </summary>
-internal class CucumberPicklesExpressionGenerator : CucumberMessage_TraversalVisitorBase
+internal class CucumberPicklesExpressionGenerator : CucumberMessageVisitorBase
 {
     private List<CodeExpression> _pickleList;
     private List<CodeExpression> _pickleSteps;

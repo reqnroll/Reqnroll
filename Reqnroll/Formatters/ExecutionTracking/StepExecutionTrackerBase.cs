@@ -1,4 +1,5 @@
 ﻿using System;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.Formatters.ExecutionTracking
 {

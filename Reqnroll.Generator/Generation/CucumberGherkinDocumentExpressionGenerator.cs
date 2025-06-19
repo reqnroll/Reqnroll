@@ -10,7 +10,7 @@ namespace Reqnroll.Generator.Generation;
 /// <summary>
 /// This class is responsible for generating a CodeDom expression that can recreate the given Cucumber Gherkin Document.
 /// </summary>
-internal class CucumberGherkinDocumentExpressionGenerator : CucumberMessage_TraversalVisitorBase
+internal class CucumberGherkinDocumentExpressionGenerator : CucumberMessageVisitorBase
 {
     private GherkinDocument _gherkinDocument;
     private CodeExpression _gherkinDocumentExpression;

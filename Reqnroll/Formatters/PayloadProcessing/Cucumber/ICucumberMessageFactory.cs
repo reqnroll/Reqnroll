@@ -5,6 +5,8 @@ using Reqnroll.BoDi;
 using Reqnroll.Formatters.ExecutionTracking;
 using System;
 
+namespace Reqnroll.Formatters.PayloadProcessing.Cucumber;
+
 public interface ICucumberMessageFactory
 {
     // Core message methods

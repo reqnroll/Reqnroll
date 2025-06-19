@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.Formatters.ExecutionTracking
 {
