@@ -248,8 +248,7 @@ namespace Reqnroll.Generator.Generation
             var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference),
                 sourceFunc,
                 gherkinDocumentFunc,
-                picklesFunc,
-                new CodePrimitiveExpression(sourceFileLocation));
+                picklesFunc);
 
             cucumberMessagesInitializeMethod.Statements.Add(
                 new CodeMethodReturnStatement(

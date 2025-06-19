@@ -16,6 +16,7 @@ using Reqnroll.Formatters;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.RuntimeSupport;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
@@ -30,7 +31,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 ICucumberMessageBroker broker,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
-                : base(configurationProvider, broker, "testPlugin", ".txt", "test_output.txt", fileSystem)
+                : base(configurationProvider, broker, new FormatterLog(), "testPlugin", ".txt", "test_output.txt", fileSystem)
             {
                 FileSystem = fileSystem;
                 _messageCollector = messageCollector;

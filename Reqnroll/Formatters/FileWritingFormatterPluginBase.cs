@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 
 namespace Reqnroll.Formatters;
@@ -17,7 +18,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
     private readonly string _defaultFileName;
     private readonly IFileSystem _fileSystem;
 
-    protected FileWritingFormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, broker, pluginName)
+    protected FileWritingFormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, broker, logger, pluginName)
     {
         _defaultFileType = defaultFileType;
         _defaultFileName = defaultFileName;
@@ -78,7 +79,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         }
         catch (System.Text.Json.JsonException)
         {
-            Trace?.WriteToolOutput($"Configuration of ${PluginName} is invalid: ${formatterConfiguration}");
+            Trace?.WriteMessage($"Configuration of ${PluginName} is invalid: ${formatterConfiguration}");
         }
 
         return string.Empty;

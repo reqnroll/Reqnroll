@@ -8,13 +8,13 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using Reqnroll.Plugins;
 using Reqnroll.Time;
-using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Reqnroll.Formatters.RuntimeSupport;
 
 namespace Reqnroll.Formatters.PubSub;
 
@@ -26,13 +26,13 @@ namespace Reqnroll.Formatters.PubSub;
 public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventListener
 {
     internal ICucumberMessageBroker _broker;
-    internal IObjectContainer _testThreadObjectContainer;
+    internal IObjectContainer _globalObjectContainer;
 
     // Started Features by name
     internal ConcurrentDictionary<string, IFeatureExecutionTracker> _startedFeatures = new();
     internal BindingMessagesGenerator _bindingCaches;
     internal IClock _clock;
-    internal ITraceListener _traceListener;
+    internal IFormatterLog _traceLogger;
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
@@ -66,16 +66,16 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     {
         runtimePluginEvents.RegisterGlobalDependencies += (_, args) =>
         {
+            _globalObjectContainer = args.ObjectContainer;
             args.ObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
             if (!args.ObjectContainer.IsRegistered<ICucumberMessageFactory>())
             {
-                args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>(() => new CucumberMessageFactory());
+                args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>((Delegate)(() => new CucumberMessageFactory()));
             }
         };
 
         runtimePluginEvents.CustomizeTestThreadDependencies += (_, args) =>
         {
-            _testThreadObjectContainer = args.ObjectContainer;
             var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
             testThreadExecutionEventPublisher.AddListener(this);
         };
@@ -134,17 +134,17 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (!_enabled || _startupCompleted)
             return;
 
-        SharedIdGenerator = _testThreadObjectContainer.Resolve<IIdGenerator>();
-        _messageFactory = _testThreadObjectContainer.Resolve<ICucumberMessageFactory>();
+        SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
+        _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
         _testRunStartedId = SharedIdGenerator.GetNewId();
         _bindingCaches = new BindingMessagesGenerator(SharedIdGenerator, _messageFactory);
-        _clock = _testThreadObjectContainer.Resolve<IClock>();
-        _traceListener = _testThreadObjectContainer.Resolve<ITraceListener>();
+        _clock = _globalObjectContainer.Resolve<IClock>();
+        _traceLogger = _globalObjectContainer.Resolve<IFormatterLog>();
         try
         {
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
-            await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_testThreadObjectContainer)));
-            foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(_testThreadObjectContainer.Resolve<IBindingRegistry>()))
+            await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_globalObjectContainer)));
+            foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(_globalObjectContainer.Resolve<IBindingRegistry>()))
             {
                 // this publishes StepDefinition, Hook, StepArgumentTransform messages
                 await _broker.PublishAsync(msg);
@@ -152,7 +152,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         }
         catch (System.Exception ex)
         {
-            _traceListener.WriteToolOutput($"Error publishing messages: {ex.Message}");
+            _traceLogger.WriteMessage($"Error publishing messages: {ex.Message}");
         }
 
         _startupCompleted = true;
@@ -227,7 +227,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             }
             catch (System.Exception ex)
             {
-                _traceListener.WriteToolOutput($"Error publishing messages: {ex.Message}");
+                _traceLogger.WriteMessage($"Error publishing messages: {ex.Message}");
             }
         }
     }

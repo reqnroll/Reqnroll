@@ -8,9 +8,8 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 /// This class is used at Code Generation time to provide serialized representations of the Source, GherkinDocument, and Pickles 
 /// to be used at runtime.
 /// </summary>
-public class FeatureLevelCucumberMessages(Func<Source> source, Func<GherkinDocument> gherkinDocument, Func<IEnumerable<Pickle>> pickles, string location)
+public class FeatureLevelCucumberMessages(Func<Source> source, Func<GherkinDocument> gherkinDocument, Func<IEnumerable<Pickle>> pickles)
 {
-    public string Location { get; } = location;
     public Func<Source> Source { get; } = source;
     public Func<GherkinDocument> GherkinDocument { get; } = gherkinDocument;
     public Func<IEnumerable<Pickle>> Pickles { get; } = pickles;

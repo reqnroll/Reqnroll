@@ -4,12 +4,11 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.BoDi;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Plugins;
-using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Formatters;
@@ -20,23 +19,21 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
 
     private readonly ICucumberMessageBroker _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
-    private readonly Lazy<ITraceListener> _traceListener;
-
+    private readonly IFormatterLog _traceLogger;
     protected readonly BlockingCollection<Envelope> PostedMessages = new();
 
-    private IObjectContainer? _testThreadObjectContainer;
     private bool _isDisposed = false;
 
+    public IFormatterLog Trace { get => _traceLogger; }
     public string PluginName { get; }
 
     string ICucumberMessageSink.Name => PluginName;
-    protected ITraceListener? Trace => _traceListener.Value;
 
-    protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, string pluginName)
+    protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, string pluginName)
     {
         _broker = broker;
         _configurationProvider = configurationProvider;
-        _traceListener = new Lazy<ITraceListener>(() => _testThreadObjectContainer!.Resolve<ITraceListener>());
+        _traceLogger = logger;
         PluginName = pluginName;
     }
 
@@ -45,11 +42,6 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
         _broker.RegisterSink(this);
 
         LaunchSinkAsync();
-
-        runtimePluginEvents.CustomizeTestThreadDependencies += (_, args) =>
-        {
-            _testThreadObjectContainer = args.ObjectContainer;
-        };
     }
 
     internal async Task CloseAsync()

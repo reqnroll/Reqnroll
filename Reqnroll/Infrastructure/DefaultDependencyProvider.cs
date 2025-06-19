@@ -21,6 +21,7 @@ using Reqnroll.Utils;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.Html;
 using Reqnroll.Formatters.Messages;
+using Reqnroll.Formatters.RuntimeSupport;
 
 namespace Reqnroll.Infrastructure
 {
@@ -106,6 +107,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
 
             //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<FormatterLog, IFormatterLog>();
             container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<EnvVariableEnableFlagParser, IEnvVariableEnableFlagParser>();
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");

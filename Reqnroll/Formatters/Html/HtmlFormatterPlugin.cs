@@ -5,6 +5,7 @@ using Cucumber.HtmlFormatter;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 
 namespace Reqnroll.Formatters.Html;
@@ -14,7 +15,7 @@ namespace Reqnroll.Formatters.Html;
 /// </summary>
 public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
 {
-    public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configurationProvider, broker, "html", ".html", "reqnroll_report.html", fileSystem)
+    public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, broker, logger, "html", ".html", "reqnroll_report.html", fileSystem)
     {
     }
 

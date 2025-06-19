@@ -6,6 +6,7 @@ using System.Text;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 
 namespace Reqnroll.Formatters.Messages;
@@ -15,7 +16,7 @@ namespace Reqnroll.Formatters.Messages;
 /// </summary>
 public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
 {
-    public MessagesFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFileSystem fileSystem) : base(configurationProvider, broker, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
+    public MessagesFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, broker, logger, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
     {
     }
 
