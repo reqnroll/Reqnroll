@@ -170,7 +170,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Act
             _sut.BrokerReady(null, new BrokerReadyEventArgs());
-            await _sut.PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(objectContainerStub));
+            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
 
             // Assert
@@ -203,10 +203,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._startedFeatures.TryAdd("feature2", featureTrackerMock.Object);
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
+            _sut._clock = _clockMock.Object;
 
             // Act
             //_sut.BrokerReady(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
-            await _sut.PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(objectContainerStub));
+            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Once);
@@ -245,10 +246,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._startedFeatures.TryAdd("feature2", feature2TrackerMock.Object);
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
+            _sut._clock = _clockMock.Object;
 
             // Act
             //_sut.BrokerReady(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
-            await _sut.PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(objectContainerStub));
+            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Once);
@@ -291,9 +293,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._enabled = true;
             _sut._messages = messages;
             _sut._messageFactory = new CucumberMessageFactory();
+            _sut._clock = _clockMock.Object;
 
             // Act
-            await _sut.PublisherTestRunCompleteAsync(null, new RuntimePluginAfterTestRunEventArgs(objectContainerStub));
+            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Exactly(3));
