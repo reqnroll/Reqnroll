@@ -34,7 +34,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     internal IClock _clock;
     internal ITraceListener _traceListener;
 
-    // This dictionary tracks the StepDefintions(ID) by their method signature
+    // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
     // shared to each Feature tracker so that we keep a single list
     internal ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature => _bindingCaches.StepDefinitionIdByMethodSignaturePatternCache;
@@ -64,7 +64,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
-        runtimePluginEvents.RegisterGlobalDependencies += (sender, args) =>
+        runtimePluginEvents.RegisterGlobalDependencies += (_, args) =>
         {
             args.ObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
             if (!args.ObjectContainer.IsRegistered<ICucumberMessageFactory>())
@@ -73,7 +73,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             }
         };
 
-        runtimePluginEvents.CustomizeTestThreadDependencies += (sender, args) =>
+        runtimePluginEvents.CustomizeTestThreadDependencies += (_, args) =>
         {
             _testThreadObjectContainer = args.ObjectContainer;
             var testThreadExecutionEventPublisher = args.ObjectContainer.Resolve<ITestThreadExecutionEventPublisher>();
@@ -175,7 +175,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         // publish all TestCase messages
         var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
         // sort the remaining Messages by timestamp
-        var executionMessages = _messages.Except(testCaseMessages).OrderBy(e => RetrieveDateTime(e)).ToList();
+        var executionMessages = _messages.Except(testCaseMessages).OrderBy(RetrieveDateTime).ToList();
 
         // publish them in order to the broker
         foreach (var env in testCaseMessages)
