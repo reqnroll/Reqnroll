@@ -32,47 +32,17 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
         return new TestRunFinished(null, testRunStatus, Converters.ToTimestamp(timestamp.ToUniversalTime()), null, testRunStartedId);
     }
 
-    public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookTracker hookTracker)
+    public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return new TestRunHookStarted(hookTracker.TestRunHookId, hookTracker.TestRunID, hookTracker.TestRunHook_HookId, Converters.ToTimestamp(hookTracker.TimeStamp.ToUniversalTime()));
+        return new TestRunHookStarted(hookExecutionTracker.HookStartedId, hookExecutionTracker.TestRunId, hookExecutionTracker.HookId, Converters.ToTimestamp(hookExecutionTracker.HookStarted.ToUniversalTime()));
     }
 
-    public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker)
+    public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return new TestRunHookFinished(hookTracker.TestRunHookId, ToTestStepResult(hookTracker), Converters.ToTimestamp(hookTracker.TimeStamp.ToUniversalTime()));
+        return new TestRunHookFinished(hookExecutionTracker.HookStartedId, ToTestStepResult(hookExecutionTracker), Converters.ToTimestamp(hookExecutionTracker.HookFinished.ToUniversalTime()));
     }
 
-    public virtual TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
-    {
-        var testSteps = new List<TestStep>();
-
-        foreach (var stepDefinition in testCaseDefinition.StepDefinitions)
-        {
-            switch (stepDefinition)
-            {
-                case HookStepDefinition hookStepDefinition:
-                    var hookTestStep = ToHookTestStep(hookStepDefinition);
-                    testSteps.Add(hookTestStep);
-                    break;
-                case TestStepDefinition _:
-                    var testStep = ToPickleTestStep(stepDefinition);
-                    testSteps.Add(testStep);
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
-        }
-        var testCase = new TestCase
-        (
-            testCaseDefinition.TestCaseId,
-            testCaseDefinition.PickleId,
-            testSteps,
-            testCaseDefinition.Tracker.TestRunStartedId
-        );
-        return testCase;
-    }
-
-    public virtual TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId)
+    public virtual TestCaseStarted ToTestCaseStarted(TestCaseExecutionTracker testCaseExecution, string testCaseId)
     {
         return new TestCaseStarted(
             testCaseExecution.AttemptId,
@@ -82,7 +52,7 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
             Converters.ToTimestamp(testCaseExecution.TestCaseStartedTimeStamp.ToUniversalTime()));
     }
 
-    public virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
+    public virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionTracker testCaseExecution)
     {
         return new TestCaseFinished(
             testCaseExecution.TestCaseStartedId,
@@ -106,15 +76,12 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
 
     public virtual StepDefinitionPattern ToStepDefinitionPattern(IStepDefinitionBinding binding)
     {
-        var bindingSourceText = binding.SourceExpression;
-        var expressionType = binding.ExpressionType;
-        var stepDefinitionPatternType = expressionType switch
+        var stepDefinitionPatternType = binding.ExpressionType switch
         {
             StepDefinitionExpressionTypes.CucumberExpression => StepDefinitionPatternType.CUCUMBER_EXPRESSION,
             _ => StepDefinitionPatternType.REGULAR_EXPRESSION
         };
-        var stepDefinitionPattern = new StepDefinitionPattern(bindingSourceText, stepDefinitionPatternType);
-        return stepDefinitionPattern;
+        return new StepDefinitionPattern(binding.SourceExpression, stepDefinitionPatternType);
     }
 
     public virtual UndefinedParameterType ToUndefinedParameterType(string expression, string paramName, IIdGenerator iDGenerator)
@@ -148,10 +115,38 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
         return sourceRef;
     }
 
-    public virtual TestStep ToPickleTestStep(TestStepDefinition stepDef)
+    public virtual TestCase ToTestCase(TestCaseTracker testCaseTracker)
     {
-        bool bound = stepDef.Bound;
+        var testSteps = new List<TestStep>();
 
+        foreach (var stepTracker in testCaseTracker.Steps)
+        {
+            switch (stepTracker)
+            {
+                case HookStepTracker hookStepDefinition:
+                    var hookTestStep = ToTestStep(hookStepDefinition);
+                    testSteps.Add(hookTestStep);
+                    break;
+                case TestStepTracker testStepDefinition:
+                    var testStep = ToTestStep(testStepDefinition);
+                    testSteps.Add(testStep);
+                    break;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+        var testCase = new TestCase
+        (
+            testCaseTracker.TestCaseId,
+            testCaseTracker.PickleId,
+            testSteps,
+            testCaseTracker.ParentTracker.TestRunStartedId
+        );
+        return testCase;
+    }
+
+    public virtual TestStep ToTestStep(TestStepTracker stepDef)
+    {
         var args = stepDef.StepArguments
                           .Select(ToStepMatchArgument)
                           .ToList();
@@ -159,12 +154,24 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
         var result = new TestStep(
             null,
             stepDef.TestStepId,
-            stepDef.PickleStepID,
+            stepDef.PickleStepId,
             stepDef.StepDefinitionIds,
-            bound ? [new StepMatchArgumentsList(args)] : new List<StepMatchArgumentsList>()
+            stepDef.IsBound ? [new StepMatchArgumentsList(args)] : []
         );
 
         return result;
+    }
+
+    public virtual TestStep ToTestStep(HookStepTracker hookStepTracker)
+    {
+        var hookId = hookStepTracker.HookId;
+
+        return new TestStep(
+            hookId,
+            hookStepTracker.TestStepId,
+            null,
+            null,
+            null);
     }
 
     public virtual StepMatchArgument ToStepMatchArgument(TestStepArgument argument)
@@ -178,21 +185,21 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
             NormalizePrimitiveTypeNamesToCucumberTypeNames(argument.Type));
     }
 
-    public virtual TestStepStarted ToTestStepStarted(TestStepTracker stepState)
+    public virtual TestStepStarted ToTestStepStarted(TestStepExecutionTracker testStepExecutionTracker)
     {
         return new TestStepStarted(
-            stepState.TestCaseStartedID,
-            stepState.Definition.TestStepId,
-            Converters.ToTimestamp(stepState.StepStarted.ToUniversalTime()));
+            testStepExecutionTracker.TestCaseStartedId,
+            testStepExecutionTracker.StepTracker.TestStepId,
+            Converters.ToTimestamp(testStepExecutionTracker.StepStarted.ToUniversalTime()));
     }
 
-    public virtual TestStepFinished ToTestStepFinished(TestStepTracker stepState)
+    public virtual TestStepFinished ToTestStepFinished(TestStepExecutionTracker testStepExecutionTracker)
     {
         return new TestStepFinished(
-            stepState.TestCaseStartedID,
-            stepState.Definition.TestStepId,
-            ToTestStepResult(stepState),
-            Converters.ToTimestamp(stepState.StepFinished.ToUniversalTime()));
+            testStepExecutionTracker.TestCaseStartedId,
+            testStepExecutionTracker.StepTracker.TestStepId,
+            ToTestStepResult(testStepExecutionTracker),
+            Converters.ToTimestamp(testStepExecutionTracker.StepFinished.ToUniversalTime()));
     }
 
     public virtual Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
@@ -228,40 +235,28 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
         };
     }
 
-    public virtual TestStep ToHookTestStep(HookStepDefinition hookStepDefinition)
+    public virtual TestStepStarted ToTestStepStarted(HookStepExecutionTracker hookStepExecutionTracker)
     {
-        var hookId = hookStepDefinition.HookId;
-
-        return new TestStep(
-            hookId,
-            hookStepDefinition.TestStepId,
-            null,
-            null,
-            null);
+        return new TestStepStarted(hookStepExecutionTracker.TestCaseStartedId,
+                                   hookStepExecutionTracker.StepTracker.TestStepId,
+                                   Converters.ToTimestamp(hookStepExecutionTracker.StepStarted.ToUniversalTime()));
     }
 
-    public virtual TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor)
+    public virtual TestStepFinished ToTestStepFinished(HookStepExecutionTracker hookStepExecutionTracker)
     {
-        return new TestStepStarted(hookStepProcessor.TestCaseStartedID,
-                                   hookStepProcessor.Definition.TestStepId,
-                                   Converters.ToTimestamp(hookStepProcessor.StepStarted.ToUniversalTime()));
+        return new TestStepFinished(hookStepExecutionTracker.TestCaseStartedId,
+                                    hookStepExecutionTracker.StepTracker.TestStepId,
+                                    ToTestStepResult(hookStepExecutionTracker), Converters.ToTimestamp(hookStepExecutionTracker.StepFinished.ToUniversalTime()));
     }
 
-    public virtual TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor)
+    public virtual Attachment ToAttachment(AttachmentTracker tracker)
     {
-        return new TestStepFinished(hookStepProcessor.TestCaseStartedID,
-                                    hookStepProcessor.Definition.TestStepId,
-                                    ToTestStepResult(hookStepProcessor), Converters.ToTimestamp(hookStepProcessor.StepFinished.ToUniversalTime()));
-    }
-
-    public virtual Attachment ToAttachment(AttachmentAddedEventWrapper tracker)
-    {
-        var attEvent = tracker.AttachmentAddedEvent;
+        var filePath = tracker.FilePath;
         return new Attachment(
-            Base64EncodeFile(attEvent.FilePath),
+            Base64EncodeFile(filePath),
             AttachmentContentEncoding.BASE64,
-            Path.GetFileName(attEvent.FilePath),
-            FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(attEvent.FilePath)),
+            Path.GetFileName(filePath),
+            FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
             null,
             tracker.TestCaseStartedId,
             tracker.TestCaseStepId,
@@ -269,11 +264,10 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
             tracker.TestRunStartedId);
     }
 
-    public virtual Attachment ToAttachment(OutputAddedEventWrapper tracker)
+    public virtual Attachment ToAttachment(OutputMessageTracker tracker)
     {
-        var outputAddedEvent = tracker.OutputAddedEvent;
         return new Attachment(
-            outputAddedEvent.Text,
+            tracker.Text,
             AttachmentContentEncoding.IDENTITY,
             null,
             "text/x.cucumber.log+plain",
@@ -294,13 +288,13 @@ public class CucumberMessageFactoryInner : ICucumberMessageFactory
         );
     }
 
-    private static TestStepResult ToTestStepResult(TestRunHookTracker hookTracker)
+    private static TestStepResult ToTestStepResult(TestRunHookExecutionTracker hookExecutionTracker)
     {
         return new TestStepResult(
-            Converters.ToDuration(hookTracker.Duration),
+            Converters.ToDuration(hookExecutionTracker.Duration),
             "",
-            ToTestStepResultStatus(hookTracker.Status),
-            ToException(hookTracker.Exception));
+            ToTestStepResultStatus(hookExecutionTracker.Status),
+            ToException(hookExecutionTracker.Exception));
     }
 
     private static Io.Cucumber.Messages.Types.Exception ToException(System.Exception exception)

@@ -26,26 +26,26 @@ public class CucumberMessageFactory(ICucumberMessageFactory innerFactory) : ICuc
         return innerFactory.ToTestRunFinished(testRunStatus, timestamp, testRunStartedId);
     }
 
-    public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookTracker hookTracker)
+    public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return innerFactory.ToTestRunHookStarted(hookTracker);
+        return innerFactory.ToTestRunHookStarted(hookExecutionTracker);
     }
 
-    public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker)
+    public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return innerFactory.ToTestRunHookFinished(hookTracker);
+        return innerFactory.ToTestRunHookFinished(hookExecutionTracker);
     }
 
-    public virtual TestCase ToTestCase(TestCaseDefinition testCaseDefinition)
+    public virtual TestCase ToTestCase(TestCaseTracker testCaseTracker)
     {
-        return innerFactory.ToTestCase(testCaseDefinition);
+        return innerFactory.ToTestCase(testCaseTracker);
     }
 
-    public virtual TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId)
+    public virtual TestCaseStarted ToTestCaseStarted(TestCaseExecutionTracker testCaseExecution, string testCaseId)
     {
         return innerFactory.ToTestCaseStarted(testCaseExecution, testCaseId);
     }
-    public virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution)
+    public virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionTracker testCaseExecution)
     {
         return innerFactory.ToTestCaseFinished(testCaseExecution);
     }
@@ -68,23 +68,23 @@ public class CucumberMessageFactory(ICucumberMessageFactory innerFactory) : ICuc
         return innerFactory.ToParameterType(stepTransform, iDGenerator);
     }
 
-    public virtual TestStep ToPickleTestStep(TestStepDefinition stepDef)
+    public virtual TestStep ToTestStep(TestStepTracker stepDef)
     {
-        return innerFactory.ToPickleTestStep(stepDef);
+        return innerFactory.ToTestStep(stepDef);
     }
 
     public virtual StepMatchArgument ToStepMatchArgument(TestStepArgument argument)
     {
         return innerFactory.ToStepMatchArgument(argument);
     }
-    public virtual TestStepStarted ToTestStepStarted(TestStepTracker stepState)
+    public virtual TestStepStarted ToTestStepStarted(TestStepExecutionTracker testStepExecutionTracker)
     {
-        return innerFactory.ToTestStepStarted(stepState);
+        return innerFactory.ToTestStepStarted(testStepExecutionTracker);
     }
 
-    public virtual TestStepFinished ToTestStepFinished(TestStepTracker stepState)
+    public virtual TestStepFinished ToTestStepFinished(TestStepExecutionTracker testStepExecutionTracker)
     {
-        return innerFactory.ToTestStepFinished(stepState);
+        return innerFactory.ToTestStepFinished(testStepExecutionTracker);
     }
 
     public virtual Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
@@ -97,25 +97,25 @@ public class CucumberMessageFactory(ICucumberMessageFactory innerFactory) : ICuc
         return innerFactory.ToHookType(hookBinding);
     }
 
-    public virtual TestStep ToHookTestStep(HookStepDefinition hookStepDefinition)
+    public virtual TestStep ToTestStep(HookStepTracker hookStepTracker)
     {
-        return innerFactory.ToHookTestStep(hookStepDefinition);
+        return innerFactory.ToTestStep(hookStepTracker);
     }
-    public virtual TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor)
+    public virtual TestStepStarted ToTestStepStarted(HookStepExecutionTracker hookStepExecutionTracker)
     {
-        return innerFactory.ToTestStepStarted(hookStepProcessor);
-    }
-
-    public virtual TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor)
-    {
-        return innerFactory.ToTestStepFinished(hookStepProcessor);
+        return innerFactory.ToTestStepStarted(hookStepExecutionTracker);
     }
 
-    public virtual Attachment ToAttachment(AttachmentAddedEventWrapper tracker)
+    public virtual TestStepFinished ToTestStepFinished(HookStepExecutionTracker hookStepExecutionTracker)
+    {
+        return innerFactory.ToTestStepFinished(hookStepExecutionTracker);
+    }
+
+    public virtual Attachment ToAttachment(AttachmentTracker tracker)
     {
         return innerFactory.ToAttachment(tracker);
     }
-    public virtual Attachment ToAttachment(OutputAddedEventWrapper tracker)
+    public virtual Attachment ToAttachment(OutputMessageTracker tracker)
     {
         return innerFactory.ToAttachment(tracker);
     }

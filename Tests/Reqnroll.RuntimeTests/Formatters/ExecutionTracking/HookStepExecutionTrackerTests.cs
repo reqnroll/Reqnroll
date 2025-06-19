@@ -18,14 +18,14 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
-    public class HookStepTrackerTests
+    public class HookStepExecutionTrackerTests
     {
         private readonly Mock<ICucumberMessageFactory> _messageFactoryMock;
-        private readonly Mock<ITestCaseTracker> _testCaseTrackerMock;
+        private readonly Mock<IPickleExecutionTracker> _testCaseTrackerMock;
         private readonly ConcurrentDictionary<string, string> _stepDefinitionsByMethodSignature;
-        private readonly TestCaseDefinition _testCaseDefinition;
+        private readonly TestCaseTracker _testCaseTracker;
         private readonly Mock<IIdGenerator> _idGeneratorMock;
-        private readonly HookStepTracker _hookStepTracker;
+        private HookStepExecutionTracker _hookStepExecutionTracker;
         private FeatureInfo _featureInfoStub;
         private FeatureContext _featureContextStub;
         private ScenarioInfo _scenarioInfoStub;
@@ -54,11 +54,11 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
 
 
-        public HookStepTrackerTests()
+        public HookStepExecutionTrackerTests()
         {
             _messageFactoryMock = new Mock<ICucumberMessageFactory>();
-            _testCaseTrackerMock = new Mock<ITestCaseTracker>();
-            _testCaseDefinition = new TestCaseDefinition("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object);
+            _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
+            _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object, _messageFactoryMock.Object);
             _idGeneratorMock = new Mock<IIdGenerator>();
             _stepDefinitionsByMethodSignature = new ConcurrentDictionary<string, string>();
             _objectContainerStub = new ObjectContainer();
@@ -66,21 +66,22 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             SetupMockContexts();
 
             // Setup mocks
-            _testCaseTrackerMock.SetupGet(t => t.TestCaseDefinition).Returns(_testCaseDefinition);
-            _testCaseTrackerMock.SetupGet(t => t.IDGenerator).Returns(_idGeneratorMock.Object);
+            _testCaseTrackerMock.SetupGet(t => t.TestCaseTracker).Returns(_testCaseTracker);
+            _testCaseTrackerMock.SetupGet(t => t.IdGenerator).Returns(_idGeneratorMock.Object);
             _testCaseTrackerMock.SetupGet(t => t.StepDefinitionsByMethodSignature)
                 .Returns(_stepDefinitionsByMethodSignature);
 
             // Create a dummy execution record
-            var dummyExecutionRecord = new TestCaseExecutionRecord(_messageFactoryMock.Object, 0, "testCaseStartedId", "testCaseId", _testCaseDefinition);
 
             // Create the tracker to test
-            _hookStepTracker = new HookStepTracker(
-                _testCaseTrackerMock.Object,
-                dummyExecutionRecord,
+            _hookStepExecutionTracker = new HookStepExecutionTracker(
+                CreateTestCaseExecutionRecord(),
                 _messageFactoryMock.Object
             );
         }
+
+        private TestCaseExecutionTracker CreateTestCaseExecutionRecord(int attemptId = 0) => 
+            new(_testCaseTrackerMock.Object, _messageFactoryMock.Object, attemptId, "testCaseStartedId", "testCaseId", _testCaseTracker);
 
         [Fact]
         public void HookStepTracker_GenerateFrom_HookBindingStartedEvent_ReturnsOneEnvelope()
@@ -91,16 +92,16 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var testStepStarted = new TestStepStarted("testCaseStartedId", "testsStepId", new Timestamp(0, 1));
             
             _messageFactoryMock
-                .Setup(f => f.ToTestStepStarted(_hookStepTracker))
+                .Setup(f => f.ToTestStepStarted(_hookStepExecutionTracker))
                 .Returns(testStepStarted);
 
             // Act
-            var envelopes = _hookStepTracker.GenerateFrom(hookBindingStartedEvent).ToList();
+            var envelopes = ((IGenerateMessage)_hookStepExecutionTracker).GenerateFrom(hookBindingStartedEvent).ToList();
 
             // Assert
             envelopes.Should().HaveCount(1);
             envelopes[0].TestStepStarted.Should().Be(testStepStarted);
-            _messageFactoryMock.Verify(f => f.ToTestStepStarted(_hookStepTracker), Times.Once);
+            _messageFactoryMock.Verify(f => f.ToTestStepStarted(_hookStepExecutionTracker), Times.Once);
         }
 
         [Fact]
@@ -112,16 +113,16 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var testStepFinished = new TestStepFinished("testCaseStartedId", "testsStepId", new TestStepResult(new Duration(0, 1), "message", TestStepResultStatus.PASSED, null), new Timestamp(0, 1));
             
             _messageFactoryMock
-                .Setup(f => f.ToTestStepFinished(_hookStepTracker))
+                .Setup(f => f.ToTestStepFinished(_hookStepExecutionTracker))
                 .Returns(testStepFinished);
 
             // Act
-            var envelopes = _hookStepTracker.GenerateFrom(hookBindingFinishedEvent).ToList();
+            var envelopes = ((IGenerateMessage)_hookStepExecutionTracker).GenerateFrom(hookBindingFinishedEvent).ToList();
 
             // Assert
             envelopes.Should().HaveCount(1);
             envelopes[0].TestStepFinished.Should().Be(testStepFinished);
-            _messageFactoryMock.Verify(f => f.ToTestStepFinished(_hookStepTracker), Times.Once);
+            _messageFactoryMock.Verify(f => f.ToTestStepFinished(_hookStepExecutionTracker), Times.Once);
         }
 
         [Fact]
@@ -131,7 +132,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var otherEvent = new Mock<ExecutionEvent>().Object;
 
             // Act
-            var envelopes = _hookStepTracker.GenerateFrom(otherEvent).ToList();
+            var envelopes = ((IGenerateMessage)_hookStepExecutionTracker).GenerateFrom(otherEvent).ToList();
 
             // Assert
             envelopes.Should().BeEmpty();
@@ -159,17 +160,15 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             _testCaseTrackerMock.SetupGet(t => t.AttemptCount).Returns(0); // First attempt
 
             // Act
-            _hookStepTracker.ProcessEvent(hookBindingStartedEvent);
+            _hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
 
             // Assert
-            _hookStepTracker.HookBindingSignature.Should().Be(hookBindingSignature);
-            _hookStepTracker.Definition.Should().NotBeNull();
-            _hookStepTracker.Definition.Should().BeOfType<HookStepDefinition>();
+            _hookStepExecutionTracker.StepTracker.Should().NotBeNull();
+            _hookStepExecutionTracker.StepTracker.Should().BeOfType<HookStepTracker>();
             
-            _messageFactoryMock.Verify(f => f.CanonicalizeHookBinding(hookBindingMock.Object), Times.Once);
-            _testCaseDefinition.StepDefinitions.Should().HaveCount(1);
-            _testCaseDefinition.StepDefinitions[0].Should().BeOfType<HookStepDefinition>();
-            (_testCaseDefinition.StepDefinitions[0] as HookStepDefinition).HookId.Should().Be(hookId);
+            _testCaseTracker.Steps.Should().HaveCount(1);
+            _testCaseTracker.Steps[0].Should().BeOfType<HookStepTracker>();
+            (_testCaseTracker.Steps[0] as HookStepTracker).HookId.Should().Be(hookId);
         }
 
         [Fact]
@@ -187,23 +186,26 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
                 .Returns(hookBindingSignature);
             
             _stepDefinitionsByMethodSignature[hookBindingSignature] = hookId;
-            
-            _testCaseTrackerMock.SetupGet(t => t.AttemptCount).Returns(1); // Retry
+
+            // Create a hook tracker for a Retry
+            _hookStepExecutionTracker = new HookStepExecutionTracker(
+                CreateTestCaseExecutionRecord(1),
+                _messageFactoryMock.Object
+            );
             
             // Pre-existing definition that should be found
             var existingHookStepDefinition = CreateDummyHookStepDefinition(hookId);
 
-            _testCaseDefinition.StepDefinitions.Add(existingHookStepDefinition);
+            _testCaseTracker.Steps.Add(existingHookStepDefinition);
 
             // Act
-            _hookStepTracker.ProcessEvent(hookBindingStartedEvent);
+            _hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
 
             // Assert
-            _hookStepTracker.HookBindingSignature.Should().Be(hookBindingSignature);
-            _hookStepTracker.Definition.Should().Be(existingHookStepDefinition);
+            _hookStepExecutionTracker.StepTracker.Should().Be(existingHookStepDefinition);
             
             _messageFactoryMock.Verify(f => f.CanonicalizeHookBinding(hookBindingMock.Object), Times.Once);
-            _testCaseDefinition.StepDefinitions.Should().HaveCount(1);
+            _testCaseTracker.Steps.Should().HaveCount(1);
         }
 
         [Fact]
@@ -218,12 +220,11 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             );
 
             // Act
-            _hookStepTracker.ProcessEvent(hookBindingFinishedEvent);
+            _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
 
             // Assert
-            _hookStepTracker.HookBindingFinishedEvent.Should().Be(hookBindingFinishedEvent);
-            _hookStepTracker.Exception.Should().BeNull();
-            _hookStepTracker.Status.Should().Be(ScenarioExecutionStatus.OK); // Success status
+            _hookStepExecutionTracker.Exception.Should().BeNull();
+            _hookStepExecutionTracker.Status.Should().Be(ScenarioExecutionStatus.OK); // Success status
         }
 
         [Fact]
@@ -240,32 +241,31 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             );
 
             // Act
-            _hookStepTracker.ProcessEvent(hookBindingFinishedEvent);
+            _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
 
             // Assert
-            _hookStepTracker.HookBindingFinishedEvent.Should().Be(hookBindingFinishedEvent);
-            _hookStepTracker.Exception.Should().Be(exception);
-            _hookStepTracker.Status.Should().Be(ScenarioExecutionStatus.TestError); // Error status
+            _hookStepExecutionTracker.Exception.Should().Be(exception);
+            _hookStepExecutionTracker.Status.Should().Be(ScenarioExecutionStatus.TestError); // Error status
         }
 
-        // Helper method to create a dummy HookStepDefinition without mocking
-        private HookStepDefinition CreateDummyHookStepDefinition(string hookId)
+        // Helper method to create a dummy HookStepTracker without mocking
+        private HookStepTracker CreateDummyHookStepDefinition(string hookId)
         {
-            return new HookStepDefinition(
+            return new HookStepTracker(
                 "dummyTestStepId", 
                 hookId, 
-                _testCaseDefinition, 
+                _testCaseTracker, 
                 _messageFactoryMock.Object
             );
         }
     }
 
  
-    //// Extend TestStepDefinition to expose HookId in tests
-    //public class HookStepDefinition : TestStepDefinition
+    //// Extend TestStepTracker to expose HookId in tests
+    //public class HookStepTracker : TestStepTracker
     //{
-    //    public HookStepDefinition(string testStepDefinitionId, string hookId, TestCaseDefinition parentTestCaseDefinition, ICucumberMessageFactory messageFactory)
-    //        : base(testStepDefinitionId, hookId, parentTestCaseDefinition, messageFactory)
+    //    public HookStepTracker(string testStepDefinitionId, string hookId, TestCaseTracker parentTestCaseTracker, ICucumberMessageFactory messageFactory)
+    //        : base(testStepDefinitionId, hookId, parentTestCaseTracker, messageFactory)
     //    {
     //        HookId = hookId;
     //    }
@@ -273,10 +273,10 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
     //    public string HookId { get; }
     //}
 
-    //// Base TestStepDefinition class needed by HookStepDefinition
-    //public class TestStepDefinition
+    //// Base TestStepTracker class needed by HookStepTracker
+    //public class TestStepTracker
     //{
-    //    public TestStepDefinition(string testStepDefinitionId, string pickleStepId, TestCaseDefinition parentTestCaseDefinition, ICucumberMessageFactory messageFactory)
+    //    public TestStepTracker(string testStepDefinitionId, string pickleStepId, TestCaseTracker parentTestCaseTracker, ICucumberMessageFactory messageFactory)
     //    {
     //        TestStepId = testStepDefinitionId;
     //    }

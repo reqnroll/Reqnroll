@@ -1,62 +1,75 @@
-﻿using Io.Cucumber.Messages.Types;
-using Reqnroll.Assist;
-using Reqnroll.Bindings;
+﻿using Reqnroll.Bindings;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Threading;
 
-namespace Reqnroll.Formatters.ExecutionTracking
+namespace Reqnroll.Formatters.ExecutionTracking;
+
+/// <summary>
+/// Tracks the information needed for a Cucumber Messages "test case step", that is a step with binding information.
+/// The test case step needs to be built upon the first execution attempt of a pickle.
+/// </summary>
+public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTracker parentTracker, ICucumberMessageFactory messageFactory)
+    : StepTracker(testStepId)
 {
-    /// <summary>
-    /// This class is used to track the execution of Test StepDefinitionBinding Methods
-    /// </summary>
-    public class TestStepTracker : StepExecutionTrackerBase, IGenerateMessage
+    public TestCaseTracker ParentTracker { get; } = parentTracker;
+    public string PickleStepId { get; } = pickleStepId;
+
+    // Indicates whether the step was successfully bound to a Step Definition.
+    public bool IsBound { get; private set; }
+    // The Step Definition(s) that match this step of the Test Case. None for no match, 1 for a successful match, 2 or more for Ambiguous match.
+    public List<string> StepDefinitionIds { get; private set; }
+    public List<TestStepArgument> StepArguments { get; } = new();
+
+    // List of method signatures that cause an ambiguous situation to arise
+    public List<string> AmbiguousStepDefinitions { get; private set; } = new();
+    public bool IsAmbiguous => AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Any();
+
+    public void ProcessEvent(StepStartedEvent stepStartedEvent)
     {
-        internal TestStepTracker(ITestCaseTracker parentTracker, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory) : base(parentTracker, parentExecutionRecord, messageFactory)
+    }
+
+    // Once the StepFinished event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method
+    public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
+    {
+        var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
+        IsBound = !(bindingMatch == null || bindingMatch == BindingMatch.NonMatching);
+
+        if (IsBound)
         {
+
         }
 
-        public IEnumerable<Envelope> GenerateFrom(ExecutionEvent executionEvent)
-        {
-            return executionEvent switch
-            {
-                StepStartedEvent started => [Envelope.Create(_messageFactory.ToTestStepStarted(this))],
-                StepFinishedEvent finished => [Envelope.Create(_messageFactory.ToTestStepFinished(this))],
-                _ => Enumerable.Empty<Envelope>()
-            };
-        }
+        var stepDefinitionBinding = IsBound ? bindingMatch!.StepBinding : null;
+        var canonicalizedStepPattern = IsBound ? messageFactory.CanonicalizeStepDefinitionPattern(stepDefinitionBinding) : "";
+        var StepDefinitionId = IsBound ? ParentTracker.FindStepDefinitionIdByBingingKey(canonicalizedStepPattern) : null;
 
-        internal void ProcessEvent(StepStartedEvent stepStartedEvent)
+        var Status = stepFinishedEvent.StepContext.Status;
+
+        if (Status == ScenarioExecutionStatus.TestError && stepFinishedEvent.ScenarioContext.TestError != null)
         {
-            StepStarted = stepStartedEvent.Timestamp;
-            
-            // if this is the first time to execute this step for this test, generate the properties needed to Generate the TestStep Message (stored in a TestStepDefinition)
-            if (ParentTestCase.AttemptCount == 0)
+            var Exception = stepFinishedEvent.ScenarioContext.TestError;
+            if (Exception is AmbiguousBindingException)
             {
-                var testStepId = ParentTestCase.IDGenerator.GetNewId();
-                var pickleStepID = stepStartedEvent.StepContext.StepInfo.PickleStepId;
-                Definition = new(testStepId, pickleStepID, ParentTestCase.TestCaseDefinition, _messageFactory);
-                ParentTestCase.TestCaseDefinition.AddStepDefinition(Definition);
-            }
-            else
-            {
-                // On retries of the TestCase, find the Definition previously created.
-                Definition = ParentTestCase.TestCaseDefinition.FindTestStepDefByPickleId(stepStartedEvent.StepContext.StepInfo.PickleStepId);
+                AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches.Select(m =>
+                                                                                                                      ParentTracker.FindStepDefinitionIdByBingingKey(messageFactory.CanonicalizeStepDefinitionPattern(m.StepBinding))));
             }
         }
 
-        internal void ProcessEvent(StepFinishedEvent stepFinishedEvent)
-        {
-            if (ParentTestCase.AttemptCount == 0)
-                Definition.PopulateStepDefinitionFromExecutionResult(stepFinishedEvent);
-            Exception = stepFinishedEvent.ScenarioContext.TestError;
-            StepFinished = stepFinishedEvent.Timestamp;
+        StepDefinitionIds = IsAmbiguous ? AmbiguousStepDefinitions.ToList() : StepDefinitionId != null ? [StepDefinitionId] : [];
 
-            Status = stepFinishedEvent.StepContext.Status;
+        var IsInputDataTableOrDocString = stepFinishedEvent.StepContext.StepInfo.Table != null || stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
+        var argumentValues = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.Value.ToString()).ToList() : new List<string>();
+        var argumentStartOffsets = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.StartOffset).ToList() : new List<int?>();
+        var argumentTypes = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
+
+        if (IsBound && !IsInputDataTableOrDocString)
+        {
+            for (int i = 0; i < argumentValues.Count; i++)
+            {
+                StepArguments.Add(new TestStepArgument { Value = argumentValues[i], StartOffset = argumentStartOffsets[i], Type = argumentTypes[i] });
+            }
         }
     }
 }

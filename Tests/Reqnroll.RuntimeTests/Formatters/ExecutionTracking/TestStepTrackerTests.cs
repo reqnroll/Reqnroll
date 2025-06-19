@@ -1,179 +1,181 @@
-using FluentAssertions;
-using Gherkin.CucumberMessages;
-using Io.Cucumber.Messages.Types;
-using Moq;
-using Reqnroll.Bindings;
-using Reqnroll.Formatters.ExecutionTracking;
-using Reqnroll.Formatters.PayloadProcessing.Cucumber;
-using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentAssertions;
+using Gherkin.CucumberMessages;
+using Moq;
+using Reqnroll.Bindings;
+using Reqnroll.Bindings.Reflection;
+using Reqnroll.Formatters.ExecutionTracking;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Reqnroll.Events;
+using Reqnroll.Infrastructure;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
     public class TestStepTrackerTests
     {
-        private readonly Mock<ICucumberMessageFactory> _messageFactoryMock;
-        private readonly Mock<ITestCaseTracker> _testCaseTrackerMock;
-        private readonly TestCaseExecutionRecord _testCaseExecutionRecordStub;
-        private readonly TestStepTracker _testStepTracker_sut;
-        private readonly TestCaseDefinition _testCaseDefinitionStub;
-        
+        private readonly Mock<ICucumberMessageFactory> _messageFactoryMock = new();
+        private readonly Mock<IIdGenerator> _idGeneratorMock = new();
+        private readonly TestCaseTracker _testCaseTracker;
+        private readonly PickleExecutionTracker _pickleExecutionTracker;
         public TestStepTrackerTests()
         {
-            _messageFactoryMock = new Mock<ICucumberMessageFactory>();
-            _testCaseTrackerMock = new Mock<ITestCaseTracker>();
-            _testCaseDefinitionStub = new TestCaseDefinition("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object);
-            _testCaseExecutionRecordStub = new TestCaseExecutionRecord(_messageFactoryMock.Object, 0, "testCaseStartedId", "testCaseId", _testCaseDefinitionStub);
 
-            // Setup mocked objects for tests
-            _testStepTracker_sut = new TestStepTracker(
-                _testCaseTrackerMock.Object,
-                _testCaseExecutionRecordStub,
-                _messageFactoryMock.Object
-            );
+            _pickleExecutionTracker = new PickleExecutionTracker("testCasePickle", "runStartedId", "featureName", true, _idGeneratorMock.Object, new(), DateTime.Now, _messageFactoryMock.Object);
+            _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickle", _pickleExecutionTracker, _messageFactoryMock.Object);
         }
+
 
         [Fact]
-        public void TestStepTracker_GenerateFrom_StepStartedEvent_ReturnsOneEnvelope()
+        public void PopulateStepDefinitionFromExecutionResult_Should_Set_Bound_And_Arguments_When_Bound()
         {
             // Arrange
-            var stepStartedEvent = new Mock<StepStartedEvent>(null, null, null);
-            var testStepStarted = new TestStepStarted("testCaseStartedId", "testStepId", new Timestamp(0, 1));
-            
-            _messageFactoryMock
-                .Setup(f => f.ToTestStepStarted(_testStepTracker_sut))
-                .Returns(testStepStarted);
+            var methodMock = SetupMockMethodWithParameters([("arg1", typeof(string)), ("arg2", typeof(string))]);
+            var stepBindingMock = new Mock<IStepDefinitionBinding>();
+            stepBindingMock.Setup(b => b.StepDefinitionType).Returns(StepDefinitionType.Given);
+            stepBindingMock.Setup(b => b.Method).Returns(methodMock.Object);
 
-            // Act
-            var envelopes = _testStepTracker_sut.GenerateFrom(stepStartedEvent.Object).ToList();
-
-            // Assert
-            envelopes.Should().HaveCount(1);
-            envelopes[0].TestStepStarted.Should().Be(testStepStarted);
-            _messageFactoryMock.Verify(f => f.ToTestStepStarted(_testStepTracker_sut), Times.Once);
-        }
-
-        [Fact]
-        public void TestStepTracker_GenerateFrom_StepFinishedEvent_ReturnsOneEnvelope()
-        {
-            // Arrange
-            var stepFinishedEvent = new Mock<StepFinishedEvent>(null, null, null);
-            var testStepFinished = new TestStepFinished("testCaseStartedId", "testStepId", new TestStepResult(new Duration(0,1), "", TestStepResultStatus.PASSED, null),new Timestamp(0, 1));
-            
-            _messageFactoryMock
-                .Setup(f => f.ToTestStepFinished(_testStepTracker_sut))
-                .Returns(testStepFinished);
-
-            // Act
-            var envelopes = _testStepTracker_sut.GenerateFrom(stepFinishedEvent.Object).ToList();
-
-            // Assert
-            envelopes.Should().HaveCount(1);
-            envelopes[0].TestStepFinished.Should().Be(testStepFinished);
-            _messageFactoryMock.Verify(f => f.ToTestStepFinished(_testStepTracker_sut), Times.Once);
-        }
-
-        [Fact]
-        public void TestStepTracker_GenerateFrom_OtherEvent_ReturnsEmptyEnumerable()
-        {
-            // Arrange
-            var otherEvent = new Mock<ExecutionEvent>();
-
-            // Act
-            var envelopes = _testStepTracker_sut.GenerateFrom(otherEvent.Object).ToList();
-
-            // Assert
-            envelopes.Should().BeEmpty();
-        }
-
-        [Fact]
-        public void TestStepTracker_ProcessEvent_StepStartedEvent_FirstAttempt_CreatesDefinition()
-        {
-            // Arrange
-            var stepContextMock = CreateStepContextWithPickleId("pickle123");
-
-            var stepStartedEvent = new StepStartedEvent(null, null, stepContextMock.Object);
-            
-            var testCaseDefinitionStub = new TestCaseDefinition("testCaseId", "pickleId", _testCaseTrackerMock.Object);
-            var idGenerator = new Mock<IIdGenerator>();
-            idGenerator.Setup(g => g.GetNewId()).Returns("newStepId");
-
-            _testCaseTrackerMock.SetupGet(t => t.AttemptCount).Returns(0);
-            _testCaseTrackerMock.SetupGet(t => t.IDGenerator).Returns(idGenerator.Object);
-            _testCaseTrackerMock.SetupGet(t => t.TestCaseDefinition).Returns(testCaseDefinitionStub);
-
-            // Act
-            _testStepTracker_sut.ProcessEvent(stepStartedEvent);
-
-            // Assert
-            _testStepTracker_sut.Definition.Should().NotBeNull();
-            var stepDef = _testStepTracker_sut.Definition;
-            testCaseDefinitionStub.StepDefinitions.Should().Contain(stepDef);
-        }
-
-        [Fact]
-        public void TestStepTracker_ProcessEvent_StepStartedEvent_Retry_FindsExistingDefinition()
-        {
-            // Arrange
-            var pickleStepId = "pickle123";
-            var stepContextMock = CreateStepContextWithPickleId(pickleStepId);
-
-            var stepStartedEvent = new StepStartedEvent(null, null, stepContextMock.Object);
-            
-            var testCaseDefinitionStub = new TestCaseDefinition("testCaseId", "pickleId", _testCaseTrackerMock.Object);
-            var existingDefinition = new TestStepDefinition("existingId", pickleStepId, testCaseDefinitionStub, _messageFactoryMock.Object);
-
-            testCaseDefinitionStub.StepDefinitions.Add(existingDefinition);
-
-            _testCaseTrackerMock.SetupGet(t => t.AttemptCount).Returns(1); // Retry
-            _testCaseTrackerMock.SetupGet(t => t.TestCaseDefinition).Returns(testCaseDefinitionStub);
-
-            // Act
-            _testStepTracker_sut.ProcessEvent(stepStartedEvent);
-
-            // Assert
-            _testStepTracker_sut.Definition.Should().Be(existingDefinition);
-        }
-
-        [Fact]
-        public void TestStepTracker_ProcessEvent_StepFinishedEvent_FirstAttempt_PopulatesDefinition()
-        {
-            // Arrange
-            var testError = new ApplicationException("Test error");
-            var status = ScenarioExecutionStatus.TestError;
-
-            var stepContextMock = CreateStepContextWithPickleId("stepPickleId");
-            stepContextMock.Setup(sc => sc.Status).Returns(status);
-
-            var scenarioContextMock = new Mock<IScenarioContext>();
-            scenarioContextMock.SetupGet(s => s.TestError).Returns(testError);
-
-            var stepFinishedEvent = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
-
-            var definitionStub = new TestStepDefinition("stepId", "stepPickleId", null, _messageFactoryMock.Object);
-            _testStepTracker_sut.Definition = definitionStub;
-
-            _testCaseTrackerMock.SetupGet(t => t.AttemptCount).Returns(0); // First attempt
-
-            // Act
-            _testStepTracker_sut.ProcessEvent(stepFinishedEvent);
-
-            // Assert
-            _testStepTracker_sut.Exception.Should().Be(testError);
-            _testStepTracker_sut.Status.Should().Be(status);
-            
-            //definitionStub.Verify(d => d.PopulateStepDefinitionFromExecutionResult(stepFinishedEvent.Object), Times.Once);
-        }
-
-        private Mock<IScenarioStepContext> CreateStepContextWithPickleId(string pickleId)
-        {
-            var stepInfo = new StepInfo(StepDefinitionType.Given, "a pattern", null, null, pickleId);
+            var stepInfo = new StepInfo(StepDefinitionType.Given, "step text", null, null, "stepPickleId")
+            {
+                BindingMatch = new BindingMatch(
+                    stepBindingMock.Object, // stepBinding
+                    0,                     // scopeMatches
+                    new MatchArgument[]    // arguments
+                    {
+                        new MatchArgument("arg1", 1 ),
+                        new MatchArgument("arg2", 2 )
+                    },
+                    null                   // stepContext
+                )
+            };
             var stepContextMock = new Mock<IScenarioStepContext>();
-            stepContextMock.SetupGet(s => s.StepInfo).Returns(stepInfo);
-            return stepContextMock;
+            stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
+            stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
+
+            _messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
+                .Returns("methodSignature");
+            _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker, _messageFactoryMock.Object));
+            _pickleExecutionTracker.StepDefinitionsByMethodSignature.TryAdd("methodSignature", "stepPickleId");
+
+            var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
+
+            var def = new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker, _messageFactoryMock.Object);
+
+            // Act
+            def.ProcessEvent(evt);
+
+            // Assert
+            def.IsBound.Should().BeTrue();
+            def.StepArguments.Should().HaveCount(2);
         }
+
+        private Mock<IBindingMethod> SetupMockMethodWithParameters(IEnumerable<(string, Type)> paramList)
+        {
+            var m = new Mock<IBindingMethod>();
+            var pList = new List<IBindingParameter>();
+            foreach (var (name, t) in paramList)
+            {
+                var p = new BindingParameter(new RuntimeBindingType(t), name);
+                pList.Add(p);
+            }
+            m.Setup(m => m.Parameters).Returns(pList);
+            return m;
+        }
+
+        [Fact]
+        public void PopulateStepDefinitionFromExecutionResult_Should_Set_Bound_False_When_Not_Bound()
+        {
+            // Arrange
+            var stepInfo = new StepInfo(
+                StepDefinitionType.Given, // stepDefinitionType
+                "Step Text",              // text
+                null,                     // table
+                null,                     // multilineText
+                "pickleStepId"            // pickleStepId
+            )
+            {
+                BindingMatch = BindingMatch.NonMatching
+            };
+            var stepContextMock = new Mock<IScenarioStepContext>();
+            stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
+            stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
+
+            var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
+
+            var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker, _messageFactoryMock.Object);
+
+            // Act
+            def.ProcessEvent(evt);
+
+            // Assert
+            def.IsBound.Should().BeFalse();
+            def.StepArguments.Should().BeEmpty();
+            def.StepDefinitionIds.Should().BeNullOrEmpty();
+        }
+
+        [Fact]
+        public void PopulateStepDefinitionFromExecutionResult_Should_Set_Ambiguous_When_AmbiguousBindingException()
+        {
+            // Arrange
+            var methodMock = SetupMockMethodWithParameters([("arg1", typeof(string)), ("arg2", typeof(string))]);
+            var stepBindingMock = new Mock<IStepDefinitionBinding>();
+            stepBindingMock.Setup(b => b.StepDefinitionType).Returns(StepDefinitionType.Given);
+            stepBindingMock.Setup(b => b.Method).Returns(methodMock.Object);
+            var bindingMatch = new BindingMatch(
+                    stepBindingMock.Object, // stepBinding
+                    0,                     // scopeMatches
+                    new MatchArgument[]    // arguments
+                    {
+                        new MatchArgument("arg1", 1 ),
+                        new MatchArgument("arg2", 2 )
+                    },
+                    null                   // stepContext
+                );
+
+            var ambiguousMatchException = new AmbiguousBindingException("error message", 
+                new List<BindingMatch> { 
+                    bindingMatch,
+                    bindingMatch
+                }
+            );
+
+            var stepInfo = new StepInfo(
+                StepDefinitionType.Given, // stepDefinitionType
+                "Step Text",              // text
+                null,                     // table
+                null,                     // multilineText
+                "pickleStepId"            // pickleStepId
+            )
+
+            {
+                BindingMatch = BindingMatch.NonMatching
+            };
+            var scenarioContextMock = new Mock<IScenarioContext>();
+            scenarioContextMock.SetupGet(x => x.TestError).Returns(ambiguousMatchException);
+
+            var stepContextMock = new Mock<IScenarioStepContext>();
+            stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
+            stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.TestError);
+
+            _messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
+                .Returns("ambiguousPattern");
+            _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", _testCaseTracker, _messageFactoryMock.Object));
+            _pickleExecutionTracker.StepDefinitionsByMethodSignature.TryAdd("ambiguousPattern", "pickleStepId");
+
+            var evt = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
+
+            var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker, _messageFactoryMock.Object);
+
+            // Act
+            def.ProcessEvent(evt);
+
+            // Assert
+            def.IsAmbiguous.Should().BeTrue();
+            def.StepDefinitionIds.Should().NotBeNull();
+            def.StepDefinitionIds.Should().Contain("pickleStepId");
+        }
+
     }
 }

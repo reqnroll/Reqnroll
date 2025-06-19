@@ -22,7 +22,7 @@ using HookType = Reqnroll.Bindings.HookType;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
-    public class TestCaseTrackerTests
+    public class PickleExecutionTrackerTests
     {
         private readonly Mock<IIdGenerator> _mockIdGenerator;
         private readonly Mock<ICucumberMessageFactory> _mockMessageFactory;
@@ -37,7 +37,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         private readonly Timestamp _testTime = new Timestamp(0, 1);
         private readonly ObjectContainer objectContainerStub = new();
 
-        public TestCaseTrackerTests()
+        public PickleExecutionTrackerTests()
         {
             _mockIdGenerator = new Mock<IIdGenerator>();
             _mockIdGenerator.Setup(x => x.GetNewId()).Returns("test-id");
@@ -52,39 +52,39 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             // Setup message factory mocks to return test envelopes
             _mockMessageFactory
-                .Setup(m => m.ToTestCase(It.IsAny<TestCaseDefinition>()))
+                .Setup(m => m.ToTestCase(It.IsAny<TestCaseTracker>()))
                 .Returns(new TestCase("test-id", "test-pickle-id", new List<TestStep>(), "test-run-started-id"));
 
             _mockMessageFactory
-                .Setup(m => m.ToTestCaseStarted(It.IsAny<TestCaseExecutionRecord>(), It.IsAny<string>()))
+                .Setup(m => m.ToTestCaseStarted(It.IsAny<TestCaseExecutionTracker>(), It.IsAny<string>()))
                 .Returns(new TestCaseStarted(0, "test-case-started-id", "test-id", "", _testTime));
 
             _mockMessageFactory
-                .Setup(m => m.ToTestCaseFinished(It.IsAny<TestCaseExecutionRecord>()))
+                .Setup(m => m.ToTestCaseFinished(It.IsAny<TestCaseExecutionTracker>()))
                 .Returns(new TestCaseFinished("test-case-started-id", _testTime, false));
 
             _mockMessageFactory
-                .Setup(m => m.ToTestStepStarted(It.IsAny<TestStepTracker>()))
+                .Setup(m => m.ToTestStepStarted(It.IsAny<TestStepExecutionTracker>()))
                 .Returns(new TestStepStarted("testCaseStartedId", "test-step-Id", new Timestamp(0, 1)));
 
             _mockMessageFactory
-                .Setup(m => m.ToTestStepFinished(It.IsAny<TestStepTracker>()))
+                .Setup(m => m.ToTestStepFinished(It.IsAny<TestStepExecutionTracker>()))
                 .Returns(new TestStepFinished("testCaseStartedId", "test-step-Id", new TestStepResult(new Duration(0, 1), "result-message", TestStepResultStatus.PASSED, null), new Timestamp(0, 1)));
 
             _mockMessageFactory
-                .Setup(m => m.ToTestStepStarted(It.IsAny<HookStepTracker>()))
+                .Setup(m => m.ToTestStepStarted(It.IsAny<HookStepExecutionTracker>()))
                 .Returns(new TestStepStarted("testCaseStartedId", "hook-Id", new Timestamp(0, 1)));
 
             _mockMessageFactory
-                .Setup(m => m.ToTestStepFinished(It.IsAny<HookStepTracker>()))
+                .Setup(m => m.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()))
                 .Returns(new TestStepFinished("testCaseStartedId", "hook-Id", new TestStepResult(new Duration(0, 1), "result-message", TestStepResultStatus.PASSED, null), new Timestamp(0, 1)));
 
             _mockMessageFactory
-                .Setup(m => m.ToAttachment(It.IsAny<AttachmentAddedEventWrapper>()))
+                .Setup(m => m.ToAttachment(It.IsAny<AttachmentTracker>()))
                 .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id"));
 
             _mockMessageFactory
-                .Setup(m => m.ToAttachment(It.IsAny<OutputAddedEventWrapper>()))
+                .Setup(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()))
                 .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id"));
 
             // Setup message factory to canonicalize a method signature
@@ -142,7 +142,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Assert
             tracker.AttemptCount.Should().Be(0);
             tracker.TestCaseId.Should().Be("test-id");
-            tracker.TestCaseDefinition.Should().NotBeNull();
+            tracker.TestCaseTracker.Should().NotBeNull();
             tracker.Finished.Should().BeFalse();
             _scenarioInfoStub.PickleId.Should().Be("test-pickle-id");
         }
@@ -223,8 +223,8 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             // Assert - check that step events are being processed
             // Since we can't directly access the private fields, we'll verify through the mock message factory
-            _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<TestStepTracker>()), Times.Once);
-            _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<TestStepTracker>()), Times.Once);
+            _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<TestStepExecutionTracker>()), Times.Once);
+            _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<TestStepExecutionTracker>()), Times.Once);
         }
 
         [Fact]
@@ -248,8 +248,8 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var msgs = tracker.RuntimeGeneratedMessages;
 
             // Assert - check through mock interactions
-            _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<HookStepTracker>()), Times.AtLeastOnce);
-            _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<HookStepTracker>()), Times.AtLeastOnce);
+            _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<HookStepExecutionTracker>()), Times.AtLeastOnce);
+            _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()), Times.AtLeastOnce);
         }
 
         [Fact]
@@ -272,8 +272,8 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             tracker.ProcessEvent(hookFinishedEvent);
 
             // Assert - verify no hook messages were generated for test run hooks
-            _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<HookStepTracker>()), Times.Never);
-            _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<HookStepTracker>()), Times.Never);
+            _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<HookStepExecutionTracker>()), Times.Never);
+            _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()), Times.Never);
         }
 
         [Fact]
@@ -296,7 +296,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             tracker.ProcessEvent(attachmentEvent);
             var msgs = tracker.RuntimeGeneratedMessages;
             // Assert
-            _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<AttachmentAddedEventWrapper>()), Times.Once);
+            _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<AttachmentTracker>()), Times.Once);
         }
 
         [Fact]
@@ -321,20 +321,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var msgs = tracker.RuntimeGeneratedMessages;
 
             // Assert
-            _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<OutputAddedEventWrapper>()), Times.Once);
-        }
-
-        [Fact]
-        public void ProcessEvent_ThrowsForUnsupportedEventType()
-        {
-            // Arrange
-            var tracker = CreateTestCaseTracker();
-            var unsupportedEvent = new Mock<ExecutionEvent>().Object;
-
-            // Act & Assert
-            Action action = () => tracker.ProcessEvent(unsupportedEvent);
-            action.Should().Throw<NotImplementedException>()
-                  .WithMessage($"Event type {unsupportedEvent.GetType().Name} is not supported.");
+            _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()), Times.Once);
         }
 
         [Fact]
@@ -346,7 +333,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var envelope = Envelope.Create(testCaseFinished);
 
             // Act
-            var fixedEnvelope = (Envelope)typeof(TestCaseTracker)
+            var fixedEnvelope = (Envelope)typeof(PickleExecutionTracker)
                 .GetMethod("FixupWillBeRetried", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                 .Invoke(tracker, new object[] { envelope });
 
@@ -357,9 +344,9 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             fixedTestCaseFinished.WillBeRetried.Should().BeTrue();
         }
 
-        private TestCaseTracker CreateTestCaseTracker()
+        private PickleExecutionTracker CreateTestCaseTracker()
         {
-            return new TestCaseTracker(
+            return new PickleExecutionTracker(
                 "test-pickle-id",
                 "test-run-id",
                 "Test Feature",

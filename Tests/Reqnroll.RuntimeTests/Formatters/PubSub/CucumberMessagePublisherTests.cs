@@ -68,17 +68,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             container.RegisterInstanceAs(_clockMock.Object);
             container.RegisterInstanceAs(_bindingRegistryMock.Object);
         }
-        private FeatureInfo CreateFeatureInfo(string title = "Feature", string description = "desc", string id = "ABCDE")
-        {
-            return new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", id, description);
-        }
-
-        private Mock<IFeatureTracker> CreateFeatureTrackerMock(bool success = true)
-        {
-            var mock = new Mock<IFeatureTracker>();
-            mock.Setup(f => f.FeatureExecutionSuccess).Returns(success);
-            return mock;
-        }
 
         [Fact]
         public void Initialize_Should_Register_Global_Dependencies()
@@ -198,7 +187,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
             _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
 
-            var featureTrackerMock = new Mock<IFeatureTracker>();
+            var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
 
             IList<Envelope> publishedEnvelopes = new List<Envelope>();
@@ -238,9 +227,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
             _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
 
-            var feature1TrackerMock = new Mock<IFeatureTracker>();
+            var feature1TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature1TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
-            var feature2TrackerMock = new Mock<IFeatureTracker>();
+            var feature2TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(false);
 
             IList<Envelope> publishedEnvelopes = new List<Envelope>();
@@ -280,7 +269,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
             _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
 
-            var featureTrackerMock = new Mock<IFeatureTracker>();
+            var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
             var messages = new List<Envelope>
             {
@@ -342,7 +331,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDEF", null);
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
 
-            var existingFeatureTrackerMock = new Mock<IFeatureTracker>();
+            var existingFeatureTrackerMock = new Mock<IFeatureExecutionTracker>();
             _sut._startedFeatures.TryAdd("ABCDEF", existingFeatureTrackerMock.Object);
             _sut._broker = _brokerMock.Object;
             _sut._testThreadObjectContainer = objectContainerStub;
@@ -357,7 +346,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
         }
 
-        // FeatureStartedEvent causes a FeatureTracker to be instantiated and Static Messages to be published to the Broker
+        // FeatureStartedEvent causes a FeatureExecutionTracker to be instantiated and Static Messages to be published to the Broker
         [Fact]
         public async Task FeatureStartedEvent_Should_InstantiateAFeatureTrackerAndPublishStaticMessages()
         {
@@ -411,12 +400,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             publishedEnvelopes[1].Content().Should().BeOfType<GherkinDocument>();
         }
 
-        // FeatureFinishedEvent delegates to the FeatureTracker and pulls Execution messages to the Messages collection
+        // FeatureFinishedEvent delegates to the FeatureExecutionTracker and pulls Execution messages to the Messages collection
         [Fact]
         public async Task FeatureFinished_Should_GatherExecutionMessagestotheMessagesCollection()
         {
             // Arrange
-            var featureTrackerMock = new Mock<IFeatureTracker>();
+            var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDE", "desc");
             var fakeMessages = new List<Envelope>
@@ -441,7 +430,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         }
 
 
-        // ScenarioStartedEvent forwards event to the FeatureTracker
+        // ScenarioStartedEvent forwards event to the FeatureExecutionTracker
         [Theory]
         [InlineData(typeof(ScenarioStartedEvent))]
         [InlineData(typeof(ScenarioFinishedEvent))]
@@ -450,7 +439,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task ScenarioEvents_Should_DelegateToTheFeatureTracker(Type eventType)
         {
             // Arrange
-            var featureTrackerMock = new Mock<IFeatureTracker>();
+            var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDE", "desc");
 
@@ -608,7 +597,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             cmMock.Setup(cm => cm.FeatureContext).Returns(featureContextStub);
             var dur = new TimeSpan(2);
 
-            var hookTracker = new TestRunHookTracker("HookTypeName.HookMethodName()", "1", DateTime.UtcNow, "0", messageFactory);
+            var hookTracker = new TestRunHookExecutionTracker("HookTypeName.HookMethodName()", "1", "0", messageFactory);
             _sut._testRunHookTrackers.TryAdd("HookTypeName.HookMethodName()", hookTracker);
             var hookBindingFinished = new HookBindingFinishedEvent(hookBindingMock.Object, dur, cmMock.Object);
 
@@ -621,8 +610,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         }
 
 
-        // HookBinddingStartedEvent for Scenario-related hooks: forwards to the FeatureTracker
-        // HookBindingFinishedEvent for Scenario-related hooks: forwards to the FeatureTracker
+        // HookBinddingStartedEvent for Scenario-related hooks: forwards to the FeatureExecutionTracker
+        // HookBindingFinishedEvent for Scenario-related hooks: forwards to the FeatureExecutionTracker
         [Theory]
         [InlineData(typeof(HookBindingStartedEvent), Reqnroll.Bindings.HookType.BeforeScenario)]
         [InlineData(typeof(HookBindingStartedEvent), Reqnroll.Bindings.HookType.AfterScenario)]
@@ -640,7 +629,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task HookBindingEvents_WithScenarioOrInnerHookTypes_Should_ForwardToFeatureTracker(Type eventType, Reqnroll.Bindings.HookType hookType)
         {
             // Arrange
-            var featureTrackerMock = new Mock<IFeatureTracker>();
+            var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDE", "desc");
 
@@ -682,15 +671,15 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             }
         }
 
-        // AttachmentAddedEvent for Scenario-related attachments: forwards to the FeatureTracker
-        // OutputAddedEvent for Scenario-related output: forwards to the FeatureTracker
+        // AttachmentAddedEvent for Scenario-related attachments: forwards to the FeatureExecutionTracker
+        // OutputAddedEvent for Scenario-related output: forwards to the FeatureExecutionTracker
         [Theory]
         [InlineData(typeof(AttachmentAddedEvent))]
         [InlineData(typeof(OutputAddedEvent))]
         public async Task AttachmentAndOutputEvents_ForScenarioRelatedContent_Should_ForwardToFeatureTracker(Type eventType)
         {
             // Arrange
-            var featureTrackerMock = new Mock<IFeatureTracker>();
+            var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDE", "desc");
             featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
@@ -722,13 +711,13 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
         private class AttachmentMessageFactory : CucumberMessageFactoryInner
         {
-            public override Attachment ToAttachment(AttachmentAddedEventWrapper tracker)
+            public override Attachment ToAttachment(AttachmentTracker tracker)
             {
-                return new Attachment("fake body", AttachmentContentEncoding.BASE64, tracker.AttachmentAddedEvent.FilePath, "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId);
+                return new Attachment("fake body", AttachmentContentEncoding.BASE64, tracker.FilePath, "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId);
             }
-            public override Attachment ToAttachment(OutputAddedEventWrapper tracker)
+            public override Attachment ToAttachment(OutputMessageTracker tracker)
             {
-                return new Attachment(tracker.OutputAddedEvent.Text, AttachmentContentEncoding.IDENTITY, "", "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId);
+                return new Attachment(tracker.Text, AttachmentContentEncoding.IDENTITY, "", "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId);
             }
         }
 

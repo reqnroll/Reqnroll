@@ -1,34 +1,25 @@
 ﻿using System;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
-namespace Reqnroll.Formatters.ExecutionTracking
+namespace Reqnroll.Formatters.ExecutionTracking;
+
+/// <summary>
+/// Base class for tracking execution of steps (test steps and hooks)
+/// </summary>
+public abstract class StepExecutionTrackerBase(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory)
 {
-    /// <summary>
-    /// Base class for tracking execution of steps (StepDefinitionBinding Methods and Hooks)
-    /// </summary>
-    public class StepExecutionTrackerBase
-    {
-        internal string TestCaseStartedID => ParentExecutionRecord.TestCaseStartedId;
-        internal ScenarioExecutionStatus Status { get; set; }
+    public TestCaseExecutionTracker ParentTracker { get; } = parentTracker;
+    protected ICucumberMessageFactory MessageFactory { get; } = messageFactory;
 
-        internal DateTime StepStarted { get; set; }
-        internal DateTime StepFinished { get; set; }
-        internal TimeSpan Duration { get => StepFinished - StepStarted; }
-        internal Exception Exception { get; set; }
+    public StepTracker StepTracker { get; protected internal set; }
 
-        internal TestStepDefinition Definition { get; set; }
+    public ScenarioExecutionStatus Status { get; protected set; }
+    public DateTime StepStarted { get; protected set; }
+    public DateTime StepFinished { get; protected set; }
+    public Exception Exception { get; protected set; }
+    public TimeSpan Duration => StepFinished - StepStarted;
 
-        internal ITestCaseTracker ParentTestCase { get; }
-
-        internal TestCaseExecutionRecord ParentExecutionRecord { get; }
-
-        internal ICucumberMessageFactory _messageFactory;
-
-        internal StepExecutionTrackerBase(ITestCaseTracker parentScenario, TestCaseExecutionRecord parentExecutionRecord, ICucumberMessageFactory messageFactory)
-        {
-            ParentTestCase = parentScenario;
-            ParentExecutionRecord = parentExecutionRecord;
-            _messageFactory = messageFactory;
-        }
-    }
+    public string TestCaseStartedId => ParentTracker.TestCaseStartedId;
+    protected IPickleExecutionTracker PickleExecutionTracker => ParentTracker.ParentTracker;
+    protected TestCaseTracker TestCaseTracker => PickleExecutionTracker.TestCaseTracker;
 }

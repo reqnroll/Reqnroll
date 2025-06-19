@@ -12,9 +12,9 @@ public interface ICucumberMessageFactory
     // Core message methods
     TestRunStarted ToTestRunStarted(DateTime timestamp, string id);
     TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId);
-    TestCase ToTestCase(TestCaseDefinition testCaseDefinition);
-    TestCaseStarted ToTestCaseStarted(TestCaseExecutionRecord testCaseExecution, string testCaseId);
-    TestCaseFinished ToTestCaseFinished(TestCaseExecutionRecord testCaseExecution);
+    TestCase ToTestCase(TestCaseTracker testCaseTracker);
+    TestCaseStarted ToTestCaseStarted(TestCaseExecutionTracker testCaseExecution, string testCaseId);
+    TestCaseFinished ToTestCaseFinished(TestCaseExecutionTracker testCaseExecution);
     
     // Step definition methods
     StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator);
@@ -23,23 +23,23 @@ public interface ICucumberMessageFactory
     ParameterType ToParameterType(IStepArgumentTransformationBinding stepTransform, IIdGenerator idGenerator);
     
     // Test step methods
-    TestStep ToPickleTestStep(TestStepDefinition stepDef);
+    TestStep ToTestStep(TestStepTracker stepDef);
     StepMatchArgument ToStepMatchArgument(TestStepArgument argument);
-    TestStepStarted ToTestStepStarted(TestStepTracker stepState);
-    TestStepFinished ToTestStepFinished(TestStepTracker stepState);
+    TestStepStarted ToTestStepStarted(TestStepExecutionTracker testStepExecutionTracker);
+    TestStepFinished ToTestStepFinished(TestStepExecutionTracker testStepExecutionTracker);
 
     // Hook methods
-    TestRunHookStarted ToTestRunHookStarted(TestRunHookTracker hookTracker);
-    TestRunHookFinished ToTestRunHookFinished(TestRunHookTracker hookTracker);
+    TestRunHookStarted ToTestRunHookStarted(TestRunHookExecutionTracker hookExecutionTracker);
+    TestRunHookFinished ToTestRunHookFinished(TestRunHookExecutionTracker hookExecutionTracker);
     Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator);
     Io.Cucumber.Messages.Types.HookType ToHookType(IHookBinding hookBinding);
-    TestStep ToHookTestStep(HookStepDefinition hookStepDefinition);
-    TestStepStarted ToTestStepStarted(HookStepTracker hookStepProcessor);
-    TestStepFinished ToTestStepFinished(HookStepTracker hookStepProcessor);
+    TestStep ToTestStep(HookStepTracker hookStepTracker);
+    TestStepStarted ToTestStepStarted(HookStepExecutionTracker hookStepExecutionTracker);
+    TestStepFinished ToTestStepFinished(HookStepExecutionTracker hookStepExecutionTracker);
     
     // Attachment methods
-    Attachment ToAttachment(AttachmentAddedEventWrapper tracker);
-    Attachment ToAttachment(OutputAddedEventWrapper tracker);
+    Attachment ToAttachment(AttachmentTracker tracker);
+    Attachment ToAttachment(OutputMessageTracker tracker);
     
     // Metadata methods
     Meta ToMeta(IObjectContainer container);

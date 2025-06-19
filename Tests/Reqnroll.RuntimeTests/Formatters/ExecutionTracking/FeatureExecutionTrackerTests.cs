@@ -20,12 +20,12 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
-    public class FeatureTrackerTests
+    public class FeatureExecutionTrackerTests
     {
         private Mock<IIdGenerator> _idGeneratorMock;
         private FeatureStartedEvent _featureStartedEventDummy;
         private IFeatureContext _mockFeatureContext;
-        private Mock<ITestCaseTracker> _testCaseTrackerMock;
+        private Mock<IPickleExecutionTracker> _testCaseTrackerMock;
 
         private ConcurrentDictionary<string, string> _stepDefinitionsByMethodSignature;
         private int idCounter;
@@ -35,11 +35,11 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
         //private Mock<IBindingRegistry> _bindingRegistryMock;
 
-        public FeatureTrackerTests()
+        public FeatureExecutionTrackerTests()
         {
         }
 
-        private FeatureTracker InitializeFeatureTrackerSUT()
+        private FeatureExecutionTracker InitializeFeatureTrackerSUT()
         {
             idCounter = 10;
             _idGeneratorMock = new Mock<IIdGenerator>();
@@ -67,13 +67,13 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             _featureStartedEventDummy = new FeatureStartedEvent(mockFeatureContext.Object);
 
-            // Initialize the FeatureTracker
-            var ft = new FeatureTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByMethodSignature, new CucumberMessageFactory());
+            // Initialize the FeatureExecutionTracker
+            var ft = new FeatureExecutionTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByMethodSignature, new CucumberMessageFactory());
 
-            _testCaseTrackerMock = new Mock<ITestCaseTracker>();
+            _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
             _testCaseTrackerMock.Setup(t => t.TestCaseStartedTimeStamp).Returns(DateTime.Now);
 
-            ft.TestCaseTrackersById.TestCaseTrackerFactory = (ft, pickleId) => _testCaseTrackerMock.Object;
+            ft.PickleExecutionTrackerFactory = (ft, pickleId) => _testCaseTrackerMock.Object;
             return ft;
         }
 
@@ -94,7 +94,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         {
             var sut = InitializeFeatureTrackerSUT();
             // Act
-            // sut.ProcessEvent(_featureStartedEventDummy); //the featureStartedEvent is processed during FeatureTracker constructor
+            // sut.ProcessEvent(_featureStartedEventDummy); //the featureStartedEvent is processed during FeatureExecutionTracker constructor
 
             // Assert
             sut.StaticMessages.Should().NotBeNull();
@@ -124,7 +124,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             _testCaseTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.TestError);
             _testCaseTrackerMock.Setup(t => t.Finished).Returns(true);
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
             var scenarioContextMock = new Mock<IScenarioContext>();
@@ -172,7 +172,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             sut.ProcessEvent(scenarioStartedEventMock.Object);
             // Assert
             _testCaseTrackerMock.Verify(t => t.ProcessEvent(scenarioStartedEventMock.Object));
-            sut.TestCaseTrackersById.GetAll().Should().NotBeEmpty();
+            sut.PickleExecutionTrackers.Should().NotBeEmpty();
             //sut.TestCaseTrackersById["0"].Should().NotBeNull();
         }
 
@@ -182,7 +182,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
             var scenarioContextMock = new Mock<IScenarioContext>();
@@ -192,7 +192,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Act
             sut.ProcessEvent(scenarioFinishedEventMock.Object);
 
-            // Assert that the ScenarioFinishedEvent was dispatched to the TestCaseTracker
+            // Assert that the ScenarioFinishedEvent was dispatched to the PickleExecutionTracker
             _testCaseTrackerMock.Verify(t => t.ProcessEvent(scenarioFinishedEventMock.Object));
         }
 
@@ -202,7 +202,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
             var scenarioContextMock = new Mock<IScenarioContext>();
@@ -216,7 +216,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Act
             sut.ProcessEvent(stepStartedEvent);
 
-            // Assert that the StepStartedEvent was dispatched to the TestCaseTracker
+            // Assert that the StepStartedEvent was dispatched to the PickleExecutionTracker
             _testCaseTrackerMock.Verify(t => t.ProcessEvent(stepStartedEvent));
         }
 
@@ -226,7 +226,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
             var scenarioContextMock = new Mock<IScenarioContext>();
@@ -251,7 +251,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
 
@@ -274,7 +274,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
 
@@ -298,7 +298,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
             scenarioInfoDummy.PickleId = "0";
@@ -318,7 +318,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Arrange
             var sut = InitializeFeatureTrackerSUT();
             _ = sut.StaticMessages.ToList();
-            sut.TestCaseTrackersById.TryAddNew("0", out _);
+            sut.GetOrAddPickleExecutionTracker("0");
 
             var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
             scenarioInfoDummy.PickleId = "0";

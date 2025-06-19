@@ -6,10 +6,10 @@ using System.Collections.Generic;
 namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
-/// Tracks the addition of a particular attachment. The <see cref="TestCaseStartedId"/> and <see cref="TestCaseStepId"/> are optional,
+/// Tracks the logging of an output message. The <see cref="TestCaseStartedId"/> and <see cref="TestCaseStepId"/> are optional,
 /// they are only filled out if the attachment is added in a scope of a scenario or step/hook execution.
 /// </summary>
-public class AttachmentTracker : IGenerateMessage
+public class OutputMessageTracker : IGenerateMessage
 {
     private readonly ICucumberMessageFactory _messageFactory;
 
@@ -17,11 +17,12 @@ public class AttachmentTracker : IGenerateMessage
     public string TestCaseStartedId { get; }
     public string TestCaseStepId { get; }
 
-    public string FilePath { get; private set; }
+    public string Text { get; private set; }
 
-    internal AttachmentTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, ICucumberMessageFactory messageFactory)
+    internal OutputMessageTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, ICucumberMessageFactory messageFactory)
     {
         _messageFactory = messageFactory;
+
         TestRunStartedId = testRunStartedId;
         TestCaseStartedId = testCaseStartedId;
         TestCaseStepId = testCaseStepId;
@@ -32,8 +33,8 @@ public class AttachmentTracker : IGenerateMessage
         return [Envelope.Create(_messageFactory.ToAttachment(this))];
     }
 
-    public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
+    public void ProcessEvent(OutputAddedEvent outputAddedEvent)
     {
-        FilePath = attachmentAddedEvent.FilePath;
+        Text = outputAddedEvent.Text;
     }
 }
