@@ -46,7 +46,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
 
             if (_testSuiteInitializationDriver.OverrideCucumberEnable is bool formattersEnable)
             {
-                envVariables.Add("REQNROLL_FORMATTERS_ENABLED", formattersEnable ? "true" : "false");
+                envVariables.Add("REQNROLL_FORMATTERS_DISABLED", formattersEnable ? "false" : "true");
             }
 
             if (_testSuiteInitializationDriver.OverrideCucumberMessagesFormatters is string cucumberMessagesFormatters)

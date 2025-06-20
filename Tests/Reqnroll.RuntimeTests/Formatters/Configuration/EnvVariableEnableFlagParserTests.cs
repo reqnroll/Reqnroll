@@ -9,46 +9,46 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
     public class EnvVariableEnableFlagParserTests
     {
         private readonly Mock<IEnvironmentWrapper> _environmentWrapperMock;
-        private readonly EnvVariableEnableFlagParser _sut;
+        private readonly FormattersDisabledOverrideProvider _sut;
 
         public EnvVariableEnableFlagParserTests()
         {
             _environmentWrapperMock = new Mock<IEnvironmentWrapper>();
-            _sut = new EnvVariableEnableFlagParser(_environmentWrapperMock.Object);
+            _sut = new FormattersDisabledOverrideProvider(_environmentWrapperMock.Object);
         }
 
         [Fact]
-        public void Parse_Should_Return_True_When_Environment_Variable_Is_Set_To_True()
+        public void Disabled_Should_Return_True_When_Environment_Variable_Is_Set_To_True()
         {
             // Arrange
             _environmentWrapperMock
-                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE))
+                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE))
                 .Returns(new Success<string>("true"));
 
             // Act
-            var result = _sut.Parse();
+            var result = _sut.Disabled();
 
             // Assert
             Assert.True(result);
         }
 
         [Fact]
-        public void Parse_Should_Return_False_When_Environment_Variable_Is_Set_To_False()
+        public void Disabled_Should_Return_False_When_Environment_Variable_Is_Set_To_False()
         {
             // Arrange
             _environmentWrapperMock
-                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE))
+                .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE))
                 .Returns(new Success<string>("false"));
 
             // Act
-            var result = _sut.Parse();
+            var result = _sut.Disabled();
 
             // Assert
             Assert.False(result);
         }
 
         [Fact]
-        public void Parse_Should_Return_True_When_Environment_Variable_Is_Not_Set()
+        public void Parse_Should_Return_False_When_Environment_Variable_Is_Not_Set()
         {
             // Arrange
             _environmentWrapperMock
@@ -56,10 +56,10 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
                 .Returns(new Failure<string>(It.IsAny<string>()));
 
             // Act
-            var result = _sut.Parse();
+            var result = _sut.Disabled();
 
             // Assert
-            Assert.True(result);
+            Assert.False(result);
         }
     }
 }

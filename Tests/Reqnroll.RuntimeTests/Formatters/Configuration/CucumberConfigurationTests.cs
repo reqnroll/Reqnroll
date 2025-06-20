@@ -8,14 +8,14 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
 {
     public class CucumberConfigurationTests
     {
-        private readonly Mock<IEnvVariableEnableFlagParser> _envVariableEnableFlagParserMock;
+        private readonly Mock<IFormattersConfigurationDisableOverrideProvider> _disableOverrideProviderMock;
         private readonly Mock<IFormattersConfigurationResolver> _fileResolverMock;
         private readonly Mock<IFormattersEnvironmentOverrideConfigurationResolver> _environmentResolverMock;
         private readonly FormattersConfigurationProvider _sut;
 
         public CucumberConfigurationTests()
         {
-            _envVariableEnableFlagParserMock = new Mock<IEnvVariableEnableFlagParser>();
+            _disableOverrideProviderMock = new Mock<IFormattersConfigurationDisableOverrideProvider>();
             _fileResolverMock = new Mock<IFormattersConfigurationResolver>();
             _environmentResolverMock = new Mock<IFormattersEnvironmentOverrideConfigurationResolver>();
 
@@ -24,7 +24,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
                 {"fileBasedResolver",  _fileResolverMock.Object }
             };
 
-            _sut = new FormattersConfigurationProvider(resolvers, _environmentResolverMock.Object, _envVariableEnableFlagParserMock.Object);
+            _sut = new FormattersConfigurationProvider(resolvers, _environmentResolverMock.Object, _disableOverrideProviderMock.Object);
         }
 
         [Fact]
@@ -33,7 +33,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             // Arrange
             _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
             _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
-            _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
+            _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
             // Act
             var result = _sut.Enabled;
@@ -51,7 +51,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
             _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
 
-            _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(false);
+            _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(true);
 
             // Act
             var result = _sut.Enabled;
@@ -68,7 +68,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             mockedSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_report.html" } });
             _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
             _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
-            _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
+            _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
             // Act
             var result = _sut.GetFormatterConfigurationByName("html");
@@ -88,7 +88,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var envVarSetup = new Dictionary<string, IDictionary<string, string>>();
             envVarSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_overridden_name.html" } });
             _environmentResolverMock.Setup(r => r.Resolve()).Returns(envVarSetup);
-            _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
+            _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
             // Act
             var result = _sut.GetFormatterConfigurationByName("html");
@@ -105,7 +105,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
             _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
 
-            _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
+            _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
             // Act
             var result = _sut.GetFormatterConfigurationByName("nonexistent");

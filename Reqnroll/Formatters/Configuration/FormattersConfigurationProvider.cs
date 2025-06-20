@@ -17,17 +17,17 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 {
     private readonly IList<IFormattersConfigurationResolverBase> _resolvers;
     private readonly Lazy<FormattersConfiguration> _resolvedConfiguration;
-    private readonly IEnvVariableEnableFlagParser _envVariableEnableFlagParser;
+    private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
     private bool _runtimeEnablementOverrideFlag = true;
 
     public bool Enabled => _runtimeEnablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IEnvVariableEnableFlagParser envVariableEnableFlagParser)
+    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
         var fileResolver = resolvers["fileBasedResolver"];
         _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
-        _envVariableEnableFlagParser = envVariableEnableFlagParser;
+        _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }
 
     public IDictionary<string, string> GetFormatterConfigurationByName(string formatterName)
@@ -49,7 +49,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
                 combinedConfig[entry.Key] = entry.Value;
             }
         }
-        bool enabled = combinedConfig.Count > 0 && _envVariableEnableFlagParser.Parse();
+        bool enabled = combinedConfig.Count > 0 && !_envVariableDisableFlagProvider.Disabled();
 
         return new FormattersConfiguration
         {

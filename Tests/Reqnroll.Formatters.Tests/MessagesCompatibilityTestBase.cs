@@ -58,14 +58,14 @@ namespace Reqnroll.Formatters.Tests
             fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".ndjson";
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
-            Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE, null);
+            Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
         }
         protected void ResetCucumberMessagesHTML(string? fileToDelete = null)
         {
             fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".html";
             DeletePreviousMessagesOutput(fileToDelete);
             ResetCucumberMessagesOutputFileName();
-            Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENABLE_ENVIRONMENT_VARIABLE, null);
+            Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
         }
 
         protected void ResetCucumberMessagesOutputFileName()
@@ -144,7 +144,7 @@ namespace Reqnroll.Formatters.Tests
                 {"fileBasedResolver",  configFileResolver }
             };
 
-            FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new EnvVariableEnableFlagParser(env));
+            FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new FormattersDisabledOverrideProvider(env));
             configurationProvider.GetFormatterConfigurationByName("messages").TryGetValue("outputFilePath", out var outputFilePath);
 
             if (string.IsNullOrEmpty(outputFilePath))
