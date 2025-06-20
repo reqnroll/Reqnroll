@@ -3,6 +3,7 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using System;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.PayloadProcessing;
 
@@ -51,8 +52,8 @@ public class NdjsonSerializer
         return JsonSerializer.Deserialize<T>(json, JsonOptions)!;
     }
 
-    public static void SerializeToStream(Stream fs, Envelope message)
+    public static async Task SerializeToStreamAsync(Stream fs, Envelope message)
     {
-        JsonSerializer.Serialize<Envelope>(fs, message, JsonOptions);
+        await JsonSerializer.SerializeAsync<Envelope>(fs, message, JsonOptions);
     }
 }

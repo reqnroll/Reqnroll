@@ -22,12 +22,12 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
 
     private readonly ICucumberMessageBroker _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
-    private readonly IFormatterLog _traceLogger;
+    private readonly IFormatterLog _logger;
     protected readonly BlockingCollection<Envelope> PostedMessages = new();
 
     private bool _isDisposed = false;
 
-    public IFormatterLog Trace { get => _traceLogger; }
+    public IFormatterLog Logger { get => _logger; }
     public string PluginName { get; }
 
     string ICucumberMessageSink.Name => PluginName;
@@ -36,7 +36,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
     {
         _broker = broker;
         _configurationProvider = configurationProvider;
-        _traceLogger = logger;
+        _logger = logger;
         PluginName = pluginName;
     }
 
@@ -50,7 +50,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
     internal async Task CloseAsync()
     {
         PostedMessages.CompleteAdding();
-        if (_formatterTask != null) await _formatterTask;
+        if (_formatterTask != null) await _formatterTask.ConfigureAwait(false);
         _formatterTask = null;
     }
 
@@ -72,7 +72,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
             return;
         }
 
-        _formatterTask = Task.Factory.StartNew(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized), TaskCreationOptions.LongRunning);
+        _formatterTask = Task.Run( () =>  ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized));
     }
 
     private void ReportInitialized(bool status)
@@ -86,10 +86,10 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
 
         // If the publisher sends the TestRunFinished message, then we can safely shut down.
         if (message.Content() is TestRunFinished)
-            await CloseAsync();
+            await CloseAsync().ConfigureAwait(false);
     }
 
-    protected abstract void ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigString, Action<bool> onAfterInitialization);
+    protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigString, Action<bool> onAfterInitialization);
 
     public void Dispose()
     {

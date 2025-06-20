@@ -37,7 +37,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _messageCollector = messageCollector;
             }
 
-            protected override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+            protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
             {
                 LastOutputPath = outputPath;
                 foreach (var message in PostedMessages.GetConsumingEnumerable())

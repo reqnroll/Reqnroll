@@ -21,7 +21,7 @@
         <dependency id="Gherkin" version="32.1.2"/>
         <dependency id="Cucumber.CucumberExpressions" version="17.1.0"/>
         <dependency id="Cucumber.Messages" version="27.0.2"/>
-        <dependency id="Cucumber.HtmlFormatter" version="21.10.1" />
+        <dependency id="Cucumber.HtmlFormatter" version="21.12.0" />
         <dependency id="Microsoft.Extensions.DependencyModel" version="8.0.2" />
         <dependency id="System.Text.Json" version="8.0.5" />
       </group>

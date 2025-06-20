@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -17,10 +17,6 @@
     <None Remove="Samples\Resources\**\*.feature" />
     <None Remove="Samples\Resources\**\*.feature.ndjson" />
     <None Remove="products.csv" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Samples\Resources\docString\docString.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -82,6 +78,8 @@
     <EmbeddedResource Include="Samples\Resources\data-tables\data_tables.feature.ndjson">
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Samples\Resources\docString\docString.feature" />
+    <EmbeddedResource Include="Samples\Resources\docString\docString.cs" />
     <EmbeddedResource Include="Samples\Resources\empty\empty.cs" />
     <EmbeddedResource Include="Samples\Resources\empty\empty.feature" />
     <EmbeddedResource Include="Samples\Resources\examples-tables\examples_tables.cs" />
@@ -175,10 +173,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Samples\Resources\docString\docString.feature" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <None Update="reqnroll_withBothFormatters.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="reqnroll_withHtmlOutput.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

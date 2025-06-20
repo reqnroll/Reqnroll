@@ -28,10 +28,11 @@ namespace Reqnroll.Formatters.Tests
         public void CCKScenarios(string testName, string featureNameText)
         {
             ResetCucumberMessages(featureNameText);
+            ResetCucumberMessagesHTML(featureNameText);
             EnableCucumberMessages();
             SetCucumberMessagesOutputFileName(featureNameText);
 
-            CucumberMessagesAddConfigurationFile("reqnroll.json");
+            CucumberMessagesAddConfigurationFile("reqnroll_withBothFormatters.json");
             AddUtilClassWithFileSystemPath();
 
             var featureFileName = testName.Replace("-", "_");

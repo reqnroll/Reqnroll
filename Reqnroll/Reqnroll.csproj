@@ -16,7 +16,7 @@
 
   <!-- build time dependencies -->
   <ItemGroup>
-    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.10.1" />
+    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.12.0" />
     <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
   </ItemGroup>
 
