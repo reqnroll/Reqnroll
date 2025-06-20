@@ -37,7 +37,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
     // shared to each Feature tracker so that we keep a single list
-    internal ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature => _bindingCaches.StepDefinitionIdByMethodSignaturePatternCache;
+    internal ConcurrentDictionary<IBinding, string> StepDefinitionsByMethodSignature => _bindingCaches.StepDefinitionIdByBinding;
 
     public IIdGenerator SharedIdGenerator { get; private set; }
 
@@ -45,7 +45,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     internal bool _enabled = false;
 
     // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
-    internal readonly ConcurrentDictionary<string, TestRunHookExecutionTracker> _testRunHookTrackers = new();
+    internal readonly ConcurrentDictionary<IBinding, TestRunHookExecutionTracker> _testRunHookTrackers = new();
     // This tracks all Attachments and Output Events; used during publication to sequence them in the correct order.
     internal readonly OutputEventsTracker OutputEventsTracker = new();
 
@@ -330,10 +330,10 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             case Bindings.HookType.BeforeFeature:
             case Bindings.HookType.AfterFeature:
                 var hookRunStartedId = SharedIdGenerator.GetNewId();
-                var signature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-                var hookId = StepDefinitionsByMethodSignature[signature];
+                //var signature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
+                var hookId = StepDefinitionsByMethodSignature[hookBindingStartedEvent.HookBinding];
                 var hookTracker = new TestRunHookExecutionTracker(hookRunStartedId, hookId, _testRunStartedId, _messageFactory);
-                _testRunHookTrackers.TryAdd(signature, hookTracker);
+                _testRunHookTrackers.TryAdd(hookBindingStartedEvent.HookBinding, hookTracker);
 
                 hookTracker.ProcessEvent(hookBindingStartedEvent);
                 _messages.AddRange(((IGenerateMessage)hookTracker).GenerateFrom(hookBindingStartedEvent));
@@ -359,8 +359,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             case Bindings.HookType.AfterTestRun:
             case Bindings.HookType.BeforeFeature:
             case Bindings.HookType.AfterFeature:
-                var signature = _messageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
-                if (!_testRunHookTrackers.TryGetValue(signature, out var hookTracker)) // should not happen
+                //var signature = _messageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
+                if (!_testRunHookTrackers.TryGetValue(hookBindingFinishedEvent.HookBinding, out var hookTracker)) // should not happen
                     return Task.CompletedTask;
                 hookTracker.ProcessEvent(hookBindingFinishedEvent);
 

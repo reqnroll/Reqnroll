@@ -8,10 +8,8 @@ using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
-using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
-using Reqnroll.Time;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -33,7 +31,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         private Mock<IScenarioStepContext> _mockStepContext;
         private Mock<IContextManager> _mockContextManager;
         private readonly Mock<IHookBinding> _mockHookBinding;
-        private readonly ConcurrentDictionary<string, string> _stepDefinitionsByMethodSignature;
+        private readonly ConcurrentDictionary<IBinding, string> _stepDefinitionsByMethodSignature;
         private readonly Timestamp _testTime = new Timestamp(0, 1);
         private readonly ObjectContainer objectContainerStub = new();
 
@@ -48,7 +46,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             _mockHookBinding = new Mock<IHookBinding>();
 
-            _stepDefinitionsByMethodSignature = new ConcurrentDictionary<string, string>();
+            _stepDefinitionsByMethodSignature = new ConcurrentDictionary<IBinding, string>();
 
             // Setup message factory mocks to return test envelopes
             _mockMessageFactory
@@ -87,11 +85,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
                 .Setup(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()))
                 .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id"));
 
-            // Setup message factory to canonicalize a method signature
-            _mockMessageFactory
-                .Setup(m => m.CanonicalizeHookBinding(It.IsAny<IHookBinding>()))
-                .Returns("hookBinding-method-signature");
-            _stepDefinitionsByMethodSignature.TryAdd("hookBinding-method-signature", "hook-id");
+            _stepDefinitionsByMethodSignature.TryAdd(_mockHookBinding.Object, "hook-id");
         }
 
         private void SetupMockContexts()

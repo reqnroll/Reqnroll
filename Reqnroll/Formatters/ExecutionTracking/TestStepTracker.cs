@@ -10,7 +10,7 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// Tracks the information needed for a Cucumber Messages "test case step", that is a step with binding information.
 /// The test case step needs to be built upon the first execution attempt of a pickle.
 /// </summary>
-public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTracker parentTracker, ICucumberMessageFactory messageFactory)
+public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTracker parentTracker)
     : StepTracker(testStepId)
 {
     public TestCaseTracker ParentTracker { get; } = parentTracker;
@@ -42,8 +42,7 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
         }
 
         var stepDefinitionBinding = IsBound ? bindingMatch!.StepBinding : null;
-        var canonicalizedStepPattern = IsBound ? messageFactory.CanonicalizeStepDefinitionPattern(stepDefinitionBinding) : "";
-        var StepDefinitionId = IsBound ? ParentTracker.FindStepDefinitionIdByBingingKey(canonicalizedStepPattern) : null;
+        var StepDefinitionId = IsBound ? ParentTracker.FindStepDefinitionIdByBindingKey(stepDefinitionBinding) : null;
 
         var Status = stepFinishedEvent.StepContext.Status;
 
@@ -52,8 +51,8 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
             var Exception = stepFinishedEvent.ScenarioContext.TestError;
             if (Exception is AmbiguousBindingException)
             {
-                AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches.Select(m =>
-                                                                                                                      ParentTracker.FindStepDefinitionIdByBingingKey(messageFactory.CanonicalizeStepDefinitionPattern(m.StepBinding))));
+                AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches
+                    .Select(m => ParentTracker.FindStepDefinitionIdByBindingKey(m.StepBinding)));
             }
         }
 

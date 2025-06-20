@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Reqnroll.Bindings;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -18,9 +19,9 @@ public class TestCaseTracker(string testCaseId, string pickleId, IPickleExecutio
 
     public List<StepTracker> Steps { get; } = new();
 
-    internal string FindStepDefinitionIdByBingingKey(string canonicalizedStepPattern)
+    internal string FindStepDefinitionIdByBindingKey(IBinding binding)
     {
-        return ParentTracker.StepDefinitionsByMethodSignature[canonicalizedStepPattern];
+        return ParentTracker.StepDefinitionsByBinding[binding];
     }
 
     public TestStepTracker GetTestStepTrackerByPickleId(string pickleId)
@@ -37,15 +38,14 @@ public class TestCaseTracker(string testCaseId, string pickleId, IPickleExecutio
     {
         var pickleStepId = stepStartedEvent.StepContext.StepInfo.PickleStepId;
         var testStepId = ParentTracker.IdGenerator.GetNewId();
-        var stepTracker = new TestStepTracker(testStepId, pickleStepId, this, messageFactory);
+        var stepTracker = new TestStepTracker(testStepId, pickleStepId, this);
         Steps.Add(stepTracker);
         stepTracker.ProcessEvent(stepStartedEvent);
     }
 
     public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
     {
-        var hookBindingSignature = messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-        var hookId = ParentTracker.StepDefinitionsByMethodSignature[hookBindingSignature];
+        var hookId = ParentTracker.StepDefinitionsByBinding[hookBindingStartedEvent.HookBinding];
 
         var testStepId = ParentTracker.IdGenerator.GetNewId();
         var hookStepTracker = new HookStepTracker(testStepId, hookId, this, messageFactory);

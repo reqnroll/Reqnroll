@@ -4,10 +4,7 @@ using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
@@ -86,9 +83,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             messages.Should().HaveCount(1);
-            _sut.StepDefinitionIdByMethodSignaturePatternCache.Should().HaveCount(1);
-            _sut.StepDefinitionIdByMethodSignaturePatternCache.Keys.Should().Contain("AssemblyName.TypeName.MethodName()");
-            _sut.StepDefinitionIdByMethodSignaturePatternCache["AssemblyName.TypeName.MethodName()"].Should().Be("0");
+            _sut.StepDefinitionIdByBinding.Should().HaveCount(1);
+            _sut.StepDefinitionIdByBinding.Should().ContainKey(validStepDefinition.Object);
+            _sut.StepDefinitionIdByBinding[validStepDefinition.Object].Should().Be("0");
         }
 
         [Fact]
@@ -108,7 +105,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             messages.Should().HaveCount(1);
-            _sut.StepDefinitionIdByMethodSignaturePatternCache.Should().ContainKey("AssemblyName.TypeName.MethodName()");
+            _sut.StepDefinitionIdByBinding.Should().ContainKey(hookBinding.Object);
         }
 
         [Fact]

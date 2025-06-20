@@ -27,13 +27,11 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         private IFeatureContext _mockFeatureContext;
         private Mock<IPickleExecutionTracker> _testCaseTrackerMock;
 
-        private ConcurrentDictionary<string, string> _stepDefinitionsByMethodSignature;
+        private ConcurrentDictionary<IBinding, string> _stepDefinitionsByBinding;
         private int idCounter;
         private FeatureInfo _featureInfoDummy;
         private Mock<IClock> _clockMock;
         private Mock<IObjectContainer> _featureContainer;
-
-        //private Mock<IBindingRegistry> _bindingRegistryMock;
 
         public FeatureExecutionTrackerTests()
         {
@@ -53,8 +51,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             _mockFeatureContext = mockFeatureContext.Object;
 
 
-            _stepDefinitionsByMethodSignature = new ConcurrentDictionary<string, string>();
-            _stepDefinitionsByMethodSignature.TryAdd("dummyMethodSignature", "step1");
+            _stepDefinitionsByBinding = new ConcurrentDictionary<IBinding, string>();
             var featureLevelCucumberMessagesDummy = new FeatureLevelCucumberMessages(
                 () => new Source("c:\\file", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN),
                 () => new GherkinDocument("", new Feature(new Location(0, 0), [], "en", "Feature", "Dummy Feature", "", new List<FeatureChild>()), []),
@@ -67,7 +64,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             _featureStartedEventDummy = new FeatureStartedEvent(mockFeatureContext.Object);
 
             // Initialize the FeatureExecutionTracker
-            var ft = new FeatureExecutionTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByMethodSignature, new CucumberMessageFactory());
+            var ft = new FeatureExecutionTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByBinding, new CucumberMessageFactory());
 
             _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
             _testCaseTrackerMock.Setup(t => t.TestCaseStartedTimeStamp).Returns(DateTime.Now);
@@ -85,7 +82,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             sut.Enabled.Should().BeTrue();
             sut.FeatureName.Should().Be("Test Feature");
             sut.TestRunStartedId.Should().Be("TestRunId");
-            sut.StepDefinitionsByMethodSignature.Should().BeSameAs(_stepDefinitionsByMethodSignature);
+            sut.StepDefinitionsByBinding.Should().BeSameAs(_stepDefinitionsByBinding);
         }
 
         [Fact]
@@ -172,7 +169,6 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Assert
             _testCaseTrackerMock.Verify(t => t.ProcessEvent(scenarioStartedEventMock.Object));
             sut.PickleExecutionTrackers.Should().NotBeEmpty();
-            //sut.TestCaseTrackersById["0"].Should().NotBeNull();
         }
 
         [Fact]

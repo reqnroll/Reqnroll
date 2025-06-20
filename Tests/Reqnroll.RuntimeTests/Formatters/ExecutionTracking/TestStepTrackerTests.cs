@@ -54,14 +54,14 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
             stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
 
-            _messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
-                .Returns("methodSignature");
-            _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker, _messageFactoryMock.Object));
-            _pickleExecutionTracker.StepDefinitionsByMethodSignature.TryAdd("methodSignature", "stepPickleId");
+            //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
+            //    .Returns("methodSignature");
+            _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker));
+            _pickleExecutionTracker.StepDefinitionsByBinding.TryAdd(stepBindingMock.Object, "stepPickleId");
 
             var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
 
-            var def = new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker, _messageFactoryMock.Object);
+            var def = new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker);
 
             // Act
             def.ProcessEvent(evt);
@@ -104,7 +104,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
 
-            var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker, _messageFactoryMock.Object);
+            var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker);
 
             // Act
             def.ProcessEvent(evt);
@@ -159,14 +159,14 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
             stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.TestError);
 
-            _messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
-                .Returns("ambiguousPattern");
-            _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", _testCaseTracker, _messageFactoryMock.Object));
-            _pickleExecutionTracker.StepDefinitionsByMethodSignature.TryAdd("ambiguousPattern", "pickleStepId");
+            //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
+            //    .Returns("ambiguousPattern");
+            _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", _testCaseTracker));
+            _pickleExecutionTracker.StepDefinitionsByBinding.TryAdd(stepBindingMock.Object, "pickleStepId");
 
             var evt = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
 
-            var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker, _messageFactoryMock.Object);
+            var def = new TestStepTracker("stepDefId", "pickleStepId", _testCaseTracker);
 
             // Act
             def.ProcessEvent(evt);

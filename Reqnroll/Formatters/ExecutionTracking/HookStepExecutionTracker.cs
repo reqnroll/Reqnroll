@@ -25,8 +25,7 @@ public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
     {
         StepStarted = hookBindingStartedEvent.Timestamp;
 
-        var hookBindingSignature = MessageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-        var hookId = PickleExecutionTracker.StepDefinitionsByMethodSignature[hookBindingSignature];
+        var hookId = PickleExecutionTracker.StepDefinitionsByBinding[hookBindingStartedEvent.HookBinding];
 
         if (ParentTracker.IsFirstAttempt)
         {

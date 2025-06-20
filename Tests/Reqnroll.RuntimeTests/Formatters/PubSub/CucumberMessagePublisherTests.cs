@@ -401,7 +401,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._broker = _brokerMock.Object;
             _sut._globalObjectContainer = objectContainerStub;
             _sut._bindingCaches = new BindingMessagesGenerator(_idGeneratorMock.Object, messageFactory);
-            _sut._bindingCaches.StepDefinitionIdByMethodSignaturePatternCache.Clear();
+            _sut._bindingCaches.StepDefinitionIdByBinding.Clear();
             _sut._enabled = true;
 
             // Act
@@ -612,8 +612,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             cmMock.Setup(cm => cm.FeatureContext).Returns(featureContextStub);
             var dur = new TimeSpan(2);
 
-            var hookTracker = new TestRunHookExecutionTracker("HookTypeName.HookMethodName()", "1", "0", messageFactory);
-            _sut._testRunHookTrackers.TryAdd("HookTypeName.HookMethodName()", hookTracker);
+            var hookTracker = new TestRunHookExecutionTracker("2", "1", "0", messageFactory);
+            _sut._testRunHookTrackers.TryAdd(hookBindingMock.Object, hookTracker);
             var hookBindingFinished = new HookBindingFinishedEvent(hookBindingMock.Object, dur, cmMock.Object);
 
             // Act

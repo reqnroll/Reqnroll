@@ -1,5 +1,6 @@
 ﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.Bindings;
 using Reqnroll.Events;
 using System;
 using System.Collections.Concurrent;
@@ -17,7 +18,7 @@ public interface IPickleExecutionTracker
     public int AttemptCount { get; }
     public IIdGenerator IdGenerator { get; }
     public TestCaseTracker TestCaseTracker { get; }
-    public ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature { get; }
+    public ConcurrentDictionary<IBinding, string> StepDefinitionsByBinding { get; }
 
     void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent);
     void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent);

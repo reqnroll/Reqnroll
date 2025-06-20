@@ -6,6 +6,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Reqnroll.Bindings;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -46,7 +47,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
-    public ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature { get; }
+    public ConcurrentDictionary<IBinding, string> StepDefinitionsByBinding { get; }
 
     public int AttemptCount { get; private set; }
     public bool Finished { get; private set; }
@@ -63,20 +64,20 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     /// <param name="featureName">The name of the feature containing this scenario.</param>
     /// <param name="enabled">Indicates whether this test case is enabled for execution.</param>
     /// <param name="idGenerator"> The ID generator used to create unique IDs for test case messages and related entities.</param>
-    /// <param name="stepDefinitionsByMethodSignature">
+    /// <param name="stepDefinitionsByMethod">
     /// A thread-safe dictionary mapping step definition patterns to their unique IDs, 
     /// used to resolve step bindings during execution.
     /// </param>
     /// <param name="instant">The timestamp marking when the test case started execution.</param>
     /// <param name="messageFactory">The factory responsible for creating Cucumber message objects.</param>
-    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionsByMethodSignature, DateTime instant, ICucumberMessageFactory messageFactory)
+    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<IBinding, string> stepDefinitionsByMethod, DateTime instant, ICucumberMessageFactory messageFactory)
     {
         TestRunStartedId = testRunStartedId;
         PickleId = pickleId;
         FeatureName = featureName;
         Enabled = enabled;
         IdGenerator = idGenerator;
-        StepDefinitionsByMethodSignature = stepDefinitionsByMethodSignature;
+        StepDefinitionsByBinding = stepDefinitionsByMethod;
         AttemptCount = -1;
         TestCaseStartedTimeStamp = instant;
         _messageFactory = messageFactory;

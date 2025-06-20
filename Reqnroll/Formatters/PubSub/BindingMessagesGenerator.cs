@@ -18,7 +18,7 @@ internal class BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessa
 {
     public ConcurrentBag<IStepArgumentTransformationBinding> StepArgumentTransformCache { get; } = new();
     public ConcurrentBag<IStepDefinitionBinding> UndefinedParameterTypeBindingsCache { get; } = new();
-    public ConcurrentDictionary<string, string> StepDefinitionIdByMethodSignaturePatternCache { get; } = new();
+    public ConcurrentDictionary<IBinding, string> StepDefinitionIdByBinding { get; } = new();
 
     public IEnumerable<Envelope> PopulateBindingCachesAndGenerateBindingMessages(IBindingRegistry bindingRegistry)
     {
@@ -47,11 +47,10 @@ internal class BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessa
 
         foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
         {
-            var pattern = messageFactory.CanonicalizeStepDefinitionPattern(binding);
-            if (StepDefinitionIdByMethodSignaturePatternCache.ContainsKey(pattern))
+            if (StepDefinitionIdByBinding.ContainsKey(binding))
                 continue;
             var stepDefinition = messageFactory.ToStepDefinition(binding, idGenerator);
-            if (StepDefinitionIdByMethodSignaturePatternCache.TryAdd(pattern, stepDefinition.Id))
+            if (StepDefinitionIdByBinding.TryAdd(binding, stepDefinition.Id))
             {
                 yield return Envelope.Create(stepDefinition);
             }
@@ -59,11 +58,10 @@ internal class BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessa
 
         foreach (var hookBinding in bindingRegistry.GetHooks())
         {
-            var hookId = messageFactory.CanonicalizeHookBinding(hookBinding);
-            if (StepDefinitionIdByMethodSignaturePatternCache.ContainsKey(hookId))
+            if (StepDefinitionIdByBinding.ContainsKey(hookBinding))
                 continue;
             var hook = messageFactory.ToHook(hookBinding, idGenerator);
-            if (StepDefinitionIdByMethodSignaturePatternCache.TryAdd(hookId, hook.Id))
+            if (StepDefinitionIdByBinding.TryAdd(hookBinding, hook.Id))
             {
                 yield return Envelope.Create(hook);
             }

@@ -22,7 +22,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
     {
         private readonly Mock<ICucumberMessageFactory> _messageFactoryMock;
         private readonly Mock<IPickleExecutionTracker> _testCaseTrackerMock;
-        private readonly ConcurrentDictionary<string, string> _stepDefinitionsByMethodSignature;
+        private readonly ConcurrentDictionary<IBinding, string> _stepDefinitionsByBinding;
         private readonly TestCaseTracker _testCaseTracker;
         private readonly Mock<IIdGenerator> _idGeneratorMock;
         private HookStepExecutionTracker _hookStepExecutionTracker;
@@ -60,7 +60,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
             _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object, _messageFactoryMock.Object);
             _idGeneratorMock = new Mock<IIdGenerator>();
-            _stepDefinitionsByMethodSignature = new ConcurrentDictionary<string, string>();
+            _stepDefinitionsByBinding = new ConcurrentDictionary<IBinding, string>();
             _objectContainerStub = new ObjectContainer();
 
             SetupMockContexts();
@@ -68,10 +68,8 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Setup mocks
             _testCaseTrackerMock.SetupGet(t => t.TestCaseTracker).Returns(_testCaseTracker);
             _testCaseTrackerMock.SetupGet(t => t.IdGenerator).Returns(_idGeneratorMock.Object);
-            _testCaseTrackerMock.SetupGet(t => t.StepDefinitionsByMethodSignature)
-                .Returns(_stepDefinitionsByMethodSignature);
-
-            // Create a dummy execution record
+            _testCaseTrackerMock.SetupGet(t => t.StepDefinitionsByBinding)
+                .Returns(_stepDefinitionsByBinding);
 
             // Create the tracker to test
             _hookStepExecutionTracker = new HookStepExecutionTracker(
@@ -145,15 +143,11 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var hookBindingMock = new Mock<IHookBinding>();
             var hookBindingStartedEvent = new HookBindingStartedEvent(hookBindingMock.Object, _mockContextManager.Object);
 
-            var hookBindingSignature = "HookSignature";
             var hookId = "hook123";
             var testStepId = "step456";
 
-            _messageFactoryMock
-                .Setup(f => f.CanonicalizeHookBinding(hookBindingMock.Object))
-                .Returns(hookBindingSignature);
             
-            _stepDefinitionsByMethodSignature[hookBindingSignature] = hookId;
+            _stepDefinitionsByBinding[hookBindingStartedEvent.HookBinding] = hookId;
             
             _idGeneratorMock.Setup(g => g.GetNewId()).Returns(testStepId);
             
@@ -178,14 +172,9 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var hookBindingMock = new Mock<IHookBinding>();
             var hookBindingStartedEvent = new HookBindingStartedEvent(hookBindingMock.Object, _mockContextManager.Object);
 
-            var hookBindingSignature = "HookSignature";
             var hookId = "hook123";
             
-            _messageFactoryMock
-                .Setup(f => f.CanonicalizeHookBinding(hookBindingMock.Object))
-                .Returns(hookBindingSignature);
-            
-            _stepDefinitionsByMethodSignature[hookBindingSignature] = hookId;
+            _stepDefinitionsByBinding[hookBindingStartedEvent.HookBinding] = hookId;
 
             // Create a hook tracker for a Retry
             _hookStepExecutionTracker = new HookStepExecutionTracker(
@@ -204,7 +193,6 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             // Assert
             _hookStepExecutionTracker.StepTracker.Should().Be(existingHookStepDefinition);
             
-            _messageFactoryMock.Verify(f => f.CanonicalizeHookBinding(hookBindingMock.Object), Times.Once);
             _testCaseTracker.Steps.Should().HaveCount(1);
         }
 

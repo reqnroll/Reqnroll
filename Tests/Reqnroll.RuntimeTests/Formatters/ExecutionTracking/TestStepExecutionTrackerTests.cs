@@ -128,7 +128,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             var stepStartedEvent = new StepStartedEvent(null, null, stepContextMock.Object);
             
             var testCaseDefinitionStub = new TestCaseTracker("testCaseId", "pickleId", _pickleExecutionTrackerMock.Object, _messageFactoryMock.Object);
-            var existingDefinition = new TestStepTracker("existingId", pickleStepId, testCaseDefinitionStub, _messageFactoryMock.Object);
+            var existingDefinition = new TestStepTracker("existingId", pickleStepId, testCaseDefinitionStub);
 
             testCaseDefinitionStub.Steps.Add(existingDefinition);
             _pickleExecutionTrackerMock.SetupGet(t => t.TestCaseTracker).Returns(testCaseDefinitionStub);
@@ -161,7 +161,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             var stepFinishedEvent = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
 
-            var definitionStub = new TestStepTracker("stepId", "stepPickleId", null, _messageFactoryMock.Object);
+            var definitionStub = new TestStepTracker("stepId", "stepPickleId", null);
             _testStepExecutionTrackerSut.StepTracker = definitionStub;
 
             _pickleExecutionTrackerMock.SetupGet(t => t.AttemptCount).Returns(0); // First attempt

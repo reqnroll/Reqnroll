@@ -8,6 +8,8 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Time;
+using Reqnroll.Bindings.Reflection;
+using Reqnroll.Bindings;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -31,7 +33,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
     // This dictionary is shared across all Features (via the Publisher)
-    public ConcurrentDictionary<string, string> StepDefinitionsByMethodSignature { get; }
+    public ConcurrentDictionary<IBinding, string> StepDefinitionsByBinding { get; }
 
     // This maintains the list of PickleExecutionTrackers, identified by (string) PickleID, running within this feature
     private readonly ConcurrentDictionary<string, IPickleExecutionTracker> _pickleExecutionTrackersById = new();
@@ -47,10 +49,10 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     public IEnumerable<IPickleExecutionTracker> PickleExecutionTrackers => _pickleExecutionTrackersById.Values;
 
     // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
-    public FeatureExecutionTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<string, string> stepDefinitionPatterns, ICucumberMessageFactory messageFactory)
+    public FeatureExecutionTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<IBinding, string> stepDefinitionIdsByMethod, ICucumberMessageFactory messageFactory)
     {
         TestRunStartedId = testRunStartedId;
-        StepDefinitionsByMethodSignature = stepDefinitionPatterns;
+        StepDefinitionsByBinding = stepDefinitionIdsByMethod;
         IdGenerator = idGenerator;
         FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
         var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
@@ -59,7 +61,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
 
         var clock = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IClock>(); //TODO: better retrieval of IClock
         PickleExecutionTrackerFactory = (ft, pickleId) =>
-            new PickleExecutionTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IdGenerator, ft.StepDefinitionsByMethodSignature, clock.GetNowDateAndTime(), messageFactory);
+            new PickleExecutionTracker(pickleId, ft.TestRunStartedId, ft.FeatureName, ft.Enabled, ft.IdGenerator, ft.StepDefinitionsByBinding, clock.GetNowDateAndTime(), messageFactory);
     }
 
     // At the completion of Feature execution, this is called to generate all non-static Messages
@@ -118,16 +120,8 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     {
         var pickleIndex = scenarioStartedEvent.ScenarioContext?.ScenarioInfo?.PickleIdIndex;
 
-        // The following validations and ANE throws are in place to help identify threading bugs when Scenarios are run in parallel.
-        // TODO: consider removing these or placing them within #IFDEBUG
-
         if (string.IsNullOrEmpty(pickleIndex))
         {
-            // Should never happen
-            if (scenarioStartedEvent.ScenarioContext == null)
-                throw new ArgumentNullException(nameof(scenarioStartedEvent), "ScenarioContext is not properly initialized for Cucumber Messages.");
-            if (scenarioStartedEvent.ScenarioContext.ScenarioInfo == null)
-                throw new ArgumentNullException(nameof(scenarioStartedEvent), "ScenarioContext.ScenarioInfo is not properly initialized for Cucumber Messages.");
             throw new ArgumentNullException(nameof(scenarioStartedEvent), "ScenarioContext.ScenarioInfo.PickleIdIndex is not initialized");
         }
 
