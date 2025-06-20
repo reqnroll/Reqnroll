@@ -50,9 +50,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             public IFileSystem FileSystem { get; }
 
             private ICollection<Envelope> _messageCollector;
-
-            public new string ParseConfiguredOutputFilePath(string messagesConfiguration) 
-                => base.ParseConfiguredOutputFilePath(messagesConfiguration);
         }
 
         private IObjectContainer _globalObjContainerStub;
@@ -84,8 +81,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _brokerMock.Object, _fileSystemMock.Object, postedEnvelopes);
             _sut.Initialize(_rtpe, _rtpp, new UnitTestProvider.UnitTestProviderConfiguration());
-            _rtpe.RaiseCustomizeGlobalDependencies(_globalObjContainerStub as ObjectContainer, null);
-            _rtpe.RaiseCustomizeTestThreadDependencies(_testThreadObjContainerStub as ObjectContainer);
+            //_rtpe.RaiseCustomizeGlobalDependencies(_globalObjContainerStub as ObjectContainer, null);
+            //_rtpe.RaiseCustomizeTestThreadDependencies(_testThreadObjContainerStub as ObjectContainer);
         }
 
         [Fact]
@@ -94,7 +91,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var sp = Path.DirectorySeparatorChar;
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"\"}");
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, string> { { "outputFilePath", "" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -112,7 +109,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var sp = Path.DirectorySeparatorChar;
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("{\"outputFilePath\": \"aFileName.txt\"}");
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, string> { { "outputFilePath", "aFileName.txt" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -128,9 +125,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("""
-                { "outputFilePath": "C:\/valid\/path/output.txt" }
-                """);
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+                .Returns(new Dictionary<string, string> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
@@ -144,43 +140,14 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             postedEnvelopes.Should().Contain(message);
         }
 
-
-        [Fact]
-        public void ParseConfigurationString_Should_Return_Valid_OutputFilePath()
-        {
-            // Arrange
-            var validConfig = """
-                { "outputFilePath": "C:\\valid/path/output.txt" }
-                """;
-            // Act
-            var result = _sut.ParseConfiguredOutputFilePath(validConfig);
-
-            // Assert
-            Assert.Equal(@"C:\valid/path/output.txt", result);
-        }
-
-        [Fact]
-        public void ParseConfigurationString_Should_Return_Empty_For_Invalid_Json()
-        {
-            // Arrange
-            var invalidConfig = "invalid_json";
-
-            // Act
-            var result = _sut.ParseConfiguredOutputFilePath(invalidConfig);
-
-            // Assert
-            Assert.Equal(string.Empty, result);
-        }
-
         [Fact]
         public async Task LaunchFileSink_Should_Create_Directory_If_Not_Exists()
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns("""
-                { "outputFilePath": "C:\/valid\/path/output.txt" }
-                """);
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+                .Returns(new Dictionary<string, string> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act

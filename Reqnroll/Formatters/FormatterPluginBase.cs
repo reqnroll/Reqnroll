@@ -1,9 +1,12 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.Configuration.JsonConfig;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
@@ -53,10 +56,14 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
 
     internal void LaunchSinkAsync()
     {
-        bool IsFormatterEnabled(out string configuration)
+        bool IsFormatterEnabled(out Dictionary<string, string> configuration)
         {
             configuration = null!;
-            return _configurationProvider.Enabled && !string.IsNullOrEmpty(configuration = _configurationProvider.GetFormatterConfigurationByName(PluginName));
+            if (!_configurationProvider.Enabled)
+                return false;
+            configuration = (Dictionary<string, string>)_configurationProvider.GetFormatterConfigurationByName(PluginName);
+
+            return configuration != null && configuration.Count > 0;
         }
 
         if (!IsFormatterEnabled(out var formatterConfiguration))
@@ -82,7 +89,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
             await CloseAsync();
     }
 
-    protected abstract void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigString, Action<bool> onAfterInitialization);
+    protected abstract void ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigString, Action<bool> onAfterInitialization);
 
     public void Dispose()
     {

@@ -145,21 +145,8 @@ namespace Reqnroll.Formatters.Tests
             };
 
             FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new EnvVariableEnableFlagParser(env));
-            string messagesConfiguration = configurationProvider.GetFormatterConfigurationByName("messages");
-            string outputFilePath = string.Empty;
-            int colonIndex = messagesConfiguration.IndexOf(':');
-            if (colonIndex != -1)
-            {
-                int firstQuoteIndex = messagesConfiguration.IndexOf('"', colonIndex);
-                if (firstQuoteIndex != -1)
-                {
-                    int secondQuoteIndex = messagesConfiguration.IndexOf('"', firstQuoteIndex + 1);
-                    if (secondQuoteIndex != -1)
-                    {
-                        outputFilePath = messagesConfiguration.Substring(firstQuoteIndex + 1, secondQuoteIndex - firstQuoteIndex - 1);
-                    }
-                }
-            }
+            configurationProvider.GetFormatterConfigurationByName("messages").TryGetValue("outputFilePath", out var outputFilePath);
+
             if (string.IsNullOrEmpty(outputFilePath))
                 outputFilePath = "[BASEDIRECTORY]\\CucumberMessages\\reqnroll_report.ndson";
 

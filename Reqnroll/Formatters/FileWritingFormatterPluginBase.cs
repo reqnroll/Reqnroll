@@ -1,8 +1,10 @@
 ﻿#nullable enable
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
@@ -27,11 +29,11 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-    protected override void ConsumeAndFormatMessagesBackgroundTask(string formatterConfigurationString, Action<bool> onInitialized)
+    protected override void ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigurationString, Action<bool> onInitialized)
     {
         var defaultBaseDirectory = ".";
 
-        var outputFilePath = ParseConfiguredOutputFilePath(formatterConfigurationString);
+        var outputFilePath = ConfiguredOutputFilePath(formatterConfigurationString);
         var fileName = Path.GetFileName(outputFilePath);
         var baseDirectory = Path.GetDirectoryName(outputFilePath) ?? "";
 
@@ -64,24 +66,10 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
 
     protected abstract void ConsumeAndWriteToFilesBackgroundTask(string outputPath);
 
-    protected virtual string ParseConfiguredOutputFilePath(string formatterConfiguration)
+    protected virtual string ConfiguredOutputFilePath(IDictionary<string, string> formatterConfiguration)
     {
-        if (string.IsNullOrWhiteSpace(formatterConfiguration))
-            return string.Empty;
-
-        try
-        {
-            using var document = System.Text.Json.JsonDocument.Parse(formatterConfiguration);
-            if (document.RootElement.TryGetProperty("outputFilePath", out var outputFilePathElement))
-            {
-                return outputFilePathElement.GetString() ?? string.Empty;
-            }
-        }
-        catch (System.Text.Json.JsonException)
-        {
-            Trace?.WriteMessage($"Configuration of ${PluginName} is invalid: ${formatterConfiguration}");
-        }
-
-        return string.Empty;
+        string outputFilePath = string.Empty;
+        formatterConfiguration.TryGetValue("outputFilePath", out outputFilePath);
+        return outputFilePath;
     }
 }

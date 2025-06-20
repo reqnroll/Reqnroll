@@ -1,7 +1,9 @@
-﻿namespace Reqnroll.Formatters.Configuration;
+﻿using System.Collections.Generic;
+
+namespace Reqnroll.Formatters.Configuration;
 
 public interface IFormattersConfigurationProvider
 {
     bool Enabled { get; }
-    string GetFormatterConfigurationByName(string formatterName);
+    IDictionary<string, string> GetFormatterConfigurationByName(string formatterName);
 }

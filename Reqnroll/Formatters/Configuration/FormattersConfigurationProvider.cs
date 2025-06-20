@@ -15,8 +15,6 @@ namespace Reqnroll.Formatters.Configuration;
 /// </summary>
 public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 {
-    public static IFormattersConfigurationProvider Current { get; private set; }
-
     private readonly IList<IFormattersConfigurationResolverBase> _resolvers;
     private readonly Lazy<FormattersConfiguration> _resolvedConfiguration;
     private readonly IEnvVariableEnableFlagParser _envVariableEnableFlagParser;
@@ -30,27 +28,19 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
         _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableEnableFlagParser = envVariableEnableFlagParser;
-        Current = this;
     }
 
-    #region Override API
-    public void SetEnabled(bool value)
-    {
-        _runtimeEnablementOverrideFlag = value;
-    }
-    #endregion
-
-    public string GetFormatterConfigurationByName(string formatterName)
+    public IDictionary<string, string> GetFormatterConfigurationByName(string formatterName)
     {
         var config = _resolvedConfiguration.Value;
         if (config.Formatters.TryGetValue(formatterName, out var formatterConfig))
             return formatterConfig;
-        return string.Empty;
+        return new Dictionary<string, string>();
     }
 
     private FormattersConfiguration ResolveConfiguration()
     {
-        var combinedConfig = new Dictionary<string, string>();
+        var combinedConfig = new Dictionary<string, IDictionary<string, string>>();
 
         foreach (var resolver in _resolvers)
         {

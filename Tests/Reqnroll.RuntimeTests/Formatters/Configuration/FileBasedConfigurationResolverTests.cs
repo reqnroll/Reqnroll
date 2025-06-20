@@ -3,6 +3,7 @@ using Moq;
 using Reqnroll.Analytics.UserId;
 using Reqnroll.Configuration;
 using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         private readonly Mock<IReqnrollJsonLocator> _jsonLocatorMock;
         private readonly Mock<IFileSystem> _fileSystemMock;
         private readonly Mock<IFileService> _fileServiceMock;
+        private readonly Mock<IFormatterLog> _log;
         private readonly FileBasedConfigurationResolver _sut;
 
         public FileBasedConfigurationResolverTests()
@@ -23,11 +25,13 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             _jsonLocatorMock = new Mock<IReqnrollJsonLocator>();
             _fileSystemMock = new Mock<IFileSystem>();
             _fileServiceMock = new Mock<IFileService>();
+            _log = new Mock<IFormatterLog>();
 
             _sut = new FileBasedConfigurationResolver(
                 _jsonLocatorMock.Object,
                 _fileSystemMock.Object,
-                _fileServiceMock.Object
+                _fileServiceMock.Object,
+                _log.Object
             );
         }
 
@@ -71,8 +75,10 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var fileContent = @"
             {
                 ""formatters"": {
-                    ""formatter1"": ""config1"",
-                    ""formatter2"": ""config2""
+                    ""formatter1"": {
+                        ""config1"": ""setting1"" },
+                    ""formatter2"": {
+                        ""config2"": ""setting2"" }
                 }
             }";
 
@@ -85,12 +91,12 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
 
             // Assert
             result.Should().HaveCount(2);
-            result["formatter1"].Should().Be("\"config1\"");
-            result["formatter2"].Should().Be("\"config2\"");
+            result["formatter1"]["config1"].Should().Be("setting1");
+            result["formatter2"]["config2"].Should().Be("setting2");
         }
 
         [Fact]
-        public void Resolve_Should_Handle_Invalid_Json_File_ByThrowingException()
+        public void Resolve_Should_Handle_Invalid_Json_File_ByEmittingLog_and_ReturningEmpty()
         {
             // Arrange
             var filePath = "config.json";
@@ -99,12 +105,15 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
             _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
             _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(invalidJsonContent);
-
+            IDictionary<string, IDictionary<string, string>> result;
             // Act
-            var act = () => _sut.Resolve();
+            var act = () => result = _sut.Resolve();
 
             // Assert
-            act.Should().Throw<Exception>().WithMessage("*invalid*");
+            act.Should().NotThrow<Exception>();
+            result = _sut.Resolve();
+            result.Should().BeEmpty();
+
         }
 
         [Fact]

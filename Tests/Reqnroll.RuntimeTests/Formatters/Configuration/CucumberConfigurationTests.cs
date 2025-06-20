@@ -31,8 +31,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void Enabled_Should_Return_False_When_No_Configuration_Is_Resolved()
         {
             // Arrange
-            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, string>());
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, string>());
+            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
             _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
 
             // Act
@@ -46,10 +46,10 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void Enabled_Should_Respect_Environment_Variable_Override()
         {
             // Arrange
-            var mockedSetup = new Dictionary<string, string>();
-            mockedSetup.Add("html", @"c:\html\html_report.html");
+            var mockedSetup = new Dictionary<string, IDictionary<string, string>>();
+            mockedSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_report.html" } });
             _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, string>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
 
             _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(false);
 
@@ -64,29 +64,29 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void GetFormatterConfigurationByName_Should_Return_Configuration_For_Existing_Formatter()
         {
             // Arrange
-            var mockedSetup = new Dictionary<string, string>();
-            mockedSetup.Add("html", @"c:\html\html_report.html");
+            var mockedSetup = new Dictionary<string, IDictionary<string, string>>();
+            mockedSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_report.html" } });
             _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, string>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
             _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
 
             // Act
             var result = _sut.GetFormatterConfigurationByName("html");
 
             // Assert
-            Assert.Equal(@"c:\html\html_report.html", result);
+            Assert.Equal(@"c:\html\html_report.html", result["outputFileName"]);
         }
 
         [Fact]
         public void GetFormatterConfigurationByName_Should_Respect_Formatter_Given_By_EnvironmentVariable_Override()
         {
             // Arrange
-            var configFileSetup = new Dictionary<string, string>();
-            configFileSetup.Add("html", @"c:\html\html_report.html");
+            var configFileSetup = new Dictionary<string, IDictionary<string, string>>();
+            configFileSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_report.html" } });
             _fileResolverMock.Setup(r => r.Resolve()).Returns(configFileSetup);
 
-            var envVarSetup = new Dictionary<string, string>();
-            envVarSetup.Add("html", @"c:\html\html_overridden_name.html");
+            var envVarSetup = new Dictionary<string, IDictionary<string, string>>();
+            envVarSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_overridden_name.html" } });
             _environmentResolverMock.Setup(r => r.Resolve()).Returns(envVarSetup);
             _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
 
@@ -94,7 +94,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var result = _sut.GetFormatterConfigurationByName("html");
 
             // Assert
-            Assert.Equal(@"c:\html\html_overridden_name.html", result);
+            Assert.Equal(@"c:\html\html_overridden_name.html", result["outputFileName"]);
         }
 
 
@@ -102,8 +102,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void GetFormatterConfigurationByName_Should_Return_Empty_For_Nonexistent_Formatter()
         {
             // Arrange
-            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, string>());
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, string>());
+            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
 
             _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
 
@@ -111,25 +111,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var result = _sut.GetFormatterConfigurationByName("nonexistent");
 
             // Assert
-            Assert.Equal(string.Empty, result);
-        }
-
-        [Fact]
-        public void SetEnabled_Should_Override_Runtime_Enablement()
-        {
-            // Arrange
-            var mockedSetup = new Dictionary<string, string>();
-            mockedSetup.Add("html", @"c:\html\html_report.html");
-            _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, string>());
-            _envVariableEnableFlagParserMock.Setup(p => p.Parse()).Returns(true);
-
-            // Act
-            _sut.SetEnabled(false);
-            var result = _sut.Enabled;
-
-            // Assert
-            Assert.False(result);
+            Assert.Empty(result);
         }
     }
 }

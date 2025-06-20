@@ -41,7 +41,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var json = @"
             {
                 ""formatters"": {
-                    ""formatter1"": ""config1""
+                    ""formatter1"": {
+                        ""configSetting1"": ""configValue1"" }
                 }
             }";
             _environmentWrapperMock
@@ -52,7 +53,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var result = _sut.Resolve();
 
             // Assert
-            result["formatter1"].Should().Be("\"config1\"");
+            result["formatter1"]["configSetting1"].Should().Be("configValue1");
         }
 
         [Fact]
@@ -61,8 +62,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             // Arrange
             var json = """
                 {"formatters": {
-                    "html": "OutputFilePath:forHtml", 
-                    "messages": "OutputFilePath:forMessages" 
+                    "html": { "outputFilePath": "forHtml" }, 
+                    "messages": { "outputFilePath": "forMessages" } 
                     }
                 }
                 """;
@@ -77,8 +78,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             Assert.Equal(2, result.Count);
             var first = result["html"];
             var second = result["messages"];
-            Assert.Equal("\"OutputFilePath:forHtml\"", first);
-            Assert.Equal("\"OutputFilePath:forMessages\"", second);
+            Assert.Equal("forHtml", first["outputFilePath"]);
+            Assert.Equal("forMessages", second["outputFilePath"]);
         }
 
     }

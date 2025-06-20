@@ -1,40 +1,62 @@
 ﻿using Reqnroll.CommonModels;
 using Reqnroll.EnvironmentAccess;
-using System.Collections.Generic;
+using Reqnroll.Formatters.RuntimeSupport;
+using System;
 using System.Text.Json;
 
 namespace Reqnroll.Formatters.Configuration;
 
-public class EnvironmentConfigurationResolver : IFormattersEnvironmentOverrideConfigurationResolver
+public class EnvironmentConfigurationResolver : FormattersConfigurationResolverBase, IFormattersEnvironmentOverrideConfigurationResolver
 {
     private readonly IEnvironmentWrapper _environmentWrapper;
+    private readonly IFormatterLog _log;
 
-    public EnvironmentConfigurationResolver(IEnvironmentWrapper environmentWrapper)
+    public EnvironmentConfigurationResolver(
+        IEnvironmentWrapper environmentWrapper,
+        IFormatterLog log = null)
     {
         _environmentWrapper = environmentWrapper;
+        _log = log;
     }
 
-    public IDictionary<string, string> Resolve()
+    protected override JsonDocument GetJsonDocument()
     {
-        // Logic for environment variable overrides
-        var result = new Dictionary<string, string>();
-        var formatters = _environmentWrapper.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE);
-        // treating formatters as a json string containing an object, iterate over the properties and add them to the configuration, replacing all existing values;
-        if (formatters is Success<string> formattersSuccess)
+        try
         {
-            using JsonDocument formattersDoc = JsonDocument.Parse(formattersSuccess.Result, new JsonDocumentOptions
+            var formatters = _environmentWrapper.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE);
+
+            if (formatters is Success<string> formattersSuccess)
             {
-                CommentHandling = JsonCommentHandling.Skip
-            });
-            var root = formattersDoc.RootElement;
-            if (root.TryGetProperty("formatters", out var formattersEntry))
-            {
-                foreach (JsonProperty jsonProperty in formattersEntry.EnumerateObject())
+                if (string.IsNullOrWhiteSpace(formattersSuccess.Result))
                 {
-                    result[jsonProperty.Name] = jsonProperty.Value.GetRawText();
+                    _log?.WriteMessage($"Environment variable {FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE} is empty");
+                    return null;
+                }
+
+                try
+                {
+                    return JsonDocument.Parse(formattersSuccess.Result, new JsonDocumentOptions
+                    {
+                        CommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true // More lenient parsing
+                    });
+                }
+                catch (JsonException ex)
+                {
+                    _log?.WriteMessage($"Failed to parse JSON from environment variable {FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE}: {ex.Message}");
                 }
             }
+            else if (formatters is Failure<string> failure)
+            {
+                _log?.WriteMessage($"Could not retrieve environment variable {FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE}: {failure.Description}");
+            }
         }
-        return result;
+        catch (Exception ex) when (ex is not JsonException)
+        {
+            // Catch any unexpected exceptions but don't let them propagate
+            _log?.WriteMessage($"Unexpected error retrieving environment configuration: {ex.Message}");
+        }
+
+        return null;
     }
 }
