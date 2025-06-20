@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.Formatters.RuntimeSupport;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class CucumberMessageBrokerTests
     {
         private readonly Mock<IObjectContainer> _objectContainerMock;
+        private readonly Mock<IFormatterLog> _logMock;
         private readonly Mock<ICucumberMessageSink> _sinkMock1;
         private readonly Mock<ICucumberMessageSink> _sinkMock2;
         private readonly CucumberMessageBroker _sut;
@@ -18,13 +20,15 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public CucumberMessageBrokerTests()
         {
             _objectContainerMock = new Mock<IObjectContainer>();
+            _logMock = new Mock<IFormatterLog>();
+
             _sinkMock1 = new Mock<ICucumberMessageSink>();
             _sinkMock1.Setup(s => s.Name).Returns("sink1");
             _sinkMock2 = new Mock<ICucumberMessageSink>();
             _sinkMock2.Setup(s => s.Name).Returns("sink2");
 
             // Initialize the system under test (SUT)
-            _sut = new CucumberMessageBroker();
+            _sut = new CucumberMessageBroker(_logMock.Object);
             _sut.RegisterSink(_sinkMock1.Object);
             _sut.RegisterSink(_sinkMock2.Object);
         }
@@ -49,8 +53,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         [Fact]
         public void Enabled_Should_Return_False_When_No_Sinks_Are_Registered()
         {
+            var log = new Mock<IFormatterLog>();
 
-            var sut = new CucumberMessageBroker();
+            var sut = new CucumberMessageBroker(log.Object);
 
             // Act
             var result = sut.Enabled;

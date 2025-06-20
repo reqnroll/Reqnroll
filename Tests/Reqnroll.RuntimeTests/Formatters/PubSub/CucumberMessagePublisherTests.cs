@@ -191,6 +191,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
 
+            var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+            var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+
             IList<Envelope> publishedEnvelopes = new List<Envelope>();
             _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
                 (e) =>
@@ -200,8 +203,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                     });
 
             _sut._broker = _brokerMock.Object;
-            _sut._startedFeatures.TryAdd("feature1", featureTrackerMock.Object);
-            _sut._startedFeatures.TryAdd("feature2", featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f1, featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f2, featureTrackerMock.Object);
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
             _sut._clock = _clockMock.Object;
@@ -234,6 +237,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var feature2TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(false);
 
+
+            var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+            var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+
             IList<Envelope> publishedEnvelopes = new List<Envelope>();
             _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
                 (e) =>
@@ -243,8 +250,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 });
 
             _sut._broker = _brokerMock.Object;
-            _sut._startedFeatures.TryAdd("feature1", feature1TrackerMock.Object);
-            _sut._startedFeatures.TryAdd("feature2", feature2TrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f1, feature1TrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f2, feature2TrackerMock.Object);
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
             _sut._clock = _clockMock.Object;
@@ -274,6 +281,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
+
+
+            var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+
             var messages = new List<Envelope>
             {
                 Envelope.Create(new TestCase("t", "p", [], "0")),
@@ -290,7 +301,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 });
 
             _sut._broker = _brokerMock.Object;
-            _sut._startedFeatures.TryAdd("feature1", featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f1, featureTrackerMock.Object);
             _sut._enabled = true;
             _sut._messages = messages;
             _sut._messageFactory = new CucumberMessageFactory();
@@ -336,7 +347,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
 
             var existingFeatureTrackerMock = new Mock<IFeatureExecutionTracker>();
-            _sut._startedFeatures.TryAdd("ABCDEF", existingFeatureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, existingFeatureTrackerMock.Object);
             _sut._broker = _brokerMock.Object;
             _sut._globalObjectContainer = objectContainerStub;
             _sut._enabled = true;
@@ -423,7 +434,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var featureFinishedEvent = new FeatureFinishedEvent(featureContextMock.Object);
             _sut._messageFactory = new CucumberMessageFactory();
 
-            _sut._startedFeatures.TryAdd("ABCDE", featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._enabled = true;
 
             // Act
@@ -467,7 +478,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             };
 
             _sut._messageFactory = new CucumberMessageFactory();
-            _sut._startedFeatures.TryAdd("ABCDE", featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._globalObjectContainer = containerStub;
             _sut._enabled = true;
 
@@ -654,7 +665,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _ => throw new NotImplementedException()
             };
 
-            _sut._startedFeatures.TryAdd("ABCDE", featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
 
@@ -692,7 +703,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             var evnt = (IExecutionEvent)Activator.CreateInstance(eventType, "", featureInfoStub, scenarioInfoStub);
 
-            _sut._startedFeatures.TryAdd("ABCDE", featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
 
