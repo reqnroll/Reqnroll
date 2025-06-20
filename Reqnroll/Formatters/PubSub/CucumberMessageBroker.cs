@@ -1,4 +1,5 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.Formatters.RuntimeSupport;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -14,6 +15,11 @@ namespace Reqnroll.Formatters.PubSub;
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
+    public CucumberMessageBroker(IFormatterLog formatterLog)
+    {
+        _logger = formatterLog;
+    }
+
     public bool Enabled { get; private set; } = false;
 
     // This is the number of sinks that we expect to register. This number is determined by the number of sinks that add themselves to the global container during plugin startup.
@@ -22,6 +28,8 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
     // and the Broker can be Enabled.
     private int _numberOfSinksInitialized = 0;
+
+    private IFormatterLog _logger;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
@@ -74,9 +82,9 @@ public class CucumberMessageBroker : ICucumberMessageBroker
             {
                 await sink.PublishAsync(message);
             }
-            catch 
+            catch(System.Exception e)
             {
-                // TODO: What should be done here? Log the exception to the tool output?
+                _logger.WriteMessage($"Formatters Broker: Exception thrown by Formatter Plugin {sink.Name}: {e.Message}");
             }
         }
     }
