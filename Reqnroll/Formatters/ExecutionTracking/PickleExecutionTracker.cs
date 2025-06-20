@@ -109,9 +109,14 @@ public class PickleExecutionTracker : IPickleExecutionTracker
                     // We will create a copy of the last TestRunFinished message, but with the 'willBeRetried' flag set to true
                     // and substitute the copy into the list
                     var lastRunTestCaseFinished = tempListOfMessages.Last();
-                    var lastRunTestCaseMarkedAsToBeRetried = FixupWillBeRetried(lastRunTestCaseFinished);
-                    tempListOfMessages.Remove(lastRunTestCaseFinished);
-                    tempListOfMessages.Add(lastRunTestCaseMarkedAsToBeRetried);
+
+                    // Guard: confirm that the last message is a TestCaseFinished; if not something went wrong and skip the fixup
+                    if (lastRunTestCaseFinished.Content() is TestCaseFinished)
+                    {
+                        var lastRunTestCaseMarkedAsToBeRetried = FixupWillBeRetried(lastRunTestCaseFinished);
+                        tempListOfMessages.Remove(lastRunTestCaseFinished);
+                        tempListOfMessages.Add(lastRunTestCaseMarkedAsToBeRetried);
+                    }
                 }
                 tempListOfMessages.AddRange(aRunsWorth);
             }
