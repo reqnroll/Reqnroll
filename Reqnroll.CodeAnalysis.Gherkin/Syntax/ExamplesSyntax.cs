@@ -1,7 +1,7 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 [SyntaxNode(SyntaxKind.Examples)]
-public partial class ExamplesSyntax : DeclarationSyntax
+public sealed partial class ExamplesSyntax : DeclarationSyntax
 {
     [SyntaxSlot(
         SyntaxKind.ExamplesKeyword,

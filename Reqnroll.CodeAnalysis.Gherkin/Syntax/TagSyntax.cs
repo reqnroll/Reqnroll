@@ -4,7 +4,7 @@
 /// Represents a tag in a Gherkin document.
 /// </summary>
 [SyntaxNode(SyntaxKind.Tag)]
-public partial class TagSyntax : SyntaxNode
+public sealed partial class TagSyntax : SyntaxNode
 {
     [SyntaxSlot(SyntaxKind.AtToken, "The token that represents the \"@\" symbol prefix of the tag.")]
     public partial SyntaxToken AtSymbolToken { get; }

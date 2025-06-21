@@ -4,7 +4,7 @@
 /// Represents an example in a Gherkin document.
 /// </summary>
 [SyntaxNode(SyntaxKind.Example)]
-public partial class ExampleSyntax : BehaviorDeclarationSyntax
+public sealed partial class ExampleSyntax : BehaviorDeclarationSyntax
 {
     [SyntaxSlot(
         SyntaxKind.ExampleKeyword,

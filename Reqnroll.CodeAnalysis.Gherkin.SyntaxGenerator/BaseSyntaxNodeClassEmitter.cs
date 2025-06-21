@@ -23,14 +23,14 @@ internal class BaseSyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             AppendInternalNodePropertyTo(builder);
             builder.AppendLine();
 
-            foreach (var property in classInfo.SlotProperties.Where(property => !property.IsInherited))
-            {
-                new SlotPropertyEmitter(property).EmitSlotPropertyTo(builder);
-                builder.AppendLine();
-            }
+            //foreach (var property in classInfo.SlotProperties.Where(property => !property.IsInherited))
+            //{
+            //    new SlotPropertyEmitter(property).EmitSlotPropertyTo(builder);
+            //    builder.AppendLine();
+            //}
 
-            AppendGetSlotAsSyntaxNodeMethodTo(builder);
-            builder.AppendLine();
+            //AppendGetSlotAsSyntaxNodeMethodTo(builder);
+            //builder.AppendLine();
         });
 
         return builder.ToString();

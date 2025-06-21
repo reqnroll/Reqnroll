@@ -24,7 +24,7 @@ internal class SyntaxNodeClassEmitter(SyntaxNodeClassInfo classInfo)
             AppendInternalNodePropertyTo(builder);
             builder.AppendLine();
 
-            foreach (var property in classInfo.SlotProperties.Where(property => !property.IsInherited))
+            foreach (var property in classInfo.SlotProperties)
             {
                 new SlotPropertyEmitter(property).EmitSlotPropertyTo(builder);
                 builder.AppendLine();

@@ -30,12 +30,6 @@ internal abstract class ParsingRuleHandler(RuleType ruleType)
 
         var line = context.SourceText.Lines[token.Line.LineNumber - 1];
 
-        // Capture any leading whitespace.
-        if (token.Line.Indent > 0)
-        {
-            context.AddLeadingWhitespace(new TextSpan(line.Start, token.Line.Indent));
-        }
-
         switch (token.MatchedType)
         {
             case TokenType.Empty: AppendEmpty(token, line, context); break;

@@ -159,6 +159,7 @@ internal static class SlotHelper
             description,
             isOptional,
             !SymbolEqualityComparer.Default.Equals(property.ContainingType, symbol),
+            property.IsAbstract,
             ComparableArray.CreateRange(parameterGroups));
     }
 
@@ -166,14 +167,13 @@ internal static class SlotHelper
         ITypeSymbol symbol,
         CancellationToken cancellationToken)
     {
-        var properties = symbol.GetMembers().OfType<IPropertySymbol>()
-            .Where(property => property.DeclaredAccessibility == Accessibility.Public &&
-                property.DeclaringSyntaxReferences
-                    .Any(reference => ((PropertyDeclarationSyntax)reference.GetSyntax(cancellationToken))
-                        .Modifiers.Any(token => token.IsKind(SyntaxKind.PartialKeyword))));
-
-        foreach (var property in properties)
+        foreach (var property in symbol.GetMembers().OfType<IPropertySymbol>())
         {
+            if (property.DeclaredAccessibility != Accessibility.Public)
+            {
+                continue;
+            }
+
             var attributes = property.GetAttributes();
             var slotAttribute = attributes
                 .FirstOrDefault(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.SyntaxSlotAttribute);

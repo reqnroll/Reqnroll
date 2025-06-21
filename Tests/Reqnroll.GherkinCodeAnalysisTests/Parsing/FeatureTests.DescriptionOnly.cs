@@ -37,24 +37,24 @@ public partial class FeatureTests
                         Literal(
                             TriviaList(),
                             "Guess the word",
-                            TriviaList([CarriageReturnLineFeed]))),
+                            TriviaList([EnvironmentNewLine]))),
                     LiteralText(
                         TokenList([
                             Literal(
-                                TriviaList([ CarriageReturnLineFeed, Whitespace("      ") ]),
+                                TriviaList([EnvironmentNewLine, Whitespace("      ")]),
                                 "The word guess game is a turn-based game for two players.",
-                                TriviaList([ CarriageReturnLineFeed ])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
-                                TriviaList([ Whitespace("      ") ]),
+                                TriviaList([Whitespace("      ")]),
                                 "The Maker makes a word for the Breaker to guess. The game",
-                                TriviaList([ CarriageReturnLineFeed ])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
-                                TriviaList([ Whitespace("      ") ]),
+                                TriviaList([Whitespace("      ")]),
                                 "is over when the Breaker guesses the Maker's word.",
-                                TriviaList([ CarriageReturnLineFeed ]))
+                                TriviaList([EnvironmentNewLine]))
                         ]))),
                 Token(
-                    TriviaList(),
+                    TriviaList([EnvironmentNewLine]),
                     SyntaxKind.EndOfFileToken,
                     TriviaList())));
 

@@ -1,7 +1,10 @@
 ﻿namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
+/// <summary>
+/// Represents the syntax of a Gherkin document.
+/// </summary>
 [SyntaxNode(SyntaxKind.GherkinDocument)]
-public partial class GherkinDocumentSyntax : SyntaxNode
+public sealed partial class GherkinDocumentSyntax : SyntaxNode
 {
     [SyntaxSlot(SyntaxKind.Feature, "The feature declaration syntax contained by the file structure.")]
     [ParameterGroup("Common")]

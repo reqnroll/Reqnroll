@@ -4,7 +4,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 /// A structured trivia syntax node which represents one or more tokens that were skipped by the parser.
 /// </summary>
 [SyntaxNode(SyntaxKind.SkippedTokensTrivia)]
-public class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
+public sealed class SkippedTokensTriviaSyntax : StructuredTriviaSyntax
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="SkippedTokensTriviaSyntax"/> class which is orphaned.

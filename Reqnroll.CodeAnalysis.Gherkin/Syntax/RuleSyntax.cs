@@ -4,7 +4,7 @@
 /// Represents a rule declaration in a Gherkin document.
 /// </summary>
 [SyntaxNode(SyntaxKind.Rule)]
-public partial class RuleSyntax : BehaviorGroupSyntax
+public sealed partial class RuleSyntax : BehaviorGroupSyntax
 {
     [SyntaxSlot(SyntaxKind.RuleKeyword, "The token that represents the \"Rule\" keyword.", LocatedAfter = nameof(Tags))]
     [ParameterGroup("Untagged")]

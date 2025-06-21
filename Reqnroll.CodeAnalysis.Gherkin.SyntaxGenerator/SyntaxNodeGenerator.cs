@@ -98,6 +98,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             info.Description, 
                             !info.IsOptional,
                             info.IsInherited,
+                            info.IsAbstract,
                             info.ParameterGroups))
                         .ToImmutableArray());
             });
@@ -126,6 +127,7 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             info.Description,
                             !info.IsOptional,
                             info.IsInherited,
+                            info.IsAbstract,
                             info.ParameterGroups))
                         .ToImmutableArray());
             });

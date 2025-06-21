@@ -10,8 +10,18 @@ internal class SlotPropertyEmitter(SyntaxSlotPropertyInfo property)
             case SyntaxNodeType.SyntaxTokenList:
             case SyntaxNodeType.SyntaxList:
                 AppendPropertySummaryTo(builder, property);
+                builder.Append("public ");
+
+                if (property.IsAbstract)
+                {
+                    builder.Append("override ");
+                }
+                else
+                {
+                    builder.Append("partial ");
+                }
+
                 builder
-                    .Append("public partial ")
                     .Append(property.TypeName)
                     .Append(' ')
                     .Append(property.Name)
@@ -45,9 +55,18 @@ internal class SlotPropertyEmitter(SyntaxSlotPropertyInfo property)
 
         AppendPropertySummaryTo(builder, property);
 
-        builder
-            .Append("public partial ")
-            .Append(property.TypeName);
+        builder.Append("public ");
+
+        if (property.IsAbstract)
+        {
+            builder.Append("override ");
+        }
+        else
+        {
+            builder.Append("partial ");
+        }
+
+        builder.Append(property.TypeName);
 
         if (!property.IsRequired)
         {

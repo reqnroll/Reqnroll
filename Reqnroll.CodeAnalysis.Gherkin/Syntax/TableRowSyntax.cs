@@ -4,7 +4,7 @@
 /// Represents a row in a table syntax structure.
 /// </summary>
 [SyntaxNode(SyntaxKind.TableRow)]
-public partial class TableRowSyntax : SyntaxNode
+public sealed partial class TableRowSyntax : SyntaxNode
 {
     [SyntaxSlot(SyntaxKind.VerticalBarToken, "The token that marks the start of the row.")]
     public partial SyntaxToken StartVerticalBarToken { get; }

@@ -177,4 +177,7 @@
   <data name="TokenMustBeVerticalBarToken" xml:space="preserve">
     <value>Value must be a vertical bar ("|") token.</value>
   </data>
+  <data name="TokenMustBeDocStringContentTypeIdentifierToken" xml:space="preserve">
+    <value>Value must be a Doc String content-type identifier token.</value>
+  </data>
 </root>

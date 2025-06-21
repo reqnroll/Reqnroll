@@ -9,6 +9,7 @@ internal record SyntaxSlotPropertyInfo(
     string? Description,
     bool IsRequired,
     bool IsInherited,
+    bool IsAbstract,
     ComparableArray<string> ParameterGroups)
 {
     public bool IsInternalNodeNullable => NodeType != SyntaxNodeType.SyntaxToken;

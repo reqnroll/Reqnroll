@@ -4,7 +4,7 @@
 /// Represents a comment which specifies a Gherkin directive.
 /// </summary>
 [SyntaxNode(SyntaxKind.DirectiveCommentTrivia)]
-public partial class DirectiveCommentTriviaSyntax : StructuredTriviaSyntax
+public sealed partial class DirectiveCommentTriviaSyntax : StructuredTriviaSyntax
 {
     [SyntaxSlot(SyntaxKind.HashToken, "The token that represents the leading hash symbol (`#`).")]
     public partial SyntaxToken HashToken { get; }
