@@ -21,7 +21,7 @@ public class PickleStepSequence(bool hasPickles, Pickle pickle)
         get
         {
             if (!HasPickles) return null;
-            return CurrentPickle.Steps.ElementAt(_pickleStepCounter).Id;
+            return (_pickleStepCounter < CurrentPickle.Steps.Count) ? CurrentPickle.Steps.ElementAt(_pickleStepCounter).Id : null;
         }
     }
 }
