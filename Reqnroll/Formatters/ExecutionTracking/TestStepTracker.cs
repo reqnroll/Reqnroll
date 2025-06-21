@@ -30,7 +30,7 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
     {
     }
 
-    // Once the StepFinished event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method
+    // Once the StepFinishedAt event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method
     public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
     {
         var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;

@@ -187,10 +187,11 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     public virtual TestStepStarted ToTestStepStarted(TestStepExecutionTracker testStepExecutionTracker)
     {
+        DateTime ts = testStepExecutionTracker.StepStartedAt.HasValue ? (DateTime) testStepExecutionTracker.StepStartedAt! : new DateTime();
         return new TestStepStarted(
             testStepExecutionTracker.TestCaseStartedId,
             testStepExecutionTracker.StepTracker.TestStepId,
-            Converters.ToTimestamp(testStepExecutionTracker.StepStarted.ToUniversalTime()));
+            Converters.ToTimestamp(ts.ToUniversalTime()));
     }
 
     public virtual TestStepFinished ToTestStepFinished(TestStepExecutionTracker testStepExecutionTracker)
@@ -199,7 +200,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             testStepExecutionTracker.TestCaseStartedId,
             testStepExecutionTracker.StepTracker.TestStepId,
             ToTestStepResult(testStepExecutionTracker),
-            Converters.ToTimestamp(testStepExecutionTracker.StepFinished.ToUniversalTime()));
+            Converters.ToTimestamp(((DateTime)testStepExecutionTracker.StepFinishedAt).ToUniversalTime()));
     }
 
     public virtual Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
@@ -239,14 +240,14 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     {
         return new TestStepStarted(hookStepExecutionTracker.TestCaseStartedId,
                                    hookStepExecutionTracker.StepTracker.TestStepId,
-                                   Converters.ToTimestamp(hookStepExecutionTracker.StepStarted.ToUniversalTime()));
+                                   Converters.ToTimestamp(((DateTime)hookStepExecutionTracker.StepStartedAt).ToUniversalTime()));
     }
 
     public virtual TestStepFinished ToTestStepFinished(HookStepExecutionTracker hookStepExecutionTracker)
     {
         return new TestStepFinished(hookStepExecutionTracker.TestCaseStartedId,
                                     hookStepExecutionTracker.StepTracker.TestStepId,
-                                    ToTestStepResult(hookStepExecutionTracker), Converters.ToTimestamp(hookStepExecutionTracker.StepFinished.ToUniversalTime()));
+                                    ToTestStepResult(hookStepExecutionTracker), Converters.ToTimestamp(((DateTime)hookStepExecutionTracker.StepFinishedAt).ToUniversalTime()));
     }
 
     public virtual Attachment ToAttachment(AttachmentTracker tracker)
@@ -280,8 +281,9 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     private static TestStepResult ToTestStepResult(StepExecutionTrackerBase stepState)
     {
+        TimeSpan d = (stepState.Duration.HasValue ? (TimeSpan) stepState.Duration : new TimeSpan(0));
         return new TestStepResult(
-            Converters.ToDuration(stepState.Duration),
+            Converters.ToDuration(d),
             "",
             ToTestStepResultStatus(stepState.Status),
             ToException(stepState.Exception)

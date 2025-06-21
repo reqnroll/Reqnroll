@@ -23,7 +23,7 @@ public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
 
     public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
     {
-        StepStarted = hookBindingStartedEvent.Timestamp;
+        StepStartedAt = hookBindingStartedEvent.Timestamp;
 
         var hookId = PickleExecutionTracker.StepDefinitionsByBinding[hookBindingStartedEvent.HookBinding];
 
@@ -37,7 +37,7 @@ public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
 
     public void ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
     {
-        StepFinished = hookFinishedEvent.Timestamp;
+        StepFinishedAt = hookFinishedEvent.Timestamp;
         Exception = hookFinishedEvent.HookException;
         Status = Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
     }

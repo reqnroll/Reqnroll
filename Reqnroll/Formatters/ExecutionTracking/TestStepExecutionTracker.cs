@@ -23,7 +23,7 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
 
     public void ProcessEvent(StepStartedEvent stepStartedEvent)
     {
-        StepStarted = stepStartedEvent.Timestamp;
+        StepStartedAt = stepStartedEvent.Timestamp;
 
         // if this is the first time to execute this step for this test, generate the properties needed to Generate the TestStep Message (stored in a TestStepTracker)
         if (ParentTracker.IsFirstAttempt)
@@ -43,7 +43,7 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
         }
 
         Exception = stepFinishedEvent.ScenarioContext.TestError;
-        StepFinished = stepFinishedEvent.Timestamp;
+        StepFinishedAt = stepFinishedEvent.Timestamp;
         Status = stepFinishedEvent.StepContext.Status;
     }
 }
