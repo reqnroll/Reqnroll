@@ -55,8 +55,9 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         StepDefinitionsByBinding = stepDefinitionIdsByMethod;
         IdGenerator = idGenerator;
         FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-        var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null;
-        Enabled = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source != null;
+        var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null; ;
+        featureHasCucumberMessages = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles() != null;
+        Enabled = featureHasCucumberMessages;
         _staticMessages = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
 
         var clock = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IClock>(); //TODO: better retrieval of IClock
@@ -80,23 +81,28 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     // This should be called only once per Feature. 
     private IEnumerable<Envelope> GenerateStaticMessages(FeatureStartedEvent featureStartedEvent)
     {
+
+        var source = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source();
+        if (source != null) yield return Envelope.Create(source);
+
         var gherkinDocument = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument();
+        if (gherkinDocument != null) yield return Envelope.Create(gherkinDocument);
 
-        var pickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles().ToList();
-
-        for (int i = 0; i < pickles.Count; i++)
+        var featurepickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles();
+        if (featurepickles != null)
         {
-            PickleIds.Add(i.ToString(), pickles[i].Id);
-        }
+            var pickles = featurepickles.ToList();
+            for (int i = 0; i < pickles.Count; i++)
+            {
+                PickleIds.Add(i.ToString(), pickles[i].Id);
+            }
 
-        _pickleJar = new PickleJar(pickles);
+            _pickleJar = new PickleJar(pickles);
 
-        yield return Envelope.Create(featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source());
-        yield return Envelope.Create(gherkinDocument);
-
-        foreach (var pickle in pickles)
-        {
-            yield return Envelope.Create(pickle);
+            foreach (var pickle in pickles)
+            {
+                yield return Envelope.Create(pickle);
+            }
         }
     }
 
@@ -151,7 +157,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         pickleExecutionTracker = null;
         var pickleIndex = scenarioInfo?.PickleIdIndex;
 
-        if (!string.IsNullOrEmpty(pickleIndex) && 
+        if (!string.IsNullOrEmpty(pickleIndex) &&
             PickleIds.TryGetValue(pickleIndex, out var pickleId) &&
             _pickleExecutionTrackersById.TryGetValue(pickleId, out pickleExecutionTracker))
         {

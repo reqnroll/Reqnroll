@@ -254,6 +254,9 @@ namespace Reqnroll.Generator.Generation
                 new CodeMethodReturnStatement(
                     featureLevelCucumberMessagesExpression));
 
+            var sourceReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
+            var gherkinDocumentReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
+            var picklesReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
             try
             {
                 var messageConverter = new CucumberMessagesConverter(new GuidIdGenerator());
@@ -279,17 +282,25 @@ namespace Reqnroll.Generator.Generation
 
                 // wrap these expressions in Func<T>
 
-                sourceFactoryMethod.Statements.Add(new CodeMethodReturnStatement(sourceExpression));
+                sourceReturnStatement = new CodeMethodReturnStatement(sourceExpression);
 
-                gherkinDocumentFactoryMethod.Statements.Add(new CodeMethodReturnStatement(gherkinDocumentExpression));
+                gherkinDocumentReturnStatement = new CodeMethodReturnStatement(gherkinDocumentExpression);
 
-                picklesFactoryMethod.Statements.Add(new CodeMethodReturnStatement(picklesExpression));
+                picklesReturnStatement = new CodeMethodReturnStatement(picklesExpression);
             }
             catch (Exception e)
             {
                 generationContext.GenerationWarnings.Add($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
                 // This effectively turns OFF the Cucumber Messages support for this feature.
+            }
+            finally
+            {
+                sourceFactoryMethod.Statements.Add(sourceReturnStatement);
+
+                gherkinDocumentFactoryMethod.Statements.Add(gherkinDocumentReturnStatement);
+
+                picklesFactoryMethod.Statements.Add(picklesReturnStatement);
             }
         }
 
