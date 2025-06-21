@@ -55,11 +55,11 @@ public partial class InternationalizationTests
                             TriviaList(),
                             "i18n support",
                             TriviaList([EnvironmentNewLine]))),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
+                                SyntaxKind.ExampleKeyword,
                                 "🎬",
                                 TriviaList()),
                             Token(

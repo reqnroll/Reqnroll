@@ -90,12 +90,12 @@ public partial class TagsTests
                                         "The untagged rule description",
                                         TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
-                            scenarios: List([
-                                Scenario(
+                            members: List([
+                                Example(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.ScenarioKeyword,
-                                        "Scenario",
+                                        SyntaxKind.ExampleKeyword,
+                                        "Example",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -104,7 +104,7 @@ public partial class TagsTests
                                     LiteralText(
                                         Literal(
                                             TriviaList(),
-                                            "Scenario with only a feature tag",
+                                            "Example with only a feature tag",
                                             TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
@@ -148,12 +148,12 @@ public partial class TagsTests
                                         "The tagged rule description",
                                         TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
-                            scenarios: List([
-                                Scenario(
+                            members: List([
+                                Example(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.ScenarioKeyword,
-                                        "Scenario",
+                                        SyntaxKind.ExampleKeyword,
+                                        "Example",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -162,7 +162,7 @@ public partial class TagsTests
                                     LiteralText(
                                         Literal(
                                             TriviaList(),
-                                            "Scenario with feature and rule tags",
+                                            "Example with feature and rule tags",
                                             TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
@@ -177,7 +177,7 @@ public partial class TagsTests
                                                     "b",
                                                     TriviaList([EnvironmentNewLine]))))
                                     ])),
-                                Scenario(
+                                Example(
                                     List([
                                         Tag(
                                             Token(TriviaList([EnvironmentNewLine, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
@@ -185,8 +185,8 @@ public partial class TagsTests
                                     ]),
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.ScenarioKeyword,
-                                        "Scenario",
+                                        SyntaxKind.ExampleKeyword,
+                                        "Example",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -195,7 +195,7 @@ public partial class TagsTests
                                     LiteralText(
                                         Literal(
                                             TriviaList(),
-                                            "Scenario with feature, rule and scenario tags",
+                                            "Example with feature, rule and scenario tags",
                                             TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
@@ -210,7 +210,7 @@ public partial class TagsTests
                                                     "b",
                                                     TriviaList([EnvironmentNewLine]))))
                                     ])),
-                                Scenario(
+                                Example(
                                     List([
                                         Tag(
                                             Token(TriviaList([EnvironmentNewLine, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
@@ -218,8 +218,8 @@ public partial class TagsTests
                                     ]),
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.ScenarioKeyword,
-                                        "Scenario Outline",
+                                        SyntaxKind.ExampleKeyword,
+                                        "Example Outline",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -228,7 +228,7 @@ public partial class TagsTests
                                     LiteralText(
                                         Literal(
                                             TriviaList(),
-                                            "Tagged Scenario outline",
+                                            "Tagged Example outline",
                                             TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(

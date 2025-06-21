@@ -165,8 +165,8 @@
   <data name="TokenMustBeRuleKeyword" xml:space="preserve">
     <value>Value must be a "rule" keyword token.</value>
   </data>
-  <data name="TokenMustBeScenarioKeyword" xml:space="preserve">
-    <value>Value must be a "scenario" keyword token.</value>
+  <data name="TokenMustBeExampleKeyword" xml:space="preserve">
+    <value>Value must be an "example" keyword token.</value>
   </data>
   <data name="TokenMustBeTableLiteralToken" xml:space="preserve">
     <value>Value must be a table literal token.</value>

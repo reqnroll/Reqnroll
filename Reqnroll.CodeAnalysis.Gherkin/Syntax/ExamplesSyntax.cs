@@ -3,25 +3,15 @@
 [SyntaxNode(SyntaxKind.Examples)]
 public partial class ExamplesSyntax : DeclarationSyntax
 {
-    [SyntaxSlot(SyntaxKind.ExamplesKeyword, "The token that represents the \"Examples\" keyword.")]
+    [SyntaxSlot(
+        SyntaxKind.ExamplesKeyword,
+        "The token that represents the \"Examples\" keyword.",
+        LocatedAfter = nameof(Tags))]
     [ParameterGroup("Minimal")]
     [ParameterGroup("Untagged")]
     public partial SyntaxToken ExamplesKeyword { get; }
 
-    [SyntaxSlot(SyntaxKind.ColonToken, "The token that represents the colon following the keyword.")]
-    [ParameterGroup("Minimal")]
-    [ParameterGroup("Untagged")]
-    public partial SyntaxToken ColonToken { get; }
-
-    [SyntaxSlot(SyntaxKind.LiteralText, "The optional name of the examples.")]
-    [ParameterGroup("Untagged")]
-    public partial LiteralTextSyntax? Name { get; }
-
-    [SyntaxSlot(SyntaxKind.LiteralText, "The optional description of the examples.")]
-    [ParameterGroup("Untagged")]
-    public partial LiteralTextSyntax? Description { get; }
-
-    [SyntaxSlot(SyntaxKind.Table, "The table which forms the examples.")]
+    [SyntaxSlot(SyntaxKind.Table, "The table which forms the examples.", LocatedAfter = nameof(Description))]
     [ParameterGroup("Untagged")]
     public partial TableSyntax? Table { get; }
 

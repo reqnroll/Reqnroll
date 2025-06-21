@@ -85,9 +85,9 @@ public enum SyntaxKind : ushort
     RuleKeyword,
 
     /// <summary>
-    /// The token is a "scenario" keyword.
+    /// The token is an "example" keyword.
     /// </summary>
-    ScenarioKeyword,
+    ExampleKeyword,
 
     /// <summary>
     /// The token is an "examples" keyword.
@@ -191,14 +191,9 @@ public enum SyntaxKind : ushort
     Background,
 
     /// <summary>
-    /// The node is a scenario declaration.
+    /// The node is an example declaration.
     /// </summary>
-    Scenario,
-
-    /// <summary>
-    /// The node is a scenario outline declaration.
-    /// </summary>
-    ScenarioOutline,
+    Example,
 
     /// <summary>
     /// The node is a declaration of examples for an outline scenario.

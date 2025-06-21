@@ -892,12 +892,12 @@ public partial class FeatureTests
                                 "This is a long feature file",
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

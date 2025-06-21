@@ -64,11 +64,11 @@ public partial class InternationalizationTests
                                 "In this scenario the parser should prefer the longest keyword.",
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
+                                SyntaxKind.ExampleKeyword,
                                 "Senaryo",
                                 TriviaList()),
                             Token(

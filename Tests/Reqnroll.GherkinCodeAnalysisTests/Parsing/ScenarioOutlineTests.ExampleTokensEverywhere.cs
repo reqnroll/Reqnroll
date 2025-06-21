@@ -47,12 +47,12 @@ public partial class ScenarioOutlineTests
                             TriviaList(),
                             "Example tokens everywhere",
                             TriviaList([EnvironmentNewLine]))),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario Outline",
+                                SyntaxKind.ExampleKeyword,
+                                "Example Outline",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

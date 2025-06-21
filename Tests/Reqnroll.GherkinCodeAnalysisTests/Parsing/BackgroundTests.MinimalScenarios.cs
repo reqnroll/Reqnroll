@@ -74,12 +74,12 @@ public partial class BackgroundTests
                                             "the minimalism inside a background",
                                             TriviaList([EnvironmentNewLine])))))
                             ])),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -106,11 +106,11 @@ public partial class BackgroundTests
                                                 TriviaList([EnvironmentNewLine]))
                                             ])))
                                 ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

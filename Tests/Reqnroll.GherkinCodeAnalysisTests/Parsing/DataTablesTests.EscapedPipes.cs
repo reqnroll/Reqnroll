@@ -55,12 +55,12 @@ public partial class DataTablesTests
                                 "iff it is followed by a |-character, a \\-character or an n.",
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

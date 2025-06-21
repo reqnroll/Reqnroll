@@ -40,14 +40,14 @@ public partial class ScenarioOutlineTests
                     LiteralText(
                         Literal(
                             TriviaList(),
-                            "Scenario Outline with a value with a dollar sign ($)",
+                            "Example Outline with a value with a dollar sign ($)",
                             TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList(),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario Outline",
+                                SyntaxKind.ExampleKeyword,
+                                "Example Outline",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

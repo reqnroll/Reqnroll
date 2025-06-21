@@ -77,7 +77,7 @@ public partial class BackgroundTests
                             SyntaxKind.ColonToken,
                             TriviaList([Space])),
                         LiteralText(
-                            Literal(
+                            Literal( 
                                 TriviaList(),
                                 "a simple background",
                                 TriviaList([EnvironmentNewLine]))),
@@ -98,12 +98,12 @@ public partial class BackgroundTests
                                     ])))
                         ])
                     ),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -130,11 +130,11 @@ public partial class BackgroundTests
                                                 TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -205,12 +205,12 @@ public partial class BackgroundTests
                                             ])))
                                 ])
                             ),
-                            scenarios: List([
-                                Scenario(
+                            members: List([
+                                Example(
                                     Token(
                                         TriviaList([EnvironmentNewLine, Whitespace("    ")]),
-                                        SyntaxKind.ScenarioKeyword,
-                                        "Scenario",
+                                        SyntaxKind.ExampleKeyword,
+                                        "Example",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -303,7 +303,7 @@ public partial class BackgroundTests
                             ]))
                     ])),
                 Token(
-                    TriviaList(),
+                    TriviaList([EnvironmentNewLine]),
                     SyntaxKind.EndOfFileToken,
                     TriviaList())));
 

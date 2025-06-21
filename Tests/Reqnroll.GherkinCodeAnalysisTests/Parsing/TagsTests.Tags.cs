@@ -83,10 +83,10 @@ public partial class TagsTests
                     LiteralText(
                         Literal(
                             TriviaList(),
-                            "Minimal Scenario Outline",
+                            "Minimal Example Outline",
                             TriviaList([EnvironmentNewLine]))),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             List([
                                 Tag(
                                     Token(TriviaList([EnvironmentNewLine]), SyntaxKind.AtToken, TriviaList()),
@@ -100,8 +100,8 @@ public partial class TagsTests
                             ]),
                             Token(
                                 TriviaList(),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -125,7 +125,7 @@ public partial class TagsTests
                                             "the minimalism",
                                             TriviaList([EnvironmentNewLine]))))
                             ])),
-                        Scenario(
+                        Example(
                             List([
                                 Tag(
                                     Token(TriviaList(), SyntaxKind.AtToken, TriviaList()),
@@ -139,8 +139,8 @@ public partial class TagsTests
                             ]),
                             Token(
                                 TriviaList(),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario Outline",
+                                SyntaxKind.ExampleKeyword,
+                                "Example Outline",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -287,7 +287,7 @@ public partial class TagsTests
                                 )
                             ])
                         ),
-                        Scenario(
+                        Example(
                             List([
                                 Tag(
                                     Token(TriviaList(), SyntaxKind.AtToken, TriviaList()),
@@ -295,8 +295,8 @@ public partial class TagsTests
                             ]),
                             Token(
                                 TriviaList([Comment("#a comment"), EnvironmentNewLine]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -320,7 +320,7 @@ public partial class TagsTests
                                             "a comment",
                                             TriviaList([EnvironmentNewLine]))))
                             ])),
-                        Scenario(
+                        Example(
                             List([
                                 Tag(
                                     Token(TriviaList(), SyntaxKind.AtToken, TriviaList()),
@@ -328,8 +328,8 @@ public partial class TagsTests
                             ]),
                             Token(
                                 TriviaList([Comment("#a comment"), EnvironmentNewLine]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -370,8 +370,8 @@ public partial class TagsTests
                                 TriviaList(),
                                 SyntaxKind.ColonToken,
                                 TriviaList([EnvironmentNewLine])),
-                            scenarios: List([
-                                Scenario(
+                            members: List([
+                                Example(
                                     List([
                                         Tag(
                                             Token(TriviaList(), SyntaxKind.AtToken, TriviaList()),
@@ -379,8 +379,8 @@ public partial class TagsTests
                                     ]),
                                     Token(
                                         TriviaList(),
-                                        SyntaxKind.ScenarioKeyword,
-                                        "Scenario",
+                                        SyntaxKind.ExampleKeyword,
+                                        "Example",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),

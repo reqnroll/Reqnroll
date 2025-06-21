@@ -39,14 +39,14 @@ public partial class ScenarioOutlineTests
                     LiteralText(
                         Literal(
                             TriviaList(),
-                            "Minimal Scenario Outline",
+                            "Minimal Example Outline",
                             TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList(),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario Outline",
+                                SyntaxKind.ExampleKeyword,
+                                "Example Outline",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

@@ -4,29 +4,15 @@
 /// Background declaration syntax.
 /// </summary>
 [SyntaxNode(SyntaxKind.Background)]
-public sealed partial class BackgroundSyntax : DeclarationSyntax
+public sealed partial class BackgroundSyntax : BehaviorDeclarationSyntax
 {
-    [SyntaxSlot(SyntaxKind.BackgroundKeyword, "The token that represents the \"Background\" keyword.")]
-    [ParameterGroup("Common")]
+    [SyntaxSlot(
+        SyntaxKind.BackgroundKeyword,
+        "The token that represents the \"Background\" keyword.",
+        LocatedAfter = nameof(Tags))]
     [ParameterGroup("Minimal")]
+    [ParameterGroup("Untagged")]
     public partial SyntaxToken BackgroundKeyword { get; }
-
-    [SyntaxSlot(SyntaxKind.ColonToken, "The token that represents the colon following the keyword.")]
-    [ParameterGroup("Common")]
-    public partial SyntaxToken ColonToken { get; }
-
-    [SyntaxSlot(SyntaxKind.LiteralText, "The optional name of the background.")]
-    [ParameterGroup("Common")]
-    public partial PlainTextSyntax? Name { get; }
-
-    [SyntaxSlot(SyntaxKind.LiteralText, "The optional description of the background.")]
-    [ParameterGroup("Common")]
-    public partial PlainTextSyntax? Description { get; }
-
-    [SyntaxSlot(SyntaxKind.Step, "The steps which form the background.")]
-    [ParameterGroup("Common")]
-    [ParameterGroup("Minimal")]
-    public partial SyntaxList<StepSyntax> Steps { get; }
 
     /// <inheritdoc />
     public override SyntaxToken GetKeywordToken() => BackgroundKeyword;

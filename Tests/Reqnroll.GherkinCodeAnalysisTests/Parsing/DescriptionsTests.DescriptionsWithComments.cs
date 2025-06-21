@@ -108,12 +108,12 @@ public partial class DescriptionsTests
                                 "with a comment in the middle and at the end",
                                 TriviaList([EnvironmentNewLine, Whitespace("  "), Comment("# comment 2"), EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -151,11 +151,11 @@ public partial class DescriptionsTests
                                                 TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -193,11 +193,11 @@ public partial class DescriptionsTests
                                                 TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -235,11 +235,11 @@ public partial class DescriptionsTests
                                                 TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -277,11 +277,11 @@ public partial class DescriptionsTests
                                                 TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario Outline",
+                                SyntaxKind.ExampleKeyword,
+                                "Example Outline",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -382,11 +382,11 @@ public partial class DescriptionsTests
                                                     TriviaList([EnvironmentNewLine])))
                                         ])))
                             ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -420,11 +420,11 @@ public partial class DescriptionsTests
                                                 TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
-                        Scenario(
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ScenarioKeyword,
-                                "Scenario",
+                                SyntaxKind.ExampleKeyword,
+                                "Example",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

@@ -15,7 +15,7 @@ public class SyntaxListTests
     [InlineData(21)]
     public void CountReturnsCorrectNumberOfItems(int count)
     {
-        var list = List(Enumerable.Range(0, count).Select(i => Scenario("Scenario", LiteralText(i.ToString()))));
+        var list = List(Enumerable.Range(0, count).Select(i => Example("Example", LiteralText(i.ToString()))));
 
         list.Count.Should().Be(count);
     }
@@ -24,9 +24,9 @@ public class SyntaxListTests
     public void ToStringReturnsItemsInOrder()
     {
         var list = List([ 
-            Scenario("Scenario", LiteralText("One")),
-            Scenario("Scenario", LiteralText("Two"))]);
+            Example("Example", LiteralText("One")),
+            Example("Example", LiteralText("Two"))]);
 
-        list.ToString().Should().Be("Scenario:OneScenario:Two");
+        list.ToString().Should().Be("Example:OneScenario:Two");
     }
 }

@@ -42,14 +42,14 @@ public partial class ScenarioOutlineTests
                     LiteralText(
                         Literal(
                             TriviaList(),
-                            "Scenario Outline with whitespace cells",
+                            "Example Outline with whitespace cells",
                             TriviaList([EnvironmentNewLine]))),
-                    scenarios: List([
-                        Scenario(
+                    members: List([
+                        Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.Scenario,
-                                "Scenario Outline",
+                                SyntaxKind.Example,
+                                "Example Outline",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

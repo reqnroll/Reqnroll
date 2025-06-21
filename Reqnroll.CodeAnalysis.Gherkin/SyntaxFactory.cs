@@ -107,17 +107,17 @@ public static partial class SyntaxFactory
         LiteralText(name));
 
     /// <summary>
-    /// Creates a new <see cref="ScenarioSyntax"/> instance.
+    /// Creates a new <see cref="ExampleSyntax"/> instance.
     /// </summary>
-    /// <param name="scenarioKeyword">The token that represents the "Scenario" keyword.</param>
-    /// <param name="name">The name of the scenario.</param>
-    /// <param name="steps">The steps of the scenario.</param>
-    /// <returns>A new <see cref="ScenarioSyntax"/> instance.</returns>
-    public static ScenarioSyntax Scenario(
-        string scenarioKeyword,
+    /// <param name="exampleKeyword">The token that represents the "Example" keyword.</param>
+    /// <param name="name">The name of the example.</param>
+    /// <param name="steps">The steps of the example.</param>
+    /// <returns>A new <see cref="ExampleSyntax"/> instance.</returns>
+    public static ExampleSyntax Example(
+        string exampleKeyword,
         string name,
-        SyntaxList<StepSyntax> steps = default) => Scenario(
-            Token(SyntaxKind.ScenarioKeyword, scenarioKeyword),
+        SyntaxList<StepSyntax> steps = default) => Example(
+            Token(SyntaxKind.ExampleKeyword, exampleKeyword),
             LiteralText(name),
             steps: steps);
 
