@@ -12,5 +12,6 @@ public class Net60PortabilityTest : PortabilityTestBase
     {
         base.TestInitialize();
         _testRunConfiguration.TargetFramework = TargetFramework.Net60;
+        SkipTUnit = true; // TUnit is not supported on .NET 6
     }
 }

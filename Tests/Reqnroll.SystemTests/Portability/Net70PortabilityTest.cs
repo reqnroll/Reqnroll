@@ -12,5 +12,6 @@ public class Net70PortabilityTest : PortabilityTestBase
     {
         base.TestInitialize();
         _testRunConfiguration.TargetFramework = TargetFramework.Net70;
+        SkipTUnit = true; // TUnit is not supported on .NET 7
     }
 }

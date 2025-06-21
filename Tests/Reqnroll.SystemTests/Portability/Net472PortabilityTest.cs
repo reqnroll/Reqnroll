@@ -14,5 +14,6 @@ public class Net472PortabilityTest : PortabilityTestBase
         base.TestInitialize();
         _testRunConfiguration.TargetFramework = TargetFramework.Net472;
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.CSharp73;
+        SkipTUnit = true; // TUnit is not supported on .NET Framework 4.7.2
     }
 }
