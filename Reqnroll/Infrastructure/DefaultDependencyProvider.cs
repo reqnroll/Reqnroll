@@ -16,6 +16,12 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.PlatformCompatibility;
+using Reqnroll.Formatters.PubSub;
+using Reqnroll.Utils;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.Html;
+using Reqnroll.Formatters.Messages;
+using Reqnroll.Formatters.RuntimeSupport;
 
 namespace Reqnroll.Infrastructure
 {
@@ -99,6 +105,18 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEventEmitter, IRuntimePluginTestExecutionLifecycleEventEmitter>();
 
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
+
+            //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<FormatterLog, IFormatterLog>();
+            container.RegisterTypeAs<FileSystem, IFileSystem>();
+            container.RegisterTypeAs<FormattersDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
+            container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
+            container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
+            container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
+            container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
+            container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");
+            container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
+            container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)

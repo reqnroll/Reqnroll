@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Reqnroll.Events
@@ -14,10 +13,9 @@ namespace Reqnroll.Events
         /// <summary>
         /// Publishes the specified execution event to the appropriate handlers or subscribers.
         /// </summary>
-        /// <remarks>This method blocks the calling thread until the event is published asynchronously. 
-        /// NOTE: This method should be retired when we can make all callers of the 
-        ///       TestThreadExecutionEventPublisher asynchronous (such as ReqnrollOutputHelper).</remarks>
+        /// <remarks>This method blocks the calling thread until the event is published asynchronously.</remarks>
         /// <param name="executionEvent">The execution event to be published. Cannot be <see langword="null"/>.</param>
+        [Obsolete("ExecutionEvents are migrating to Async. Please migrate to PublishEventAsync", false)]
         public void PublishEvent(IExecutionEvent executionEvent)
         {
             Task.Run(async () => await PublishEventAsync(executionEvent)).Wait();
@@ -44,6 +42,7 @@ namespace Reqnroll.Events
             }
         }
 
+        [Obsolete("ExecutionEvents are migrating to Async. Please migrate to PublishEventAsync", false)]
         public void AddListener(IExecutionEventListener listener)
         {
             _listeners.Add(listener);
