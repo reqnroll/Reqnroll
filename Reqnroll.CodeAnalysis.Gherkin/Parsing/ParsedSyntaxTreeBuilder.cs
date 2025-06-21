@@ -1,6 +1,7 @@
 using Gherkin;
 using Microsoft.CodeAnalysis.Text;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
+using System.Runtime.ExceptionServices;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
@@ -108,9 +109,16 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
     /// <param name="token">The token to add.</param>
     public void Build(Token token)
     {
-        _cancellationToken.ThrowIfCancellationRequested();
+        try
+        {
+            _cancellationToken.ThrowIfCancellationRequested();
 
-        CurrentRuleHandler.AppendToken(token, _context);
+            CurrentRuleHandler.AppendToken(token, _context);
+        }
+        catch (Exception ex)
+        {
+            throw new ParsingException(ExceptionDispatchInfo.Capture(ex));
+        }
     }
 
     public GherkinSyntaxTree GetResult()
@@ -145,36 +153,36 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
 
     private void AddUnexpectedToken(UnexpectedTokenException exception, string message)
     {
-        throw new NotImplementedException();
+        // Unexpected tokens are the parser's way of indicating it doesn't know how to interpret the current line.
+        // A misspelled keyword or incorrect formatting of a line can cause this.
+        // Although there are some scenarios the parser could examine in more depth (like missing a colon after a keyword)
+        // for now we'll treat all these errors generically and treat them as skipped tokens.
+        var token = exception.ReceivedToken;
+        var line = _context.SourceText.Lines[token.Line.LineNumber - 1];
+        var contentSpan = TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End);
 
-        //// Unexpected tokens are the parser's way of indicating it doesn't know how to interpret the current line.
-        //// A misspelled keyword or incorrect formatting of a line can cause this.
-        //// Although there are some scenarios the parser could examine in more depth (like missing a colon after a keyword)
-        //// for now we'll treat all these errors generically and treat them as skipped tokens.
-        //var token = exception.ReceivedToken;
-        //var line = _context.SourceText.Lines[token.Line.LineNumber - 1];
-        //var contentSpan = TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End);
+        InternalNode? leadingTrivia = Whitespace(_context.SourceText, line.Start, token.MatchedIndent);
+        var leadingWhitespace = _context.SourceText.ConsumeWhitespace(contentSpan);
 
-        //InternalNode? leadingTrivia = Whitespace(_context.SourceText, line.Start, token.MatchedIndent);
-        //var leadingWhitespace = _context.SourceText.ConsumeWhitespace(contentSpan);
+        leadingTrivia += leadingWhitespace;
 
-        //leadingTrivia += leadingWhitespace;
+        var trailingWhitespace = _context.SourceText.ReverseConsumeWhitespace(contentSpan);
+        InternalNode? trailingTrivia = trailingWhitespace + line.GetEndOfLineTrivia();
 
-        //var trailingWhitespace = _context.SourceText.ReverseConsumeWhitespace(contentSpan);
-        //InternalNode? trailingTrivia = trailingWhitespace + line.GetEndOfLineTrivia();
+        // All text remaining between any whitespace we'll treat as a literal.
+        var literalSpan = TextSpan.FromBounds(
+            contentSpan.Start + (leadingWhitespace?.Width ?? 0),
+            contentSpan.End - (trailingWhitespace?.Width ?? 0));
 
-        //// All text remaining between any whitespace we'll treat as a literal.
-        //var literalSpan = TextSpan.FromBounds(
-        //    contentSpan.Start + (leadingWhitespace?.Width ?? 0),
-        //    contentSpan.End - (trailingWhitespace?.Width ?? 0));
+        var text = _context.SourceText.ToString(literalSpan);
 
-        //var literal = Literal(leadingTrivia, _context.SourceText.ToString(literalSpan) , trailingTrivia);
+        var literal = Literal(leadingTrivia, LiteralEscapingStyle.Default.Escape(text), text, trailingTrivia);
 
-        //// Add the skipped tokens to be included as leading trivia in the next token.
-        //// Inkeeping with the CS compiler error codes, we'll create a unique error for each combination of expected tokens.
-        //var diagnostic = GetUnexpectedTokenDiagnostic(exception.ExpectedTokenTypes);
+        // Add the skipped tokens to be included as leading trivia in the next token.
+        // Inkeeping with the CS compiler error codes, we'll create a unique error for each combination of expected tokens.
+        var diagnostic = GetUnexpectedTokenDiagnostic(exception.ExpectedTokenTypes);
 
-        //_context.AddSkippedToken(literal, diagnostic);
+        _context.AddSkippedToken(literal, diagnostic);
     }
 
     private static InternalDiagnostic GetUnexpectedTokenDiagnostic(string[] expectedTokenTypes)

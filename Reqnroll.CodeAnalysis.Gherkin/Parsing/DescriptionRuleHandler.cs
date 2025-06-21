@@ -1,15 +1,12 @@
 ﻿using Gherkin;
 using Microsoft.CodeAnalysis.Text;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
-using System.Collections.Immutable;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
-using static InternalSyntaxFactory;
-
-internal class DescriptionRuleHandler() : ParsingRuleHandler(RuleType.Description)
+internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
 {
-    private readonly ImmutableArray<InternalNode>.Builder _description = ImmutableArray.CreateBuilder<InternalNode>();
+    private readonly PlainTextParser _plainTextParser = new(LiteralEscapingStyle.Default);
 
     protected override void AppendOther(Token token, TextLine line, ParsingContext context)
     {
@@ -23,7 +20,10 @@ internal class DescriptionRuleHandler() : ParsingRuleHandler(RuleType.Descriptio
 
         InternalNode? trailing;
 
-        // Blank lines will be matched as "other" in this context. These lines should be included as trivia, rather than tokens.
+        // Blank lines will be matched as "other" in this context.
+        // If these lines occur between text lines, they are treated as part of the text.
+        // If they occur at the start of the description, they are treated as leading trivia.
+        // If they occur at the end of the description, they are leading trivia for the next element (standard rules).
         if (token.MatchedText.Length == 0)
         {
             // The line is completely empty.
@@ -44,20 +44,10 @@ internal class DescriptionRuleHandler() : ParsingRuleHandler(RuleType.Descriptio
         trailing = context.SourceText.ConsumeWhitespace(line.Start + token.Line.Indent + text.Length, line.End) +
             line.GetEndOfLineTrivia();
 
-        throw new NotImplementedException("I forgot how this works.");
-
-        //_description.Add(Literal(context.ConsumeLeadingTrivia(), text, trailing));
+        // Unfortunately, description text can contain interpolation, which means we need to buffer all the text,
+        // including trivia, then decide at the end of the block whether to encode as literal or interpolated syntax.
+        _plainTextParser.AppendText(context.ConsumeLeadingTrivia(), text, trailing);
     }
 
-    //public DescriptionSyntax.Internal? CreateDescriptionSyntax()
-    //{
-    //    var text = InternalNode.CreateList(_description);
-
-    //    if (text == null)
-    //    {
-    //        return null;
-    //    }
-
-    //    return Description(text);
-    //}
+    public PlainTextSyntax.Internal? CreateDescriptionSyntax() => _plainTextParser.ParseText();
 }

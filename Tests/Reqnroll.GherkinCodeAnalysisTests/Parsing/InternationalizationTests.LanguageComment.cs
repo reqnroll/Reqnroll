@@ -29,12 +29,12 @@ public partial class FeatureTests
                     Token(
                         TriviaList([
                             Trivia(
-                                LanguageCommentTrivia(
+                                DirectiveCommentTrivia(
                                     Token(TriviaList(), SyntaxKind.HashToken, TriviaList()),
-                                    Token(TriviaList(), SyntaxKind.LanguageKeyword, "language", TriviaList()),
+                                    DirectiveIdentifier(TriviaList(), "language", TriviaList()),
                                     Token(TriviaList(), SyntaxKind.ColonToken, TriviaList()),
-                                    Token(TriviaList(), SyntaxKind.IdentifierToken, "en", TriviaList([EnvironmentNewline])))),
-                            EnvironmentNewline
+                                    Literal(TriviaList(), "en", TriviaList([EnvironmentNewLine])))),
+                            EnvironmentNewLine
                         ]),
                         SyntaxKind.FeatureKeyword,
                         "Feature",
@@ -47,11 +47,11 @@ public partial class FeatureTests
                         Literal(
                             TriviaList(),
                             "Explicit language specification",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -63,7 +63,7 @@ public partial class FeatureTests
                                 Literal(
                                     TriviaList(),
                                     "minimalistic",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -75,11 +75,11 @@ public partial class FeatureTests
                                         Literal(
                                             TriviaList(),
                                             "the minimalism",
-                                            TriviaList([EnvironmentNewline]))))
+                                            TriviaList([EnvironmentNewLine]))))
                             ]))
                     ])),
                 Token(
-                    TriviaList(),
+                    TriviaList([EnvironmentNewLine]),
                     SyntaxKind.EndOfFileToken,
                     TriviaList())));
 

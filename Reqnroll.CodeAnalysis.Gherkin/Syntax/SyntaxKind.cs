@@ -28,11 +28,6 @@ public enum SyntaxKind : ushort
     // Textless syntax tokens //
 
     /// <summary>
-    /// The token is the "language" keyword.
-    /// </summary>
-    LanguageKeyword,
-
-    /// <summary>
     /// The token is a colon <c>:</c>
     /// </summary>
     ColonToken, // This is assumed to be the first textless syntax token.
@@ -45,7 +40,7 @@ public enum SyntaxKind : ushort
     /// <summary>
     /// The token is the asterisk symbol <c>*</c>
     /// </summary>
-    AsterixToken,
+    AsteriskToken,
 
     /// <summary>
     /// The token is the less-than symbol <c>&lt;</c>
@@ -137,19 +132,9 @@ public enum SyntaxKind : ushort
     DocStringContentTypeIdentifierToken,
 
     /// <summary>
-    /// The token is a literal string within an interpolated text.
+    /// The token is the identifier of a directive.
     /// </summary>
-    InterpolatedLiteralToken,
-
-    /// <summary>
-    /// The token is a literal string within an interpolated text in a table.
-    /// </summary>
-    InterpolatedTableLiteralToken,
-
-    /// <summary>
-    /// The token is an identifier.
-    /// </summary>
-    IdentifierToken,
+    DirectiveIdentifierToken,
 
     /// <summary>
     /// The token is text from inside a table.
@@ -179,9 +164,9 @@ public enum SyntaxKind : ushort
     CommentTrivia,
 
     /// <summary>
-    /// The trivia is a comment to select the language.
+    /// The trivia is a directive comment, such as a language specification comment.
     /// </summary>
-    LanguageCommentTrivia,
+    DirectiveCommentTrivia,
 
     /// <summary>
     /// The trivia is one or more tokens which have been skipped by the parser. This is typically due to an error in syntax.
@@ -244,21 +229,6 @@ public enum SyntaxKind : ushort
     /// The node is text with no additional meaning.
     /// </summary>
     LiteralText,
-
-    /// <summary>
-    /// The node is text which includes one or more parameters.
-    /// </summary>
-    InterpolatedText,
-
-    /// <summary>
-    /// The node is a literal text within an interpolated text.
-    /// </summary>
-    InterpolatedTextLiteral,
-
-    /// <summary>
-    /// The node is a parameter interpolation within an interpolated text.
-    /// </summary>
-    Interpolation,
 
     /// <summary>
     /// The node is a table.

@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using Gherkin;
+using Microsoft.CodeAnalysis.Text;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
@@ -104,7 +105,6 @@ internal class ParsingContext(SourceText text)
     /// Consumes all leading trivia that has been added to the context by calling <see cref="AddLeadingTrivia(InternalNode?)"/>, 
     /// emptying the buffer and returning a <see cref="InternalNode"/> that contains all the buffered trivia, or <c>null</c> if 
     /// no leading trivia has been buffered.
-    /// buffered.
     /// </summary>
     /// <returns>A <see cref="InternalNode"/> that is the buffered leading trivia, or <c>null</c> if no leading trivia has been
     /// buffered.</returns>
@@ -117,5 +117,21 @@ internal class ParsingContext(SourceText text)
         _trivia = null;
 
         return trivia;
+    }
+
+    /// <summary>
+    /// Consumes all leading trivia that has been added to the context by calling <see cref="AddLeadingTrivia(InternalNode?)"/>, 
+    /// emptying the buffer and reading any whitespace on the specified line up to the specified token's indent,
+    /// returning a <see cref="InternalNode"/> that contains all the trivia, or <c>null</c> if 
+    /// no leading trivia has been buffered or was read from the line.
+    /// </summary>
+    /// <param name="line">The line to read whitespace from.</param>
+    /// <param name="token">The token to read until.</param>
+    /// <returns>A <see cref="InternalNode"/> that is the buffered leading trivia and the whitespace preceeding the token, 
+    /// or <c>null</c> if no leading trivia has been buffered and no whitespace preceeds the token.</returns>
+    public InternalNode? ConsumeLeadingTriviaAndWhitespace(TextLine line, Token token)
+    {
+        return ConsumeLeadingTrivia() +
+            SourceText.ConsumeWhitespace(line.Start, line.Start + token.Line.Indent);
     }
 }

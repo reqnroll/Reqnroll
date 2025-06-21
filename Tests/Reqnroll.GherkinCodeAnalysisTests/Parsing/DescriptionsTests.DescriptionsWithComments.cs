@@ -96,17 +96,17 @@ public partial class DescriptionsTests
                         Literal(
                             TriviaList(),
                             "Descriptions with comments everywhere",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     description: LiteralText(
                         TokenList([
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "This is a description",
-                                TriviaList([EnvironmentNewline, Whitespace("  "), Comment("# comment"), EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine, Whitespace("  "), Comment("# comment"), EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "with a comment in the middle and at the end",
-                                TriviaList([EnvironmentNewline, Whitespace("  "), Comment("# comment 2"), EnvironmentNewline, EnvironmentNewline]))
+                                TriviaList([EnvironmentNewLine, Whitespace("  "), Comment("# comment 2"), EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
                     scenarios: List([
                         Scenario(
@@ -123,17 +123,17 @@ public partial class DescriptionsTests
                                 Literal(
                                     TriviaList(),
                                     "two lines",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
                                         TriviaList([Whitespace("  ")]),
                                         "This description",
-                                        TriviaList([EnvironmentNewline, Whitespace("  "), Comment("# comment"), EnvironmentNewline, Whitespace("  "), Comment("# comment 2"), EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine, Whitespace("  "), Comment("# comment"), EnvironmentNewLine, Whitespace("  "), Comment("# comment 2"), EnvironmentNewLine])),
                                     Literal(
                                         TriviaList([Whitespace("  ")]),
                                         "has two lines and two comments in the middle and is indented with two spaces",
-                                        TriviaList([EnvironmentNewline]))
+                                        TriviaList([EnvironmentNewLine]))
                                 ])),
                             List([
                                 Step(
@@ -148,12 +148,12 @@ public partial class DescriptionsTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline]),
+                                TriviaList([EnvironmentNewLine]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -165,17 +165,17 @@ public partial class DescriptionsTests
                                 Literal(
                                     TriviaList(),
                                     "without indentation",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
                                         TriviaList(),
                                         "This is a description without indentation",
-                                        TriviaList([EnvironmentNewline, Comment("# comment"), EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine, Comment("# comment"), EnvironmentNewLine])),
                                     Literal(
                                         TriviaList(),
                                         "and a comment in the middle and at the end",
-                                        TriviaList([EnvironmentNewline, Comment("# comment 2"), EnvironmentNewline, EnvironmentNewline]))
+                                        TriviaList([EnvironmentNewLine, Comment("# comment 2"), EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
                             List([
                                 Step(
@@ -190,12 +190,12 @@ public partial class DescriptionsTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -207,17 +207,17 @@ public partial class DescriptionsTests
                                 Literal(
                                     TriviaList(),
                                     "empty lines in the middle",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
                                         TriviaList([Whitespace("  ")]),
                                         "This description",
-                                        TriviaList([EnvironmentNewline, Whitespace("  "), Comment("# comment"), EnvironmentNewline, EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine, Whitespace("  "), Comment("# comment"), EnvironmentNewLine, EnvironmentNewLine])),
                                     Literal(
                                         TriviaList([Whitespace("  ")]),
                                         "has an empty line and a comment in the middle",
-                                        TriviaList([EnvironmentNewline]))
+                                        TriviaList([EnvironmentNewLine]))
                                 ])),
                             List([
                                 Step(
@@ -232,12 +232,12 @@ public partial class DescriptionsTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -249,17 +249,17 @@ public partial class DescriptionsTests
                                 Literal(
                                     TriviaList(),
                                     "empty lines around",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
-                                        TriviaList([EnvironmentNewline, Whitespace("  "), Comment("# comment"), EnvironmentNewline]),
+                                        TriviaList([EnvironmentNewLine, Whitespace("  "), Comment("# comment"), EnvironmentNewLine]),
                                         "This description",
-                                        TriviaList([EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine])),
                                     Literal(
                                         TriviaList([Whitespace("  ")]),
                                         "has an empty lines around",
-                                        TriviaList([EnvironmentNewline, Whitespace("  "), Comment("# comment"), EnvironmentNewline, EnvironmentNewline]))
+                                        TriviaList([EnvironmentNewLine, Whitespace("  "), Comment("# comment"), EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
                             List([
                                 Step(
@@ -274,12 +274,12 @@ public partial class DescriptionsTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario Outline",
                                 TriviaList()),
@@ -291,17 +291,17 @@ public partial class DescriptionsTests
                                 Literal(
                                     TriviaList(),
                                     "scenario outline with a description",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
-                                        TriviaList([Comment("# comment"), EnvironmentNewline]),
+                                        TriviaList([Comment("# comment"), EnvironmentNewLine]),
                                         "This is a scenario outline description with comments",
-                                        TriviaList([EnvironmentNewline, Comment("# comment 2"), EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine, Comment("# comment 2"), EnvironmentNewLine])),
                                     Literal(
                                         TriviaList(),
                                         "in the middle and before and at the end",
-                                        TriviaList([EnvironmentNewline, Comment("# comment 3"), EnvironmentNewline]))
+                                        TriviaList([EnvironmentNewLine, Comment("# comment 3"), EnvironmentNewLine]))
                                 ])),
                             List([
                                 Step(
@@ -316,13 +316,13 @@ public partial class DescriptionsTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ]),
                             List([
                                 Examples(
                                     Token(
-                                        TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                        TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                         SyntaxKind.ExamplesKeyword,
                                         "Examples",
                                         TriviaList()),
@@ -334,17 +334,17 @@ public partial class DescriptionsTests
                                         Literal(
                                             TriviaList(),
                                             "examples with description",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     description: LiteralText(
                                         TokenList([
                                             Literal(
-                                                TriviaList([Comment("# comment"), EnvironmentNewline]),
+                                                TriviaList([Comment("# comment"), EnvironmentNewLine]),
                                                 "This is an examples description",
-                                                TriviaList([EnvironmentNewline, Comment("# comment"), EnvironmentNewline])),
+                                                TriviaList([EnvironmentNewLine, Comment("# comment"), EnvironmentNewLine])),
                                             Literal(
                                                 TriviaList(),
                                                 "with a comment in the middle",
-                                                TriviaList([EnvironmentNewline, Comment("# comment"), EnvironmentNewline, EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine, Comment("# comment"), EnvironmentNewLine, EnvironmentNewLine]))
                                         ])),
                                     Table(
                                         List([
@@ -363,7 +363,7 @@ public partial class DescriptionsTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline]))),
+                                                    TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("    ")]),
@@ -379,12 +379,12 @@ public partial class DescriptionsTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline])))
+                                                    TriviaList([EnvironmentNewLine])))
                                         ])))
                             ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -396,11 +396,11 @@ public partial class DescriptionsTests
                                 Literal(
                                     TriviaList(),
                                     "scenario with just a comment",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
-                                        TriviaList([Whitespace("    "), Comment("# comment"), EnvironmentNewline]),
+                                        TriviaList([Whitespace("    "), Comment("# comment"), EnvironmentNewLine]),
                                         "",
                                         TriviaList())
                                 ])),
@@ -417,12 +417,12 @@ public partial class DescriptionsTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -434,11 +434,11 @@ public partial class DescriptionsTests
                                 Literal(
                                     TriviaList(),
                                     "scenario with a comment with new lines around",
-                                    TriviaList([EnvironmentNewline, EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
-                                        TriviaList([Whitespace("    "), Comment("# comment"), EnvironmentNewline, EnvironmentNewline]),
+                                        TriviaList([Whitespace("    "), Comment("# comment"), EnvironmentNewLine, EnvironmentNewLine]),
                                         "",
                                         TriviaList())
                                 ])),
@@ -455,7 +455,7 @@ public partial class DescriptionsTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([Space, EnvironmentNewline]))
+                                                TriviaList([Space, EnvironmentNewLine]))
                                         ])))
                             ]))
                     ])

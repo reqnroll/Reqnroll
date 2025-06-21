@@ -43,17 +43,17 @@ public partial class DataTablesTests
                         Literal(
                             TriviaList(),
                             "Escaped pipes",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     description: LiteralText(
                         TokenList([
                             Literal(
                                 TriviaList([Whitespace("    ")]),
                                 "The \\-character will be considered as an escape in table cell",
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("    ")]),
                                 "iff it is followed by a |-character, a \\-character or an n.",
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
                     scenarios: List([
                         Scenario(
@@ -70,7 +70,7 @@ public partial class DataTablesTests
                                 Literal(
                                     TriviaList(),
                                     "They are the future",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -84,7 +84,7 @@ public partial class DataTablesTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "they have arrived",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])),
                                     StepTable(
                                         Table(
@@ -113,7 +113,7 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("      ")]),
@@ -138,7 +138,7 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ])))),
                                 Step(
                                     Token(
@@ -152,7 +152,7 @@ public partial class DataTablesTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "they have arrived",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])),
                                     StepTable(
                                         Table(
@@ -183,7 +183,7 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("      ")]),
@@ -210,7 +210,7 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ]))))
                             ]))
                     ])),

@@ -57,18 +57,18 @@ public partial class BackgroundTests
                         Literal(
                             TriviaList(),
                             "Complex background",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     description: LiteralText(
                         TokenList([
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "We want to ensure PickleStep all have different IDs",
-                                TriviaList([EnvironmentNewline]))
+                                TriviaList([EnvironmentNewLine]))
                         ])
                     ),
                     background: Background(
                         Token(
-                            TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                            TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                             SyntaxKind.BackgroundKeyword,
                             "Background",
                             TriviaList()),
@@ -80,7 +80,7 @@ public partial class BackgroundTests
                             Literal(
                                 TriviaList(),
                                 "a simple background",
-                                TriviaList([EnvironmentNewline]))),
+                                TriviaList([EnvironmentNewLine]))),
                         steps: List([
                             Step(
                                 Token(
@@ -94,14 +94,14 @@ public partial class BackgroundTests
                                             TriviaList(),
                                             SyntaxKind.LiteralToken,
                                             "the minimalism inside a background",
-                                            TriviaList([EnvironmentNewline]))
+                                            TriviaList([EnvironmentNewLine]))
                                     ])))
                         ])
                     ),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]),
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -113,7 +113,7 @@ public partial class BackgroundTests
                                 Literal(
                                     TriviaList(),
                                     "minimalistic",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -127,12 +127,12 @@ public partial class BackgroundTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]),
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -144,7 +144,7 @@ public partial class BackgroundTests
                                 Literal(
                                     TriviaList(),
                                     "also minimalistic",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -158,14 +158,14 @@ public partial class BackgroundTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ]))
                     ]),
                     rules: List([
                         Rule(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.RuleKeyword,
                                 "Rule",
                                 TriviaList()),
@@ -177,10 +177,10 @@ public partial class BackgroundTests
                                 Literal(
                                     TriviaList(),
                                     "My Rule",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             background: Background(
                                 Token(
-                                    TriviaList([EnvironmentNewline, Whitespace("    ")]),
+                                    TriviaList([EnvironmentNewLine, Whitespace("    ")]),
                                     SyntaxKind.BackgroundKeyword,
                                     "Background",
                                     TriviaList()),
@@ -201,14 +201,14 @@ public partial class BackgroundTests
                                                     TriviaList(),
                                                     SyntaxKind.LiteralToken,
                                                     "a rule background step",
-                                                    TriviaList([EnvironmentNewline]))
+                                                    TriviaList([EnvironmentNewLine]))
                                             ])))
                                 ])
                             ),
                             scenarios: List([
                                 Scenario(
                                     Token(
-                                        TriviaList([EnvironmentNewline, Whitespace("    ")]),
+                                        TriviaList([EnvironmentNewLine, Whitespace("    ")]),
                                         SyntaxKind.ScenarioKeyword,
                                         "Scenario",
                                         TriviaList()),
@@ -220,7 +220,7 @@ public partial class BackgroundTests
                                         Literal(
                                             TriviaList(),
                                             "with examples",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
                                             Token(
@@ -234,20 +234,20 @@ public partial class BackgroundTests
                                                         TriviaList(),
                                                         SyntaxKind.LiteralToken,
                                                         "the <value> minimalism",
-                                                        TriviaList([EnvironmentNewline]))
+                                                        TriviaList([EnvironmentNewLine]))
                                                 ])))
                                     ]),
                                     examples: List([
                                         Examples(
                                             Token(
-                                                TriviaList([EnvironmentNewline, Whitespace("    ")]),
+                                                TriviaList([EnvironmentNewLine, Whitespace("    ")]),
                                                 SyntaxKind.ExamplesKeyword,
                                                 "Examples",
                                                 TriviaList()),
                                             Token(
                                                 TriviaList(),
                                                 SyntaxKind.ColonToken,
-                                                TriviaList([EnvironmentNewline])),
+                                                TriviaList([EnvironmentNewLine])),
                                             table: Table(
                                                 List([
                                                     TableRow(
@@ -265,7 +265,7 @@ public partial class BackgroundTests
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList([EnvironmentNewline]))),
+                                                            TriviaList([EnvironmentNewLine]))),
                                                     TableRow(
                                                         Token(
                                                             TriviaList([Whitespace("      ")]),
@@ -281,7 +281,7 @@ public partial class BackgroundTests
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList([EnvironmentNewline]))),
+                                                            TriviaList([EnvironmentNewLine]))),
                                                     TableRow(
                                                         Token(
                                                             TriviaList([Whitespace("      ")]),
@@ -297,7 +297,7 @@ public partial class BackgroundTests
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList([EnvironmentNewline])))
+                                                            TriviaList([EnvironmentNewLine])))
                                                 ])))
                                     ]))
                             ]))

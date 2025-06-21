@@ -2,7 +2,10 @@
 using System.Collections;
 using System.Collections.Immutable;
 using System.Diagnostics.CodeAnalysis;
+
+#if NET8_0_OR_GREATER
 using System.Runtime.CompilerServices;
+#endif
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -30,6 +33,37 @@ public static class SyntaxList
 public readonly struct SyntaxList<TNode> : IEquatable<SyntaxList<TNode>>, IReadOnlyList<TNode>
     where TNode : SyntaxNode
 {
+    public struct Enumerator(SyntaxList<TNode> list) : IEnumerator<TNode>
+    {
+        private int _index = -1;
+
+        public readonly TNode Current
+        {
+            get
+            {
+                if (_index < 0)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                if (_index > list.Count - 1)
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return list[_index];
+            }
+        }
+
+        readonly object? IEnumerator.Current => Current;
+
+        readonly void IDisposable.Dispose() { }
+
+        public bool MoveNext() => ++_index < list.Count;
+
+        public void Reset() => _index = -1;
+    }
+
     private readonly SyntaxNode? _parent;
 
     internal SyntaxList(InternalNode? node, SyntaxNode parent, int position)
@@ -154,10 +188,9 @@ public readonly struct SyntaxList<TNode> : IEquatable<SyntaxList<TNode>>, IReadO
 
     public override int GetHashCode() => InternalNode?.GetHashCode() ?? 0;
 
-    public IEnumerator<TNode> GetEnumerator()
-    {
-        throw new NotImplementedException();
-    }
+    public Enumerator GetEnumerator() => new (this);
+
+    IEnumerator<TNode> IEnumerable<TNode>.GetEnumerator() => GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 

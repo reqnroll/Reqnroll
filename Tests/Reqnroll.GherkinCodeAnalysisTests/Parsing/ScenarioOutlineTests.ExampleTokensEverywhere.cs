@@ -46,11 +46,11 @@ public partial class ScenarioOutlineTests
                         Literal(
                             TriviaList(),
                             "Example tokens everywhere",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario Outline",
                                 TriviaList()),
@@ -58,26 +58,12 @@ public partial class ScenarioOutlineTests
                                 TriviaList(),
                                 SyntaxKind.ColonToken,
                                 TriviaList([Space])),
-                            InterpolatedText(
-                                List<InterpolatedTextContentSyntax>([
-                                    InterpolatedTextLiteral(
-                                        Literal(
-                                            TriviaList(),
-                                            "the ",
-                                            TriviaList())),
-                                    Interpolation(
-                                        Token(
-                                            TriviaList(),
-                                            SyntaxKind.LessThanToken,
-                                            TriviaList()),
-                                        Identifier(
-                                            TriviaList(),
-                                            "one",
-                                            TriviaList()),
-                                        Token(
-                                            TriviaList(),
-                                            SyntaxKind.GreaterThanToken,
-                                            TriviaList([EnvironmentNewline])))
+                            LiteralText(
+                                TokenList([
+                                    Literal(
+                                        TriviaList(),
+                                        "the <one>",
+                                        TriviaList([EnvironmentNewLine]))
                                 ])),
                             steps: List([
                                 Step(
@@ -86,86 +72,44 @@ public partial class ScenarioOutlineTests
                                         SyntaxKind.GivenKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    InterpolatedText(
-                                        List<InterpolatedTextContentSyntax>([
-                                            InterpolatedTextLiteral(
-                                                Literal(
-                                                    TriviaList(),
-                                                    "the ",
-                                                    TriviaList())),
-                                            Interpolation(
-                                                Token(
-                                                    TriviaList(),
-                                                    SyntaxKind.LessThanToken,
-                                                    TriviaList()),
-                                                Identifier(
-                                                    TriviaList(),
-                                                    "two",
-                                                    TriviaList()),
-                                                Token(
-                                                    TriviaList(),
-                                                    SyntaxKind.GreaterThanToken,
-                                                    TriviaList([EnvironmentNewline])))
-                                        ])),
+                                    LiteralText(
+                                        TokenList([
+                                            Literal(
+                                                TriviaList(),
+                                                "the <two>:",
+                                                TriviaList([EnvironmentNewLine])),
+                                    ])),
                                     StepDocString(
                                         DocString(
                                             Token(
                                                 TriviaList([Whitespace("    ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
-                                                TriviaList([EnvironmentNewline])),
-                                            InterpolatedText(
-                                                List<InterpolatedTextContentSyntax>([
-                                                    Interpolation(
-                                                        Token(
-                                                            TriviaList([Whitespace("    ")]),
-                                                            SyntaxKind.LessThanToken,
-                                                            TriviaList()),
-                                                        Identifier(
-                                                            TriviaList(),
-                                                            "three",
-                                                            TriviaList()),
-                                                        Token(
-                                                            TriviaList(),
-                                                            SyntaxKind.GreaterThanToken,
-                                                            TriviaList([EnvironmentNewline])))
+                                                TriviaList([EnvironmentNewLine])),
+                                            LiteralText(
+                                                TokenList([
+                                                    Literal(
+                                                        TriviaList([Whitespace("    ")]),
+                                                        "<three>",
+                                                        TriviaList([EnvironmentNewLine]))
                                                 ])),
                                             Token(
                                                 TriviaList([Whitespace("    ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
-                                                TriviaList([EnvironmentNewline]))))),
+                                                TriviaList([EnvironmentNewLine]))))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("  ")]),
                                         SyntaxKind.GivenKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    InterpolatedText(
-                                        List<InterpolatedTextContentSyntax>([
-                                            InterpolatedTextLiteral(
-                                                Literal(
-                                                    TriviaList(),
-                                                    "the ",
-                                                    TriviaList())),
-                                            Interpolation(
-                                                Token(
-                                                    TriviaList(),
-                                                    SyntaxKind.LessThanToken,
-                                                    TriviaList()),
-                                                Identifier(
-                                                    TriviaList(),
-                                                    "four",
-                                                    TriviaList()),
-                                                Token(
-                                                    TriviaList(),
-                                                    SyntaxKind.GreaterThanToken,
-                                                    TriviaList())),
-                                            InterpolatedTextLiteral(
-                                                Literal(
-                                                    TriviaList(),
-                                                    ":",
-                                                    TriviaList([EnvironmentNewline])))
+                                    LiteralText(
+                                        TokenList([
+                                            Literal(
+                                                TriviaList(),
+                                                "the <four>:",
+                                                TriviaList([EnvironmentNewLine]))
                                         ])),
                                     StepTable(
                                         Table(
@@ -185,20 +129,20 @@ public partial class ScenarioOutlineTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ]))))
                             ]),
                             examples: List([
                                 Examples(
                                     Token(
-                                        TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                        TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                         SyntaxKind.ExamplesKeyword,
                                         "Examples",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
-                                        TriviaList([EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine])),
                                     table: Table(
                                         List([
                                             TableRow(
@@ -252,7 +196,7 @@ public partial class ScenarioOutlineTests
                                             Token(
                                                 TriviaList(),
                                                 SyntaxKind.VerticalBarToken,
-                                                TriviaList([EnvironmentNewline]))),
+                                                TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("    ")]),
@@ -304,7 +248,7 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline]))),
+                                                    TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("    ")]),
@@ -356,7 +300,7 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline])))
+                                                    TriviaList([EnvironmentNewLine])))
                                         ]))
                                 )
                             ])

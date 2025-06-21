@@ -886,11 +886,11 @@ public partial class FeatureTests
                             Literal(
                                 TriviaList(),
                                 "Long feature file",
-                                TriviaList([EnvironmentNewline, Whitespace("  ")])),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")])),
                             Literal(
                                 TriviaList(),
                                 "This is a long feature file",
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
                     scenarios: List([
                         Scenario(
@@ -907,7 +907,7 @@ public partial class FeatureTests
                                 Literal(
                                     TriviaList(),
                                     "scenario 01",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -919,7 +919,7 @@ public partial class FeatureTests
                                         Literal(
                                             TriviaList(),
                                             "a simple data table",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     StepTable(
                                         Table(
                                             List([
@@ -948,7 +948,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("      ")]),
@@ -974,7 +974,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ])))),
                                 Step(
                                     Token(
@@ -986,7 +986,7 @@ public partial class FeatureTests
                                         Literal(
                                             TriviaList(),
                                             "a data table with a single cell",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     StepTable(
                                         Table(
                                             List([
@@ -1006,7 +1006,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ])))),
                                 Step(
                                     Token(
@@ -1018,7 +1018,7 @@ public partial class FeatureTests
                                         Literal(
                                             TriviaList(),
                                             "a data table with different fromatting",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     StepTable(
                                         Table(
                                             List([
@@ -1056,7 +1056,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ])))),
                                 Step(
                                     Token(
@@ -1068,7 +1068,7 @@ public partial class FeatureTests
                                         Literal(
                                             TriviaList(),
                                             "a data table with an empty cell",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     StepTable(
                                         Table(
                                             List([
@@ -1105,7 +1105,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ])))),
                                 Step(
                                     Token(
@@ -1117,7 +1117,7 @@ public partial class FeatureTests
                                         Literal(
                                             TriviaList(),
                                             "a data table with comments and newlines inside",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     StepTable(
                                         Table(
                                             List([
@@ -1146,7 +1146,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline, EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("      ")]),
@@ -1172,7 +1172,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline, Comment("# this is a comment"), EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine, Comment("# this is a comment"), EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("      ")]),
@@ -1198,7 +1198,7 @@ public partial class FeatureTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ]))))
                             ])
                         )

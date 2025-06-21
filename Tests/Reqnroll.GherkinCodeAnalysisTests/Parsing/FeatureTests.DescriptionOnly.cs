@@ -24,7 +24,6 @@ public partial class FeatureTests
         tree.GetRoot().Should().BeEquivalentTo(
             GherkinDocument(
                 Feature(
-                    default,
                     Token(
                         TriviaList([Whitespace("    ")]),
                         SyntaxKind.FeatureKeyword,
@@ -53,10 +52,7 @@ public partial class FeatureTests
                                 TriviaList([ Whitespace("      ") ]),
                                 "is over when the Breaker guesses the Maker's word.",
                                 TriviaList([ CarriageReturnLineFeed ]))
-                        ])),
-                    default,
-                    default,
-                    default),
+                        ]))),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,

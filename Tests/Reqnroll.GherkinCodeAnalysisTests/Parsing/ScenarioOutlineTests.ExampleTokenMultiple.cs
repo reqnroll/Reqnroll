@@ -40,11 +40,11 @@ public partial class ScenarioOutlineTests
                         Literal(
                             TriviaList(),
                             "Example token used multiple times",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario Outline",
                                 TriviaList()),
@@ -56,7 +56,7 @@ public partial class ScenarioOutlineTests
                                 Literal(
                                     TriviaList(),
                                     "Token used twice in a single step",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -70,20 +70,20 @@ public partial class ScenarioOutlineTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "<what> <what>",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ]),
                             examples: List([
                                 Examples(
                                     Token(
-                                        TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                        TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                         SyntaxKind.ExamplesKeyword,
                                         "Examples",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
-                                        TriviaList([EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine])),
                                     table: Table(
                                         List([
                                             TableRow(
@@ -101,7 +101,7 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline]))),
+                                                    TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("    ")]),
@@ -117,7 +117,7 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline])))
+                                                    TriviaList([EnvironmentNewLine])))
                                         ])))
                             ]))
                     ])),

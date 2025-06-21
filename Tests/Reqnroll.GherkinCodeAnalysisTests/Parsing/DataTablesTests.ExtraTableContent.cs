@@ -44,33 +44,33 @@ public partial class DataTablesTests
                         Literal(
                             TriviaList(),
                             "Extra table content",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     LiteralText(
                         TokenList([
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "Tables are delimited by pipes on both sides.",
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "Anything that isn't enclosed is not part of",
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "the table.",
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 Environment.NewLine,
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "It is not recommended to use this feature, but",
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "it is how the implementation currently works.",
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
                     scenarios: List([
                         Scenario(
@@ -87,7 +87,7 @@ public partial class DataTablesTests
                                 Literal(
                                     TriviaList(),
                                     "We're a bit extra",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -99,7 +99,7 @@ public partial class DataTablesTests
                                         Literal(
                                             TriviaList(),
                                             "a pirate crew",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     StepTable(
                                         Table(
                                             List([
@@ -136,7 +136,7 @@ public partial class DataTablesTests
                                                     MissingToken(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("    ")]),
@@ -170,7 +170,7 @@ public partial class DataTablesTests
                                                     MissingToken(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ]))))
                             ]))
                     ])),

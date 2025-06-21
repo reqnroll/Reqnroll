@@ -7,7 +7,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 using static InternalSyntaxFactory;
 
-internal class FeatureHeaderRuleHandler() : ParsingRuleHandler(RuleType.FeatureHeader)
+internal class FeatureHeaderRuleHandler() : BaseRuleHandler(RuleType.FeatureHeader)
 {
     private DescriptionRuleHandler? _descriptionRuleHandler;
 
@@ -32,18 +32,35 @@ internal class FeatureHeaderRuleHandler() : ParsingRuleHandler(RuleType.FeatureH
         var colonPosition = line.Start + token.Line.Indent + token.MatchedKeyword.Length;
         var colonWhitespace = context.SourceText.ConsumeWhitespace(colonPosition + 1, line.End);
 
-        Keyword = Token(context.ConsumeLeadingTrivia(), SyntaxKind.FeatureKeyword, token.MatchedKeyword, null);
+        var leading = context.ConsumeLeadingTriviaAndWhitespace(line, token);
+
+        Keyword = Token(leading, SyntaxKind.FeatureKeyword, token.MatchedKeyword, null);
         Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
 
-        // Extract any whitespace between the end of the feature name and the end of the line.
-        var featureNameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
-        InternalNode? nameWhitespace = context.SourceText
-            .ConsumeWhitespace(featureNameEndPosition, line.End);
+        InternalNode? nameToken;
 
-        nameWhitespace += line.GetEndOfLineTrivia();
+        if (string.IsNullOrEmpty(token.MatchedText))
+        {
+            // If the feature name is empty, we create a missing token for it.
+            nameToken = MissingToken(null, SyntaxKind.LiteralToken, line.GetEndOfLineTrivia());
+        }
+        else
+        {
+            // Extract any whitespace between the end of the feature name and the end of the line.
+            var featureNameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
+            InternalNode? nameWhitespace = context.SourceText
+                .ConsumeWhitespace(featureNameEndPosition, line.End);
 
-        Name = LiteralText(
-            Literal(null, LiteralEncoding.EncodeLiteralForDisplay(token.MatchedText), token.MatchedText, nameWhitespace));
+            nameWhitespace += line.GetEndOfLineTrivia();
+
+            nameToken = Literal(
+                null,
+                LiteralEscapingStyle.Default.Escape(token.MatchedText),
+                token.MatchedText,
+                nameWhitespace);
+        }
+
+        Name = LiteralText(nameToken);
     }
 
     public override ParsingRuleHandler StartChildRule(RuleType ruleType)
@@ -57,5 +74,5 @@ internal class FeatureHeaderRuleHandler() : ParsingRuleHandler(RuleType.FeatureH
         return base.StartChildRule(ruleType);
     }
 
-    //public DescriptionSyntax.Internal? Description => _descriptionRuleHandler?.CreateDescriptionSyntax();
+    public PlainTextSyntax.Internal? Description => _descriptionRuleHandler?.CreateDescriptionSyntax();
 }

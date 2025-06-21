@@ -4,7 +4,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 using static SyntaxFactory;
 
-public partial class FeatureTests
+public partial class ScenarioTests
 {
     [Fact]
     public void IncompleteScenarioIsRepresentedInTree()
@@ -39,10 +39,10 @@ public partial class FeatureTests
                         Literal(
                             TriviaList(),
                             "Incomplete scenarios",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     background: Background(
                         Token(
-                            TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                            TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                             SyntaxKind.BackgroundKeyword,
                             "Background",
                             TriviaList()),
@@ -54,12 +54,12 @@ public partial class FeatureTests
                             Literal(
                                 TriviaList(),
                                 "Adding a background won't make a pickle",
-                                TriviaList([EnvironmentNewline]))),
+                                TriviaList([EnvironmentNewLine]))),
                         steps: List([
                             Step(
                                 Token(
                                     TriviaList([Whitespace("    ")]),
-                                    SyntaxKind.AsterixToken,
+                                    SyntaxKind.AsteriskToken,
                                     TriviaList([Space])),
                                 LiteralText(
                                     TokenList([
@@ -67,13 +67,13 @@ public partial class FeatureTests
                                             TriviaList(),
                                             SyntaxKind.LiteralToken,
                                             "a step",
-                                            TriviaList([EnvironmentNewline]))
+                                            TriviaList([EnvironmentNewLine]))
                                     ])))
                         ])),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -85,7 +85,7 @@ public partial class FeatureTests
                                 Literal(
                                     TriviaList(),
                                     "no steps",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List<StepSyntax>()
                         )
                     ])

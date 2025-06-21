@@ -33,18 +33,18 @@ public partial class RuleTests
                     Token(
                         TriviaList(),
                         SyntaxKind.ColonToken,
-                        TriviaList([EnvironmentNewline])),
+                        TriviaList([EnvironmentNewLine])),
                     rules: List([
                         Rule(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.RuleKeyword,
                                 "Rule",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
                                 SyntaxKind.ColonToken,
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             scenarios: List([
                                 Scenario(
                                     Token(
@@ -55,7 +55,7 @@ public partial class RuleTests
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
-                                        TriviaList([EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine])),
                                     steps: List([
                                         Step(
                                             Token(
@@ -67,7 +67,7 @@ public partial class RuleTests
                                                 Literal(
                                                     TriviaList(),
                                                     "text",
-                                                    TriviaList([EnvironmentNewline]))))
+                                                    TriviaList([EnvironmentNewLine]))))
                                     ]))
                             ]))
                     ])),

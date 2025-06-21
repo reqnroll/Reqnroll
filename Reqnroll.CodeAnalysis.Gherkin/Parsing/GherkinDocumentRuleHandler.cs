@@ -6,7 +6,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 using static InternalSyntaxFactory;
 
-internal class GherkinDocumentRuleHandler() : ParsingRuleHandler(RuleType.GherkinDocument)
+internal class GherkinDocumentRuleHandler() : BaseRuleHandler(RuleType.GherkinDocument)
 {
     private FeatureRuleHandler? _featureRuleHandler;
 

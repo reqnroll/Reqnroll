@@ -41,11 +41,11 @@ public partial class DataTablesTests
                         Literal(
                             TriviaList(),
                             "More Complex DataTables",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -57,7 +57,7 @@ public partial class DataTablesTests
                                 Literal(
                                     TriviaList(),
                                     "table with comments and empty lines",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -71,7 +71,7 @@ public partial class DataTablesTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "a table",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])),
                                     StepTable(
                                         Table(
@@ -100,7 +100,7 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("    ")]),
@@ -126,11 +126,11 @@ public partial class DataTablesTests
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([
-                                                            EnvironmentNewline,
-                                                            EnvironmentNewline,
+                                                            EnvironmentNewLine,
+                                                            EnvironmentNewLine,
                                                             Whitespace("    "),
                                                             Comment("# a comment"),
-                                                            EnvironmentNewline
+                                                            EnvironmentNewLine
                                                         ]))),
                                                 TableRow(
                                                     Token(
@@ -156,7 +156,7 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ]))))
                             ]))
                     ])),

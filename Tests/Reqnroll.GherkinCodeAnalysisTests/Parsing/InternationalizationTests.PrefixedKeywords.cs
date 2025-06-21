@@ -34,12 +34,12 @@ public partial class InternationalizationTests
                     Token(
                         TriviaList([
                             Trivia(
-                                LanguageCommentTrivia(
+                                DirectiveCommentTrivia(
                                     Token(TriviaList(), SyntaxKind.HashToken, TriviaList()),
-                                    Token(TriviaList(), SyntaxKind.LanguageKeyword, "language", TriviaList()),
+                                    DirectiveIdentifier(TriviaList(), "language", TriviaList()),
                                     Token(TriviaList(), SyntaxKind.ColonToken, TriviaList()),
-                                    Token(TriviaList(), SyntaxKind.IdentifierToken, "ht", TriviaList([EnvironmentNewline])))),
-                            EnvironmentNewline
+                                    Literal(TriviaList(), "ht", TriviaList([EnvironmentNewLine])))),
+                            EnvironmentNewLine
                         ]),
                         SyntaxKind.FeatureKeyword,
                         "Karakteristik",
@@ -52,17 +52,17 @@ public partial class InternationalizationTests
                         Literal(
                             TriviaList(),
                             "Keywords can be a prefix of another",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     description: LiteralText(
                         TokenList([
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "Some times keywords are a prefix of another keyword.",
-                                TriviaList([EnvironmentNewline])),
+                                TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "In this scenario the parser should prefer the longest keyword.",
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
                     scenarios: List([
                         Scenario(
@@ -79,7 +79,7 @@ public partial class InternationalizationTests
                                 Literal(
                                     TriviaList(),
                                     "Erasing agent memory",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -91,7 +91,7 @@ public partial class InternationalizationTests
                                         Literal(
                                             TriviaList(),
                                             "there is agent J",
-                                            TriviaList([EnvironmentNewline])))),
+                                            TriviaList([EnvironmentNewLine])))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
@@ -102,7 +102,7 @@ public partial class InternationalizationTests
                                         Literal(
                                             TriviaList(),
                                             "there is agent K",
-                                            TriviaList([EnvironmentNewline])))),
+                                            TriviaList([EnvironmentNewLine])))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
@@ -113,7 +113,7 @@ public partial class InternationalizationTests
                                         Literal(
                                             TriviaList(),
                                             "I erase agent K's memory",
-                                            TriviaList([EnvironmentNewline])))),
+                                            TriviaList([EnvironmentNewLine])))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
@@ -124,7 +124,7 @@ public partial class InternationalizationTests
                                         Literal(
                                             TriviaList(),
                                             "there should be agent J",
-                                            TriviaList([EnvironmentNewline])))),
+                                            TriviaList([EnvironmentNewLine])))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
@@ -135,7 +135,7 @@ public partial class InternationalizationTests
                                         Literal(
                                             TriviaList(),
                                             "there should not be agent K",
-                                            TriviaList([EnvironmentNewline]))))
+                                            TriviaList([EnvironmentNewLine]))))
                             ]))
                     ])),
                 Token(

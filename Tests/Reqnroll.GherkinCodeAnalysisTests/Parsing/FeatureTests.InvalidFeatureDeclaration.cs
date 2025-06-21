@@ -15,12 +15,15 @@ public partial class FeatureTests
 
         tree.GetRoot().Should().BeEquivalentTo(
             GherkinDocument(
-                Feature(
-                    MissingToken(SyntaxKind.FeatureKeyword),
-                    MissingToken(SyntaxKind.ColonToken),
-                    LiteralText(Literal(TriviaList(), "invalid", TriviaList([Space])))),
+                null,
                 Token(
-                    TriviaList(),
+                    TriviaList([
+                        Trivia(
+                            SkippedTokensTrivia(
+                                TokenList([
+                                    Literal(TriviaList(), "invalid", TriviaList([Space]))
+                                ])))
+                        ]),
                     SyntaxKind.EndOfFileToken,
                     TriviaList())));
 

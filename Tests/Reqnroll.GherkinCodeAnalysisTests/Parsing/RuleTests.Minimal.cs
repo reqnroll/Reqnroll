@@ -37,11 +37,11 @@ public partial class RuleTests
                         Literal(
                             TriviaList(),
                             "Rule support",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     rules: List([
                         Rule(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.RuleKeyword,
                                 "Rule",
                                 TriviaList()),
@@ -53,7 +53,7 @@ public partial class RuleTests
                                 Literal(
                                     TriviaList(),
                                     "A rule",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             scenarios: List([
                                 Scenario(
                                     Token(
@@ -69,7 +69,7 @@ public partial class RuleTests
                                         Literal(
                                             TriviaList(),
                                             "scenario in a rule",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
                                             Token(
@@ -83,7 +83,7 @@ public partial class RuleTests
                                                         TriviaList(),
                                                         SyntaxKind.LiteralToken,
                                                         "the minimalism",
-                                                        TriviaList([EnvironmentNewline]))
+                                                        TriviaList([EnvironmentNewLine]))
                                                 ])))
                                     ]))
                             ]))

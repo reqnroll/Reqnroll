@@ -40,11 +40,11 @@ public partial class RuleTests
                         Literal(
                             TriviaList(),
                             "Rule with background",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     rules: List([
                         Rule(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.RuleKeyword,
                                 "Rule",
                                 TriviaList()),
@@ -56,7 +56,7 @@ public partial class RuleTests
                                 Literal(
                                     TriviaList(),
                                     "A rule",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             background: Background(
                                 Token(
                                     TriviaList([Whitespace("    ")]),
@@ -71,7 +71,7 @@ public partial class RuleTests
                                     Literal(
                                         TriviaList(),
                                         "rule background",
-                                        TriviaList([EnvironmentNewline]))),
+                                        TriviaList([EnvironmentNewLine]))),
                                 steps: List([
                                     Step(
                                         Token(
@@ -85,14 +85,14 @@ public partial class RuleTests
                                                     TriviaList(),
                                                     SyntaxKind.LiteralToken,
                                                     "a rule background step",
-                                                    TriviaList([EnvironmentNewline]))
+                                                    TriviaList([EnvironmentNewLine]))
                                             ])))
                                 ])
                             ),
                             scenarios: List([
                                 Scenario(
                                     Token(
-                                        TriviaList([EnvironmentNewline, Whitespace("    ")]),
+                                        TriviaList([EnvironmentNewLine, Whitespace("    ")]),
                                         SyntaxKind.ScenarioKeyword,
                                         "Scenario",
                                         TriviaList()),
@@ -104,7 +104,7 @@ public partial class RuleTests
                                         Literal(
                                             TriviaList(),
                                             "scenario in a rule",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
                                             Token(
@@ -118,7 +118,7 @@ public partial class RuleTests
                                                         TriviaList(),
                                                         SyntaxKind.LiteralToken,
                                                         "the minimalism",
-                                                        TriviaList([EnvironmentNewline]))
+                                                        TriviaList([EnvironmentNewLine]))
                                                 ])))
                                     ])
                                 )

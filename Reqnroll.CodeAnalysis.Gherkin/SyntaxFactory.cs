@@ -36,7 +36,7 @@ public static partial class SyntaxFactory
     /// <summary>
     /// A trivia with kind <see cref="SyntaxKind.EndOfLineTrivia"/> characters which match the current environment's newline.
     /// </summary>
-    public static SyntaxTrivia EnvironmentNewline => Environment.NewLine == "\r\n"
+    public static SyntaxTrivia EnvironmentNewLine => Environment.NewLine == "\r\n"
         ? CarriageReturnLineFeed
         : LineFeed;
 
@@ -70,19 +70,19 @@ public static partial class SyntaxFactory
     public static SyntaxToken Token(SyntaxTriviaList leading, SyntaxKind kind, string text, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.Token(leading.InternalNode, kind, text, trailing.InternalNode);
 
-    public static SyntaxToken Identifier(string text) =>
-        InternalSyntaxFactory.Identifier(null, text, null);
+    public static SyntaxToken DirectiveIdentifier(string text) =>
+        InternalSyntaxFactory.DirectiveIdentifier(null, text, null);
 
-    public static SyntaxToken Identifier(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.Identifier(leading.InternalNode, text, trailing.InternalNode);
+    public static SyntaxToken DirectiveIdentifier(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.DirectiveIdentifier(leading.InternalNode, text, trailing.InternalNode);
 
     public static SyntaxToken Literal(string value) =>
-        InternalSyntaxFactory.Literal(null, LiteralEncoding.EncodeLiteralForDisplay(value), value, null);
+        InternalSyntaxFactory.Literal(null, LiteralEscapingStyle.Default.Escape(value), value, null);
 
     public static SyntaxToken Literal(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.Literal(
             leading.InternalNode,
-            LiteralEncoding.EncodeLiteralForDisplay(value),
+            LiteralEscapingStyle.Default.Escape(value),
             value,
             trailing.InternalNode);
 
@@ -128,12 +128,12 @@ public static partial class SyntaxFactory
         InternalSyntaxFactory.StepTextLiteral(leading.InternalNode, text, trailing.InternalNode);
 
     public static SyntaxToken TableLiteral(string value) =>
-        InternalSyntaxFactory.TableLiteral(null, LiteralEncoding.EncodeTableLiteralForDisplay(value), value, null);
+        InternalSyntaxFactory.TableLiteral(null, LiteralEscapingStyle.Table.Escape(value), value, null);
 
     public static SyntaxToken TableLiteral(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.TableLiteral(
             leading.InternalNode,
-            LiteralEncoding.EncodeTableLiteralForDisplay(value),
+            LiteralEscapingStyle.Table.Escape(value),
             value,
             trailing.InternalNode);
 
@@ -167,6 +167,11 @@ public static partial class SyntaxFactory
 
     public static SyntaxTrivia Whitespace(string text) => InternalSyntaxFactory.Whitespace(text);
 
+    /// <summary>
+    /// Creates a trivia with kind <see cref="SyntaxKind.CommentTrivia"/  containing the specified text.
+    /// </summary>
+    /// <param name="text">The entire text of the comment including the leading '#' token.</param>
+    /// <returns>A <see cref="SyntaxTrivia"/> containing the specified text.</returns>
     public static SyntaxTrivia Comment(string text) => InternalSyntaxFactory.Comment(text);
 
     public static SkippedTokensTriviaSyntax SkippedTokensTrivia(SyntaxTokenList tokens) =>

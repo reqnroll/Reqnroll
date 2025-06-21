@@ -41,7 +41,7 @@ public partial class ScenarioOutlineTests
                         Literal(
                             TriviaList(),
                             "Scenario Outline with a value with a dollar sign ($)",
-                            TriviaList([EnvironmentNewline, EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
@@ -57,7 +57,7 @@ public partial class ScenarioOutlineTests
                                 Literal(
                                     TriviaList(),
                                     "minimalistic",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -65,39 +65,25 @@ public partial class ScenarioOutlineTests
                                         SyntaxKind.GivenKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    InterpolatedText(
-                                        List<InterpolatedTextContentSyntax>([
-                                            InterpolatedTextLiteral(
-                                                Literal(
-                                                    TriviaList(),
-                                                    "the ",
-                                                    TriviaList())),
-                                            Interpolation(
-                                                Token(
-                                                    TriviaList(),
-                                                    SyntaxKind.LessThanToken,
-                                                    TriviaList()),
-                                                Identifier(
-                                                    TriviaList(),
-                                                    "what",
-                                                    TriviaList()),
-                                                Token(
-                                                    TriviaList(),
-                                                    SyntaxKind.GreaterThanToken,
-                                                    TriviaList([EnvironmentNewline])))
+                                    LiteralText(
+                                        TokenList([
+                                            StepTextLiteral(
+                                                TriviaList(),
+                                                "the <what>",
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ]),
                             examples: List([
                                 Examples(
                                     Token(
-                                        TriviaList([EnvironmentNewline]),
+                                        TriviaList([EnvironmentNewLine]),
                                         SyntaxKind.ExamplesKeyword,
                                         "Examples",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
-                                        TriviaList([EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine])),
                                     table: Table(
                                         List([
                                             TableRow(
@@ -116,7 +102,7 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline]))),
+                                                    TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("  ")]),
@@ -133,7 +119,7 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline])))
+                                                    TriviaList([EnvironmentNewLine])))
                                         ])))
                             ]))
                     ])),

@@ -9,10 +9,10 @@ public partial class FeatureTests
     [Fact]
     public void EmptyFeatureIsRepresentedInTree()
     {
-        // Taken from good/rule_without_name_and_description.feature
         const string source =
             """
             Feature: 
+
             """;
 
         var tree = GherkinSyntaxTree.ParseText(source);
@@ -30,12 +30,14 @@ public partial class FeatureTests
                         SyntaxKind.ColonToken,
                         TriviaList([Space])),
                     LiteralText(
-                        MissingToken(SyntaxKind.LiteralToken))),
+                        MissingToken(
+                            TriviaList(),
+                            SyntaxKind.LiteralToken,
+                            TriviaList([EnvironmentNewLine])))),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,
-                    TriviaList()))
-        );
+                    TriviaList())));
 
         tree.ToString().Should().Be(source);
     }

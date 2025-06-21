@@ -26,23 +26,23 @@ public partial class InternationalizationTests
                     Token(
                         TriviaList([
                             Trivia(
-                                LanguageCommentTrivia(
+                                DirectiveCommentTrivia(
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.HashToken,
                                         TriviaList()),
-                                    Token(
+                                    DirectiveIdentifier(
                                         TriviaList(),
-                                        SyntaxKind.LanguageKeyword,
+                                        "language",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
                                         TriviaList()),
-                                    Identifier(
+                                    Literal(
                                         TriviaList(),
                                         "no",
-                                        TriviaList([EnvironmentNewline]))))]),
+                                        TriviaList([EnvironmentNewLine]))))]),
                         SyntaxKind.FeatureKeyword,
                         "Egenskap",
                         TriviaList()),
@@ -54,11 +54,11 @@ public partial class InternationalizationTests
                         Literal(
                             TriviaList(),
                             "i18n støtte",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -70,7 +70,7 @@ public partial class InternationalizationTests
                                 Literal(
                                     TriviaList(),
                                     "Støtte for spesialtegn",
-                                    TriviaList([EnvironmentNewline, Whitespace("  "), EnvironmentNewline]))
+                                    TriviaList([EnvironmentNewLine, Whitespace("  "), EnvironmentNewLine]))
                             ),
                             steps: List<StepSyntax>()
                         )

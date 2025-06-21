@@ -12,12 +12,12 @@ public partial class ScenarioSyntax : DeclarationSyntax
     [ParameterGroup("Common")]
     public partial SyntaxToken ColonToken { get; }
 
-    [SyntaxSlot([SyntaxKind.LiteralText, SyntaxKind.InterpolatedText], "The name of the scenario.")]
+    [SyntaxSlot(SyntaxKind.LiteralText, "The name of the scenario.")]
     [ParameterGroup("Common")]
     [ParameterGroup("Minimal")]
     public partial PlainTextSyntax? Name { get; }
 
-    [SyntaxSlot([SyntaxKind.LiteralText, SyntaxKind.InterpolatedText], "The optional description of the scenario.")]
+    [SyntaxSlot(SyntaxKind.LiteralText, "The optional description of the scenario.")]
     [ParameterGroup("Common")]
     [ParameterGroup("Minimal")]
     public partial PlainTextSyntax? Description { get; }

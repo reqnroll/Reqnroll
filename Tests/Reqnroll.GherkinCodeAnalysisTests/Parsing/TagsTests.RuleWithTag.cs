@@ -51,7 +51,7 @@ public partial class TagsTests
                     List([
                         Tag(
                             Token(TriviaList(), SyntaxKind.AtToken, TriviaList()),
-                            Literal(TriviaList(), "tag_feature", TriviaList([EnvironmentNewline])))
+                            Literal(TriviaList(), "tag_feature", TriviaList([EnvironmentNewLine])))
                     ]),
                     Token(
                         TriviaList(),
@@ -66,11 +66,11 @@ public partial class TagsTests
                         Literal(
                             TriviaList(),
                             "Some tagged rules",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     rules: List([
                         Rule(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.RuleKeyword,
                                 "Rule",
                                 TriviaList()),
@@ -82,13 +82,13 @@ public partial class TagsTests
                                 Literal(
                                     TriviaList(),
                                     "Untagged rule",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
                                         TriviaList([Whitespace("  ")]),
                                         "The untagged rule description",
-                                        TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                                        TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
                             scenarios: List([
                                 Scenario(
@@ -105,7 +105,7 @@ public partial class TagsTests
                                         Literal(
                                             TriviaList(),
                                             "Scenario with only a feature tag",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
                                             Token(
@@ -117,15 +117,15 @@ public partial class TagsTests
                                                 Literal(
                                                     TriviaList(),
                                                     "a",
-                                                    TriviaList([EnvironmentNewline]))))
+                                                    TriviaList([EnvironmentNewLine]))))
                                     ]))
                             ])
                         ),
                         Rule(
                             List([
                                 Tag(
-                                    Token(TriviaList([EnvironmentNewline, Whitespace("  ")]), SyntaxKind.AtToken, TriviaList()),
-                                    Literal(TriviaList(), "tag_rule", TriviaList([EnvironmentNewline])))
+                                    Token(TriviaList([EnvironmentNewLine, Whitespace("  ")]), SyntaxKind.AtToken, TriviaList()),
+                                    Literal(TriviaList(), "tag_rule", TriviaList([EnvironmentNewLine])))
                             ]),
                             Token(
                                 TriviaList(),
@@ -140,13 +140,13 @@ public partial class TagsTests
                                 Literal(
                                     TriviaList(),
                                     "Tagged rule",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             description: LiteralText(
                                 TokenList([
                                     Literal(
                                         TriviaList([Whitespace("  ")]),
                                         "The tagged rule description",
-                                        TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                                        TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
                             scenarios: List([
                                 Scenario(
@@ -163,7 +163,7 @@ public partial class TagsTests
                                         Literal(
                                             TriviaList(),
                                             "Scenario with feature and rule tags",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
                                             Token(
@@ -175,13 +175,13 @@ public partial class TagsTests
                                                 Literal(
                                                     TriviaList(),
                                                     "b",
-                                                    TriviaList([EnvironmentNewline]))))
+                                                    TriviaList([EnvironmentNewLine]))))
                                     ])),
                                 Scenario(
                                     List([
                                         Tag(
-                                            Token(TriviaList([EnvironmentNewline, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
-                                            Literal(TriviaList(), "tag_scenario", TriviaList([EnvironmentNewline])))
+                                            Token(TriviaList([EnvironmentNewLine, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
+                                            Literal(TriviaList(), "tag_scenario", TriviaList([EnvironmentNewLine])))
                                     ]),
                                     Token(
                                         TriviaList([Whitespace("    ")]),
@@ -196,7 +196,7 @@ public partial class TagsTests
                                         Literal(
                                             TriviaList(),
                                             "Scenario with feature, rule and scenario tags",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
                                             Token(
@@ -208,13 +208,13 @@ public partial class TagsTests
                                                 Literal(
                                                     TriviaList(),
                                                     "b",
-                                                    TriviaList([EnvironmentNewline]))))
+                                                    TriviaList([EnvironmentNewLine]))))
                                     ])),
                                 Scenario(
                                     List([
                                         Tag(
-                                            Token(TriviaList([EnvironmentNewline, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
-                                            Literal(TriviaList(), "tag_outline", TriviaList([EnvironmentNewline])))
+                                            Token(TriviaList([EnvironmentNewLine, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
+                                            Literal(TriviaList(), "tag_outline", TriviaList([EnvironmentNewLine])))
                                     ]),
                                     Token(
                                         TriviaList([Whitespace("    ")]),
@@ -229,7 +229,7 @@ public partial class TagsTests
                                         Literal(
                                             TriviaList(),
                                             "Tagged Scenario outline",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     steps: List([
                                         Step(
                                             Token(
@@ -241,14 +241,14 @@ public partial class TagsTests
                                                 Literal(
                                                     TriviaList(),
                                                     "b",
-                                                    TriviaList([EnvironmentNewline]))))
+                                                    TriviaList([EnvironmentNewLine]))))
                                     ]),
                                     examples: List([
                                         Examples(
                                             List([
                                                 Tag(
-                                                    Token(TriviaList([EnvironmentNewline, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
-                                                    Literal(TriviaList(), "examples_tag", TriviaList([EnvironmentNewline])))
+                                                    Token(TriviaList([EnvironmentNewLine, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
+                                                    Literal(TriviaList(), "examples_tag", TriviaList([EnvironmentNewLine])))
                                             ]),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
@@ -258,7 +258,7 @@ public partial class TagsTests
                                             Token(
                                                 TriviaList(),
                                                 SyntaxKind.ColonToken,
-                                                TriviaList([EnvironmentNewline])),
+                                                TriviaList([EnvironmentNewLine])),
                                             table: Table(
                                                 List([
                                                     TableRow(
@@ -277,7 +277,7 @@ public partial class TagsTests
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList([EnvironmentNewline]))),
+                                                            TriviaList([EnvironmentNewLine]))),
                                                     TableRow(
                                                         Token(
                                                             TriviaList([Whitespace("        ")]),
@@ -294,7 +294,7 @@ public partial class TagsTests
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList([EnvironmentNewline])))
+                                                            TriviaList([EnvironmentNewLine])))
                                                 ])))
                                     ]))
                             ]))

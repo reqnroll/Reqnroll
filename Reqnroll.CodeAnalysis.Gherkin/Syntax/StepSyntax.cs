@@ -12,11 +12,11 @@ public partial class StepSyntax : SyntaxNode
         SyntaxKind.ThenKeyword,
         SyntaxKind.AndKeyword,
         SyntaxKind.ButKeyword,
-        SyntaxKind.AsterixToken],
+        SyntaxKind.AsteriskToken],
         "The token that represents the keyword of the step.")]
     public partial SyntaxToken StepKeyword { get; }
 
-    [SyntaxSlot([SyntaxKind.LiteralText, SyntaxKind.InterpolatedText], "The text of the step following the keyword.")]
+    [SyntaxSlot(SyntaxKind.LiteralText, "The text of the step following the keyword.")]
     public partial PlainTextSyntax Text { get; }
 
     [SyntaxSlot([SyntaxKind.StepTable, SyntaxKind.StepDocString], "The optional data associated with the step.")]
@@ -61,57 +61,11 @@ public abstract partial class PlainTextSyntax : SyntaxNode
 }
 
 /// <summary>
-/// Represents plain, non-structural text which includes one or more parameters.
-/// </summary>
-[SyntaxNode(SyntaxKind.InterpolatedText)]
-public partial class InterpolatedTextSyntax : PlainTextSyntax
-{
-    [SyntaxSlot([SyntaxKind.InterpolatedLiteralToken, SyntaxKind.InterpolatedTableLiteralToken, SyntaxKind.Interpolation], "The interpolated text elements.")]
-    public partial SyntaxList<InterpolatedTextContentSyntax> Text { get; }
-}
-
-/// <summary>
 /// Represents plain, non-structural text.
 /// </summary>
 [SyntaxNode(SyntaxKind.LiteralText)]
 public partial class LiteralTextSyntax : PlainTextSyntax
 {
-    [SyntaxSlot([SyntaxKind.LiteralToken, SyntaxKind.TableLiteralToken], "The text of the step following the keyword.")]
+    [SyntaxSlot(SyntaxKind.LiteralToken, "The text of the step following the keyword.")]
     public partial SyntaxTokenList Text { get; }
-}
-
-/// <summary>
-/// Represents a section of interpolated text.
-/// </summary>
-[SyntaxNode]
-public abstract partial class InterpolatedTextContentSyntax : SyntaxNode
-{
-}
-
-/// <summary>
-/// Represents a section of interpolated step text which is a literal string.
-/// </summary>
-[SyntaxNode(SyntaxKind.InterpolatedTextLiteral)]
-public partial class InterpolatedTextLiteralSyntax : InterpolatedTextContentSyntax
-{
-    [SyntaxSlot(
-        [SyntaxKind.InterpolatedLiteralToken, SyntaxKind.InterpolatedTableLiteralToken],
-        "The literal token of the text.")]
-    public partial SyntaxToken TextToken { get; }
-}
-
-/// <summary>
-/// Represents the interpolation of a parameter within interpolated text.
-/// </summary>
-[SyntaxNode(SyntaxKind.Interpolation)]
-public partial class InterpolationSyntax : InterpolatedTextContentSyntax
-{
-    [SyntaxSlot(SyntaxKind.LessThanToken, "The less-than '<' token of the parameter.")]
-    public partial SyntaxToken LessThanToken { get; }
-
-    [SyntaxSlot(SyntaxKind.IdentifierToken, "The identifier of the parameter.")]
-    public partial SyntaxToken Identifier { get; }
-
-    [SyntaxSlot(SyntaxKind.GreaterThanToken, "The greater-than '>' token of the parameter.")]
-    public partial SyntaxToken GreaterThanToken { get; }
 }

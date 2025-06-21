@@ -13,7 +13,7 @@ public partial class DocStringSyntax : SyntaxNode
     [SyntaxSlot(SyntaxKind.DocStringContentType, "The optional content type of the syntax.")]
     public partial DocStringContentTypeSyntax? ContentType { get; }
 
-    [SyntaxSlot([SyntaxKind.LiteralText, SyntaxKind.InterpolatedText], "The text tokens which make up the content of the Doc String.")]
+    [SyntaxSlot(SyntaxKind.LiteralText, "The text tokens which make up the content of the Doc String.")]
     [ParameterGroup("Common")]
     public partial PlainTextSyntax Content { get; }
 
@@ -25,6 +25,6 @@ public partial class DocStringSyntax : SyntaxNode
 [SyntaxNode(SyntaxKind.DocStringContentType)]
 public partial class DocStringContentTypeSyntax : SyntaxNode
 {
-    [SyntaxSlot(SyntaxKind.IdentifierToken, "The text tokens which make up the content of the Doc String.")]
+    [SyntaxSlot(SyntaxKind.DirectiveIdentifierToken, "The text tokens which make up the content-type of the Doc String.")]
     public partial SyntaxToken Identifier { get; }
 }

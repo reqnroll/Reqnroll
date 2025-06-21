@@ -25,12 +25,12 @@ public partial class InternationalizationTests
                     Token(
                         TriviaList([
                             Trivia(
-                                LanguageCommentTrivia(
-                                    Token(TriviaList([Whitespace("  ")]), SyntaxKind.HashToken, TriviaList()),
-                                    Token(TriviaList([Whitespace("  ")]), SyntaxKind.LanguageKeyword, "language", TriviaList([Whitespace("  ")])),
+                                DirectiveCommentTrivia(
+                                    Token(TriviaList([Whitespace("  ")]), SyntaxKind.HashToken, TriviaList([Whitespace("  ")])),
+                                    DirectiveIdentifier(TriviaList(), "language", TriviaList([Whitespace("  ")])),
                                     Token(TriviaList(), SyntaxKind.ColonToken, TriviaList([Whitespace("   ")])),
-                                    Token(TriviaList(), SyntaxKind.IdentifierToken, "en-lol", TriviaList([EnvironmentNewline])))),
-                            EnvironmentNewline
+                                    Literal(TriviaList(), "en-lol", TriviaList([EnvironmentNewLine])))),
+                            EnvironmentNewLine
                         ]),
                         SyntaxKind.FeatureKeyword,
                         "OH HAI",
@@ -43,7 +43,7 @@ public partial class InternationalizationTests
                         Literal(
                             TriviaList(),
                             "STUFFING",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List<ScenarioSyntax>()),
                 Token(
                     TriviaList(),

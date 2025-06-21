@@ -169,8 +169,8 @@ internal static partial class InternalSyntaxFactory
         SyntaxKind kind,
         InternalNode? trailingTrivia) => InternalSyntaxToken.CreateMissing(kind, leadingTrivia, trailingTrivia);
 
-    internal static SyntaxToken Identifier(InternalNode? leadingTrivia, string text, InternalNode? trailingTrivia) =>
-        InternalSyntaxToken.Create(SyntaxKind.IdentifierToken, text, leadingTrivia, trailingTrivia);
+    internal static InternalSyntaxToken DirectiveIdentifier(InternalNode? leadingTrivia, string text, InternalNode? trailingTrivia) =>
+        InternalSyntaxToken.Create(SyntaxKind.DirectiveIdentifierToken, text, leadingTrivia, trailingTrivia);
 
     public static InternalSyntaxToken Literal(
         InternalNode? leadingTrivia,

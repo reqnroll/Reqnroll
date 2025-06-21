@@ -43,10 +43,10 @@ public partial class BackgroundTests
                         Literal(
                             TriviaList(),
                             "Background",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     background: Background(
                         Token(
-                            TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                            TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                             SyntaxKind.BackgroundKeyword,
                             "Background",
                             TriviaList()),
@@ -58,7 +58,7 @@ public partial class BackgroundTests
                             Literal(
                                 TriviaList(),
                                 "a simple background",
-                                TriviaList([EnvironmentNewline]))),
+                                TriviaList([EnvironmentNewLine]))),
                         steps: List([
                             Step(
                                 Token(
@@ -72,12 +72,12 @@ public partial class BackgroundTests
                                             TriviaList(),
                                             SyntaxKind.LiteralToken,
                                             "the minimalism inside a background",
-                                            TriviaList([EnvironmentNewline])))))
+                                            TriviaList([EnvironmentNewLine])))))
                             ])),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]),
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -89,7 +89,7 @@ public partial class BackgroundTests
                                 Literal(
                                     TriviaList(),
                                     "minimalistic",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps : List([
                                 Step(
                                     Token(
@@ -103,12 +103,12 @@ public partial class BackgroundTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                             ])))
                                 ])),
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, EnvironmentNewline]),
+                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -120,7 +120,7 @@ public partial class BackgroundTests
                                 Literal(
                                     TriviaList(),
                                     "also minimalistic",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps : List([
                                 Step(
                                     Token(
@@ -134,7 +134,7 @@ public partial class BackgroundTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                             ])))
                             ]))
                     ])),

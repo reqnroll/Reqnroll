@@ -46,11 +46,11 @@ public partial class ScenarioOutlineTests
                         Literal(
                             TriviaList(),
                             "Scenario Outline",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario Outline",
                                 TriviaList()),
@@ -62,7 +62,7 @@ public partial class ScenarioOutlineTests
                                 Literal(
                                     TriviaList(),
                                     "eating",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -76,7 +76,7 @@ public partial class ScenarioOutlineTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "there are <start> cucumbers",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ]))),
                                 Step(
                                     Token(
@@ -90,7 +90,7 @@ public partial class ScenarioOutlineTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "I eat <eat> cucumbers",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ]))),
                                 Step(
                                     Token(
@@ -104,7 +104,7 @@ public partial class ScenarioOutlineTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "I should have <left> cucumbers",
-                                                TriviaList([EnvironmentNewline, EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                                         ])))
                             ]),
                             examples: List([
@@ -122,7 +122,7 @@ public partial class ScenarioOutlineTests
                                         Literal(
                                             TriviaList(),
                                             "first",
-                                            TriviaList([EnvironmentNewline]))),
+                                            TriviaList([EnvironmentNewLine]))),
                                     table: Table(
                                         List([
                                             TableRow(
@@ -158,7 +158,7 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline]))),
+                                                    TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("    ")]),
@@ -192,13 +192,13 @@ public partial class ScenarioOutlineTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline])))
+                                                    TriviaList([EnvironmentNewLine])))
                                         ])
                                     )
                                 ),
                                     Examples(
                                         Token(
-                                            TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                            TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                             SyntaxKind.ExamplesKeyword,
                                             "Examples",
                                             TriviaList()),
@@ -210,7 +210,7 @@ public partial class ScenarioOutlineTests
                                             TableLiteral(
                                                 TriviaList(),
                                                 "second",
-                                                TriviaList([EnvironmentNewline]))),
+                                                TriviaList([EnvironmentNewLine]))),
                                         table: Table(
                                             List([
                                                 TableRow(
@@ -246,7 +246,7 @@ public partial class ScenarioOutlineTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("    ")]),
@@ -280,7 +280,7 @@ public partial class ScenarioOutlineTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline])))
+                                                        TriviaList([EnvironmentNewLine])))
                                             ])
                                         )
                                     )

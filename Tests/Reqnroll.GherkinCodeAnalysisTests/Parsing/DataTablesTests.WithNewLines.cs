@@ -40,11 +40,11 @@ public partial class DataTablesTests
                         Literal(
                             TriviaList(),
                             "DataTables",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -56,7 +56,7 @@ public partial class DataTablesTests
                                 Literal(
                                     TriviaList(),
                                     "some whitespace is important",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps : List([
                                 Step(
                                     Token(
@@ -70,7 +70,7 @@ public partial class DataTablesTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "3 lines of poetry on 5 lines",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])),
                                     StepTable(
                                         Table(
@@ -91,7 +91,7 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                             ])))),
                                 Step(
                                     Token(
@@ -105,7 +105,7 @@ public partial class DataTablesTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "an example of negative space",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])),
                                     StepTable(
                                         Table(
@@ -114,18 +114,18 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList([Whitespace("    ")]),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([Whitespace("        ")])),
+                                                        TriviaList()),
                                                     SeparatedList<PlainTextSyntax>([
                                                         LiteralText(
-                                                            Identifier(
-                                                                TriviaList(),
+                                                            TableLiteral(
+                                                                TriviaList([Whitespace("        ")]),
                                                                 "lost        i n        space",
                                                                 TriviaList([Whitespace("        ")])))
                                                     ]),
                                                     Token(
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewline]))),
+                                                        TriviaList([EnvironmentNewLine]))),
                                             ]))))
                             ]))
                     ])),

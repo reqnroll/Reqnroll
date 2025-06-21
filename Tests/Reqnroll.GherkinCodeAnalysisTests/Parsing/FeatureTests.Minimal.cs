@@ -37,11 +37,11 @@ public partial class FeatureTests
                         Literal(
                             TriviaList(),
                             "Minimal",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -53,7 +53,7 @@ public partial class FeatureTests
                                 Literal(
                                     TriviaList(),
                                     "minimalistic",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -65,7 +65,7 @@ public partial class FeatureTests
                                         Literal(
                                             TriviaList(),
                                             "the minimalism",
-                                            TriviaList([EnvironmentNewline]))))
+                                            TriviaList([EnvironmentNewLine]))))
                             ]))
                     ])),
                 Token(

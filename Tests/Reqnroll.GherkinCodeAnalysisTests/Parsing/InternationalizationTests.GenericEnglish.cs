@@ -27,23 +27,23 @@ public partial class InternationalizationTests
                     Token(
                         TriviaList([
                             Trivia(
-                                LanguageCommentTrivia(
+                                DirectiveCommentTrivia(
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.HashToken,
                                         TriviaList()),
-                                    Token(
+                                    DirectiveIdentifier(
                                         TriviaList(),
-                                        SyntaxKind.LanguageKeyword,
+                                        "language",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
                                         TriviaList()),
-                                    Identifier(
+                                    Literal(
                                         TriviaList(),
                                         "en",
-                                        TriviaList([EnvironmentNewline]))))]),
+                                        TriviaList([EnvironmentNewLine]))))]),
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
@@ -55,11 +55,11 @@ public partial class InternationalizationTests
                         Literal(
                             TriviaList(),
                             "Language directive",
-                            TriviaList([EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
-                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ScenarioKeyword,
                                 "Scenario",
                                 TriviaList()),
@@ -71,7 +71,7 @@ public partial class InternationalizationTests
                                 Literal(
                                     TriviaList(),
                                     "language is ignored",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -85,7 +85,7 @@ public partial class InternationalizationTests
                                                 TriviaList(),
                                                 SyntaxKind.LiteralToken,
                                                 "the minimalism",
-                                                TriviaList([EnvironmentNewline]))
+                                                TriviaList([EnvironmentNewLine]))
                                         ])))
                             ])
                         )

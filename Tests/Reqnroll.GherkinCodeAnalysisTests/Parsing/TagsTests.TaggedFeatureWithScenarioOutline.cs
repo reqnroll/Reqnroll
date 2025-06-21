@@ -33,7 +33,7 @@ public partial class TagsTests
                     List([
                         Tag(
                             Token(TriviaList(), SyntaxKind.AtToken, TriviaList()),
-                            Literal(TriviaList(), "sometag", TriviaList([EnvironmentNewline])))
+                            Literal(TriviaList(), "sometag", TriviaList([EnvironmentNewLine])))
                     ]),
                     Token(
                         TriviaList(),
@@ -48,7 +48,7 @@ public partial class TagsTests
                         Literal(
                             TriviaList(),
                             "Foo",
-                            TriviaList([EnvironmentNewline, EnvironmentNewline]))),
+                            TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
                     scenarios: List([
                         Scenario(
                             Token(
@@ -64,7 +64,7 @@ public partial class TagsTests
                                 Literal(
                                     TriviaList(),
                                     "Bar",
-                                    TriviaList([EnvironmentNewline]))),
+                                    TriviaList([EnvironmentNewLine]))),
                             steps: List([
                                 Step(
                                     Token(
@@ -76,19 +76,19 @@ public partial class TagsTests
                                         Literal(
                                             TriviaList(),
                                             "Baz",
-                                            TriviaList([EnvironmentNewline]))))
+                                            TriviaList([EnvironmentNewLine]))))
                             ]),
                             examples: List([
                                 Examples(
                                     Token(
-                                        TriviaList([EnvironmentNewline, Whitespace("    ")]),
+                                        TriviaList([EnvironmentNewLine, Whitespace("    ")]),
                                         SyntaxKind.ExamplesKeyword,
                                         "Examples",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
-                                        TriviaList([EnvironmentNewline])),
+                                        TriviaList([EnvironmentNewLine])),
                                     table: Table(
                                         List([
                                             TableRow(
@@ -107,7 +107,7 @@ public partial class TagsTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline]))),
+                                                    TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("      ")]),
@@ -124,7 +124,7 @@ public partial class TagsTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline]))),
+                                                    TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("      ")]),
@@ -141,7 +141,7 @@ public partial class TagsTests
                                                 Token(
                                                     TriviaList(),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList([EnvironmentNewline])))
+                                                    TriviaList([EnvironmentNewLine])))
                                         ])))
                             ]))
                     ])),

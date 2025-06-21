@@ -15,11 +15,11 @@ public sealed partial class BackgroundSyntax : DeclarationSyntax
     [ParameterGroup("Common")]
     public partial SyntaxToken ColonToken { get; }
 
-    [SyntaxSlot([SyntaxKind.LiteralText, SyntaxKind.InterpolatedText], "The optional name of the background.")]
+    [SyntaxSlot(SyntaxKind.LiteralText, "The optional name of the background.")]
     [ParameterGroup("Common")]
     public partial PlainTextSyntax? Name { get; }
 
-    [SyntaxSlot([SyntaxKind.LiteralText, SyntaxKind.InterpolatedText], "The optional description of the background.")]
+    [SyntaxSlot(SyntaxKind.LiteralText, "The optional description of the background.")]
     [ParameterGroup("Common")]
     public partial PlainTextSyntax? Description { get; }
 

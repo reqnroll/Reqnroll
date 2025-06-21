@@ -144,8 +144,8 @@
   <data name="TokenMustBeHashToken" xml:space="preserve">
     <value>Value must be a hash ("#") token.</value>
   </data>
-  <data name="TokenMustBeIdentifierToken" xml:space="preserve">
-    <value>Value must be an identifier token.</value>
+  <data name="TokenMustBeDirectiveIdentifierToken" xml:space="preserve">
+    <value>Value must be a directive identifier token.</value>
   </data>
   <data name="TokenMustBeLanguageKeyword" xml:space="preserve">
     <value>Value must be a "language" keyword token.</value>
@@ -156,7 +156,7 @@
   <data name="TokenMustBeLiteralToken" xml:space="preserve">
     <value>Value must be a literal token.</value>
   </data>
-  <data name="TokenMustBeOneOfGivenKeywordWhenKeywordThenKeywordAndKeywordButKeywordAsterixToken" xml:space="preserve">
+  <data name="TokenMustBeOneOfGivenKeywordWhenKeywordThenKeywordAndKeywordButKeywordAsteriskToken" xml:space="preserve">
     <value>Value must be one of a "given", "when", "then", "and" or "but" keyword tokens or an asterisk ("*") token.</value>
   </data>
   <data name="TokenMustBeOneOfInterpolatedLiteralTokenInterpolatedTableLiteralToken" xml:space="preserve">
