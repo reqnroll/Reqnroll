@@ -54,8 +54,52 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
             stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
 
-            //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
-            //    .Returns("methodSignature");
+            _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker));
+            _pickleExecutionTracker.StepDefinitionsByBinding.TryAdd(stepBindingMock.Object, "stepPickleId");
+
+            var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
+
+            var def = new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker);
+
+            // Act
+            def.ProcessEvent(evt);
+
+            // Assert
+            def.IsBound.Should().BeTrue();
+            def.StepArguments.Should().HaveCount(2);
+        }
+
+        [Fact]
+        public void PopulateStepDefinitionFromExecutionResult_Should_Set_Bound_Arguments_When_Step_Uses_A_DocString()
+        {
+            // Arrange
+            var methodMock = SetupMockMethodWithParameters([("arg1", typeof(int)), ("arg2", typeof(string))]);
+            var stepBindingMock = new Mock<IStepDefinitionBinding>();
+            stepBindingMock.Setup(b => b.StepDefinitionType).Returns(StepDefinitionType.Given);
+            stepBindingMock.Setup(b => b.Method).Returns(methodMock.Object);
+
+            var multilineText =
+                """
+                This is a multiline
+                text argument used in a step.
+                """;
+            var stepInfo = new StepInfo(StepDefinitionType.Given, "step {int} text", null, multilineText , "stepPickleId")
+            {
+                BindingMatch = new BindingMatch(
+                    stepBindingMock.Object, // stepBinding
+                    0,                     // scopeMatches
+                    new MatchArgument[]    // arguments
+                    {
+                        new MatchArgument(53, 1 ),
+                        new MatchArgument(multilineText, 2 )
+                    },
+                    null                   // stepContext
+                )
+            };
+            var stepContextMock = new Mock<IScenarioStepContext>();
+            stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
+            stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
+
             _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker));
             _pickleExecutionTracker.StepDefinitionsByBinding.TryAdd(stepBindingMock.Object, "stepPickleId");
 

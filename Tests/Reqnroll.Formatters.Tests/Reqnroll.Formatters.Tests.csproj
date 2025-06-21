@@ -20,6 +20,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Resources\docString\docString.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <EmbeddedResource Include="Samples\Resources\ambiguous\ambiguous.feature" />
     <EmbeddedResource Include="Samples\Resources\ambiguous\ambiguous.cs" />
     <EmbeddedResource Include="Samples\Resources\attachments\attachments.cs" />
@@ -168,6 +172,10 @@
   <ItemGroup>
     <Folder Include="Properties\" />
     <Folder Include="Samples\CucumberMessages\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Samples\Resources\docString\docString.feature" />
   </ItemGroup>
 
   <ItemGroup>

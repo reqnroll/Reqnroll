@@ -58,17 +58,28 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
 
         StepDefinitionIds = IsAmbiguous ? AmbiguousStepDefinitions.ToList() : StepDefinitionId != null ? [StepDefinitionId] : [];
 
-        var IsInputDataTableOrDocString = stepFinishedEvent.StepContext.StepInfo.Table != null || stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
+        var HasInputDataTable = stepFinishedEvent.StepContext.StepInfo.Table != null;
+        var HasInputDocString = stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
         var argumentValues = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.Value.ToString()).ToList() : new List<string>();
         var argumentStartOffsets = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.StartOffset).ToList() : new List<int?>();
         var argumentTypes = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
 
-        if (IsBound && !IsInputDataTableOrDocString)
+        if (IsBound)
         {
             for (int i = 0; i < argumentValues.Count; i++)
             {
                 StepArguments.Add(new TestStepArgument { Value = argumentValues[i], StartOffset = argumentStartOffsets[i], Type = argumentTypes[i] });
             }
         }
+        if (HasInputDataTable)
+        {
+            var table = stepFinishedEvent.StepContext.StepInfo.Table;
+            StepArguments.Add(new TestStepArgument { Value = table.ToString(), StartOffset = 0, Type = typeof(Table).Name });
+        }
+        //if (HasInputDocString)
+        //{
+        //    var docString = stepFinishedEvent.StepContext.StepInfo.MultilineText;
+        //    StepArguments.Add(new TestStepArgument { Value = docString, StartOffset = 0, Type = "string" });
+        //}
     }
 }
