@@ -179,6 +179,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Samples\Resources\docString\docString.feature.ndjson" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="reqnroll_withHtmlOutput.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
