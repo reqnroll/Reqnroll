@@ -80,6 +80,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Samples\Resources\docString\docString.feature" />
     <EmbeddedResource Include="Samples\Resources\docString\docString.cs" />
+    <EmbeddedResource Include="Samples\Resources\docString\docString.feature.ndjson" />
     <EmbeddedResource Include="Samples\Resources\empty\empty.cs" />
     <EmbeddedResource Include="Samples\Resources\empty\empty.feature" />
     <EmbeddedResource Include="Samples\Resources\examples-tables\examples_tables.cs" />
@@ -170,14 +171,6 @@
   <ItemGroup>
     <Folder Include="Properties\" />
     <Folder Include="Samples\CucumberMessages\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Samples\Resources\docString\docString.feature" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Samples\Resources\docString\docString.feature.ndjson" />
   </ItemGroup>
 
   <ItemGroup>
