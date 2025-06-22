@@ -81,8 +81,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _brokerMock.Object, _fileSystemMock.Object, postedEnvelopes);
             _sut.Initialize(_rtpe, _rtpp, new UnitTestProvider.UnitTestProviderConfiguration());
-            //_rtpe.RaiseCustomizeGlobalDependencies(_globalObjContainerStub as ObjectContainer, null);
-            //_rtpe.RaiseCustomizeTestThreadDependencies(_testThreadObjContainerStub as ObjectContainer);
         }
 
         [Fact]
@@ -145,9 +143,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
+            var filepath = @"C:/valid/path/output.txt".Replace('/', sp);
             _configurationMock.Setup(c => c.Enabled).Returns(true);
             _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                .Returns(new Dictionary<string, string> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+                .Returns(new Dictionary<string, string> { { "outputFilePath", filepath } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act
@@ -155,7 +154,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             await _sut.CloseAsync();
 
             // Assert
-            _fileSystemMock.Verify(fs => fs.CreateDirectory($"C:{sp}valid{sp}path"), Times.Once);
+            _fileSystemMock.Verify(fs => fs.CreateDirectory(Path.GetDirectoryName(filepath)), Times.Once);
         }
     }
 }
