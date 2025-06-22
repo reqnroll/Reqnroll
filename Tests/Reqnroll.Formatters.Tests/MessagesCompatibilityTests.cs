@@ -9,6 +9,7 @@ namespace Reqnroll.Formatters.Tests
         [TestMethod]
         [DataRow("minimal", "minimal")]
         [DataRow("cdata", "cdata")]
+        [DataRow("data-tables", "Data Tables")] 
         [DataRow("pending", "Pending steps")]
         [DataRow("empty", "Empty Scenarios")]
         [DataRow("examples-tables", "Examples Tables")]
@@ -73,7 +74,6 @@ namespace Reqnroll.Formatters.Tests
 
         [Ignore]
         [TestMethod]
-        [DataRow("data-tables", "Data Tables")] // Non-compliant, but suspect that the CCK is wrong and in need of change in how Data Table arguments are conveyed in Messages
         [DataRow("attachments", "Attachments")]
         [DataRow("hooks-named", "Hooks - Named")]
         [DataRow("skipped", "Skipping scenarios")]

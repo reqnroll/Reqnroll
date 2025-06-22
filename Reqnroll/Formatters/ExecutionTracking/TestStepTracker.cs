@@ -36,11 +36,6 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
         var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
         IsBound = !(bindingMatch == null || bindingMatch == BindingMatch.NonMatching);
 
-        if (IsBound)
-        {
-
-        }
-
         var stepDefinitionBinding = IsBound ? bindingMatch!.StepBinding : null;
         var StepDefinitionId = IsBound ? ParentTracker.FindStepDefinitionIdByBindingKey(stepDefinitionBinding) : null;
 
@@ -60,26 +55,20 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
 
         var HasInputDataTable = stepFinishedEvent.StepContext.StepInfo.Table != null;
         var HasInputDocString = stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
+        var HasEitherDataTableOrDocString = HasInputDataTable || HasInputDocString;
         var argumentValues = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.Value.ToString()).ToList() : new List<string>();
         var argumentStartOffsets = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.StartOffset).ToList() : new List<int?>();
         var argumentTypes = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
 
         if (IsBound)
         {
-            for (int i = 0; i < argumentValues.Count; i++)
+            var argumentCount = argumentValues.Count;
+            if (argumentCount > 0 && HasEitherDataTableOrDocString)
+                argumentCount = argumentCount - 1; // don't add the DataTable or DocString argument as a TestStepArgument
+            for (int i = 0; i < argumentCount; i++)
             {
                 StepArguments.Add(new TestStepArgument { Value = argumentValues[i], StartOffset = argumentStartOffsets[i], Type = argumentTypes[i] });
             }
         }
-        if (HasInputDataTable)
-        {
-            var table = stepFinishedEvent.StepContext.StepInfo.Table;
-            StepArguments.Add(new TestStepArgument { Value = table.ToString(), StartOffset = 0, Type = typeof(Table).Name });
-        }
-        //if (HasInputDocString)
-        //{
-        //    var docString = stepFinishedEvent.StepContext.StepInfo.MultilineText;
-        //    StepArguments.Add(new TestStepArgument { Value = docString, StartOffset = 0, Type = "string" });
-        //}
     }
 }
