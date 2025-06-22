@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using Io.Cucumber.Messages.Types;
+﻿using Io.Cucumber.Messages.Types;
+using System;
+using System.Collections.Generic;
 
 namespace Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
@@ -7,12 +8,190 @@ namespace Reqnroll.Formatters.PayloadProcessing.Cucumber;
 /// Base implementation of a visitor pattern over the Cucumber Message types
 /// (consumer of this, for now, is within the Test class for Messages; but provided here for future use)
 /// </summary>
-public abstract class CucumberMessageVisitorBase : ICucumberMessageVisitor
+public abstract class CucumberMessageVisitorBase 
 {
     public virtual void Accept(object message)
     {
-        if (message != null) 
-            this.AcceptMessage(message);
+        if (message == null)
+            return;
+        switch (message)
+        {
+            // Existing cases
+            case Envelope envelope:
+                Visit(envelope);
+                break;
+            case Attachment attachment:
+                Visit(attachment);
+                break;
+            case GherkinDocument gherkinDocument:
+                Visit(gherkinDocument);
+                break;
+            case Feature feature:
+                Visit(feature);
+                break;
+            case FeatureChild featureChild:
+                Visit(featureChild);
+                break;
+            case Rule rule:
+                Visit(rule);
+                break;
+            case RuleChild ruleChild:
+                Visit(ruleChild);
+                break;
+            case Background background:
+                Visit(background);
+                break;
+            case Scenario scenario:
+                Visit(scenario);
+                break;
+            case Examples examples:
+                Visit(examples);
+                break;
+            case Step step:
+                Visit(step);
+                break;
+            case TableRow tableRow:
+                Visit(tableRow);
+                break;
+            case TableCell tableCell:
+                Visit(tableCell);
+                break;
+            case Tag tag:
+                Visit(tag);
+                break;
+            case Pickle pickle:
+                Visit(pickle);
+                break;
+            case PickleStep pickleStep:
+                Visit(pickleStep);
+                break;
+            case PickleStepArgument pickleStepArgument:
+                Visit(pickleStepArgument);
+                break;
+            case PickleTable pickleTable:
+                Visit(pickleTable);
+                break;
+            case PickleTableRow pickleTableRow:
+                Visit(pickleTableRow);
+                break;
+            case PickleTableCell pickleTableCell:
+                Visit(pickleTableCell);
+                break;
+            case PickleTag pickleTag:
+                Visit(pickleTag);
+                break;
+            case TestCase testCase:
+                Visit(testCase);
+                break;
+            case TestCaseStarted testCaseStarted:
+                Visit(testCaseStarted);
+                break;
+            case TestCaseFinished testCaseFinished:
+                Visit(testCaseFinished);
+                break;
+            case TestStep testStep:
+                Visit(testStep);
+                break;
+            case TestStepStarted testStepStarted:
+                Visit(testStepStarted);
+                break;
+            case TestStepFinished testStepFinished:
+                Visit(testStepFinished);
+                break;
+            case TestStepResult testStepResult:
+                Visit(testStepResult);
+                break;
+            case Hook hook:
+                Visit(hook);
+                break;
+            case StepDefinition stepDefinition:
+                Visit(stepDefinition);
+                break;
+            case ParameterType parameterType:
+                Visit(parameterType);
+                break;
+            case UndefinedParameterType undefinedParameterType:
+                Visit(undefinedParameterType);
+                break;
+            case SourceReference sourceReference:
+                Visit(sourceReference);
+                break;
+            case Duration duration:
+                Visit(duration);
+                break;
+            case Timestamp timestamp:
+                Visit(timestamp);
+                break;
+            case Io.Cucumber.Messages.Types.Exception exception:
+                Visit(exception);
+                break;
+            case Meta meta:
+                Visit(meta);
+                break;
+            case Product product:
+                Visit(product);
+                break;
+            case Ci ci:
+                Visit(ci);
+                break;
+            case Git git:
+                Visit(git);
+                break;
+            case Source source:
+                Visit(source);
+                break;
+            case Comment comment:
+                Visit(comment);
+                break;
+            case Io.Cucumber.Messages.Types.DataTable dataTable:
+                Visit(dataTable);
+                break;
+            case DocString docString:
+                Visit(docString);
+                break;
+            case Group group:
+                Visit(group);
+                break;
+            case JavaMethod javaMethod:
+                Visit(javaMethod);
+                break;
+            case JavaStackTraceElement javaStackTraceElement:
+                Visit(javaStackTraceElement);
+                break;
+            case Location location:
+                Visit(location);
+                break;
+            case ParseError parseError:
+                Visit(parseError);
+                break;
+            case PickleDocString pickleDocString:
+                Visit(pickleDocString);
+                break;
+            case StepDefinitionPattern stepDefinitionPattern:
+                Visit(stepDefinitionPattern);
+                break;
+            case StepMatchArgument stepMatchArgument:
+                Visit(stepMatchArgument);
+                break;
+            case StepMatchArgumentsList stepMatchArgumentsList:
+                Visit(stepMatchArgumentsList);
+                break;
+            case TestRunStarted testRunStarted:
+                Visit(testRunStarted);
+                break;
+            case TestRunFinished testRunFinished:
+                Visit(testRunFinished);
+                break;
+            case TestRunHookStarted testRunHookStarted:
+                Visit(testRunHookStarted);
+                break;
+            case TestRunHookFinished testRunHookFinished:
+                Visit(testRunHookFinished);
+                break;
+
+            default:
+                throw new ArgumentException($"Unsupported message type:{message.GetType().Name}", nameof(message));
+        }
     }
 
     public virtual void Visit(Envelope envelope)
@@ -346,7 +525,7 @@ public abstract class CucumberMessageVisitorBase : ICucumberMessageVisitor
         OnVisited(timestamp);
     }
 
-    public virtual void Visit(Exception exception)
+    public virtual void Visit(Io.Cucumber.Messages.Types.Exception exception)
     {
         OnVisiting(exception);
         OnVisited(exception);
@@ -747,10 +926,10 @@ public abstract class CucumberMessageVisitorBase : ICucumberMessageVisitor
     public virtual void OnVisited(Io.Cucumber.Messages.Types.DataTable dataTable)
     { }
 
-    public virtual void OnVisiting(Exception exception)
+    public virtual void OnVisiting(Io.Cucumber.Messages.Types.Exception exception)
     { }
 
-    public virtual void OnVisited(Exception exception)
+    public virtual void OnVisited(Io.Cucumber.Messages.Types.Exception exception)
     { }
 
     public virtual void OnVisiting(JavaMethod javaMethod)

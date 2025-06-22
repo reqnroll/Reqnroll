@@ -37,7 +37,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
     // shared to each Feature tracker so that we keep a single list
-    internal ConcurrentDictionary<IBinding, string> StepDefinitionsByMethodSignature => _bindingCaches.StepDefinitionIdByBinding;
+    internal ConcurrentDictionary<IBinding, string> StepDefinitionIdByMethodBinding => _bindingCaches.StepDefinitionIdByBinding;
 
     public IIdGenerator SharedIdGenerator { get; private set; }
 
@@ -216,7 +216,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             return;
         }
 
-        var featureExecutionTracker = new FeatureExecutionTracker(featureStartedEvent, _testRunStartedId, SharedIdGenerator, StepDefinitionsByMethodSignature, _messageFactory);
+        var featureExecutionTracker = new FeatureExecutionTracker(featureStartedEvent, _testRunStartedId, SharedIdGenerator, StepDefinitionIdByMethodBinding, _messageFactory);
         if (_startedFeatures.TryAdd(featureInfo, featureExecutionTracker) && featureExecutionTracker.Enabled)
         {
             try
@@ -331,7 +331,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             case Bindings.HookType.AfterFeature:
                 var hookRunStartedId = SharedIdGenerator.GetNewId();
                 //var signature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
-                var hookId = StepDefinitionsByMethodSignature[hookBindingStartedEvent.HookBinding];
+                var hookId = StepDefinitionIdByMethodBinding[hookBindingStartedEvent.HookBinding];
                 var hookTracker = new TestRunHookExecutionTracker(hookRunStartedId, hookId, _testRunStartedId, _messageFactory);
                 _testRunHookTrackers.TryAdd(hookBindingStartedEvent.HookBinding, hookTracker);
 
