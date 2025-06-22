@@ -50,7 +50,7 @@ The settings discussed above can be overriden by setting an Environment Variable
 
 The available Environment Variables are:
 
-* REQNROLL_CUCUMBER_MESSAGES_ENABLED
+* REQNROLL_CUCUMBER_MESSAGES_DISABLED
 * REQNROLL_CUCUMBER_MESSAGES_FORMATTERS
 
 ```{note}
