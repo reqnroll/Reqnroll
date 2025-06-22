@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PubSub;
@@ -29,7 +30,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-    protected override void ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigurationString, Action<bool> onInitialized)
+    protected override async Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigurationString, Action<bool> onInitialized)
     {
         var defaultBaseDirectory = ".";
 
@@ -52,19 +53,27 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         if (!FileFilter.IsValidFile(outputPath))
         {
             onInitialized(false);
-            throw new InvalidOperationException($"Path of configured formatter output file: {outputPath} is invalid or missing.");
+            Logger.WriteMessage($"Path of configured formatter output file: {outputPath} is invalid or missing.\r\nFormatter {PluginName} will be disabled.");
+            return;
         }
-
         if (!_fileSystem.DirectoryExists(baseDirectory))
         {
-            _fileSystem.CreateDirectory(baseDirectory);
+            try
+            {
+                _fileSystem.CreateDirectory(baseDirectory);
+            }
+            catch (Exception e)
+            {
+                onInitialized(false);
+                Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {PluginName}. The formatter will be disabled.");
+                return;
+            }
         }
-
         onInitialized(true);
-        ConsumeAndWriteToFilesBackgroundTask(outputPath);
+        await ConsumeAndWriteToFilesBackgroundTask(outputPath);
     }
 
-    protected abstract void ConsumeAndWriteToFilesBackgroundTask(string outputPath);
+    protected abstract Task ConsumeAndWriteToFilesBackgroundTask(string outputPath);
 
     protected virtual string ConfiguredOutputFilePath(IDictionary<string, string> formatterConfiguration)
     {

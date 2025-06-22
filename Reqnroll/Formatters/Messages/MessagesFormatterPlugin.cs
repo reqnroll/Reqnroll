@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.PubSub;
@@ -20,22 +21,29 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
     {
     }
 
-    protected override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
     {
         var newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-        using var fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
-
-        foreach (var message in PostedMessages.GetConsumingEnumerable())
+        try
         {
-            if (message != null)
-            {
-                NdjsonSerializer.SerializeToStream(fileStream, message);
+            using var fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
 
-                // Write a newline after each message, except for the last one
-                if (message.TestRunFinished == null)
-                    fileStream.Write(newLineBytes, 0, newLineBytes.Length);
+            foreach (var message in PostedMessages.GetConsumingEnumerable())
+            {
+                if (message != null)
+                {
+                    await NdjsonSerializer.SerializeToStreamAsync(fileStream, message);
+
+                    // Write a newline after each message, except for the last one
+                    if (message.TestRunFinished == null)
+                        await fileStream.WriteAsync(newLineBytes, 0, newLineBytes.Length);
+                }
             }
+        }
+        catch(Exception e)
+        {
+            Logger.WriteMessage($"Formatter {PluginName} threw an exception: {e.Message}. \r\nNo further messages will be processed.");
         }
     }
 }

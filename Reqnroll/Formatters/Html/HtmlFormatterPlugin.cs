@@ -1,9 +1,12 @@
 ﻿#nullable enable
 
+using System;
 using System.IO;
+using System.Threading.Tasks;
 using Cucumber.HtmlFormatter;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
@@ -15,23 +18,33 @@ namespace Reqnroll.Formatters.Html;
 /// </summary>
 public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
 {
+    private IFormatterLog _logger;
+
     public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, broker, logger, "html", ".html", "reqnroll_report.html", fileSystem)
     {
+        _logger = logger;
     }
 
-    protected override void ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
     {
-        using var fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
-        using var htmlWriter = new MessagesToHtmlWriter(
-            fileStream,
-            (sw, e) => sw.Write(NdjsonSerializer.Serialize(e)));
-
-        foreach (var message in PostedMessages.GetConsumingEnumerable())
+        try
         {
-            if (message != null)
+            using var fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
+            using var htmlWriter = new MessagesToHtmlWriter(
+                fileStream,
+                async (sw, e) => await sw.WriteAsync(NdjsonSerializer.Serialize(e)));
+
+            foreach (var message in PostedMessages.GetConsumingEnumerable())
             {
-                htmlWriter.Write(message);
+                if (message != null)
+                {
+                    await htmlWriter.WriteAsync(message);
+                }
             }
+        }
+        catch(Exception e)
+        {
+            Logger.WriteMessage($"Formatter {PluginName} threw an exception: {e.Message}. No further messages will be added to the generated html file.");
         }
     }
 }
