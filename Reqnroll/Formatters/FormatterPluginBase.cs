@@ -47,13 +47,6 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
         LaunchSink();
     }
 
-    internal async Task CloseAsync()
-    {
-        PostedMessages.CompleteAdding();
-        if (_formatterTask != null) await _formatterTask.ConfigureAwait(false);
-        _formatterTask = null;
-    }
-
     internal void LaunchSink()
     {
         bool IsFormatterEnabled(out IDictionary<string, object> configuration)
@@ -97,6 +90,19 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
     protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
 
+    internal async Task CloseAsync()
+    {
+        if (PostedMessages.IsAddingCompleted || _formatterTask!.IsCompleted)
+            throw new InvalidOperationException($"Formatter {Name} has invoked Close when it is already in a closed state.");
+
+        if (!PostedMessages.IsAddingCompleted) 
+            PostedMessages.CompleteAdding();
+        await _formatterTask!.ConfigureAwait(false);
+
+        if (!PostedMessages.IsCompleted)
+            throw new InvalidOperationException($"Formatter {Name} has shut down before all messages processed.");
+    }
+
     public void Dispose()
     {
         if (!_isDisposed)
@@ -104,7 +110,9 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
             try
             {
                 if (!PostedMessages.IsAddingCompleted)
-                    CloseAsync().GetAwaiter().GetResult();
+                    // In this situation, the TestEngine is shutting down and has called Dispose on the global container.
+                    // Forcing the Dispose to wait until the formatter has had a chance to complete.
+                    _formatterTask?.GetAwaiter().GetResult();
             }
             finally
             {
