@@ -44,6 +44,10 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     private string _testRunStartedId;
     internal bool _enabled = false;
 
+    // This field will be updated as each Feature completes. If all complete successfully, this will remain as true.
+    // This field ultimately used to set the TestRunFinished message's status.
+    internal bool _runStatus = true;
+
     // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
     internal readonly ConcurrentDictionary<IBinding, TestRunHookExecutionTracker> _testRunHookTrackers = new();
     // This tracks all Attachments and Output Events; used during publication to sequence them in the correct order.
@@ -172,7 +176,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     {
         if (!_enabled)
             return;
-        var status = _startedFeatures.Values.All(ft => ft.FeatureExecutionSuccess);
+
         // publish all TestCase messages
         var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
         // sort the remaining Messages by timestamp
@@ -189,9 +193,11 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             await _broker.PublishAsync(env);
         }
 
-        await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(status, _clock.GetNowDateAndTime(), _testRunStartedId)));
+        await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(_runStatus, _clock.GetNowDateAndTime(), _testRunStartedId)));
 
-        _startedFeatures.Clear();
+        // By the time PublisherTestRunComplete is called, all Features should have completed and been removed from the _startedFeatures collection.
+        if (_startedFeatures.Count > 0)
+            throw new InvalidOperationException($"PublisherTestRunComplete invoked before all Features have been completed. Count of remaining: {_startedFeatures.Count}");
     }
 
     #region TestThreadExecutionEventPublisher Event Handling Methods
@@ -233,7 +239,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         }
     }
 
-    private Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
+    internal Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
     {
         // For this and subsequent events, we pull up the FeatureExecutionTracker by featureInfo.
         var featureInfo = featureFinishedEvent.FeatureContext?.FeatureInfo;
@@ -251,7 +257,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         {
             _messages.Add(msg);
         }
-
+        _runStatus = _runStatus & featureTracker.FeatureExecutionSuccess;
+        _startedFeatures.TryRemove(featureInfo, out _);
         return Task.CompletedTask;
         // throw an exception if any of the TestCaseExecutionTrackers are not done?
     }

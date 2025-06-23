@@ -188,66 +188,21 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
             _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
 
-            var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
-            featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
-
-            var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
-            var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
-
-            IList<Envelope> publishedEnvelopes = new List<Envelope>();
-            _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
-                (e) =>
-                    {
-                        publishedEnvelopes.Add(e);
-                        return Task.CompletedTask;
-                    });
-
-            _sut._broker = _brokerMock.Object;
-            _sut._startedFeatures.TryAdd(f1, featureTrackerMock.Object);
-            _sut._startedFeatures.TryAdd(f2, featureTrackerMock.Object);
-            _sut._enabled = true;
-            _sut._messageFactory = new CucumberMessageFactory();
-            _sut._clock = _clockMock.Object;
-
-            // Act
-            //_sut.BrokerReady(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
-            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
-
-            // Assert
-            _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Once);
-            publishedEnvelopes.Should().HaveCount(1);
-            var msg = publishedEnvelopes[0].Content();
-            msg.Should().BeOfType<TestRunFinished>();
-            var trf = msg as TestRunFinished;
-            trf.Success.Should().BeTrue();
-        }
-
-        // PublisherTestRunComplete calculates test run status as Failed when any started feature is not complete or any are Failed
-        [Fact]
-        public async Task PublisherTestRunComplete_Should_CalculateStatusWhenAFeatureFails()
-        {
-            // Arrange
-            var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
-            _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
-
             var feature1TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature1TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
+            feature1TrackerMock.Setup(f => f.Enabled).Returns(true);
             var feature2TrackerMock = new Mock<IFeatureExecutionTracker>();
-            feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(false);
+            feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
+            feature2TrackerMock.Setup(f => f.Enabled).Returns(true);
+
 
 
             var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
-            var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
-
-            IList<Envelope> publishedEnvelopes = new List<Envelope>();
-            _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
-                (e) =>
-                {
-                    publishedEnvelopes.Add(e);
-                    return Task.CompletedTask;
-                });
+            var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2", "");
+            var f1Context = new Mock<IFeatureContext>();
+            f1Context.Setup(x => x.FeatureInfo).Returns(f1);
+            var f2Context = new Mock<IFeatureContext>();
+            f2Context.Setup(x => x.FeatureInfo).Returns(f2);
 
             _sut._broker = _brokerMock.Object;
             _sut._startedFeatures.TryAdd(f1, feature1TrackerMock.Object);
@@ -257,16 +212,54 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._clock = _clockMock.Object;
 
             // Act
-            //_sut.BrokerReady(null, new RuntimePluginBeforeTestRunEventArgs(objectContainerStub));
-            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
+            await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
+            _sut._runStatus.Should().BeTrue();
+            await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
 
             // Assert
-            _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Once);
-            publishedEnvelopes.Should().HaveCount(1);
-            var msg = publishedEnvelopes[0].Content();
-            msg.Should().BeOfType<TestRunFinished>();
-            var trf = msg as TestRunFinished;
-            trf.Success.Should().BeFalse();
+            _sut._runStatus.Should().BeTrue();
+        }
+
+        // PublisherTestRunComplete calculates test run status as Failed when any started feature is are Failed
+        [Fact]
+        public async Task PublisherFeatureFinished_Should_CalculateStatusWhenAFeatureFails()
+        {
+            // Arrange
+            var objectContainerStub = CreateObjectContainerWithBroker(true);
+            SetupCommonMocks(objectContainerStub);
+            objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
+            _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
+
+            var feature1TrackerMock = new Mock<IFeatureExecutionTracker>();
+            feature1TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
+            feature1TrackerMock.Setup(f => f.Enabled).Returns(true);
+            var feature2TrackerMock = new Mock<IFeatureExecutionTracker>();
+            feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(false);
+            feature2TrackerMock.Setup(f => f.Enabled).Returns(true);
+
+
+
+            var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+            var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2", "");
+            var f1Context = new Mock<IFeatureContext>();
+            f1Context.Setup(x => x.FeatureInfo).Returns(f1);
+            var f2Context = new Mock<IFeatureContext>();
+            f2Context.Setup(x => x.FeatureInfo).Returns(f2);
+
+            _sut._broker = _brokerMock.Object;
+            _sut._startedFeatures.TryAdd(f1, feature1TrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f2, feature2TrackerMock.Object);
+            _sut._enabled = true;
+            _sut._messageFactory = new CucumberMessageFactory();
+            _sut._clock = _clockMock.Object;
+
+            // Act
+            await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
+            _sut._runStatus.Should().BeTrue();
+            await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
+
+            // Assert
+            _sut._runStatus.Should().BeFalse();
         }
 
         // PublisherTestRunComplete publishes TestCase messages for Pickles, then Execution messages, followed by the TestRunFinished message
@@ -281,9 +274,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
+            featureTrackerMock.Setup(f => f.Enabled).Returns(true);
 
 
             var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+            var f1Context = new Mock<IFeatureContext>();
+            f1Context.Setup(x => x.FeatureInfo).Returns(f1);
 
             var messages = new List<Envelope>
             {
@@ -308,6 +304,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._clock = _clockMock.Object;
 
             // Act
+            await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
             await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
