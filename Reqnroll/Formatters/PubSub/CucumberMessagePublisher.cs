@@ -172,26 +172,35 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     {
         if (!_enabled)
             return;
-        var status = _startedFeatures.Values.All(ft => ft.FeatureExecutionSuccess);
-        // publish all TestCase messages
-        var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
-        // sort the remaining Messages by timestamp
-        var executionMessages = _messages.Except(testCaseMessages).OrderBy(RetrieveDateTime).ToList();
-
-        // publish them in order to the broker
-        foreach (var env in testCaseMessages)
+        int stage = 1;
+        try
         {
-            await _broker.PublishAsync(env);
-        }
+            var status = _startedFeatures.Values.All(ft => ft.FeatureExecutionSuccess);
+            // publish all TestCase messages
+            var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
+            // sort the remaining Messages by timestamp
+            var executionMessages = _messages.Except(testCaseMessages).OrderBy(RetrieveDateTime).ToList();
 
-        foreach (var env in executionMessages)
+            stage++;
+            // publish them in order to the broker
+            foreach (var env in testCaseMessages)
+            {
+                await _broker.PublishAsync(env);
+            }
+            stage++;
+            foreach (var env in executionMessages)
+            {
+                await _broker.PublishAsync(env);
+            }
+            stage++;
+            await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(status, _clock.GetNowDateAndTime(), _testRunStartedId)));
+            stage++;
+            _startedFeatures.Clear();
+        }
+        catch(System.Exception ex)
         {
-            await _broker.PublishAsync(env);
+            _logger.WriteMessage($"Exception during Publisher shutdown at stage: {stage}, Message: {ex.Message}  \r\n{ex.StackTrace}");
         }
-
-        await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(status, _clock.GetNowDateAndTime(), _testRunStartedId)));
-
-        _startedFeatures.Clear();
     }
 
     #region TestThreadExecutionEventPublisher Event Handling Methods
