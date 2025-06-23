@@ -47,7 +47,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
-    public ConcurrentDictionary<IBinding, string> StepDefinitionsByBinding { get; }
+    public IReadOnlyDictionary<IBinding, string> StepDefinitionsByBinding { get; internal set; }
 
     public int AttemptCount { get; private set; }
     public bool Finished { get; private set; }
@@ -70,7 +70,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     /// </param>
     /// <param name="instant">The timestamp marking when the test case started execution.</param>
     /// <param name="messageFactory">The factory responsible for creating Cucumber message objects.</param>
-    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, ConcurrentDictionary<IBinding, string> stepDefinitionsByMethod, DateTime instant, ICucumberMessageFactory messageFactory)
+    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, IReadOnlyDictionary<IBinding, string> stepDefinitionsByMethod, DateTime instant, ICucumberMessageFactory messageFactory)
     {
         TestRunStartedId = testRunStartedId;
         PickleId = pickleId;

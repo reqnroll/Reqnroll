@@ -30,14 +30,14 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     // Started Features by name
     internal ConcurrentDictionary<FeatureInfo, IFeatureExecutionTracker> _startedFeatures = new();
-    internal BindingMessagesGenerator _bindingCaches;
+    internal IBindingMessagesGenerator _bindingCaches;
     internal IClock _clock;
     internal IFormatterLog _logger;
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
     // shared to each Feature tracker so that we keep a single list
-    internal ConcurrentDictionary<IBinding, string> StepDefinitionIdByMethodBinding => _bindingCaches.StepDefinitionIdByBinding;
+    internal IReadOnlyDictionary<IBinding, string> StepDefinitionIdByMethodBinding => _bindingCaches.StepDefinitionIdByBinding;
 
     public IIdGenerator SharedIdGenerator { get; private set; }
 
@@ -71,7 +71,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         runtimePluginEvents.RegisterGlobalDependencies += (_, args) =>
         {
             _globalObjectContainer = args.ObjectContainer;
-            args.ObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
+            _globalObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
+            _globalObjectContainer.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
             if (!args.ObjectContainer.IsRegistered<ICucumberMessageFactory>())
             {
                 args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>((Delegate)(() => new CucumberMessageFactory()));
@@ -142,14 +143,14 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
         _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
         _testRunStartedId = SharedIdGenerator.GetNewId();
-        _bindingCaches = new BindingMessagesGenerator(SharedIdGenerator, _messageFactory);
+        _bindingCaches = _globalObjectContainer.Resolve<IBindingMessagesGenerator>();
         _clock = _globalObjectContainer.Resolve<IClock>();
         _logger = _globalObjectContainer.Resolve<IFormatterLog>();
         try
         {
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_globalObjectContainer)));
-            foreach (var msg in _bindingCaches.PopulateBindingCachesAndGenerateBindingMessages(_globalObjectContainer.Resolve<IBindingRegistry>()))
+            foreach (var msg in _bindingCaches.StaticBindingMessages)
             {
                 // this publishes StepDefinition, Hook, StepArgumentTransform messages
                 await _broker.PublishAsync(msg);
@@ -208,8 +209,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     {
         var featureInfo = featureStartedEvent.FeatureContext?.FeatureInfo;
 
-        if (!_startupCompleted)
-            throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message publisher is ready.");
+        //if (!_startupCompleted)
+        //    throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message publisher is ready.");
 
         if (!_enabled || featureInfo == null)
         {

@@ -32,6 +32,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         private readonly Mock<IIdGenerator> _idGeneratorMock;
         private readonly Mock<IClock> _clockMock;
         private readonly Mock<ITestThreadExecutionEventPublisher> _eventPublisherMock;
+        private readonly Mock<IBindingMessagesGenerator> _bindingMessagesGeneratorMock;
         private readonly RuntimePluginEvents _runtimePluginEvents;
         private readonly RuntimePluginParameters _runtimePluginParameters;
         private readonly UnitTestProviderConfiguration _unitTestProviderConfiguration;
@@ -45,6 +46,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _idGeneratorMock = new Mock<IIdGenerator>();
             _clockMock = new Mock<IClock>();
             _eventPublisherMock = new Mock<ITestThreadExecutionEventPublisher>();
+            _bindingMessagesGeneratorMock = new Mock<IBindingMessagesGenerator>();
 
             _runtimePluginEvents = new RuntimePluginEvents();
             _runtimePluginParameters = new RuntimePluginParameters();
@@ -139,9 +141,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var beforeTestRunArgs = new RuntimePluginBeforeTestRunEventArgs(objectContainerStub);
             // nb. This approach required as Moq can't mock types from Io.Cucumber.Messages.Types (as they're not visibleTo as well as sealed)
             var msgFactory = new PublisherStartup_FactoryStub();
-            var traceListen = new Mock<ITraceListener>();
-            objectContainerStub.RegisterInstanceAs(traceListen.Object);
             objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(msgFactory);
+            objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object));
 
             _sut._globalObjectContainer = objectContainerStub;
 
@@ -399,8 +400,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._messageFactory = messageFactory;
             _sut._broker = _brokerMock.Object;
             _sut._globalObjectContainer = objectContainerStub;
-            _sut._bindingCaches = new BindingMessagesGenerator(_idGeneratorMock.Object, messageFactory);
-            _sut._bindingCaches.StepDefinitionIdByBinding.Clear();
+            _sut._bindingCaches = new BindingMessagesGenerator(_idGeneratorMock.Object, messageFactory, _bindingRegistryMock.Object);
+            //_sut._bindingCaches.StepDefinitionIdByBinding.Clear();
             _sut._enabled = true;
             _sut._startupCompleted = true;
 
@@ -539,8 +540,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(true);
             SetupCommonMocks(objectContainerStub);
-
-            objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(new HookBindingTest_CucumberMessageFactoryStub());
+            var msgFactory = new HookBindingTest_CucumberMessageFactoryStub();
+            objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(msgFactory);
 
             var traceListen = new Mock<ITraceListener>();
             objectContainerStub.RegisterInstanceAs(traceListen.Object);
@@ -555,6 +556,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new List<IHookBinding>([hookBindingMock.Object]));
+            objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object));
 
             _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherStartup(new TestRunStartedEvent());

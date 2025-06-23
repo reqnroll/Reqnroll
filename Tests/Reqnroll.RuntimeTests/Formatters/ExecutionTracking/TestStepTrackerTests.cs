@@ -11,6 +11,7 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Xunit;
+using System.Collections.ObjectModel;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 {
@@ -23,7 +24,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         public TestStepTrackerTests()
         {
 
-            _pickleExecutionTracker = new PickleExecutionTracker("testCasePickle", "runStartedId", "featureName", true, _idGeneratorMock.Object, new(), DateTime.Now, _messageFactoryMock.Object);
+            _pickleExecutionTracker = new PickleExecutionTracker("testCasePickle", "runStartedId", "featureName", true, _idGeneratorMock.Object, null, DateTime.Now, _messageFactoryMock.Object);
             _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickle", _pickleExecutionTracker, _messageFactoryMock.Object);
         }
 
@@ -55,8 +56,9 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
 
             _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker));
-            _pickleExecutionTracker.StepDefinitionsByBinding.TryAdd(stepBindingMock.Object, "stepPickleId");
-
+            _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
+                new Dictionary<IBinding, string> { { stepBindingMock.Object, "stepPickleId" } });
+                
             var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
 
             var def = new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker);
@@ -101,7 +103,8 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.OK);
 
             _testCaseTracker.Steps.Add(new TestStepTracker("stepDefId", "stepPickleId", _testCaseTracker));
-            _pickleExecutionTracker.StepDefinitionsByBinding.TryAdd(stepBindingMock.Object, "stepPickleId");
+            _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
+                new Dictionary<IBinding, string> { { stepBindingMock.Object, "stepPickleId" } });
 
             var evt = new StepFinishedEvent(null, null, stepContextMock.Object);
 
@@ -206,7 +209,8 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
             //    .Returns("ambiguousPattern");
             _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", _testCaseTracker));
-            _pickleExecutionTracker.StepDefinitionsByBinding.TryAdd(stepBindingMock.Object, "pickleStepId");
+            _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
+                new Dictionary<IBinding, string> { { stepBindingMock.Object, "pickleStepId" } });
 
             var evt = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
 

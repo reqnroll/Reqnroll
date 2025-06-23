@@ -33,7 +33,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
     // This dictionary is shared across all Features (via the Publisher)
-    public ConcurrentDictionary<IBinding, string> StepDefinitionsByBinding { get; }
+    public IReadOnlyDictionary<IBinding, string> StepDefinitionsByBinding { get; }
 
     // This maintains the list of PickleExecutionTrackers, identified by (string) PickleID, running within this feature
     private readonly ConcurrentDictionary<string, IPickleExecutionTracker> _pickleExecutionTrackersById = new();
@@ -49,7 +49,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     public IEnumerable<IPickleExecutionTracker> PickleExecutionTrackers => _pickleExecutionTrackersById.Values;
 
     // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
-    public FeatureExecutionTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, ConcurrentDictionary<IBinding, string> stepDefinitionIdsByMethod, ICucumberMessageFactory messageFactory)
+    public FeatureExecutionTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IIdGenerator idGenerator, IReadOnlyDictionary<IBinding, string> stepDefinitionIdsByMethod, ICucumberMessageFactory messageFactory)
     {
         TestRunStartedId = testRunStartedId;
         StepDefinitionsByBinding = stepDefinitionIdsByMethod;

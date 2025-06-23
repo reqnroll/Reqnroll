@@ -21,7 +21,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock = new Mock<IBindingRegistry>();
             _idGeneratorMock = new Mock<IIdGenerator>();
             _idGeneratorMock.Setup(i => i.GetNewId()).Returns(CurrentId++.ToString());
-            _sut = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory());
+            _sut = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(), _bindingRegistryMock.Object);
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new[] { stepTransform.Object });
 
             // Act
-            var messages = _sut.PopulateBindingCachesAndGenerateBindingMessages(_bindingRegistryMock.Object).ToList();
+            var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
             messages.Should().HaveCount(1);
@@ -57,7 +57,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new[] { invalidStepDefinition.Object });
 
             // Act
-            var messages = _sut.PopulateBindingCachesAndGenerateBindingMessages(_bindingRegistryMock.Object).ToList();
+            var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
             messages.Should().HaveCount(1);
@@ -79,7 +79,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new[] { validStepDefinition.Object });
 
             // Act
-            var messages = _sut.PopulateBindingCachesAndGenerateBindingMessages(_bindingRegistryMock.Object).ToList();
+            var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
             messages.Should().HaveCount(1);
@@ -101,7 +101,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new[] { hookBinding.Object });
             // Act
-            var messages = _sut.PopulateBindingCachesAndGenerateBindingMessages(_bindingRegistryMock.Object).ToList();
+            var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
             messages.Should().HaveCount(1);
@@ -120,7 +120,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new[] { stepTransform.Object });
 
             // Act
-            var messages = _sut.PopulateBindingCachesAndGenerateBindingMessages(_bindingRegistryMock.Object).ToList();
+            var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
             messages.Should().BeEmpty();

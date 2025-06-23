@@ -18,7 +18,7 @@ public interface IPickleExecutionTracker
     public int AttemptCount { get; }
     public IIdGenerator IdGenerator { get; }
     public TestCaseTracker TestCaseTracker { get; }
-    public ConcurrentDictionary<IBinding, string> StepDefinitionsByBinding { get; }
+    public IReadOnlyDictionary<IBinding, string> StepDefinitionsByBinding { get; }
 
     void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent);
     void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent);
