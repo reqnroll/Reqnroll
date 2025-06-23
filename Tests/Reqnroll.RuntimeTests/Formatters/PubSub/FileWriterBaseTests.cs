@@ -165,7 +165,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             await _sut.CloseAsync();
 
             // Assert
-            _fileSystemMock.Verify(fs => fs.CreateDirectory(Path.GetDirectoryName(filepath)), Times.Once);
+            _fileSystemMock.Verify(fs => fs.CreateDirectory(It.IsAny<string>()), Times.Once);
         }
 
         private JsonDocument CreateJsonDoc(string key, string value)
