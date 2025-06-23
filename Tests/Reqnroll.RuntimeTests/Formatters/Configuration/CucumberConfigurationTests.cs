@@ -31,8 +31,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void Enabled_Should_Return_False_When_No_Configuration_Is_Resolved()
         {
             // Arrange
-            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
+            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
             _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
             // Act
@@ -46,10 +46,12 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void Enabled_Should_Respect_Environment_Variable_Override()
         {
             // Arrange
-            var mockedSetup = new Dictionary<string, IDictionary<string, string>>();
-            mockedSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_report.html" } });
+            var mockedSetup = new Dictionary<string, IDictionary<string, object>>();
+            var htmlConfig = new Dictionary<string, object>();
+            htmlConfig.Add("outputFileName", @"c:\html\html_report.html");
+            mockedSetup.Add("html", htmlConfig);
             _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
 
             _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(true);
 
@@ -64,10 +66,10 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void GetFormatterConfigurationByName_Should_Return_Configuration_For_Existing_Formatter()
         {
             // Arrange
-            var mockedSetup = new Dictionary<string, IDictionary<string, string>>();
-            mockedSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_report.html" } });
+            var mockedSetup = new Dictionary<string, IDictionary<string, object>>();
+            mockedSetup.Add("html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_report.html" } });
             _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
             _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
             // Act
@@ -81,12 +83,12 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void GetFormatterConfigurationByName_Should_Respect_Formatter_Given_By_EnvironmentVariable_Override()
         {
             // Arrange
-            var configFileSetup = new Dictionary<string, IDictionary<string, string>>();
-            configFileSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_report.html" } });
+            var configFileSetup = new Dictionary<string, IDictionary<string, object>>();
+            configFileSetup.Add("html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_report.html" } });
             _fileResolverMock.Setup(r => r.Resolve()).Returns(configFileSetup);
 
-            var envVarSetup = new Dictionary<string, IDictionary<string, string>>();
-            envVarSetup.Add("html", new Dictionary<string, string> { { "outputFileName", @"c:\html\html_overridden_name.html" } });
+            var envVarSetup = new Dictionary<string, IDictionary<string, object>>();
+            envVarSetup.Add("html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_overridden_name.html" } });
             _environmentResolverMock.Setup(r => r.Resolve()).Returns(envVarSetup);
             _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
@@ -102,8 +104,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void GetFormatterConfigurationByName_Should_Return_Empty_For_Nonexistent_Formatter()
         {
             // Arrange
-            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
-            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, string>>());
+            _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
+            _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
 
             _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 

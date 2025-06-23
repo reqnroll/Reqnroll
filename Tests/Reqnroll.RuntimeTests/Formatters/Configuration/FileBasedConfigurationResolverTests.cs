@@ -91,8 +91,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
 
             // Assert
             result.Should().HaveCount(2);
-            result["formatter1"]["config1"].Should().Be("setting1");
-            result["formatter2"]["config2"].Should().Be("setting2");
+            ((JsonElement)result["formatter1"]["config1"]).GetString().Should().Be("setting1");
+            ((JsonElement)result["formatter2"]["config2"]).GetString().Should().Be("setting2");
         }
 
         [Fact]
@@ -105,7 +105,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
             _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
             _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(invalidJsonContent);
-            IDictionary<string, IDictionary<string, string>> result;
+            IDictionary<string, IDictionary<string, object>> result;
             // Act
             var act = () => result = _sut.Resolve();
 

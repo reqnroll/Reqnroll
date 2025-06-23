@@ -56,12 +56,12 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
     internal void LaunchSink()
     {
-        bool IsFormatterEnabled(out Dictionary<string, string> configuration)
+        bool IsFormatterEnabled(out IDictionary<string, object> configuration)
         {
             configuration = null!;
             if (!_configurationProvider.Enabled)
                 return false;
-            configuration = (Dictionary<string, string>)_configurationProvider.GetFormatterConfigurationByName(_pluginName);
+            configuration = _configurationProvider.GetFormatterConfigurationByName(_pluginName);
 
             return configuration != null && configuration.Count > 0;
         }
@@ -95,7 +95,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
             await CloseAsync().ConfigureAwait(false);
     }
 
-    protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigString, Action<bool> onAfterInitialization);
+    protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
 
     public void Dispose()
     {

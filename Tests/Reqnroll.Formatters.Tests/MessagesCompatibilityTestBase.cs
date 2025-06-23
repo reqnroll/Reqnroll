@@ -12,6 +12,7 @@ using Reqnroll.SystemTests;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
 using System.Reflection;
+using System.Text.Json;
 
 namespace Reqnroll.Formatters.Tests
 {
@@ -145,8 +146,9 @@ namespace Reqnroll.Formatters.Tests
             };
 
             FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new FormattersDisabledOverrideProvider(env));
-            configurationProvider.GetFormatterConfigurationByName("messages").TryGetValue("outputFilePath", out var outputFilePath);
+            configurationProvider.GetFormatterConfigurationByName("messages").TryGetValue("outputFilePath", out var outputFilePathElement);
 
+            var outputFilePath = ((JsonElement)outputFilePathElement!).GetString();
             if (string.IsNullOrEmpty(outputFilePath))
                 outputFilePath = "[BASEDIRECTORY]\\CucumberMessages\\reqnroll_report.ndson";
 

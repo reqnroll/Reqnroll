@@ -17,6 +17,7 @@ using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
+using System.Text.Json;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
@@ -88,8 +89,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
+            var filepath = "";
+            using var doc = CreateJsonDoc("outputFilePath", filepath);
+
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, string> { { "outputFilePath", "" } });
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -106,8 +110,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
+            var filepath = "aFileName.txt";
+            using var doc = CreateJsonDoc("outputFilePath", filepath);
+
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, string> { { "outputFilePath", "aFileName.txt" } });
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -122,9 +129,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublishAsync_Should_Write_Envelopes()
         {
             // Arrange
+            var filepath = @"C:\/valid\/path/output.txt";
+            using var doc = CreateJsonDoc("outputFilePath", filepath);
+
             _configurationMock.Setup(c => c.Enabled).Returns(true);
             _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                .Returns(new Dictionary<string, string> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+                .Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
@@ -143,10 +153,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
-            var filepath = @"C:/valid/path/output.txt".Replace('/', sp);
+            var filepath = @"C:\/valid\/path\/output.txt".Replace('/', sp);
+            using var doc = CreateJsonDoc("outputFilePath", filepath);
             _configurationMock.Setup(c => c.Enabled).Returns(true);
             _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                .Returns(new Dictionary<string, string> { { "outputFilePath", filepath } });
+                .Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act
@@ -155,6 +166,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             _fileSystemMock.Verify(fs => fs.CreateDirectory(Path.GetDirectoryName(filepath)), Times.Once);
+        }
+
+        private JsonDocument CreateJsonDoc(string key, string value)
+        {
+            var jsonText = $" {{ \"{key}\": \"{value}\" }}";
+            return JsonDocument.Parse(jsonText);
         }
     }
 }

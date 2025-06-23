@@ -4,6 +4,7 @@ using Reqnroll.CommonModels;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using System.Collections.Generic;
+using System.Text.Json;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.Configuration
@@ -38,13 +39,14 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
         public void Resolve_Should_Return_Configuration_From_Environment_Variables()
         {
             // Arrange
-            var json = @"
+            var json = """
             {
-                ""formatters"": {
-                    ""formatter1"": {
-                        ""configSetting1"": ""configValue1"" }
+                "formatters": {
+                    "formatter1": {
+                        "configSetting1": "configValue1" }
                 }
-            }";
+            }
+            """;
             _environmentWrapperMock
                 .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
                 .Returns(new Success<string>(json));
@@ -53,7 +55,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var result = _sut.Resolve();
 
             // Assert
-            result["formatter1"]["configSetting1"].Should().Be("configValue1");
+            ((JsonElement)result["formatter1"]["configSetting1"]).GetString().Should().Be("configValue1");
         }
 
         [Fact]
@@ -78,8 +80,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             Assert.Equal(2, result.Count);
             var first = result["html"];
             var second = result["messages"];
-            Assert.Equal("forHtml", first["outputFilePath"]);
-            Assert.Equal("forMessages", second["outputFilePath"]);
+            Assert.Equal("forHtml", ((JsonElement)first["outputFilePath"]).GetString());
+            Assert.Equal("forMessages", ((JsonElement)second["outputFilePath"]).GetString());
         }
 
     }

@@ -30,17 +30,17 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }
 
-    public IDictionary<string, string> GetFormatterConfigurationByName(string formatterName)
+    public IDictionary<string, object> GetFormatterConfigurationByName(string formatterName)
     {
         var config = _resolvedConfiguration.Value;
         if (config.Formatters.TryGetValue(formatterName, out var formatterConfig))
             return formatterConfig;
-        return new Dictionary<string, string>();
+        return new Dictionary<string, object>();
     }
 
     private FormattersConfiguration ResolveConfiguration()
     {
-        var combinedConfig = new Dictionary<string, IDictionary<string, string>>();
+        var combinedConfig = new Dictionary<string, IDictionary<string, object>>();
 
         foreach (var resolver in _resolvers)
         {

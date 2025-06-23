@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
@@ -30,7 +31,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-    protected override async Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, string> formatterConfigurationString, Action<bool> onInitialized)
+    protected override async Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigurationString, Action<bool> onInitialized)
     {
         var defaultBaseDirectory = ".";
 
@@ -76,10 +77,13 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
 
     protected abstract Task ConsumeAndWriteToFilesBackgroundTask(string outputPath);
 
-    protected virtual string ConfiguredOutputFilePath(IDictionary<string, string> formatterConfiguration)
+    protected virtual string ConfiguredOutputFilePath(IDictionary<string, object> formatterConfiguration)
     {
         string outputFilePath = string.Empty;
-        formatterConfiguration.TryGetValue("outputFilePath", out outputFilePath);
+        if (formatterConfiguration.TryGetValue("outputFilePath", out var outputPathElement) && outputPathElement is JsonElement jsonElement)
+        {
+            outputFilePath = jsonElement.GetString() ?? string.Empty; // Ensure null-coalescing to handle possible null values.
+        }
         return outputFilePath;
     }
 }

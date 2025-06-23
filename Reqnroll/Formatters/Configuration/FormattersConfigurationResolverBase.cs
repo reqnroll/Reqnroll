@@ -7,9 +7,9 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
 {
     protected const string FORMATTERS_KEY = "formatters";
 
-    public IDictionary<string, IDictionary<string, string>> Resolve()
+    public IDictionary<string, IDictionary<string, object>> Resolve()
     {
-        var result = new Dictionary<string, IDictionary<string, string>>();
+        var result = new Dictionary<string, IDictionary<string, object>>();
         JsonDocument jsonDocument = GetJsonDocument();
         
         if (jsonDocument != null)
@@ -22,31 +22,19 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
     
     protected abstract JsonDocument GetJsonDocument();
     
-    protected virtual void ProcessJsonDocument(JsonDocument jsonDocument, Dictionary<string, IDictionary<string, string>> result)
+    protected virtual void ProcessJsonDocument(JsonDocument jsonDocument, Dictionary<string, IDictionary<string, object>> result)
     {
         if (jsonDocument.RootElement.TryGetProperty(FORMATTERS_KEY, out JsonElement formatters))
         {
             foreach(JsonProperty formatterProperty in formatters.EnumerateObject())
             {
-                var configValues = new Dictionary<string, string>();
+                var configValues = new Dictionary<string, object>();
                 
                 if (formatterProperty.Value.ValueKind == JsonValueKind.Object)
                 {
                     foreach (JsonProperty configProperty in formatterProperty.Value.EnumerateObject())
                     {
-                        // If the configuration value is a simple type, store its string representation
-                        if (configProperty.Value.ValueKind == JsonValueKind.String ||
-                            configProperty.Value.ValueKind == JsonValueKind.Number ||
-                            configProperty.Value.ValueKind == JsonValueKind.True ||
-                            configProperty.Value.ValueKind == JsonValueKind.False)
-                        {
-                            configValues.Add(configProperty.Name, configProperty.Value.ToString());
-                        }
-                        else
-                        {
-                            // For complex types, store the raw JSON text
-                            configValues.Add(configProperty.Name, configProperty.Value.GetRawText());
-                        }
+                            configValues.Add(configProperty.Name, configProperty.Value);
                     }
                 }
                 

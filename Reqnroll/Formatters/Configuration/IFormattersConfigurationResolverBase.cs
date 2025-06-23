@@ -4,7 +4,7 @@ namespace Reqnroll.Formatters.Configuration;
 
 public interface IFormattersConfigurationResolverBase
 {
-    IDictionary<string, IDictionary<string, string>> Resolve();
+    IDictionary<string, IDictionary<string, object>> Resolve();
 }
 
 public interface IFormattersConfigurationResolver : IFormattersConfigurationResolverBase;
