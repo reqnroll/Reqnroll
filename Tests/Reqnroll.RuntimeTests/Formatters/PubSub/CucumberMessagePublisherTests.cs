@@ -323,6 +323,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._enabled = false;
             _sut._broker = _brokerMock.Object;
             _sut._globalObjectContainer = objectContainerStub;
+            _sut._startupCompleted = true;
 
             // Act
             await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
@@ -348,6 +349,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._broker = _brokerMock.Object;
             _sut._globalObjectContainer = objectContainerStub;
             _sut._enabled = true;
+            _sut._startupCompleted = true;
 
             // Act
             await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
@@ -400,6 +402,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._bindingCaches = new BindingMessagesGenerator(_idGeneratorMock.Object, messageFactory);
             _sut._bindingCaches.StepDefinitionIdByBinding.Clear();
             _sut._enabled = true;
+            _sut._startupCompleted = true;
 
             // Act
             await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));

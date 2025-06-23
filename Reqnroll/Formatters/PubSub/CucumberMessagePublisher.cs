@@ -58,7 +58,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
 
     internal ICucumberMessageFactory _messageFactory;
-    private bool _startupCompleted = false;
+    internal bool _startupCompleted = false;
 
     public CucumberMessagePublisher(ICucumberMessageBroker broker)
     {
@@ -133,7 +133,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         _enabled = _broker.Enabled;
     }
 
-    internal async Task PublisherStartup(IExecutionEvent executionEvent)
+    internal async Task PublisherStartup(TestRunStartedEvent testRunStartEvent)
     {
 
         if (!_enabled || _startupCompleted)
@@ -207,6 +207,9 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
     {
         var featureInfo = featureStartedEvent.FeatureContext?.FeatureInfo;
+
+        if (!_startupCompleted)
+            throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message publisher is ready.");
 
         if (!_enabled || featureInfo == null)
         {
