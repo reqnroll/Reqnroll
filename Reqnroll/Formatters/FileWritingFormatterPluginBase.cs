@@ -53,7 +53,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         if (!FileFilter.IsValidFile(outputPath))
         {
             onInitialized(false);
-            Logger.WriteMessage($"Path of configured formatter output file: {outputPath} is invalid or missing.\r\nFormatter {PluginName} will be disabled.");
+            Logger.WriteMessage($"Path of configured formatter output file: {outputPath} is invalid or missing.\r\nFormatter {Name} will be disabled.");
             return;
         }
         if (!_fileSystem.DirectoryExists(baseDirectory))
@@ -65,11 +65,12 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
             catch (Exception e)
             {
                 onInitialized(false);
-                Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {PluginName}. The formatter will be disabled.");
+                Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {Name}. The formatter will be disabled.");
                 return;
             }
         }
         onInitialized(true);
+        Logger.WriteMessage($"Formatter {Name} initialized to write to: {outputPath}.");
         await ConsumeAndWriteToFilesBackgroundTask(outputPath);
     }
 

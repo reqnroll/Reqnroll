@@ -44,7 +44,7 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
         }
         catch(Exception e)
         {
-            Logger.WriteMessage($"Formatter {PluginName} threw an exception: {e.Message}. No further messages will be added to the generated html file.");
+            Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be added to the generated html file.");
         }
     }
 }

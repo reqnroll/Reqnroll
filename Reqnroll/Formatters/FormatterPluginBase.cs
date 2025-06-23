@@ -16,7 +16,7 @@ using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Formatters;
 
-public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, IRuntimePlugin
+public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin, IDisposable
 {
     private Task? _formatterTask;
 
@@ -28,23 +28,23 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
     private bool _isDisposed = false;
 
     public IFormatterLog Logger { get => _logger; }
-    public string PluginName { get; }
+    private string _pluginName;
 
-    string ICucumberMessageSink.Name => PluginName;
+    public string Name => _pluginName;
 
     protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, string pluginName)
     {
         _broker = broker;
         _configurationProvider = configurationProvider;
         _logger = logger;
-        PluginName = pluginName;
+        _pluginName = pluginName;
     }
 
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
         _broker.RegisterSink(this);
 
-        LaunchSinkAsync();
+        LaunchSink();
     }
 
     internal async Task CloseAsync()
@@ -54,14 +54,14 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
         _formatterTask = null;
     }
 
-    internal void LaunchSinkAsync()
+    internal void LaunchSink()
     {
         bool IsFormatterEnabled(out Dictionary<string, string> configuration)
         {
             configuration = null!;
             if (!_configurationProvider.Enabled)
                 return false;
-            configuration = (Dictionary<string, string>)_configurationProvider.GetFormatterConfigurationByName(PluginName);
+            configuration = (Dictionary<string, string>)_configurationProvider.GetFormatterConfigurationByName(_pluginName);
 
             return configuration != null && configuration.Count > 0;
         }
@@ -72,7 +72,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
             return;
         }
 
-        _formatterTask = Task.Run( () =>  ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized));
+        _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized));
     }
 
     private void ReportInitialized(bool status)
@@ -82,6 +82,12 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
 
     public async Task PublishAsync(Envelope message)
     {
+        if (_isDisposed || PostedMessages.IsAddingCompleted)
+        {
+            Logger.WriteMessage($"Cannot add message {message.Content().GetType().Name} to formatter {Name} - formatter is closed and not able to accept additional messages.");
+            return;
+        }
+
         PostedMessages.Add(message);
 
         // If the publisher sends the TestRunFinished message, then we can safely shut down.
@@ -95,8 +101,17 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable, I
     {
         if (!_isDisposed)
         {
-            PostedMessages.Dispose();
-            _isDisposed = true;
+            try
+            {
+                if (!PostedMessages.IsAddingCompleted)
+                    CloseAsync().GetAwaiter().GetResult();
+            }
+            finally
+            {
+                PostedMessages.Dispose();
+                _isDisposed = true;
+                GC.SuppressFinalize(this);
+            }
         }
     }
 }
