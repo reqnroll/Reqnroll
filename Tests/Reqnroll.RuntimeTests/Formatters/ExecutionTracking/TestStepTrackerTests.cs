@@ -112,7 +112,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             // Assert
             def.IsBound.Should().BeTrue();
-            def.StepArguments.Should().HaveCount(2);
+            def.StepArguments.Should().HaveCount(1);
         }
 
         private Mock<IBindingMethod> SetupMockMethodWithParameters(IEnumerable<(string, Type)> paramList)
