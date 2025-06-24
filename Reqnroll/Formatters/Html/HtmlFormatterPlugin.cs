@@ -18,7 +18,6 @@ namespace Reqnroll.Formatters.Html;
 /// </summary>
 public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
 {
-    private IFormatterLog _logger;
 
     public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, broker, logger, "html", ".html", "reqnroll_report.html", fileSystem)
     {
