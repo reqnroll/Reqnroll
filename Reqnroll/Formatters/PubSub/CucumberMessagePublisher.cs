@@ -370,7 +370,6 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             case Bindings.HookType.AfterTestRun:
             case Bindings.HookType.BeforeFeature:
             case Bindings.HookType.AfterFeature:
-                //var signature = _messageFactory.CanonicalizeHookBinding(hookBindingFinishedEvent.HookBinding);
                 if (!_testRunHookTrackers.TryGetValue(hookBindingFinishedEvent.HookBinding, out var hookTracker)) // should not happen
                     return Task.CompletedTask;
                 hookTracker.ProcessEvent(hookBindingFinishedEvent);
