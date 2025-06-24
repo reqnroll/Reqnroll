@@ -155,6 +155,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             await _sut.PublisherStartup(new TestRunStartedEvent());
 
             // Assert
+            _sut._startupCompletionSource.Task.IsCompletedSuccessfully.Should().BeTrue();
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.AtLeast(2)); // TestRunStarted and Meta messages
             _bindingRegistryMock.Verify(br => br.GetStepDefinitions(), Times.Exactly(2));
             _bindingRegistryMock.Verify(br => br.GetHooks(), Times.Once);
@@ -327,7 +328,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._startupCompleted = true;
 
             // Act
-            await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
+            await _sut.FeatureStartedEventHandler(new FeatureStartedEvent(featureContextMock.Object));
 
             // Assert
             _sut._startedFeatures.Count.Should().Be(0);
@@ -353,7 +354,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._startupCompleted = true;
 
             // Act
-            await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
+            await _sut.FeatureStartedEventHandler(new FeatureStartedEvent(featureContextMock.Object));
 
             // Assert
             _sut._startedFeatures.Count.Should().Be(1);
@@ -406,7 +407,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._startupCompleted = true;
 
             // Act
-            await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
+            await _sut.FeatureStartedEventHandler(new FeatureStartedEvent(featureContextMock.Object));
 
             // Assert
             _sut._startedFeatures.Count.Should().Be(1);
@@ -439,7 +440,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._enabled = true;
 
             // Act
-            await _sut.OnEventAsync(featureFinishedEvent);
+            await _sut.FeatureFinishedEventHandler(featureFinishedEvent);
 
             // Assert
             _sut._messages.Should().Contain(fakeMessages);
@@ -482,6 +483,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._globalObjectContainer = containerStub;
             _sut._enabled = true;
+            _sut._startupCompletionSource.TrySetResult(true);
+            _sut._startupCompleted = true;
 
             // Act 
             await _sut.OnEventAsync(evnt);
@@ -582,7 +585,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task HookBindingFinishedEvent_ForNonScenarioHooks_Should_EmitAHookFinishedMessage(Reqnroll.Bindings.HookType hookType)
         {
             // Arrange
-            // Hack: Re-using code from a prior test to invoke the BrokerReady and get the sut set-up for this test.
             var objectContainerStub = CreateObjectContainerWithBroker(true);
             SetupCommonMocks(objectContainerStub);
             var messageFactory = new HookBindingTest_CucumberMessageFactoryStub();
@@ -603,6 +605,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _sut._globalObjectContainer = objectContainerStub;
             _sut._enabled = true;
+            _sut._startupCompletionSource.SetResult(true);
+            _sut._startupCompleted = true;
             _sut._messageFactory = messageFactory;
 
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
@@ -669,6 +673,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._enabled = true;
+            _sut._startupCompletionSource.TrySetResult(true);
+            _sut._startupCompleted = true;
             _sut._messageFactory = new CucumberMessageFactory();
 
             // Act 
@@ -707,6 +713,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._enabled = true;
+            _sut._startupCompletionSource.TrySetResult(true);
+            _sut._startupCompleted = true;
             _sut._messageFactory = new CucumberMessageFactory();
 
             // Act 
@@ -750,6 +758,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var evnt = (IExecutionEvent)Activator.CreateInstance(eventType, "attachment-path", null, null);
 
             _sut._enabled = true;
+            _sut._startupCompletionSource.TrySetResult(true);
+            _sut._startupCompleted = true;
             _sut._messageFactory = new AttachmentMessageFactory();
             // Act 
             await _sut.OnEventAsync(evnt);

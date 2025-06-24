@@ -59,6 +59,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     internal ICucumberMessageFactory _messageFactory;
     internal bool _startupCompleted = false;
+    internal readonly TaskCompletionSource<bool> _startupCompletionSource = new TaskCompletionSource<bool>();
 
     public CucumberMessagePublisher(ICucumberMessageBroker broker)
     {
@@ -88,11 +89,21 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     public async Task OnEventAsync(IExecutionEvent executionEvent)
     {
+        if (executionEvent is TestRunStartedEvent testRunStartedEvent)
+        {
+            await PublisherStartup(testRunStartedEvent);
+            return;
+        }
+
+        // Wait for startup to complete before processing any other events
+        await _startupCompletionSource.Task;
+
+        // Only proceed if startup succeeded
+        if (!_startupCompleted)
+            return;
+
         switch (executionEvent)
         {
-            case TestRunStartedEvent testRunStartedEvent:
-                await PublisherStartup(testRunStartedEvent);
-                break;
             case TestRunFinishedEvent testRunFinishedEvent:
                 await PublisherTestRunCompleteAsync(testRunFinishedEvent);
                 break;
@@ -138,30 +149,42 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     {
 
         if (!_enabled || _startupCompleted)
+        {
+            _startupCompletionSource.TrySetResult(true);
             return;
-
-        SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
-        _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
-        _testRunStartedId = SharedIdGenerator.GetNewId();
-        _bindingCaches = _globalObjectContainer.Resolve<IBindingMessagesGenerator>();
-        _clock = _globalObjectContainer.Resolve<IClock>();
-        _logger = _globalObjectContainer.Resolve<IFormatterLog>();
+        }
         try
         {
-            await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
-            await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_globalObjectContainer)));
-            foreach (var msg in _bindingCaches.StaticBindingMessages)
+            SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
+            _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
+            _testRunStartedId = SharedIdGenerator.GetNewId();
+            _bindingCaches = _globalObjectContainer.Resolve<IBindingMessagesGenerator>();
+            _clock = _globalObjectContainer.Resolve<IClock>();
+            _logger = _globalObjectContainer.Resolve<IFormatterLog>();
+            try
             {
-                // this publishes StepDefinition, Hook, StepArgumentTransform messages
-                await _broker.PublishAsync(msg);
+                await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
+                await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_globalObjectContainer)));
+                foreach (var msg in _bindingCaches.StaticBindingMessages)
+                {
+                    // this publishes StepDefinition, Hook, StepArgumentTransform messages
+                    await _broker.PublishAsync(msg);
+                }
             }
+            catch (System.Exception ex)
+            {
+                _logger.WriteMessage($"Error publishing messages: {ex.Message}");
+            }
+
+            _startupCompleted = true;
+            _startupCompletionSource.TrySetResult(true);
         }
         catch (System.Exception ex)
         {
-            _logger.WriteMessage($"Error publishing messages: {ex.Message}");
+            _logger?.WriteMessage($"Error during startup: {ex.Message}");
+            _startupCompletionSource.TrySetException(ex);
+            throw;
         }
-
-        _startupCompleted = true;
     }
 
     private DateTime RetrieveDateTime(Envelope e)
@@ -205,7 +228,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     // The following methods handle the events published by the TestThreadExecutionEventPublisher
     // When one of these calls the Broker, that method is async; otherwise these are sync methods that return a completed Task (to allow them to be called async from the TestThreadExecutionEventPublisher)
-    private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
+    internal async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
     {
         var featureInfo = featureStartedEvent.FeatureContext?.FeatureInfo;
 
