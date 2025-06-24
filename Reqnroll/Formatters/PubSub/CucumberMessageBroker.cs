@@ -64,13 +64,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     private void RaiseBrokerReadyEvent()
     {
-        if (BrokerReadyEvent is null)
-            return;
-
-        foreach (var subscriber in BrokerReadyEvent.GetInvocationList().OfType<EventHandler<BrokerReadyEventArgs>>())
-        {
-            subscriber.Invoke(this, new BrokerReadyEventArgs());
-        }
+        BrokerReadyEvent?.Invoke(this, new BrokerReadyEventArgs());
     }
 
     public async Task PublishAsync(Envelope message)

@@ -148,7 +148,7 @@ namespace Reqnroll.Formatters.Tests
             FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new FormattersDisabledOverrideProvider(env));
             configurationProvider.GetFormatterConfigurationByName("messages").TryGetValue("outputFilePath", out var outputFilePathElement);
 
-            var outputFilePath = ((JsonElement)outputFilePathElement!).GetString();
+            var outputFilePath = outputFilePathElement!.ToString();
             if (string.IsNullOrEmpty(outputFilePath))
                 outputFilePath = "[BASEDIRECTORY]\\CucumberMessages\\reqnroll_report.ndson";
 

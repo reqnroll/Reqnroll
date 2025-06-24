@@ -46,7 +46,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     // This field will be updated as each Feature completes. If all complete successfully, this will remain as true.
     // This field ultimately used to set the TestRunFinished message's status.
-    internal bool _runStatus = true;
+    internal bool _allFeaturesPassed = true;
 
     // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
     internal readonly ConcurrentDictionary<IBinding, TestRunHookExecutionTracker> _testRunHookTrackers = new();
@@ -194,7 +194,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             await _broker.PublishAsync(env);
         }
 
-        await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(_runStatus, _clock.GetNowDateAndTime(), _testRunStartedId)));
+        await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(_allFeaturesPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
 
         // By the time PublisherTestRunComplete is called, all Features should have completed and been removed from the _startedFeatures collection.
         if (_startedFeatures.Count > 0)
@@ -261,7 +261,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         {
             _messages.Add(msg);
         }
-        _runStatus = _runStatus & featureTracker.FeatureExecutionSuccess;
+        if (!featureTracker.FeatureExecutionSuccess)
+            _allFeaturesPassed = false;
         _startedFeatures.TryRemove(featureInfo, out _);
         return Task.CompletedTask;
         // throw an exception if any of the TestCaseExecutionTrackers are not done?

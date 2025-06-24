@@ -31,11 +31,11 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-    protected override async Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigurationString, Action<bool> onInitialized)
+    protected override async Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
     {
         var defaultBaseDirectory = ".";
 
-        var outputFilePath = ConfiguredOutputFilePath(formatterConfigurationString);
+        var outputFilePath = ConfiguredOutputFilePath(formatterConfiguration);
         var fileName = Path.GetFileName(outputFilePath);
         var baseDirectory = Path.GetDirectoryName(outputFilePath) ?? "";
 
@@ -54,7 +54,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         if (!FileFilter.IsValidFile(outputPath))
         {
             onInitialized(false);
-            Logger.WriteMessage($"Path of configured formatter output file: {outputPath} is invalid or missing.\r\nFormatter {Name} will be disabled.");
+            Logger.WriteMessage($"Path of configured formatter output file: {outputPath} is invalid or missing. Formatter {Name} will be disabled.");
             return;
         }
         if (!_fileSystem.DirectoryExists(baseDirectory))
@@ -80,9 +80,9 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
     protected virtual string ConfiguredOutputFilePath(IDictionary<string, object> formatterConfiguration)
     {
         string outputFilePath = string.Empty;
-        if (formatterConfiguration.TryGetValue("outputFilePath", out var outputPathElement) && outputPathElement is JsonElement jsonElement)
+        if (formatterConfiguration.TryGetValue("outputFilePath", out var outputPathElement))
         {
-            outputFilePath = jsonElement.GetString() ?? string.Empty; // Ensure null-coalescing to handle possible null values.
+            outputFilePath = (string)outputPathElement ?? string.Empty; // Ensure null-coalescing to handle possible null values.
         }
         return outputFilePath;
     }

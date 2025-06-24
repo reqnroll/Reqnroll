@@ -91,8 +91,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
 
             // Assert
             result.Should().HaveCount(2);
-            ((JsonElement)result["formatter1"]["config1"]).GetString().Should().Be("setting1");
-            ((JsonElement)result["formatter2"]["config2"]).GetString().Should().Be("setting2");
+            result["formatter1"]["config1"].Should().Be("setting1");
+            result["formatter2"]["config2"].Should().Be("setting2");
         }
 
         [Fact]

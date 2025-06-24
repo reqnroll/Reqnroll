@@ -10,11 +10,6 @@ using System.Collections.ObjectModel;
 
 namespace Reqnroll.Formatters.PubSub;
 
-public interface IBindingMessagesGenerator
-{
-    IReadOnlyDictionary<IBinding, string> StepDefinitionIdByBinding { get; }
-    IEnumerable<Envelope> StaticBindingMessages { get; }
-}
 /// <summary>
 /// This class is used at test start-up to iterate through the <see cref="IBindingRegistry"/> to generate messages for each of the 
 /// <see cref="IStepArgumentTransformationBinding"/>, <see cref="IStepDefinitionBinding"/> and <see cref="IHookBinding"/>.
@@ -29,17 +24,17 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
     public IEnumerable<Envelope> StaticBindingMessages => PullMessages();
     private IEnumerable<Envelope> _cachedMessages;
 
-    private readonly IIdGenerator idGenerator;
-    private readonly ICucumberMessageFactory messageFactory;
-    private readonly IBindingRegistry bindingRegistry;
+    private readonly IIdGenerator _idGenerator;
+    private readonly ICucumberMessageFactory _messageFactory;
+    private readonly IBindingRegistry _bindingRegistry;
     private object _lock = new();
     private bool _initialized = false;
 
     public BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessageFactory messageFactory, IBindingRegistry bindingRegistry)
     {
-        this.idGenerator = idGenerator;
-        this.messageFactory = messageFactory;
-        this.bindingRegistry = bindingRegistry;
+        _idGenerator = idGenerator;
+        _messageFactory = messageFactory;
+        _bindingRegistry = bindingRegistry;
     }
 
     private IReadOnlyDictionary<IBinding, string> PullBindings()
@@ -83,16 +78,16 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
         var resultMessages = new List<Envelope>();
         var cachedBindings = new Dictionary<IBinding, string>();
 
-        foreach (var stepTransform in bindingRegistry.GetStepTransformations())
+        foreach (var stepTransform in _bindingRegistry.GetStepTransformations())
         {
             if (StepArgumentTransformCache.Contains(stepTransform))
                 continue;
             StepArgumentTransformCache.Add(stepTransform);
-            var parameterType = messageFactory.ToParameterType(stepTransform, idGenerator);
+            var parameterType = _messageFactory.ToParameterType(stepTransform, _idGenerator);
             resultMessages.Add(Envelope.Create(parameterType));
         }
 
-        foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => !sd.IsValid))
+        foreach (var binding in _bindingRegistry.GetStepDefinitions().Where(sd => !sd.IsValid))
         {
             var errorMessage = binding.ErrorMessage;
             if (errorMessage.Contains("Undefined parameter type"))
@@ -101,25 +96,25 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
                 if (UndefinedParameterTypeBindingsCache.Contains(binding))
                     continue;
                 UndefinedParameterTypeBindingsCache.Add(binding);
-                var undefinedParameterType = messageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, idGenerator);
+                var undefinedParameterType = _messageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, _idGenerator);
                 resultMessages.Add(Envelope.Create(undefinedParameterType));
             }
         }
 
-        foreach (var binding in bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
+        foreach (var binding in _bindingRegistry.GetStepDefinitions().Where(sd => sd.IsValid))
         {
             if (cachedBindings.ContainsKey(binding))
                 continue;
-            var stepDefinition = messageFactory.ToStepDefinition(binding, idGenerator);
+            var stepDefinition = _messageFactory.ToStepDefinition(binding, _idGenerator);
             cachedBindings.Add(binding, stepDefinition.Id);
             resultMessages.Add(Envelope.Create(stepDefinition));
         }
 
-        foreach (var hookBinding in bindingRegistry.GetHooks())
+        foreach (var hookBinding in _bindingRegistry.GetHooks())
         {
             if (cachedBindings.ContainsKey(hookBinding))
                 continue;
-            var hook = messageFactory.ToHook(hookBinding, idGenerator);
+            var hook = _messageFactory.ToHook(hookBinding, _idGenerator);
             cachedBindings.Add(hookBinding, hook.Id);
             resultMessages.Add(Envelope.Create(hook));
         }

@@ -214,11 +214,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
-            _sut._runStatus.Should().BeTrue();
+            _sut._allFeaturesPassed.Should().BeTrue();
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
 
             // Assert
-            _sut._runStatus.Should().BeTrue();
+            _sut._allFeaturesPassed.Should().BeTrue();
         }
 
         // PublisherTestRunComplete calculates test run status as Failed when any started feature is are Failed
@@ -256,11 +256,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
-            _sut._runStatus.Should().BeTrue();
+            _sut._allFeaturesPassed.Should().BeTrue();
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
 
             // Assert
-            _sut._runStatus.Should().BeFalse();
+            _sut._allFeaturesPassed.Should().BeFalse();
         }
 
         // PublisherTestRunComplete publishes TestCase messages for Pickles, then Execution messages, followed by the TestRunFinished message

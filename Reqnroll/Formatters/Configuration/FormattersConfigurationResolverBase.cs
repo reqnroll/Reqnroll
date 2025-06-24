@@ -34,12 +34,28 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
                 {
                     foreach (JsonProperty configProperty in formatterProperty.Value.EnumerateObject())
                     {
-                            configValues.Add(configProperty.Name, configProperty.Value);
+                            configValues.Add(configProperty.Name, GetConfigValue(configProperty.Value));
                     }
                 }
                 
                 result.Add(formatterProperty.Name, configValues);
             }
         }
+    }
+    private object GetConfigValue(JsonElement valueElement)
+    {
+        switch (valueElement.ValueKind)
+        {
+            case JsonValueKind.String:
+                return valueElement.GetString();
+            case JsonValueKind.False:
+            case JsonValueKind.True:
+                return valueElement.GetBoolean();
+            case JsonValueKind.Number:
+                return valueElement.GetDouble();
+        }
+
+        // if value is an embedded JSON object or array, we keep it as it is
+        return valueElement;
     }
 }

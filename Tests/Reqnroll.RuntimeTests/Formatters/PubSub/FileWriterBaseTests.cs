@@ -89,11 +89,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
-            var filepath = "";
-            using var doc = CreateJsonDoc("outputFilePath", filepath);
 
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -110,11 +108,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var sp = Path.DirectorySeparatorChar;
-            var filepath = "aFileName.txt";
-            using var doc = CreateJsonDoc("outputFilePath", filepath);
-
+ 
             _configurationMock.Setup(c => c.Enabled).Returns(true);
-            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "aFileName.txt" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
@@ -129,12 +125,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublishAsync_Should_Write_Envelopes()
         {
             // Arrange
-            var filepath = @"C:\/valid\/path/output.txt";
-            using var doc = CreateJsonDoc("outputFilePath", filepath);
-
             _configurationMock.Setup(c => c.Enabled).Returns(true);
             _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                .Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
+                .Returns(new Dictionary<string, object> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
@@ -154,10 +147,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var sp = Path.DirectorySeparatorChar;
             var filepath = @"C:\/valid\/path\/output.txt".Replace('/', sp);
-            using var doc = CreateJsonDoc("outputFilePath", filepath);
             _configurationMock.Setup(c => c.Enabled).Returns(true);
             _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                .Returns(new Dictionary<string, object> { { "outputFilePath", doc.RootElement.GetProperty("outputFilePath") } });
+                .Returns(new Dictionary<string, object> { { "outputFilePath", "outputFilePath" } });
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act
@@ -166,12 +158,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             _fileSystemMock.Verify(fs => fs.CreateDirectory(It.IsAny<string>()), Times.Once);
-        }
-
-        private JsonDocument CreateJsonDoc(string key, string value)
-        {
-            var jsonText = $" {{ \"{key}\": \"{value}\" }}";
-            return JsonDocument.Parse(jsonText);
         }
     }
 }

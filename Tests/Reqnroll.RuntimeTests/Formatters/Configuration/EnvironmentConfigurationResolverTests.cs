@@ -55,7 +55,7 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             var result = _sut.Resolve();
 
             // Assert
-            ((JsonElement)result["formatter1"]["configSetting1"]).GetString().Should().Be("configValue1");
+            result["formatter1"]["configSetting1"].Should().Be("configValue1");
         }
 
         [Fact]
@@ -80,8 +80,8 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration
             Assert.Equal(2, result.Count);
             var first = result["html"];
             var second = result["messages"];
-            Assert.Equal("forHtml", ((JsonElement)first["outputFilePath"]).GetString());
-            Assert.Equal("forMessages", ((JsonElement)second["outputFilePath"]).GetString());
+            Assert.Equal("forHtml", first["outputFilePath"]);
+            Assert.Equal("forMessages", second["outputFilePath"]);
         }
 
     }

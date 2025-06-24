@@ -21,7 +21,6 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
 
     public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, broker, logger, "html", ".html", "reqnroll_report.html", fileSystem)
     {
-        _logger = logger;
     }
 
     protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
@@ -29,7 +28,7 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
         try
         {
             using var fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
-            using var htmlWriter = new MessagesToHtmlWriter(
+            await using var htmlWriter = new MessagesToHtmlWriter(
                 fileStream,
                 async (sw, e) => await sw.WriteAsync(NdjsonSerializer.Serialize(e)));
 
@@ -41,7 +40,7 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
                 }
             }
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be added to the generated html file.");
         }

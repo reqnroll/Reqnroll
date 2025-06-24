@@ -118,7 +118,6 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
             {
                 PostedMessages.Dispose();
                 _isDisposed = true;
-                GC.SuppressFinalize(this);
             }
         }
     }
