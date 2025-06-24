@@ -1,18 +1,16 @@
 ﻿#nullable enable
 
-using System;
-using System.Collections;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.Configuration.JsonConfig;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
+using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters;
 
@@ -97,10 +95,34 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
         if (!PostedMessages.IsAddingCompleted) 
             PostedMessages.CompleteAdding();
-        await _formatterTask!.ConfigureAwait(false);
+        if (_formatterTask != null)
+            await WaitForTaskToFinishAsync(_formatterTask, TimeSpan.FromMinutes(1));
 
         if (!PostedMessages.IsCompleted)
             throw new InvalidOperationException($"Formatter {Name} has shut down before all messages processed.");
+    }
+
+    private async Task WaitForTaskToFinishAsync(Task task, TimeSpan timeout)
+    {
+        // source: https://stackoverflow.com/a/11191070/26530
+        if (await Task.WhenAny(task, Task.Delay(timeout)) == task)
+        {
+            // Task completed within timeout, but may have faulted or been canceled.
+            // We re-await the task so that any exceptions/cancellation is rethrown.
+            await task;
+        }
+        else
+        {
+            throw new InvalidOperationException($"The task had not completed within {timeout.TotalSeconds:F1} seconds.");
+        }
+    }
+
+    private void WaitForTaskToFinish(Task task, TimeSpan timeout)
+    {
+        if (!task.Wait(timeout))
+        {
+            throw new InvalidOperationException($"The task had not completed within {timeout.TotalSeconds:F1} seconds.");
+        }
     }
 
     public void Dispose()
@@ -114,6 +136,8 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
                     // Forcing the Dispose to wait until the formatter has had a chance to complete.
                 {
                     //_formatterTask?.GetAwaiter().GetResult();
+                    if (_formatterTask != null)
+                        WaitForTaskToFinish(_formatterTask, TimeSpan.FromMinutes(1));
                 }
             }
             finally
