@@ -341,7 +341,6 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             case Bindings.HookType.BeforeFeature:
             case Bindings.HookType.AfterFeature:
                 var hookRunStartedId = SharedIdGenerator.GetNewId();
-                //var signature = _messageFactory.CanonicalizeHookBinding(hookBindingStartedEvent.HookBinding);
                 var hookId = StepDefinitionIdByMethodBinding[hookBindingStartedEvent.HookBinding];
                 var hookTracker = new TestRunHookExecutionTracker(hookRunStartedId, hookId, _testRunStartedId, _messageFactory);
                 _testRunHookTrackers.TryAdd(hookBindingStartedEvent.HookBinding, hookTracker);
