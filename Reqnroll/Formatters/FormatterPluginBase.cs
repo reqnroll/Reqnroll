@@ -112,7 +112,9 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
                 if (!PostedMessages.IsAddingCompleted)
                     // In this situation, the TestEngine is shutting down and has called Dispose on the global container.
                     // Forcing the Dispose to wait until the formatter has had a chance to complete.
-                    _formatterTask?.GetAwaiter().GetResult();
+                {
+                    //_formatterTask?.GetAwaiter().GetResult();
+                }
             }
             finally
             {
