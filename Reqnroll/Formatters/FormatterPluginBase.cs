@@ -85,6 +85,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
         // If the publisher sends the TestRunFinished message, then we can safely shut down.
         if (message.Content() is TestRunFinished)
+            // using ConfigureAwait(false) per guidance here: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
             await CloseAsync().ConfigureAwait(false);
     }
 
@@ -97,6 +98,8 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
         if (!PostedMessages.IsAddingCompleted) 
             PostedMessages.CompleteAdding();
+
+        // using ConfigureAwait(false) per guidance here: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
         await _formatterTask!.ConfigureAwait(false);
 
         if (!PostedMessages.IsCompleted)
