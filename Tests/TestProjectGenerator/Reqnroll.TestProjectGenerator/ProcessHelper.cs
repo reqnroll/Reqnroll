@@ -10,7 +10,7 @@ namespace Reqnroll.TestProjectGenerator
 {
     public class ProcessHelper
     { 
-        private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(5);
+        private static readonly TimeSpan Timeout = TimeSpan.FromMinutes(10);
 
         public delegate Task<ProcessResult> ProcessResultSelector(Process process);
 
