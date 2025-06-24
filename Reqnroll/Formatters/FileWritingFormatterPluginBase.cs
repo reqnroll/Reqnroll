@@ -82,7 +82,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         string outputFilePath = string.Empty;
         if (formatterConfiguration.TryGetValue("outputFilePath", out var outputPathElement))
         {
-            outputFilePath = (string)outputPathElement ?? string.Empty; // Ensure null-coalescing to handle possible null values.
+            outputFilePath = outputPathElement?.ToString() ?? string.Empty; // Ensure null-coalescing to handle possible null values.
         }
         return outputFilePath;
     }
