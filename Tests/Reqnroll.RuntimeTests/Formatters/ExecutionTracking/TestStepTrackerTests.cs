@@ -220,7 +220,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             def.ProcessEvent(evt);
 
             // Assert
-            def.IsAmbiguous.Should().BeTrue();
+            def._isAmbiguous.Should().BeTrue();
             def.StepDefinitionIds.Should().NotBeNull();
             def.StepDefinitionIds.Should().Contain("pickleStepId");
         }

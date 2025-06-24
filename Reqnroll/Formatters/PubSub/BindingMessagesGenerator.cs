@@ -17,8 +17,8 @@ namespace Reqnroll.Formatters.PubSub;
 /// </summary>
 internal class BindingMessagesGenerator : IBindingMessagesGenerator
 {
-    internal HashSet<IStepArgumentTransformationBinding> StepArgumentTransformCache { get; } = new();
-    internal HashSet<IStepDefinitionBinding> UndefinedParameterTypeBindingsCache { get; } = new();
+    internal HashSet<IStepArgumentTransformationBinding> _stepArgumentTransformCache { get; } = new();
+    internal HashSet<IStepDefinitionBinding> _undefinedParameterTypeBindingsCache { get; } = new();
     public IReadOnlyDictionary<IBinding, string> StepDefinitionIdByBinding => PullBindings();
     private IReadOnlyDictionary<IBinding, string> _cachedBindings;
     public IEnumerable<Envelope> StaticBindingMessages => PullMessages();
@@ -80,9 +80,9 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
 
         foreach (var stepTransform in _bindingRegistry.GetStepTransformations())
         {
-            if (StepArgumentTransformCache.Contains(stepTransform))
+            if (_stepArgumentTransformCache.Contains(stepTransform))
                 continue;
-            StepArgumentTransformCache.Add(stepTransform);
+            _stepArgumentTransformCache.Add(stepTransform);
             var parameterType = _messageFactory.ToParameterType(stepTransform, _idGenerator);
             resultMessages.Add(Envelope.Create(parameterType));
         }
@@ -93,9 +93,9 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
             if (errorMessage.Contains("Undefined parameter type"))
             {
                 var paramName = Regex.Match(errorMessage, "Undefined parameter type '(.*)'").Groups[1].Value;
-                if (UndefinedParameterTypeBindingsCache.Contains(binding))
+                if (_undefinedParameterTypeBindingsCache.Contains(binding))
                     continue;
-                UndefinedParameterTypeBindingsCache.Add(binding);
+                _undefinedParameterTypeBindingsCache.Add(binding);
                 var undefinedParameterType = _messageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, _idGenerator);
                 resultMessages.Add(Envelope.Create(undefinedParameterType));
             }

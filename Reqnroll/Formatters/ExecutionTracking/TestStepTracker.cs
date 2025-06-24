@@ -22,9 +22,9 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
     public List<string> StepDefinitionIds { get; private set; }
     public List<TestStepArgument> StepArguments { get; } = new();
 
-    // List of method signatures that cause an ambiguous situation to arise
-    public List<string> AmbiguousStepDefinitions { get; private set; } = new();
-    public bool IsAmbiguous => AmbiguousStepDefinitions != null && AmbiguousStepDefinitions.Any();
+    // List of StepIds that cause an ambiguous situation to arise
+    private List<string> _ambiguousStepDefinitions { get; set; } = new();
+    internal bool _isAmbiguous => _ambiguousStepDefinitions != null && _ambiguousStepDefinitions.Any();
 
     public void ProcessEvent(StepStartedEvent stepStartedEvent)
     {
@@ -46,12 +46,12 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
             var Exception = stepFinishedEvent.ScenarioContext.TestError;
             if (Exception is AmbiguousBindingException)
             {
-                AmbiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches
+                _ambiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches
                     .Select(m => ParentTracker.FindStepDefinitionIdByBindingKey(m.StepBinding)));
             }
         }
 
-        StepDefinitionIds = IsAmbiguous ? AmbiguousStepDefinitions.ToList() : StepDefinitionId != null ? [StepDefinitionId] : [];
+        StepDefinitionIds = _isAmbiguous ? _ambiguousStepDefinitions.ToList() : StepDefinitionId != null ? [StepDefinitionId] : [];
 
         var HasInputDataTable = stepFinishedEvent.StepContext.StepInfo.Table != null;
         var HasInputDocString = stepFinishedEvent.StepContext.StepInfo.MultilineText != null;

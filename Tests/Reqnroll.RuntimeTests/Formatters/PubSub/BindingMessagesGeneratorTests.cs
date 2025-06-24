@@ -42,7 +42,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             messages.Should().HaveCount(1);
-            _sut.StepArgumentTransformCache.Should().Contain(stepTransform.Object);
+            _sut._stepArgumentTransformCache.Should().Contain(stepTransform.Object);
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             messages.Should().HaveCount(1);
-            _sut.UndefinedParameterTypeBindingsCache.Should().Contain(invalidStepDefinition.Object);
+            _sut._undefinedParameterTypeBindingsCache.Should().Contain(invalidStepDefinition.Object);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var stepTransform = new Mock<IStepArgumentTransformationBinding>();
             stepTransform.Setup(st => st.Name).Returns("TransformName");
 
-            _sut.StepArgumentTransformCache.Add(stepTransform.Object);
+            _sut._stepArgumentTransformCache.Add(stepTransform.Object);
 
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new[] { stepTransform.Object });
 

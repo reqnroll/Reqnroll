@@ -37,7 +37,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
     // shared to each Feature tracker so that we keep a single list
-    internal IReadOnlyDictionary<IBinding, string> StepDefinitionIdByMethodBinding => _bindingCaches.StepDefinitionIdByBinding;
+    internal IReadOnlyDictionary<IBinding, string> _stepDefinitionIdByMethodBinding => _bindingCaches.StepDefinitionIdByBinding;
 
     public IIdGenerator SharedIdGenerator { get; private set; }
 
@@ -51,7 +51,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
     internal readonly ConcurrentDictionary<IBinding, TestRunHookExecutionTracker> _testRunHookTrackers = new();
     // This tracks all Attachments and Output Events; used during publication to sequence them in the correct order.
-    internal readonly OutputEventsTracker OutputEventsTracker = new();
+    internal readonly OutputEventsTracker _outputEventsTracker = new();
 
     // Holds all Messages that are pending publication (collected from Feature Trackers as each Feature completes)
     internal List<Envelope> _messages = new();
@@ -168,7 +168,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     {
         return e.Content() switch
         {
-            Attachment attachment => OutputEventsTracker.GetTimestampForMatchingAttachment(attachment).ToUniversalTime(),
+            Attachment attachment => _outputEventsTracker.GetTimestampForMatchingAttachment(attachment).ToUniversalTime(),
             _ => Converters.ToDateTime(e.Timestamp())
         };
     }
@@ -226,7 +226,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             return;
         }
 
-        var featureExecutionTracker = new FeatureExecutionTracker(featureStartedEvent, _testRunStartedId, SharedIdGenerator, StepDefinitionIdByMethodBinding, _messageFactory);
+        var featureExecutionTracker = new FeatureExecutionTracker(featureStartedEvent, _testRunStartedId, SharedIdGenerator, _stepDefinitionIdByMethodBinding, _messageFactory);
         if (_startedFeatures.TryAdd(featureInfo, featureExecutionTracker) && featureExecutionTracker.Enabled)
         {
             try
@@ -342,7 +342,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             case Bindings.HookType.BeforeFeature:
             case Bindings.HookType.AfterFeature:
                 var hookRunStartedId = SharedIdGenerator.GetNewId();
-                var hookId = StepDefinitionIdByMethodBinding[hookBindingStartedEvent.HookBinding];
+                var hookId = _stepDefinitionIdByMethodBinding[hookBindingStartedEvent.HookBinding];
                 var hookTracker = new TestRunHookExecutionTracker(hookRunStartedId, hookId, _testRunStartedId, _messageFactory);
                 _testRunHookTrackers.TryAdd(hookBindingStartedEvent.HookBinding, hookTracker);
 
@@ -391,7 +391,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (!_enabled)
             return Task.CompletedTask;
 
-        OutputEventsTracker.ProcessEvent(attachmentAddedEvent);
+        _outputEventsTracker.ProcessEvent(attachmentAddedEvent);
 
         var featureInfo = attachmentAddedEvent.FeatureInfo;
         if (featureInfo == null || string.IsNullOrEmpty(attachmentAddedEvent.ScenarioInfo?.Title))
@@ -416,7 +416,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (!_enabled)
             return Task.CompletedTask;
 
-        OutputEventsTracker.ProcessEvent(outputAddedEvent);
+        _outputEventsTracker.ProcessEvent(outputAddedEvent);
 
         var featureInfo = outputAddedEvent.FeatureInfo;
         if (featureInfo == null || string.IsNullOrEmpty(outputAddedEvent.ScenarioInfo?.Title))
