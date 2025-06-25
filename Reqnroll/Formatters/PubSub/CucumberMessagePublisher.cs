@@ -91,7 +91,14 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     public async Task OnEventAsync(IExecutionEvent executionEvent)
     {
-        _logger.WriteMessage($"DEBUG: Publisher dispatching {executionEvent.GetType().Name}");
+        var hookType = executionEvent switch
+        {
+            HookStartedEvent se => se.HookType.ToString(),
+            HookFinishedEvent fe => fe.HookType.ToString(),
+            _ => ""
+        };
+        hookType = hookType.IsNotNullOrEmpty() ? "." + hookType : String.Empty;
+        _logger.WriteMessage($"DEBUG: Publisher dispatching {executionEvent.GetType().Name}{hookType}");
         switch (executionEvent)
         {
             case TestRunStartedEvent testRunStartedEvent:
@@ -138,6 +145,11 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         // It is possible fro BrokerReady to be called multiple times (once per formatter)
         _enabled = _broker.Enabled ? true : _enabled;
         _logger.WriteMessage($"DEBUG: Publisher.BrokerReady: {_enabled}");
+        if (_startupCompleted)
+        {
+            _logger.WriteMessage($"WARNING: Publisher.BrokerReady: Broker reported ready status after Startup had already completed. All publishing will be disabled.");
+            _enabled = false;
+        }
     }
 
     internal async Task PublisherStartup(TestRunStartedEvent testRunStartEvent)
@@ -190,7 +202,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     internal async Task PublisherTestRunCompleteAsync(TestRunFinishedEvent testRunFinishedEvent)
     {
-        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete invoked.");
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete invoked. Enabled: {_enabled}; StartupCompleted: {_startupCompleted}");
         if (!_enabled)
             return;
 

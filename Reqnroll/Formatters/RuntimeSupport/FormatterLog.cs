@@ -11,7 +11,7 @@ namespace Reqnroll.Formatters.RuntimeSupport
     {
         public void WriteMessage(string message)
         {
-            tl.WriteToolOutput(message);
+            tl.WriteToolOutput($"{DateTime.Now.ToString("HH:mm:ss.fff")}: {message}");
             //Console.WriteLine(message);
             //Debug.WriteLine(message);
         }
