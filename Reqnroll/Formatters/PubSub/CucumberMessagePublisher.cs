@@ -135,15 +135,21 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     internal void BrokerReady(object sender, BrokerReadyEventArgs args)
     {
-        _enabled = _broker.Enabled;
+        // It is possible fro BrokerReady to be called multiple times (once per formatter)
+        _enabled = _broker.Enabled ? true : _enabled;
         _logger.WriteMessage($"DEBUG: Publisher.BrokerReady: {_enabled}");
     }
 
     internal async Task PublisherStartup(TestRunStartedEvent testRunStartEvent)
     {
         _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup invoked. Enabled: {_enabled}; StartupCompleted: {_startupCompleted}");
-        if (!_enabled || _startupCompleted)
+        if (_startupCompleted)
             return;
+        if (!_enabled)
+        {
+            _startupCompleted = true;
+            return;
+        }
 
         SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
         _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
@@ -184,6 +190,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     internal async Task PublisherTestRunCompleteAsync(TestRunFinishedEvent testRunFinishedEvent)
     {
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete invoked.");
         if (!_enabled)
             return;
 
@@ -216,10 +223,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     // When one of these calls the Broker, that method is async; otherwise these are sync methods that return a completed Task (to allow them to be called async from the TestThreadExecutionEventPublisher)
     private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
     {
-        _logger.WriteMessage($"DEBUG: Formatters.Publisher.FeatureStartedEvent invoked");
-
         var featureInfo = featureStartedEvent.FeatureContext?.FeatureInfo;
-        _logger.WriteMessage($"DEBUG: Formatters.Publisher.FeatureStartedEvent invoked {featureInfo?.Title}");
+        _logger.WriteMessage($"DEBUG: Formatters.Publisher.FeatureStartedEvent invoked {featureInfo?.Title} with startup completed status: {_startupCompleted}");
         //if (!_startupCompleted)
         //    throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message publisher is ready.");
 

@@ -32,7 +32,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 ICucumberMessageBroker broker,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
-                : base(configurationProvider, broker, new FormatterLog(), "testPlugin", ".txt", "test_output.txt", fileSystem)
+                : base(configurationProvider, broker, new FormatterLog(new DefaultListener()), "testPlugin", ".txt", "test_output.txt", fileSystem)
             {
                 FileSystem = fileSystem;
                 _messageCollector = messageCollector;

@@ -44,6 +44,7 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
         catch(Exception e)
         {
             Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be processed.");
+            throw;
         }
     }
 }
