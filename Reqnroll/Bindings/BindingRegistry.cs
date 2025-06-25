@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Reqnroll.Bindings
 {
@@ -9,8 +11,18 @@ namespace Reqnroll.Bindings
         private readonly List<IStepArgumentTransformationBinding> _stepArgumentTransformations = new();
         private readonly Dictionary<HookType, List<IHookBinding>> _hooks = new();
         private readonly List<BindingError> _genericBindingErrors = new();
+        public event EventHandler<BindingRegistryReadyEventArgs> BindingRegistryReadyEvent;
+        private bool _registryReady;
 
-        public bool Ready { get; set; }
+        public bool Ready
+        {
+            get { return _registryReady; }
+            set
+            {
+                _registryReady = value;
+                BindingRegistryReadyEvent?.Invoke(this, new BindingRegistryReadyEventArgs());
+            }
+        }
 
         public bool IsValid => !GetErrorMessages().Any();
 

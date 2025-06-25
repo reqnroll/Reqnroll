@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using System;
 using System.Collections.ObjectModel;
+using Reqnroll.EnvironmentAccess;
 
 namespace Reqnroll.Formatters.PubSub;
 
@@ -35,40 +36,55 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
         _idGenerator = idGenerator;
         _messageFactory = messageFactory;
         _bindingRegistry = bindingRegistry;
+        _bindingRegistry.BindingRegistryReadyEvent += OnBindingRegistryReady;
+    }
+
+    internal void OnBindingRegistryReady(object sender, BindingRegistryReadyEventArgs e)
+    {
+        if (!_initialized && _bindingRegistry.Ready)
+        {
+            PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
+            _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
+            _cachedMessages = messages;
+            _initialized = true;
+        }
     }
 
     private IReadOnlyDictionary<IBinding, string> PullBindings()
     {
         if (_initialized)
             return _cachedBindings;
-        lock (_lock)
-        {
-            if (!_initialized)
-            {
-                PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
-                _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
-                _cachedMessages = messages;
-                _initialized = true;
-            }
-        }
-        return _cachedBindings;
+
+        throw new ApplicationException("Formatters asked to provide IBindings before they were ready.");
+        //lock (_lock)
+        //{
+        //    if (!_initialized)
+        //    {
+        //        PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
+        //        _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
+        //        _cachedMessages = messages;
+        //        _initialized = true;
+        //    }
+        //}
+        //return _cachedBindings;
     }
 
     private IEnumerable<Envelope> PullMessages()
     {
         if (_initialized)
             return _cachedMessages;
-        lock (_lock)
-        {
-            if (!_initialized)
-            {
-                PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
-                _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
-                _cachedMessages = messages;
-                _initialized = true;
-            }
-        }
-        return _cachedMessages;
+        throw new ApplicationException("Formatters asked to provide static Messages before they ready.");
+        //lock (_lock)
+        //{
+        //    if (!_initialized)
+        //    {
+        //        PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
+        //        _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
+        //        _cachedMessages = messages;
+        //        _initialized = true;
+        //    }
+        //}
+        //return _cachedMessages;
     }
 
 

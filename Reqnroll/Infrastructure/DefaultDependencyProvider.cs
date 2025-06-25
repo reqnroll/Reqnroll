@@ -1,27 +1,29 @@
-using Reqnroll.BoDi;
+using Gherkin.CucumberMessages;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
 using Reqnroll.Analytics.UserId;
-using Reqnroll.BindingSkeletons;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.CucumberExpressions;
 using Reqnroll.Bindings.Discovery;
+using Reqnroll.BindingSkeletons;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.FileAccess;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.Html;
+using Reqnroll.Formatters.Messages;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
-using Reqnroll.PlatformCompatibility;
-using Reqnroll.Formatters.PubSub;
 using Reqnroll.Utils;
-using Reqnroll.Formatters.Configuration;
-using Reqnroll.Formatters.Html;
-using Reqnroll.Formatters.Messages;
-using Reqnroll.Formatters.RuntimeSupport;
 
 namespace Reqnroll.Infrastructure
 {
@@ -117,6 +119,9 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
+            container.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
+            container.RegisterTypeAs<CucumberMessageFactory, ICucumberMessageFactory>();
+            container.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
