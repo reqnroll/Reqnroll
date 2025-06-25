@@ -29,8 +29,10 @@ Parameters can be defined using the `{parameter-type}` syntax. The type name is 
 * A single word without quotes, `{word}`. E.g., `[Given("a user {word}")]` matches to `Given a user Marvin`.
 * Any other type, `{}`, like `(.*)` when using regex
 * An enum type, with or without a namespace. E.g. `[When("I have {CustomColor} cucumbers in my belly")]` matches to `When I have green cucumbers in my belly` if `CustomColor` is an enum with `Green` as a value.
-* [Step Argument Transformations](step-argument-conversions) with a name, E.g., With `[StepArgumentTransformation("v(.*)", Name = "my_version")]`, you can define a step as `[When("I download the release {my_version} of the application")]` that matches to `When I download the release v1.2.3 of the application`.
-
+* [Step Argument Transformations](step-argument-conversions):
+  * with a name property, E.g., With `[StepArgumentTransformation("v(.*)", Name = "my_version")]`, you can define a step as `[When("I download the release {my_version} of the application")]` that matches to `When I download the release v1.2.3 of the application`.
+  * without a name property, use the typename of the return type without namespace. E.g. If the method  `[StepArgumentTransformation("EUR (\d+)"]` has a return type of `MyCurrency`  you could use `{MyCurrency}` in the expression.
+    
 #### No built-in support
 
 These have no built-in support for:
