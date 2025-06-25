@@ -138,6 +138,11 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         // It is possible fro BrokerReady to be called multiple times (once per formatter)
         _enabled = _broker.Enabled ? true : _enabled;
         _logger.WriteMessage($"DEBUG: Publisher.BrokerReady: {_enabled}");
+        if (_startupCompleted)
+        {
+            _logger.WriteMessage($"WARNING: Publisher.BrokerReady: Broker reported ready status after Startup had already completed. All publishing will be disabled.");
+            _enabled = false;
+        }
     }
 
     internal async Task PublisherStartup(TestRunStartedEvent testRunStartEvent)
