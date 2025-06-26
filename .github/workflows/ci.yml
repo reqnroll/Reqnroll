@@ -325,7 +325,7 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }}
     - name: Formatters Tests
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.Formatters.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.Formatters.Tests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/Formatterstests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
+      run: dotnet test ./Tests/Reqnroll.Formatters.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.Formatters.Tests.dll --logger "console;verbosity=detailed" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/Formatterstests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
