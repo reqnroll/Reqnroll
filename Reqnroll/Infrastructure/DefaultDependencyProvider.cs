@@ -119,6 +119,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
+            container.RegisterFactoryAs<INotifyPublisherReady>(() => container.Resolve<IRuntimePlugin>("CucumberMessagePublisher"));
             container.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
             container.RegisterTypeAs<CucumberMessageFactory, ICucumberMessageFactory>();
             container.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();

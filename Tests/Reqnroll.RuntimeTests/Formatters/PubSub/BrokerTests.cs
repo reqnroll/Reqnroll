@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Xunit;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Plugins;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
@@ -13,6 +14,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
     {
         private readonly Mock<IObjectContainer> _objectContainerMock;
         private readonly Mock<IFormatterLog> _logMock;
+        private readonly Mock<IBindingMessagesGenerator> _bindingMessageGeneratorMock;
         private readonly Mock<ICucumberMessageSink> _sinkMock1;
         private readonly Mock<ICucumberMessageSink> _sinkMock2;
         private readonly CucumberMessageBroker _sut;
@@ -21,16 +23,16 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             _objectContainerMock = new Mock<IObjectContainer>();
             _logMock = new Mock<IFormatterLog>();
-
+            _bindingMessageGeneratorMock = new Mock<IBindingMessagesGenerator>();
             _sinkMock1 = new Mock<ICucumberMessageSink>();
+            _sinkMock1.As<IRuntimePlugin>();
             _sinkMock1.Setup(s => s.Name).Returns("sink1");
             _sinkMock2 = new Mock<ICucumberMessageSink>();
+            _sinkMock2.As<IRuntimePlugin>();
             _sinkMock2.Setup(s => s.Name).Returns("sink2");
-
+            _objectContainerMock.Setup(c => c.ResolveAll<IRuntimePlugin>()).Returns([(IRuntimePlugin)_sinkMock1.Object, (IRuntimePlugin) _sinkMock2.Object]);
             // Initialize the system under test (SUT)
-            _sut = new CucumberMessageBroker(_logMock.Object);
-            _sut.RegisterSink(_sinkMock1.Object);
-            _sut.RegisterSink(_sinkMock2.Object);
+            _sut = new CucumberMessageBroker(_logMock.Object, _objectContainerMock.Object);
         }
 
         [Fact]
@@ -55,7 +57,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             var log = new Mock<IFormatterLog>();
 
-            var sut = new CucumberMessageBroker(log.Object);
+            var sut = new CucumberMessageBroker(log.Object, _objectContainerMock.Object);
 
             // Act
             var result = sut.Enabled;

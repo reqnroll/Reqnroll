@@ -23,6 +23,13 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class FileWritingFormatterPluginBaseTests
     {
+        private class ConsoleLogger : IFormatterLog
+        {
+            public void WriteMessage(string message)
+            {
+                Console.WriteLine($" --> {DateTime.Now.ToString("HH:mm:ss.fff")}: {message}");
+            }
+        }
         private class TestFileWritingFormatterPlugin : FileWritingFormatterPluginBase
         {
             public string LastOutputPath { get; private set; }
@@ -32,7 +39,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 ICucumberMessageBroker broker,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
-                : base(configurationProvider, broker, new FormatterLog(new DefaultListener()), "testPlugin", ".txt", "test_output.txt", fileSystem)
+                : base(configurationProvider, broker, new ConsoleLogger(), "testPlugin", ".txt", "test_output.txt", fileSystem)
             {
                 FileSystem = fileSystem;
                 _messageCollector = messageCollector;
@@ -81,7 +88,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
 
             _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _brokerMock.Object, _fileSystemMock.Object, postedEnvelopes);
-            _sut.Initialize(_rtpe, _rtpp, new UnitTestProvider.UnitTestProviderConfiguration());
         }
 
         [Fact]

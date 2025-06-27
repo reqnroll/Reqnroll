@@ -1,5 +1,8 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Plugins;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -15,21 +18,50 @@ namespace Reqnroll.Formatters.PubSub;
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
-    public CucumberMessageBroker(IFormatterLog formatterLog)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IObjectContainer globalObjectContainer)
     {
+        //(_publisher as INotifyPublisherReady).Initialized += CucumberMessagePublisher_Initialized;
         _logger = formatterLog;
+        _globalcontainer = globalObjectContainer;
+        _numberOfSinksExpected = new Lazy<int>(FindContainerRegisteredSinks);
+    }
+
+    private int FindContainerRegisteredSinks()
+    {
+        // Calculate the number of Sinks that should have registered by looking at IRuntimePlugin registrations that also implement the ICucumberMessageSink interface
+        var plugins = _globalcontainer.ResolveAll<IRuntimePlugin>();
+        var sinks = plugins.Where(p => typeof(ICucumberMessageSink).IsAssignableFrom(p.GetType())).ToList(); 
+        return sinks.Count;
+    }
+
+    private void CucumberMessagePublisher_Initialized(object sender, PublisherReadyEventArgs e)
+    {
+        _logger.WriteMessage("DEBUG: Formatters - Broker received Publisher ready event.");
+        CheckInitializationStatus();
+    }
+
+    private void CheckInitializationStatus()
+    {
+        // If all known sinks have registered 
+        // The system is enabled if we have at least one registered sink that is Enabled
+        if (_numberOfSinksInitialized == _numberOfSinksExpected.Value)
+        {
+            Enabled = _registeredSinks.Values.Count > 0;
+            _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {Enabled}");
+            //RaiseBrokerReadyEvent();
+        }
     }
 
     public bool Enabled { get; private set; } = false;
 
     // This is the number of sinks that we expect to register. This number is determined by the number of sinks that add themselves to the global container during plugin startup.
-    private int _numberOfSinksExpected;
+    private Lazy<int> _numberOfSinksExpected;
 
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
     // and the Broker can be Enabled.
     private int _numberOfSinksInitialized = 0;
-
     private IFormatterLog _logger;
+    private IObjectContainer _globalcontainer;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
@@ -39,10 +71,10 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     public event EventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
 
     // This method is called by the sinks during their plugin initialization. This tells the broker how many plugin sinks to expect.
-    public void RegisterSink(ICucumberMessageSink sink)
-    {
-        Interlocked.Increment(ref _numberOfSinksExpected);
-    }
+    //public void RegisterSink(ICucumberMessageSink sink)
+    //{
+    //    Interlocked.Increment(ref _numberOfSinksExpected);
+    //}
 
     // This method is called by the sinks during TestRunStarted event handling. By then, all sinks will have registered themselves in the object container,
     // which happened during plugin Initialize().
@@ -52,14 +84,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
             _registeredSinks.TryAdd(formatterSink.Name, formatterSink);
 
         Interlocked.Increment(ref _numberOfSinksInitialized);
-
-        // If all known sinks have registered then we can inform the Publisher
-        // The system is enabled if we have at least one registered sink that is Enabled
-        if (_numberOfSinksInitialized == _numberOfSinksExpected)
-        {
-            Enabled = _registeredSinks.Values.Count > 0;
-            RaiseBrokerReadyEvent();
-        }
+        CheckInitializationStatus();
     }
 
     private void RaiseBrokerReadyEvent()

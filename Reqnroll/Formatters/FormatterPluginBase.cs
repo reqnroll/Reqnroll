@@ -6,7 +6,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.Configuration.JsonConfig;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
@@ -35,7 +34,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
     protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, string pluginName)
     {
         _broker = broker;
-        _broker.RegisterSink(this);
+        //_broker.RegisterSink(this);
         _configurationProvider = configurationProvider;
         _logger = logger;
         _pluginName = pluginName;
@@ -63,9 +62,9 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
         if (!IsFormatterEnabled(out var formatterConfiguration))
         {
-            _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} disabled.");
+            _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} disabled via configuration.");
 
-            _broker.SinkInitialized(this, enabled: false);
+            ReportInitialized(false);
             return;
         }
 
@@ -76,6 +75,9 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} reporting status as {status}.");
 
+        // Preemptively closing down the BlockingCollection to force error identification
+        if (status == false)
+            PostedMessages.CompleteAdding();
         _broker.SinkInitialized(this, enabled: status);
     }
 
@@ -89,10 +91,13 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
         PostedMessages.Add(message);
 
-        // If the publisher sends the TestRunFinished message, then we can safely shut down.
+        // If the _publisher sends the TestRunFinished message, then we can safely shut down.
         if (message.Content() is TestRunFinished)
+        {
+            _logger.WriteMessage($"DEBUG: Formatters.Plugin {Name} has recieved the TestRunFinished message and is calling CloseAsync");
             // using ConfigureAwait(false) per guidance here: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
             await CloseAsync().ConfigureAwait(false);
+        }
     }
 
     protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
@@ -106,23 +111,23 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
         if (!PostedMessages.IsAddingCompleted)
             PostedMessages.CompleteAdding();
+        Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the BlockignCollection is closed. Awaiting the writing task.");
+        //// using ConfigureAwait(false) per guidance here: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
+        //var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30));
+        //var finishedTask = await Task.WhenAny(timeoutTask, _formatterTask);
+        //if (finishedTask == timeoutTask)
+        //{
+        //    Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close - timeout waiting for formatter {Name}");
+        //}
+        //else
+        //{
+        //    Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close - formatter {Name} has finished.");
 
-        // using ConfigureAwait(false) per guidance here: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
-        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30));
-        var finishedTask = await Task.WhenAny(timeoutTask, _formatterTask);
-        if (finishedTask == timeoutTask)
-        {
-            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close - timeout waiting for formatter {Name}");
-        }
-        else
-        {
-            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close - formatter {Name} has finished.");
-
-            // The formatter task completed before timeout, allow propogation of exceptions from the Task
-            await _formatterTask!.ConfigureAwait(false);
-        }
-        //await _formatterTask!.ConfigureAwait(false);
-
+        //    // The formatter task completed before timeout, allow propogation of exceptions from the Task
+        //    await _formatterTask!.ConfigureAwait(false);
+        //}
+        await _formatterTask!.ConfigureAwait(false);
+        Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - The formatterTask is now completed.");
         if (!PostedMessages.IsCompleted)
             throw new InvalidOperationException($"Formatter {Name} has shut down before all messages processed.");
     }
@@ -134,23 +139,34 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
         {
             try
             {
-                if ( _formatterTask != null)
+                if (_formatterTask != null)
                 {
-                    Logger.WriteMessage($"DEBUG: Formatters: Dispose is waiting on the formatter task {Name}.");
-                    // In this situation, the TestEngine is shutting down and has called Dispose on the global container.
-                    // Forcing the Dispose to wait until the formatter has had a chance to complete.
-                    var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30));
-                    var finishedTask = Task.WhenAny(timeoutTask, _formatterTask);
-                    if (finishedTask == timeoutTask)
+                    if (!_formatterTask.IsCompleted)
                     {
-                        Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - timeout waiting for formatter {Name}");
+                        Logger.WriteMessage($"DEBUG: Formatters: Dispose is waiting on the formatter task {Name}.");
+                        // In this situation, the TestEngine is shutting down and has called Dispose on the global container.
+                        // Forcing the Dispose to wait until the formatter has had a chance to complete.
+                        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30));
+                        var finishedTask = Task.WhenAny(timeoutTask, _formatterTask);
+                        if (finishedTask == timeoutTask)
+                        {
+                            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - timeout waiting for formatter {Name}");
+                        }
+                        else
+                        {
+                            Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} has finished.");
+
+                            // The formatter task completed before timeout, allow propogation of exceptions from the Task
+                            _formatterTask?.GetAwaiter().GetResult();
+                        }
                     }
                     else
                     {
-                        Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} has finished.");
+                        Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} had already finished.");
 
                         // The formatter task completed before timeout, allow propogation of exceptions from the Task
                         _formatterTask?.GetAwaiter().GetResult();
+
                     }
                 }
                 else
@@ -158,7 +174,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
                     Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - skipping wait on formatters task {Name}.");
                 }
             }
-            catch(System.Exception e)
+            catch (System.Exception e)
             {
                 Logger.WriteMessage($"DEBUG: Forrmatters:PluginBase.Dispose- formatter task {Name} threw Ex: {e.Message}");
             }

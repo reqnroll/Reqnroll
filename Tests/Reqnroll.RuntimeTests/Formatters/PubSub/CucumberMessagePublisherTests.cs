@@ -54,7 +54,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _runtimePluginParameters = new RuntimePluginParameters();
             _unitTestProviderConfiguration = new UnitTestProviderConfiguration();
 
-            _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object);
+            _sut = new CucumberMessagePublisher(_bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object);
         }
         private ObjectContainer CreateObjectContainerWithBroker(bool brokerEnabled = true)
         {
@@ -98,6 +98,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(false);
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
+            _sut._broker = _brokerMock.Object;
 
             // Act
             _sut.BrokerReady(null, new BrokerReadyEventArgs());
@@ -134,7 +135,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object);
             objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(bmg);
             _sut._bindingCaches = bmg;
-
+            _sut._broker = _brokerMock.Object;
             _sut._globalObjectContainer = objectContainerStub;
 
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
@@ -161,6 +162,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var objectContainerStub = CreateObjectContainerWithBroker(false);
             SetupCommonMocks(objectContainerStub);
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
+            _sut._broker = _brokerMock.Object;
 
             // Act
             _sut.BrokerReady(null, new BrokerReadyEventArgs());
@@ -547,6 +549,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDE", "desc");
 
             _sut._globalObjectContainer = objectContainerStub;
+            _sut._broker = _brokerMock.Object;
 
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());

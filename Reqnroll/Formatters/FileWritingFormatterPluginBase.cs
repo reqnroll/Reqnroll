@@ -72,7 +72,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         }
         onInitialized(true);
         Logger.WriteMessage($"Formatter {Name} initialized to write to: {outputPath}.");
-        await ConsumeAndWriteToFilesBackgroundTask(outputPath);
+        await ConsumeAndWriteToFilesBackgroundTask(outputPath).ConfigureAwait(false);
     }
 
     protected abstract Task ConsumeAndWriteToFilesBackgroundTask(string outputPath);

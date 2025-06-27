@@ -60,27 +60,26 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     internal ICucumberMessageFactory _messageFactory;
     internal bool _startupCompleted = false;
 
-    public CucumberMessagePublisher(ICucumberMessageBroker broker, IBindingMessagesGenerator bindingMessagesGenerator, IFormatterLog logger)
+    // Implementation members of INotifyPublisherReady
+    public bool IsInitialized { get; internal set; }
+    //public event EventHandler<PublisherReadyEventArgs> Initialized;
+
+    public CucumberMessagePublisher(IBindingMessagesGenerator bindingMessagesGenerator, IFormatterLog logger)
     {
-        _broker = broker;
         _bindingCaches = bindingMessagesGenerator;
-        _broker.BrokerReadyEvent += BrokerReady;
         _logger = logger;
+        _logger.WriteMessage("DEBUG: Formatters: Publisher in constructor.");
     }
 
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
         _logger.WriteMessage("DEBUG: Publisher in Initialize()");
+
         runtimePluginEvents.RegisterGlobalDependencies += (_, args) =>
-        {
-            _globalObjectContainer = args.ObjectContainer;
-            //_globalObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
-            //_globalObjectContainer.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
-            //if (!args.ObjectContainer.IsRegistered<ICucumberMessageFactory>())
-            //{
-            //    args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>((Delegate)(() => new CucumberMessageFactory()));
-            //}
-        };
+         {
+             _globalObjectContainer = args.ObjectContainer;
+             _broker = _globalObjectContainer.Resolve<ICucumberMessageBroker>();
+         };
 
         runtimePluginEvents.CustomizeTestThreadDependencies += (_, args) =>
         {
@@ -142,7 +141,6 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     internal void BrokerReady(object sender, BrokerReadyEventArgs args)
     {
-        // It is possible fro BrokerReady to be called multiple times (once per formatter)
         _enabled = _broker.Enabled ? true : _enabled;
         _logger.WriteMessage($"DEBUG: Publisher.BrokerReady: {_enabled}");
         if (_startupCompleted)
@@ -157,6 +155,9 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup invoked. Enabled: {_enabled}; StartupCompleted: {_startupCompleted}");
         if (_startupCompleted)
             return;
+
+        _enabled = _broker.Enabled && _bindingCaches.Ready ? true : _enabled;
+        _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup: Broker: {_broker.Enabled}; bindingCache: {_bindingCaches.Ready}");
         if (!_enabled)
         {
             _startupCompleted = true;
@@ -238,7 +239,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         var featureInfo = featureStartedEvent.FeatureContext?.FeatureInfo;
         _logger.WriteMessage($"DEBUG: Formatters.Publisher.FeatureStartedEvent invoked {featureInfo?.Title} with startup completed status: {_startupCompleted}");
         //if (!_startupCompleted)
-        //    throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message publisher is ready.");
+        //    throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message _publisher is ready.");
 
         if (!_enabled || featureInfo == null)
         {

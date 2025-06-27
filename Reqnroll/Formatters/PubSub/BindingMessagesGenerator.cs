@@ -30,6 +30,10 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
     private readonly IBindingRegistry _bindingRegistry;
     private object _lock = new();
     private bool _initialized = false;
+    public bool Ready {  get
+        {
+            return _initialized && _cachedBindings != null;
+        } }
 
     public BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessageFactory messageFactory, IBindingRegistry bindingRegistry)
     {
