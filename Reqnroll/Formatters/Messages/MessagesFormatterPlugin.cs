@@ -33,7 +33,13 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
             foreach (var message in PostedMessages.GetConsumingEnumerable())
             {
                 if (cancellationToken.IsCancellationRequested)
+                {
+                    Logger.WriteMessage($"Formatter {Name} has been cancelled.");
+                    _closed = true;
+                    await fileStream.FlushAsync();
                     break;
+                }
+
                 if (message != null)
                 {
                     await NdjsonSerializer.SerializeToStreamAsync(fileStream, message);
@@ -43,6 +49,7 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
                         await fileStream.WriteAsync(newLineBytes, 0, newLineBytes.Length);
                 }
             }
+            await fileStream.FlushAsync();
         }
         catch(Exception e)
         {

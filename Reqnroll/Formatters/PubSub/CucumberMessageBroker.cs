@@ -34,12 +34,6 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         return sinks.Count;
     }
 
-    private void CucumberMessagePublisher_Initialized(object sender, PublisherReadyEventArgs e)
-    {
-        _logger.WriteMessage("DEBUG: Formatters - Broker received Publisher ready event.");
-        CheckInitializationStatus();
-    }
-
     private void CheckInitializationStatus()
     {
         // If all known sinks have registered 
@@ -67,17 +61,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // Using a concurrent collection as the sinks may be registering in parallel threads
     private readonly ConcurrentDictionary<string, ICucumberMessageSink> _registeredSinks = new();
 
-    // This event gets fired when all Sinks have registered and indicates to the Publisher that it can start Publishing messages.
-    public event EventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
-
-    // This method is called by the sinks during their plugin initialization. This tells the broker how many plugin sinks to expect.
-    //public void RegisterSink(ICucumberMessageSink sink)
-    //{
-    //    Interlocked.Increment(ref _numberOfSinksExpected);
-    //}
-
-    // This method is called by the sinks during TestRunStarted event handling. By then, all sinks will have registered themselves in the object container,
-    // which happened during plugin Initialize().
+    // This method is called by the sinks during plugin Initialize().
     public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
     {
         if (enabled) 
@@ -85,11 +69,6 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
         Interlocked.Increment(ref _numberOfSinksInitialized);
         CheckInitializationStatus();
-    }
-
-    private void RaiseBrokerReadyEvent()
-    {
-        BrokerReadyEvent?.Invoke(this, new BrokerReadyEventArgs());
     }
 
     public async Task PublishAsync(Envelope message)

@@ -101,7 +101,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._broker = _brokerMock.Object;
 
             // Act
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherStartup(new TestRunStartedEvent());
 
             // Assert
@@ -142,7 +141,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new List<IHookBinding>());
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
             // Act
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             bmg.OnBindingRegistryReady(null, null);
             
             await _sut.PublisherStartup(new TestRunStartedEvent());
@@ -165,7 +163,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._broker = _brokerMock.Object;
 
             // Act
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
 
@@ -559,7 +556,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _sut._bindingCaches = bmg;
             bmg.OnBindingRegistryReady(null, null);
 
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherStartup(new TestRunStartedEvent());
             var cmMock = new Mock<IContextManager>();
             var featureContextStub = new FeatureContext(null, featureInfoStub, ConfigurationLoader.GetDefault());

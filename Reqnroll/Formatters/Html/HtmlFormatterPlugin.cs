@@ -36,13 +36,19 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
             foreach (var message in PostedMessages.GetConsumingEnumerable())
             {
                 if (cancellationToken.IsCancellationRequested)
+                {
+                    Logger.WriteMessage($"Formatter {Name} has been cancelled.");
+                    _closed = true;
+                    await fileStream.FlushAsync();
                     break;
+                }
 
                 if (message != null)
                 {
                     await htmlWriter.WriteAsync(message);
                 }
             }
+            await fileStream.FlushAsync();
         }
         catch (Exception e)
         {

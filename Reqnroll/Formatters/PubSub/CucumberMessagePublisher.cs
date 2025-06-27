@@ -58,11 +58,9 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
 
     internal ICucumberMessageFactory _messageFactory;
-    internal bool _startupCompleted = false;
 
-    // Implementation members of INotifyPublisherReady
-    public bool IsInitialized { get; internal set; }
-    //public event EventHandler<PublisherReadyEventArgs> Initialized;
+    // StartupCompleted is set to true the first time the Publisher handles the TestRunStartedEvent. It is used as a guard against abnormal behavior from the test runner.
+        internal bool _startupCompleted = false;
 
     public CucumberMessagePublisher(IBindingMessagesGenerator bindingMessagesGenerator, IFormatterLog logger)
     {
@@ -139,17 +137,6 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         }
     }
 
-    internal void BrokerReady(object sender, BrokerReadyEventArgs args)
-    {
-        _enabled = _broker.Enabled ? true : _enabled;
-        _logger.WriteMessage($"DEBUG: Publisher.BrokerReady: {_enabled}");
-        if (_startupCompleted)
-        {
-            _logger.WriteMessage($"WARNING: Publisher.BrokerReady: Broker reported ready status after Startup had already completed. All publishing will be disabled.");
-            _enabled = false;
-        }
-    }
-
     internal async Task PublisherStartup(TestRunStartedEvent testRunStartEvent)
     {
         _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup invoked. Enabled: {_enabled}; StartupCompleted: {_startupCompleted}");
@@ -167,9 +154,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
         _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
         _testRunStartedId = SharedIdGenerator.GetNewId();
-        //_bindingCaches = _globalObjectContainer.Resolve<IBindingMessagesGenerator>();
         _clock = _globalObjectContainer.Resolve<IClock>();
-        //_logger = _globalObjectContainer.Resolve<IFormatterLog>();
         try
         {
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));

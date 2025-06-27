@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -26,6 +25,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
     protected readonly BlockingCollection<Envelope> PostedMessages = new();
 
     private bool _isDisposed = false;
+    protected bool _closed = false;
 
     public IFormatterLog Logger { get => _logger; }
     private string _pluginName;
@@ -74,6 +74,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
     private void ReportInitialized(bool status)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} reporting status as {status}.");
+        _closed = !status;
 
         // Preemptively closing down the BlockingCollection to force error identification
         if (status == false)
@@ -83,7 +84,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
     public async Task PublishAsync(Envelope message)
     {
-        if (_isDisposed || PostedMessages.IsAddingCompleted)
+        if (_closed || _isDisposed || PostedMessages.IsAddingCompleted)
         {
             Logger.WriteMessage($"Cannot add message {message.Content().GetType().Name} to formatter {Name} - formatter is closed and not able to accept additional messages.");
             return;
@@ -111,23 +112,11 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
         if (!PostedMessages.IsAddingCompleted)
             PostedMessages.CompleteAdding();
-        Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the BlockignCollection is closed. Awaiting the writing task.");
-        //// using ConfigureAwait(false) per guidance here: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
-        //var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30));
-        //var finishedTask = await Task.WhenAny(timeoutTask, _formatterTask);
-        //if (finishedTask == timeoutTask)
-        //{
-        //    Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close - timeout waiting for formatter {Name}");
-        //}
-        //else
-        //{
-        //    Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close - formatter {Name} has finished.");
 
-        //    // The formatter task completed before timeout, allow propogation of exceptions from the Task
-        //    await _formatterTask!.ConfigureAwait(false);
-        //}
+        Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the BlockingCollection is closed. Awaiting the writing task.");
         await _formatterTask!.ConfigureAwait(false);
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - The formatterTask is now completed.");
+
         if (!PostedMessages.IsCompleted)
             throw new InvalidOperationException($"Formatter {Name} has shut down before all messages processed.");
     }
