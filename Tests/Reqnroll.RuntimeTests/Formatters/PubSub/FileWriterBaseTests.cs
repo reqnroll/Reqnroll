@@ -1,24 +1,25 @@
-﻿using Moq;
-using Reqnroll.Formatters.PubSub;
-using Reqnroll.Utils;
-using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Threading.Tasks;
-using Xunit;
+﻿using FluentAssertions;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.Events;
-using System.Collections;
-using System.Collections.Generic;
-using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Moq;
 using Reqnroll.BoDi;
+using Reqnroll.Events;
 using Reqnroll.Formatters;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
-using Reqnroll.Formatters.Configuration;
-using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Utils;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
 using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
@@ -26,9 +27,21 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
     {
         private class ConsoleLogger : IFormatterLog
         {
+            public List<string> entries = new();
+            private bool hasDumped = false;
             public void WriteMessage(string message)
             {
-                Console.WriteLine($" --> {DateTime.Now.ToString("HH:mm:ss.fff")}: {message}");
+                entries.Add($"{DateTime.Now.ToString("HH:mm:ss.fff")}: {message}");
+            }
+
+            public void DumpMessages()
+            {
+                if (!hasDumped)
+                    foreach (var msg in entries)
+                    {
+                        Console.WriteLine(msg);
+                    }
+                hasDumped = true;
             }
         }
         private class TestFileWritingFormatterPlugin : FileWritingFormatterPluginBase

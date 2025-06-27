@@ -59,7 +59,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         private ObjectContainer CreateObjectContainerWithBroker(bool brokerEnabled = true)
         {
             var container = new ObjectContainer();
-            _brokerMock.Setup(b => b.Enabled).Returns(brokerEnabled);
+            _brokerMock.Setup(b => b.IsEnabled).Returns(brokerEnabled);
             container.RegisterInstanceAs(_brokerMock.Object);
             container.RegisterTypeAs<IFormatterLog>(typeof(FormatterLog));
             return container;

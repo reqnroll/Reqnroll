@@ -191,6 +191,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
             }
             finally
             {
+                _logger.DumpMessages();
                 PostedMessages.Dispose();
                 _isDisposed = true;
             }

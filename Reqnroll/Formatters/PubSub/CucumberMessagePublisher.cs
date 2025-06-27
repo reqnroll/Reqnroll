@@ -143,8 +143,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (_startupCompleted)
             return;
 
-        _enabled = _broker.Enabled && _bindingCaches.Ready ? true : _enabled;
-        _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup: Broker: {_broker.Enabled}; bindingCache: {_bindingCaches.Ready}");
+        _enabled = _broker.IsEnabled && _bindingCaches.Ready ? true : _enabled;
+        _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup: Broker: {_broker.IsEnabled}; bindingCache: {_bindingCaches.Ready}");
         if (!_enabled)
         {
             _startupCompleted = true;
@@ -196,19 +196,22 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
         // sort the remaining Messages by timestamp
         var executionMessages = _messages.Except(testCaseMessages).OrderBy(RetrieveDateTime).ToList();
-
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: has {testCaseMessages.Count} test case messages & {executionMessages.Count} execution messages.");
         // publish them in order to the broker
         foreach (var env in testCaseMessages)
         {
             await _broker.PublishAsync(env);
         }
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: testCase messages written.");
 
         foreach (var env in executionMessages)
         {
             await _broker.PublishAsync(env);
         }
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: exec messages written.");
 
         await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(_allFeaturesPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: TestRunFinished Message written");
 
         // By the time PublisherTestRunComplete is called, all Features should have completed and been removed from the _startedFeatures collection.
         if (_startedFeatures.Count > 0)

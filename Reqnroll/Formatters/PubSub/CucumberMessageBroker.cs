@@ -30,29 +30,33 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     {
         // Calculate the number of Sinks that should have registered by looking at IRuntimePlugin registrations that also implement the ICucumberMessageSink interface
         var plugins = _globalcontainer.ResolveAll<IRuntimePlugin>();
-        var sinks = plugins.Where(p => typeof(ICucumberMessageSink).IsAssignableFrom(p.GetType())).ToList(); 
+        var sinks = plugins.Where(p => typeof(ICucumberMessageSink).IsAssignableFrom(p.GetType())).ToList();
         return sinks.Count;
     }
 
     private void CheckInitializationStatus()
     {
         // If all known sinks have registered 
-        // The system is enabled if we have at least one registered sink that is Enabled
+        // The system is enabled if we have at least one registered sink that is IsEnabled
         if (_numberOfSinksInitialized == _numberOfSinksExpected.Value)
         {
-            Enabled = _registeredSinks.Values.Count > 0;
-            _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {Enabled}");
-            //RaiseBrokerReadyEvent();
+            _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
         }
     }
 
-    public bool Enabled { get; private set; } = false;
+    public bool IsEnabled
+    {
+        get
+        {
+            return (_numberOfSinksInitialized == _numberOfSinksExpected.Value && _numberOfSinksInitialized > 0) ? true : false;
+        }
+    }
 
     // This is the number of sinks that we expect to register. This number is determined by the number of sinks that add themselves to the global container during plugin startup.
     private Lazy<int> _numberOfSinksExpected;
 
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
-    // and the Broker can be Enabled.
+    // and the Broker can be IsEnabled.
     private int _numberOfSinksInitialized = 0;
     private IFormatterLog _logger;
     private IObjectContainer _globalcontainer;
@@ -64,7 +68,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // This method is called by the sinks during plugin Initialize().
     public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
     {
-        if (enabled) 
+        if (enabled)
             _registeredSinks.TryAdd(formatterSink.Name, formatterSink);
 
         Interlocked.Increment(ref _numberOfSinksInitialized);
@@ -80,7 +84,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
             {
                 await sink.PublishAsync(message);
             }
-            catch(System.Exception e)
+            catch (System.Exception e)
             {
                 _logger.WriteMessage($"Formatters Broker: Exception thrown by Formatter Plugin {sink.Name}: {e.Message}");
             }

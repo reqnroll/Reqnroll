@@ -41,12 +41,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             _sut.SinkInitialized(_sinkMock1.Object, true);
 
-            Assert.False(_sut.Enabled); // should not be enabled until after both sinks are registered
+            Assert.False(_sut.IsEnabled); // should not be enabled until after both sinks are registered
 
             _sut.SinkInitialized(_sinkMock2.Object, true);
 
             // Act
-            var result = _sut.Enabled;
+            var result = _sut.IsEnabled;
 
             // Assert
             Assert.True(result);
@@ -60,7 +60,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var sut = new CucumberMessageBroker(log.Object, _objectContainerMock.Object);
 
             // Act
-            var result = sut.Enabled;
+            var result = sut.IsEnabled;
 
             // Assert
             Assert.False(result);

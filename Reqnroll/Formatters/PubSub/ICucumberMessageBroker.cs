@@ -6,7 +6,7 @@ namespace Reqnroll.Formatters.PubSub;
 
 public interface ICucumberMessageBroker
 {
-    bool Enabled { get; }
+    bool IsEnabled { get; }
     Task PublishAsync(Envelope featureMessages);
     void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled);
 }
