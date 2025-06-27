@@ -16,6 +16,7 @@
 * Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
 * Provide AsyncEventHandler in RuntimePluginTestExecutionLifecycleEvents (#634)
 * Improved test execution time by decoupling the telemetry sending from the execution. (#629)
+* Improved test feature context and feature hook handling for non-parallel or class-parallel scenarios where the scenarios of the feature are not executed in sequence. (#638)
 * Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
 
 ## Bug fixes:
