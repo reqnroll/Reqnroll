@@ -1,8 +1,5 @@
 ﻿#nullable enable
 
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Cucumber.HtmlFormatter;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
@@ -10,6 +7,10 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
+using System;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.Html;
 
@@ -23,7 +24,7 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
     {
     }
 
-    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
     {
         try
         {
@@ -34,6 +35,9 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase
 
             foreach (var message in PostedMessages.GetConsumingEnumerable())
             {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
+
                 if (message != null)
                 {
                     await htmlWriter.WriteAsync(message);

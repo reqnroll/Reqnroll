@@ -3,6 +3,7 @@
 using System;
 using System.IO;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
@@ -21,7 +22,7 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
     {
     }
 
-    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
     {
         var newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
@@ -31,6 +32,8 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
 
             foreach (var message in PostedMessages.GetConsumingEnumerable())
             {
+                if (cancellationToken.IsCancellationRequested)
+                    break;
                 if (message != null)
                 {
                     await NdjsonSerializer.SerializeToStreamAsync(fileStream, message);

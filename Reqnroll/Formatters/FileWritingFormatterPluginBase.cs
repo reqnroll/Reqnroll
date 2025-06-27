@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
@@ -31,7 +32,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-    protected override async Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    protected override async Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized, CancellationToken cancellationToken)
     {
         var defaultBaseDirectory = ".";
 
@@ -72,10 +73,10 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         }
         onInitialized(true);
         Logger.WriteMessage($"Formatter {Name} initialized to write to: {outputPath}.");
-        await ConsumeAndWriteToFilesBackgroundTask(outputPath).ConfigureAwait(false);
+        await ConsumeAndWriteToFilesBackgroundTask(outputPath, cancellationToken).ConfigureAwait(false);
     }
 
-    protected abstract Task ConsumeAndWriteToFilesBackgroundTask(string outputPath);
+    protected abstract Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken);
 
     protected virtual string ConfiguredOutputFilePath(IDictionary<string, object> formatterConfiguration)
     {

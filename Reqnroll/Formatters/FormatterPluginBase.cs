@@ -4,6 +4,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
@@ -18,7 +19,7 @@ namespace Reqnroll.Formatters;
 public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin, IDisposable
 {
     private Task? _formatterTask;
-
+    internal CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
     private readonly ICucumberMessageBroker _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
     private readonly IFormatterLog _logger;
@@ -34,7 +35,6 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
     protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, string pluginName)
     {
         _broker = broker;
-        //_broker.RegisterSink(this);
         _configurationProvider = configurationProvider;
         _logger = logger;
         _pluginName = pluginName;
@@ -68,7 +68,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
             return;
         }
 
-        _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized));
+        _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized, _cancellationTokenSource.Token));
     }
 
     private void ReportInitialized(bool status)
@@ -100,7 +100,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
         }
     }
 
-    protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
+    protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization, CancellationToken cancellationToken);
 
     internal async Task CloseAsync()
     {
@@ -146,11 +146,34 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
                         Logger.WriteMessage($"DEBUG: Formatters: Dispose is waiting on the formatter task {Name}.");
                         // In this situation, the TestEngine is shutting down and has called Dispose on the global container.
                         // Forcing the Dispose to wait until the formatter has had a chance to complete.
-                        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(30));
-                        var finishedTask = Task.WhenAny(timeoutTask, _formatterTask);
+                        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(15));
+                        var finishedTask = Task.WhenAny(timeoutTask, _formatterTask).GetAwaiter().GetResult();
                         if (finishedTask == timeoutTask)
                         {
                             Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - timeout waiting for formatter {Name}");
+                            _cancellationTokenSource.Cancel();
+                            // the following sends a simulated message to the writer, which will then notice the cancellation token
+                            if (!PostedMessages.IsAddingCompleted)
+                            {
+                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - sending cancellation token message");
+                                PostedMessages.Add(Envelope.Create(new TestRunFinished("forced closure", false, new Timestamp(0, 0), null, "")));
+                            }
+                            else
+                            {
+                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - cancellation message can't be sent as the collection is closed.");
+                            }
+                            _logger.WriteMessage($"DEBUG: Formatters.PluginBase.Dispose - waiting again after cancellation.");
+                            timeoutTask = Task.Delay(TimeSpan.FromSeconds(15));
+                            finishedTask = Task.WhenAny(timeoutTask, _formatterTask).GetAwaiter().GetResult();
+                            if (finishedTask == timeoutTask)
+                            {
+                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - cancellation unsuccessful.");
+                            }
+                            else
+                            {
+                                _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - cancellation successful.");
+                                _formatterTask?.GetAwaiter().GetResult();
+                            }
                         }
                         else
                         {
@@ -166,7 +189,6 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
 
                         // The formatter task completed before timeout, allow propogation of exceptions from the Task
                         _formatterTask?.GetAwaiter().GetResult();
-
                     }
                 }
                 else

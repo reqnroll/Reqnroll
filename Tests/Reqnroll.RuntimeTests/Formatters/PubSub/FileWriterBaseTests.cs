@@ -18,6 +18,7 @@ using Reqnroll.Tracing;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
 using System.Text.Json;
+using System.Threading;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
@@ -33,6 +34,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         private class TestFileWritingFormatterPlugin : FileWritingFormatterPluginBase
         {
             public string LastOutputPath { get; private set; }
+            public bool WasCancelled = false;
 
             public TestFileWritingFormatterPlugin(
                 IFormattersConfigurationProvider configurationProvider,
@@ -45,11 +47,17 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _messageCollector = messageCollector;
             }
 
-            protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+            protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
             {
                 LastOutputPath = outputPath;
                 foreach (var message in PostedMessages.GetConsumingEnumerable())
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        WasCancelled = true;
+                        break;
+                    }
+
                     // Simulate writing to a file
                     _messageCollector.Add(message);
                 }
@@ -165,5 +173,27 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Assert
             _fileSystemMock.Verify(fs => fs.CreateDirectory(It.IsAny<string>()), Times.Once);
         }
+
+        [Fact]
+        public async Task Publish_FollowedBy_Dispose_Should_Cause_CancelToken_to_Fire()
+        {
+            // Arrange
+            _configurationMock.Setup(c => c.Enabled).Returns(true);
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+                .Returns(new Dictionary<string, object> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+            _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+            var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
+
+            // Act
+            _sut.LaunchSink();
+            await _sut.PublishAsync(message);
+            _sut.Dispose();
+
+            // Assert
+            postedEnvelopes.Should().Contain(message);
+            _sut.WasCancelled.Should().BeTrue();
+        }
+
     }
 }
