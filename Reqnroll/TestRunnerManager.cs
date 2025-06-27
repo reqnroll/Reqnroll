@@ -241,7 +241,6 @@ public class TestRunnerManager : ITestRunnerManager
                 if (!_availableTestWorkerContainers.TryRemove(container, out _))
                     continue; // Container was already taken by another thread
                 testThreadContainer = container;
-                Debug.WriteLine($"{container.Resolve<ITestRunner>().TestWorkerId} - {container.Resolve<ITestRunner>().FeatureContext?.FeatureInfo.Title}", "chosen");
                 return true;
             }
 
