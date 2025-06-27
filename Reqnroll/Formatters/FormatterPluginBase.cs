@@ -62,10 +62,12 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
             ReportInitialized(false);
             return;
         }
-
-        _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(formatterConfiguration, ReportInitialized, _cancellationTokenSource.Token));
+        LaunchInner(formatterConfiguration, ReportInitialized);
+        _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(_cancellationTokenSource.Token));
     }
 
+    // Method available to sinks to allow them to initialize.
+    public abstract void LaunchInner(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
     private void ReportInitialized(bool status)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} reporting status as {status}.");
@@ -96,7 +98,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
         }
     }
 
-    protected abstract Task ConsumeAndFormatMessagesBackgroundTask(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization, CancellationToken cancellationToken);
+    protected abstract Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken);
 
     internal async Task CloseAsync()
     {
@@ -116,7 +118,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
             throw new InvalidOperationException($"Formatter {Name} has shut down before all messages processed.");
     }
 
-    public void Dispose()
+    public virtual void Dispose()
     {
         Logger.WriteMessage($"DEBUG: Formatters: Dispose called on FormatterPlugin {Name}, isDisposed: {_isDisposed}, Formatter Task was launched: {_formatterTask != null}, Queue marked for completion: {PostedMessages.IsAddingCompleted}, Queue is empty:{PostedMessages.IsCompleted}");
         if (!_isDisposed)

@@ -76,6 +76,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 }
             }
 
+            protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+            {
+                onInitialized(true);
+            }
+
             public IFileSystem FileSystem { get; }
 
             private ICollection<Envelope> _messageCollector;
