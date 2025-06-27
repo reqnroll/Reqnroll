@@ -15,7 +15,7 @@ using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Formatters;
 
-public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin, IDisposable
+public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
 {
     private Task? _formatterTask;
     internal CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
@@ -41,12 +41,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IRuntimePlugin
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in constructor.");
     }
 
-    public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
-    {
-        LaunchSink();
-    }
-
-    internal void LaunchSink()
+    public void LaunchSink()
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in Launch().");
 

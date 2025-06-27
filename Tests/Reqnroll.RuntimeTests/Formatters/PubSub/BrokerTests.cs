@@ -25,12 +25,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _logMock = new Mock<IFormatterLog>();
             _bindingMessageGeneratorMock = new Mock<IBindingMessagesGenerator>();
             _sinkMock1 = new Mock<ICucumberMessageSink>();
-            _sinkMock1.As<IRuntimePlugin>();
             _sinkMock1.Setup(s => s.Name).Returns("sink1");
             _sinkMock2 = new Mock<ICucumberMessageSink>();
-            _sinkMock2.As<IRuntimePlugin>();
             _sinkMock2.Setup(s => s.Name).Returns("sink2");
-            _objectContainerMock.Setup(c => c.ResolveAll<IRuntimePlugin>()).Returns([(IRuntimePlugin)_sinkMock1.Object, (IRuntimePlugin) _sinkMock2.Object]);
+            _objectContainerMock.Setup(c => c.ResolveAll<ICucumberMessageSink>()).Returns([_sinkMock1.Object,  _sinkMock2.Object]);
             // Initialize the system under test (SUT)
             _sut = new CucumberMessageBroker(_logMock.Object, _objectContainerMock.Object);
         }
@@ -39,6 +37,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task Enabled_Should_Return_True_When_Sinks_Are_Registered()
         {
             // Arrange
+            _sut.Initialize();
             _sut.SinkInitialized(_sinkMock1.Object, true);
 
             Assert.False(_sut.IsEnabled); // should not be enabled until after both sinks are registered

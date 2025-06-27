@@ -1,11 +1,8 @@
 ﻿using Io.Cucumber.Messages.Types;
-using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
 using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Plugins;
-using System;
 using System.Collections.Concurrent;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,7 +11,7 @@ namespace Reqnroll.Formatters.PubSub;
 /// <summary>
 /// Cucumber Message implementation is a simple Pub/Sub implementation.
 /// This broker mediates between the (singleton) CucumberMessagePublisher and (one or more) CucumberMessageSinks.
-/// The pub/sub mechanism is considered to be turned "OFF" if no sinks are registered.
+/// The pub/sub mechanism is considered to be turned "OFF" if no sinks are registered or if none of them are configured.
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
@@ -23,37 +20,37 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         //(_publisher as INotifyPublisherReady).Initialized += CucumberMessagePublisher_Initialized;
         _logger = formatterLog;
         _globalcontainer = globalObjectContainer;
-        _numberOfSinksExpected = new Lazy<int>(FindContainerRegisteredSinks);
     }
 
-    private int FindContainerRegisteredSinks()
+    public void Initialize()
     {
-        // Calculate the number of Sinks that should have registered by looking at IRuntimePlugin registrations that also implement the ICucumberMessageSink interface
-        var plugins = _globalcontainer.ResolveAll<IRuntimePlugin>();
-        var sinks = plugins.Where(p => typeof(ICucumberMessageSink).IsAssignableFrom(p.GetType())).ToList();
-        return sinks.Count;
-    }
-
-    private void CheckInitializationStatus()
-    {
-        // If all known sinks have registered 
-        // The system is enabled if we have at least one registered sink that is IsEnabled
-        if (_numberOfSinksInitialized == _numberOfSinksExpected.Value)
+        _registeredSinks.AddRange(_globalcontainer.ResolveAll<ICucumberMessageSink>());
+        foreach (var sink in _registeredSinks)
         {
-            _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
+            sink.LaunchSink();
         }
+    }
+
+    // This method is called by the sinks during sink LaunchSink().
+    public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
+    {
+        if (enabled)
+            _activeSinks.TryAdd(formatterSink.Name, formatterSink);
+
+        Interlocked.Increment(ref _numberOfSinksInitialized);
+        CheckInitializationStatus();
     }
 
     public bool IsEnabled
     {
         get
         {
-            return (_numberOfSinksInitialized == _numberOfSinksExpected.Value && _numberOfSinksInitialized > 0) ? true : false;
+            return (HaveAllSinksRegistered() && _activeSinks.Count > 0) ? true : false;
         }
     }
 
-    // This is the number of sinks that we expect to register. This number is determined by the number of sinks that add themselves to the global container during plugin startup.
-    private Lazy<int> _numberOfSinksExpected;
+    // This is the list of sinks registered in the container. Not all may be enabled/configured.
+    private List<ICucumberMessageSink> _registeredSinks = new();
 
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
     // and the Broker can be IsEnabled.
@@ -63,21 +60,26 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
-    private readonly ConcurrentDictionary<string, ICucumberMessageSink> _registeredSinks = new();
+    private readonly ConcurrentDictionary<string, ICucumberMessageSink> _activeSinks = new();
 
-    // This method is called by the sinks during plugin Initialize().
-    public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
+    private void CheckInitializationStatus()
     {
-        if (enabled)
-            _registeredSinks.TryAdd(formatterSink.Name, formatterSink);
+        // If all known sinks have registered 
+        // The system is enabled if we have at least one registered sink that is IsEnabled
+        if (HaveAllSinksRegistered())
+        {
+            _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
+        }
+    }
 
-        Interlocked.Increment(ref _numberOfSinksInitialized);
-        CheckInitializationStatus();
+    private bool HaveAllSinksRegistered()
+    {
+        return _numberOfSinksInitialized == _registeredSinks.Count;
     }
 
     public async Task PublishAsync(Envelope message)
     {
-        foreach (var sink in _registeredSinks.Values)
+        foreach (var sink in _activeSinks.Values)
         {
             // Will catch and swallow any exceptions thrown by sinks so that all get a chance to process each message.
             try

@@ -115,8 +115,22 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
             container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
             container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
-            container.RegisterTypeAs<MessagesFormatterPlugin, IRuntimePlugin>("messages");
-            container.RegisterTypeAs<HtmlFormatterPlugin, IRuntimePlugin>("html");
+            container.RegisterFactoryAs<ICucumberMessageSink>(() =>
+            {
+                var configurationProvider = container.Resolve<IFormattersConfigurationProvider>();
+                var logger = container.Resolve<IFormatterLog>();
+                var fs = container.Resolve<IFileSystem>();
+                var broker = container.Resolve<ICucumberMessageBroker>();
+                return new MessagesFormatterPlugin(configurationProvider, broker, logger, fs);
+            }, "messages");
+            container.RegisterFactoryAs<ICucumberMessageSink>(() =>
+            {
+                var configurationProvider = container.Resolve<IFormattersConfigurationProvider>();
+                var logger = container.Resolve<IFormatterLog>();
+                var fs = container.Resolve<IFileSystem>();
+                var broker = container.Resolve<ICucumberMessageBroker>();
+                return new HtmlFormatterPlugin(configurationProvider, broker, logger, fs);
+            }, "html");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, IRuntimePlugin>("CucumberMessagePublisher");
             container.RegisterFactoryAs<INotifyPublisherReady>(() => container.Resolve<IRuntimePlugin>("CucumberMessagePublisher"));

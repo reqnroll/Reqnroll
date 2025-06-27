@@ -62,9 +62,10 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     // StartupCompleted is set to true the first time the Publisher handles the TestRunStartedEvent. It is used as a guard against abnormal behavior from the test runner.
         internal bool _startupCompleted = false;
 
-    public CucumberMessagePublisher(IBindingMessagesGenerator bindingMessagesGenerator, IFormatterLog logger)
+    public CucumberMessagePublisher(IBindingMessagesGenerator bindingMessagesGenerator, IObjectContainer container, IFormatterLog logger)
     {
         _bindingCaches = bindingMessagesGenerator;
+        _globalObjectContainer = container;
         _logger = logger;
         _logger.WriteMessage("DEBUG: Formatters: Publisher in constructor.");
     }
@@ -72,12 +73,8 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
         _logger.WriteMessage("DEBUG: Publisher in Initialize()");
-
-        runtimePluginEvents.RegisterGlobalDependencies += (_, args) =>
-         {
-             _globalObjectContainer = args.ObjectContainer;
-             _broker = _globalObjectContainer.Resolve<ICucumberMessageBroker>();
-         };
+        _broker = _globalObjectContainer.Resolve<ICucumberMessageBroker>();
+        _broker.Initialize();
 
         runtimePluginEvents.CustomizeTestThreadDependencies += (_, args) =>
         {

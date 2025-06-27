@@ -54,7 +54,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _runtimePluginParameters = new RuntimePluginParameters();
             _unitTestProviderConfiguration = new UnitTestProviderConfiguration();
 
-            _sut = new CucumberMessagePublisher(_bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object);
+            _sut = new CucumberMessagePublisher(_bindingMessagesGeneratorMock.Object, CreateObjectContainerWithBroker(true), _formatterLoggerMock.Object);
         }
         private ObjectContainer CreateObjectContainerWithBroker(bool brokerEnabled = true)
         {
@@ -79,13 +79,13 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public void Initialize_Should_Setup_TestThread_Dependencies()
         {
             // Arrange
-            var objectContainerStub = new ObjectContainer();
-            objectContainerStub.RegisterInstanceAs(_eventPublisherMock.Object);
-            objectContainerStub.RegisterInstanceAs(_brokerMock.Object);
+            var oC = CreateObjectContainerWithBroker(true);
+            oC.RegisterInstanceAs<ITestThreadExecutionEventPublisher>(_eventPublisherMock.Object);
+            var publisher = new CucumberMessagePublisher(_bindingMessagesGeneratorMock.Object, oC, _formatterLoggerMock.Object);
 
             // Act
             _sut.Initialize(_runtimePluginEvents, _runtimePluginParameters, _unitTestProviderConfiguration);
-            _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(objectContainerStub);
+            _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(oC);
 
             // Assert
             _eventPublisherMock.Verify(e => e.AddListener(_sut), Times.Once);
