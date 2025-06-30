@@ -6,45 +6,43 @@ using System.Threading.Tasks;
 using Xunit;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Plugins;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class CucumberMessageBrokerTests
     {
-        private readonly Mock<IObjectContainer> _objectContainerMock;
         private readonly Mock<IFormatterLog> _logMock;
+        private readonly Mock<IBindingMessagesGenerator> _bindingMessageGeneratorMock;
         private readonly Mock<ICucumberMessageSink> _sinkMock1;
         private readonly Mock<ICucumberMessageSink> _sinkMock2;
         private readonly CucumberMessageBroker _sut;
 
         public CucumberMessageBrokerTests()
         {
-            _objectContainerMock = new Mock<IObjectContainer>();
             _logMock = new Mock<IFormatterLog>();
-
+            _bindingMessageGeneratorMock = new Mock<IBindingMessagesGenerator>();
             _sinkMock1 = new Mock<ICucumberMessageSink>();
             _sinkMock1.Setup(s => s.Name).Returns("sink1");
             _sinkMock2 = new Mock<ICucumberMessageSink>();
             _sinkMock2.Setup(s => s.Name).Returns("sink2");
-
             // Initialize the system under test (SUT)
-            _sut = new CucumberMessageBroker(_logMock.Object);
-            _sut.RegisterSink(_sinkMock1.Object);
-            _sut.RegisterSink(_sinkMock2.Object);
+            _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageSink> { { "sink1", _sinkMock1.Object}, { "sink2", _sinkMock2.Object} });
         }
 
         [Fact]
         public async Task Enabled_Should_Return_True_When_Sinks_Are_Registered()
         {
             // Arrange
+            _sut.Initialize();
             _sut.SinkInitialized(_sinkMock1.Object, true);
 
-            Assert.False(_sut.Enabled); // should not be enabled until after both sinks are registered
+            Assert.False(_sut.IsEnabled); // should not be enabled until after both sinks are registered
 
             _sut.SinkInitialized(_sinkMock2.Object, true);
 
             // Act
-            var result = _sut.Enabled;
+            var result = _sut.IsEnabled;
 
             // Assert
             Assert.True(result);
@@ -55,10 +53,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             var log = new Mock<IFormatterLog>();
 
-            var sut = new CucumberMessageBroker(log.Object);
+            var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageSink>());
 
             // Act
-            var result = sut.Enabled;
+            var result = sut.IsEnabled;
 
             // Assert
             Assert.False(result);

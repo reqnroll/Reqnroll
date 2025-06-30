@@ -27,48 +27,45 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
     private readonly IIdGenerator _idGenerator;
     private readonly ICucumberMessageFactory _messageFactory;
     private readonly IBindingRegistry _bindingRegistry;
-    private object _lock = new();
     private bool _initialized = false;
+    public bool Ready {  get
+        {
+            return _initialized && _cachedBindings != null;
+        } }
 
     public BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessageFactory messageFactory, IBindingRegistry bindingRegistry)
     {
         _idGenerator = idGenerator;
         _messageFactory = messageFactory;
         _bindingRegistry = bindingRegistry;
+        _bindingRegistry.BindingRegistryReadyEvent += OnBindingRegistryReady;
+    }
+
+    internal void OnBindingRegistryReady(object sender, BindingRegistryReadyEventArgs e)
+    {
+        if (!_initialized && _bindingRegistry.Ready)
+        {
+            PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
+            _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
+            _cachedMessages = messages;
+            _initialized = true;
+        }
     }
 
     private IReadOnlyDictionary<IBinding, string> PullBindings()
     {
         if (_initialized)
             return _cachedBindings;
-        lock (_lock)
-        {
-            if (!_initialized)
-            {
-                PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
-                _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
-                _cachedMessages = messages;
-                _initialized = true;
-            }
-        }
-        return _cachedBindings;
+
+        throw new ApplicationException("Formatters asked to provide IBindings before they were ready.");
     }
 
     private IEnumerable<Envelope> PullMessages()
     {
         if (_initialized)
             return _cachedMessages;
-        lock (_lock)
-        {
-            if (!_initialized)
-            {
-                PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
-                _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
-                _cachedMessages = messages;
-                _initialized = true;
-            }
-        }
-        return _cachedMessages;
+
+        throw new ApplicationException("Formatters asked to provide static Messages before they ready.");
     }
 
 

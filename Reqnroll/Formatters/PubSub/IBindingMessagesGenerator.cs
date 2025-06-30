@@ -8,5 +8,6 @@ public interface IBindingMessagesGenerator
 {
     IReadOnlyDictionary<IBinding, string> StepDefinitionIdByBinding { get; }
     IEnumerable<Envelope> StaticBindingMessages { get; }
+    bool Ready { get; }
 }
 

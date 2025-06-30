@@ -33,10 +33,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         private readonly Mock<IClock> _clockMock;
         private readonly Mock<ITestThreadExecutionEventPublisher> _eventPublisherMock;
         private readonly Mock<IBindingMessagesGenerator> _bindingMessagesGeneratorMock;
+        private readonly Mock<IFormatterLog> _formatterLoggerMock;
         private readonly RuntimePluginEvents _runtimePluginEvents;
         private readonly RuntimePluginParameters _runtimePluginParameters;
         private readonly UnitTestProviderConfiguration _unitTestProviderConfiguration;
-        private readonly CucumberMessagePublisher _sut;
+        private CucumberMessagePublisher _sut;
 
         public CucumberMessagePublisherTests()
         {
@@ -47,56 +48,41 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _clockMock = new Mock<IClock>();
             _eventPublisherMock = new Mock<ITestThreadExecutionEventPublisher>();
             _bindingMessagesGeneratorMock = new Mock<IBindingMessagesGenerator>();
+            _formatterLoggerMock = new Mock<IFormatterLog>();
 
             _runtimePluginEvents = new RuntimePluginEvents();
             _runtimePluginParameters = new RuntimePluginParameters();
             _unitTestProviderConfiguration = new UnitTestProviderConfiguration();
 
-            _sut = new CucumberMessagePublisher(_brokerMock.Object);
+            _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, CreateObjectContainerWithBroker(true), _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object);
         }
         private ObjectContainer CreateObjectContainerWithBroker(bool brokerEnabled = true)
         {
             var container = new ObjectContainer();
-            _brokerMock.Setup(b => b.Enabled).Returns(brokerEnabled);
+            _brokerMock.Setup(b => b.IsEnabled).Returns(brokerEnabled);
             container.RegisterInstanceAs(_brokerMock.Object);
-            container.RegisterTypeAs<IFormatterLog>(typeof(FormatterLog));
-            return container;
-        }
-
-        private void SetupCommonMocks(ObjectContainer container)
-        {
+            container.RegisterTypeAs<IFormatterLog>(typeof(DebugFormatterLog));
+            _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
             _clockMock.Setup(c => c.GetNowDateAndTime()).Returns(DateTime.UtcNow);
-
             container.RegisterInstanceAs(_idGeneratorMock.Object);
             container.RegisterInstanceAs(_clockMock.Object);
             container.RegisterInstanceAs(_bindingRegistryMock.Object);
-        }
+            _bindingRegistryMock.SetupGet<bool>(br => br.Ready).Returns(true);
 
-        [Fact]
-        public void Initialize_Should_Register_Global_Dependencies()
-        {
-            // Arrange
-            var objectContainerStub = new ObjectContainer();
-
-            // Act
-            _sut.Initialize(_runtimePluginEvents, _runtimePluginParameters, _unitTestProviderConfiguration);
-            _runtimePluginEvents.RaiseRegisterGlobalDependencies(objectContainerStub);
-
-            // Assert
-            objectContainerStub.IsRegistered<IIdGenerator>().Should().BeTrue();
+            return container;
         }
 
         [Fact]
         public void Initialize_Should_Setup_TestThread_Dependencies()
         {
             // Arrange
-            var objectContainerStub = new ObjectContainer();
-            objectContainerStub.RegisterInstanceAs(_eventPublisherMock.Object);
-            objectContainerStub.RegisterInstanceAs(_brokerMock.Object);
+            var oC = CreateObjectContainerWithBroker(true);
+            oC.RegisterInstanceAs<ITestThreadExecutionEventPublisher>(_eventPublisherMock.Object);
+            var publisher = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, oC, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object);
 
             // Act
             _sut.Initialize(_runtimePluginEvents, _runtimePluginParameters, _unitTestProviderConfiguration);
-            _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(objectContainerStub);
+            _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(oC);
 
             // Assert
             _eventPublisherMock.Verify(e => e.AddListener(_sut), Times.Once);
@@ -109,9 +95,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(false);
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
+            _sut._broker = _brokerMock.Object;
 
             // Act
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherStartup(new TestRunStartedEvent());
 
             // Assert
@@ -137,21 +123,23 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
             var beforeTestRunArgs = new RuntimePluginBeforeTestRunEventArgs(objectContainerStub);
             // nb. This approach required as Moq can't mock types from Io.Cucumber.Messages.Types (as they're not visibleTo as well as sealed)
             var msgFactory = new PublisherStartup_FactoryStub();
             objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(msgFactory);
-            objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object));
-
-            _sut._globalObjectContainer = objectContainerStub;
+            var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object);
+            objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(bmg);
 
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new List<IHookBinding>());
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
 
+            _sut = new CucumberMessagePublisher(_brokerMock.Object, bmg, objectContainerStub, _formatterLoggerMock.Object, _idGeneratorMock.Object, msgFactory, _clockMock.Object);
+            _sut.Initialize(new RuntimePluginEvents(), null, null);
+
             // Act
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
+            bmg.OnBindingRegistryReady(null, null);
+
             await _sut.PublisherStartup(new TestRunStartedEvent());
 
             // Assert
@@ -166,12 +154,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublisherTestRunComplete_Should_Not_Perform_Actions_When_Broker_Is_Disabled()
         {
             // Arrange
-            var objectContainerStub = CreateObjectContainerWithBroker(false);
-            SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
 
             // Act
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
 
@@ -184,19 +168,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublisherTestRunComplete_Should_CalculateStatusWhenAllFeaturesSucceed()
         {
             // Arrange
-            var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
-            _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
-
             var feature1TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature1TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
             feature1TrackerMock.Setup(f => f.Enabled).Returns(true);
             var feature2TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
             feature2TrackerMock.Setup(f => f.Enabled).Returns(true);
-
-
 
             var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
             var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2", "");
@@ -205,12 +182,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var f2Context = new Mock<IFeatureContext>();
             f2Context.Setup(x => x.FeatureInfo).Returns(f2);
 
-            _sut._broker = _brokerMock.Object;
             _sut._startedFeatures.TryAdd(f1, feature1TrackerMock.Object);
             _sut._startedFeatures.TryAdd(f2, feature2TrackerMock.Object);
             _sut._enabled = true;
-            _sut._messageFactory = new CucumberMessageFactory();
-            _sut._clock = _clockMock.Object;
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
@@ -226,19 +200,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublisherFeatureFinished_Should_CalculateStatusWhenAFeatureFails()
         {
             // Arrange
-            var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
-            _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
-
             var feature1TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature1TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
             feature1TrackerMock.Setup(f => f.Enabled).Returns(true);
             var feature2TrackerMock = new Mock<IFeatureExecutionTracker>();
             feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(false);
             feature2TrackerMock.Setup(f => f.Enabled).Returns(true);
-
-
 
             var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
             var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2", "");
@@ -247,12 +214,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var f2Context = new Mock<IFeatureContext>();
             f2Context.Setup(x => x.FeatureInfo).Returns(f2);
 
-            _sut._broker = _brokerMock.Object;
             _sut._startedFeatures.TryAdd(f1, feature1TrackerMock.Object);
             _sut._startedFeatures.TryAdd(f2, feature2TrackerMock.Object);
             _sut._enabled = true;
-            _sut._messageFactory = new CucumberMessageFactory();
-            _sut._clock = _clockMock.Object;
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
@@ -268,15 +232,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task PublisherTestRunComplete_Should_PublishTestCase_and_Exec_Messages()
         {
             // Arrange
-            var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
-            _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
-
             var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
             featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
             featureTrackerMock.Setup(f => f.Enabled).Returns(true);
-
 
             var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
             var f1Context = new Mock<IFeatureContext>();
@@ -297,12 +255,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                     return Task.CompletedTask;
                 });
 
-            _sut._broker = _brokerMock.Object;
             _sut._startedFeatures.TryAdd(f1, featureTrackerMock.Object);
             _sut._enabled = true;
             _sut._messages = messages;
-            _sut._messageFactory = new CucumberMessageFactory();
-            _sut._clock = _clockMock.Object;
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
@@ -317,13 +272,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task FeatureStartedEvent_Should_cause_no_sideEffects_When_Disabled()
         {
             // Arrange
-            var objectContainerStub = new ObjectContainer();
-            objectContainerStub.RegisterInstanceAs(new Mock<ITraceListener>().Object);
             var featureContextMock = new Mock<IFeatureContext>();
 
             _sut._enabled = false;
-            _sut._broker = _brokerMock.Object;
-            _sut._globalObjectContainer = objectContainerStub;
             _sut._startupCompleted = true;
 
             // Act
@@ -338,17 +289,12 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task FeatureStartedEvent_Should_not_startASecondFeatureTrackerIfOneAlreadyExistsForAGivenFeatureName()
         {
             // Arrange
-            var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterInstanceAs(new Mock<ITraceListener>().Object);
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDEF", null);
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
 
             var existingFeatureTrackerMock = new Mock<IFeatureExecutionTracker>();
             _sut._startedFeatures.TryAdd(featureInfoStub, existingFeatureTrackerMock.Object);
-            _sut._broker = _brokerMock.Object;
-            _sut._globalObjectContainer = objectContainerStub;
             _sut._enabled = true;
             _sut._startupCompleted = true;
 
@@ -366,10 +312,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         public async Task FeatureStartedEvent_Should_InstantiateAFeatureTrackerAndPublishStaticMessages()
         {
             // Arrange
-            var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
-            objectContainerStub.RegisterInstanceAs(new Mock<ITraceListener>().Object);
-
             var featureContextMock = new Mock<IFeatureContext>();
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDEF", null);
             var sourceFunc = () =>
@@ -387,7 +329,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var featureMessagesStub = new FeatureLevelCucumberMessages(sourceFunc, gherkinDocFunc, picklesFunc);
             featureInfoStub.FeatureCucumberMessages = featureMessagesStub;
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
-            featureContextMock.Setup(fc => fc.FeatureContainer).Returns(objectContainerStub);
+            featureContextMock.Setup(fc => fc.FeatureContainer).Returns(_objectContainerMock.Object);
 
             IList<Envelope> publishedEnvelopes = new List<Envelope>();
             _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
@@ -396,12 +338,10 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                         publishedEnvelopes.Add(e);
                         return Task.CompletedTask;
                     });
-            var messageFactory = new CucumberMessageFactory();
-            _sut._messageFactory = messageFactory;
-            _sut._broker = _brokerMock.Object;
-            _sut._globalObjectContainer = objectContainerStub;
-            _sut._bindingCaches = new BindingMessagesGenerator(_idGeneratorMock.Object, messageFactory, _bindingRegistryMock.Object);
-            //_sut._bindingCaches.StepDefinitionIdByBinding.Clear();
+            var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(), _bindingRegistryMock.Object);
+            _sut._bindingCaches = bmg;
+            bmg.OnBindingRegistryReady(null, null);
+
             _sut._enabled = true;
             _sut._startupCompleted = true;
 
@@ -539,13 +479,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
             var msgFactory = new HookBindingTest_CucumberMessageFactoryStub();
             objectContainerStub.RegisterInstanceAs<ICucumberMessageFactory>(msgFactory);
-
-            var traceListen = new Mock<ITraceListener>();
-            objectContainerStub.RegisterInstanceAs(traceListen.Object);
-            _idGeneratorMock.Setup(ig => ig.GetNewId()).Returns("x");
 
             var hookBindingMock = new Mock<IHookBinding>();
             hookBindingMock.Setup(hb => hb.HookType).Returns(hookType);
@@ -556,9 +491,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new List<IHookBinding>([hookBindingMock.Object]));
-            objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object));
+            var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object);
+            objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(bmg);
+            _sut._bindingCaches = bmg;
+            bmg.OnBindingRegistryReady(null, null);
 
-            _sut.BrokerReady(null, new BrokerReadyEventArgs());
             await _sut.PublisherStartup(new TestRunStartedEvent());
             var cmMock = new Mock<IContextManager>();
             var featureContextStub = new FeatureContext(null, featureInfoStub, ConfigurationLoader.GetDefault());
@@ -584,7 +521,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             // Hack: Re-using code from a prior test to invoke the BrokerReady and get the sut set-up for this test.
             var objectContainerStub = CreateObjectContainerWithBroker(true);
-            SetupCommonMocks(objectContainerStub);
             var messageFactory = new HookBindingTest_CucumberMessageFactoryStub();
 
             IList<Envelope> publishedEnvelopes = new List<Envelope>();
@@ -594,8 +530,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                         publishedEnvelopes.Add(e);
                         return Task.CompletedTask;
                     });
-
-            _idGeneratorMock.Setup(ig => ig.GetNewId()).Returns("x");
 
             var hookBindingMock = new Mock<IHookBinding>();
             hookBindingMock.Setup(hb => hb.HookType).Returns(hookType);

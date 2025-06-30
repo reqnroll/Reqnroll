@@ -1,8 +1,8 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.BoDi;
 using Reqnroll.Formatters.RuntimeSupport;
-using System;
 using System.Collections.Concurrent;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -11,72 +11,79 @@ namespace Reqnroll.Formatters.PubSub;
 /// <summary>
 /// Cucumber Message implementation is a simple Pub/Sub implementation.
 /// This broker mediates between the (singleton) CucumberMessagePublisher and (one or more) CucumberMessageSinks.
-/// The pub/sub mechanism is considered to be turned "OFF" if no sinks are registered.
+/// The pub/sub mechanism is considered to be turned "OFF" if no sinks are registered or if none of them are configured.
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
-    public CucumberMessageBroker(IFormatterLog formatterLog)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageSink> containerRegisteredSinks)
     {
         _logger = formatterLog;
+        _registeredSinks.AddRange(containerRegisteredSinks.Values);
     }
 
-    public bool Enabled { get; private set; } = false;
+    public void Initialize()
+    {
+        foreach (var sink in _registeredSinks)
+        {
+            sink.LaunchSink(this);
+        }
+    }
 
-    // This is the number of sinks that we expect to register. This number is determined by the number of sinks that add themselves to the global container during plugin startup.
-    private int _numberOfSinksExpected;
+    // This method is called by the sinks during sink LaunchSink().
+    public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
+    {
+        if (enabled)
+            _activeSinks.TryAdd(formatterSink.Name, formatterSink);
+
+        Interlocked.Increment(ref _numberOfSinksInitialized);
+        CheckInitializationStatus();
+    }
+
+    public bool IsEnabled
+    {
+        get
+        {
+            return (HaveAllSinksRegistered() && _activeSinks.Count > 0) ? true : false;
+        }
+    }
+
+    // This is the list of sinks registered in the container. Not all may be enabled/configured.
+    private List<ICucumberMessageSink> _registeredSinks = new();
 
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
-    // and the Broker can be Enabled.
+    // and the Broker can be IsEnabled.
     private int _numberOfSinksInitialized = 0;
-
     private IFormatterLog _logger;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
-    private readonly ConcurrentDictionary<string, ICucumberMessageSink> _registeredSinks = new();
+    private readonly ConcurrentDictionary<string, ICucumberMessageSink> _activeSinks = new();
 
-    // This event gets fired when all Sinks have registered and indicates to the Publisher that it can start Publishing messages.
-    public event EventHandler<BrokerReadyEventArgs> BrokerReadyEvent;
-
-    // This method is called by the sinks during their plugin initialization. This tells the broker how many plugin sinks to expect.
-    public void RegisterSink(ICucumberMessageSink sink)
+    private void CheckInitializationStatus()
     {
-        Interlocked.Increment(ref _numberOfSinksExpected);
-    }
-
-    // This method is called by the sinks during TestRunStarted event handling. By then, all sinks will have registered themselves in the object container,
-    // which happened during plugin Initialize().
-    public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
-    {
-        if (enabled) 
-            _registeredSinks.TryAdd(formatterSink.Name, formatterSink);
-
-        Interlocked.Increment(ref _numberOfSinksInitialized);
-
-        // If all known sinks have registered then we can inform the Publisher
-        // The system is enabled if we have at least one registered sink that is Enabled
-        if (_numberOfSinksInitialized == _numberOfSinksExpected)
+        // If all known sinks have registered 
+        // The system is enabled if we have at least one registered sink that is IsEnabled
+        if (HaveAllSinksRegistered())
         {
-            Enabled = _registeredSinks.Values.Count > 0;
-            RaiseBrokerReadyEvent();
+            _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
         }
     }
 
-    private void RaiseBrokerReadyEvent()
+    private bool HaveAllSinksRegistered()
     {
-        BrokerReadyEvent?.Invoke(this, new BrokerReadyEventArgs());
+        return _numberOfSinksInitialized == _registeredSinks.Count;
     }
 
     public async Task PublishAsync(Envelope message)
     {
-        foreach (var sink in _registeredSinks.Values)
+        foreach (var sink in _activeSinks.Values)
         {
             // Will catch and swallow any exceptions thrown by sinks so that all get a chance to process each message.
             try
             {
                 await sink.PublishAsync(message);
             }
-            catch(System.Exception e)
+            catch (System.Exception e)
             {
                 _logger.WriteMessage($"Formatters Broker: Exception thrown by Formatter Plugin {sink.Name}: {e.Message}");
             }

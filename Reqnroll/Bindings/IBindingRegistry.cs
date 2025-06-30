@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 
 namespace Reqnroll.Bindings
 {
     public interface IBindingRegistry
     {
+        event EventHandler<BindingRegistryReadyEventArgs> BindingRegistryReadyEvent;
         bool Ready { get; set; }
         bool IsValid { get; }
 

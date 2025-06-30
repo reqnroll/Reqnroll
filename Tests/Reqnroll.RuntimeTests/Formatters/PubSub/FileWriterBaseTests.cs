@@ -1,51 +1,83 @@
-﻿using Moq;
-using Reqnroll.Formatters.PubSub;
-using Reqnroll.Utils;
-using System;
-using System.Collections.Concurrent;
-using System.IO;
-using System.Threading.Tasks;
-using Xunit;
+﻿using FluentAssertions;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.Events;
-using System.Collections;
-using System.Collections.Generic;
-using FluentAssertions;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Moq;
 using Reqnroll.BoDi;
+using Reqnroll.Events;
 using Reqnroll.Formatters;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
-using Reqnroll.Formatters.Configuration;
-using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Utils;
+using System;
+using System.Collections;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.Json;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class FileWritingFormatterPluginBaseTests
     {
+        private class ConsoleLogger : IFormatterLog
+        {
+            public List<string> entries = new();
+            private bool hasDumped = false;
+            public void WriteMessage(string message)
+            {
+                entries.Add($"{DateTime.Now.ToString("HH:mm:ss.fff")}: {message}");
+            }
+
+            public void DumpMessages()
+            {
+                if (!hasDumped)
+                    foreach (var msg in entries)
+                    {
+                        Console.WriteLine(msg);
+                    }
+                hasDumped = true;
+            }
+        }
         private class TestFileWritingFormatterPlugin : FileWritingFormatterPluginBase
         {
             public string LastOutputPath { get; private set; }
+            public bool WasCancelled = false;
 
             public TestFileWritingFormatterPlugin(
                 IFormattersConfigurationProvider configurationProvider,
-                ICucumberMessageBroker broker,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
-                : base(configurationProvider, broker, new FormatterLog(), "testPlugin", ".txt", "test_output.txt", fileSystem)
+                : base(configurationProvider, new ConsoleLogger(), "testPlugin", ".txt", "test_output.txt", fileSystem)
             {
                 FileSystem = fileSystem;
                 _messageCollector = messageCollector;
             }
 
-            protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath)
+            protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
             {
                 LastOutputPath = outputPath;
                 foreach (var message in PostedMessages.GetConsumingEnumerable())
                 {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        WasCancelled = true;
+                        break;
+                    }
+
                     // Simulate writing to a file
                     _messageCollector.Add(message);
                 }
+            }
+
+            protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+            {
+                onInitialized(true);
             }
 
             public IFileSystem FileSystem { get; }
@@ -80,8 +112,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _testThreadObjContainerStub.RegisterInstanceAs(_tracerMock.Object);
 
 
-            _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _brokerMock.Object, _fileSystemMock.Object, postedEnvelopes);
-            _sut.Initialize(_rtpe, _rtpp, new UnitTestProvider.UnitTestProviderConfiguration());
+            _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _fileSystemMock.Object, postedEnvelopes);
         }
 
         [Fact]
@@ -95,7 +126,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.CloseAsync();
 
             // Assert
@@ -114,7 +145,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.CloseAsync();
 
             // Assert
@@ -133,7 +164,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.PublishAsync(message);
             await _sut.CloseAsync();
 
@@ -153,11 +184,33 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.CloseAsync();
 
             // Assert
             _fileSystemMock.Verify(fs => fs.CreateDirectory(It.IsAny<string>()), Times.Once);
         }
+
+        [Fact]
+        public async Task Publish_FollowedBy_Dispose_Should_Cause_CancelToken_to_Fire()
+        {
+            // Arrange
+            _configurationMock.Setup(c => c.Enabled).Returns(true);
+            _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+                .Returns(new Dictionary<string, object> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+            _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+            var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
+
+            // Act
+            _sut.LaunchSink(_brokerMock.Object);
+            await _sut.PublishAsync(message);
+            _sut.Dispose();
+
+            // Assert
+            postedEnvelopes.Should().Contain(message);
+            _sut.WasCancelled.Should().BeTrue();
+        }
+
     }
 }

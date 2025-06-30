@@ -58,26 +58,28 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
 
     internal ICucumberMessageFactory _messageFactory;
+
+    // StartupCompleted is set to true the first time the Publisher handles the TestRunStartedEvent. It is used as a guard against abnormal behavior from the test runner.
     internal bool _startupCompleted = false;
 
-    public CucumberMessagePublisher(ICucumberMessageBroker broker)
+    public CucumberMessagePublisher(ICucumberMessageBroker broker, IBindingMessagesGenerator bindingMessagesGenerator, IObjectContainer container, IFormatterLog logger, IIdGenerator idGenerator, ICucumberMessageFactory messageFactory, IClock clock)
     {
+        _logger = logger;
+        _logger.WriteMessage("DEBUG: Formatters: Publisher in constructor.");
         _broker = broker;
-        _broker.BrokerReadyEvent += BrokerReady;
+        _bindingCaches = bindingMessagesGenerator;
+        _globalObjectContainer = container;
+        SharedIdGenerator = idGenerator;
+        _messageFactory = messageFactory;
+        _testRunStartedId = SharedIdGenerator.GetNewId();
+        _clock = clock;
+
     }
 
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
-        runtimePluginEvents.RegisterGlobalDependencies += (_, args) =>
-        {
-            _globalObjectContainer = args.ObjectContainer;
-            _globalObjectContainer.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
-            _globalObjectContainer.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
-            if (!args.ObjectContainer.IsRegistered<ICucumberMessageFactory>())
-            {
-                args.ObjectContainer.RegisterFactoryAs<ICucumberMessageFactory>((Delegate)(() => new CucumberMessageFactory()));
-            }
-        };
+        _logger.WriteMessage("DEBUG: Publisher in Initialize()");
+        _broker.Initialize();
 
         runtimePluginEvents.CustomizeTestThreadDependencies += (_, args) =>
         {
@@ -88,6 +90,14 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     public async Task OnEventAsync(IExecutionEvent executionEvent)
     {
+        var hookType = executionEvent switch
+        {
+            HookStartedEvent se => se.HookType.ToString(),
+            HookFinishedEvent fe => fe.HookType.ToString(),
+            _ => ""
+        };
+        hookType = hookType.IsNotNullOrEmpty() ? "." + hookType : String.Empty;
+        _logger.WriteMessage($"DEBUG: Publisher dispatching {executionEvent.GetType().Name}{hookType}");
         switch (executionEvent)
         {
             case TestRunStartedEvent testRunStartedEvent:
@@ -129,38 +139,38 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         }
     }
 
-    internal void BrokerReady(object sender, BrokerReadyEventArgs args)
-    {
-        // It is possible fro BrokerReady to be called multiple times (once per formatter)
-        _enabled = _broker.Enabled ? true : _enabled;
-    }
-
     internal async Task PublisherStartup(TestRunStartedEvent testRunStartEvent)
     {
-
-        if (!_enabled || _startupCompleted)
+        _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup invoked. Enabled: {_enabled}; StartupCompleted: {_startupCompleted}");
+        if (_startupCompleted)
             return;
 
-        SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
-        _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
-        _testRunStartedId = SharedIdGenerator.GetNewId();
-        _bindingCaches = _globalObjectContainer.Resolve<IBindingMessagesGenerator>();
-        _clock = _globalObjectContainer.Resolve<IClock>();
-        _logger = _globalObjectContainer.Resolve<IFormatterLog>();
+        _enabled = _broker.IsEnabled && _bindingCaches.Ready ? true : _enabled;
+        _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup: Broker: {_broker.IsEnabled}; bindingCache: {_bindingCaches.Ready}");
+        if (!_enabled)
+        {
+            _startupCompleted = true;
+            return;
+        }
+
         try
         {
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_globalObjectContainer)));
+            _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup - published TestRunStarted");
+
             foreach (var msg in _bindingCaches.StaticBindingMessages)
             {
                 // this publishes StepDefinition, Hook, StepArgumentTransform messages
                 await _broker.PublishAsync(msg);
+                _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup - published {msg.Content().GetType().Name}");
             }
         }
         catch (System.Exception ex)
         {
             _logger.WriteMessage($"Error publishing messages: {ex.Message}");
         }
+        _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup - startup completed");
 
         _startupCompleted = true;
     }
@@ -176,6 +186,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     internal async Task PublisherTestRunCompleteAsync(TestRunFinishedEvent testRunFinishedEvent)
     {
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete invoked. Enabled: {_enabled}; StartupCompleted: {_startupCompleted}");
         if (!_enabled)
             return;
 
@@ -183,19 +194,22 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
         // sort the remaining Messages by timestamp
         var executionMessages = _messages.Except(testCaseMessages).OrderBy(RetrieveDateTime).ToList();
-
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: has {testCaseMessages.Count} test case messages & {executionMessages.Count} execution messages.");
         // publish them in order to the broker
         foreach (var env in testCaseMessages)
         {
             await _broker.PublishAsync(env);
         }
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: testCase messages written.");
 
         foreach (var env in executionMessages)
         {
             await _broker.PublishAsync(env);
         }
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: exec messages written.");
 
         await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(_allFeaturesPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
+        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: TestRunFinished Message written");
 
         // By the time PublisherTestRunComplete is called, all Features should have completed and been removed from the _startedFeatures collection.
         if (_startedFeatures.Count > 0)
@@ -209,9 +223,9 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
     {
         var featureInfo = featureStartedEvent.FeatureContext?.FeatureInfo;
-
+        _logger.WriteMessage($"DEBUG: Formatters.Publisher.FeatureStartedEvent invoked {featureInfo?.Title} with startup completed status: {_startupCompleted}");
         //if (!_startupCompleted)
-        //    throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message publisher is ready.");
+        //    throw new InvalidOperationException($"Formatters attempting to start processing on feature {featureInfo.Title} before the message _publisher is ready.");
 
         if (!_enabled || featureInfo == null)
         {

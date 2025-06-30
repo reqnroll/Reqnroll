@@ -183,7 +183,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
 
     public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
     {
-        // At this point we only care about hooks that wrap scenarios or steps; Before/AfterTestRun hooks were processed earlier by the publisher
+        // At this point we only care about hooks that wrap scenarios or steps; Before/AfterTestRun hooks were processed earlier by the _publisher
         if (hookBindingStartedEvent.HookBinding.HookType is Bindings.HookType.AfterTestRun or Bindings.HookType.BeforeTestRun)
             return;
 

@@ -37,7 +37,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new[] { stepTransform.Object });
 
+            _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
+            _sut.OnBindingRegistryReady(null, null);
             var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
@@ -56,7 +58,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new[] { invalidStepDefinition.Object });
 
+            _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
+            _sut.OnBindingRegistryReady(null, null);
             var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
@@ -78,7 +82,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new[] { validStepDefinition.Object });
 
+            _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
+            _sut.OnBindingRegistryReady(null, null);
             var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
@@ -100,7 +106,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             hookBinding.Setup(sd => sd.Method.Parameters).Returns([]);
 
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new[] { hookBinding.Object });
+            _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
+            _sut.OnBindingRegistryReady(null, null);
             var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
@@ -119,7 +127,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new[] { stepTransform.Object });
 
+            _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
+            _sut.OnBindingRegistryReady(null, null);
             var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
