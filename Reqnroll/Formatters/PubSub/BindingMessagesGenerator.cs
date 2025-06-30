@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using System;
 using System.Collections.ObjectModel;
-using Reqnroll.EnvironmentAccess;
 
 namespace Reqnroll.Formatters.PubSub;
 
@@ -28,7 +27,6 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
     private readonly IIdGenerator _idGenerator;
     private readonly ICucumberMessageFactory _messageFactory;
     private readonly IBindingRegistry _bindingRegistry;
-    private object _lock = new();
     private bool _initialized = false;
     public bool Ready {  get
         {
@@ -60,35 +58,14 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
             return _cachedBindings;
 
         throw new ApplicationException("Formatters asked to provide IBindings before they were ready.");
-        //lock (_lock)
-        //{
-        //    if (!_initialized)
-        //    {
-        //        PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
-        //        _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
-        //        _cachedMessages = messages;
-        //        _initialized = true;
-        //    }
-        //}
-        //return _cachedBindings;
     }
 
     private IEnumerable<Envelope> PullMessages()
     {
         if (_initialized)
             return _cachedMessages;
+
         throw new ApplicationException("Formatters asked to provide static Messages before they ready.");
-        //lock (_lock)
-        //{
-        //    if (!_initialized)
-        //    {
-        //        PopulateBindingCachesAndGenerateBindingMessages(out var messages, out var idsByBinding);
-        //        _cachedBindings = new ReadOnlyDictionary<IBinding, string>(idsByBinding);
-        //        _cachedMessages = messages;
-        //        _initialized = true;
-        //    }
-        //}
-        //return _cachedMessages;
     }
 
 

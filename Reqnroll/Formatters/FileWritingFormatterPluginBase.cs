@@ -22,7 +22,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
     private readonly IFileSystem _fileSystem;
     private string _outputPath;
 
-    protected FileWritingFormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, broker, logger, pluginName)
+    protected FileWritingFormatterPluginBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, logger, pluginName)
     {
         _defaultFileType = defaultFileType;
         _defaultFileName = defaultFileName;

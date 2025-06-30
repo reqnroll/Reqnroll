@@ -15,18 +15,17 @@ namespace Reqnroll.Formatters.PubSub;
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
-    public CucumberMessageBroker(IFormatterLog formatterLog, IObjectContainer globalObjectContainer)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageSink> containerRegisteredSinks)
     {
         _logger = formatterLog;
-        _globalcontainer = globalObjectContainer;
+        _registeredSinks.AddRange(containerRegisteredSinks.Values);
     }
 
     public void Initialize()
     {
-        _registeredSinks.AddRange(_globalcontainer.ResolveAll<ICucumberMessageSink>());
         foreach (var sink in _registeredSinks)
         {
-            sink.LaunchSink();
+            sink.LaunchSink(this);
         }
     }
 
@@ -55,7 +54,6 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // and the Broker can be IsEnabled.
     private int _numberOfSinksInitialized = 0;
     private IFormatterLog _logger;
-    private IObjectContainer _globalcontainer;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads

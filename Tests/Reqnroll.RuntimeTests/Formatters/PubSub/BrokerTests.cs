@@ -12,7 +12,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
     public class CucumberMessageBrokerTests
     {
-        private readonly Mock<IObjectContainer> _objectContainerMock;
         private readonly Mock<IFormatterLog> _logMock;
         private readonly Mock<IBindingMessagesGenerator> _bindingMessageGeneratorMock;
         private readonly Mock<ICucumberMessageSink> _sinkMock1;
@@ -21,16 +20,14 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
         public CucumberMessageBrokerTests()
         {
-            _objectContainerMock = new Mock<IObjectContainer>();
             _logMock = new Mock<IFormatterLog>();
             _bindingMessageGeneratorMock = new Mock<IBindingMessagesGenerator>();
             _sinkMock1 = new Mock<ICucumberMessageSink>();
             _sinkMock1.Setup(s => s.Name).Returns("sink1");
             _sinkMock2 = new Mock<ICucumberMessageSink>();
             _sinkMock2.Setup(s => s.Name).Returns("sink2");
-            _objectContainerMock.Setup(c => c.ResolveAll<ICucumberMessageSink>()).Returns([_sinkMock1.Object,  _sinkMock2.Object]);
             // Initialize the system under test (SUT)
-            _sut = new CucumberMessageBroker(_logMock.Object, _objectContainerMock.Object);
+            _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageSink> { { "sink1", _sinkMock1.Object}, { "sink2", _sinkMock2.Object} });
         }
 
         [Fact]
@@ -56,7 +53,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             var log = new Mock<IFormatterLog>();
 
-            var sut = new CucumberMessageBroker(log.Object, _objectContainerMock.Object);
+            var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageSink>());
 
             // Act
             var result = sut.IsEnabled;

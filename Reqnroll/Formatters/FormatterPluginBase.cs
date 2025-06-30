@@ -19,7 +19,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
 {
     private Task? _formatterTask;
     internal CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-    private readonly ICucumberMessageBroker _broker;
+    private ICucumberMessageBroker? _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
     private readonly IFormatterLog _logger;
     protected readonly BlockingCollection<Envelope> PostedMessages = new();
@@ -32,18 +32,18 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
 
     public string Name => _pluginName;
 
-    protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, string pluginName)
+    protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName)
     {
-        _broker = broker;
         _configurationProvider = configurationProvider;
         _logger = logger;
         _pluginName = pluginName;
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in constructor.");
     }
 
-    public void LaunchSink()
+    public void LaunchSink(ICucumberMessageBroker broker)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in Launch().");
+        _broker = broker;
 
         bool IsFormatterEnabled(out IDictionary<string, object> configuration)
         {
@@ -76,7 +76,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
         // Preemptively closing down the BlockingCollection to force error identification
         if (status == false)
             PostedMessages.CompleteAdding();
-        _broker.SinkInitialized(this, enabled: status);
+        _broker?.SinkInitialized(this, enabled: status);
     }
 
     public async Task PublishAsync(Envelope message)

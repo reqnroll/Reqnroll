@@ -51,10 +51,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             public TestFileWritingFormatterPlugin(
                 IFormattersConfigurationProvider configurationProvider,
-                ICucumberMessageBroker broker,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
-                : base(configurationProvider, broker, new ConsoleLogger(), "testPlugin", ".txt", "test_output.txt", fileSystem)
+                : base(configurationProvider, new ConsoleLogger(), "testPlugin", ".txt", "test_output.txt", fileSystem)
             {
                 FileSystem = fileSystem;
                 _messageCollector = messageCollector;
@@ -113,7 +112,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _testThreadObjContainerStub.RegisterInstanceAs(_tracerMock.Object);
 
 
-            _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _brokerMock.Object, _fileSystemMock.Object, postedEnvelopes);
+            _sut = new TestFileWritingFormatterPlugin(_configurationMock.Object, _fileSystemMock.Object, postedEnvelopes);
         }
 
         [Fact]
@@ -127,7 +126,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.CloseAsync();
 
             // Assert
@@ -146,7 +145,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.CloseAsync();
 
             // Assert
@@ -165,7 +164,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.PublishAsync(message);
             await _sut.CloseAsync();
 
@@ -185,7 +184,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.CloseAsync();
 
             // Assert
@@ -204,7 +203,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "started"));
 
             // Act
-            _sut.LaunchSink();
+            _sut.LaunchSink(_brokerMock.Object);
             await _sut.PublishAsync(message);
             _sut.Dispose();
 
