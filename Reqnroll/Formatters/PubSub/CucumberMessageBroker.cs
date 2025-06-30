@@ -17,7 +17,6 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 {
     public CucumberMessageBroker(IFormatterLog formatterLog, IObjectContainer globalObjectContainer)
     {
-        //(_publisher as INotifyPublisherReady).Initialized += CucumberMessagePublisher_Initialized;
         _logger = formatterLog;
         _globalcontainer = globalObjectContainer;
     }

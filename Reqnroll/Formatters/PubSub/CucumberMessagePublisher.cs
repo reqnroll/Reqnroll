@@ -60,20 +60,25 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
     internal ICucumberMessageFactory _messageFactory;
 
     // StartupCompleted is set to true the first time the Publisher handles the TestRunStartedEvent. It is used as a guard against abnormal behavior from the test runner.
-        internal bool _startupCompleted = false;
+    internal bool _startupCompleted = false;
 
-    public CucumberMessagePublisher(IBindingMessagesGenerator bindingMessagesGenerator, IObjectContainer container, IFormatterLog logger)
+    public CucumberMessagePublisher(ICucumberMessageBroker broker, IBindingMessagesGenerator bindingMessagesGenerator, IObjectContainer container, IFormatterLog logger, IIdGenerator idGenerator, ICucumberMessageFactory messageFactory, IClock clock)
     {
-        _bindingCaches = bindingMessagesGenerator;
-        _globalObjectContainer = container;
         _logger = logger;
         _logger.WriteMessage("DEBUG: Formatters: Publisher in constructor.");
+        _broker = broker;
+        _bindingCaches = bindingMessagesGenerator;
+        _globalObjectContainer = container;
+        SharedIdGenerator = idGenerator;
+        _messageFactory = messageFactory;
+        _testRunStartedId = SharedIdGenerator.GetNewId();
+        _clock = clock;
+
     }
 
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
         _logger.WriteMessage("DEBUG: Publisher in Initialize()");
-        _broker = _globalObjectContainer.Resolve<ICucumberMessageBroker>();
         _broker.Initialize();
 
         runtimePluginEvents.CustomizeTestThreadDependencies += (_, args) =>
@@ -148,10 +153,6 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
             return;
         }
 
-        SharedIdGenerator = _globalObjectContainer.Resolve<IIdGenerator>();
-        _messageFactory = _globalObjectContainer.Resolve<ICucumberMessageFactory>();
-        _testRunStartedId = SharedIdGenerator.GetNewId();
-        _clock = _globalObjectContainer.Resolve<IClock>();
         try
         {
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
