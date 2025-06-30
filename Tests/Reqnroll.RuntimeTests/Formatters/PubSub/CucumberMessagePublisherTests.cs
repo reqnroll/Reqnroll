@@ -61,7 +61,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var container = new ObjectContainer();
             _brokerMock.Setup(b => b.IsEnabled).Returns(brokerEnabled);
             container.RegisterInstanceAs(_brokerMock.Object);
-            container.RegisterTypeAs<IFormatterLog>(typeof(FormatterLog));
+            container.RegisterTypeAs<IFormatterLog>(typeof(DebugFormatterLog));
             _idGeneratorMock.Setup(g => g.GetNewId()).Returns("1");
             _clockMock.Setup(c => c.GetNowDateAndTime()).Returns(DateTime.UtcNow);
             container.RegisterInstanceAs(_idGeneratorMock.Object);

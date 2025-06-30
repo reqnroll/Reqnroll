@@ -109,7 +109,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
 
             //Support for publishing Cucumber Messages
-            container.RegisterTypeAs<FormatterLog, IFormatterLog>();
+            container.RegisterTypeAs<DebugFormatterLog, IFormatterLog>();
             container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<FormattersDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
