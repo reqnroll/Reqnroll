@@ -17,7 +17,7 @@ namespace Reqnroll.Formatters.Messages;
 /// <summary>
 /// Produces a Cucumber Messages output (.ndjson) file.
 /// </summary>
-public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
+public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
 {
     FileStream? _fileStream;
     public MessagesFormatterPlugin(IFormattersConfigurationProvider configurationProvider, ICucumberMessageBroker broker, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, broker, logger, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
@@ -80,4 +80,11 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase
             _fileStream?.Close();
         }
     }
+    public override void Dispose()
+    {
+        _fileStream?.Close();
+        _fileStream?.Dispose();
+        base.Dispose();
+    }
+
 }
