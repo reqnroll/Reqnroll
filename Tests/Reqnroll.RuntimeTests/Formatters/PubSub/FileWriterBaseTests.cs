@@ -62,7 +62,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
             {
                 LastOutputPath = outputPath;
-                foreach (var message in PostedMessages.GetConsumingEnumerable())
+                await foreach (var message in PostedMessages.Reader.ReadAllAsync())
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {

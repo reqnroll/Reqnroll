@@ -55,7 +55,7 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
 
         try
         {
-            foreach (var message in PostedMessages.GetConsumingEnumerable())
+            await foreach (var message in PostedMessages.Reader.ReadAllAsync())
             {
                 if (cancellationToken.IsCancellationRequested)
                 {

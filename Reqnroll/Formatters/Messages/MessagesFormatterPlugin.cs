@@ -49,7 +49,7 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposab
         }
         try
         {
-            foreach (var message in PostedMessages.GetConsumingEnumerable())
+            await foreach (var message in PostedMessages.Reader.ReadAllAsync())
             {
                 if (cancellationToken.IsCancellationRequested)
                 {

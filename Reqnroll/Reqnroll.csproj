@@ -34,6 +34,7 @@
          We need 'PrivateAssets="all"' to avoid shipping it with the package and causing conflicts with the runtime. -->
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />
+    <PackageReference Include="System.Threading.Channels" Version="9.0.6" />
   </ItemGroup>
 
   <PropertyGroup Condition="'$(AppInsightsInstrumentationKey)' == ''">

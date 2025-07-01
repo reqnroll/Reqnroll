@@ -4,6 +4,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Channels;
 using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
@@ -22,7 +23,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
     private ICucumberMessageBroker? _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
     private readonly IFormatterLog _logger;
-    protected readonly BlockingCollection<Envelope> PostedMessages = new();
+    protected readonly Channel<Envelope> PostedMessages = Channel.CreateUnbounded<Envelope>();
 
     private bool _isDisposed = false;
     protected bool _closed = false;
@@ -73,21 +74,21 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} reporting status as {status}.");
         _closed = !status;
 
-        // Preemptively closing down the BlockingCollection to force error identification
+        // Preemptively closing down the Channel to force error identification
         if (status == false)
-            PostedMessages.CompleteAdding();
+            PostedMessages.Writer.Complete();
         _broker?.SinkInitialized(this, enabled: status);
     }
 
     public async Task PublishAsync(Envelope message)
     {
-        if (_closed || _isDisposed || PostedMessages.IsAddingCompleted)
+        if (_closed || _isDisposed || PostedMessages.Reader.Completion.IsCompleted)
         {
             Logger.WriteMessage($"Cannot add message {message.Content().GetType().Name} to formatter {Name} - formatter is closed and not able to accept additional messages.");
             return;
         }
 
-        PostedMessages.Add(message);
+        await PostedMessages.Writer.WriteAsync(message);
 
         // If the _publisher sends the TestRunFinished message, then we can safely shut down.
         if (message.Content() is TestRunFinished)
@@ -104,23 +105,22 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
     {
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close called on formatter {Name}; formatter task was launched: {_formatterTask != null}");
 
-        if (PostedMessages.IsAddingCompleted || _formatterTask!.IsCompleted)
+        if (PostedMessages.Reader.Completion.IsCompleted || _formatterTask!.IsCompleted)
             throw new InvalidOperationException($"Formatter {Name} has invoked Close when it is already in a closed state.");
 
-        if (!PostedMessages.IsAddingCompleted)
-            PostedMessages.CompleteAdding();
+        PostedMessages.Writer.Complete();
 
-        Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the BlockingCollection is closed. Awaiting the writing task.");
+        Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the Channel is closed. Awaiting the writing task.");
         await _formatterTask!.ConfigureAwait(false);
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - The formatterTask is now completed.");
 
-        if (!PostedMessages.IsCompleted)
+        if (!PostedMessages.Reader.Completion.IsCompleted)
             throw new InvalidOperationException($"Formatter {Name} has shut down before all messages processed.");
     }
 
     public virtual void Dispose()
     {
-        Logger.WriteMessage($"DEBUG: Formatters: Dispose called on FormatterPlugin {Name}, isDisposed: {_isDisposed}, Formatter Task was launched: {_formatterTask != null}, Queue marked for completion: {PostedMessages.IsAddingCompleted}, Queue is empty:{PostedMessages.IsCompleted}");
+        Logger.WriteMessage($"DEBUG: Formatters: Dispose called on FormatterPlugin {Name}, isDisposed: {_isDisposed}, Formatter Task was launched: {_formatterTask != null}, Queue is empty:{PostedMessages.Reader.Completion.IsCompleted}");
         if (!_isDisposed)
         {
             try
@@ -139,10 +139,10 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
                             Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - timeout waiting for formatter {Name}");
                             _cancellationTokenSource.Cancel();
                             // the following sends a simulated message to the writer, which will then notice the cancellation token
-                            if (!PostedMessages.IsAddingCompleted)
+                            if (!PostedMessages.Reader.Completion.IsCompleted)
                             {
                                 _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - sending cancellation token message");
-                                PostedMessages.Add(Envelope.Create(new TestRunFinished("forced closure", false, new Timestamp(0, 0), null, "")));
+                                PostedMessages.Writer.TryWrite(Envelope.Create(new TestRunFinished("forced closure", false, new Timestamp(0, 0), null, "")));
                             }
                             else
                             {
@@ -189,7 +189,6 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
             finally
             {
                 _logger.DumpMessages();
-                PostedMessages.Dispose();
                 _isDisposed = true;
             }
         }
