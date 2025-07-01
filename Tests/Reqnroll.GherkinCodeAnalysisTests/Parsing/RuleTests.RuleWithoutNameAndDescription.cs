@@ -1,0 +1,81 @@
+using Reqnroll.CodeAnalysis.Gherkin.Syntax;
+
+namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
+
+using static SyntaxFactory;
+
+public partial class RuleTests
+{
+    [Fact]
+    public void RuleWithoutNameAndDescriptionIsRepresentedInTree()
+    {
+        // Taken from good/rule_without_name_and_description.feature
+        const string source =
+            """
+            Feature:
+
+              Rule:
+              Scenario:
+                Given text
+
+            """;
+
+        var tree = GherkinSyntaxTree.ParseText(source);
+
+        tree.GetRoot().Should().BeEquivalentTo(
+            GherkinDocument(
+                Feature(
+                    Token(
+                        TriviaList(),
+                        SyntaxKind.FeatureKeyword,
+                        "Feature",
+                        TriviaList()),
+                    Token(
+                        TriviaList(),
+                        SyntaxKind.ColonToken,
+                        TriviaList([EnvironmentNewline])),
+                    rules: List([
+                        Rule(
+                            Token(
+                                TriviaList([EnvironmentNewline, Whitespace("  ")]),
+                                SyntaxKind.RuleKeyword,
+                                "Rule",
+                                TriviaList()),
+                            Token(
+                                TriviaList(),
+                                SyntaxKind.ColonToken,
+                                TriviaList([EnvironmentNewline])),
+                            scenarios: List([
+                                Scenario(
+                                    Token(
+                                        TriviaList([Whitespace("  ")]),
+                                        SyntaxKind.ScenarioKeyword,
+                                        "Scenario",
+                                        TriviaList()),
+                                    Token(
+                                        TriviaList(),
+                                        SyntaxKind.ColonToken,
+                                        TriviaList([EnvironmentNewline])),
+                                    steps: List([
+                                        Step(
+                                            Token(
+                                                TriviaList([Whitespace("    ")]),
+                                                SyntaxKind.GivenKeyword,
+                                                "Given",
+                                                TriviaList([Space])),
+                                            LiteralText(
+                                                Literal(
+                                                    TriviaList(),
+                                                    "text",
+                                                    TriviaList([EnvironmentNewline]))))
+                                    ]))
+                            ]))
+                    ])),
+                Token(
+                    TriviaList(),
+                    SyntaxKind.EndOfFileToken,
+                    TriviaList())));
+
+        tree.ToString().Should().Be(source);
+    }
+}
