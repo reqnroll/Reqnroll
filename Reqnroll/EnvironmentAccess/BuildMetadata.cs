@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Reqnroll.EnvironmentAccess
 {
-    public class CiMetadata
+    public class BuildMetadata
     {
         public string ProductName { get; set; }
         public string BuildUrl { get; set; }

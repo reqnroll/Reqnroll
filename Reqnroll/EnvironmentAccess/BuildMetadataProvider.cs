@@ -2,7 +2,7 @@
 
 namespace Reqnroll.EnvironmentAccess
 {
-    public class CiMetadataProvider(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environment) : ICiMetadataProvider
+    public class BuildMetadataProvider(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environment) : IBuilldMetadataProvider
     {
         private string GetVariable(string variable)
         {
@@ -11,7 +11,7 @@ namespace Reqnroll.EnvironmentAccess
                 return (varValue as ISuccess<string>).Result;
             return null;
         }
-        public CiMetadata GetCiMetadata()
+        public BuildMetadata GetBuildMetadata()
         {
             var buildServer = environmentInfoProvider.GetBuildServerName();
             return buildServer switch
@@ -41,7 +41,7 @@ namespace Reqnroll.EnvironmentAccess
 
         // One function per build server:
 
-        private CiMetadata GetAzurePipelinesMetadata()
+        private BuildMetadata GetAzurePipelinesMetadata()
         {
             string GetAzureTag()
             {
@@ -52,7 +52,7 @@ namespace Reqnroll.EnvironmentAccess
             }
 
             // These are from: https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml
-            return new CiMetadata
+            return new BuildMetadata
             {
                 ProductName = "Azure Pipelines",
                 BuildUrl = GetVariable("BUILD_BUILDURI"),
@@ -65,7 +65,7 @@ namespace Reqnroll.EnvironmentAccess
         }
 
         // From: https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html
-        private CiMetadata GetTeamCityMetadata() => new CiMetadata
+        private BuildMetadata GetTeamCityMetadata() => new BuildMetadata
         {
             ProductName = "TeamCity",
             BuildUrl = GetVariable("BUILD_URL"),
@@ -76,7 +76,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("TEAMCITY_BUILD_TAG")
         };
 
-        private CiMetadata GetJenkinsMetadata() => new CiMetadata
+        private BuildMetadata GetJenkinsMetadata() => new BuildMetadata
         {
             ProductName = "Jenkins",
             BuildUrl = GetVariable("BUILD_URL"),
@@ -87,7 +87,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("GIT_TAG_NAME")
         };
 
-        private CiMetadata GetGitHubActionsMetadata()
+        private BuildMetadata GetGitHubActionsMetadata()
         {
             string repo = GetVariable("GITHUB_REPOSITORY");
             string serverUrl = GetVariable("GITHUB_SERVER_URL");
@@ -98,7 +98,7 @@ namespace Reqnroll.EnvironmentAccess
                 ? $"{serverUrl}/{repo}/actions/runs/{runId}"
                 : null;
 
-            return new CiMetadata
+            return new BuildMetadata
             {
                 ProductName = "GitHub Actions",
                 BuildUrl = buildUrl,
@@ -110,7 +110,7 @@ namespace Reqnroll.EnvironmentAccess
             };
         }
 
-        private CiMetadata GetGitLabMetadata() => new CiMetadata
+        private BuildMetadata GetGitLabMetadata() => new BuildMetadata
         {
             ProductName = "GitLab CI",
             BuildUrl = GetVariable("CI_PIPELINE_URL"),
@@ -121,7 +121,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("CI_COMMIT_TAG")
         };
 
-        private CiMetadata GetAwsCodeBuildMetadata() => new CiMetadata
+        private BuildMetadata GetAwsCodeBuildMetadata() => new BuildMetadata
         {
             ProductName = "AWS CodeBuild",
             BuildUrl = GetVariable("CODEBUILD_BUILD_URL"),
@@ -132,7 +132,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("CODEBUILD_WEBHOOK_TRIGGER")
         };
 
-        private CiMetadata GetTravisMetadata() => new CiMetadata
+        private BuildMetadata GetTravisMetadata() => new BuildMetadata
         {
             ProductName = "Travis CI",
             BuildUrl = GetVariable("TRAVIS_BUILD_WEB_URL"),
@@ -143,7 +143,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("TRAVIS_TAG")
         };
 
-        private CiMetadata GetAppVeyorMetadata() => new CiMetadata
+        private BuildMetadata GetAppVeyorMetadata() => new BuildMetadata
         {
             ProductName = "AppVeyor",
             BuildUrl = GetVariable("APPVEYOR_URL"),
@@ -154,7 +154,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("APPVEYOR_REPO_TAG_NAME")
         };
 
-        private CiMetadata GetBitbucketMetadata() => new CiMetadata
+        private BuildMetadata GetBitbucketMetadata() => new BuildMetadata
         {
             ProductName = "Bitbucket Pipelines",
             BuildUrl = GetVariable("BITBUCKET_BUILD_URL"),
@@ -165,7 +165,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("BITBUCKET_TAG")
         };
 
-        private CiMetadata GetBambooMetadata() => new CiMetadata
+        private BuildMetadata GetBambooMetadata() => new BuildMetadata
         {
             ProductName = "Bamboo",
             BuildUrl = GetVariable("bamboo_resultsUrl"),
@@ -176,7 +176,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("bamboo_planRepository_tag")
         };
 
-        private CiMetadata GetCircleCiMetadata() => new CiMetadata
+        private BuildMetadata GetCircleCiMetadata() => new BuildMetadata
         {
             ProductName = "CircleCI",
             BuildUrl = GetVariable("CIRCLE_BUILD_URL"),
@@ -187,7 +187,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("CIRCLE_TAG")
         };
 
-        private CiMetadata GetGoCdMetadata() => new CiMetadata
+        private BuildMetadata GetGoCdMetadata() => new BuildMetadata
         {
             ProductName = "GoCD",
             BuildUrl = GetVariable("GO_SERVER_URL"),
@@ -198,7 +198,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("GO_TAG")
         };
 
-        private CiMetadata GetBuddyMetadata() => new CiMetadata
+        private BuildMetadata GetBuddyMetadata() => new BuildMetadata
         {
             ProductName = "Buddy",
             BuildUrl = GetVariable("BUDDY_EXECUTION_URL"),
@@ -209,7 +209,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("BUDDY_EXECUTION_TAG")
         };
 
-        private CiMetadata GetNevercodeMetadata() => new CiMetadata
+        private BuildMetadata GetNevercodeMetadata() => new BuildMetadata
         {
             ProductName = "Nevercode",
             BuildUrl = GetVariable("NEVERCODE_BUILD_URL"),
@@ -220,7 +220,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("NEVERCODE_TAG")
         };
 
-        private CiMetadata GetSemaphoreMetadata() => new CiMetadata
+        private BuildMetadata GetSemaphoreMetadata() => new BuildMetadata
         {
             ProductName = "Semaphore",
             BuildUrl = GetVariable("SEMAPHORE_WORKFLOW_URL"),
@@ -231,7 +231,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("SEMAPHORE_GIT_TAG_NAME")
         };
 
-        private CiMetadata GetBrowserStackMetadata() => new CiMetadata
+        private BuildMetadata GetBrowserStackMetadata() => new BuildMetadata
         {
             ProductName = "BrowserStack",
             BuildUrl = GetVariable("BROWSERSTACK_BUILD_URL"),
@@ -242,7 +242,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("BROWSERSTACK_TAG")
         };
 
-        private CiMetadata GetCodefreshMetadata() => new CiMetadata
+        private BuildMetadata GetCodefreshMetadata() => new BuildMetadata
         {
             ProductName = "Codefresh",
             BuildUrl = GetVariable("CF_BUILD_URL"),
@@ -253,7 +253,7 @@ namespace Reqnroll.EnvironmentAccess
             Tag = GetVariable("CF_TAG")
         };
 
-        private CiMetadata GetOctopusDeployMetadata() => new CiMetadata
+        private BuildMetadata GetOctopusDeployMetadata() => new BuildMetadata
         {
             ProductName = "Octopus Deploy",
             BuildUrl = GetVariable("OCTOPUS_DEPLOY_BUILD_URL"),
