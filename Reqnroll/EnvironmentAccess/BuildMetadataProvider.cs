@@ -7,8 +7,8 @@ namespace Reqnroll.EnvironmentAccess
         private string GetVariable(string variable)
         {
             var varValue = environment.GetEnvironmentVariable(variable);
-            if (varValue is ISuccess<string>)
-                return (varValue as ISuccess<string>).Result;
+            if (varValue is ISuccess<string> success)
+                return success.Result;
             return null;
         }
         public BuildMetadata GetBuildMetadata()
