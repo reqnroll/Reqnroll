@@ -2,8 +2,18 @@
 
 namespace Reqnroll.EnvironmentAccess
 {
+    /// <summary>
+    /// Provides build metadata information from various CI/CD environments by reading their specific environment variables.
+    /// Supports multiple build servers including Azure Pipelines, TeamCity, Jenkins, GitHub Actions, GitLab CI, and others.
+    /// </summary>
     public class BuildMetadataProvider(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environment) : IBuildMetadataProvider
     {
+
+        /// <summary>
+        /// Retrieves the value of an environment variable safely.
+        /// </summary>
+        /// <param name="variable">The name of the environment variable to retrieve.</param>
+        /// <returns>The value of the environment variable if it exists and can be accessed; otherwise, <c>null</c>.</returns>
         internal string GetVariable(string variable)
         {
             var varValue = environment.GetEnvironmentVariable(variable);
@@ -11,6 +21,15 @@ namespace Reqnroll.EnvironmentAccess
                 return success.Result;
             return null;
         }
+
+        /// <summary>
+        /// Retrieves build metadata from the current CI/CD environment by detecting the build server type
+        /// and extracting relevant information from environment variables.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="BuildMetadata"/> object containing build information such as build URL, number, repository details,
+        /// revision, branch, and tag information. Returns <c>null</c> if the build server is not recognized or supported.
+        /// </returns>
         public BuildMetadata GetBuildMetadata()
         {
             var buildServer = environmentInfoProvider.GetBuildServerName();
