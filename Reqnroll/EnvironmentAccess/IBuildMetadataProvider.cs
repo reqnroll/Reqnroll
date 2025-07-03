@@ -1,6 +1,6 @@
 ﻿namespace Reqnroll.EnvironmentAccess
 {
-    public interface IBuilldMetadataProvider
+    public interface IBuildMetadataProvider
     {
         BuildMetadata GetBuildMetadata();
     }

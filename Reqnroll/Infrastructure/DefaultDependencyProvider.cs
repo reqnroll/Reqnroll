@@ -72,7 +72,7 @@ namespace Reqnroll.Infrastructure
 
             container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
             container.RegisterTypeAs<EnvironmentInfoProvider, IEnvironmentInfoProvider>();
-            container.RegisterTypeAs<BuildMetadataProvider, IBuilldMetadataProvider>();
+            container.RegisterTypeAs<BuildMetadataProvider, IBuildMetadataProvider>();
             container.RegisterTypeAs<BinaryFileAccessor, IBinaryFileAccessor>();
             container.RegisterTypeAs<TestPendingMessageFactory, ITestPendingMessageFactory>();
             container.RegisterTypeAs<TestUndefinedMessageFactory, ITestUndefinedMessageFactory>();

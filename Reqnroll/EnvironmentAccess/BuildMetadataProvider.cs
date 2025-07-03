@@ -2,7 +2,7 @@
 
 namespace Reqnroll.EnvironmentAccess
 {
-    public class BuildMetadataProvider(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environment) : IBuilldMetadataProvider
+    public class BuildMetadataProvider(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environment) : IBuildMetadataProvider
     {
         private string GetVariable(string variable)
         {
@@ -14,7 +14,7 @@ namespace Reqnroll.EnvironmentAccess
         public BuildMetadata GetBuildMetadata()
         {
             var buildServer = environmentInfoProvider.GetBuildServerName();
-            return buildServer switch
+            var buildMetaData = buildServer switch
             {
                 "Azure Pipelines" => GetAzurePipelinesMetadata(),
                 "TeamCity" => GetTeamCityMetadata(),
@@ -36,6 +36,11 @@ namespace Reqnroll.EnvironmentAccess
                 "Octopus Deploy" => GetOctopusDeployMetadata(),
                 _ => null
             };
+
+            if (buildMetaData == null)
+                return null;
+
+            return buildMetaData with { ProductName = buildServer };
         }
 
 
@@ -51,41 +56,43 @@ namespace Reqnroll.EnvironmentAccess
                 return null;
             }
 
-            // These are from: https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml
-            return new BuildMetadata
-            {
-                ProductName = "Azure Pipelines",
-                BuildUrl = GetVariable("BUILD_BUILDURI"),
-                BuildNumber = GetVariable("BUILD_BUILDNUMBER"),
-                Remote = GetVariable("BUILD_REPOSITORY_URI"),
-                Revision = GetVariable("BUILD_SOURCEVERSION"),
-                Branch = GetVariable("BUILD_SOURCEBRANCHNAME"),
-                Tag = GetAzureTag()
-            };
+            var buildUrl = GetVariable("BUILD_BUILDURI");
+            var buildNumber = GetVariable("BUILD_BUILDNUMBER");
+            var remote = GetVariable("BUILD_REPOSITORY_URI");
+            var revision = GetVariable("BUILD_SOURCEVERSION");
+            var branch = GetVariable("BUILD_SOURCEBRANCHNAME");
+            var tag = GetAzureTag();
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
-        // From: https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html
-        private BuildMetadata GetTeamCityMetadata() => new BuildMetadata
+        /// <summary>
+        /// Gets TeamCity build metadata.
+        /// See: https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html
+        /// </summary>
+        private BuildMetadata GetTeamCityMetadata()
         {
-            ProductName = "TeamCity",
-            BuildUrl = GetVariable("BUILD_URL"),
-            BuildNumber = GetVariable("BUILD_NUMBER"),
-            Remote = GetVariable("TEAMCITY_GIT_REPOSITORY_URL"),
-            Revision = GetVariable("BUILD_VCS_NUMBER"),
-            Branch = GetVariable("TEAMCITY_BUILD_BRANCH"),
-            Tag = GetVariable("TEAMCITY_BUILD_TAG")
-        };
+            var buildUrl = GetVariable("BUILD_URL");
+            var buildNumber = GetVariable("BUILD_NUMBER");
+            var remote = GetVariable("TEAMCITY_GIT_REPOSITORY_URL");
+            var revision = GetVariable("BUILD_VCS_NUMBER");
+            var branch = GetVariable("TEAMCITY_BUILD_BRANCH");
+            var tag = GetVariable("TEAMCITY_BUILD_TAG");
 
-        private BuildMetadata GetJenkinsMetadata() => new BuildMetadata
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetJenkinsMetadata()
         {
-            ProductName = "Jenkins",
-            BuildUrl = GetVariable("BUILD_URL"),
-            BuildNumber = GetVariable("BUILD_NUMBER"),
-            Remote = GetVariable("GIT_URL"),
-            Revision = GetVariable("GIT_COMMIT"),
-            Branch = GetVariable("GIT_BRANCH"),
-            Tag = GetVariable("GIT_TAG_NAME")
-        };
+            var buildUrl = GetVariable("BUILD_URL");
+            var buildNumber = GetVariable("BUILD_NUMBER");
+            var remote = GetVariable("GIT_URL");
+            var revision = GetVariable("GIT_COMMIT");
+            var branch = GetVariable("GIT_BRANCH");
+            var tag = GetVariable("GIT_TAG_NAME");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
 
         private BuildMetadata GetGitHubActionsMetadata()
         {
@@ -97,171 +104,181 @@ namespace Reqnroll.EnvironmentAccess
             string buildUrl = !string.IsNullOrEmpty(serverUrl) && !string.IsNullOrEmpty(repo) && !string.IsNullOrEmpty(runId)
                 ? $"{serverUrl}/{repo}/actions/runs/{runId}"
                 : null;
+            string buildNumber = GetVariable("GITHUB_RUN_NUMBER");
+            string remote = !string.IsNullOrEmpty(serverUrl) && !string.IsNullOrEmpty(repo) ? $"{serverUrl}/{repo}.git" : null;
+            string revision = GetVariable("GITHUB_SHA");
+            string branch = refType == "branch" ? refName : null;
+            string tag = refType == "tag" ? refName : null;
 
-            return new BuildMetadata
-            {
-                ProductName = "GitHub Actions",
-                BuildUrl = buildUrl,
-                BuildNumber = GetVariable("GITHUB_RUN_NUMBER"),
-                Remote = !string.IsNullOrEmpty(serverUrl) && !string.IsNullOrEmpty(repo) ? $"{serverUrl}/{repo}.git" : null,
-                Revision = GetVariable("GITHUB_SHA"),
-                Branch = refType == "branch" ? refName : null,
-                Tag = refType == "tag" ? refName : null
-            };
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
-        private BuildMetadata GetGitLabMetadata() => new BuildMetadata
+        private BuildMetadata GetGitLabMetadata()
         {
-            ProductName = "GitLab CI",
-            BuildUrl = GetVariable("CI_PIPELINE_URL"),
-            BuildNumber = GetVariable("CI_PIPELINE_IID"),
-            Remote = GetVariable("CI_REPOSITORY_URL"),
-            Revision = GetVariable("CI_COMMIT_SHA"),
-            Branch = GetVariable("CI_COMMIT_REF_NAME"),
-            Tag = GetVariable("CI_COMMIT_TAG")
-        };
+            var buildUrl = GetVariable("CI_PIPELINE_URL");
+            var buildNumber = GetVariable("CI_PIPELINE_IID");
+            var remote = GetVariable("CI_REPOSITORY_URL");
+            var revision = GetVariable("CI_COMMIT_SHA");
+            var branch = GetVariable("CI_COMMIT_REF_NAME");
+            var tag = GetVariable("CI_COMMIT_TAG");
 
-        private BuildMetadata GetAwsCodeBuildMetadata() => new BuildMetadata
-        {
-            ProductName = "AWS CodeBuild",
-            BuildUrl = GetVariable("CODEBUILD_BUILD_URL"),
-            BuildNumber = GetVariable("CODEBUILD_BUILD_NUMBER"),
-            Remote = GetVariable("CODEBUILD_SOURCE_REPO_URL"),
-            Revision = GetVariable("CODEBUILD_RESOLVED_SOURCE_VERSION"),
-            Branch = GetVariable("CODEBUILD_SOURCE_VERSION"),
-            Tag = GetVariable("CODEBUILD_WEBHOOK_TRIGGER")
-        };
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
 
-        private BuildMetadata GetTravisMetadata() => new BuildMetadata
+        private BuildMetadata GetAwsCodeBuildMetadata()
         {
-            ProductName = "Travis CI",
-            BuildUrl = GetVariable("TRAVIS_BUILD_WEB_URL"),
-            BuildNumber = GetVariable("TRAVIS_BUILD_NUMBER"),
-            Remote = GetVariable("TRAVIS_REPO_SLUG"),
-            Revision = GetVariable("TRAVIS_COMMIT"),
-            Branch = GetVariable("TRAVIS_BRANCH"),
-            Tag = GetVariable("TRAVIS_TAG")
-        };
+            var buildUrl = GetVariable("CODEBUILD_BUILD_URL");
+            var buildNumber = GetVariable("CODEBUILD_BUILD_NUMBER");
+            var remote = GetVariable("CODEBUILD_SOURCE_REPO_URL");
+            var revision = GetVariable("CODEBUILD_RESOLVED_SOURCE_VERSION");
+            var branch = GetVariable("CODEBUILD_SOURCE_VERSION");
+            var tag = GetVariable("CODEBUILD_WEBHOOK_TRIGGER");
 
-        private BuildMetadata GetAppVeyorMetadata() => new BuildMetadata
-        {
-            ProductName = "AppVeyor",
-            BuildUrl = GetVariable("APPVEYOR_URL"),
-            BuildNumber = GetVariable("APPVEYOR_BUILD_NUMBER"),
-            Remote = GetVariable("APPVEYOR_REPO_NAME"),
-            Revision = GetVariable("APPVEYOR_REPO_COMMIT"),
-            Branch = GetVariable("APPVEYOR_REPO_BRANCH"),
-            Tag = GetVariable("APPVEYOR_REPO_TAG_NAME")
-        };
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
 
-        private BuildMetadata GetBitbucketMetadata() => new BuildMetadata
+        private BuildMetadata GetTravisMetadata()
         {
-            ProductName = "Bitbucket Pipelines",
-            BuildUrl = GetVariable("BITBUCKET_BUILD_URL"),
-            BuildNumber = GetVariable("BITBUCKET_BUILD_NUMBER"),
-            Remote = GetVariable("BITBUCKET_GIT_SSH_ORIGIN"),
-            Revision = GetVariable("BITBUCKET_COMMIT"),
-            Branch = GetVariable("BITBUCKET_BRANCH"),
-            Tag = GetVariable("BITBUCKET_TAG")
-        };
+            var buildUrl = GetVariable("TRAVIS_BUILD_WEB_URL");
+            var buildNumber = GetVariable("TRAVIS_BUILD_NUMBER");
+            var remote = GetVariable("TRAVIS_REPO_SLUG");
+            var revision = GetVariable("TRAVIS_COMMIT");
+            var branch = GetVariable("TRAVIS_BRANCH");
+            var tag = GetVariable("TRAVIS_TAG");
 
-        private BuildMetadata GetBambooMetadata() => new BuildMetadata
-        {
-            ProductName = "Bamboo",
-            BuildUrl = GetVariable("bamboo_resultsUrl"),
-            BuildNumber = GetVariable("bamboo_buildNumber"),
-            Remote = GetVariable("bamboo_repository_git_repositoryUrl"),
-            Revision = GetVariable("bamboo_repository_revision_number"),
-            Branch = GetVariable("bamboo_planRepository_branch"),
-            Tag = GetVariable("bamboo_planRepository_tag")
-        };
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
 
-        private BuildMetadata GetCircleCiMetadata() => new BuildMetadata
+        private BuildMetadata GetAppVeyorMetadata()
         {
-            ProductName = "CircleCI",
-            BuildUrl = GetVariable("CIRCLE_BUILD_URL"),
-            BuildNumber = GetVariable("CIRCLE_BUILD_NUM"),
-            Remote = GetVariable("CIRCLE_REPOSITORY_URL"),
-            Revision = GetVariable("CIRCLE_SHA1"),
-            Branch = GetVariable("CIRCLE_BRANCH"),
-            Tag = GetVariable("CIRCLE_TAG")
-        };
+            var buildUrl = GetVariable("APPVEYOR_URL");
+            var buildNumber = GetVariable("APPVEYOR_BUILD_NUMBER");
+            var remote = GetVariable("APPVEYOR_REPO_NAME");
+            var revision = GetVariable("APPVEYOR_REPO_COMMIT");
+            var branch = GetVariable("APPVEYOR_REPO_BRANCH");
+            var tag = GetVariable("APPVEYOR_REPO_TAG_NAME");
 
-        private BuildMetadata GetGoCdMetadata() => new BuildMetadata
-        {
-            ProductName = "GoCD",
-            BuildUrl = GetVariable("GO_SERVER_URL"),
-            BuildNumber = GetVariable("GO_PIPELINE_COUNTER"),
-            Remote = GetVariable("GO_REPO_URL"),
-            Revision = GetVariable("GO_REVISION"),
-            Branch = GetVariable("GO_BRANCH"),
-            Tag = GetVariable("GO_TAG")
-        };
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
 
-        private BuildMetadata GetBuddyMetadata() => new BuildMetadata
+        private BuildMetadata GetBitbucketMetadata()
         {
-            ProductName = "Buddy",
-            BuildUrl = GetVariable("BUDDY_EXECUTION_URL"),
-            BuildNumber = GetVariable("BUDDY_EXECUTION_ID"),
-            Remote = GetVariable("BUDDY_SCM_URL"),
-            Revision = GetVariable("BUDDY_EXECUTION_REVISION"),
-            Branch = GetVariable("BUDDY_EXECUTION_BRANCH"),
-            Tag = GetVariable("BUDDY_EXECUTION_TAG")
-        };
+            var buildUrl = GetVariable("BITBUCKET_BUILD_URL");
+            var buildNumber = GetVariable("BITBUCKET_BUILD_NUMBER");
+            var remote = GetVariable("BITBUCKET_GIT_SSH_ORIGIN");
+            var revision = GetVariable("BITBUCKET_COMMIT");
+            var branch = GetVariable("BITBUCKET_BRANCH");
+            var tag = GetVariable("BITBUCKET_TAG");
 
-        private BuildMetadata GetNevercodeMetadata() => new BuildMetadata
-        {
-            ProductName = "Nevercode",
-            BuildUrl = GetVariable("NEVERCODE_BUILD_URL"),
-            BuildNumber = GetVariable("NEVERCODE_BUILD_NUMBER"),
-            Remote = GetVariable("NEVERCODE_REPO_URL"),
-            Revision = GetVariable("NEVERCODE_COMMIT"),
-            Branch = GetVariable("NEVERCODE_BRANCH"),
-            Tag = GetVariable("NEVERCODE_TAG")
-        };
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
 
-        private BuildMetadata GetSemaphoreMetadata() => new BuildMetadata
+        private BuildMetadata GetBambooMetadata()
         {
-            ProductName = "Semaphore",
-            BuildUrl = GetVariable("SEMAPHORE_WORKFLOW_URL"),
-            BuildNumber = GetVariable("SEMAPHORE_PIPELINE_NUMBER"),
-            Remote = GetVariable("SEMAPHORE_GIT_URL"),
-            Revision = GetVariable("SEMAPHORE_GIT_SHA"),
-            Branch = GetVariable("SEMAPHORE_GIT_BRANCH"),
-            Tag = GetVariable("SEMAPHORE_GIT_TAG_NAME")
-        };
+            var buildUrl = GetVariable("bamboo_resultsUrl");
+            var buildNumber = GetVariable("bamboo_buildNumber");
+            var remote = GetVariable("bamboo_repository_git_repositoryUrl");
+            var revision = GetVariable("bamboo_repository_revision_number");
+            var branch = GetVariable("bamboo_planRepository_branch");
+            var tag = GetVariable("bamboo_planRepository_tag");
 
-        private BuildMetadata GetBrowserStackMetadata() => new BuildMetadata
-        {
-            ProductName = "BrowserStack",
-            BuildUrl = GetVariable("BROWSERSTACK_BUILD_URL"),
-            BuildNumber = GetVariable("BROWSERSTACK_BUILD_NUMBER"),
-            Remote = GetVariable("BROWSERSTACK_REPO_URL"),
-            Revision = GetVariable("BROWSERSTACK_COMMIT"),
-            Branch = GetVariable("BROWSERSTACK_BRANCH"),
-            Tag = GetVariable("BROWSERSTACK_TAG")
-        };
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
 
-        private BuildMetadata GetCodefreshMetadata() => new BuildMetadata
+        private BuildMetadata GetCircleCiMetadata()
         {
-            ProductName = "Codefresh",
-            BuildUrl = GetVariable("CF_BUILD_URL"),
-            BuildNumber = GetVariable("CF_BUILD_ID"),
-            Remote = GetVariable("CF_REPO_CLONE_URL"),
-            Revision = GetVariable("CF_REVISION"),
-            Branch = GetVariable("CF_BRANCH"),
-            Tag = GetVariable("CF_TAG")
-        };
+            var buildUrl = GetVariable("CIRCLE_BUILD_URL");
+            var buildNumber = GetVariable("CIRCLE_BUILD_NUM");
+            var remote = GetVariable("CIRCLE_REPOSITORY_URL");
+            var revision = GetVariable("CIRCLE_SHA1");
+            var branch = GetVariable("CIRCLE_BRANCH");
+            var tag = GetVariable("CIRCLE_TAG");
 
-        private BuildMetadata GetOctopusDeployMetadata() => new BuildMetadata
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetGoCdMetadata()
         {
-            ProductName = "Octopus Deploy",
-            BuildUrl = GetVariable("OCTOPUS_DEPLOY_BUILD_URL"),
-            BuildNumber = GetVariable("OCTOPUS_DEPLOY_BUILD_NUMBER"),
-            Remote = GetVariable("OCTOPUS_DEPLOY_REPO_URL"),
-            Revision = GetVariable("OCTOPUS_DEPLOY_COMMIT"),
-            Branch = GetVariable("OCTOPUS_DEPLOY_BRANCH"),
-            Tag = GetVariable("OCTOPUS_DEPLOY_TAG")
-        };
+            var buildUrl = GetVariable("GO_SERVER_URL");
+            var buildNumber = GetVariable("GO_PIPELINE_COUNTER");
+            var remote = GetVariable("GO_REPO_URL");
+            var revision = GetVariable("GO_REVISION");
+            var branch = GetVariable("GO_BRANCH");
+            var tag = GetVariable("GO_TAG");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetBuddyMetadata()
+        {
+            var buildUrl = GetVariable("BUDDY_EXECUTION_URL");
+            var buildNumber = GetVariable("BUDDY_EXECUTION_ID");
+            var remote = GetVariable("BUDDY_SCM_URL");
+            var revision = GetVariable("BUDDY_EXECUTION_REVISION");
+            var branch = GetVariable("BUDDY_EXECUTION_BRANCH");
+            var tag = GetVariable("BUDDY_EXECUTION_TAG");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetNevercodeMetadata()
+        {
+            var buildUrl = GetVariable("NEVERCODE_BUILD_URL");
+            var buildNumber = GetVariable("NEVERCODE_BUILD_NUMBER");
+            var remote = GetVariable("NEVERCODE_REPO_URL");
+            var revision = GetVariable("NEVERCODE_COMMIT");
+            var branch = GetVariable("NEVERCODE_BRANCH");
+            var tag = GetVariable("NEVERCODE_TAG");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetSemaphoreMetadata()
+        {
+            var buildUrl = GetVariable("SEMAPHORE_WORKFLOW_URL");
+            var buildNumber = GetVariable("SEMAPHORE_PIPELINE_NUMBER");
+            var remote = GetVariable("SEMAPHORE_GIT_URL");
+            var revision = GetVariable("SEMAPHORE_GIT_SHA");
+            var branch = GetVariable("SEMAPHORE_GIT_BRANCH");
+            var tag = GetVariable("SEMAPHORE_GIT_TAG_NAME");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetBrowserStackMetadata()
+        {
+            var buildUrl = GetVariable("BROWSERSTACK_BUILD_URL");
+            var buildNumber = GetVariable("BROWSERSTACK_BUILD_NUMBER");
+            var remote = GetVariable("BROWSERSTACK_REPO_URL");
+            var revision = GetVariable("BROWSERSTACK_COMMIT");
+            var branch = GetVariable("BROWSERSTACK_BRANCH");
+            var tag = GetVariable("BROWSERSTACK_TAG");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetCodefreshMetadata()
+        {
+            var buildUrl = GetVariable("CF_BUILD_URL");
+            var buildNumber = GetVariable("CF_BUILD_ID");
+            var remote = GetVariable("CF_REPO_CLONE_URL");
+            var revision = GetVariable("CF_REVISION");
+            var branch = GetVariable("CF_BRANCH");
+            var tag = GetVariable("CF_TAG");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
+
+        private BuildMetadata GetOctopusDeployMetadata()
+        {
+            var buildUrl = GetVariable("OCTOPUS_DEPLOY_BUILD_URL");
+            var buildNumber = GetVariable("OCTOPUS_DEPLOY_BUILD_NUMBER");
+            var remote = GetVariable("OCTOPUS_DEPLOY_REPO_URL");
+            var revision = GetVariable("OCTOPUS_DEPLOY_COMMIT");
+            var branch = GetVariable("OCTOPUS_DEPLOY_BRANCH");
+            var tag = GetVariable("OCTOPUS_DEPLOY_TAG");
+
+            return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
+        }
     }
 }
