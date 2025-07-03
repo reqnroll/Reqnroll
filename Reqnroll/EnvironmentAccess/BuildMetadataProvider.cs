@@ -4,7 +4,7 @@ namespace Reqnroll.EnvironmentAccess
 {
     public class BuildMetadataProvider(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environment) : IBuildMetadataProvider
     {
-        private string GetVariable(string variable)
+        internal string GetVariable(string variable)
         {
             var varValue = environment.GetEnvironmentVariable(variable);
             if (varValue is ISuccess<string> success)
