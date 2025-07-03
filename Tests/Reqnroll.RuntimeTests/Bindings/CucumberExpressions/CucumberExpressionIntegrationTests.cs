@@ -88,26 +88,32 @@ public class CucumberExpressionIntegrationTests
         {
             ExecutedParams.Add((doubleParam, typeof(float)));
         }
+
         public void StepDefWithDoubleParam(double doubleParam)
         {
             ExecutedParams.Add((doubleParam, typeof(double)));
         }
+
         public void StepDefWithDecimalParam(decimal decimalParam)
         {
             ExecutedParams.Add((decimalParam, typeof(decimal)));
         }
+
         public void StepDefWithEnumParam(SampleColorEnum enumParam)
         {
             ExecutedParams.Add((enumParam, typeof(SampleColorEnum)));
         }
+
         public void StepDefWithDateTimeParam(DateTime dateTimeParam)
         {
             ExecutedParams.Add((dateTimeParam, typeof(DateTime)));
         }
+
         public void StepDefWithDateOnlyParam(DateOnly dateParam)
         {
             ExecutedParams.Add((dateParam, typeof(DateOnly)));
         }
+
         public void StepDefWithTimeOnlyParam(TimeOnly timeParam)
         {
             ExecutedParams.Add((timeParam, typeof(TimeOnly)));
