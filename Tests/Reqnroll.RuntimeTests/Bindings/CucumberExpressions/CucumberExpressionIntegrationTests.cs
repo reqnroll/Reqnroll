@@ -155,7 +155,7 @@ public class CucumberExpressionIntegrationTests
         }
     }
 
-    private async Task<SampleBindings> PerformStepExecution(string methodName, string expression, string stepText, IStepArgumentTransformationBinding[] transformations = null, Action<IBindingRegistry> onBindingRegistryPreparation = null)
+    private async Task<SampleBindings> PerformStepExecution(string methodName, string expression, string stepText, IStepArgumentTransformationBinding[] transformations = null, Action<IBindingRegistry> onBindingRegistryPreparation = null, string culture = "en-US")
     {
         var containerBuilder = new ContainerBuilder(new TestDependencyProvider());
         var globalContainer = containerBuilder.CreateGlobalContainer(GetType().Assembly);
@@ -202,7 +202,7 @@ public class CucumberExpressionIntegrationTests
         bindingSourceProcessor.BuildingCompleted();
 
         await engine.OnTestRunStartAsync();
-        await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo("en-US"), ".", "Sample feature", null, ProgrammingLanguage.CSharp));
+        await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo(culture), ".", "Sample feature", null, ProgrammingLanguage.CSharp));
         await engine.OnScenarioStartAsync();
         engine.OnScenarioInitialize(new ScenarioInfo("Sample scenario", null, null, null), null);
         await engine.StepAsync(StepDefinitionKeyword.Given, "Given ", stepText, null, null);
@@ -365,8 +365,21 @@ public class CucumberExpressionIntegrationTests
         var sampleBindings = await PerformStepExecution(methodName, expression, stepText);
 
         sampleBindings.ExecutedParams.Should().Contain(expectedParam);
-    } 
-    
+    }
+
+    [Fact]
+    public async Task Should_match_step_with_joker_parameter_to_dateTime_dutch()
+    {
+        var expression = "The datetime of the system is {}";
+        var stepText = "The datetime of the system is 31-12-2024 23:25";
+        var expectedParam = (new DateTime(2024, 12, 31, 23, 25, 0), typeof(DateTime));
+        var methodName = nameof(SampleBindings.StepDefWithDateTimeParam);
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, culture: "nl-NL");
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
     [Fact]
     public async Task Should_match_step_with_joker_parameter_to_dateOnly()
     {
@@ -379,7 +392,7 @@ public class CucumberExpressionIntegrationTests
 
         sampleBindings.ExecutedParams.Should().Contain(expectedParam);
     }
-    
+
     [Fact]
     public async Task Should_match_step_with_joker_parameter_to_timeOnly()
     {
