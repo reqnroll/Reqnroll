@@ -2,12 +2,6 @@
 
 This section covers the details of customizing Reqnroll's build metadata functionality for custom source control management (SCM) and build systems.
 
-```{toctree}
-:maxdepth: 2
-
-build-metadata-record
-custom-build-metadata-provider
-```
 
 ## Overview
 
