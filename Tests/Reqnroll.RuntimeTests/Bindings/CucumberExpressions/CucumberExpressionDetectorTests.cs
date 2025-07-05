@@ -13,6 +13,10 @@ public class CucumberExpressionDetectorTests
     [InlineData("a/b", true)]
     [InlineData("a\\/b", true)]
     [InlineData("^a/b", false)]
+    [InlineData("(a/b)", true)]
+    [InlineData("(a+)", false)]
+    [InlineData("(a)", true)]
+    [InlineData("\\(a\\)", true)]
     public void IsCucumberExpressionTest(string expression, bool expected)
     {
         // Arrange
