@@ -17,7 +17,6 @@ public class CucumberExpressionDetectorTests
     [InlineData("(a+)", false)]
     [InlineData("(a)", true)]
     [InlineData("\\(a\\)", true)]
-
     public void IsCucumberExpressionTest(string expression, bool expected)
     {
         // Arrange
