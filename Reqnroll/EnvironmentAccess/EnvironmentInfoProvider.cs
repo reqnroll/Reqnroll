@@ -6,12 +6,12 @@ using System.Runtime.InteropServices;
 
 namespace Reqnroll.EnvironmentAccess
 {
-     /// <summary>
-     /// This provides an abstraction for obtaining platform and runtime information. Used by Anaytics and Cucumber Messages
-     /// </summary>
+    /// <summary>
+    /// This provides an abstraction for obtaining platform and runtime information. Used by Analytics and Cucumber Messages
+    /// </summary>
     public class EnvironmentInfoProvider : IEnvironmentInfoProvider
     {
-        private IEnvironmentWrapper EnvironmentWrapper { get;  set; }
+        private IEnvironmentWrapper EnvironmentWrapper { get; set; }
 
         public EnvironmentInfoProvider(IEnvironmentWrapper environmentWrapper)
         {
@@ -40,28 +40,26 @@ namespace Reqnroll.EnvironmentAccess
 
         private readonly Dictionary<string, string> buildServerTypes
             = new Dictionary<string, string> {
-                { "TF_BUILD","Azure Pipelines"},
-                { "TEAMCITY_VERSION","TeamCity"},
-                { "JENKINS_HOME","Jenkins"},
-                { "GITHUB_ACTIONS","GitHub Actions"},
-                { "GITLAB_CI","GitLab CI/CD"},
-                { "CODEBUILD_BUILD_ID","AWS CodeBuild"},
-                { "TRAVIS","Travis CI"},
-                { "APPVEYOR","AppVeyor"},
-                { "BITBUCKET_BUILD_NUMBER", "Bitbucket Pipelines" },
-                { "bamboo_agentId", "Atlassian Bamboo" },
-                { "CIRCLECI", "CircleCI" },
-                { "GO_PIPELINE_NAME", "GoCD" },
-                { "BUDDY", "Buddy" },
-                { "NEVERCODE", "Nevercode" },
-                { "SEMAPHORE", "SEMAPHORE" },
-                { "BROWSERSTACK_USERNAME", "BrowserStack" },
-                { "CF_BUILD_ID", "Codefresh" },
-                { "TentacleVersion", "Octopus Deploy" },
-
-                { "CI_NAME", "CodeShip" }
+                { "TF_BUILD", BuildServerNames.AzurePipelines },
+                { "TEAMCITY_VERSION", BuildServerNames.TeamCity },
+                { "JENKINS_HOME", BuildServerNames.Jenkins },
+                { "GITHUB_ACTIONS", BuildServerNames.GitHubActions },
+                { "GITLAB_CI", BuildServerNames.GitLabCI },
+                { "CODEBUILD_BUILD_ID", BuildServerNames.AwsCodeBuild },
+                { "TRAVIS", BuildServerNames.TravisCI },
+                { "APPVEYOR", BuildServerNames.AppVeyor },
+                { "BITBUCKET_BUILD_NUMBER", BuildServerNames.BitbucketPipelines },
+                { "bamboo_agentId", BuildServerNames.Bamboo },
+                { "CIRCLECI", BuildServerNames.CircleCI },
+                { "GO_PIPELINE_NAME", BuildServerNames.GoCD },
+                { "BUDDY", BuildServerNames.Buddy },
+                { "NEVERCODE", BuildServerNames.Nevercode },
+                { "SEMAPHORE", BuildServerNames.Semaphore },
+                { "BROWSERSTACK_USERNAME", BuildServerNames.BrowserStack },
+                { "CF_BUILD_ID", BuildServerNames.Codefresh },
+                { "TentacleVersion", BuildServerNames.OctopusDeploy },
+                { "CI_NAME", BuildServerNames.CodeShip }
             };
-
 
         public string GetBuildServerName()
         {
@@ -83,6 +81,7 @@ namespace Reqnroll.EnvironmentAccess
         {
             return VersionInfo.NuGetVersion;
         }
+
         public string GetNetCoreVersion()
         {
             var assembly = typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly;
@@ -95,6 +94,5 @@ namespace Reqnroll.EnvironmentAccess
 
             return null;
         }
-
     }
 }

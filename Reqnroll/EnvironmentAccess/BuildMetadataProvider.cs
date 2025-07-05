@@ -8,7 +8,6 @@ namespace Reqnroll.EnvironmentAccess
     /// </summary>
     public class BuildMetadataProvider(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environment) : IBuildMetadataProvider
     {
-
         /// <summary>
         /// Retrieves the value of an environment variable safely.
         /// </summary>
@@ -35,24 +34,24 @@ namespace Reqnroll.EnvironmentAccess
             var buildServer = environmentInfoProvider.GetBuildServerName();
             var buildMetaData = buildServer switch
             {
-                "Azure Pipelines" => GetAzurePipelinesMetadata(),
-                "TeamCity" => GetTeamCityMetadata(),
-                "Jenkins" => GetJenkinsMetadata(),
-                "GitHub Actions" => GetGitHubActionsMetadata(),
-                "GitLab CI" => GetGitLabMetadata(),
-                "AWS CodeBuild" => GetAwsCodeBuildMetadata(),
-                "Travis CI" => GetTravisMetadata(),
-                "AppVeyor" => GetAppVeyorMetadata(),
-                "Bitbucket Pipelines" => GetBitbucketMetadata(),
-                "Bamboo" => GetBambooMetadata(),
-                "CircleCI" => GetCircleCiMetadata(),
-                "GoCD" => GetGoCdMetadata(),
-                "Buddy" => GetBuddyMetadata(),
-                "Nevercode" => GetNevercodeMetadata(),
-                "Semaphore" => GetSemaphoreMetadata(),
-                "BrowserStack" => GetBrowserStackMetadata(),
-                "Codefresh" => GetCodefreshMetadata(),
-                "Octopus Deploy" => GetOctopusDeployMetadata(),
+                BuildServerNames.AzurePipelines => GetAzurePipelinesMetadata(),
+                BuildServerNames.TeamCity => GetTeamCityMetadata(),
+                BuildServerNames.Jenkins => GetJenkinsMetadata(),
+                BuildServerNames.GitHubActions => GetGitHubActionsMetadata(),
+                BuildServerNames.GitLabCI => GetGitLabMetadata(),
+                BuildServerNames.AwsCodeBuild => GetAwsCodeBuildMetadata(),
+                BuildServerNames.TravisCI => GetTravisMetadata(),
+                BuildServerNames.AppVeyor => GetAppVeyorMetadata(),
+                BuildServerNames.BitbucketPipelines => GetBitbucketMetadata(),
+                BuildServerNames.Bamboo => GetBambooMetadata(),
+                BuildServerNames.CircleCI => GetCircleCiMetadata(),
+                BuildServerNames.GoCD => GetGoCdMetadata(),
+                BuildServerNames.Buddy => GetBuddyMetadata(),
+                BuildServerNames.Nevercode => GetNevercodeMetadata(),
+                BuildServerNames.Semaphore => GetSemaphoreMetadata(),
+                BuildServerNames.BrowserStack => GetBrowserStackMetadata(),
+                BuildServerNames.Codefresh => GetCodefreshMetadata(),
+                BuildServerNames.OctopusDeploy => GetOctopusDeployMetadata(),
                 _ => null
             };
 
@@ -62,9 +61,13 @@ namespace Reqnroll.EnvironmentAccess
             return buildMetaData with { ProductName = buildServer };
         }
 
-
         // One function per build server:
 
+        /// <summary>
+        /// Extracts build metadata from Azure Pipelines environment variables.
+        /// Handles special tag extraction from BUILD_SOURCEBRANCH when it contains refs/tags/ prefix.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Azure Pipelines-specific build information.</returns>
         private BuildMetadata GetAzurePipelinesMetadata()
         {
             string GetAzureTag()
@@ -86,9 +89,10 @@ namespace Reqnroll.EnvironmentAccess
         }
 
         /// <summary>
-        /// Gets TeamCity build metadata.
-        /// See: https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html
+        /// Extracts build metadata from TeamCity environment variables.
         /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with TeamCity-specific build information.</returns>
+        /// <seealso href="https://www.jetbrains.com/help/teamcity/predefined-build-parameters.html">TeamCity Predefined Build Parameters</seealso>
         private BuildMetadata GetTeamCityMetadata()
         {
             var buildUrl = GetVariable("BUILD_URL");
@@ -101,6 +105,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Jenkins environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Jenkins-specific build information.</returns>
         private BuildMetadata GetJenkinsMetadata()
         {
             var buildUrl = GetVariable("BUILD_URL");
@@ -113,6 +121,11 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from GitHub Actions environment variables.
+        /// Constructs build URL and remote URL from GitHub-specific variables and handles branch/tag detection.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with GitHub Actions-specific build information.</returns>
         private BuildMetadata GetGitHubActionsMetadata()
         {
             string repo = GetVariable("GITHUB_REPOSITORY");
@@ -132,6 +145,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from GitLab CI environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with GitLab CI-specific build information.</returns>
         private BuildMetadata GetGitLabMetadata()
         {
             var buildUrl = GetVariable("CI_PIPELINE_URL");
@@ -144,6 +161,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from AWS CodeBuild environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with AWS CodeBuild-specific build information.</returns>
         private BuildMetadata GetAwsCodeBuildMetadata()
         {
             var buildUrl = GetVariable("CODEBUILD_BUILD_URL");
@@ -156,6 +177,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Travis CI environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Travis CI-specific build information.</returns>
         private BuildMetadata GetTravisMetadata()
         {
             var buildUrl = GetVariable("TRAVIS_BUILD_WEB_URL");
@@ -168,6 +193,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from AppVeyor environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with AppVeyor-specific build information.</returns>
         private BuildMetadata GetAppVeyorMetadata()
         {
             var buildUrl = GetVariable("APPVEYOR_URL");
@@ -180,6 +209,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Bitbucket Pipelines environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Bitbucket Pipelines-specific build information.</returns>
         private BuildMetadata GetBitbucketMetadata()
         {
             var buildUrl = GetVariable("BITBUCKET_BUILD_URL");
@@ -192,6 +225,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Atlassian Bamboo environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Bamboo-specific build information.</returns>
         private BuildMetadata GetBambooMetadata()
         {
             var buildUrl = GetVariable("bamboo_resultsUrl");
@@ -204,6 +241,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from CircleCI environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with CircleCI-specific build information.</returns>
         private BuildMetadata GetCircleCiMetadata()
         {
             var buildUrl = GetVariable("CIRCLE_BUILD_URL");
@@ -216,6 +257,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from GoCD environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with GoCD-specific build information.</returns>
         private BuildMetadata GetGoCdMetadata()
         {
             var buildUrl = GetVariable("GO_SERVER_URL");
@@ -228,6 +273,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Buddy environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Buddy-specific build information.</returns>
         private BuildMetadata GetBuddyMetadata()
         {
             var buildUrl = GetVariable("BUDDY_EXECUTION_URL");
@@ -240,6 +289,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Nevercode environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Nevercode-specific build information.</returns>
         private BuildMetadata GetNevercodeMetadata()
         {
             var buildUrl = GetVariable("NEVERCODE_BUILD_URL");
@@ -252,6 +305,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Semaphore environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Semaphore-specific build information.</returns>
         private BuildMetadata GetSemaphoreMetadata()
         {
             var buildUrl = GetVariable("SEMAPHORE_WORKFLOW_URL");
@@ -264,6 +321,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from BrowserStack environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with BrowserStack-specific build information.</returns>
         private BuildMetadata GetBrowserStackMetadata()
         {
             var buildUrl = GetVariable("BROWSERSTACK_BUILD_URL");
@@ -276,6 +337,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Codefresh environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Codefresh-specific build information.</returns>
         private BuildMetadata GetCodefreshMetadata()
         {
             var buildUrl = GetVariable("CF_BUILD_URL");
@@ -288,6 +353,10 @@ namespace Reqnroll.EnvironmentAccess
             return new BuildMetadata(buildUrl, buildNumber, remote, revision, branch, tag);
         }
 
+        /// <summary>
+        /// Extracts build metadata from Octopus Deploy environment variables.
+        /// </summary>
+        /// <returns>A <see cref="BuildMetadata"/> object with Octopus Deploy-specific build information.</returns>
         private BuildMetadata GetOctopusDeployMetadata()
         {
             var buildUrl = GetVariable("OCTOPUS_DEPLOY_BUILD_URL");
