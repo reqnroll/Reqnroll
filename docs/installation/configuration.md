@@ -188,3 +188,9 @@ The `bindingAssemblies` section can contain multiple JSON objects (one for each 
   - assembly name
   - The name of the assembly containing bindings (without `.dll`).
 ```
+
+```{toctree}
+:maxdepth: 1
+
+configuring-build
+```
