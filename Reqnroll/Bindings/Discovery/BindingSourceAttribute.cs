@@ -29,7 +29,7 @@ namespace Reqnroll.Bindings.Discovery
 
         public TValue TryGetAttributeValue<TValue>(string name, TValue defaultValue = default)
         {
-            if (NamedAttributeValues.TryGetValue(name, out var valueProvider))
+            if (NamedAttributeValues != null && NamedAttributeValues.TryGetValue(name, out var valueProvider))
                 return valueProvider.GetValue<TValue>();
 
             return defaultValue;
