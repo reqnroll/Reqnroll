@@ -246,6 +246,7 @@ namespace Reqnroll.Bindings.Discovery
         {
             var stepDefinitionTypes = GetStepDefinitionTypes(stepDefinitionAttribute);
             string expressionString = stepDefinitionAttribute.TryGetAttributeValue<string>(0);
+            var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>("ExpressionType");
 
             var validationResult = ValidateStepDefinition(bindingSourceMethod, stepDefinitionAttribute);
             if (!validationResult.IsValid)
@@ -261,7 +262,7 @@ namespace Reqnroll.Bindings.Discovery
 
             foreach (var stepDefinitionType in stepDefinitionTypes)
             {
-                var stepDefinitionBindingBuilder = _bindingFactory.CreateStepDefinitionBindingBuilder(stepDefinitionType, bindingSourceMethod.BindingMethod, scope, expressionString);
+                var stepDefinitionBindingBuilder = _bindingFactory.CreateStepDefinitionBindingBuilder(stepDefinitionType, bindingSourceMethod.BindingMethod, scope, expressionString, expressionType);
                 _stepDefinitionBindingBuilders.Add(stepDefinitionBindingBuilder);
             }
         }

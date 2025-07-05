@@ -3,6 +3,14 @@ using Reqnroll.Bindings;
 
 namespace Reqnroll
 {
+
+    public enum ExpressionType
+    {
+        Automatic,
+        CucumberExpression,
+        RegularExpression
+    }
+
     /// <summary>
     /// Marker attribute that specifies that this class may contain bindings (step definitions, hooks, etc.)
     /// </summary>
@@ -27,6 +35,8 @@ namespace Reqnroll
         /// it is only for tooling support needed
         /// </summary>
         public string Culture { get; set; }
+
+        public ExpressionType ExpressionType { get; set; } = ExpressionType.Automatic;
 
         internal StepDefinitionBaseAttribute(string expression, StepDefinitionType type)
             : this(expression, new[] { type })
