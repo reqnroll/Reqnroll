@@ -246,7 +246,7 @@ namespace Reqnroll.Bindings.Discovery
         {
             var stepDefinitionTypes = GetStepDefinitionTypes(stepDefinitionAttribute);
             string expressionString = stepDefinitionAttribute.TryGetAttributeValue<string>(0);
-            var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>("ExpressionType");
+            var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>(nameof(StepDefinitionBaseAttribute.ExpressionType));
 
             var validationResult = ValidateStepDefinition(bindingSourceMethod, stepDefinitionAttribute);
             if (!validationResult.IsValid)
