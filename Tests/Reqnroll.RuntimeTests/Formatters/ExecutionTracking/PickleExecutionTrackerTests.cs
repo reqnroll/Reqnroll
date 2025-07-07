@@ -79,11 +79,11 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             _mockMessageFactory
                 .Setup(m => m.ToAttachment(It.IsAny<AttachmentTracker>()))
-                .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id"));
+                .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0,1)));
 
             _mockMessageFactory
                 .Setup(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()))
-                .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id"));
+                .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0,1)));
 
             _stepDefinitionsByMethodSignature.TryAdd(_mockHookBinding.Object, "hook-id");
         }

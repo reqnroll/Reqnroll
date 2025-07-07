@@ -117,6 +117,7 @@ public static class EnvelopeExtensions
         else if (envelope.TestStepStarted != null) { result = envelope.TestStepStarted.Timestamp; }
         else if (envelope.TestRunHookStarted != null) { result = envelope.TestRunHookStarted.Timestamp; }
         else if (envelope.TestRunHookFinished != null) { result = envelope.TestRunHookFinished.Timestamp; }
+        else if (envelope.Attachment != null) { result = envelope.Attachment.Timestamp; }
         else throw new ArgumentException($"Envelope of type: {envelope.Content().GetType()} does not contain a timestamp");
         return result;
     }

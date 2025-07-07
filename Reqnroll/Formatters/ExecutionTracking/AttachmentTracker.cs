@@ -2,6 +2,7 @@
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System.Collections.Generic;
+using System;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -16,15 +17,17 @@ public class AttachmentTracker : IGenerateMessage
     public string TestRunStartedId { get; }
     public string TestCaseStartedId { get; }
     public string TestCaseStepId { get; }
-
+    public string TestRunHookStartedId { get; }
     public string FilePath { get; private set; }
+    public DateTime Timestamp { get; private set; }
 
-    internal AttachmentTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, ICucumberMessageFactory messageFactory)
+    internal AttachmentTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string testRunHookStartedId, ICucumberMessageFactory messageFactory)
     {
         _messageFactory = messageFactory;
         TestRunStartedId = testRunStartedId;
         TestCaseStartedId = testCaseStartedId;
         TestCaseStepId = testCaseStepId;
+        TestRunHookStartedId = testRunHookStartedId;
     }
 
     IEnumerable<Envelope> IGenerateMessage.GenerateFrom(ExecutionEvent executionEvent)
@@ -35,5 +38,6 @@ public class AttachmentTracker : IGenerateMessage
     public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
     {
         FilePath = attachmentAddedEvent.FilePath;
+        Timestamp = attachmentAddedEvent.Timestamp;
     }
 }

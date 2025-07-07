@@ -258,11 +258,13 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             AttachmentContentEncoding.BASE64,
             Path.GetFileName(filePath),
             FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
-            null,
+            null, //Source
             tracker.TestCaseStartedId,
             tracker.TestCaseStepId,
-            null,
-            tracker.TestRunStartedId);
+            null, //url
+            tracker.TestRunStartedId,
+            tracker.TestRunHookStartedId,
+            Converters.ToTimestamp(tracker.Timestamp));
     }
 
     public virtual Attachment ToAttachment(OutputMessageTracker tracker)
@@ -276,7 +278,9 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             tracker.TestCaseStartedId,
             tracker.TestCaseStepId,
             null,
-            tracker.TestRunStartedId);
+            tracker.TestRunStartedId,
+            tracker.TestRunHookStartedId,
+            Converters.ToTimestamp(tracker.Timestamp));
     }
 
     private static TestStepResult ToTestStepResult(StepExecutionTrackerBase stepState)

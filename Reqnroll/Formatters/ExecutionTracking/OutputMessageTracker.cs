@@ -2,6 +2,7 @@
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System.Collections.Generic;
+using System;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -16,16 +17,18 @@ public class OutputMessageTracker : IGenerateMessage
     public string TestRunStartedId { get; }
     public string TestCaseStartedId { get; }
     public string TestCaseStepId { get; }
-
+    public string TestRunHookStartedId { get; }
     public string Text { get; private set; }
+    public DateTime Timestamp { get; private set; }
 
-    internal OutputMessageTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, ICucumberMessageFactory messageFactory)
+    internal OutputMessageTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string outputIssuedByHookStartedId, ICucumberMessageFactory messageFactory)
     {
         _messageFactory = messageFactory;
 
         TestRunStartedId = testRunStartedId;
         TestCaseStartedId = testCaseStartedId;
         TestCaseStepId = testCaseStepId;
+        TestRunHookStartedId = outputIssuedByHookStartedId;
     }
 
     IEnumerable<Envelope> IGenerateMessage.GenerateFrom(ExecutionEvent executionEvent)
@@ -36,5 +39,6 @@ public class OutputMessageTracker : IGenerateMessage
     public void ProcessEvent(OutputAddedEvent outputAddedEvent)
     {
         Text = outputAddedEvent.Text;
+        Timestamp = outputAddedEvent.Timestamp;
     }
 }

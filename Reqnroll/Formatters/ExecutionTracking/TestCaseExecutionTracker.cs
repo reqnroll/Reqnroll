@@ -142,6 +142,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
             ParentTracker.TestRunStartedId,
             TestCaseStartedId,
             CurrentStep.StepTracker.TestStepId,
+            "", // TestRunHookStartedId is not applicable here
             _messageFactory);
         attachmentTracker.ProcessEvent(attachmentAddedEvent);
         StoreMessageGenerator(attachmentTracker, attachmentAddedEvent);
@@ -153,6 +154,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
             ParentTracker.TestRunStartedId,
             TestCaseStartedId,
             CurrentStep.StepTracker.TestStepId,
+            "", // TestRunHookStartedId is not applicable here
             _messageFactory);
         outputMessageTracker.ProcessEvent(outputAddedEvent);
         StoreMessageGenerator(outputMessageTracker, outputAddedEvent);

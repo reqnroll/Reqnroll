@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Reqnroll.Formatters.RuntimeSupport;
+using System.Diagnostics;
 
 namespace Reqnroll.Formatters.PubSub;
 
@@ -50,8 +51,6 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
     internal readonly ConcurrentDictionary<IBinding, TestRunHookExecutionTracker> _testRunHookTrackers = new();
-    // This tracks all Attachments and Output Events; used during publication to sequence them in the correct order.
-    internal readonly OutputEventsTracker _outputEventsTracker = new();
 
     // Holds all Messages that are pending publication (collected from Feature Trackers as each Feature completes)
     internal List<Envelope> _messages = new();
@@ -177,11 +176,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     private DateTime RetrieveDateTime(Envelope e)
     {
-        return e.Content() switch
-        {
-            Attachment attachment => _outputEventsTracker.GetTimestampForMatchingAttachment(attachment).ToUniversalTime(),
-            _ => Converters.ToDateTime(e.Timestamp())
-        };
+        return Converters.ToDateTime(e.Timestamp());
     }
 
     internal async Task PublisherTestRunCompleteAsync(TestRunFinishedEvent testRunFinishedEvent)
@@ -406,13 +401,13 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (!_enabled)
             return Task.CompletedTask;
 
-        _outputEventsTracker.ProcessEvent(attachmentAddedEvent);
-
         var featureInfo = attachmentAddedEvent.FeatureInfo;
         if (featureInfo == null || string.IsNullOrEmpty(attachmentAddedEvent.ScenarioInfo?.Title))
         {
             // This is a TestRun-level attachment (not tied to any feature or scenario)
-            var attachmentTracker = new AttachmentTracker(_testRunStartedId, null, null, _messageFactory);
+            var attachmentIssuedByHookId = ActiveTestRunHook == null ? "" : ActiveTestRunHook.HookStartedId;
+            Debug.Assert(!string.IsNullOrEmpty(attachmentIssuedByHookId), "AttachmentAddedEvent without a FeatureInfo or ScenarioInfo should be issued by a TestRun Hook.");
+            var attachmentTracker = new AttachmentTracker(_testRunStartedId, null, null, attachmentIssuedByHookId, _messageFactory);
             attachmentTracker.ProcessEvent(attachmentAddedEvent);
 
             _messages.Add(Envelope.Create(_messageFactory.ToAttachment(attachmentTracker)));
@@ -431,13 +426,14 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (!_enabled)
             return Task.CompletedTask;
 
-        _outputEventsTracker.ProcessEvent(outputAddedEvent);
-
         var featureInfo = outputAddedEvent.FeatureInfo;
         if (featureInfo == null || string.IsNullOrEmpty(outputAddedEvent.ScenarioInfo?.Title))
         {
             // This is a TestRun-level attachment (not tied to any feature) or is an output coming from a Before/AfterFeature hook
-            var outputMessageTracker = new OutputMessageTracker(_testRunStartedId, null, null, _messageFactory);
+            var outputIssuedByHookId = ActiveTestRunHook == null ? "" : ActiveTestRunHook.HookStartedId;
+            Debug.Assert(!string.IsNullOrEmpty(outputIssuedByHookId), "OutputAddedEvent without a FeatureInfo or ScenarioInfo should be issued by a TestRun Hook.");
+
+            var outputMessageTracker = new OutputMessageTracker(_testRunStartedId, null, null, outputIssuedByHookId, _messageFactory);
             outputMessageTracker.ProcessEvent(outputAddedEvent);
 
             _messages.Add(Envelope.Create(_messageFactory.ToAttachment(outputMessageTracker)));
@@ -452,4 +448,14 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         return Task.CompletedTask;
     }
     #endregion
+    private TestRunHookExecutionTracker ActiveTestRunHook
+    {
+        get
+        {
+            if (_testRunHookTrackers.Count == 0)
+                return null;
+            // Return the first active hook tracker
+            return _testRunHookTrackers.Values.FirstOrDefault(hook => hook.IsActive);
+        }
+    }
 }

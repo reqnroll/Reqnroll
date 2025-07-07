@@ -20,6 +20,7 @@ public class TestRunHookExecutionTracker(string hookStartedId, string hookId, st
     public DateTime HookFinished { get; private set; }
     public TimeSpan Duration { get; private set; }
     public System.Exception Exception { get; private set; }
+    public bool IsActive => HookStarted != default && HookFinished == default;
     public ScenarioExecutionStatus Status => Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
 
     IEnumerable<Envelope> IGenerateMessage.GenerateFrom(ExecutionEvent executionEvent)

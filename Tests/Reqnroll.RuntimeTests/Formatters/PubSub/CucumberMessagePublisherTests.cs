@@ -1,3 +1,4 @@
+using Cucumber.Messages;
 using FluentAssertions;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
@@ -664,11 +665,11 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             public override Attachment ToAttachment(AttachmentTracker tracker)
             {
-                return new Attachment("fake body", AttachmentContentEncoding.BASE64, tracker.FilePath, "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId);
+                return new Attachment("fake body", AttachmentContentEncoding.BASE64, tracker.FilePath, "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId, tracker.TestRunHookStartedId, Converters.ToTimestamp(tracker.Timestamp));
             }
             public override Attachment ToAttachment(OutputMessageTracker tracker)
             {
-                return new Attachment(tracker.Text, AttachmentContentEncoding.IDENTITY, "", "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId);
+                return new Attachment(tracker.Text, AttachmentContentEncoding.IDENTITY, "", "dummy", new Source("", "source", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), tracker.TestCaseStartedId, "", "", tracker.TestRunStartedId, tracker.TestRunHookStartedId, Converters.ToTimestamp(tracker.Timestamp));
             }
         }
 
@@ -685,6 +686,15 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             _sut._enabled = true;
             _sut._messageFactory = new AttachmentMessageFactory();
+
+            // the SUT needs an active TestRunHookExecutionTracker to be able to add attachments and output messages
+
+            var mockBinding = new Mock<IHookBinding>();
+            var hookId = Guid.NewGuid().ToString();
+            var mockHook = new TestRunHookExecutionTracker(hookId, null, "test-run-started-id", _sut._messageFactory);
+            mockHook.ProcessEvent(new HookBindingStartedEvent(mockBinding.Object, new Mock<IContextManager>().Object));
+            _sut._testRunHookTrackers.TryAdd(mockBinding.Object, mockHook);
+
             // Act 
             await _sut.OnEventAsync(evnt);
 
