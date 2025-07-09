@@ -437,7 +437,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         {
             // This is a TestRun-level attachment (not tied to any feature) or is an output coming from a Before/AfterFeature hook
             var outputIssuedByHookId = ActiveTestRunHook?.HookStartedId ?? "";
-            if (!string.IsNullOrEmpty(outputIssuedByHookId))
+            if (string.IsNullOrEmpty(outputIssuedByHookId))
             {
                 _logger.WriteMessage("OutputAddedEvent without a FeatureInfo or ScenarioInfo should be issued by a TestRun Hook. OutputEvent will be ignored by formatters.");
             }

@@ -34,12 +34,12 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return new TestRunHookStarted(hookExecutionTracker.HookStartedId, hookExecutionTracker.TestRunId, hookExecutionTracker.HookId, Converters.ToTimestamp(hookExecutionTracker.HookStarted.ToUniversalTime()));
+        return new TestRunHookStarted(hookExecutionTracker.HookStartedId, hookExecutionTracker.TestRunId, hookExecutionTracker.HookId, Converters.ToTimestamp(hookExecutionTracker.HookStarted?.ToUniversalTime() ?? DateTime.MinValue));
     }
 
     public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return new TestRunHookFinished(hookExecutionTracker.HookStartedId, ToTestStepResult(hookExecutionTracker), Converters.ToTimestamp(hookExecutionTracker.HookFinished.ToUniversalTime()));
+        return new TestRunHookFinished(hookExecutionTracker.HookStartedId, ToTestStepResult(hookExecutionTracker), Converters.ToTimestamp(hookExecutionTracker.HookFinished?.ToUniversalTime() ?? DateTime.MinValue));
     }
 
     public virtual TestCaseStarted ToTestCaseStarted(TestCaseExecutionTracker testCaseExecution, string testCaseId)
@@ -297,7 +297,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     private static TestStepResult ToTestStepResult(TestRunHookExecutionTracker hookExecutionTracker)
     {
         return new TestStepResult(
-            Converters.ToDuration(hookExecutionTracker.Duration),
+            Converters.ToDuration(hookExecutionTracker.Duration ?? TimeSpan.Zero),
             "",
             ToTestStepResultStatus(hookExecutionTracker.Status),
             ToException(hookExecutionTracker.Exception));
