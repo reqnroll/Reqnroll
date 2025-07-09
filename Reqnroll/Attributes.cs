@@ -21,11 +21,6 @@ namespace Reqnroll
         /// </summary>
         public string Expression { get; set; }
 
-        /// <summary>
-        /// Additional information about the culture in which the step is written. This does not affect the matching of the step, but it is used for parsing the parameters.
-        /// </summary>
-        public string Culture { get; set; }
-
         internal StepDefinitionBaseAttribute(string expression, StepDefinitionType type)
             : this(expression, new[] { type })
         {
@@ -55,14 +50,6 @@ namespace Reqnroll
             : base(expression, StepDefinitionType.Given)
         {
         }
-
-        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
-        /// <param name="culture">Additional information about the culture in which the step is written. This does not affect the matching of the step, but it is used for parsing the parameters.</param>
-        public GivenAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
-        }
     }
 
     /// <summary>
@@ -80,14 +67,6 @@ namespace Reqnroll
             : base(expression, StepDefinitionType.When)
         {
         }
-
-        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
-        /// <param name="culture">Additional information about the culture in which the step is written. This does not affect the matching of the step, but it is used for parsing the parameters.</param>
-        public WhenAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
-        }
     }
 
     /// <summary>
@@ -103,14 +82,6 @@ namespace Reqnroll
         public ThenAttribute(string expression)
             : base(expression, StepDefinitionType.Then)
         {
-        }
-
-        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
-        /// <param name="culture">Additional information about the culture in which the step is written. This does not affect the matching of the step, but it is used for parsing the parameters.</param>
-        public ThenAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
         }
     }
 
@@ -128,14 +99,6 @@ namespace Reqnroll
         public StepDefinitionAttribute(string expression)
             : base(expression, new[] { StepDefinitionType.Given, StepDefinitionType.When, StepDefinitionType.Then })
         {
-        }
-        
-        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
-        /// <param name="culture">Additional information about the culture in which the step is written. This does not affect the matching of the step, but it is used for parsing the parameters.</param>
-        public StepDefinitionAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
         }
     }
 }
