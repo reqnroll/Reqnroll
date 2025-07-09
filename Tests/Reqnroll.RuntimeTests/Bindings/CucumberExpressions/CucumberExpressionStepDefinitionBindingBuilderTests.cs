@@ -1,9 +1,10 @@
-using System;
-using System.Reflection;
 using FluentAssertions;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.CucumberExpressions;
 using Reqnroll.Bindings.Reflection;
+using System;
+using System.Linq;
+using System.Reflection;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Bindings.CucumberExpressions;
@@ -46,9 +47,9 @@ public class CucumberExpressionStepDefinitionBindingBuilderTests
         var sut = CreateSut("I have {int} cucumbers in my belly");
 
         var result = sut.BuildSingle();
-
         result.ExpressionType.Should().Be(StepDefinitionExpressionTypes.CucumberExpression);
         result.Regex?.ToString().Should().Be(@"^I have (-?\d+) cucumbers in my belly$");
+        result.Expression.Should().BeOfType<ReqnrollCucumberExpression>().Which.ParameterTypes.FirstOrDefault()?.ParameterType.Should().Be(typeof(int));
     }
 
     [Fact]
@@ -60,6 +61,19 @@ public class CucumberExpressionStepDefinitionBindingBuilderTests
 
         result.ExpressionType.Should().Be(StepDefinitionExpressionTypes.CucumberExpression);
         result.Regex?.ToString().Should().Be(@"^I have eaten cucumbers on (.*)$");
+        result.Expression.Should().BeOfType<ReqnrollCucumberExpression>().Which.ParameterTypes.FirstOrDefault()?.ParameterType.Should().Be(typeof(DateTime));
+    }
+
+    [Fact]
+    public void Should_build_from_expression_with_Guid_param()
+    {
+        var sut = CreateSut("I've named my cucumber the unique name {Guid}");
+
+        var result = sut.BuildSingle();
+
+        result.ExpressionType.Should().Be(StepDefinitionExpressionTypes.CucumberExpression);
+        result.Regex?.ToString().Should().Be(@"^I've named my cucumber the unique name (.*)$");
+        result.Expression.Should().BeOfType<ReqnrollCucumberExpression>().Which.ParameterTypes.FirstOrDefault()?.ParameterType.Should().Be(typeof(Guid));
     }
 
     [Fact]

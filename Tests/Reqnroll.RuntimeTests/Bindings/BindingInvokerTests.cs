@@ -1,14 +1,15 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using Reqnroll.BoDi;
 using FluentAssertions;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Infrastructure;
 using Reqnroll.RuntimeTests.ErrorHandling;
 using Reqnroll.Tracing;
@@ -29,9 +30,11 @@ public class BindingInvokerTests
         _testOutputHelperInstance = _testOutputHelper; // to be able to access it from step def classes
     }
 
-    private BindingInvoker CreateSut()
+    private BindingInvoker CreateSut(EnvironmentWrapperStub environmentWrapperStub = null)
     {
-        return new BindingInvoker(ConfigurationLoader.GetDefault(), new StubErrorProvider(), new BindingDelegateInvoker());
+        var mockContainer = new Mock<IObjectContainer>();
+        mockContainer.Setup(ctx => ctx.Resolve<IEnvironmentWrapper>()).Returns(environmentWrapperStub ?? new EnvironmentWrapperStub());
+        return new BindingInvoker(ConfigurationLoader.GetDefault(), new StubErrorProvider(), new BindingDelegateInvoker(), mockContainer.Object);
     }
 
     class TestableMethodBinding : MethodBinding
@@ -41,11 +44,16 @@ public class BindingInvokerTests
         }
     }
 
-    private async Task<object> InvokeBindingAsync(BindingInvoker sut, IContextManager contextManager, Type stepDefType, string methodName, params object[] args)
+    private Task<object> InvokeBindingAsync(BindingInvoker sut, IContextManager contextManager, Type stepDefType, string methodName, params object[] args)
+    {
+        return InvokeBindingAsync(sut, contextManager, stepDefType, methodName, new DurationHolder(), args);
+    }
+
+    private async Task<object> InvokeBindingAsync(BindingInvoker sut, IContextManager contextManager, Type stepDefType, string methodName, DurationHolder durationHolder, params object[] args)
     {
         var testTracerMock = new Mock<ITestTracer>();
         var setMethodBinding = new TestableMethodBinding(new RuntimeBindingMethod(stepDefType.GetMethod(methodName)));
-        return await sut.InvokeBindingAsync(setMethodBinding, contextManager, args, testTracerMock.Object, new DurationHolder());
+        return await sut.InvokeBindingAsync(setMethodBinding, contextManager, args, testTracerMock.Object, durationHolder);
     }
 
     private IContextManager CreateContextManagerWith()
@@ -263,7 +271,7 @@ public class BindingInvokerTests
     }
 
     #endregion
-    
+
     #region ExecutionContext / AsyncLocal<T> related tests
 
     public enum AsyncLocalType
@@ -434,12 +442,12 @@ public class BindingInvokerTests
                             Task.Run(async () => throw new Exception("This is the second Exception embedded in the AggregateException"))
                         };
                         var continuation = Task.WhenAll(tasks);
-                        
+
                         // This will throw an AggregateException with two Inner Exceptions
                         continuation.Wait();
                         return;
                     }
-             }
+            }
 
         }
     }
@@ -487,4 +495,56 @@ public class BindingInvokerTests
     }
     #endregion
 
+    #region Dry run tests
+
+    [Theory]
+    [InlineData("true")]
+    [InlineData("True")]
+    public async Task ShouldSkipExecutingStepsWhenDryRunEnabled(string value)
+    {
+        var envStub = new EnvironmentWrapperStub();
+        envStub.EnvironmentVariables.Add(BindingInvoker.DryRunEnvVarName, value);
+        var sut = CreateSut(environmentWrapperStub: envStub);
+        var contextManager = CreateContextManagerWith();
+        var durationHolder = new DurationHolder();
+
+        // invoke, but with dry run execution we expect no exception thrown
+        var result = await InvokeBindingAsync(sut, contextManager, typeof(GenericStepDefClass), nameof(GenericStepDefClass.AsyncStepDefWithException), durationHolder, 1, "foo");
+
+        // verify dry run execution
+        result.Should().BeNull();
+        durationHolder.Duration.Should().Be(TimeSpan.Zero);
+        var stepDefClass = contextManager.ScenarioContext.ScenarioContainer.Resolve<GenericStepDefClass>();
+        stepDefClass.WasInvoked.Should().BeFalse();
+        stepDefClass.CapturedIntParam.Should().Be(0);
+        stepDefClass.CapturedStringParam.Should().BeNull();
+    }
+
+    [Theory]
+    [InlineData("false")]
+    [InlineData("False")]
+    [InlineData("0")]
+    [InlineData("1")]
+    [InlineData((string)null)]
+    public async Task ShouldExecuteStepsWhenDryRunDisabled(string value)
+    {
+        var envStub = new EnvironmentWrapperStub();
+        envStub.EnvironmentVariables.Add(BindingInvoker.DryRunEnvVarName, value);
+        var sut = CreateSut(environmentWrapperStub: envStub);
+        var contextManager = CreateContextManagerWith();
+        var durationHolder = new DurationHolder();
+
+        // invoke, but expect dry run execution
+        var result = await InvokeBindingAsync(sut, contextManager, typeof(GenericStepDefClass), nameof(GenericStepDefClass.AsyncConverter), durationHolder, 1, "foo");
+
+        // verify dry run execution
+        result.Should().Be(42);
+        durationHolder.Duration.Should().BeGreaterThan(TimeSpan.Zero);
+        var stepDefClass = contextManager.ScenarioContext.ScenarioContainer.Resolve<GenericStepDefClass>();
+        stepDefClass.WasInvoked.Should().BeTrue();
+        stepDefClass.CapturedIntParam.Should().Be(1);
+        stepDefClass.CapturedStringParam.Should().Be("foo");
+    }
+
+    #endregion
 }

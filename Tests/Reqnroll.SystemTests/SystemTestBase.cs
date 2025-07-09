@@ -12,6 +12,7 @@ using Reqnroll.TestProjectGenerator.Data;
 using Reqnroll.TestProjectGenerator.Driver;
 using Reqnroll.TestProjectGenerator.Helpers;
 using Scrutor;
+using TestContext = Microsoft.VisualStudio.TestTools.UnitTesting.TestContext;
 
 namespace Reqnroll.SystemTests;
 public abstract class SystemTestBase

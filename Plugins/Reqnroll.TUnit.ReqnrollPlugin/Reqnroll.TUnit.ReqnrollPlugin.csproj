@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TUnit.Core" Version="0.25.21" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+  </ItemGroup>
+
+</Project>
