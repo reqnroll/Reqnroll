@@ -15,6 +15,19 @@ namespace Reqnroll.Formatters.PubSub;
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
+    // This is the list of sinks registered in the container. Not all may be enabled/configured.
+    private readonly List<ICucumberMessageSink> _registeredSinks = new();
+
+    // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
+    // and the Broker can be IsEnabled.
+    private int _numberOfSinksInitialized = 0;
+    private readonly IFormatterLog _logger;
+
+    // This holds the list of registered and enabled sinks to which messages will be routed.
+    // Using a concurrent collection as the sinks may be registering in parallel threads
+    private readonly ConcurrentDictionary<string, ICucumberMessageSink> _activeSinks = new();
+
+
     public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageSink> containerRegisteredSinks)
     {
         _logger = formatterLog;
@@ -39,25 +52,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         CheckInitializationStatus();
     }
 
-    public bool IsEnabled
-    {
-        get
-        {
-            return (HaveAllSinksRegistered() && _activeSinks.Count > 0) ? true : false;
-        }
-    }
-
-    // This is the list of sinks registered in the container. Not all may be enabled/configured.
-    private List<ICucumberMessageSink> _registeredSinks = new();
-
-    // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
-    // and the Broker can be IsEnabled.
-    private int _numberOfSinksInitialized = 0;
-    private IFormatterLog _logger;
-
-    // This holds the list of registered and enabled sinks to which messages will be routed.
-    // Using a concurrent collection as the sinks may be registering in parallel threads
-    private readonly ConcurrentDictionary<string, ICucumberMessageSink> _activeSinks = new();
+    public bool IsEnabled => HaveAllSinksRegistered() && _activeSinks.Count > 0;
 
     private void CheckInitializationStatus()
     {

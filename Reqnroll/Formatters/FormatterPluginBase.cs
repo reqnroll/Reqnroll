@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Channels;
@@ -11,25 +10,24 @@ using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Plugins;
-using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Formatters;
 
 public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
 {
     private Task? _formatterTask;
-    internal CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+    private readonly CancellationTokenSource _cancellationTokenSource = new();
     private ICucumberMessageBroker? _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
     private readonly IFormatterLog _logger;
     protected readonly Channel<Envelope> PostedMessages = Channel.CreateUnbounded<Envelope>();
 
     private bool _isDisposed = false;
-    protected bool _closed = false;
+    protected bool Closed = false;
 
-    public IFormatterLog Logger { get => _logger; }
-    private string _pluginName;
+    public IFormatterLog Logger => _logger;
+
+    private readonly string _pluginName;
 
     public string Name => _pluginName;
 
@@ -72,7 +70,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
     private void ReportInitialized(bool status)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} reporting status as {status}.");
-        _closed = !status;
+        Closed = !status;
 
         // Preemptively closing down the Channel to force error identification
         if (status == false)
@@ -82,7 +80,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
 
     public async Task PublishAsync(Envelope message)
     {
-        if (_closed || _isDisposed || PostedMessages.Reader.Completion.IsCompleted)
+        if (Closed || _isDisposed || PostedMessages.Reader.Completion.IsCompleted)
         {
             Logger.WriteMessage($"Cannot add message {message.Content().GetType().Name} to formatter {Name} - formatter is closed and not able to accept additional messages.");
             return;

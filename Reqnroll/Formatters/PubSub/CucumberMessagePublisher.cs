@@ -42,7 +42,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     public IIdGenerator SharedIdGenerator { get; private set; }
 
-    private string _testRunStartedId;
+    private readonly string _testRunStartedId;
     internal bool _enabled = false;
 
     // This field will be updated as each Feature completes. If all complete successfully, this will remain as true.

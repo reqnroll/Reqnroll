@@ -54,7 +54,7 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposab
                 if (cancellationToken.IsCancellationRequested)
                 {
                     Logger.WriteMessage($"Formatter {Name} has been cancelled.");
-                    _closed = true;
+                    Closed = true;
                     await _fileStream.FlushAsync();
                     break;
                 }
