@@ -25,7 +25,6 @@
         <dependency id="Microsoft.Extensions.DependencyModel" version="8.0.2" />
         <dependency id="System.Text.Json" version="8.0.5" />
         <dependency id="System.Threading.Channels" version="9.0.6" />
-        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="9.0.6" />
       </group>
     </dependencies>
   </metadata>

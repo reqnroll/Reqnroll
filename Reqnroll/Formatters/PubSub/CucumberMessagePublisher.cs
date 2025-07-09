@@ -405,12 +405,18 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (featureInfo == null || string.IsNullOrEmpty(attachmentAddedEvent.ScenarioInfo?.Title))
         {
             // This is a TestRun-level attachment (not tied to any feature or scenario)
-            var attachmentIssuedByHookId = ActiveTestRunHook == null ? "" : ActiveTestRunHook.HookStartedId;
-            Debug.Assert(!string.IsNullOrEmpty(attachmentIssuedByHookId), "AttachmentAddedEvent without a FeatureInfo or ScenarioInfo should be issued by a TestRun Hook.");
-            var attachmentTracker = new AttachmentTracker(_testRunStartedId, null, null, attachmentIssuedByHookId, _messageFactory);
-            attachmentTracker.ProcessEvent(attachmentAddedEvent);
+            var attachmentIssuedByHookId = ActiveTestRunHook?.HookStartedId ?? "";
+            if (string.IsNullOrEmpty(attachmentIssuedByHookId))
+            {
+                _logger.WriteMessage("Error: AttachmentAddedEvent without a FeatureInfo or ScenarioInfo should be issued by a TestRun Hook. Attachment will be ignored by formatters.");
+            }
+            else
+            {
+                var attachmentTracker = new AttachmentTracker(_testRunStartedId, null, null, attachmentIssuedByHookId, _messageFactory);
+                attachmentTracker.ProcessEvent(attachmentAddedEvent);
 
-            _messages.Add(Envelope.Create(_messageFactory.ToAttachment(attachmentTracker)));
+                _messages.Add(Envelope.Create(_messageFactory.ToAttachment(attachmentTracker)));
+            }
             return Task.CompletedTask;
         }
         if (_startedFeatures.TryGetValue(featureInfo, out var featureTracker))
@@ -430,13 +436,18 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
         if (featureInfo == null || string.IsNullOrEmpty(outputAddedEvent.ScenarioInfo?.Title))
         {
             // This is a TestRun-level attachment (not tied to any feature) or is an output coming from a Before/AfterFeature hook
-            var outputIssuedByHookId = ActiveTestRunHook == null ? "" : ActiveTestRunHook.HookStartedId;
-            Debug.Assert(!string.IsNullOrEmpty(outputIssuedByHookId), "OutputAddedEvent without a FeatureInfo or ScenarioInfo should be issued by a TestRun Hook.");
+            var outputIssuedByHookId = ActiveTestRunHook?.HookStartedId ?? "";
+            if (!string.IsNullOrEmpty(outputIssuedByHookId))
+            {
+                _logger.WriteMessage("OutputAddedEvent without a FeatureInfo or ScenarioInfo should be issued by a TestRun Hook. OutputEvent will be ignored by formatters.");
+            }
+            else
+            {
+                var outputMessageTracker = new OutputMessageTracker(_testRunStartedId, null, null, outputIssuedByHookId, _messageFactory);
+                outputMessageTracker.ProcessEvent(outputAddedEvent);
 
-            var outputMessageTracker = new OutputMessageTracker(_testRunStartedId, null, null, outputIssuedByHookId, _messageFactory);
-            outputMessageTracker.ProcessEvent(outputAddedEvent);
-
-            _messages.Add(Envelope.Create(_messageFactory.ToAttachment(outputMessageTracker)));
+                _messages.Add(Envelope.Create(_messageFactory.ToAttachment(outputMessageTracker)));
+            }
             return Task.CompletedTask;
         }
 
