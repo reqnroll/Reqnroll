@@ -21,7 +21,7 @@ namespace Reqnroll.Specs.StepDefinitions
             _executionDriver.ExecuteTests();
         }
 
-        [When(@"I execute the tests (once|twice|\d+ times)")]
+        [When(@"I execute the tests (once|twice|\d+ times)", ExpressionType = ExpressionType.RegularExpression)]
         public void WhenIExecuteTheTestsTwice(uint times)
         {
             _executionDriver.ExecuteTestsTimes(times);
