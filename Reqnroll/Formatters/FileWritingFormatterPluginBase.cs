@@ -1,14 +1,16 @@
 ﻿#nullable enable
 
+using Io.Cucumber.Messages.Types;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.PayloadProcessing;
+using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Reqnroll.Formatters.Configuration;
-using Reqnroll.Formatters.PubSub;
-using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Utils;
 
 namespace Reqnroll.Formatters;
 
@@ -21,6 +23,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
     private readonly string _defaultFileName;
     private readonly IFileSystem _fileSystem;
     private string _outputPath;
+    protected Stream? FileStreamTarget;
 
     protected FileWritingFormatterPluginBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, logger, pluginName)
     {
@@ -28,6 +31,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
         _defaultFileName = defaultFileName;
         _fileSystem = fileSystem;
         _outputPath = String.Empty;
+        FileStreamTarget = null;
     }
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
@@ -64,7 +68,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
             {
                 _fileSystem.CreateDirectory(baseDirectory);
             }
-            catch (Exception e)
+            catch (System.Exception e)
             {
                 onInitialized(false);
                 Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {Name}. The formatter will be disabled.");
@@ -77,10 +81,53 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
     }
     protected override async Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken)
     {
-        await ConsumeAndWriteToFilesBackgroundTask(_outputPath, cancellationToken).ConfigureAwait(false);
+
+        if (FileStreamTarget == null)
+        {
+            Logger.WriteMessage($"Formatter {Name} closing because the filestream is not open.");
+            return;
+        }
+        try
+        {
+            await foreach (var message in PostedMessages.Reader.ReadAllAsync(cancellationToken))
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    Logger.WriteMessage($"Formatter {Name} has been cancelled.");
+                    Closed = true;
+                    await FileStreamTarget.FlushAsync(cancellationToken);
+                    break;
+                }
+
+                if (message != null)
+                {
+                    await WriteToFile(message, cancellationToken);                
+                }
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            Logger.WriteMessage($"Formatter {Name} has been cancelled.");
+            await OnCancellation();
+        }
+        catch (System.Exception e)
+        {
+            Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be processed.");
+            throw;
+        }
+        finally
+        {
+            Closed = true;
+            try
+            {
+                await FileStreamTarget.FlushAsync(cancellationToken);
+            }
+            catch { }
+        }
     }
+
     protected abstract void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized);
-    protected abstract Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken);
+    protected abstract Task WriteToFile(Envelope? envelope, CancellationToken cancellationToken);
 
     protected virtual string ConfiguredOutputFilePath(IDictionary<string, object> formatterConfiguration)
     {

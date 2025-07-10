@@ -99,6 +99,8 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
 
     protected abstract Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken);
 
+    protected abstract Task OnCancellation();
+
     internal async Task CloseAsync()
     {
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Close called on formatter {Name}; formatter task was launched: {_formatterTask != null}");

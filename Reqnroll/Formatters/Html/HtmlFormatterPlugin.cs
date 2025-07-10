@@ -1,6 +1,7 @@
 ﻿#nullable enable
 
 using Cucumber.HtmlFormatter;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.PubSub;
@@ -23,16 +24,15 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
     public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "html", ".html", "reqnroll_report.html", fileSystem)
     {
     }
-    private FileStream? _fileStream;
     private MessagesToHtmlWriter? _htmlWriter;
 
     protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
     {
         try
         {
-            _fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
+            FileStreamTarget = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
             _htmlWriter = new MessagesToHtmlWriter(
-                _fileStream,
+                FileStreamTarget,
                 async (sw, e) => await sw.WriteAsync(NdjsonSerializer.Serialize(e)));
             onInitialized(true);
             Logger.WriteMessage($"Formatter {Name} opened filestream.");
@@ -45,54 +45,27 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
         }
     }
 
-    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
+    protected override async Task WriteToFile(Envelope? envelope, CancellationToken cancellationToken)
     {
-        if (_fileStream == null || _htmlWriter == null)
+        if (_htmlWriter != null && envelope != null)
         {
-            Logger.WriteMessage($"Formatter {Name} closing because the filestream is not open.");
-            return;
-        }
-
-        try
-        {
-            await foreach (var message in PostedMessages.Reader.ReadAllAsync(cancellationToken))
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    Logger.WriteMessage($"Formatter {Name} has been cancelled.");
-                    Closed = true;
-                    await _fileStream.FlushAsync(cancellationToken);
-                    break;
-                }
-
-                if (message != null)
-                {
-                    await _htmlWriter.WriteAsync(message);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be added to the generated html file.");
-            throw;
-        }
-        finally
-        {
-            Closed = true;
-            Logger.WriteMessage($"Formatter {Name} has finished writing to file: {outputPath}.");
-            try
-            {
-                await _fileStream.FlushAsync(cancellationToken);
-            }
-            catch { }
+            await _htmlWriter.WriteAsync(envelope);
         }
     }
 
     public override void Dispose()
     {
         _htmlWriter?.Dispose();
-        _fileStream?.Close();
-        _fileStream?.Dispose();
+        FileStreamTarget?.Close();
+        FileStreamTarget?.Dispose();
         base.Dispose();
+    }
+
+    protected override async Task OnCancellation()
+    {
+        // Ensure that the HTML writer is disposed properly
+        _htmlWriter?.Dispose();
+        _htmlWriter = null;
+        await Task.CompletedTask;
     }
 }

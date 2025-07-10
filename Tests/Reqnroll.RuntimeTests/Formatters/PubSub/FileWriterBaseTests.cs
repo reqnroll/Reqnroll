@@ -1,6 +1,5 @@
 ﻿using FluentAssertions;
 using Io.Cucumber.Messages.Types;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Moq;
 using Reqnroll.BoDi;
 using Reqnroll.Events;
@@ -12,11 +11,8 @@ using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
 using System;
-using System.Collections;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -48,6 +44,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             public string LastOutputPath { get; private set; }
             public bool WasCancelled = false;
+            private Mock<Stream> _fileStreamMock = new Mock<Stream>(MockBehavior.Loose);
 
             public TestFileWritingFormatterPlugin(
                 IFormattersConfigurationProvider configurationProvider,
@@ -59,27 +56,24 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _messageCollector = messageCollector;
             }
 
-            protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
+            protected override async Task WriteToFile(Envelope env, CancellationToken cancellationToken)
             {
-                LastOutputPath = outputPath;
-                await foreach (var message in PostedMessages.Reader.ReadAllAsync())
-                {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        WasCancelled = true;
-                        break;
-                    }
 
-                    // Simulate writing to a file
-                    _messageCollector.Add(message);
-                }
+                // Simulate writing to a file
+                _messageCollector.Add(env);
             }
 
             protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
             {
+                LastOutputPath = outputPath;
+                FileStreamTarget = _fileStreamMock.Object;  
                 onInitialized(true);
             }
-
+            protected override async Task OnCancellation()
+            {
+                WasCancelled = true;
+                await Task.CompletedTask;
+            }
             public IFileSystem FileSystem { get; }
 
             private ICollection<Envelope> _messageCollector;

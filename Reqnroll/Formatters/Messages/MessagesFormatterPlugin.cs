@@ -6,6 +6,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.PubSub;
@@ -19,7 +20,8 @@ namespace Reqnroll.Formatters.Messages;
 /// </summary>
 public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
 {
-    FileStream? _fileStream;
+    private byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+
     public MessagesFormatterPlugin(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
     {
     }
@@ -27,7 +29,7 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposab
     {
         try
         {
-            _fileStream = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
+            FileStreamTarget = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
             onInitialized(true);
             Logger.WriteMessage($"Formatter {Name} opened filestream.");
         }
@@ -38,58 +40,24 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposab
             onInitialized(false);
         }
     }
-    protected override async Task ConsumeAndWriteToFilesBackgroundTask(string outputPath, CancellationToken cancellationToken)
+    protected override async Task WriteToFile(Envelope? envelope, CancellationToken cancellationToken)
     {
-        var newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+        if (FileStreamTarget != null)
+        {
+            await NdjsonSerializer.SerializeToStreamAsync(FileStreamTarget, envelope);
 
-        if (_fileStream == null)
-        {
-            Logger.WriteMessage($"Formatter {Name} closing because the filestream is not open.");
-            return;
-        }
-        try
-        {
-            await foreach (var message in PostedMessages.Reader.ReadAllAsync(cancellationToken))
-            {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    Logger.WriteMessage($"Formatter {Name} has been cancelled.");
-                    Closed = true;
-                    await _fileStream.FlushAsync(cancellationToken);
-                    break;
-                }
-
-                if (message != null)
-                {
-                    await NdjsonSerializer.SerializeToStreamAsync(_fileStream, message);
-
-                    // Write a newline after each message, except for the last one
-                    if (message.TestRunFinished == null)
-                        await _fileStream.WriteAsync(newLineBytes, 0, newLineBytes.Length, cancellationToken);
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be processed.");
-            throw;
-        }
-        finally
-        {
-            Closed = true;
-            try
-            {
-                await _fileStream.FlushAsync(cancellationToken);
-                _fileStream?.Close();
-            }
-            catch { }
+            // Write a newline after each message, except for the last one
+            if (envelope!.TestRunFinished == null)
+                await FileStreamTarget.WriteAsync(_newLineBytes, 0, _newLineBytes.Length, cancellationToken);
         }
     }
+
+    protected override async Task OnCancellation() { await Task.CompletedTask; }
+
     public override void Dispose()
     {
-        _fileStream?.Close();
-        _fileStream?.Dispose();
+        FileStreamTarget?.Close();
+        FileStreamTarget?.Dispose();
         base.Dispose();
     }
-
 }
