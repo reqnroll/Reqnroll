@@ -49,13 +49,13 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposab
         }
         try
         {
-            await foreach (var message in PostedMessages.Reader.ReadAllAsync())
+            await foreach (var message in PostedMessages.Reader.ReadAllAsync(cancellationToken))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
                     Logger.WriteMessage($"Formatter {Name} has been cancelled.");
                     Closed = true;
-                    await _fileStream.FlushAsync();
+                    await _fileStream.FlushAsync(cancellationToken);
                     break;
                 }
 
@@ -65,10 +65,9 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposab
 
                     // Write a newline after each message, except for the last one
                     if (message.TestRunFinished == null)
-                        await _fileStream.WriteAsync(newLineBytes, 0, newLineBytes.Length);
+                        await _fileStream.WriteAsync(newLineBytes, 0, newLineBytes.Length, cancellationToken);
                 }
             }
-            await _fileStream.FlushAsync();
         }
         catch (Exception e)
         {
@@ -77,7 +76,13 @@ public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposab
         }
         finally
         {
-            _fileStream?.Close();
+            Closed = true;
+            try
+            {
+                await _fileStream.FlushAsync(cancellationToken);
+                _fileStream?.Close();
+            }
+            catch { }
         }
     }
     public override void Dispose()

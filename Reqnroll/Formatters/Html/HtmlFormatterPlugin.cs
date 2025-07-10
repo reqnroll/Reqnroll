@@ -55,13 +55,13 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
 
         try
         {
-            await foreach (var message in PostedMessages.Reader.ReadAllAsync())
+            await foreach (var message in PostedMessages.Reader.ReadAllAsync(cancellationToken))
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
                     Logger.WriteMessage($"Formatter {Name} has been cancelled.");
                     Closed = true;
-                    await _fileStream.FlushAsync();
+                    await _fileStream.FlushAsync(cancellationToken);
                     break;
                 }
 
@@ -70,12 +70,21 @@ public class HtmlFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
                     await _htmlWriter.WriteAsync(message);
                 }
             }
-            await _fileStream.FlushAsync();
         }
         catch (Exception e)
         {
             Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be added to the generated html file.");
             throw;
+        }
+        finally
+        {
+            Closed = true;
+            Logger.WriteMessage($"Formatter {Name} has finished writing to file: {outputPath}.");
+            try
+            {
+                await _fileStream.FlushAsync(cancellationToken);
+            }
+            catch { }
         }
     }
 
