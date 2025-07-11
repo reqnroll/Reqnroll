@@ -14,15 +14,26 @@ public class TestFileManager
     private const string RootNamespace = "Reqnroll.SystemTests";
     private const string TestFileFolder = "Resources";
 
-    private string GetPrefix(string? resourceGroup = null) =>
-        resourceGroup == null ? $"{RootNamespace}.{TestFileFolder}" : $"{RootNamespace}.{resourceGroup}.{TestFileFolder}";
+    private string GetPrefix(string? assemblyName = null, string? resourceGroup = null)
+    {
+        var rootNamespace = assemblyName ?? RootNamespace;
+        if (resourceGroup == null)
+        {
+            return $"{rootNamespace}.{TestFileFolder}";
+        }
+        else
+        {
+            return $"{rootNamespace}.{resourceGroup}.{TestFileFolder}";
+        }
+    }
 
-    public string GetTestFileContent(string testFileName, string? resourceGroup = null)
+    public string GetTestFileContent(string testFileName, string? resourceGroup = null, Assembly? assemblyToLoadFrom = null)
     {
         var testFileResourceName = testFileName.Replace('/', '.');
-        var resourceName = $"{GetPrefix(resourceGroup)}.{testFileResourceName}";
-        var projectTemplateStream = Assembly
-                                    .GetExecutingAssembly()
+        var assemblyToLoad = assemblyToLoadFrom ?? Assembly.GetExecutingAssembly();
+        var assemblyName = assemblyToLoad.GetName().Name;
+        var resourceName = $"{GetPrefix(assemblyName, resourceGroup)}.{testFileResourceName}";
+        var projectTemplateStream = assemblyToLoad
                                     .GetManifestResourceStream(resourceName);
         projectTemplateStream.Should().NotBeNull($"Resource with name '{resourceName}' should be an embedded resource");
         Debug.Assert(projectTemplateStream != null);

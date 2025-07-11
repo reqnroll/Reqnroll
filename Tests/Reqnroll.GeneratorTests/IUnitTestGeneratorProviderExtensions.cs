@@ -6,6 +6,7 @@ using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
+using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {

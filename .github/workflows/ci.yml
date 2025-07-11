@@ -218,6 +218,12 @@ jobs:
         name: Specs
         if-no-files-found: error
         path: Tests/Reqnroll.Specs/bin/
+    - name: Upload Formatters Tests
+      uses: actions/upload-artifact@v4
+      with:
+        name: Formatters
+        if-no-files-found: error
+        path: Tests/Reqnroll.Formatters.Tests/bin/
 
   specs:
     runs-on: ubuntu-latest
@@ -296,6 +302,11 @@ jobs:
       with:
         name: SystemTests
         path: Tests/Reqnroll.SystemTests/bin/
+    - name: Download Formatters Tests
+      uses: actions/download-artifact@v4
+      with:
+        name: Formatters
+        path: Tests/Reqnroll.Formatters.Tests/bin/
     - name: Setup required .NET SDKs
       # It is faster to install all required .NET versions to D: drive than installing only the missing one to C: drive and use it from there.
       uses: actions/setup-dotnet@v4
@@ -311,7 +322,10 @@ jobs:
         dotnet --list-runtimes
     - name: System Tests
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
+      run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }}
+    - name: Formatters Tests
+      shell: pwsh
+      run: dotnet test ./Tests/Reqnroll.Formatters.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.Formatters.Tests.dll --logger "console;verbosity=detailed" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/Formatterstests-windows-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()
@@ -354,6 +368,11 @@ jobs:
       with:
         name: SystemTests
         path: Tests/Reqnroll.SystemTests/bin/
+    - name: Download Formatters Tests
+      uses: actions/download-artifact@v4
+      with:
+        name: Formatters
+        path: Tests/Reqnroll.Formatters.Tests/bin/
     - name: Setup required .NET SDKs
       # The default image contains .NET 8 only, but reusing it would not provide much performance benefit
       uses: actions/setup-dotnet@v4
@@ -369,7 +388,10 @@ jobs:
         dotnet --list-runtimes
     - name: System Tests
       shell: pwsh
-      run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx"  ${{ needs.build.outputs.test_params }} 
+      run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx" ${{ needs.build.outputs.test_params }}
+    - name: Formatters Tests
+      shell: pwsh
+      run: dotnet test ./Tests/Reqnroll.Formatters.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.Formatters.Tests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/Formatterstests-linux-results.trx" ${{ needs.build.outputs.test_params }} 
     - name: Upload Test Result TRX Files
       uses: actions/upload-artifact@v4
       if: always()

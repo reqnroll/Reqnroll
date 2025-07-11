@@ -12,15 +12,18 @@ namespace Reqnroll
         public BindingMatch BindingMatch { get; set; }
         public StepInstance StepInstance { get; set; }
 
+        /// <summary>
+        /// The unique identifier for the current step execution. Used internally at runtime.
+        /// </summary>
+        internal string PickleStepId { get; }
 
-        public StepInfo(StepDefinitionType stepDefinitionType, string text, Table table, string multilineText)
+        public StepInfo(StepDefinitionType stepDefinitionType, string text, Table table, string multilineText, string pickleStepId = null)
         {
             StepDefinitionType = stepDefinitionType;
             Text = text;
             Table = table;
             MultilineText = multilineText;
+            PickleStepId = pickleStepId;
         }
-
-
     }
 }
