@@ -7,6 +7,7 @@ using Xunit;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Plugins;
+using Reqnroll.Formatters;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub
 {
@@ -14,20 +15,20 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
     {
         private readonly Mock<IFormatterLog> _logMock;
         private readonly Mock<IBindingMessagesGenerator> _bindingMessageGeneratorMock;
-        private readonly Mock<ICucumberMessageSink> _sinkMock1;
-        private readonly Mock<ICucumberMessageSink> _sinkMock2;
+        private readonly Mock<ICucumberMessageFormatter> _sinkMock1;
+        private readonly Mock<ICucumberMessageFormatter> _sinkMock2;
         private readonly CucumberMessageBroker _sut;
 
         public CucumberMessageBrokerTests()
         {
             _logMock = new Mock<IFormatterLog>();
             _bindingMessageGeneratorMock = new Mock<IBindingMessagesGenerator>();
-            _sinkMock1 = new Mock<ICucumberMessageSink>();
+            _sinkMock1 = new Mock<ICucumberMessageFormatter>();
             _sinkMock1.Setup(s => s.Name).Returns("sink1");
-            _sinkMock2 = new Mock<ICucumberMessageSink>();
+            _sinkMock2 = new Mock<ICucumberMessageFormatter>();
             _sinkMock2.Setup(s => s.Name).Returns("sink2");
             // Initialize the system under test (SUT)
-            _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageSink> { { "sink1", _sinkMock1.Object}, { "sink2", _sinkMock2.Object} });
+            _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "sink1", _sinkMock1.Object}, { "sink2", _sinkMock2.Object} });
         }
 
         [Fact]
@@ -53,7 +54,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         {
             var log = new Mock<IFormatterLog>();
 
-            var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageSink>());
+            var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>());
 
             // Act
             var result = sut.IsEnabled;

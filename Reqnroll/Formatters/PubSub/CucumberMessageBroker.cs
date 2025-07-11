@@ -16,7 +16,7 @@ namespace Reqnroll.Formatters.PubSub;
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
     // This is the list of sinks registered in the container. Not all may be enabled/configured.
-    private readonly List<ICucumberMessageSink> _registeredSinks = new();
+    private readonly List<ICucumberMessageFormatter> _registeredSinks = new();
 
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
     // and the Broker can be IsEnabled.
@@ -25,10 +25,10 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
-    private readonly ConcurrentDictionary<string, ICucumberMessageSink> _activeSinks = new();
+    private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeSinks = new();
 
 
-    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageSink> containerRegisteredSinks)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredSinks)
     {
         _logger = formatterLog;
         _registeredSinks.AddRange(containerRegisteredSinks.Values);
@@ -43,7 +43,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     }
 
     // This method is called by the sinks during sink LaunchSink().
-    public void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled)
+    public void SinkInitialized(ICucumberMessageFormatter formatterSink, bool enabled)
     {
         if (enabled)
             _activeSinks.TryAdd(formatterSink.Name, formatterSink);

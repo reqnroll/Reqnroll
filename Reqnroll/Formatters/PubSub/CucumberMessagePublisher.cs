@@ -24,7 +24,7 @@ namespace Reqnroll.Formatters.PubSub;
 /// It uses the set of <see cref="IExecutionEvent"/> to track overall execution of features and steps and drive generation of messages.
 /// It uses the <see cref="IRuntimePlugin"/> interface to force the runtime to load it during startup (although it is not an external plugin per se).
 /// </summary>
-public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventListener
+public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberMessagePublisher
 {
     internal ICucumberMessageBroker _broker;
     internal IObjectContainer _globalObjectContainer;
@@ -75,7 +75,7 @@ public class CucumberMessagePublisher : IRuntimePlugin, IAsyncExecutionEventList
 
     }
 
-    public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
+    public void Initialize(RuntimePluginEvents runtimePluginEvents)
     {
         _logger.WriteMessage("DEBUG: Publisher in Initialize()");
         _broker.Initialize();

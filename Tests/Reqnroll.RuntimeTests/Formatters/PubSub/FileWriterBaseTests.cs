@@ -40,7 +40,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 hasDumped = true;
             }
         }
-        private class TestFileWritingFormatterPlugin : FileWritingFormatterPluginBase
+        private class TestFileWritingFormatterPlugin : FileWritingFormatterBase
         {
             public string LastOutputPath { get; private set; }
             public bool WasCancelled = false;

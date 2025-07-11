@@ -1,9 +1,10 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
 
-namespace Reqnroll.Formatters.PubSub;
+namespace Reqnroll.Formatters;
 
-public interface ICucumberMessageSink
+public interface ICucumberMessageFormatter
 {
     void LaunchSink(ICucumberMessageBroker broker);
     string Name { get; }

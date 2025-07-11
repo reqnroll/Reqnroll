@@ -10,5 +10,5 @@ public interface ICucumberMessageBroker
 
     void Initialize();
     Task PublishAsync(Envelope featureMessages);
-    void SinkInitialized(ICucumberMessageSink formatterSink, bool enabled);
+    void SinkInitialized(ICucumberMessageFormatter formatterSink, bool enabled);
 }

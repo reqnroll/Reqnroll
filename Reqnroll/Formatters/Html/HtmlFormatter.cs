@@ -18,10 +18,10 @@ namespace Reqnroll.Formatters.Html;
 /// <summary>
 /// Produces an HTML report file based on https://github.com/cucumber/html-formatter/ and https://github.com/cucumber/react-components.
 /// </summary>
-public class HtmlFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
+public class HtmlFormatter : FileWritingFormatterBase, IDisposable
 {
 
-    public HtmlFormatterPlugin(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "html", ".html", "reqnroll_report.html", fileSystem)
+    public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "html", ".html", "reqnroll_report.html", fileSystem)
     {
     }
     private MessagesToHtmlWriter? _htmlWriter;

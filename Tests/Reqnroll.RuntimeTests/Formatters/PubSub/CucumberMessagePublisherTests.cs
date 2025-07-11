@@ -36,8 +36,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         private readonly Mock<IBindingMessagesGenerator> _bindingMessagesGeneratorMock;
         private readonly Mock<IFormatterLog> _formatterLoggerMock;
         private readonly RuntimePluginEvents _runtimePluginEvents;
-        private readonly RuntimePluginParameters _runtimePluginParameters;
-        private readonly UnitTestProviderConfiguration _unitTestProviderConfiguration;
         private CucumberMessagePublisher _sut;
 
         public CucumberMessagePublisherTests()
@@ -52,8 +50,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _formatterLoggerMock = new Mock<IFormatterLog>();
 
             _runtimePluginEvents = new RuntimePluginEvents();
-            _runtimePluginParameters = new RuntimePluginParameters();
-            _unitTestProviderConfiguration = new UnitTestProviderConfiguration();
 
             _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, CreateObjectContainerWithBroker(true), _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object);
         }
@@ -82,7 +78,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var publisher = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, oC, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object);
 
             // Act
-            _sut.Initialize(_runtimePluginEvents, _runtimePluginParameters, _unitTestProviderConfiguration);
+            _sut.Initialize(_runtimePluginEvents);
             _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(oC);
 
             // Assert
@@ -136,7 +132,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
 
             _sut = new CucumberMessagePublisher(_brokerMock.Object, bmg, objectContainerStub, _formatterLoggerMock.Object, _idGeneratorMock.Object, msgFactory, _clockMock.Object);
-            _sut.Initialize(new RuntimePluginEvents(), null, null);
+            _sut.Initialize(new RuntimePluginEvents());
 
             // Act
             bmg.OnBindingRegistryReady(null, null);

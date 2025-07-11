@@ -18,11 +18,11 @@ namespace Reqnroll.Formatters.Messages;
 /// <summary>
 /// Produces a Cucumber Messages output (.ndjson) file.
 /// </summary>
-public class MessagesFormatterPlugin : FileWritingFormatterPluginBase, IDisposable
+public class MessagesFormatter : FileWritingFormatterBase, IDisposable
 {
     private byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-    public MessagesFormatterPlugin(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
+    public MessagesFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
     {
     }
     protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)

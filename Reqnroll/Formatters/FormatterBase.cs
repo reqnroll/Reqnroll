@@ -13,7 +13,7 @@ using Reqnroll.Formatters.RuntimeSupport;
 
 namespace Reqnroll.Formatters;
 
-public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
+public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
 {
     private Task? _formatterTask;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
@@ -31,7 +31,7 @@ public abstract class FormatterPluginBase : ICucumberMessageSink, IDisposable
 
     public string Name => _pluginName;
 
-    protected FormatterPluginBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName)
+    protected FormatterBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName)
     {
         _configurationProvider = configurationProvider;
         _logger = logger;

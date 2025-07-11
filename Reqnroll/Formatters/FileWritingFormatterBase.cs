@@ -17,7 +17,7 @@ namespace Reqnroll.Formatters;
 /// <summary>
 /// Formatter plugin base that receives Cucumber messages and let the implementor process them and generate a single output file.
 /// </summary>
-public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
+public abstract class FileWritingFormatterBase : FormatterBase
 {
     private readonly string _defaultFileType;
     private readonly string _defaultFileName;
@@ -25,7 +25,7 @@ public abstract class FileWritingFormatterPluginBase : FormatterPluginBase
     private string _outputPath;
     protected Stream? FileStreamTarget;
 
-    protected FileWritingFormatterPluginBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, logger, pluginName)
+    protected FileWritingFormatterBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName, string defaultFileType, string defaultFileName, IFileSystem fileSystem) : base(configurationProvider, logger, pluginName)
     {
         _defaultFileType = defaultFileType;
         _defaultFileName = defaultFileName;
