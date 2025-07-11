@@ -2,20 +2,17 @@
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
-using Reqnroll.BoDi;
+using Reqnroll.Events;
 using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
-using Reqnroll.Events;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Plugins;
 using Reqnroll.Time;
-using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Reqnroll.Formatters.RuntimeSupport;
-using System.Diagnostics;
 
 namespace Reqnroll.Formatters.PubSub;
 
@@ -27,12 +24,12 @@ namespace Reqnroll.Formatters.PubSub;
 public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberMessagePublisher
 {
     internal ICucumberMessageBroker _broker;
-    internal IObjectContainer _globalObjectContainer;
 
     // Started Features by name
     internal ConcurrentDictionary<FeatureInfo, IFeatureExecutionTracker> _startedFeatures = new();
     internal IBindingMessagesGenerator _bindingCaches;
     internal IClock _clock;
+    internal IMetaMessageGenerator _metaMessageGenerator;
     internal IFormatterLog _logger;
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
@@ -61,18 +58,24 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
     // StartupCompleted is set to true the first time the Publisher handles the TestRunStartedEvent. It is used as a guard against abnormal behavior from the test runner.
     internal bool _startupCompleted = false;
 
-    public CucumberMessagePublisher(ICucumberMessageBroker broker, IBindingMessagesGenerator bindingMessagesGenerator, IObjectContainer container, IFormatterLog logger, IIdGenerator idGenerator, ICucumberMessageFactory messageFactory, IClock clock)
+    public CucumberMessagePublisher(ICucumberMessageBroker broker, 
+                                    IBindingMessagesGenerator bindingMessagesGenerator, 
+                                    IFormatterLog logger, 
+                                    IIdGenerator idGenerator, 
+                                    ICucumberMessageFactory messageFactory, 
+                                    IClock clock,
+                                    IMetaMessageGenerator metaMessageGenerator
+        )
     {
         _logger = logger;
         _logger.WriteMessage("DEBUG: Formatters: Publisher in constructor.");
         _broker = broker;
         _bindingCaches = bindingMessagesGenerator;
-        _globalObjectContainer = container;
         SharedIdGenerator = idGenerator;
         _messageFactory = messageFactory;
         _testRunStartedId = SharedIdGenerator.GetNewId();
         _clock = clock;
-
+        _metaMessageGenerator = metaMessageGenerator;
     }
 
     public void Initialize(RuntimePluginEvents runtimePluginEvents)
@@ -155,7 +158,7 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         try
         {
             await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
-            await _broker.PublishAsync(Envelope.Create(_messageFactory.ToMeta(_globalObjectContainer)));
+            await _broker.PublishAsync(Envelope.Create(_metaMessageGenerator.GenerateMetaMessage()));
             _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup - published TestRunStarted");
 
             foreach (var msg in _bindingCaches.StaticBindingMessages)

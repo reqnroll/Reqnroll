@@ -2,12 +2,12 @@
 using Reqnroll.Events;
 using System.Collections.Generic;
 
-namespace Reqnroll.Formatters.ExecutionTracking;
+namespace Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
 /// <summary>
 /// This interface signifies that the implementer can generate message(s) based upon an ExecutionEvent
 /// </summary>
 public interface IGenerateMessage
 {
-    public IEnumerable<Envelope> GenerateFrom(ExecutionEvent executionEvent);
+    IEnumerable<Envelope> GenerateFrom(ExecutionEvent executionEvent);
 }

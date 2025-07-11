@@ -328,16 +328,13 @@ public class CucumberMessageFactory : ICucumberMessageFactory
         };
     }
 
-    public virtual Meta ToMeta(IObjectContainer container)
+    public virtual Meta ToMeta(string reqnrollVersion, string netCoreVersion, string osPlatform, BuildMetadata buildMetaData)
     {
-        var environmentInfoProvider = container.Resolve<IEnvironmentInfoProvider>();
-        var environmentWrapper = container.Resolve<IEnvironmentWrapper>();
-
-        var implementation = new Product("Reqnroll", environmentInfoProvider.GetReqnrollVersion());
-        string targetFramework = environmentInfoProvider.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
+        var implementation = new Product("Reqnroll", reqnrollVersion);
+        string targetFramework = netCoreVersion ?? RuntimeInformation.FrameworkDescription;
 
         var runTime = new Product("dotNet", targetFramework);
-        var os = new Product(environmentInfoProvider.GetOSPlatform(), RuntimeInformation.OSDescription);
+        var os = new Product(osPlatform, RuntimeInformation.OSDescription);
 
         var cpu = RuntimeInformation.ProcessArchitecture switch
         {
@@ -348,7 +345,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             _ => new Product("unknown", null),
         };
 
-        var ci = ToCi(environmentInfoProvider, environmentWrapper);
+        var ci = ToCi(buildMetaData);
 
         return new Meta(
             ProtocolVersion.Version.Split('+')[0],
@@ -359,33 +356,29 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             ci);
     }
 
-    private static Ci ToCi(IEnvironmentInfoProvider environmentInfoProvider, IEnvironmentWrapper environmentWrapper)
+    private static Ci ToCi(BuildMetadata buildMetadata)
     {
-        //TODO: Find a way to abstract how various CI systems convey links to builds and build numbers.
-        //      Until then, these will be hard coded as null
-        var ciName = environmentInfoProvider.GetBuildServerName();
+        var ciName = buildMetadata.ProductName;
         if (string.IsNullOrEmpty(ciName)) return null;
 
-        var git = ToGit(environmentWrapper);
+        var git = ToGit(buildMetadata);
 
-        return new Ci(ciName, null, null, git);
+        return new Ci(ciName, buildMetadata.BuildUrl, buildMetadata.BuildNumber, git);
     }
 
-    private static Git ToGit(IEnvironmentWrapper environmentWrapper)
+    private static Git ToGit(BuildMetadata buildMetadata)
     {
         Git git;
-        var gitUrl = environmentWrapper.GetEnvironmentVariable("GIT_URL");
-        var gitBranch = environmentWrapper.GetEnvironmentVariable("GIT_BRANCH");
-        var gitCommit = environmentWrapper.GetEnvironmentVariable("GIT_COMMIT");
-        var gitTag = environmentWrapper.GetEnvironmentVariable("GIT_TAG");
-        if (gitUrl is not ISuccess<string> gitUrlSuccess) git = null;
-        else
-            git = new Git
+        var gitUrl = buildMetadata.Remote;
+        var gitBranch = buildMetadata.Branch;
+        var gitCommit = buildMetadata.Revision;
+        var gitTag = buildMetadata.Tag;
+        git = new Git
             (
-                gitUrlSuccess.Result,
-                gitBranch is ISuccess<string> branchSuccess ? branchSuccess.Result : null,
-                gitCommit is ISuccess<string> commitSuccess ? commitSuccess.Result : null,
-                gitTag is ISuccess<string> tagSuccess ? tagSuccess.Result : null
+                gitUrl,
+                gitBranch,
+                gitCommit,
+                gitTag  
             );
         return git;
     }

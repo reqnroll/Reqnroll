@@ -2,6 +2,7 @@ using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.BoDi;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.ExecutionTracking;
 using System;
 
@@ -42,7 +43,7 @@ public interface ICucumberMessageFactory
     Attachment ToAttachment(OutputMessageTracker tracker);
     
     // Metadata methods
-    Meta ToMeta(IObjectContainer container);
+    Meta ToMeta(string reqnrollVersion, string netCoreVersion, string osPlatform, BuildMetadata buildMetaData);
     
     // Utility methods
     string CanonicalizeStepDefinitionPattern(IStepDefinitionBinding stepDefinition);

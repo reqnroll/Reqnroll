@@ -124,6 +124,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
             container.RegisterTypeAs<CucumberMessageFactory, ICucumberMessageFactory>();
             container.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
+            container.RegisterTypeAs<MetaMessageGenerator, IMetaMessageGenerator>();
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
