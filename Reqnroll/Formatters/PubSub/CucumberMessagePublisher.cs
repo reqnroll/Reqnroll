@@ -58,11 +58,11 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
     // StartupCompleted is set to true the first time the Publisher handles the TestRunStartedEvent. It is used as a guard against abnormal behavior from the test runner.
     internal bool _startupCompleted = false;
 
-    public CucumberMessagePublisher(ICucumberMessageBroker broker, 
-                                    IBindingMessagesGenerator bindingMessagesGenerator, 
-                                    IFormatterLog logger, 
-                                    IIdGenerator idGenerator, 
-                                    ICucumberMessageFactory messageFactory, 
+    public CucumberMessagePublisher(ICucumberMessageBroker broker,
+                                    IBindingMessagesGenerator bindingMessagesGenerator,
+                                    IFormatterLog logger,
+                                    IIdGenerator idGenerator,
+                                    ICucumberMessageFactory messageFactory,
                                     IClock clock,
                                     IMetaMessageGenerator metaMessageGenerator
         )
@@ -188,6 +188,13 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         if (!_enabled)
             return;
 
+        foreach (var featureTracker in _startedFeatures.Values)
+        {
+            _messages.AddRange(featureTracker.RuntimeGeneratedMessages);
+
+            if (!featureTracker.FeatureExecutionSuccess)
+                _allFeaturesPassed = false;
+        }
         // publish all TestCase messages
         var testCaseMessages = _messages.Where(e => e.Content() is TestCase).ToList();
         // sort the remaining Messages by timestamp
@@ -208,10 +215,6 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
 
         await _broker.PublishAsync(Envelope.Create(_messageFactory.ToTestRunFinished(_allFeaturesPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
         _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: TestRunFinished Message written");
-
-        // By the time PublisherTestRunComplete is called, all Features should have completed and been removed from the _startedFeatures collection.
-        if (_startedFeatures.Count > 0)
-            throw new InvalidOperationException($"PublisherTestRunComplete invoked before all Features have been completed. Count of remaining: {_startedFeatures.Count}");
     }
 
     #region TestThreadExecutionEventPublisher Event Handling Methods
@@ -269,14 +272,12 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
             return Task.CompletedTask;
         }
         var featureTracker = _startedFeatures[featureInfo];
+
+        // The following will compute the overall execution status of the feature.
+        // Message generation is deferred until the TestRunFinishedEvent is published (see PublisherTestRunCompleteAsync).
+        // This allows for multiple features to be processed in parallel; we can't tell which of these FeatureFinishedEvents is the final one.
+
         featureTracker.ProcessEvent(featureFinishedEvent);
-        foreach (var msg in featureTracker.RuntimeGeneratedMessages)
-        {
-            _messages.Add(msg);
-        }
-        if (!featureTracker.FeatureExecutionSuccess)
-            _allFeaturesPassed = false;
-        _startedFeatures.TryRemove(featureInfo, out _);
         return Task.CompletedTask;
         // throw an exception if any of the TestCaseExecutionTrackers are not done?
     }

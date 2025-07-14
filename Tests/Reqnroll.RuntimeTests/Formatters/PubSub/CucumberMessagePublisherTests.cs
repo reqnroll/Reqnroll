@@ -193,6 +193,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
             _sut._allFeaturesPassed.Should().BeTrue();
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
+            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
             _sut._allFeaturesPassed.Should().BeTrue();
@@ -200,7 +201,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
         // PublisherTestRunComplete calculates test run status as Failed when any started feature is are Failed
         [Fact]
-        public async Task PublisherFeatureFinished_Should_CalculateStatusWhenAFeatureFails()
+        public async Task PublisherTestRunComplete_Should_CalculateStatusWhenAFeatureFails()
         {
             // Arrange
             var feature1TrackerMock = new Mock<IFeatureExecutionTracker>();
@@ -225,6 +226,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
             _sut._allFeaturesPassed.Should().BeTrue();
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
+            await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
             _sut._allFeaturesPassed.Should().BeFalse();
@@ -361,7 +363,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
         // FeatureFinishedEvent delegates to the FeatureExecutionTracker and pulls Execution messages to the Messages collection
         [Fact]
-        public async Task FeatureFinished_Should_GatherExecutionMessagestotheMessagesCollection()
+        public async Task TestRunFinished_Should_GatherExecutionMessagestotheMessagesCollection()
         {
             // Arrange
             var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
@@ -375,14 +377,13 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             featureTrackerMock.Setup(ft => ft.RuntimeGeneratedMessages).Returns(fakeMessages);
             featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
-            var featureFinishedEvent = new FeatureFinishedEvent(featureContextMock.Object);
             _sut._messageFactory = new CucumberMessageFactory();
 
             _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
             _sut._enabled = true;
 
             // Act
-            await _sut.OnEventAsync(featureFinishedEvent);
+            await _sut.OnEventAsync(new TestRunFinishedEvent());
 
             // Assert
             _sut._messages.Should().Contain(fakeMessages);
