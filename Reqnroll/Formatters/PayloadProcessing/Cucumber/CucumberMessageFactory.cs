@@ -362,14 +362,16 @@ public class CucumberMessageFactory : ICucumberMessageFactory
         if (string.IsNullOrEmpty(ciName)) return null;
 
         var git = ToGit(buildMetadata);
+        var buildUrl = buildMetadata.BuildUrl == "UNKNOWN" ? "" : buildMetadata.BuildUrl;
 
-        return new Ci(ciName, buildMetadata.BuildUrl, buildMetadata.BuildNumber, git);
+        return new Ci(ciName, buildUrl, buildMetadata.BuildNumber, git);
     }
 
     private static Git ToGit(BuildMetadata buildMetadata)
     {
         Git git;
-        var gitUrl = buildMetadata.Remote;
+        // If the remote is UNKNOWN, we can't create a real Git object. Returning UNKNOWN will cause the HtmlFormatter to fail.
+        var gitUrl = buildMetadata.Remote == "UNKNOWN" ? "" : buildMetadata.Remote;
         var gitBranch = buildMetadata.Branch;
         var gitCommit = buildMetadata.Revision;
         var gitTag = buildMetadata.Tag;
