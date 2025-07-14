@@ -1,4 +1,5 @@
-﻿using Io.Cucumber.Messages.Types;
+﻿using Gherkin.Specs.Helper;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using System;
 using System.IO;
@@ -17,13 +18,7 @@ public class NdjsonSerializer
     {
         var options = new JsonSerializerOptions();
         options.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        options.Converters.Add(new CucumberMessageEnumConverter<AttachmentContentEncoding>());
-        options.Converters.Add(new CucumberMessageEnumConverter<PickleStepType>());
-        options.Converters.Add(new CucumberMessageEnumConverter<SourceMediaType>());
-        options.Converters.Add(new CucumberMessageEnumConverter<StepDefinitionPatternType>());
-        options.Converters.Add(new CucumberMessageEnumConverter<StepKeywordType>());
-        options.Converters.Add(new CucumberMessageEnumConverter<TestStepResultStatus>());
-        options.Converters.Add(new CucumberMessageEnumConverter<HookType>());
+        options.Converters.Add(new CucumberMessagesEnumConverterFactory());
         options.DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull;
         options.Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping;
 
