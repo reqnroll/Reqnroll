@@ -92,8 +92,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         if (message.Content() is TestRunFinished)
         {
             _logger.WriteMessage($"DEBUG: Formatters.Plugin {Name} has recieved the TestRunFinished message and is calling CloseAsync");
-            // using ConfigureAwait(false) per guidance here: https://learn.microsoft.com/en-us/dotnet/fundamentals/code-analysis/quality-rules/ca2007
-            await CloseAsync().ConfigureAwait(false);
+            await CloseAsync();
         }
     }
 
@@ -111,7 +110,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         PostedMessages.Writer.Complete();
 
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} has signaled the Channel is closed. Awaiting the writing task.");
-        await _formatterTask!.ConfigureAwait(false);
+        await _formatterTask!;
         Logger.WriteMessage($"DEBUG: Formatters:PluginBase {Name} - The formatterTask is now completed.");
 
         if (!PostedMessages.Reader.Completion.IsCompleted)
