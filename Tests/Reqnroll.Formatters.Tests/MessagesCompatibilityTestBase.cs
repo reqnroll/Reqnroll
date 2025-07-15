@@ -85,6 +85,17 @@ namespace Reqnroll.Formatters.Tests
             Environment.SetEnvironmentVariable("GITHUB_REF_NAME", "main");
             Environment.SetEnvironmentVariable("GITHUB_SHA", "abcdef1234567890abcdef1234567890abcdef12");
         }
+
+        protected void MimicAzurePipelinesEnvironment()
+        {
+            Environment.SetEnvironmentVariable("TF_BUILD", "true");
+            Environment.SetEnvironmentVariable("BUILD_BUILDURI", "https://dev.azure.com/reqnroll/reqnroll/_build");
+            Environment.SetEnvironmentVariable("BUILD_BUILDNUMBER", "20231001.1");
+            Environment.SetEnvironmentVariable("BUILD_REPOSITORY_URI", "https://dev.azure.com/reqnroll/reqnroll/_git/reqnroll");
+            Environment.SetEnvironmentVariable("BUILD_SOURCEBRANCHNAME", "1b1c2588e46d5c995d54da1082b618fa13553eb3");
+            Environment.SetEnvironmentVariable("BUILD_SOURCEVERSION", "main");
+            Environment.SetEnvironmentVariable("Build_SOURCEBRANCH", "refs/tags/v1.0.0");
+        }
         protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
         {
             var directory = ActualsResultLocationDirectory();

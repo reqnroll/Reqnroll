@@ -372,13 +372,13 @@ public class CucumberMessageFactory : ICucumberMessageFactory
         Git git;
         // If the remote is UNKNOWN, we can't create a real Git object. Returning UNKNOWN will cause the HtmlFormatter to fail.
         var gitUrl = buildMetadata.Remote == "UNKNOWN" ? "" : buildMetadata.Remote;
+        var gitRevision = buildMetadata.Revision;
         var gitBranch = buildMetadata.Branch;
-        var gitCommit = buildMetadata.Revision;
         var gitTag = buildMetadata.Tag;
         git = new Git
             (
                 gitUrl,
-                gitCommit,
+                gitRevision,
                 gitBranch,
                 gitTag  
             );
