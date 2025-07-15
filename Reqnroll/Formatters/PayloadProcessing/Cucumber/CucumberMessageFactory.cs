@@ -378,8 +378,8 @@ public class CucumberMessageFactory : ICucumberMessageFactory
         git = new Git
             (
                 gitUrl,
-                gitBranch,
                 gitCommit,
+                gitBranch,
                 gitTag  
             );
         return git;
