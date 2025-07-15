@@ -34,6 +34,7 @@ namespace Reqnroll.Formatters.Tests
             SetCucumberMessagesOutputFileName(featureNameText);
 
             CucumberMessagesAddConfigurationFile("reqnroll_withBothFormatters.json");
+            MimicGitHubActionsEnvironment();
             AddUtilClassWithFileSystemPath();
 
             var featureFileName = testName.Replace("-", "_");

@@ -74,6 +74,17 @@ namespace Reqnroll.Formatters.Tests
             Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE, null);
         }
 
+        protected void MimicGitHubActionsEnvironment()
+        {
+            Environment.SetEnvironmentVariable("GITHUB_ACTIONS", "true");
+            Environment.SetEnvironmentVariable("GITHUB_SERVER_URL", "https://github.com");
+            Environment.SetEnvironmentVariable("GITHUB_REPOSITORY", "reqnroll/reqnroll");
+            Environment.SetEnvironmentVariable("GITHUB_RUN_ID", "1234567890");
+            Environment.SetEnvironmentVariable("GITHUB_RUN_NUMBER", "1");
+            Environment.SetEnvironmentVariable("GITHUB_REF_TYPE", "branch");
+            Environment.SetEnvironmentVariable("GITHUB_REF_NAME", "main");
+            Environment.SetEnvironmentVariable("GITHUB_SHA", "abcdef1234567890abcdef1234567890abcdef12");
+        }
         protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
         {
             var directory = ActualsResultLocationDirectory();
