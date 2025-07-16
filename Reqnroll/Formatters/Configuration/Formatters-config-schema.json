@@ -1,0 +1,11 @@
+﻿{
+    "description": "Configures a Reqnroll formatter",
+    "properties": {
+        "Enabled": {
+            "type": "boolean"
+        },
+        "OutputFilePath": {
+            "type": "string"
+        }
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,6 +22,7 @@ public abstract class SystemTestBase
     protected ExecutionDriver _executionDriver = null!;
     protected VSTestExecutionDriver _vsTestExecutionDriver = null!;
     protected ConfigurationFileDriver _configurationFileDriver = null!;
+    protected TestSuiteInitializationDriver _testSuiteInitializationDriver = null!;
     protected TestFileManager _testFileManager = new();
     protected FolderCleaner _folderCleaner = null!;
     protected IServiceProvider _testContainer = null!;
@@ -29,6 +31,7 @@ public abstract class SystemTestBase
     protected CompilationDriver _compilationDriver = null!;
     protected BindingsDriver _bindingDriver = null!;
     protected TestProjectFolders _testProjectFolders = null!;
+    protected JsonConfigurationLoaderDriver _jsonConfigurationLoaderDriver = null!;
 
     protected int _preparedTests = 0;
 
@@ -91,7 +94,9 @@ public abstract class SystemTestBase
         _compilationDriver = GetServiceSafe<CompilationDriver>();
         _testProjectFolders = GetServiceSafe<TestProjectFolders>();
         _bindingDriver = GetServiceSafe<BindingsDriver>();
+        _jsonConfigurationLoaderDriver = GetServiceSafe<JsonConfigurationLoaderDriver>();
         _configurationFileDriver = GetServiceSafe<ConfigurationFileDriver>();
+        _testSuiteInitializationDriver = GetServiceSafe<TestSuiteInitializationDriver>();
     }
 
 
@@ -107,9 +112,9 @@ public abstract class SystemTestBase
             _folderCleaner.CleanSolutionFolder();
     }
 
-    protected void AddFeatureFileFromResource(string fileName, int? preparedTests = null, string? resourceGroup = null)
+    protected void AddFeatureFileFromResource(string fileName, string? resourceGroup = null, Assembly? assembly = null, int? preparedTests = null)
     {
-        var featureFileContent = _testFileManager.GetTestFileContent(fileName, resourceGroup);
+        var featureFileContent = _testFileManager.GetTestFileContent(fileName, resourceGroup, assembly);
         AddFeatureFile(featureFileContent, preparedTests);
     }
 
@@ -272,5 +277,10 @@ public abstract class SystemTestBase
     protected void AddBindingClass(string content)
     {
         _projectsDriver.AddBindingClass(content);
+    }
+
+    protected void AddJsonConfigFileContent(string reqnrollConfigContent)
+    {
+        _jsonConfigurationLoaderDriver.AddReqnrollJson(reqnrollConfigContent);
     }
 }

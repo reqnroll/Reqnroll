@@ -20,5 +20,7 @@ namespace Reqnroll.Generator.Generation
         public const string SCENARIO_ARGUMENTS_VARIABLE_NAME = "argumentsOfScenario";
         public const string RULE_TAGS_VARIABLE_NAME = "tagsOfRule";
         public const string FEATURE_TAGS_VARIABLE_NAME = "featureTags";
+        public const string PICKLEINDEX_PARAMETER_NAME = "__pickleIndex";
+        public const string PICKLEINDEX_VARIABLE_NAME = "pickleIndex";
     }
 }

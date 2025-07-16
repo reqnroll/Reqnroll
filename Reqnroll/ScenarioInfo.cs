@@ -1,3 +1,4 @@
+using Reqnroll.Formatters.RuntimeSupport;
 using System;
 using System.Collections.Specialized;
 using System.Linq;
@@ -36,13 +37,32 @@ namespace Reqnroll
         /// </summary>
         public string Description { get; }
 
-        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null)
+        /// <summary>
+        /// The PickleIdIndex of the test scenario when exported as a Cucumber Messages "pickle". Used internally.
+        /// The index is the sequential number of the pickle in the list of pickles generated from the feature file.
+        /// The index is "replaced" by real unique identifiers (<see cref="PickleId"/>) during <see cref="Events.ScenarioStartedEvent"/> event.
+        /// </summary>
+        internal string PickleIdIndex { get; }
+
+        /// <summary>
+        /// The list of step PickleIds in the step sequence for this test. Used internally at runtime.
+        /// </summary>
+        internal PickleStepSequence PickleStepSequence { get; set; }
+
+        /// <summary>
+        /// This holds the unique identifier for the test ("pickle") represented by this scenario info. Used internally at runtime.
+        /// </summary>
+        internal string PickleId { get; set; }
+
+
+        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleIndex = null)
         {
             Title = title;
             Description = description;
             Tags = tags ?? Array.Empty<string>();
             Arguments = arguments;
             CombinedTags = Tags.Concat(inheritedTags ?? Array.Empty<string>()).ToArray();
+            PickleIdIndex = pickleIndex;
         }
     }
 }

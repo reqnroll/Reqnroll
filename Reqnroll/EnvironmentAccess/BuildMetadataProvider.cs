@@ -137,7 +137,7 @@ namespace Reqnroll.EnvironmentAccess
                 ? $"{serverUrl}/{repo}/actions/runs/{runId}"
                 : null;
             string buildNumber = GetVariable("GITHUB_RUN_NUMBER");
-            string remote = !string.IsNullOrEmpty(serverUrl) && !string.IsNullOrEmpty(repo) ? $"{serverUrl}/{repo}.git" : null;
+            string remote = !string.IsNullOrEmpty(serverUrl) && !string.IsNullOrEmpty(repo) ? $"{serverUrl}/{repo}.git" : "";
             string revision = GetVariable("GITHUB_SHA");
             string branch = refType == "branch" ? refName : null;
             string tag = refType == "tag" ? refName : null;
