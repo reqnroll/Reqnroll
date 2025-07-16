@@ -21,8 +21,8 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
 {
     // Static Messages are those generated during code generation (Source, GherkinDocument & Pickles)
     // and the StepTransformations, StepDefinitions and Hook messages which are global to the entire Solution.
-    private readonly Lazy<IEnumerable<Envelope>> _staticMessages;
-    public IEnumerable<Envelope> StaticMessages => _staticMessages.Value;
+    private readonly Lazy<IEnumerable<Envelope>> _staticMessagesFactory;
+    public IEnumerable<Envelope> StaticMessages => _staticMessagesFactory.Value;
 
     private PickleJar _pickleJar;
 
@@ -58,7 +58,8 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null; ;
         featureHasCucumberMessages = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles() != null;
         Enabled = featureHasCucumberMessages;
-        _staticMessages = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
+        _staticMessagesFactory = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
+        _ = _staticMessagesFactory.Value;
 
         var clock = featureStartedEvent.FeatureContext.FeatureContainer.Resolve<IClock>(); //TODO: better retrieval of IClock
         PickleExecutionTrackerFactory = (ft, pickleId) =>

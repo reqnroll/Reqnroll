@@ -185,8 +185,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var f2Context = new Mock<IFeatureContext>();
             f2Context.Setup(x => x.FeatureInfo).Returns(f2);
 
-            _sut._startedFeatures.TryAdd(f1, feature1TrackerMock.Object);
-            _sut._startedFeatures.TryAdd(f2, feature2TrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature1TrackerMock.Object)));
+            _sut._startedFeatures.TryAdd(f2, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature2TrackerMock.Object)));
             _sut._enabled = true;
 
             // Act
@@ -218,8 +218,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var f2Context = new Mock<IFeatureContext>();
             f2Context.Setup(x => x.FeatureInfo).Returns(f2);
 
-            _sut._startedFeatures.TryAdd(f1, feature1TrackerMock.Object);
-            _sut._startedFeatures.TryAdd(f2, feature2TrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature1TrackerMock.Object)));
+            _sut._startedFeatures.TryAdd(f2, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature2TrackerMock.Object)));
             _sut._enabled = true;
 
             // Act
@@ -260,7 +260,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                     return Task.CompletedTask;
                 });
 
-            _sut._startedFeatures.TryAdd(f1, featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
             _sut._enabled = true;
             _sut._messages = messages;
 
@@ -299,7 +299,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
 
             var existingFeatureTrackerMock = new Mock<IFeatureExecutionTracker>();
-            _sut._startedFeatures.TryAdd(featureInfoStub, existingFeatureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => existingFeatureTrackerMock.Object)));
             _sut._enabled = true;
             _sut._startupCompleted = true;
 
@@ -379,7 +379,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
             _sut._messageFactory = new CucumberMessageFactory();
 
-            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
             _sut._enabled = true;
 
             // Act
@@ -423,7 +423,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             };
 
             _sut._messageFactory = new CucumberMessageFactory();
-            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
             _sut._enabled = true;
 
             // Act 
@@ -601,7 +601,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _ => throw new NotImplementedException()
             };
 
-            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
 
@@ -639,7 +639,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             var evnt = (IExecutionEvent)Activator.CreateInstance(eventType, "", featureInfoStub, scenarioInfoStub);
 
-            _sut._startedFeatures.TryAdd(featureInfoStub, featureTrackerMock.Object);
+            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
             _sut._enabled = true;
             _sut._messageFactory = new CucumberMessageFactory();
 
