@@ -25,6 +25,7 @@
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
+* Fix: Hook methods in a class hierarchy are mistakenly treated as distinct from each class of the hierarchy and fired multiple times (#676)
 
 *Contributors of this release (in alphabetical order):*  @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
