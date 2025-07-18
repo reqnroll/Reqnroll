@@ -351,7 +351,7 @@ namespace Reqnroll.Infrastructure
             // The InvokeHook uses only the Method anyway...
             // The only problem could be if the same method is decorated with hook attributes using different order,
             // but in this case it is anyway impossible to tell the right ordering.
-            var uniqueMatchingHooks = matchingHooks.GroupBy(hookBinding => hookBinding.Method).Select(g => g.First());
+            var uniqueMatchingHooks = matchingHooks.GroupBy(hookBinding => hookBinding.Method, new BindingMethodEqualityComparer()).Select(g => g.First());
             Exception hookException = null;
             try
             {
