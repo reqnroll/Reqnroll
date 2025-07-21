@@ -39,9 +39,16 @@ internal class PatchMissingLocationElementsTransformation : ScenarioTransformati
     {
         if (scenarioOutline.Examples == null || !scenarioOutline.Examples.Any())
             return null;
-
         var exampleTables = scenarioOutline.Examples;
-        var transformedExamples = exampleTables.Select(PatchExamplesLocations).ToArray();
+
+        // Patch the location of the examples
+        // When the examples are provided by the External Data plugin, they are not provided with a location.
+        // We will use the location of the Examples table header, if it exists, or the location of the last step in the scenario outline (plus one).
+        var lastExampleLocation = exampleTables.FirstOrDefault()?.TableHeader?.Location;
+        var lastStepLocation = scenarioOutline.Steps.LastOrDefault()?.Location;
+        var defaultLocation = lastExampleLocation != null && lastExampleLocation.Value.Line > 0 ? lastExampleLocation : new Location((int)lastStepLocation?.Line + 1);
+
+        var transformedExamples = exampleTables.Select(ext => PatchExamplesLocations(ext, defaultLocation)).ToArray();
 
         return new ScenarioOutline(
             scenarioOutline.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(),
@@ -53,16 +60,20 @@ internal class PatchMissingLocationElementsTransformation : ScenarioTransformati
             transformedExamples);
     }
 
-    private Examples PatchExamplesLocations(Examples e)
+    private Examples PatchExamplesLocations(Examples e, Location? defaultLocation)
     {
         var headerCells = e.TableHeader.Cells;
-        var tableHeader = new TableRow(PatchLocation(e.TableHeader.Location), headerCells.Select(hc => new TableCell(PatchLocation(hc.Location), hc.Value)).ToArray());
-        var rows = e.TableBody.Select(r => new TableRow(PatchLocation(r.Location), r.Cells.Select(c => new TableCell(PatchLocation(c.Location), c.Value)).ToArray())).ToArray();
-        return new Examples(e.Tags.Select(t => new Tag(PatchLocation(t.Location), t.Name)).ToArray(), PatchLocation(e.Location), e.Keyword, e.Name, e.Description, tableHeader, rows);
+        var tableHeader = new TableRow(PatchLocation(e.TableHeader.Location, defaultLocation), headerCells.Select(hc => new TableCell(PatchLocation(hc.Location, defaultLocation), hc.Value)).ToArray());
+        var rows = e.TableBody.Select(r => new TableRow(PatchLocation(r.Location, defaultLocation), r.Cells.Select(c => new TableCell(PatchLocation(c.Location, defaultLocation), c.Value)).ToArray())).ToArray();
+        return new Examples(e.Tags.Select(t => new Tag(PatchLocation(t.Location, defaultLocation), t.Name)).ToArray(), PatchLocation(e.Location, defaultLocation), e.Keyword, e.Name, e.Description, tableHeader, rows);
     }
 
-    private static Location PatchLocation(Location? l)
+    private static Location PatchLocation(Location? l, Location? defaultLocation = null)
     {
-        return l ?? new Location(0, 0);
+        if (l == null  &&  defaultLocation == null)
+            return new Location(0, 0);
+        if (l == null || l?.Line == 0)
+            return defaultLocation ?? new Location(0, 0);
+        return (Location)l;
     }
 }
