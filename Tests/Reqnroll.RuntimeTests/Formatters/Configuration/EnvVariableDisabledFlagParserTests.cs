@@ -6,12 +6,12 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.Configuration
 {
-    public class EnvVariableEnableFlagParserTests
+    public class EnvVariableDisabledFlagParserTests
     {
         private readonly Mock<IEnvironmentWrapper> _environmentWrapperMock;
         private readonly FormattersDisabledOverrideProvider _sut;
 
-        public EnvVariableEnableFlagParserTests()
+        public EnvVariableDisabledFlagParserTests()
         {
             _environmentWrapperMock = new Mock<IEnvironmentWrapper>();
             _sut = new FormattersDisabledOverrideProvider(_environmentWrapperMock.Object);

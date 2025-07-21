@@ -18,9 +18,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     private readonly IList<IFormattersConfigurationResolverBase> _resolvers;
     private readonly Lazy<FormattersConfiguration> _resolvedConfiguration;
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
-    private bool _runtimeEnablementOverrideFlag = true;
-
-    public bool Enabled => _runtimeEnablementOverrideFlag && _resolvedConfiguration.Value.Enabled;
+    public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
     public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
