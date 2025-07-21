@@ -3,7 +3,6 @@ using Reqnroll.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Reqnroll.Formatters.Configuration;
@@ -31,7 +30,7 @@ public class FileBasedConfigurationResolver : FormattersConfigurationResolverBas
     {
         try
         {
-            string fileName = null;
+            string fileName;
             try
             {
                 fileName = _configFileLocator.GetReqnrollJsonFilePath();

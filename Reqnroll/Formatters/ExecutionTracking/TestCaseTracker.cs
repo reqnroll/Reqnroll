@@ -1,7 +1,6 @@
 ﻿using Reqnroll.Events;
 using System.Collections.Generic;
 using System.Linq;
-using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Bindings;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
@@ -11,7 +10,7 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// so it captures for every step and hook the related step definitions.
 /// The test case needs to be built upon the first execution attempt of a pickle.
 /// </summary>
-public class TestCaseTracker(string testCaseId, string pickleId, IPickleExecutionTracker parentTracker, ICucumberMessageFactory messageFactory)
+public class TestCaseTracker(string testCaseId, string pickleId, IPickleExecutionTracker parentTracker)
 {
     public IPickleExecutionTracker ParentTracker { get; } = parentTracker;
     public string PickleId { get; } = pickleId;
@@ -48,7 +47,7 @@ public class TestCaseTracker(string testCaseId, string pickleId, IPickleExecutio
         var hookId = ParentTracker.StepDefinitionsByBinding[hookBindingStartedEvent.HookBinding];
 
         var testStepId = ParentTracker.IdGenerator.GetNewId();
-        var hookStepTracker = new HookStepTracker(testStepId, hookId, this, messageFactory);
+        var hookStepTracker = new HookStepTracker(testStepId, hookId);
         Steps.Add(hookStepTracker);
     }
 }

@@ -25,7 +25,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         {
             _messageFactoryMock = new Mock<ICucumberMessageFactory>();
             _pickleExecutionTrackerMock = new Mock<IPickleExecutionTracker>();
-            _testCaseTrackerStub = new TestCaseTracker("testCaseId", "testCasePickleId", _pickleExecutionTrackerMock.Object, _messageFactoryMock.Object);
+            _testCaseTrackerStub = new TestCaseTracker("testCaseId", "testCasePickleId", _pickleExecutionTrackerMock.Object);
             _testCaseExecutionTrackerStub = CreateTestCaseExecutionRecord();
 
             _pickleExecutionTrackerMock.SetupGet(t => t.TestCaseTracker).Returns(_testCaseTrackerStub);
@@ -101,7 +101,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             var stepStartedEvent = new StepStartedEvent(null, null, stepContextMock.Object);
             
-            var testCaseDefinitionStub = new TestCaseTracker("testCaseId", "pickleId", _pickleExecutionTrackerMock.Object, _messageFactoryMock.Object);
+            var testCaseDefinitionStub = new TestCaseTracker("testCaseId", "pickleId", _pickleExecutionTrackerMock.Object);
             var idGenerator = new Mock<IIdGenerator>();
             idGenerator.Setup(g => g.GetNewId()).Returns("newStepId");
 
@@ -127,7 +127,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
 
             var stepStartedEvent = new StepStartedEvent(null, null, stepContextMock.Object);
             
-            var testCaseDefinitionStub = new TestCaseTracker("testCaseId", "pickleId", _pickleExecutionTrackerMock.Object, _messageFactoryMock.Object);
+            var testCaseDefinitionStub = new TestCaseTracker("testCaseId", "pickleId", _pickleExecutionTrackerMock.Object);
             var existingDefinition = new TestStepTracker("existingId", pickleStepId, testCaseDefinitionStub);
 
             testCaseDefinitionStub.Steps.Add(existingDefinition);

@@ -8,7 +8,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Time;
-using Reqnroll.Bindings.Reflection;
 using Reqnroll.Bindings;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
@@ -55,7 +54,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         StepDefinitionsByBinding = stepDefinitionIdsByMethod;
         IdGenerator = idGenerator;
         FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-        var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null; ;
+        var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null;
         featureHasCucumberMessages = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles() != null;
         Enabled = featureHasCucumberMessages;
         _staticMessagesFactory = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
@@ -139,7 +138,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
 
             // Fetch the PickleStepSequence for this Pickle and give to the ScenarioInfo
             var pickleStepSequence = _pickleJar.PickleStepSequenceFor(pickleIndex);
-            scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence; ;
+            scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence;
 
             // Get: This represents a re-execution of the TestCase
             // Add: This is the first time this TestCase (aka, pickle) is getting executed. New up a PickleExecutionTracker for it.

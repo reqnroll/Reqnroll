@@ -3,7 +3,6 @@ using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.Events;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 
 namespace Reqnroll.Formatters.ExecutionTracking;

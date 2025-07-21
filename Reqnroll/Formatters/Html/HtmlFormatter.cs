@@ -4,7 +4,6 @@ using Cucumber.HtmlFormatter;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
-using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
@@ -18,13 +17,13 @@ namespace Reqnroll.Formatters.Html;
 /// <summary>
 /// Produces an HTML report file based on https://github.com/cucumber/html-formatter/ and https://github.com/cucumber/react-components.
 /// </summary>
-public class HtmlFormatter : FileWritingFormatterBase, IDisposable
+public class HtmlFormatter : FileWritingFormatterBase
 {
+    private MessagesToHtmlWriter? _htmlWriter;
 
     public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "html", ".html", "reqnroll_report.html", fileSystem)
     {
     }
-    private MessagesToHtmlWriter? _htmlWriter;
 
     protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
     {
@@ -64,8 +63,11 @@ public class HtmlFormatter : FileWritingFormatterBase, IDisposable
     protected override async Task OnCancellation()
     {
         // Ensure that the HTML writer is disposed properly
-        _htmlWriter?.Dispose();
-        _htmlWriter = null;
+        if (_htmlWriter != null)
+        {
+            await _htmlWriter.DisposeAsync();
+            _htmlWriter = null;
+        }
         await Task.CompletedTask;
     }
 }

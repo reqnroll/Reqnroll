@@ -3,7 +3,6 @@ using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Bindings;
@@ -83,7 +82,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         _messageFactory = messageFactory;
 
         TestCaseId = IdGenerator.GetNewId();
-        TestCaseTracker = new TestCaseTracker(TestCaseId, PickleId, this, messageFactory);
+        TestCaseTracker = new TestCaseTracker(TestCaseId, PickleId, this);
     }
 
     private void SetExecutionRecordAsCurrentlyExecuting(TestCaseExecutionTracker testCaseExecutionTracker)

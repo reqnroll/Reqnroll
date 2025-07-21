@@ -1,29 +1,26 @@
-﻿using Reqnroll.Tracing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Reqnroll.Formatters.RuntimeSupport
+namespace Reqnroll.Formatters.RuntimeSupport;
+
+public class DebugFormatterLog : IFormatterLog
 {
-    public class DebugFormatterLog() : IFormatterLog
-    {
-        public List<string> entries = new();
-        private bool hasDumped = false;
-        public void WriteMessage(string message)
-        {
-            entries.Add($"{DateTime.Now.ToString("HH:mm:ss.fff")}: {message}");
-        }
+    private readonly List<string> _entries = new();
+    private bool _hasDumped = false;
 
-        public void DumpMessages()
-        {
-            if (!hasDumped)
-                foreach (var msg in entries)
-                {
-                    Debug.WriteLine(msg);
-                }
-            hasDumped = true;
-        }
+    public void WriteMessage(string message)
+    {
+        _entries.Add($"{DateTime.Now:HH:mm:ss.fff}: {message}");
+    }
+
+    public void DumpMessages()
+    {
+        if (!_hasDumped)
+            foreach (var msg in _entries)
+            {
+                Debug.WriteLine(msg);
+            }
+        _hasDumped = true;
     }
 }

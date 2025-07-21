@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
-using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 
@@ -18,13 +17,14 @@ namespace Reqnroll.Formatters.Messages;
 /// <summary>
 /// Produces a Cucumber Messages output (.ndjson) file.
 /// </summary>
-public class MessagesFormatter : FileWritingFormatterBase, IDisposable
+public class MessagesFormatter : FileWritingFormatterBase
 {
-    private byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
+    private readonly byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
     public MessagesFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
     {
     }
+
     protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
     {
         try

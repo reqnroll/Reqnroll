@@ -1,6 +1,4 @@
-﻿using Gherkin.Specs.Helper;
-using Io.Cucumber.Messages.Types;
-using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+﻿using Io.Cucumber.Messages.Types;
 using System;
 using System.IO;
 using System.Text.Json;
@@ -49,6 +47,6 @@ public class NdjsonSerializer
 
     public static async Task SerializeToStreamAsync(Stream fs, Envelope message)
     {
-        await JsonSerializer.SerializeAsync<Envelope>(fs, message, JsonOptions);
+        await JsonSerializer.SerializeAsync(fs, message, JsonOptions);
     }
 }

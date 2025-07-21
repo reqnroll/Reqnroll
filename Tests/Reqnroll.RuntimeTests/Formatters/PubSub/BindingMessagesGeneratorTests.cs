@@ -44,7 +44,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             messages.Should().HaveCount(1);
-            _sut._stepArgumentTransformCache.Should().Contain(stepTransform.Object);
         }
 
         [Fact]
@@ -56,7 +55,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             invalidStepDefinition.Setup(sd => sd.ErrorMessage).Returns("Undefined parameter type 'paramName'");
             invalidStepDefinition.Setup(sd => sd.SourceExpression).Returns("sourceExpression");
 
-            _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new[] { invalidStepDefinition.Object });
+            _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns([invalidStepDefinition.Object]);
 
             _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
@@ -65,7 +64,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             // Assert
             messages.Should().HaveCount(1);
-            _sut._undefinedParameterTypeBindingsCache.Should().Contain(invalidStepDefinition.Object);
         }
 
         [Fact]
@@ -105,7 +103,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             hookBinding.Setup(sd => sd.Method.Type.FullName).Returns("TypeName");
             hookBinding.Setup(sd => sd.Method.Parameters).Returns([]);
 
-            _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new[] { hookBinding.Object });
+            _bindingRegistryMock.Setup(br => br.GetHooks()).Returns([hookBinding.Object]);
             _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
             _sut.OnBindingRegistryReady(null, null);
@@ -117,15 +115,23 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
         }
 
         [Fact]
-        public void Should_Not_Duplicate_Messages_For_Already_Cached_Items()
+        public void Should_Not_Duplicate_Messages_For_Already_Processed_StepTransformations_And_Invalid_StepDefinitions()
         {
             // Arrange
             var stepTransform = new Mock<IStepArgumentTransformationBinding>();
             stepTransform.Setup(st => st.Name).Returns("TransformName");
+            stepTransform.Setup(sd => sd.Method.Name).Returns("MethodName");
+            stepTransform.Setup(sd => sd.Method.Type.AssemblyName).Returns("AssemblyName");
+            stepTransform.Setup(sd => sd.Method.Type.FullName).Returns("TypeName");
+            stepTransform.Setup(sd => sd.Method.Parameters).Returns([]);
 
-            _sut._stepArgumentTransformCache.Add(stepTransform.Object);
+            var invalidStepDefinition = new Mock<IStepDefinitionBinding>();
+            invalidStepDefinition.Setup(sd => sd.IsValid).Returns(false);
+            invalidStepDefinition.Setup(sd => sd.ErrorMessage).Returns("Undefined parameter type 'paramName'");
+            invalidStepDefinition.Setup(sd => sd.SourceExpression).Returns("sourceExpression");
 
-            _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new[] { stepTransform.Object });
+            _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns([invalidStepDefinition.Object, invalidStepDefinition.Object]);
+            _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns([stepTransform.Object, stepTransform.Object]);
 
             _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
             // Act
@@ -133,7 +139,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var messages = _sut.StaticBindingMessages.ToList();
 
             // Assert
-            messages.Should().BeEmpty();
+            messages.Should().HaveCount(2);
         }
     }
 }

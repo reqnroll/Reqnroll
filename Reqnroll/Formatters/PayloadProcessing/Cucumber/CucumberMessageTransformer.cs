@@ -217,14 +217,14 @@ public class CucumberMessageTransformer
     {
         return keywordType switch
         {
-            //case Gherkin.StepKeywordType.Unspecified:
-            //    return StepKeywordType.UNKNOWN;
+            // ReSharper disable RedundantNameQualifier
             global::Gherkin.StepKeywordType.Context => StepKeywordType.CONTEXT,
             global::Gherkin.StepKeywordType.Conjunction => StepKeywordType.CONJUNCTION,
             global::Gherkin.StepKeywordType.Action => StepKeywordType.ACTION,
             global::Gherkin.StepKeywordType.Outcome => StepKeywordType.OUTCOME,
             global::Gherkin.StepKeywordType.Unknown => StepKeywordType.UNKNOWN,
             _ => throw new ArgumentException($"Invalid keyword type: {keywordType}"),
+            // ReSharper restore RedundantNameQualifier
         };
     }
 
@@ -296,11 +296,13 @@ public class CucumberMessageTransformer
     {
         return pickleStepType switch
         {
+            // ReSharper disable RedundantNameQualifier
             global::Gherkin.StepKeywordType.Unknown => PickleStepType.UNKNOWN,
             global::Gherkin.StepKeywordType.Action => PickleStepType.ACTION,
             global::Gherkin.StepKeywordType.Outcome => PickleStepType.OUTCOME,
             global::Gherkin.StepKeywordType.Context => PickleStepType.CONTEXT,
             _ => throw new ArgumentException($"Invalid pickle step type: {pickleStepType}")
+            // ReSharper restore RedundantNameQualifier
         };
     }
     private static PickleDocString ToPickleDocString(global::Gherkin.CucumberMessages.Types.PickleDocString pickleDocString)

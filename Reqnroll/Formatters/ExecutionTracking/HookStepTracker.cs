@@ -1,6 +1,4 @@
-﻿using Reqnroll.Formatters.PayloadProcessing.Cucumber;
-
-namespace Reqnroll.Formatters.ExecutionTracking;
+﻿namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
 /// Tracks the information needed for a Cucumber Messages "hook step", that is a hook with binding information.
@@ -10,7 +8,7 @@ public class HookStepTracker : StepTracker
 {
     public string HookId { get; }
 
-    public HookStepTracker(string testStepId, string hookId, TestCaseTracker parentTestCaseTracker, ICucumberMessageFactory messageFactory) : base(testStepId)
+    public HookStepTracker(string testStepId, string hookId) : base(testStepId)
     {
         HookId = hookId;
     }

@@ -58,7 +58,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         {
             _messageFactoryMock = new Mock<ICucumberMessageFactory>();
             _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
-            _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object, _messageFactoryMock.Object);
+            _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object);
             _idGeneratorMock = new Mock<IIdGenerator>();
             _stepDefinitionsByBinding = new ConcurrentDictionary<IBinding, string>();
             _objectContainerStub = new ObjectContainer();
@@ -241,9 +241,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         {
             return new HookStepTracker(
                 "dummyTestStepId", 
-                hookId, 
-                _testCaseTracker, 
-                _messageFactoryMock.Object
+                hookId
             );
         }
     }

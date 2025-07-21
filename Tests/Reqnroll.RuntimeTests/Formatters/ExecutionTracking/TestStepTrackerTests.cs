@@ -25,7 +25,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
         {
 
             _pickleExecutionTracker = new PickleExecutionTracker("testCasePickle", "runStartedId", "featureName", true, _idGeneratorMock.Object, null, DateTime.Now, _messageFactoryMock.Object);
-            _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickle", _pickleExecutionTracker, _messageFactoryMock.Object);
+            _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickle", _pickleExecutionTracker);
         }
 
 
@@ -220,7 +220,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking
             def.ProcessEvent(evt);
 
             // Assert
-            def._isAmbiguous.Should().BeTrue();
+            def.IsAmbiguous.Should().BeTrue();
             def.StepDefinitionIds.Should().NotBeNull();
             def.StepDefinitionIds.Should().Contain("pickleStepId");
         }

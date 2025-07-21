@@ -17,21 +17,20 @@ namespace Reqnroll.Formatters.PubSub;
 /// </summary>
 internal class BindingMessagesGenerator : IBindingMessagesGenerator
 {
-    internal HashSet<IStepArgumentTransformationBinding> _stepArgumentTransformCache { get; } = new();
-    internal HashSet<IStepDefinitionBinding> _undefinedParameterTypeBindingsCache { get; } = new();
-    public IReadOnlyDictionary<IBinding, string> StepDefinitionIdByBinding => PullBindings();
     private IReadOnlyDictionary<IBinding, string> _cachedBindings;
-    public IEnumerable<Envelope> StaticBindingMessages => PullMessages();
     private IEnumerable<Envelope> _cachedMessages;
 
     private readonly IIdGenerator _idGenerator;
     private readonly ICucumberMessageFactory _messageFactory;
     private readonly IBindingRegistry _bindingRegistry;
     private bool _initialized = false;
-    public bool Ready {  get
-        {
-            return _initialized && _cachedBindings != null;
-        } }
+
+    private readonly HashSet<IStepArgumentTransformationBinding> _processedStepArgumentTransforms = new();
+    private readonly HashSet<IStepDefinitionBinding> _processedStepDefinitionsWithUndefinedParameterType = new();
+
+    public bool Ready => _initialized && _cachedBindings != null;
+    public IReadOnlyDictionary<IBinding, string> StepDefinitionIdByBinding => PullBindings();
+    public IEnumerable<Envelope> StaticBindingMessages => PullMessages();
 
     public BindingMessagesGenerator(IIdGenerator idGenerator, ICucumberMessageFactory messageFactory, IBindingRegistry bindingRegistry)
     {
@@ -68,8 +67,6 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
         throw new ApplicationException("Formatters asked to provide static Messages before they ready.");
     }
 
-
-
     private void PopulateBindingCachesAndGenerateBindingMessages(out IEnumerable<Envelope> messages, out IDictionary<IBinding, string> idsByBinding)
     {
         var resultMessages = new List<Envelope>();
@@ -77,9 +74,8 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
 
         foreach (var stepTransform in _bindingRegistry.GetStepTransformations())
         {
-            if (_stepArgumentTransformCache.Contains(stepTransform))
+            if (!_processedStepArgumentTransforms.Add(stepTransform))
                 continue;
-            _stepArgumentTransformCache.Add(stepTransform);
             var parameterType = _messageFactory.ToParameterType(stepTransform, _idGenerator);
             resultMessages.Add(Envelope.Create(parameterType));
         }
@@ -90,9 +86,8 @@ internal class BindingMessagesGenerator : IBindingMessagesGenerator
             if (errorMessage.Contains("Undefined parameter type"))
             {
                 var paramName = Regex.Match(errorMessage, "Undefined parameter type '(.*)'").Groups[1].Value;
-                if (_undefinedParameterTypeBindingsCache.Contains(binding))
+                if (!_processedStepDefinitionsWithUndefinedParameterType.Add(binding))
                     continue;
-                _undefinedParameterTypeBindingsCache.Add(binding);
                 var undefinedParameterType = _messageFactory.ToUndefinedParameterType(binding.SourceExpression, paramName, _idGenerator);
                 resultMessages.Add(Envelope.Create(undefinedParameterType));
             }

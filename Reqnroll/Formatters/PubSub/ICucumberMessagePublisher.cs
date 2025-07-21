@@ -1,10 +1,8 @@
 ﻿using Reqnroll.Plugins;
-using Reqnroll.UnitTestProvider;
 
-namespace Reqnroll.Formatters.PubSub
+namespace Reqnroll.Formatters.PubSub;
+
+public interface ICucumberMessagePublisher
 {
-    public interface ICucumberMessagePublisher
-    {
-        void Initialize(RuntimePluginEvents runtimePluginEvents);
-    }
+    void Initialize(RuntimePluginEvents runtimePluginEvents);
 }

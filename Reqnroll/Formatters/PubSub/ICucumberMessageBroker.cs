@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.Formatters.PubSub;

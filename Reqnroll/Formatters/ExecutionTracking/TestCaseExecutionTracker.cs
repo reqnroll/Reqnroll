@@ -29,8 +29,8 @@ public class TestCaseExecutionTracker : IGenerateMessage
     /// </summary>
     public string TestCaseStartedId { get; }
 
-    public DateTime TestCaseStartedTimeStamp { get; private set; }
-    public DateTime TestCaseFinishedTimeStamp { get; private set; }
+    public DateTime TestCaseStartedTimestamp { get; private set; }
+    public DateTime TestCaseFinishedTimestamp { get; private set; }
     public ScenarioExecutionStatus ScenarioExecutionStatus { get; private set; }
 
     private StepExecutionTrackerBase CurrentStep => _stepExecutionTrackers.Last();
@@ -91,13 +91,13 @@ public class TestCaseExecutionTracker : IGenerateMessage
 
     public void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
     {
-        TestCaseStartedTimeStamp = scenarioStartedEvent.Timestamp;
+        TestCaseStartedTimestamp = scenarioStartedEvent.Timestamp;
         StoreMessageGenerator(this, scenarioStartedEvent);
     }
 
     public void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
     {
-        TestCaseFinishedTimeStamp = scenarioFinishedEvent.Timestamp;
+        TestCaseFinishedTimestamp = scenarioFinishedEvent.Timestamp;
         ScenarioExecutionStatus = scenarioFinishedEvent.ScenarioContext.ScenarioExecutionStatus;
         StoreMessageGenerator(this, scenarioFinishedEvent);
     }

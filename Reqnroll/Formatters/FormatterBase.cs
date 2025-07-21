@@ -91,7 +91,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         // If the _publisher sends the TestRunFinished message, then we can safely shut down.
         if (message.Content() is TestRunFinished)
         {
-            _logger.WriteMessage($"DEBUG: Formatters.Plugin {Name} has recieved the TestRunFinished message and is calling CloseAsync");
+            _logger.WriteMessage($"DEBUG: Formatters.Plugin {Name} has received the TestRunFinished message and is calling CloseAsync");
             await CloseAsync();
         }
     }
@@ -164,7 +164,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                         {
                             Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} has finished.");
 
-                            // The formatter task completed before timeout, allow propogation of exceptions from the Task
+                            // The formatter task completed before timeout, allow propagation of exceptions from the Task
                             _formatterTask?.GetAwaiter().GetResult();
                         }
                     }
@@ -172,7 +172,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                     {
                         Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - formatter {Name} had already finished.");
 
-                        // The formatter task completed before timeout, allow propogation of exceptions from the Task
+                        // The formatter task completed before timeout, allow propagation of exceptions from the Task
                         _formatterTask?.GetAwaiter().GetResult();
                     }
                 }
@@ -183,7 +183,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
             }
             catch (System.Exception e)
             {
-                Logger.WriteMessage($"DEBUG: Forrmatters:PluginBase.Dispose- formatter task {Name} threw Ex: {e.Message}");
+                Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose- formatter task {Name} threw Ex: {e.Message}");
             }
             finally
             {

@@ -95,7 +95,6 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var objectContainerStub = CreateObjectContainerWithBroker(false);
             objectContainerStub.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEvents, RuntimePluginTestExecutionLifecycleEvents>();
-            _sut._broker = _brokerMock.Object;
 
             // Act
             await _sut.PublisherStartup(new TestRunStartedEvent());
@@ -185,18 +184,18 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var f2Context = new Mock<IFeatureContext>();
             f2Context.Setup(x => x.FeatureInfo).Returns(f2);
 
-            _sut._startedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature1TrackerMock.Object)));
-            _sut._startedFeatures.TryAdd(f2, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature2TrackerMock.Object)));
-            _sut._enabled = true;
+            _sut.StartedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature1TrackerMock.Object)));
+            _sut.StartedFeatures.TryAdd(f2, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature2TrackerMock.Object)));
+            _sut.Enabled = true;
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
-            _sut._allFeaturesPassed.Should().BeTrue();
+            _sut.AllFeaturesPassed.Should().BeTrue();
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
             await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
-            _sut._allFeaturesPassed.Should().BeTrue();
+            _sut.AllFeaturesPassed.Should().BeTrue();
         }
 
         // PublisherTestRunComplete calculates test run status as Failed when any started feature is are Failed
@@ -218,18 +217,18 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var f2Context = new Mock<IFeatureContext>();
             f2Context.Setup(x => x.FeatureInfo).Returns(f2);
 
-            _sut._startedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature1TrackerMock.Object)));
-            _sut._startedFeatures.TryAdd(f2, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature2TrackerMock.Object)));
-            _sut._enabled = true;
+            _sut.StartedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature1TrackerMock.Object)));
+            _sut.StartedFeatures.TryAdd(f2, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => feature2TrackerMock.Object)));
+            _sut.Enabled = true;
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
-            _sut._allFeaturesPassed.Should().BeTrue();
+            _sut.AllFeaturesPassed.Should().BeTrue();
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
             await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
             // Assert
-            _sut._allFeaturesPassed.Should().BeFalse();
+            _sut.AllFeaturesPassed.Should().BeFalse();
         }
 
         // PublisherTestRunComplete publishes TestCase messages for Pickles, then Execution messages, followed by the TestRunFinished message
@@ -260,9 +259,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                     return Task.CompletedTask;
                 });
 
-            _sut._startedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
-            _sut._enabled = true;
-            _sut._messages = messages;
+            _sut.StartedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
+            _sut.Enabled = true;
+            _sut.Messages = messages;
 
             // Act
             await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
@@ -279,14 +278,14 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             // Arrange
             var featureContextMock = new Mock<IFeatureContext>();
 
-            _sut._enabled = false;
-            _sut._startupCompleted = true;
+            _sut.Enabled = false;
+            _sut.StartupCompleted = true;
 
             // Act
             await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
 
             // Assert
-            _sut._startedFeatures.Count.Should().Be(0);
+            _sut.StartedFeatures.Count.Should().Be(0);
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Never);
         }
         // FeatureStartedEvent does not start a second Feature Tracker if one already exists for the given Feature name
@@ -299,15 +298,15 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
 
             var existingFeatureTrackerMock = new Mock<IFeatureExecutionTracker>();
-            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => existingFeatureTrackerMock.Object)));
-            _sut._enabled = true;
-            _sut._startupCompleted = true;
+            _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => existingFeatureTrackerMock.Object)));
+            _sut.Enabled = true;
+            _sut.StartupCompleted = true;
 
             // Act
             await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
 
             // Assert
-            _sut._startedFeatures.Count.Should().Be(1);
+            _sut.StartedFeatures.Count.Should().Be(1);
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Never);
 
         }
@@ -344,17 +343,17 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                         return Task.CompletedTask;
                     });
             var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(), _bindingRegistryMock.Object);
-            _sut._bindingCaches = bmg;
+            _sut.BindingMessagesGenerator = bmg;
             bmg.OnBindingRegistryReady(null, null);
 
-            _sut._enabled = true;
-            _sut._startupCompleted = true;
+            _sut.Enabled = true;
+            _sut.StartupCompleted = true;
 
             // Act
             await _sut.OnEventAsync(new FeatureStartedEvent(featureContextMock.Object));
 
             // Assert
-            _sut._startedFeatures.Count.Should().Be(1);
+            _sut.StartedFeatures.Count.Should().Be(1);
             _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Exactly(2));
             publishedEnvelopes.Count.Should().Be(2);
             publishedEnvelopes[0].Content().Should().BeOfType<Source>();
@@ -377,16 +376,16 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             featureTrackerMock.Setup(ft => ft.RuntimeGeneratedMessages).Returns(fakeMessages);
             featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
             featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
-            _sut._messageFactory = new CucumberMessageFactory();
+            _sut.MessageFactory = new CucumberMessageFactory();
 
-            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
-            _sut._enabled = true;
+            _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
+            _sut.Enabled = true;
 
             // Act
             await _sut.OnEventAsync(new TestRunFinishedEvent());
 
             // Assert
-            _sut._messages.Should().Contain(fakeMessages);
+            _sut.Messages.Should().Contain(fakeMessages);
         }
 
 
@@ -422,9 +421,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _ => throw new NotImplementedException()
             };
 
-            _sut._messageFactory = new CucumberMessageFactory();
-            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
-            _sut._enabled = true;
+            _sut.MessageFactory = new CucumberMessageFactory();
+            _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
+            _sut.Enabled = true;
 
             // Act 
             await _sut.OnEventAsync(evnt);
@@ -494,7 +493,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             _bindingRegistryMock.Setup(br => br.GetHooks()).Returns(new List<IHookBinding>([hookBindingMock.Object]));
             var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, msgFactory, _bindingRegistryMock.Object);
             objectContainerStub.RegisterInstanceAs<IBindingMessagesGenerator>(bmg);
-            _sut._bindingCaches = bmg;
+            _sut.BindingMessagesGenerator = bmg;
             bmg.OnBindingRegistryReady(null, null);
 
             await _sut.PublisherStartup(new TestRunStartedEvent());
@@ -507,7 +506,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             await _sut.OnEventAsync(hookBindingStarted);
 
             // Assert
-            _sut._testRunHookTrackers.Should().HaveCount(1);
+            _sut.TestRunHookTrackers.Should().HaveCount(1);
 
         }
 
@@ -536,8 +535,8 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             hookBindingMock.Setup(hb => hb.HookType).Returns(hookType);
             var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "ABCDE", "desc");
 
-            _sut._enabled = true;
-            _sut._messageFactory = messageFactory;
+            _sut.Enabled = true;
+            _sut.MessageFactory = messageFactory;
 
             _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
             _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
@@ -549,15 +548,15 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
             var dur = new TimeSpan(2);
 
             var hookTracker = new TestRunHookExecutionTracker("2", "1", "0", messageFactory);
-            _sut._testRunHookTrackers.TryAdd(hookBindingMock.Object, hookTracker);
+            _sut.TestRunHookTrackers.TryAdd(hookBindingMock.Object, hookTracker);
             var hookBindingFinished = new HookBindingFinishedEvent(hookBindingMock.Object, dur, cmMock.Object);
 
             // Act
             await _sut.OnEventAsync(hookBindingFinished);
 
             // Assert
-            _sut._messages.Should().HaveCount(1);
-            _sut._messages[0].Content().Should().BeOfType<TestRunHookFinished>();
+            _sut.Messages.Should().HaveCount(1);
+            _sut.Messages[0].Content().Should().BeOfType<TestRunHookFinished>();
         }
 
 
@@ -601,9 +600,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _ => throw new NotImplementedException()
             };
 
-            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
-            _sut._enabled = true;
-            _sut._messageFactory = new CucumberMessageFactory();
+            _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
+            _sut.Enabled = true;
+            _sut.MessageFactory = new CucumberMessageFactory();
 
             // Act 
             await _sut.OnEventAsync(evnt);
@@ -639,9 +638,9 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             var evnt = (IExecutionEvent)Activator.CreateInstance(eventType, "", featureInfoStub, scenarioInfoStub);
 
-            _sut._startedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
-            _sut._enabled = true;
-            _sut._messageFactory = new CucumberMessageFactory();
+            _sut.StartedFeatures.TryAdd(featureInfoStub, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
+            _sut.Enabled = true;
+            _sut.MessageFactory = new CucumberMessageFactory();
 
             // Act 
             await _sut.OnEventAsync(evnt);
@@ -683,24 +682,24 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
 
             var evnt = (IExecutionEvent)Activator.CreateInstance(eventType, "attachment-path", null, null);
 
-            _sut._enabled = true;
-            _sut._messageFactory = new AttachmentMessageFactory();
+            _sut.Enabled = true;
+            _sut.MessageFactory = new AttachmentMessageFactory();
 
             // the SUT needs an active TestRunHookExecutionTracker to be able to add attachments and output messages
 
             var mockBinding = new Mock<IHookBinding>();
             var hookId = Guid.NewGuid().ToString();
-            var mockHook = new TestRunHookExecutionTracker(hookId, null, "test-run-started-id", _sut._messageFactory);
+            var mockHook = new TestRunHookExecutionTracker(hookId, null, "test-run-started-id", _sut.MessageFactory);
             mockHook.ProcessEvent(new HookBindingStartedEvent(mockBinding.Object, new Mock<IContextManager>().Object));
-            _sut._testRunHookTrackers.TryAdd(mockBinding.Object, mockHook);
+            _sut.TestRunHookTrackers.TryAdd(mockBinding.Object, mockHook);
 
             // Act 
             await _sut.OnEventAsync(evnt);
 
             // Assert
 
-            _sut._messages.Should().HaveCount(1);
-            _sut._messages[0].Content().Should().BeOfType<Attachment>();
+            _sut.Messages.Should().HaveCount(1);
+            _sut.Messages[0].Content().Should().BeOfType<Attachment>();
         }
     }
 }

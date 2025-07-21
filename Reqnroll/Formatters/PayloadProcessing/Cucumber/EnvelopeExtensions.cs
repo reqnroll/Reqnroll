@@ -108,7 +108,7 @@ public static class EnvelopeExtensions
 
     public static Timestamp Timestamp(this Envelope envelope)
     {
-        Timestamp result = null;
+        Timestamp result;
         if (envelope.TestCaseFinished != null) { result = envelope.TestCaseFinished.Timestamp; }
         else if (envelope.TestCaseStarted != null) { result = envelope.TestCaseStarted.Timestamp; }
         else if (envelope.TestRunFinished != null) { result = envelope.TestRunFinished.Timestamp; }

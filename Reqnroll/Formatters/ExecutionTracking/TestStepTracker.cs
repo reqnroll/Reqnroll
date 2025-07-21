@@ -1,5 +1,4 @@
 ﻿using Reqnroll.Bindings;
-using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,9 +21,7 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
     public List<string> StepDefinitionIds { get; private set; }
     public List<TestStepArgument> StepArguments { get; } = new();
 
-    // List of StepIds that cause an ambiguous situation to arise
-    private List<string> _ambiguousStepDefinitions { get; set; } = new();
-    internal bool _isAmbiguous => _ambiguousStepDefinitions != null && _ambiguousStepDefinitions.Any();
+    public bool IsAmbiguous { get; private set; }
 
     public void ProcessEvent(StepStartedEvent stepStartedEvent)
     {
@@ -34,41 +31,54 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
     public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
     {
         var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
-        IsBound = !(bindingMatch == null || bindingMatch == BindingMatch.NonMatching);
+        // store isBound in a local variable to avoid null checks later
+        var isBound = bindingMatch != null && bindingMatch != BindingMatch.NonMatching;
+        IsBound = isBound;
 
-        var stepDefinitionBinding = IsBound ? bindingMatch!.StepBinding : null;
-        var StepDefinitionId = IsBound ? ParentTracker.FindStepDefinitionIdByBindingKey(stepDefinitionBinding) : null;
-
-        var Status = stepFinishedEvent.StepContext.Status;
-
-        if (Status == ScenarioExecutionStatus.TestError && stepFinishedEvent.ScenarioContext.TestError != null)
+        var ambiguousStepDefinitionIds = DetectAmbiguousStepDefinitionIds(stepFinishedEvent);
+        IsAmbiguous = ambiguousStepDefinitionIds.Any();
+        if (IsAmbiguous)
         {
-            var Exception = stepFinishedEvent.ScenarioContext.TestError;
-            if (Exception is AmbiguousBindingException)
-            {
-                _ambiguousStepDefinitions = new List<string>(((AmbiguousBindingException)Exception).Matches
-                    .Select(m => ParentTracker.FindStepDefinitionIdByBindingKey(m.StepBinding)));
-            }
+            StepDefinitionIds = ambiguousStepDefinitionIds;
+        }
+        else
+        {
+            var stepDefinitionId = isBound ? ParentTracker.FindStepDefinitionIdByBindingKey(bindingMatch.StepBinding) : null;
+            StepDefinitionIds = stepDefinitionId != null ? [stepDefinitionId] : [];
         }
 
-        StepDefinitionIds = _isAmbiguous ? _ambiguousStepDefinitions.ToList() : StepDefinitionId != null ? [StepDefinitionId] : [];
-
-        var HasInputDataTable = stepFinishedEvent.StepContext.StepInfo.Table != null;
-        var HasInputDocString = stepFinishedEvent.StepContext.StepInfo.MultilineText != null;
-        var HasEitherDataTableOrDocString = HasInputDataTable || HasInputDocString;
-        var argumentValues = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.Value.ToString()).ToList() : new List<string>();
-        var argumentStartOffsets = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.Arguments.Select(arg => arg.StartOffset).ToList() : new List<int?>();
-        var argumentTypes = IsBound ? stepFinishedEvent.StepContext.StepInfo.BindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList() : new List<string>();
-
-        if (IsBound)
+        if (isBound)
         {
+            var hasInputDataTable = stepFinishedEvent.StepContext?.StepInfo?.Table != null;
+            var hasInputDocString = stepFinishedEvent.StepContext?.StepInfo?.MultilineText != null;
+            var hasEitherDataTableOrDocString = hasInputDataTable || hasInputDocString;
+
+            var argumentValues = bindingMatch.Arguments.Select(arg => arg.Value.ToString()).ToList();
+            var argumentStartOffsets = bindingMatch.Arguments.Select(arg => arg.StartOffset).ToList();
+            var argumentTypes = bindingMatch.StepBinding.Method.Parameters.Select(p => p.Type.Name).ToList();
+
             var argumentCount = argumentValues.Count;
-            if (argumentCount > 0 && HasEitherDataTableOrDocString)
-                argumentCount = argumentCount - 1; // don't add the DataTable or DocString argument as a TestStepArgument
+            if (argumentCount > 0 && hasEitherDataTableOrDocString)
+                argumentCount -= 1; // don't add the DataTable or DocString argument as a TestStepArgument
             for (int i = 0; i < argumentCount; i++)
             {
                 StepArguments.Add(new TestStepArgument { Value = argumentValues[i], StartOffset = argumentStartOffsets[i], Type = argumentTypes[i] });
             }
         }
+    }
+
+    private List<string> DetectAmbiguousStepDefinitionIds(StepFinishedEvent stepFinishedEvent)
+    {
+        var stepStatus = stepFinishedEvent.StepContext?.Status ?? ScenarioExecutionStatus.Skipped;
+
+        if (stepStatus == ScenarioExecutionStatus.TestError && 
+            stepFinishedEvent.ScenarioContext.TestError is AmbiguousBindingException ambiguousBindingException)
+        {
+            return ambiguousBindingException.Matches
+                .Select(m => ParentTracker.FindStepDefinitionIdByBindingKey(m.StepBinding))
+                .ToList();
+        }
+
+        return [];
     }
 }

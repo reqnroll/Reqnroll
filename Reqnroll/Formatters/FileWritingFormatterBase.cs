@@ -2,8 +2,6 @@
 
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
-using Reqnroll.Formatters.PayloadProcessing;
-using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
@@ -99,10 +97,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
                     break;
                 }
 
-                if (message != null)
-                {
-                    await WriteToFile(message, cancellationToken);                
-                }
+                await WriteToFile(message, cancellationToken);                
             }
         }
         catch (OperationCanceledException)
@@ -122,7 +117,10 @@ public abstract class FileWritingFormatterBase : FormatterBase
             {
                 await FileStreamTarget.FlushAsync(cancellationToken);
             }
-            catch { }
+            catch (System.Exception e)
+            {
+                Logger.WriteMessage($"Formatter {Name} file stream flush threw an exception: {e.Message}.");
+            }
         }
     }
 

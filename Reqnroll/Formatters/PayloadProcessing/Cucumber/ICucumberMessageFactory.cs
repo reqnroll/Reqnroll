@@ -1,7 +1,6 @@
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
-using Reqnroll.BoDi;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.ExecutionTracking;
 using System;

@@ -1,5 +1,4 @@
 ﻿using Io.Cucumber.Messages.Types;
-using Reqnroll.BoDi;
 using Reqnroll.Formatters.RuntimeSupport;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -16,7 +15,7 @@ namespace Reqnroll.Formatters.PubSub;
 public class CucumberMessageBroker : ICucumberMessageBroker
 {
     // This is the list of sinks registered in the container. Not all may be enabled/configured.
-    private readonly List<ICucumberMessageFormatter> _registeredSinks = new();
+    private readonly List<ICucumberMessageFormatter> _registeredFormatters = new();
 
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
     // and the Broker can be IsEnabled.
@@ -28,17 +27,17 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeSinks = new();
 
 
-    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredSinks)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters)
     {
         _logger = formatterLog;
-        _registeredSinks.AddRange(containerRegisteredSinks.Values);
+        _registeredFormatters.AddRange(containerRegisteredFormatters.Values);
     }
 
     public void Initialize()
     {
-        foreach (var sink in _registeredSinks)
+        foreach (var formatter in _registeredFormatters)
         {
-            sink.LaunchSink(this);
+            formatter.LaunchSink(this);
         }
     }
 
@@ -66,7 +65,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     private bool HaveAllSinksRegistered()
     {
-        return _numberOfSinksInitialized == _registeredSinks.Count;
+        return _numberOfSinksInitialized == _registeredFormatters.Count;
     }
 
     public async Task PublishAsync(Envelope message)
