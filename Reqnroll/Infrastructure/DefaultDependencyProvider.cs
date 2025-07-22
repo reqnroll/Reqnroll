@@ -121,7 +121,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<HtmlFormatter, ICucumberMessageFormatter>("html");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
-            container.RegisterTypeAs<GuidIdGenerator, IIdGenerator>();
+            container.RegisterTypeAs<ShortGuidIdGenerator, IIdGenerator>();
             container.RegisterTypeAs<CucumberMessageFactory, ICucumberMessageFactory>();
             container.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
             container.RegisterTypeAs<MetaMessageGenerator, IMetaMessageGenerator>();
