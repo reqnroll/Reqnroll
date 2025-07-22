@@ -34,7 +34,7 @@ public class CucumberMessagesConverter
         return converter.ConvertGherkinDocumentToEventArgs(gherkinDocumentWithLocation, location);
     }
 
-    public Source ConvertToCucumberMessagesSource(ReqnrollDocument gherkinDocument)
+    public static Source ConvertToCucumberMessagesSource(ReqnrollDocument gherkinDocument)
     {
         if (File.Exists(gherkinDocument.SourceFilePath))
         {

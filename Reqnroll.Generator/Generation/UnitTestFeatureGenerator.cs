@@ -259,8 +259,9 @@ namespace Reqnroll.Generator.Generation
             var picklesReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
             try
             {
-                var messageConverter = new CucumberMessagesConverter(new GuidIdGenerator());
-                var featureSource = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(messageConverter.ConvertToCucumberMessagesSource(generationContext.Document));
+                var featureSource = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document));
+                var IdGeneratorSeed = featureSource.Uri + featureSource.Data;
+                var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(IdGeneratorSeed));
                 var featureGherkinDocument = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
                 var featurePickles = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocument);
                 var featureGherkinDocumentMessage = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToGherkinDocument(featureGherkinDocument);
