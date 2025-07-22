@@ -67,6 +67,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
 
     // Method available to sinks to allow them to initialize.
     public abstract void LaunchInner(IDictionary<string, object> formatterConfigString, Action<bool> onAfterInitialization);
+
     private void ReportInitialized(bool status)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} reporting status as {status}.");
@@ -97,8 +98,6 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
     }
 
     protected abstract Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken);
-
-    protected abstract Task OnCancellation();
 
     internal async Task CloseAsync()
     {

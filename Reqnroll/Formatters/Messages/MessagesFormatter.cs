@@ -1,7 +1,6 @@
 ﻿#nullable enable
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
@@ -21,43 +20,29 @@ public class MessagesFormatter : FileWritingFormatterBase
 {
     private readonly byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-    public MessagesFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "messages", ".ndjson", "reqnroll_report.ndjson", fileSystem)
+    public MessagesFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, fileSystem, "messages", ".ndjson", "reqnroll_report.ndjson")
     {
     }
 
-    protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    protected override void OnTargetFileStreamInitialized(Stream targetFileStream)
     {
-        try
-        {
-            FileStreamTarget = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
-            onInitialized(true);
-            Logger.WriteMessage($"Formatter {Name} opened filestream.");
-        }
-        catch
-        {
-            Logger.WriteMessage($"Formatter {Name} closing because of an exception opening the filestream.");
-
-            onInitialized(false);
-        }
+        //nop
     }
-    protected override async Task WriteToFile(Envelope? envelope, CancellationToken cancellationToken)
+
+    protected override void OnTargetFileStreamDisposing()
     {
-        if (FileStreamTarget != null)
+        //nop
+    }
+
+    protected override async Task WriteToFile(Envelope envelope, CancellationToken cancellationToken)
+    {
+        if (TargetFileStream != null)
         {
-            await NdjsonSerializer.SerializeToStreamAsync(FileStreamTarget, envelope);
+            await NdjsonSerializer.SerializeToStreamAsync(TargetFileStream, envelope);
 
             // Write a newline after each message, except for the last one
-            if (envelope!.TestRunFinished == null)
-                await FileStreamTarget.WriteAsync(_newLineBytes, 0, _newLineBytes.Length, cancellationToken);
+            if (envelope.TestRunFinished == null)
+                await TargetFileStream.WriteAsync(_newLineBytes, 0, _newLineBytes.Length, cancellationToken);
         }
-    }
-
-    protected override async Task OnCancellation() { await Task.CompletedTask; }
-
-    public override void Dispose()
-    {
-        FileStreamTarget?.Close();
-        FileStreamTarget?.Dispose();
-        base.Dispose();
     }
 }

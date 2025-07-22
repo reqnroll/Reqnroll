@@ -21,53 +21,43 @@ public class HtmlFormatter : FileWritingFormatterBase
 {
     private MessagesToHtmlWriter? _htmlWriter;
 
-    public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, "html", ".html", "reqnroll_report.html", fileSystem)
+    public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, fileSystem, "html", ".html", "reqnroll_report.html")
     {
     }
 
-    protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    protected override void OnTargetFileStreamInitialized(Stream targetFileStream)
     {
-        try
-        {
-            FileStreamTarget = File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
-            _htmlWriter = new MessagesToHtmlWriter(
-                FileStreamTarget,
-                async (sw, e) => await sw.WriteAsync(NdjsonSerializer.Serialize(e)));
-            onInitialized(true);
-            Logger.WriteMessage($"Formatter {Name} opened filestream.");
-        }
-        catch
-        {
-            Logger.WriteMessage($"Formatter {Name} closing because of an exception opening the filestream.");
-
-            onInitialized(false);
-        }
+        _htmlWriter = new MessagesToHtmlWriter(
+            targetFileStream,
+            async (sw, e) => await sw.WriteAsync(NdjsonSerializer.Serialize(e)));
     }
 
-    protected override async Task WriteToFile(Envelope? envelope, CancellationToken cancellationToken)
-    {
-        if (_htmlWriter != null && envelope != null)
-        {
-            await _htmlWriter.WriteAsync(envelope);
-        }
-    }
-
-    public override void Dispose()
+    protected override void OnTargetFileStreamDisposing()
     {
         _htmlWriter?.Dispose();
-        FileStreamTarget?.Close();
-        FileStreamTarget?.Dispose();
-        base.Dispose();
+        _htmlWriter = null;
     }
 
-    protected override async Task OnCancellation()
+    protected override async Task FlushTargetFileStream(CancellationToken cancellationToken)
     {
-        // Ensure that the HTML writer is disposed properly
         if (_htmlWriter != null)
         {
             await _htmlWriter.DisposeAsync();
             _htmlWriter = null;
+            // We should not call base.FlushTargetFileStream here because the HtmlWriter already disposed the stream
+            // and the stream's flush operation would throw an exception.
         }
-        await Task.CompletedTask;
+        else
+        {
+            await base.FlushTargetFileStream(cancellationToken);
+        }
+    }
+
+    protected override async Task WriteToFile(Envelope envelope, CancellationToken cancellationToken)
+    {
+        if (_htmlWriter != null)
+        {
+            await _htmlWriter.WriteAsync(envelope);
+        }
     }
 }

@@ -50,7 +50,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 IFormattersConfigurationProvider configurationProvider,
                 IFileSystem fileSystem,
                 ICollection<Envelope> messageCollector)
-                : base(configurationProvider, new ConsoleLogger(), "testPlugin", ".txt", "test_output.txt", fileSystem)
+                : base(configurationProvider, new ConsoleLogger(), fileSystem, "testPlugin", ".txt", "test_output.txt")
             {
                 FileSystem = fileSystem;
                 _messageCollector = messageCollector;
@@ -63,12 +63,25 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub
                 _messageCollector.Add(env);
             }
 
+            protected override void OnTargetFileStreamInitialized(Stream targetFileStream)
+            {
+            }
+
+            protected override void OnTargetFileStreamDisposing()
+            {
+            }
+
+            protected override Stream CreateTargetFileStream(string outputPath)
+            {
+                return _fileStreamMock.Object;
+            }
+
             protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
             {
                 LastOutputPath = outputPath;
-                FileStreamTarget = _fileStreamMock.Object;  
-                onInitialized(true);
+                base.FinalizeInitialization(outputPath, formatterConfiguration, onInitialized);
             }
+
             protected override async Task OnCancellation()
             {
                 WasCancelled = true;
