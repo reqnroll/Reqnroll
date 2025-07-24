@@ -54,8 +54,8 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         StepDefinitionsByBinding = stepDefinitionIdsByMethod;
         IdGenerator = idGenerator;
         FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-        var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles != null;
-        featureHasCucumberMessages = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles() != null;
+        var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument != null;
+        featureHasCucumberMessages = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument() != null;
         Enabled = featureHasCucumberMessages;
         _staticMessagesFactory = new Lazy<IEnumerable<Envelope>>(() => GenerateStaticMessages(featureStartedEvent));
         _ = _staticMessagesFactory.Value;
@@ -81,29 +81,31 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     // This should be called only once per Feature. 
     private IEnumerable<Envelope> GenerateStaticMessages(FeatureStartedEvent featureStartedEvent)
     {
+        var result = new List<Envelope>(20); // Pre-allocate a list with an expected size of 20, to avoid multiple allocations
+        if (!Enabled)
+        {
+            // If the feature is not enabled, we do not generate any static messages
+            return result;
+        }
 
         var source = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source();
-        if (source != null) yield return Envelope.Create(source);
+        if (source != null) result.Add(Envelope.Create(source));
 
         var gherkinDocument = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument();
-        if (gherkinDocument != null) yield return Envelope.Create(gherkinDocument);
+        if (gherkinDocument != null) result.Add(Envelope.Create(gherkinDocument));
 
         var featurepickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles();
         if (featurepickles != null)
         {
-            var pickles = featurepickles.ToList();
-            for (int i = 0; i < pickles.Count; i++)
+            var pickles = featurepickles.Select((p, i) =>
             {
-                PickleIds.Add(i.ToString(), pickles[i].Id);
-            }
-
-            _pickleJar = new PickleJar(pickles);
-
-            foreach (var pickle in pickles)
-            {
-                yield return Envelope.Create(pickle);
-            }
+                PickleIds.Add(i.ToString(), p.Id);
+                return Envelope.Create(p);
+            });
+            result.AddRange(pickles);
+            _pickleJar = new PickleJar(featurepickles);
         }
+        return result;
     }
 
     // When the FeatureFinished event fires, we calculate the feature-level execution status
