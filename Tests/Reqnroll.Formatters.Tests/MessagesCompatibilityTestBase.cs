@@ -173,9 +173,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         if (string.IsNullOrEmpty(outputFilePath))
             outputFilePath = "[BASEDIRECTORY]\\CucumberMessages\\reqnroll_report.ndson";
 
-        string configurationPath = outputFilePath.Replace(DEFAULTSAMPLESDIRECTORYPLACEHOLDER, GetDefaultSamplesDirectory());
-        configurationPath = Path.GetDirectoryName(configurationPath)!;
-        return configurationPath;
+        string actualResultLocationDirectory = outputFilePath.Replace(DEFAULTSAMPLESDIRECTORYPLACEHOLDER, GetDefaultSamplesDirectory());
+        actualResultLocationDirectory = Path.GetDirectoryName(actualResultLocationDirectory)!;
+        return actualResultLocationDirectory;
     }
 
     protected void FileShouldExist(string v)
