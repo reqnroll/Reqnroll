@@ -315,7 +315,7 @@ namespace Reqnroll.Infrastructure
         {
             await FireScenarioEventsAsync(HookType.AfterStep);
         }
-        
+
         protected virtual async Task OnSkipStepAsync()
         {
             _contextManager.StepContext.Status = ScenarioExecutionStatus.Skipped;
@@ -487,7 +487,9 @@ namespace Reqnroll.Infrastructure
             _testTracer.TraceStep(stepInstance, true);
 
             bool isStepSkipped = contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.OK;
+            bool isBindingExecutable = true;
             bool onStepStartExecuted = false;
+            bool onStepSkippedExecuted = false;
 
             BindingMatch match = null;
             object[] arguments = null;
@@ -497,23 +499,49 @@ namespace Reqnroll.Infrastructure
                 match = GetStepMatch(stepInstance);
                 contextManager.StepContext.StepInfo.BindingMatch = match;
                 contextManager.StepContext.StepInfo.StepInstance = stepInstance;
+                _obsoleteStepHandler.Handle(match);
+            }
+            catch (MissingStepDefinitionException)
+            {
+                UpdateStatusOnStepFailure(ScenarioExecutionStatus.UndefinedStep, null);
+                isBindingExecutable = false;
+            }
+            catch (BindingException ex)
+            {
+                _testTracer.TraceBindingError(ex);
+                UpdateStatusOnStepFailure(ScenarioExecutionStatus.BindingError, ex);
+                isBindingExecutable = false;
+            }
 
+            try
+            {
                 if (isStepSkipped)
                 {
-                    await OnSkipStepAsync();
+                    var stepStartedEvent = new StepStartedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
+                    await _testThreadExecutionEventPublisher.PublishEventAsync(stepStartedEvent);
+
+                    if (contextManager.StepContext.Status != ScenarioExecutionStatus.UndefinedStep)
+                        await OnSkipStepAsync();
+                    onStepSkippedExecuted = true;
                 }
                 else
                 {
-                    arguments = await GetExecuteArgumentsAsync(match);
-                    _obsoleteStepHandler.Handle(match);
+                    if (isBindingExecutable)
+                        arguments = await GetExecuteArgumentsAsync(match);
 
-                    onStepStartExecuted = true;
                     // Both 'OnStepStartAsync' and 'ExecuteStepMatchAsync' can throw exceptions
                     // if the related hook or step definition fails.
                     await OnStepStartAsync();
-                    await ExecuteStepMatchAsync(match, arguments, durationHolder);
-                    if (_reqnrollConfiguration.TraceSuccessfulSteps)
-                        _testTracer.TraceStepDone(match, arguments, durationHolder.Duration);
+                    onStepStartExecuted = true;
+                    var stepStartedEvent = new StepStartedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
+                    await _testThreadExecutionEventPublisher.PublishEventAsync(stepStartedEvent);
+
+                    if (isBindingExecutable)
+                    {
+                        await ExecuteStepMatchAsync(match, arguments, durationHolder);
+                        if (_reqnrollConfiguration.TraceSuccessfulSteps)
+                            _testTracer.TraceStepDone(match, arguments, durationHolder.Duration);
+                    }
                 }
             }
             catch (PendingStepException)
@@ -527,15 +555,11 @@ namespace Reqnroll.Infrastructure
 
                 UpdateStatusOnStepFailure(ScenarioExecutionStatus.StepDefinitionPending, null);
             }
-            catch (MissingStepDefinitionException)
-            {
-                UpdateStatusOnStepFailure(ScenarioExecutionStatus.UndefinedStep, null);
-            }
+
             catch (BindingException ex)
             {
                 _testTracer.TraceBindingError(ex);
                 UpdateStatusOnStepFailure(ScenarioExecutionStatus.BindingError, ex);
-
             }
             catch (Exception ex)
             {
@@ -550,10 +574,24 @@ namespace Reqnroll.Infrastructure
             {
                 if (onStepStartExecuted)
                 {
+                    var stepFinishedEvent = new StepFinishedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
+                    await _testThreadExecutionEventPublisher.PublishEventAsync(stepFinishedEvent);
+                }
+                else if (onStepSkippedExecuted)
+                {
+                    var e = contextManager.ScenarioContext.TestError;
+                    contextManager.ScenarioContext.TestError = null; // clear the error to avoid it being propagated to the step finished event
+                    var stepFinishedEvent = new StepFinishedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
+                    await _testThreadExecutionEventPublisher.PublishEventAsync(stepFinishedEvent);
+                    contextManager.ScenarioContext.TestError = e; // restore the error for further processing
+                }
+                if (onStepStartExecuted && isBindingExecutable)
+                {
                     // We need to have this call after the 'UpdateStatusOnStepFailure' above, because otherwise
                     // after step hooks cannot handle step errors.
                     // The 'OnStepEndAsync' call might throw an exception if the related after step hook fails,
                     // but we can let the exception propagate to the caller.
+
                     await OnStepEndAsync();
                 }
             }
@@ -601,7 +639,7 @@ namespace Reqnroll.Infrastructure
         protected virtual async Task ExecuteStepMatchAsync(BindingMatch match, object[] arguments, DurationHolder durationHolder)
         {
             await _testThreadExecutionEventPublisher.PublishEventAsync(new StepBindingStartedEvent(match.StepBinding));
-            
+
             try
             {
                 await _bindingInvoker.InvokeBindingAsync(match.StepBinding, _contextManager, arguments, _testTracer, durationHolder);
@@ -618,7 +656,7 @@ namespace Reqnroll.Infrastructure
             {
                 throw new ArgumentNullException(nameof(_contextManager));
             }
-            
+
             if (_contextManager.ScenarioContext == null)
             {
                 throw new ArgumentNullException(nameof(_contextManager.ScenarioContext));
@@ -677,12 +715,11 @@ namespace Reqnroll.Infrastructure
         {
             StepDefinitionType stepDefinitionType = stepDefinitionKeyword == StepDefinitionKeyword.And || stepDefinitionKeyword == StepDefinitionKeyword.But
                 ? GetCurrentBindingType()
-                : (StepDefinitionType) stepDefinitionKeyword;
+                : (StepDefinitionType)stepDefinitionKeyword;
             var stepSequenceIdentifiers = ScenarioContext.ScenarioInfo.PickleStepSequence;
             var pickleStepId = stepSequenceIdentifiers?.CurrentPickleStepId ?? "";
 
             _contextManager.InitializeStepContext(new StepInfo(stepDefinitionType, text, tableArg, multilineTextArg, pickleStepId));
-            await _testThreadExecutionEventPublisher.PublishEventAsync(new StepStartedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
 
             try
             {
@@ -691,7 +728,6 @@ namespace Reqnroll.Infrastructure
             }
             finally
             {
-                await _testThreadExecutionEventPublisher.PublishEventAsync(new StepFinishedEvent(FeatureContext, ScenarioContext, _contextManager.StepContext));
                 stepSequenceIdentifiers?.NextStep();
                 _contextManager.CleanupStepContext();
             }
