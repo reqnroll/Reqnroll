@@ -236,7 +236,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             Bindings.HookType.AfterFeature => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_RUN,
             Bindings.HookType.BeforeScenario => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_CASE,
             Bindings.HookType.AfterScenario => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_CASE,
-            Bindings.HookType.BeforeStep => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_STEP,
+            Bindings.HookType.BeforeStep => Io.Cucumber.Messages.Types.HookType.BEFORE_TEST_STEP,
             Bindings.HookType.AfterStep => Io.Cucumber.Messages.Types.HookType.AFTER_TEST_STEP,
 
             // Note: The following isn't strictly correct, but about all that can be done given that Cucumber doesn't support any other types of Hooks

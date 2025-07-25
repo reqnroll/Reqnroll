@@ -15,7 +15,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
 {
     private readonly ICucumberMessageFactory _messageFactory;
     private readonly TestCaseTracker _testCaseTracker;
-    private readonly List<StepExecutionTrackerBase> _stepExecutionTrackers;
+    private readonly Stack<StepExecutionTrackerBase> _stepExecutionTrackers;
     // This queue holds ExecutionEvents that will be processed in stage 2
     private readonly Queue<(IGenerateMessage, ExecutionEvent)> _events = new();
 
@@ -33,7 +33,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
     public DateTime TestCaseFinishedTimestamp { get; private set; }
     public ScenarioExecutionStatus ScenarioExecutionStatus { get; private set; }
 
-    private StepExecutionTrackerBase CurrentStep => _stepExecutionTrackers.Last();
+    private StepExecutionTrackerBase CurrentStep => _stepExecutionTrackers.Peek();
 
     public bool IsFirstAttempt => AttemptId == 0;
 
@@ -106,7 +106,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
     {
         var testStepTracker = new TestStepExecutionTracker(this, _messageFactory);
         testStepTracker.ProcessEvent(stepStartedEvent);
-        _stepExecutionTrackers.Add(testStepTracker);
+        _stepExecutionTrackers.Push(testStepTracker);
         StoreMessageGenerator(testStepTracker, stepStartedEvent);
     }
 
@@ -116,6 +116,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
         {
             testStepTracker.ProcessEvent(stepFinishedEvent);
             StoreMessageGenerator(testStepTracker, stepFinishedEvent);
+            _stepExecutionTrackers.Pop();
         }
     }
 
@@ -123,7 +124,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
     {
         var hookStepStateTracker = new HookStepExecutionTracker(this, _messageFactory);
         hookStepStateTracker.ProcessEvent(hookBindingStartedEvent);
-        _stepExecutionTrackers.Add(hookStepStateTracker);
+        _stepExecutionTrackers.Push(hookStepStateTracker);
         StoreMessageGenerator(hookStepStateTracker, hookBindingStartedEvent);
     }
 
@@ -132,6 +133,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
         if (CurrentStep is HookStepExecutionTracker hookStepTracker)
         {
             hookStepTracker.ProcessEvent(hookBindingFinishedEvent);
+            _stepExecutionTrackers.Pop();
             StoreMessageGenerator(hookStepTracker, hookBindingFinishedEvent);
         }
     }

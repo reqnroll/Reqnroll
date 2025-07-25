@@ -227,8 +227,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var stepDefStub = new Mock<IStepDefinitionBinding>();
             stepDefStub.Setup(sd => sd.Method).Returns(methodStub.Object);
 
-            StepDefinitionAmbiguityReason ambiguityReason;
-            List<BindingMatch> candidatingMatches;
+            StepDefinitionAmbiguityReason ambiguityReason = StepDefinitionAmbiguityReason.None;
+            List<BindingMatch> candidatingMatches = new();
             stepDefinitionMatcherStub.Setup(sdm => sdm.GetBestMatch(It.IsAny<StepInstance>(), It.IsAny<CultureInfo>(), out ambiguityReason, out candidatingMatches))
                 .Returns(BindingMatch.NonMatching);
 
@@ -455,6 +455,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
             RegisterUndefinedStepDefinition();
+            errorProviderStub.Setup(ep => ep.GetMissingStepDefinitionError()).Returns(new MissingStepDefinitionException());
+
 
             var afterStepMock = CreateHookMock(afterStepEvents);
 
@@ -748,6 +750,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var sut = CreateTestExecutionEngine();
             scenarioContext.ScenarioExecutionStatus = ScenarioExecutionStatus.TestError;
+
+            errorProviderStub.Setup(ep => ep.GetMissingStepDefinitionError()).Returns(new MissingStepDefinitionException());
 
             var mockHandler = new Mock<ISkippedStepHandler>();
             mockHandler.Setup(b => b.Handle(It.IsAny<ScenarioContext>())).Verifiable();
