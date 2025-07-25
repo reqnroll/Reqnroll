@@ -1,47 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using FluentAssertions;
+﻿using FluentAssertions;
 using FluentAssertions.Execution;
 
-namespace Reqnroll.Formatters.Tests
+namespace Reqnroll.Formatters.Tests;
+
+internal class CucumberMessagesHtmlGenerationValidator
 {
-    internal class CucumberMessagesHTMLGenerationValidator
+    private readonly string[] _generatedHtml;
+    private readonly string[] _expectedJson;
+
+    public CucumberMessagesHtmlGenerationValidator(string[] generatedHtml, string[] expectedJsonContent)
     {
-        private string[] _generatedHtml;
-        private string[] _expectedJson;
+        _generatedHtml = generatedHtml;
+        _expectedJson = expectedJsonContent;
+    }
 
-        public CucumberMessagesHTMLGenerationValidator(string[] generatedHtml, string[] expectedJsonContent)
+    public void GeneratedHtmlContentMatchesJsonMessages() {
+
+        var actual = ExtractMessagesFromHtml(_generatedHtml).Replace(@"\/", "/");
+        var expected = string.Join(',', _expectedJson);
+        actual.Should().Be(expected);
+    }
+
+    public void GeneratedHtmlProperlyReflectsExpectedMessages()
+    {
+        using (new AssertionScope("Html Validates"))
         {
-            _generatedHtml = generatedHtml;
-            _expectedJson = expectedJsonContent;
+            GeneratedHtmlContentMatchesJsonMessages();
         }
+    }
 
-        public void GeneratedHtmlContentMatchesJsonMessages() {
-
-            var actual = ExtractMessagesFromHtml(_generatedHtml)!.Replace(@"\/", "/");
-            var expected = string.Join(',', _expectedJson);
-            actual.Should().Be(expected);
-        }
-
-        public void GeneratedHtmlProperlyReflectsExpectedMessages()
-        {
-            using (new AssertionScope("Html Validates"))
-            {
-                GeneratedHtmlContentMatchesJsonMessages();
-            }
-        }
-
-        private string? ExtractMessagesFromHtml(string[] html)
-        {
-            var line = html.Where(s => s.StartsWith("window.CUCUMBER_MESSAGES"))
-                       .Select(s => s)
-                       .FirstOrDefault();
-            var start = line!.IndexOf('[');
-            return line.Substring(start + 1, line.Length - start - 3);
-
-        }
+    private string ExtractMessagesFromHtml(string[] html)
+    {
+        var line = html.First(s => s.StartsWith("window.CUCUMBER_MESSAGES"));
+        var start = line.IndexOf('[');
+        return line.Substring(start + 1, line.Length - start - 3);
     }
 }
