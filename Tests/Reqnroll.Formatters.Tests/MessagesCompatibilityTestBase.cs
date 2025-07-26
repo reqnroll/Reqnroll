@@ -213,7 +213,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
     {
         var fileName = featureFileName + "." + featureFileName + ".feature.ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
-        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(['\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
+        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         //var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
         //var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
         return expectedJsonText;
