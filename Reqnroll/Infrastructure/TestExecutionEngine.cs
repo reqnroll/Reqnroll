@@ -499,7 +499,6 @@ namespace Reqnroll.Infrastructure
                 match = GetStepMatch(stepInstance);
                 contextManager.StepContext.StepInfo.BindingMatch = match;
                 contextManager.StepContext.StepInfo.StepInstance = stepInstance;
-                _obsoleteStepHandler.Handle(match);
             }
             catch (MissingStepDefinitionException)
             {
@@ -527,7 +526,10 @@ namespace Reqnroll.Infrastructure
                 else
                 {
                     if (isBindingExecutable)
+                    {
                         arguments = await GetExecuteArgumentsAsync(match);
+                        _obsoleteStepHandler.Handle(match);
+                    }
 
                     // Both 'OnStepStartAsync' and 'ExecuteStepMatchAsync' can throw exceptions
                     // if the related hook or step definition fails.
