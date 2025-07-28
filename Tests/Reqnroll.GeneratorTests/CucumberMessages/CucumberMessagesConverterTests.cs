@@ -14,8 +14,10 @@ public class CucumberMessagesConverterTests
     {
         // Arrange
         var sut = new CucumberMessagesConverter(new IncrementingIdGenerator());
+        using var tempFile = new TempFile(".feature");
+        tempFile.SetContent("Feature: Addition");
         var documentLocation = new ReqnrollDocumentLocation(
-            @"C:\MyProject\Features\MyFolder\MyFeature.feature",
+            tempFile.FullPath,
             "Features/MyFolder");
         var reqnrollDocument = ParserHelper.CreateAnyDocument(documentLocation: documentLocation);
 
@@ -23,7 +25,7 @@ public class CucumberMessagesConverterTests
         var result = sut.ConvertToCucumberMessagesGherkinDocument(reqnrollDocument);
 
         // Assert
-        result.Uri.Should().Be("Features/MyFolder/MyFeature.feature");
+        result.Uri.Should().Be($"Features/MyFolder/{tempFile.FileName}");
     }
 
     [Fact]
