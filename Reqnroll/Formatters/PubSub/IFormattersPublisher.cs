@@ -2,7 +2,7 @@
 
 namespace Reqnroll.Formatters.PubSub;
 
-public interface ICucumberMessagePublisher
+public interface IFormattersPublisher
 {
     void Initialize(RuntimePluginEvents runtimePluginEvents);
 }

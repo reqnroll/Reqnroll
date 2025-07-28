@@ -15,7 +15,7 @@ public class CucumberMessageBrokerTests
     private readonly Mock<IFormatterLog> _logMock;
     private readonly Mock<ICucumberMessageFormatter> _sinkMock1;
     private readonly Mock<ICucumberMessageFormatter> _sinkMock2;
-    private readonly CucumberMessageBroker _sut;
+    private readonly FormattersMessageBroker _sut;
 
     public CucumberMessageBrokerTests()
     {
@@ -25,7 +25,7 @@ public class CucumberMessageBrokerTests
         _sinkMock2 = new Mock<ICucumberMessageFormatter>();
         _sinkMock2.Setup(s => s.Name).Returns("sink2");
         // Initialize the system under test (SUT)
-        _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "sink1", _sinkMock1.Object}, { "sink2", _sinkMock2.Object} });
+        _sut = new FormattersMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "sink1", _sinkMock1.Object}, { "sink2", _sinkMock2.Object} });
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class CucumberMessageBrokerTests
     {
         var log = new Mock<IFormatterLog>();
 
-        var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>());
+        var sut = new FormattersMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>());
 
         // Act
         var result = sut.IsEnabled;
