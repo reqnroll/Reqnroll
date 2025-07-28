@@ -290,8 +290,10 @@ public class FeatureExecutionTrackerTests
         _ = sut.StaticMessages.ToList();
         sut.GetOrAddPickleExecutionTracker("0");
 
-        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
-        scenarioInfoDummy.PickleId = "0";
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0")
+        {
+            PickleId = "0"
+        };
 
         var attachmentAddedEvent = new AttachmentAddedEvent("attachmentFileName.png", _mockFeatureContext.FeatureInfo,  scenarioInfoDummy);
 
@@ -310,8 +312,10 @@ public class FeatureExecutionTrackerTests
         _ = sut.StaticMessages.ToList();
         sut.GetOrAddPickleExecutionTracker("0");
 
-        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
-        scenarioInfoDummy.PickleId = "0";
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0")
+        {
+            PickleId = "0"
+        };
 
         var outputAddedEvent = new OutputAddedEvent("sample output text", _featureInfoDummy, scenarioInfoDummy);
 

@@ -160,8 +160,8 @@ public class HookStepExecutionTrackerTests
         _hookStepExecutionTracker.StepTracker.Should().BeOfType<HookStepTracker>();
             
         _testCaseTracker.Steps.Should().HaveCount(1);
-        _testCaseTracker.Steps[0].Should().BeOfType<HookStepTracker>();
-        ((HookStepTracker)_testCaseTracker.Steps[0]).HookId.Should().Be(hookId);
+        _testCaseTracker.Steps[0].Should().BeOfType<HookStepTracker>()
+                        .Which.HookId.Should().Be(hookId);
     }
 
     [Fact]
@@ -244,27 +244,3 @@ public class HookStepExecutionTrackerTests
         );
     }
 }
-
- 
-//// Extend TestStepTracker to expose HookId in tests
-//public class HookStepTracker : TestStepTracker
-//{
-//    public HookStepTracker(string testStepDefinitionId, string hookId, TestCaseTracker parentTestCaseTracker, ICucumberMessageFactory messageFactory)
-//        : base(testStepDefinitionId, hookId, parentTestCaseTracker, messageFactory)
-//    {
-//        HookId = hookId;
-//    }
-
-//    public string HookId { get; }
-//}
-
-//// Base TestStepTracker class needed by HookStepTracker
-//public class TestStepTracker
-//{
-//    public TestStepTracker(string testStepDefinitionId, string pickleStepId, TestCaseTracker parentTestCaseTracker, ICucumberMessageFactory messageFactory)
-//    {
-//        TestStepId = testStepDefinitionId;
-//    }
-
-//    public string TestStepId { get; }
-//}

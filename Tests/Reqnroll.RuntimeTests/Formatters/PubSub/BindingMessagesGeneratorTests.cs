@@ -15,6 +15,7 @@ public class BindingMessagesGeneratorTests
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly Mock<IIdGenerator> _idGeneratorMock;
     private readonly BindingMessagesGenerator _sut;
+    // ReSharper disable once FieldCanBeMadeReadOnly.Local
     private int _currentId = 0;
 
     public BindingMessagesGeneratorTests()
@@ -36,7 +37,7 @@ public class BindingMessagesGeneratorTests
         stepTransform.Setup(sd => sd.Method.Type.FullName).Returns("TypeName");
         stepTransform.Setup(sd => sd.Method.Parameters).Returns([]);
 
-        _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new[] { stepTransform.Object });
+        _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns([stepTransform.Object]);
 
         _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
         // Act
@@ -79,7 +80,7 @@ public class BindingMessagesGeneratorTests
         validStepDefinition.Setup(sd => sd.Method.Type.FullName).Returns("TypeName");
         validStepDefinition.Setup(sd => sd.Method.Parameters).Returns([]);
 
-        _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new[] { validStepDefinition.Object });
+        _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns([validStepDefinition.Object]);
 
         _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
         // Act

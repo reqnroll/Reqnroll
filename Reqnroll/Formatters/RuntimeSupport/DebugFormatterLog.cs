@@ -11,16 +11,23 @@ public class DebugFormatterLog : IFormatterLog
 
     public void WriteMessage(string message)
     {
+#if DEBUG
         _entries.Add($"{DateTime.Now:HH:mm:ss.fff}: {message}");
+#endif
     }
 
     public void DumpMessages()
     {
         if (!_hasDumped)
+        {
+#if DEBUG
             foreach (var msg in _entries)
             {
                 Debug.WriteLine(msg);
             }
+#endif
+        }
+
         _hasDumped = true;
     }
 }

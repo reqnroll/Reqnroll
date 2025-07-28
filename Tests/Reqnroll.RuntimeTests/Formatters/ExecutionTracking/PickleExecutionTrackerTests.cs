@@ -32,7 +32,7 @@ public class PickleExecutionTrackerTests
     private Mock<IContextManager> _mockContextManager;
     private readonly Mock<IHookBinding> _mockHookBinding;
     private readonly ConcurrentDictionary<IBinding, string> _stepDefinitionsByMethodSignature;
-    private readonly Timestamp _testTime = new Timestamp(0, 1);
+    private readonly Timestamp _testTime = new(0, 1);
     private readonly ObjectContainer _objectContainerStub = new();
 
     public PickleExecutionTrackerTests()
@@ -104,7 +104,6 @@ public class PickleExecutionTrackerTests
         _mockContextManager = new Mock<IContextManager>();
         _mockContextManager.Setup(x => x.FeatureContext).Returns(_featureContextStub);
         _mockContextManager.Setup(x => x.ScenarioContext).Returns(_scenarioContextSub);
-        //_mockContextManager.Setup(x => x.StepContext).Returns(_mockStepContext.Object);
     }
 
     [Fact]

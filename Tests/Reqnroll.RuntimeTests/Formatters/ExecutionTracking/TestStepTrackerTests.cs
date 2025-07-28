@@ -41,12 +41,12 @@ public class TestStepTrackerTests
         {
             BindingMatch = new BindingMatch(
                 stepBindingMock.Object, // stepBinding
-                0,                     // scopeMatches
+                0,           // scopeMatches
                 [
                     new MatchArgument("arg1", 1 ),
                     new MatchArgument("arg2", 2 )
                 ],
-                null                   // stepContext
+                null          // stepContext
             )
         };
         var stepContextMock = new Mock<IScenarioStepContext>();
@@ -134,10 +134,10 @@ public class TestStepTrackerTests
         // Arrange
         var stepInfo = new StepInfo(
             StepDefinitionType.Given, // stepDefinitionType
-            "Step Text",              // text
-            null,                     // table
-            null,                     // multilineText
-            "pickleStepId"            // pickleStepId
+            "Step Text",         // text
+            null,               // table
+            null,         // multilineText
+            "pickleStepId" // pickleStepId
         )
         {
             BindingMatch = BindingMatch.NonMatching
@@ -169,27 +169,29 @@ public class TestStepTrackerTests
         stepBindingMock.Setup(b => b.Method).Returns(methodMock.Object);
         var bindingMatch = new BindingMatch(
             stepBindingMock.Object, // stepBinding
-            0,                     // scopeMatches
+            0,           // scopeMatches
             [
                 new MatchArgument("arg1", 1 ),
                 new MatchArgument("arg2", 2 )
             ],
-            null                   // stepContext
+            null          // stepContext
         );
 
-        var ambiguousMatchException = new AmbiguousBindingException("error message", 
-                                                                    new List<BindingMatch> { 
-                                                                        bindingMatch,
-                                                                        bindingMatch
-                                                                    }
+        var ambiguousMatchException = new AmbiguousBindingException(
+            "error message",
+            new List<BindingMatch>
+            {
+                bindingMatch,
+                bindingMatch
+            }
         );
 
         var stepInfo = new StepInfo(
             StepDefinitionType.Given, // stepDefinitionType
-            "Step Text",              // text
-            null,                     // table
-            null,                     // multilineText
-            "pickleStepId"            // pickleStepId
+            "Step Text",         // text
+            null,               // table
+            null,         // multilineText
+            "pickleStepId" // pickleStepId
         )
 
         {
@@ -202,8 +204,6 @@ public class TestStepTrackerTests
         stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
         stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.TestError);
 
-        //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
-        //    .Returns("ambiguousPattern");
         _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", _testCaseTracker));
         _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
             new Dictionary<IBinding, string> { { stepBindingMock.Object, "pickleStepId" } });
@@ -220,5 +220,4 @@ public class TestStepTrackerTests
         def.StepDefinitionIds.Should().NotBeNull();
         def.StepDefinitionIds.Should().Contain("pickleStepId");
     }
-
 }
