@@ -20,6 +20,16 @@ public class CucumberMessagesConverter
         _idGenerator = idGenerator;
     }
 
+    private static string CombinePathsWithSlash(string path1, string path2)
+    {
+        if (string.IsNullOrEmpty(path1) || path1 == ".")
+            return path2;
+        if (string.IsNullOrEmpty(path2) || path2 == ".")
+            return path1;
+
+        return $"{path1}/{path2}";
+    }
+
     /// <summary>
     /// This method transforms an AST <see cref="ReqnrollDocument"/> into a <see cref="GherkinDocument"/>.
     /// Before doing so, it patches any missing Location elements in the AST. These might be missing because our ExternalData Plugin
@@ -30,7 +40,7 @@ public class CucumberMessagesConverter
         var nullLocationPatcher = new PatchMissingLocationElementsTransformation();
         var gherkinDocumentWithLocation = nullLocationPatcher.TransformDocument(gherkinDocument);
         var converter = new AstMessagesConverter(_idGenerator);
-        var location = Path.Combine(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath));
+        var location = CombinePathsWithSlash(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath));
         return converter.ConvertGherkinDocumentToEventArgs(gherkinDocumentWithLocation, location);
     }
 
@@ -41,7 +51,7 @@ public class CucumberMessagesConverter
             var sourceText = File.ReadAllText(gherkinDocument.SourceFilePath);
             return new Source
             {
-                Uri = Path.Combine(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath)),
+                Uri = CombinePathsWithSlash(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath)),
                 Data = sourceText,
                 MediaType = "text/x.cucumber.gherkin+plain"
             };
