@@ -1,0 +1,13 @@
+{
+  "language": {
+    "feature": "en-US"
+  },
+  "unitTestProvider": {
+    "name": "xunit"
+  },
+  "plugins": [
+    {
+      "name": "Reqnroll.ScenarioCall.ReqnrollPlugin"
+    }
+  ]
+}

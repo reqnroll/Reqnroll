@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
+    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.ScenarioCall.Generator.nuspec</NuspecFile>
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <PackageId>Reqnroll.ScenarioCall</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="build\**\*" />
+    <None Include="build\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+    <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" />
+  </ItemGroup>
+
+</Project>
