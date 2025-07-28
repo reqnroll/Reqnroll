@@ -16,6 +16,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public async Task Should_publish_step_started_event()
         {
+            var stepDefinition = RegisterStepDefinition().Object;
             var testExecutionEngine = CreateTestExecutionEngine();
 
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
@@ -64,6 +65,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public async Task Should_publish_step_finished_event()
         {
+            var stepDefinition = RegisterStepDefinition().Object;
+
             var testExecutionEngine = CreateTestExecutionEngine();
 
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
@@ -202,7 +205,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(scenarioInfo, null);
+            testExecutionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
             await testExecutionEngine.OnScenarioSkippedAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();

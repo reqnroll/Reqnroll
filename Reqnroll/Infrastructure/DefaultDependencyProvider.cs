@@ -1,21 +1,30 @@
-using Reqnroll.BoDi;
+using Gherkin.CucumberMessages;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
 using Reqnroll.Analytics.UserId;
-using Reqnroll.BindingSkeletons;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.CucumberExpressions;
 using Reqnroll.Bindings.Discovery;
+using Reqnroll.BindingSkeletons;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.FileAccess;
+using Reqnroll.Formatters;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.Html;
+using Reqnroll.Formatters.Messages;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
-using Reqnroll.PlatformCompatibility;
+using Reqnroll.Utils;
 
 namespace Reqnroll.Infrastructure
 {
@@ -100,6 +109,22 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<RuntimePluginTestExecutionLifecycleEventEmitter, IRuntimePluginTestExecutionLifecycleEventEmitter>();
 
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
+
+            //Support for publishing Cucumber Messages
+            container.RegisterTypeAs<DebugFormatterLog, IFormatterLog>();
+            container.RegisterTypeAs<FileSystem, IFileSystem>();
+            container.RegisterTypeAs<FormattersDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
+            container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
+            container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
+            container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
+            container.RegisterTypeAs<MessagesFormatter, ICucumberMessageFormatter>("messages");
+            container.RegisterTypeAs<HtmlFormatter, ICucumberMessageFormatter>("html");
+            container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
+            container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
+            container.RegisterTypeAs<ShortGuidIdGenerator, IIdGenerator>();
+            container.RegisterTypeAs<CucumberMessageFactory, ICucumberMessageFactory>();
+            container.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
+            container.RegisterTypeAs<MetaMessageGenerator, IMetaMessageGenerator>();
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)

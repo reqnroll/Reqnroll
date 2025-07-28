@@ -11,5 +11,22 @@ namespace Reqnroll.EnvironmentAccess
             string Tag)
     {
         public string ProductName { get; init; }
+
+        public static BuildMetadata Unknown
+        {
+            get
+            {
+                return new BuildMetadata(
+                     BuildUrl: "UNKNOWN",
+                     BuildNumber: "UNKNOWN",
+                     Remote: "UNKNOWN",
+                     Revision: "UNKNOWN",
+                     Branch: "UNKNOWN",
+                     Tag: "UNKNOWN")
+                {
+                    ProductName = "UNKNOWN"
+                };
+            }
+        }
     }
 }

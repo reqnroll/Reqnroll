@@ -9,6 +9,7 @@ setup-project
 setup-ide
 configuration
 compatibility
+../cucumber-messages/configuration
 ```
 
 

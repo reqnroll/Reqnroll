@@ -48,7 +48,7 @@ namespace Reqnroll.Generator.Generation
                 GenerateStep(generationContext, statements, step, null);
             }
             backgroundMethod.Statements.AddRange(statements.ToArray());
-            
+
         }
         #region Rule Background Support
 
@@ -92,7 +92,7 @@ namespace Reqnroll.Generator.Generation
                 GetTableArgExpression(scenarioStep.Argument as Gherkin.Ast.DataTable, statements, paramToIdentifier),
                 new CodePrimitiveExpression(scenarioStep.Keyword)
             };
-            
+
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, gherkinStep.Location))
             {
                 string stepKeyWord = scenarioStep.StepKeyword switch
@@ -225,13 +225,26 @@ namespace Reqnroll.Generator.Generation
                 return new CodePrimitiveExpression(text);
             }
 
-            var formatArguments = new List<CodeExpression> {new CodePrimitiveExpression(formatText)};
+            var formatArguments = new List<CodeExpression> { new CodePrimitiveExpression(formatText) };
             formatArguments.AddRange(arguments.Select(id => new CodeVariableReferenceExpression(id)));
 
             return new CodeMethodInvokeExpression(
                 new CodeTypeReferenceExpression(typeof(string)),
                 "Format",
                 formatArguments.ToArray());
+        }
+        public void AddVariableForPickleIndex(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, int? pickleIndex)
+        {
+            if (!pickleIdIncludedInParameters && pickleIndex == null)
+                throw new ArgumentNullException(nameof(pickleIndex));
+
+            // string pickleId = "<pickleJar.CurrentPickleId>"; or
+            // string pickleId = __pickleId;
+            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), GeneratorConstants.PICKLEINDEX_VARIABLE_NAME,
+                pickleIdIncludedInParameters ?
+                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEINDEX_PARAMETER_NAME) :
+                    new CodePrimitiveExpression(pickleIndex.Value.ToString()));
+            testMethod.Statements.Add(pickleIdVariable);
         }
     }
 }

@@ -173,11 +173,6 @@ namespace Reqnroll.Events
         public IHookBinding HookBinding { get; }
         public IContextManager ContextManager { get; private set; }
 
-        public HookBindingStartedEvent(IHookBinding hookBinding)
-        {
-            HookBinding = hookBinding;
-        }
-
         public HookBindingStartedEvent(IHookBinding hookBinding, IContextManager contextManager) 
         {
             HookBinding = hookBinding;
@@ -192,12 +187,6 @@ namespace Reqnroll.Events
         public TimeSpan Duration { get; }
         public IContextManager ContextManager { get; private set; }
         public Exception HookException { get; private set; }
-
-        public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration)
-        {
-            HookBinding = hookBinding;
-            Duration = duration;
-        }
 
         public HookBindingFinishedEvent(IHookBinding hookBinding, TimeSpan duration, IContextManager contextManager, Exception hookException = null) 
         {
@@ -217,11 +206,6 @@ namespace Reqnroll.Events
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
 
-        public OutputAddedEvent(string text)
-        {
-            Text = text;
-        }
-
         public OutputAddedEvent(string text, FeatureInfo featureInfo, ScenarioInfo scenarioInfo)
         {
             Text = text;
@@ -235,11 +219,6 @@ namespace Reqnroll.Events
         public string FilePath { get; }
         public FeatureInfo FeatureInfo { get; }
         public ScenarioInfo ScenarioInfo { get; }
-
-        public AttachmentAddedEvent(string filePath)
-        {
-            FilePath = filePath;
-        }
 
         public AttachmentAddedEvent(string filePath, FeatureInfo featureInfo, ScenarioInfo scenarioInfo)
         {
