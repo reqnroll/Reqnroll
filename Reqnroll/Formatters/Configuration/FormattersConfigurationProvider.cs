@@ -33,7 +33,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
         var config = _resolvedConfiguration.Value;
         if (config.Formatters.TryGetValue(formatterName, out var formatterConfig))
             return formatterConfig;
-        return new Dictionary<string, object>();
+        return null;
     }
 
     private FormattersConfiguration ResolveConfiguration()

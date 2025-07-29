@@ -51,7 +51,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                 return false;
             configuration = _configurationProvider.GetFormatterConfigurationByName(_pluginName);
 
-            return configuration != null && configuration.Count > 0;
+            return configuration != null;
         }
 
         if (!IsFormatterEnabled(out var formatterConfiguration))
