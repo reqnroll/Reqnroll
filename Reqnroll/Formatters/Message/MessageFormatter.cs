@@ -11,16 +11,16 @@ using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 
-namespace Reqnroll.Formatters.Messages;
+namespace Reqnroll.Formatters.Message;
 
 /// <summary>
 /// Produces a Cucumber Messages output (.ndjson) file.
 /// </summary>
-public class MessagesFormatter : FileWritingFormatterBase
+public class MessageFormatter : FileWritingFormatterBase
 {
     private readonly byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-    public MessagesFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, fileSystem, "messages", ".ndjson", "reqnroll_report.ndjson")
+    public MessageFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, fileSystem, "message", ".ndjson", "reqnroll_report.ndjson")
     {
     }
 
