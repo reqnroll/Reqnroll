@@ -245,7 +245,10 @@ namespace Reqnroll.Bindings.Discovery
         private void ProcessStepDefinitionAttribute(BindingSourceMethod bindingSourceMethod, BindingSourceAttribute stepDefinitionAttribute, BindingScope scope)
         {
             var stepDefinitionTypes = GetStepDefinitionTypes(stepDefinitionAttribute);
-            string regex = stepDefinitionAttribute.TryGetAttributeValue<string>(0);
+
+            // The expressionString what called in Reqnroll v1+v2 Regex, and since v3 Expression
+            string expressionString = stepDefinitionAttribute.TryGetAttributeValue<string>(0);
+            var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>(nameof(StepDefinitionBaseAttribute.ExpressionType));
 
             var validationResult = ValidateStepDefinition(bindingSourceMethod, stepDefinitionAttribute);
             if (!validationResult.IsValid)
@@ -254,14 +257,14 @@ namespace Reqnroll.Bindings.Discovery
                 foreach (var stepDefinitionType in stepDefinitionTypes)
                 {
                     _stepDefinitionBindingBuilders.Add(new InvalidStepDefinitionBindingBuilder(
-                        stepDefinitionType, bindingSourceMethod.BindingMethod, scope, regex, validationResult.CombinedErrorMessages));
+                        stepDefinitionType, bindingSourceMethod.BindingMethod, scope, expressionString, validationResult.CombinedErrorMessages));
                 }
                 return;
             }
 
             foreach (var stepDefinitionType in stepDefinitionTypes)
             {
-                var stepDefinitionBindingBuilder = _bindingFactory.CreateStepDefinitionBindingBuilder(stepDefinitionType, bindingSourceMethod.BindingMethod, scope, regex);
+                var stepDefinitionBindingBuilder = _bindingFactory.CreateStepDefinitionBindingBuilder(stepDefinitionType, bindingSourceMethod.BindingMethod, scope, expressionString, expressionType);
                 _stepDefinitionBindingBuilders.Add(stepDefinitionBindingBuilder);
             }
         }

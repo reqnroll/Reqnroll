@@ -3,6 +3,22 @@ using Reqnroll.Bindings;
 
 namespace Reqnroll
 {
+    public enum ExpressionType
+    {
+        /// <summary>
+        /// Detect automatically if the expression is a Regular expression (Regex) or a Cucumber expression
+        /// </summary>
+        Unspecified,
+        /// <summary>
+        /// The expression is a Cucumber Expression
+        /// </summary>
+        CucumberExpression,
+        /// <summary>
+        /// The expression is a Regular expression (Regex)
+        /// </summary>
+        RegularExpression
+    }
+
     /// <summary>
     /// Marker attribute that specifies that this class may contain bindings (step definitions, hooks, etc.)
     /// </summary>
@@ -20,6 +36,8 @@ namespace Reqnroll
         /// A cucumber expression or a regular expression (regex) that matches the step text.
         /// </summary>
         public string Expression { get; set; }
+
+        public ExpressionType ExpressionType { get; set; } = ExpressionType.Unspecified;
 
         internal StepDefinitionBaseAttribute(string expression, StepDefinitionType type)
             : this(expression, new[] { type })
