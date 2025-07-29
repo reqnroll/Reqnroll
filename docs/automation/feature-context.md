@@ -95,6 +95,10 @@ Then the FeatureInfo contains the following information
 
 ...and in the step definition:
 
+```{note}
+The example below uses the `CreateInstance<T>` method to convert table data to objects. For detailed information about this method and other DataTable helpers, see [DataTable Helpers](datatable-helpers.md).
+```
+
 ```{code-block} csharp
 :caption: Step Definition File
 
