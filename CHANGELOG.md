@@ -2,6 +2,7 @@
 
 ## Improvements:
 
+* Removed unused Culture property from step definition attributes (Given, When, Then, StepDefinition) (#671)
 * Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
 * Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 * Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)

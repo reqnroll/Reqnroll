@@ -19,7 +19,7 @@ public class GivenAttribute : Reqnroll.GivenAttribute
     {
     }
 
-    public GivenAttribute(string expression, string culture) : base(expression, culture)
+    public GivenAttribute(string expression, string culture) : base(expression)
     {
     }
 }
@@ -37,7 +37,7 @@ public class WhenAttribute : Reqnroll.WhenAttribute
     {
     }
 
-    public WhenAttribute(string expression, string culture) : base(expression, culture)
+    public WhenAttribute(string expression, string culture) : base(expression)
     {
     }
 }
@@ -55,7 +55,7 @@ public class ThenAttribute : Reqnroll.ThenAttribute
     {
     }
 
-    public ThenAttribute(string expression, string culture) : base(expression, culture)
+    public ThenAttribute(string expression, string culture) : base(expression)
     {
     }
 }
@@ -73,7 +73,7 @@ public class StepDefinitionAttribute : Reqnroll.StepDefinitionAttribute
     {
     }
 
-    public StepDefinitionAttribute(string expression, string culture) : base(expression, culture)
+    public StepDefinitionAttribute(string expression, string culture) : base(expression)
     {
     }
 }

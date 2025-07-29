@@ -174,19 +174,19 @@ namespace Reqnroll.RuntimeTests
         {
             public class AngenommenAttribute : GivenAttribute
             {
-                public AngenommenAttribute(string expression) : base(expression, "de-DE")
+                public AngenommenAttribute(string expression) : base(expression)
                 {
                 }
             }
             public class WennAttribute : WhenAttribute
             {
-                public WennAttribute(string expression) : base(expression, "de-DE")
+                public WennAttribute(string expression) : base(expression)
                 {
                 }
             }
             public class DannAttribute : ThenAttribute
             {
-                public DannAttribute(string expression) : base(expression, "de-DE")
+                public DannAttribute(string expression) : base(expression)
                 {
                 }
             }
