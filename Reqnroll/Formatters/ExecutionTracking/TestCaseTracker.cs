@@ -16,7 +16,7 @@ public class TestCaseTracker(string testCaseId, string pickleId, IPickleExecutio
     public string PickleId { get; } = pickleId;
     public string TestCaseId { get; } = testCaseId;
 
-    public List<StepTracker> Steps { get; } = new();
+    public List<StepTrackerBase> Steps { get; } = new();
 
     internal string FindStepDefinitionIdByBindingKey(IBinding binding)
     {

@@ -1,17 +1,20 @@
 ﻿using System;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Reqnroll.Formatters.PubSub;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
 /// Base class for tracking execution of steps (test steps and hooks)
 /// </summary>
-public abstract class StepExecutionTrackerBase(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory)
+public abstract class StepExecutionTrackerBase(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, IPublishMessage publisher)
 {
+    protected readonly IPublishMessage _publisher = publisher;
+
     public TestCaseExecutionTracker ParentTracker { get; } = parentTracker;
     protected ICucumberMessageFactory MessageFactory { get; } = messageFactory;
 
-    public StepTracker StepTracker { get; protected internal set; }
+    public StepTrackerBase StepTracker { get; protected internal set; }
 
     public ScenarioExecutionStatus Status { get; protected set; }
     public DateTime? StepStartedAt { get; protected set; }

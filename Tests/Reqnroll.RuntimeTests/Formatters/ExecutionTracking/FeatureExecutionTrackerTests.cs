@@ -16,6 +16,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Xunit;
+using Reqnroll.Formatters.PubSub;
+using System.Threading.Tasks;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
@@ -24,13 +26,14 @@ public class FeatureExecutionTrackerTests
     private Mock<IIdGenerator> _idGeneratorMock;
     private FeatureStartedEvent _featureStartedEventDummy;
     private IFeatureContext _mockFeatureContext;
-    private Mock<IPickleExecutionTracker> _testCaseTrackerMock;
+    private Mock<IPickleExecutionTracker> _pickleTrackerMock;
 
     private ConcurrentDictionary<IBinding, string> _stepDefinitionsByBinding;
     private int _idCounter;
     private FeatureInfo _featureInfoDummy;
     private Mock<IClock> _clockMock;
     private Mock<IObjectContainer> _featureContainer;
+    private Mock<IPublishMessage> _publisherMock;
 
     private FeatureExecutionTracker InitializeFeatureTrackerSut()
     {
@@ -39,6 +42,7 @@ public class FeatureExecutionTrackerTests
         _idGeneratorMock.Setup(g => g.GetNewId()).Returns(() => _idCounter++.ToString());
         _clockMock = new Mock<IClock>();
         _clockMock.Setup(clock => clock.GetNowDateAndTime()).Returns(DateTime.UnixEpoch);
+        _publisherMock = new Mock<IPublishMessage>();
 
         _featureContainer = new Mock<IObjectContainer>();
         _featureContainer.Setup(c => c.Resolve<IClock>()).Returns(_clockMock.Object);
@@ -58,13 +62,16 @@ public class FeatureExecutionTrackerTests
 
         _featureStartedEventDummy = new FeatureStartedEvent(mockFeatureContext.Object);
 
+        _pickleTrackerMock = new Mock<IPickleExecutionTracker>();
+        _pickleTrackerMock.Setup(t => t.TestCaseStartedTimeStamp).Returns(DateTime.Now);
+
+        var pickleFactoryMock = new Mock<IPickleExecutionTrackerFactory>();
+        pickleFactoryMock.Setup(f => f.CreatePickleTracker(It.IsAny<IFeatureExecutionTracker>(), It.IsAny<string>()))
+            .Returns(_pickleTrackerMock.Object);
+
         // Initialize the FeatureExecutionTracker
-        var ft = new FeatureExecutionTracker(_featureStartedEventDummy, "TestRunId", _idGeneratorMock.Object, _stepDefinitionsByBinding, new CucumberMessageFactory());
+        var ft = new FeatureExecutionTracker(_featureStartedEventDummy, "TestRunId", _stepDefinitionsByBinding, _idGeneratorMock.Object, _clockMock.Object, new CucumberMessageFactory(), pickleFactoryMock.Object, _publisherMock.Object);
 
-        _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
-        _testCaseTrackerMock.Setup(t => t.TestCaseStartedTimeStamp).Returns(DateTime.Now);
-
-        ft.PickleExecutionTrackerFactory = (_, _) => _testCaseTrackerMock.Object;
         return ft;
     }
 
@@ -81,40 +88,37 @@ public class FeatureExecutionTrackerTests
     }
 
     [Fact]
-    public void ProcessEvent_Should_Generate_StaticMessages_On_FeatureStartedEvent()
+    public async Task ProcessEvent_Should_Generate_StaticMessages_On_FeatureStartedEvent()
     {
         var sut = InitializeFeatureTrackerSut();
         // Act
-        // sut.ProcessEvent(_featureStartedEventDummy); //the featureStartedEvent is processed during FeatureExecutionTracker constructor
+        await sut.ProcessEvent(_featureStartedEventDummy); 
 
         // Assert
-        sut.StaticMessages.Should().NotBeNull();
-        sut.StaticMessages.ToList().Count.Should().Be(3);
+        _publisherMock.Verify(p => p.PublishAsync(It.IsAny<Envelope>()), Times.Exactly(3));
     }
 
     [Fact]
-    public void ProcessEvent_Should_Calculate_FeatureExecutionSuccess_On_FeatureFinishedEvent()
+    public async Task ProcessEvent_Should_Calculate_FeatureExecutionSuccess_On_TestRunFinished()
     {
         // Arrange
-        var featureFinishedEventMock = new Mock<FeatureFinishedEvent>(MockBehavior.Strict, null!);
         var sut = InitializeFeatureTrackerSut();
 
         // Act
-        sut.ProcessEvent(featureFinishedEventMock.Object);
+        await sut.FinalizeTracking();
 
         // Assert
         sut.FeatureExecutionSuccess.Should().BeTrue(); // No test cases were added, so it should default to true
     }
 
     [Fact]
-    public void ProcessEvent_Should_Calculate_FeatureExecutionFailure_On_FeatureFinishedEventWhenAScenarioFails()
+    public async Task ProcessEvent_Should_Calculate_FeatureExecutionFailure_On_FeatureFinishedEventWhenAScenarioFails()
     {
         // Arrange
         var featureFinishedEventMock = new Mock<FeatureFinishedEvent>(MockBehavior.Strict, null!);
         var sut = InitializeFeatureTrackerSut();
-        _testCaseTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.TestError);
-        _testCaseTrackerMock.Setup(t => t.Finished).Returns(true);
-        _ = sut.StaticMessages.ToList();
+        _pickleTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.TestError);
+        _pickleTrackerMock.Setup(t => t.Finished).Returns(true);
         sut.GetOrAddPickleExecutionTracker("0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
@@ -123,75 +127,84 @@ public class FeatureExecutionTrackerTests
         var scenarioFinishedEventMock = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock.Object);
 
         // Act
-        sut.ProcessEvent(scenarioFinishedEventMock.Object);
-        sut.ProcessEvent(featureFinishedEventMock.Object);
+        await sut.ProcessEvent(scenarioFinishedEventMock.Object);
+        await sut.FinalizeTracking();
 
         // Assert
-        sut.FeatureExecutionSuccess.Should().BeFalse(); // No test cases were added, so it should default to true
+        sut.FeatureExecutionSuccess.Should().BeFalse(); 
     }
 
 
 
     [Fact]
-    public void ProcessEvent_Should_Throw_Exception_For_Invalid_ScenarioStartedEvent()
+    public async Task ProcessEvent_Should_Throw_Exception_For_Invalid_ScenarioStartedEvent()
     {
         // Arrange
         var scenarioStartedEventMock = new Mock<ScenarioStartedEvent>(MockBehavior.Strict, null!, null!);
         var sut = InitializeFeatureTrackerSut();
 
         // Act
-        Action act = () => sut.ProcessEvent(scenarioStartedEventMock.Object);
+        Func<Task> act = async () => await sut.ProcessEvent(scenarioStartedEventMock.Object);
 
         // Assert
-        act.Should().Throw<ArgumentNullException>();
+        await act.Should().ThrowAsync<ArgumentNullException>();
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_Valid_ScenarioStartedEvent()
+    public async Task ProcessEvent_Should_Handle_Valid_ScenarioStartedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
         var scenarioContextMock = new Mock<IScenarioContext>();
         scenarioContextMock.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy);
 
-        var scenarioStartedEventMock = new Mock<ScenarioStartedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock.Object);
-        _ = sut.StaticMessages.ToList();
+        var scenarioStartedEvent = new ScenarioStartedEvent(_mockFeatureContext, scenarioContextMock.Object);
 
         // Act
-        sut.ProcessEvent(scenarioStartedEventMock.Object);
+        await sut.ProcessEvent(scenarioStartedEvent);
         // Assert
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(scenarioStartedEventMock.Object));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(scenarioStartedEvent));
         sut.PickleExecutionTrackers.Should().NotBeEmpty();
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_ScenarioFinishedEvent()
+    public async Task ProcessEvent_Should_Handle_ScenarioFinishedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        _ = sut.StaticMessages.ToList();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
+        // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
         var scenarioContextMock = new Mock<IScenarioContext>();
         scenarioContextMock.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy);
-        var scenarioFinishedEventMock = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock.Object);
+        var scenarioFinishedEventMock = new ScenarioFinishedEvent(_mockFeatureContext, scenarioContextMock.Object);
 
         // Act
-        sut.ProcessEvent(scenarioFinishedEventMock.Object);
+        await sut.ProcessEvent(scenarioFinishedEventMock);
 
         // Assert that the ScenarioFinishedEvent was dispatched to the PickleExecutionTracker
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(scenarioFinishedEventMock.Object));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(scenarioFinishedEventMock));
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_StepStartedEvent()
+    public async Task ProcessEvent_Should_Handle_StepStartedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        _ = sut.StaticMessages.ToList();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
+        // Ensure that the PickleExecutionTracker is created for the Scenario
+
         sut.GetOrAddPickleExecutionTracker("0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
@@ -204,18 +217,21 @@ public class FeatureExecutionTrackerTests
         var stepStartedEvent = new StepStartedEvent(_mockFeatureContext, scenarioContextMock.Object, stepContext);
 
         // Act
-        sut.ProcessEvent(stepStartedEvent);
+        await sut.ProcessEvent(stepStartedEvent);
 
         // Assert that the StepStartedEvent was dispatched to the PickleExecutionTracker
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(stepStartedEvent));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(stepStartedEvent));
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_StepFinishedEvent()
+    public async Task ProcessEvent_Should_Handle_StepFinishedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        _ = sut.StaticMessages.ToList();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
+        // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
@@ -229,18 +245,21 @@ public class FeatureExecutionTrackerTests
         var stepFinishedEvent = new StepFinishedEvent(_mockFeatureContext, scenarioContextMock.Object, stepContext);
 
         // Act
-        sut.ProcessEvent(stepFinishedEvent);
+        await sut.ProcessEvent(stepFinishedEvent);
 
         // Assert
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(stepFinishedEvent));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(stepFinishedEvent));
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_HookBindingStartedEvent()
+    public async Task ProcessEvent_Should_Handle_HookBindingStartedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        _ = sut.StaticMessages.ToList();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
+        // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
@@ -252,18 +271,21 @@ public class FeatureExecutionTrackerTests
         var hookBindingStarted = new HookBindingStartedEvent(null, contextManagerMock.Object);
 
         // Act
-        sut.ProcessEvent(hookBindingStarted);
+        await sut.ProcessEvent(hookBindingStarted);
 
         // Assert
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(hookBindingStarted));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(hookBindingStarted));
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_HookBindingFinishedEvent()
+    public async Task ProcessEvent_Should_Handle_HookBindingFinishedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        _ = sut.StaticMessages.ToList();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
+        // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
@@ -276,53 +298,55 @@ public class FeatureExecutionTrackerTests
         var hookBindingFinished = new HookBindingFinishedEvent(null, new TimeSpan(), contextManagerMock.Object);
 
         // Act
-        sut.ProcessEvent(hookBindingFinished);
+        await sut.ProcessEvent(hookBindingFinished);
 
         // Assert
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(hookBindingFinished));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(hookBindingFinished));
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_AttachmentAddedEvent()
+    public async Task ProcessEvent_Should_Handle_AttachmentAddedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        _ = sut.StaticMessages.ToList();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
+        // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
-        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0")
-        {
-            PickleId = "0"
-        };
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+        scenarioInfoDummy.PickleId = "0";
 
         var attachmentAddedEvent = new AttachmentAddedEvent("attachmentFileName.png", _mockFeatureContext.FeatureInfo,  scenarioInfoDummy);
 
         // Act
-        sut.ProcessEvent(attachmentAddedEvent);
+        await sut.ProcessEvent(attachmentAddedEvent);
 
         // Assert
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(attachmentAddedEvent));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(attachmentAddedEvent));
     }
 
     [Fact]
-    public void ProcessEvent_Should_Handle_OutputAddedEvent()
+    public async Task ProcessEvent_Should_Handle_OutputAddedEvent()
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        _ = sut.StaticMessages.ToList();
+        // setup the PickleJar and PickleIds for the Scenario in this test
+        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        sut.PickleIds.Add("0", "0");
+        // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
-        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0")
-        {
-            PickleId = "0"
-        };
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+        scenarioInfoDummy.PickleId = "0";
 
         var outputAddedEvent = new OutputAddedEvent("sample output text", _featureInfoDummy, scenarioInfoDummy);
 
         // Act
-        sut.ProcessEvent(outputAddedEvent);
+        await sut.ProcessEvent(outputAddedEvent);
 
         // Assert
-        _testCaseTrackerMock.Verify(t => t.ProcessEvent(outputAddedEvent));
+        _pickleTrackerMock.Verify(t => t.ProcessEvent(outputAddedEvent));
     }
 }

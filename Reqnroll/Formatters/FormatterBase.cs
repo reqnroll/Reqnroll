@@ -17,10 +17,12 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
 {
     private Task? _formatterTask;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private ICucumberMessageBroker? _broker;
+    private IFormattersBroker? _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
     private readonly IFormatterLog _logger;
-    protected readonly Channel<Envelope> PostedMessages = Channel.CreateUnbounded<Envelope>();
+    protected readonly Channel<Envelope> PostedMessages = Channel.CreateUnbounded<Envelope>(
+                                                            new UnboundedChannelOptions() { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations=true }
+                                                            );
 
     private bool _isDisposed = false;
     protected bool Closed = false;
@@ -39,7 +41,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in constructor.");
     }
 
-    public void LaunchSink(ICucumberMessageBroker broker)
+    public void LaunchSink(IFormattersBroker broker)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in Launch().");
         _broker = broker;
