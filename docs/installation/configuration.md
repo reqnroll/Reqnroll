@@ -188,3 +188,7 @@ The `bindingAssemblies` section can contain multiple JSON objects (one for each 
   - assembly name
   - The name of the assembly containing bindings (without `.dll`).
 ```
+
+### `formatters`
+
+This section can be used to configure [Reqnroll Formatters](../reporting/reqnroll-formatters.md). See [](formatter-configuration.md) for further details.
