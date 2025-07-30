@@ -12,6 +12,7 @@ using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using Xunit;
+using System.Runtime.InteropServices;
 
 namespace Reqnroll.RuntimeTests.Formatters;
 
@@ -102,6 +103,11 @@ public class FileWritingFormatterBaseTests
     [Fact]
     public void LaunchInner_InvalidFile_DisablesFormatter()
     {
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            throw new SkipException("Test only valid on Windows due to file path validation differences.");
+        }
+
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
         _configMock.Setup(c => c.Enabled).Returns(true);
         var config = new Dictionary<string, object> { { "outputFilePath", "invalid|file.txt" } };
