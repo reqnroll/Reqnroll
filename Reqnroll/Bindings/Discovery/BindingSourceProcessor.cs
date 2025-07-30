@@ -248,7 +248,7 @@ namespace Reqnroll.Bindings.Discovery
 
             // The expressionString what called in Reqnroll v1+v2 Regex, and since v3 Expression
             string expressionString = stepDefinitionAttribute.TryGetAttributeValue<string>(0);
-            var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>(nameof(StepDefinitionBaseAttribute.ExpressionType));
+            var expressionType = stepDefinitionAttribute.TryGetAttributeValue(nameof(StepDefinitionBaseAttribute.ExpressionType), ExpressionType.Unspecified);
 
             var validationResult = ValidateStepDefinition(bindingSourceMethod, stepDefinitionAttribute);
             if (!validationResult.IsValid)
