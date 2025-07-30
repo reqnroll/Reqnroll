@@ -8,8 +8,8 @@ Reqnroll is distributed as a set of NuGet packages that you need to configure fo
 setup-project
 setup-ide
 configuration
+formatter-configuration
 compatibility
-../cucumber-messages/configuration
 ```
 
 
