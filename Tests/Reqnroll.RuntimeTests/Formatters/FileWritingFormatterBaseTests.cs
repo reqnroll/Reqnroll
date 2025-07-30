@@ -105,7 +105,7 @@ public class FileWritingFormatterBaseTests
     {
         if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            throw new SkipException("Test only valid on Windows due to file path validation differences.");
+            return; // Skip this test on non-Windows platforms as it checks for invalid file names specific to Windows.
         }
 
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
