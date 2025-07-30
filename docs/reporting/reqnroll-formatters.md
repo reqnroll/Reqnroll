@@ -30,7 +30,7 @@ The HTML generator uses the [Cucumber React Components](https://github.com/cucum
 ```{note}
 Currently the HTML formatter does not allow customizations or templating. We plan to add customization options in future releases. 
 
-With this release, customizations can be done either by a custom formatter (based on the [HTML formatter implementation](https://github.com/reqnroll/Reqnroll/blob/main/Reqnroll/Formatters/Html/HtmlFormatter.cs)) or by using the [Cucumber Messages formatter](#cucumber-messages-formatter) to generate a Cucumber Messages report and use custom tooling to generate a HTML report from it (see [this sample project](https://github.com/gasparnagy/cucumber-html-formatter-cli) as an example).
+With this release, customizations can be done either by a custom formatter (based on the [HTML formatter implementation](https://github.com/reqnroll/Reqnroll/blob/main/Reqnroll/Formatters/Html/HtmlFormatter.cs)) or by using the [Cucumber Message formatter](#cucumber-messages-formatter) to generate a Cucumber Messages report and use custom tooling to generate a HTML report from it (see [this sample project](https://github.com/gasparnagy/cucumber-html-formatter-cli) as an example).
 ```
 
 

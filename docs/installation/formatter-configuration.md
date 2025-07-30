@@ -24,7 +24,7 @@ Unless overwritten by using the Reqnroll configuration file and/or environment v
 
 The `formatters` section of the [`reqnroll.json` configuration file](configuration.md) can be used to configure formatters. Each section within `formatters` enables and configures a built-in or custom formatter. You can enable multiple formatters.
 
-The following example enables both the [HTML](../reporting/reqnroll-formatters.md#html-formatter) and the [Cucumber Messages](../reporting/reqnroll-formatters.md#cucumber-messages-formatter) formatter with custom output file paths.
+The following example enables both the [HTML](../reporting/reqnroll-formatters.md#html-formatter) and the [Cucumber Message](../reporting/reqnroll-formatters.md#cucumber-messages-formatter) formatter with custom output file paths.
 
 ```{code-block} json
 :caption: reqnroll.json
@@ -40,7 +40,7 @@ The following example enables both the [HTML](../reporting/reqnroll-formatters.m
 }
 ```
 
-If the formatter section is omitted or empty, the report for that particular formatter is not enabled.
+If the formatter section is omitted, the report for that particular formatter is not enabled.
 
 ## Environment Variables
 
