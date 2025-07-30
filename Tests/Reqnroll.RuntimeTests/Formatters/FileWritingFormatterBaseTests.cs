@@ -13,6 +13,7 @@ using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using Xunit;
 using System.Runtime.InteropServices;
+using Reqnroll.Formatters.PubSub;
 
 namespace Reqnroll.RuntimeTests.Formatters;
 
@@ -206,5 +207,117 @@ public class FileWritingFormatterBaseTests
         _sut.LaunchInner(config, _ => { });
         _sut.Dispose();
         _sut.OnTargetFileStreamDisposingCalled.Should().BeTrue();
+    }
+
+
+    [Fact]
+    public void LaunchFormatter_Should_Create_Output_File_With_Default_Name_If_No_Configuration()
+    {
+        var sp = Path.DirectorySeparatorChar;
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        // Act
+        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
+        _sut.Dispose();
+
+        // Assert
+        _sut.LastOutputPath.Should().NotBeNull();
+        _sut.LastOutputPath.Should().EndWith($".{sp}default.txt");
+    }
+
+    [Fact]
+    public void LaunchFormatter_Should_Create_Local_Path_When_No_Path_Provided_in_Configuration()
+    {
+        var sp = Path.DirectorySeparatorChar;
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "aFileName.txt" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
+        _sut.Dispose();
+
+        _sut.LastOutputPath.Should().NotBeNull();
+        _sut.LastOutputPath.Should().Be($".{sp}aFileName.txt");
+    }
+
+    [Fact]
+    public void LaunchFormatter_Should_Apply_Default_Extension_When_Filename_Has_No_Extension()
+    {
+        var sp = Path.DirectorySeparatorChar;
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "myoutput" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
+        _sut.Dispose();
+
+        _sut.LastOutputPath.Should().NotBeNull();
+        _sut.LastOutputPath.Should().EndWith($".{sp}myoutput.txt");
+    }
+
+    [Fact]
+    public void LaunchFormatter_Should_Not_Apply_Default_Extension_When_Filename_Has_Extension()
+    {
+        var sp = Path.DirectorySeparatorChar;
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "myoutput.log" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
+        _sut.Dispose();
+
+        _sut.LastOutputPath.Should().NotBeNull();
+        _sut.LastOutputPath!.Should().NotContain(".txt");
+    }
+
+    [Fact]
+    public async Task PublishAsync_Should_Write_Envelopes()
+    {
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+                          .Returns(new Dictionary<string, object> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        var message = Envelope.Create(new TestRunStarted(new Io.Cucumber.Messages.Types.Timestamp(1, 0), "started"));
+
+        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
+        await _sut.PublishAsync(message);
+        await _sut.CloseAsync();
+
+        _sut.LastEnvelope.Should().Be(message);
+    }
+
+    [Fact]
+    public void LaunchFormatter_Should_Create_Directory_If_Not_Exists()
+    {
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+                          .Returns(new Dictionary<string, object> { { "outputFilePath", "outputFilePath" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
+
+        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
+        _sut.Dispose();
+
+        _fileSystemMock.Verify(fs => fs.CreateDirectory(It.IsAny<string>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task Publish_FollowedBy_Dispose_Should_Cause_CancelToken_to_Fire()
+    {
+        _configMock.Setup(c => c.Enabled).Returns(true);
+        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+                          .Returns(new Dictionary<string, object> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        var message = Envelope.Create(new TestRunStarted(new Io.Cucumber.Messages.Types.Timestamp(1, 0), "started"));
+
+        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
+        await _sut.PublishAsync(message);
+        _sut.Dispose();
+
+        _sut.LastEnvelope.Should().Be(message);
+        _sut.OnCancellationCalled.Should().BeTrue();
     }
 }

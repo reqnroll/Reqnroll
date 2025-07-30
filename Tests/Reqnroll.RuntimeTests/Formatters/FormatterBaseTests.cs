@@ -70,20 +70,20 @@ public class FormatterBaseTests
 
 
     [Fact]
-    public void LaunchSink_Disabled_ReportsInitializedFalse()
+    public void LaunchFormatter_Disabled_ReportsInitializedFalse()
     {
         _configMock.Setup(c => c.Enabled).Returns(false);
-        _sut.LaunchSink(_brokerMock.Object);
+        _sut.LaunchFormatter(_brokerMock.Object);
         _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains("disabled via configuration"))), Times.Once);
-        _brokerMock.Verify(b => b.SinkInitialized(_sut, false), Times.Once);
+        _brokerMock.Verify(b => b.FormatterInitialized(_sut, false), Times.Once);
     }
 
     [Fact]
-    public void LaunchSink_Enabled_Calls_LaunchInner_And_StartsTask()
+    public void LaunchFormatter_Enabled_Calls_LaunchInner_And_StartsTask()
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object>());
-        _sut.LaunchSink(_brokerMock.Object);
+        _sut.LaunchFormatter(_brokerMock.Object);
         _sut.LaunchInnerCalled.Should().BeTrue();
         _sut.LaunchInnerConfig.Should().NotBeNull();
         _sut.LaunchInnerCallback.Should().NotBeNull();
@@ -94,7 +94,7 @@ public class FormatterBaseTests
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object>());
-        _sut.LaunchSink(_brokerMock.Object);
+        _sut.LaunchFormatter(_brokerMock.Object);
         var msg = Envelope.Create(new TestRunFinished("", false, new Timestamp(0, 0), null, ""));
         await _sut.PublishAsync(msg);
         _sut.ConsumedMessages.Should().Contain(msg);
@@ -114,7 +114,7 @@ public class FormatterBaseTests
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object>());
-        _sut.LaunchSink(_brokerMock.Object);
+        _sut.LaunchFormatter(_brokerMock.Object);
         await _sut.PublishAsync(Envelope.Create(new TestRunStarted(new Timestamp(0, 0), "")));
         await _sut.CloseAsync();
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await _sut.CloseAsync());
@@ -125,32 +125,32 @@ public class FormatterBaseTests
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object>());
-        _sut.LaunchSink(_brokerMock.Object);
+        _sut.LaunchFormatter(_brokerMock.Object);
         _sut.Dispose();
         _loggerMock.Verify(l => l.DumpMessages(), Times.Once);
     }
 
     [Fact]
-    public void LaunchSink_NoConfigEntry_ReportsInitializedFalse()
+    public void LaunchFormatter_NoConfigEntry_ReportsInitializedFalse()
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns((IDictionary<string, object>)null!);
-        _sut.LaunchSink(_brokerMock.Object);
+        _sut.LaunchFormatter(_brokerMock.Object);
         _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains("disabled via configuration"))), Times.Once);
-        _brokerMock.Verify(b => b.SinkInitialized(_sut, false), Times.Once);
+        _brokerMock.Verify(b => b.FormatterInitialized(_sut, false), Times.Once);
     }
 
     [Fact]
-    public void LaunchSink_EmptyConfigEntry_ReportsInitializedTrue()
+    public void LaunchFormatter_EmptyConfigEntry_ReportsInitializedTrue()
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object>());
-        _sut.LaunchSink(_brokerMock.Object);
+        _sut.LaunchFormatter(_brokerMock.Object);
         _sut.LaunchInnerCalled.Should().BeTrue();
         _sut.LaunchInnerConfig.Should().NotBeNull();
         _sut.LaunchInnerConfig.Should().BeEmpty();
         _sut.LaunchInnerCallback.Should().NotBeNull();
-        _brokerMock.Verify(b => b.SinkInitialized(_sut, true), Times.Once);
+        _brokerMock.Verify(b => b.FormatterInitialized(_sut, true), Times.Once);
 
     }
 }
