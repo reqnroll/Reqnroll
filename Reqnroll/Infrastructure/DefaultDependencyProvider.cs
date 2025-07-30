@@ -115,7 +115,6 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<FormattersDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
-            container.RegisterTypeAs<VsTestIntegrationConfigurationResolver, IFormattersConfigurationResolver>("vsTestIntegrationResolver");
             container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
             container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
             container.RegisterTypeAs<MessagesFormatter, ICucumberMessageFormatter>("messages");

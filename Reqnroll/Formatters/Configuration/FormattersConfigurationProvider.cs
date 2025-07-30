@@ -23,8 +23,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
         var fileResolver = resolvers["fileBasedResolver"];
-        var vsTestIntegrationResolver = resolvers["vsTestIntegrationResolver"];
-        _resolvers = [fileResolver, vsTestIntegrationResolver, environmentOverrideConfigurationResolver];
+        _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }
