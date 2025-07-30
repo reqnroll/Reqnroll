@@ -51,7 +51,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
         if (fileName.IsNullOrEmpty())
             fileName = _defaultFileName;
 
-        if (!fileName.EndsWith(_defaultFileExtension, StringComparison.OrdinalIgnoreCase))
+        if (Path.GetExtension(fileName).IsNullOrEmpty())
         {
             fileName += _defaultFileExtension;
         }

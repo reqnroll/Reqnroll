@@ -152,6 +152,46 @@ public class FileWritingFormatterBaseTests
         Assert.NotNull(_sut.LastOutputPath);
         Assert.Equal($".{sp}aFileName.txt", _sut.LastOutputPath);
     }
+
+    [Fact]
+    public async Task LaunchFileSink_Should_Apply_Default_Extension_When_Filename_Has_No_Extension()
+    {
+        // Arrange
+        var sp = Path.DirectorySeparatorChar;
+        _configurationMock.Setup(c => c.Enabled).Returns(true);
+        _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+            .Returns(new Dictionary<string, object> { { "outputFilePath", "myoutput" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        // Act
+        _sut.LaunchSink(_brokerMock.Object);
+        await _sut.CloseAsync();
+
+        // Assert
+        Assert.NotNull(_sut.LastOutputPath);
+        Assert.EndsWith($".{sp}myoutput.txt", _sut.LastOutputPath);
+    }
+
+    [Fact]
+    public async Task LaunchFileSink_Should_Not_Apply_Default_Extension_When_Filename_Has_Extension()
+    {
+        // Arrange
+        var sp = Path.DirectorySeparatorChar;
+        _configurationMock.Setup(c => c.Enabled).Returns(true);
+        _configurationMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
+            .Returns(new Dictionary<string, object> { { "outputFilePath", "myoutput.log" } });
+        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
+
+        // Act
+        _sut.LaunchSink(_brokerMock.Object);
+        await _sut.CloseAsync();
+
+        // Assert
+        Assert.NotNull(_sut.LastOutputPath);
+        Assert.EndsWith($".{sp}myoutput.log", _sut.LastOutputPath);
+        Assert.DoesNotContain(".txt", _sut.LastOutputPath.Replace(".txt", "", StringComparison.OrdinalIgnoreCase));
+    }
+
     [Fact]
     public async Task PublishAsync_Should_Write_Envelopes()
     {
