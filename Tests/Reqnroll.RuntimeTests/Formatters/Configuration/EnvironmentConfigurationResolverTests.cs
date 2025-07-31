@@ -63,7 +63,7 @@ public class EnvironmentConfigurationResolverTests
         var json = """
                    {"formatters": {
                        "html": { "outputFilePath": "forHtml" }, 
-                       "messages": { "outputFilePath": "forMessages" } 
+                       "message": { "outputFilePath": "forMessages" } 
                        }
                    }
                    """;
@@ -77,7 +77,7 @@ public class EnvironmentConfigurationResolverTests
         // Assert
         Assert.Equal(2, result.Count);
         var first = result["html"];
-        var second = result["messages"];
+        var second = result["message"];
         Assert.Equal("forHtml", first["outputFilePath"]);
         Assert.Equal("forMessages", second["outputFilePath"]);
     }

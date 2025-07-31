@@ -15,7 +15,7 @@ using Reqnroll.FileAccess;
 using Reqnroll.Formatters;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.Html;
-using Reqnroll.Formatters.Messages;
+using Reqnroll.Formatters.Message;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
@@ -117,7 +117,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
             container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
             container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
-            container.RegisterTypeAs<MessagesFormatter, ICucumberMessageFormatter>("messages");
+            container.RegisterTypeAs<MessageFormatter, ICucumberMessageFormatter>("message");
             container.RegisterTypeAs<HtmlFormatter, ICucumberMessageFormatter>("html");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
