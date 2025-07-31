@@ -6,7 +6,7 @@ Contributing can be a rewarding way to teach, improve existing skills, refine th
 
 We do all of our development [on GitHub](https://github.com/reqnroll/Reqnroll). If you are not familiar with GitHub or pull requests please check out [this guide](https://guides.github.com/activities/hello-world/) to get started.
 
-Minumum prerequisites to develop:
+Minimum prerequisites to develop:
 
 - .NET 8.0 SDK
 - .NET 4.6.2 SDK
@@ -186,7 +186,7 @@ To build local documentation:
   - Result: html pages are generated in the working directory
     - _build/html/index.html
 
-- For editing the documentation it is recommended to use the "autobuild" option of Sphinx, that monitorse the changed files and rebuilds the documentation automatically:
+- For editing the documentation it is recommended to use the "autobuild" option of Sphinx, that monitors the changed files and rebuilds the documentation automatically:
 
   ```PowerShell
   .\autobuild.cmd
