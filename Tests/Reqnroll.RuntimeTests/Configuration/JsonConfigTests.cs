@@ -71,6 +71,91 @@ namespace Reqnroll.RuntimeTests.Configuration
         }
 
         [Fact]
+        public void CheckDefaultFeatureLanguageIsEnUS()
+        {
+            string config = @"{}";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.FeatureLanguage.Name.Should().Be("en-US");
+        }
+
+        [Fact]
+        public void CheckDefaultBindingCultureIsNull()
+        {
+            string config = @"{}";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.BindingCulture.Should().BeNull();
+        }
+
+        [Fact]
+        public void CheckLanguageBindingConfiguration()
+        {
+            string config = @"{
+                                ""language"": { 
+                                    ""feature"": ""de-DE"",
+                                    ""binding"": ""en-US""
+                                }
+                            }";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.FeatureLanguage.Name.Should().Be("de-DE");
+            runtimeConfig.BindingCulture.Name.Should().Be("en-US");
+        }
+
+        [Fact]
+        public void CheckLanguageBindingOnlyConfiguration()
+        {
+            string config = @"{
+                                ""language"": { 
+                                    ""binding"": ""en-GB""
+                                }
+                            }";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.FeatureLanguage.Name.Should().Be("en-US"); // Default
+            runtimeConfig.BindingCulture.Name.Should().Be("en-GB");
+        }
+
+        [Fact]
+        public void CheckLanguageFeatureOnlyConfiguration()
+        {
+            string config = @"{
+                                ""language"": { 
+                                    ""feature"": ""fr-FR""
+                                }
+                            }";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.FeatureLanguage.Name.Should().Be("fr-FR");
+            runtimeConfig.BindingCulture.Should().BeNull(); // Not specified
+        }
+
+        [Fact]
+        public void CheckSpecificCultureVsGenericCulture()
+        {
+            string config = @"{
+                                ""language"": { 
+                                    ""feature"": ""en-US"",
+                                    ""binding"": ""en-GB""
+                                }
+                            }";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            // Should support specific cultures (en-US, en-GB) rather than generic (en)
+            runtimeConfig.FeatureLanguage.Name.Should().Be("en-US");
+            runtimeConfig.BindingCulture.Name.Should().Be("en-GB");
+            runtimeConfig.FeatureLanguage.IsNeutralCulture.Should().BeFalse();
+            runtimeConfig.BindingCulture.IsNeutralCulture.Should().BeFalse();
+        }
+
+        [Fact]
         public void Check_Runtime_stopAtFirstError_as_true()
         {
             string config = @"{
