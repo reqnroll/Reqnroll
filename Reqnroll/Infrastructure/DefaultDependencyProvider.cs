@@ -117,7 +117,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
             container.RegisterTypeAs<EnvironmentConfigurationResolver, IFormattersEnvironmentOverrideConfigurationResolver>();
             container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
-            container.RegisterTypeAs<MessageFormatter, ICucumberMessageFormatter>("messages");
+            container.RegisterTypeAs<MessageFormatter, ICucumberMessageFormatter>("message");
             container.RegisterTypeAs<HtmlFormatter, ICucumberMessageFormatter>("html");
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
