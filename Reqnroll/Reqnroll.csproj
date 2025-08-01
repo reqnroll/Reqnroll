@@ -49,6 +49,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Reqnroll.MessagesLogger.TestLogger\FormattersTestLogger.csproj">
+      <Private></Private>
+    </ProjectReference>
     <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
   </ItemGroup>
 
