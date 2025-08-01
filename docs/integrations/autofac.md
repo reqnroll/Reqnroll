@@ -92,7 +92,7 @@ public class SetupTestDependencies
 }
 ```
 
-  ### 4. It is also possible to continue to use the legacy method as well, however this method is __not__ compatible with global dependency registration and can only be used on it's own like so:
+  ### 4. It is also possible to continue to use the legacy method as well, however this method is __not__ compatible with global dependency registration and can only be used on its own like so:
   Create a static method somewhere in the Reqnroll project to register scenario dependencies: 
   (Recommended to put it into the `Support` folder) that returns an Autofac `ContainerBuilder` and tag it with the `[ScenarioDependencies]` attribute. 
 

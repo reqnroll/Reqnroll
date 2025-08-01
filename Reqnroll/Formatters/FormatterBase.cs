@@ -39,7 +39,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in constructor.");
     }
 
-    public void LaunchSink(ICucumberMessageBroker broker)
+    public void LaunchFormatter(ICucumberMessageBroker broker)
     {
         _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} in Launch().");
         _broker = broker;
@@ -51,7 +51,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                 return false;
             configuration = _configurationProvider.GetFormatterConfigurationByName(_pluginName);
 
-            return configuration != null && configuration.Count > 0;
+            return configuration != null;
         }
 
         if (!IsFormatterEnabled(out var formatterConfiguration))
@@ -76,7 +76,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         // Preemptively closing down the Channel to force error identification
         if (status == false)
             PostedMessages.Writer.Complete();
-        _broker?.SinkInitialized(this, enabled: status);
+        _broker?.FormatterInitialized(this, enabled: status);
     }
 
     public async Task PublishAsync(Envelope message)

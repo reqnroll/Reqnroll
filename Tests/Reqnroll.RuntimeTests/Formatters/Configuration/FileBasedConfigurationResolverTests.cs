@@ -138,4 +138,25 @@ public class FileBasedConfigurationResolverTests
         // Assert
         result.Should().BeEmpty();
     }
+
+    [Fact]
+    public void Resolve_Should_Return_An_EmptyEntry_When_Key_Has_no_Content()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""emptyFormatter"": {}
+                }
+            }";
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+        // Act
+        var result = _sut.Resolve();
+        // Assert
+        result.Should().HaveCount(1);
+        result["emptyFormatter"].Should().BeEmpty();
+    }
 }
