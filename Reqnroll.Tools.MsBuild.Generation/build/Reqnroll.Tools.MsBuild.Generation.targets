@@ -147,7 +147,7 @@
       <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
         <LogicalName>%(ReqnrollFeatureFiles.Identity)</LogicalName>
       </EmbeddedResource>
