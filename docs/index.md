@@ -51,6 +51,7 @@ guides/index
 gherkin/index
 automation/index
 execution/index
+reporting/index
 extend/index
 ```
 

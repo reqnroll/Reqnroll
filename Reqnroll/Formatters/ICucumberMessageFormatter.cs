@@ -6,7 +6,7 @@ namespace Reqnroll.Formatters;
 
 public interface ICucumberMessageFormatter
 {
-    void LaunchSink(ICucumberMessageBroker broker);
+    void LaunchFormatter(ICucumberMessageBroker broker);
     string Name { get; }
     Task PublishAsync(Envelope message);
 }

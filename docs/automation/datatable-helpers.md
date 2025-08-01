@@ -112,6 +112,77 @@ public void GivenIEnteredTheFollowingDataIntoTheNewAccountForm(DataTable table)
 
 The next section describes how to convert a horizontal table with more than one data row to a collection of objects.
 
+## `FillInstance`
+
+The `FillInstance` extension method of the `DataTable` class populates an existing object instance with values from a table. Unlike `CreateInstance<T>` which creates a new object, `FillInstance` takes an existing object and fills its properties with table data.
+
+This method is useful when you:
+- Already have an object instance that you want to populate
+- Need to update an existing object with test data
+- Want to reuse an object and modify its properties based on table values
+
+### Basic Usage
+
+The `FillInstance` method accepts any object and populates its properties based on the table structure. Like `CreateInstance<T>`, it supports both vertical and horizontal table layouts:
+
+```{code-block} csharp
+:caption: Step Definition File
+[Given(@"I update the account with the following data:")]
+public void GivenIUpdateTheAccountWithTheFollowingData(DataTable table)
+{
+    // Assume we already have an account instance
+    var existingAccount = GetExistingAccount();
+    
+    // Fill the existing instance with table data
+    table.FillInstance(existingAccount);
+    
+    // existingAccount properties are now updated with table values
+}
+```
+
+### Using `FillInstance` with `InstanceCreationOptions`
+
+The `FillInstance` method also supports `InstanceCreationOptions` to control how properties are populated:
+
+```{code-block} csharp
+:caption: Step Definition File
+[Given(@"I update the account with the following data:")]
+public void GivenIUpdateTheAccountWithTheFollowingData(DataTable table)
+{
+    var existingAccount = GetExistingAccount();
+    
+    var options = new InstanceCreationOptions 
+    { 
+        VerifyAllColumnsBound = true 
+    };
+    
+    table.FillInstance(existingAccount, options);
+}
+```
+
+For more information about `InstanceCreationOptions`, see the [InstanceCreationOptions section](#instancecreationoptions) below.
+
+### Example with Vertical Table
+
+```{code-block} gherkin
+:caption: Feature File
+Given I update the account with the following data:
+    | Property             | Value     |
+    | Name                 | Jane Doe  |
+    | Bank Account Balance | 2500.75   |
+```
+
+### Example with Horizontal Table
+
+```{code-block} gherkin
+:caption: Feature File
+Given I update the account with the following data:
+    | Name     | Bank Account Balance |
+    | Jane Doe | 2500.75              |
+```
+
+Both table formats will update the existing object's `Name` and `BankAccountBalance` properties with the specified values.
+
 ## `CreateSet<T>`
 
 The `CreateSet<T>` extension method of the `DataTable` class converts the table into an enumerable set of objects. For example, assume you have the following step:
