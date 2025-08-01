@@ -19,12 +19,12 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     // As sinks are initialized, this number is incremented. When we reach the expected number of sinks, then we know that all have initialized
     // and the Broker can be IsEnabled.
-    private int _numberOfSinksInitialized = 0;
+    private int _numberOfFormattersInitialized = 0;
     private readonly IFormatterLog _logger;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
-    private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeSinks = new();
+    private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeFormatters = new();
 
 
     public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters)
@@ -37,49 +37,49 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     {
         foreach (var formatter in _registeredFormatters)
         {
-            formatter.LaunchSink(this);
+            formatter.LaunchFormatter(this);
         }
     }
 
-    // This method is called by the sinks during sink LaunchSink().
-    public void SinkInitialized(ICucumberMessageFormatter formatterSink, bool enabled)
+    // This method is called by the sinks during formatter LaunchFormatter().
+    public void FormatterInitialized(ICucumberMessageFormatter formatter, bool enabled)
     {
         if (enabled)
-            _activeSinks.TryAdd(formatterSink.Name, formatterSink);
+            _activeFormatters.TryAdd(formatter.Name, formatter);
 
-        Interlocked.Increment(ref _numberOfSinksInitialized);
+        Interlocked.Increment(ref _numberOfFormattersInitialized);
         CheckInitializationStatus();
     }
 
-    public bool IsEnabled => HaveAllSinksRegistered() && _activeSinks.Count > 0;
+    public bool IsEnabled => HaveAllFormattersRegisteredAndInitialized() && _activeFormatters.Count > 0;
 
     private void CheckInitializationStatus()
     {
-        // If all known sinks have registered 
-        // The system is enabled if we have at least one registered sink that is IsEnabled
-        if (HaveAllSinksRegistered())
+        // If all known formatters have registered 
+        // The system is enabled if we have at least one registered formatter that is IsEnabled
+        if (HaveAllFormattersRegisteredAndInitialized())
         {
             _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
         }
     }
 
-    private bool HaveAllSinksRegistered()
+    private bool HaveAllFormattersRegisteredAndInitialized()
     {
-        return _numberOfSinksInitialized == _registeredFormatters.Count;
+        return _numberOfFormattersInitialized == _registeredFormatters.Count;
     }
 
     public async Task PublishAsync(Envelope message)
     {
-        foreach (var sink in _activeSinks.Values)
+        foreach (var formatter in _activeFormatters.Values)
         {
             // Will catch and swallow any exceptions thrown by sinks so that all get a chance to process each message.
             try
             {
-                await sink.PublishAsync(message);
+                await formatter.PublishAsync(message);
             }
             catch (System.Exception e)
             {
-                _logger.WriteMessage($"Formatters Broker: Exception thrown by Formatter Plugin {sink.Name}: {e.Message}");
+                _logger.WriteMessage($"Formatters Broker: Exception thrown by Formatter Plugin {formatter.Name}: {e.Message}");
             }
         }
     }
