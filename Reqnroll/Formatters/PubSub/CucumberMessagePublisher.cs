@@ -17,18 +17,18 @@ using System.Threading.Tasks;
 namespace Reqnroll.Formatters.PubSub;
 
 /// <summary>
-/// This class is responsible for publishing Cucumber Messages to the <see cref="FormattersMessageBroker"/>.
+/// This class is responsible for publishing Cucumber Messages to the <see cref="CucumberMessageBroker"/>.
 /// It uses the set of <see cref="IExecutionEvent"/> to track overall execution of features and steps and drive generation of messages.
 /// It uses the <see cref="IRuntimePlugin"/> interface to force the runtime to load it during startup (although it is not an external plugin per se).
 /// </summary>
-public class FormattersMessagePublisher : IAsyncExecutionEventListener, IFormattersPublisher
+public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberMessagePublisher
 {
     private readonly IFormatterLog _logger;
     private readonly IMetaMessageGenerator _metaMessageGenerator;
     private readonly IFeatureExecutionTrackerFactory _featureExecutionTrackerFactory;
     private readonly IIdGenerator _sharedIdGenerator;
     private readonly string _testRunStartedId;
-    private readonly IFormattersBroker _broker;
+    private readonly ICucumberMessageBroker _broker;
     private readonly IClock _clock;
 
     public ICucumberMessageFactory MessageFactory { get; internal set; }
@@ -54,7 +54,7 @@ public class FormattersMessagePublisher : IAsyncExecutionEventListener, IFormatt
     // shared to each Feature tracker so that we keep a single list
     private IReadOnlyDictionary<IBinding, string> StepDefinitionIdByMethodBinding => BindingMessagesGenerator.StepDefinitionIdByBinding;
 
-    public FormattersMessagePublisher(IFormattersBroker broker,
+    public CucumberMessagePublisher(ICucumberMessageBroker broker,
                                     IBindingMessagesGenerator bindingMessagesGenerator,
                                     IFormatterLog logger,
                                     IIdGenerator idGenerator,

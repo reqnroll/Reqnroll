@@ -17,7 +17,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
 {
     private Task? _formatterTask;
     private readonly CancellationTokenSource _cancellationTokenSource = new();
-    private IFormattersBroker? _broker;
+    private ICucumberMessageBroker? _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
     private readonly IFormatterLog _logger;
     protected readonly Channel<Envelope> PostedMessages = Channel.CreateUnbounded<Envelope>(

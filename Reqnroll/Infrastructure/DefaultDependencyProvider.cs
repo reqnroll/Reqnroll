@@ -120,8 +120,8 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
             container.RegisterTypeAs<MessageFormatter, ICucumberMessageFormatter>("message");
             container.RegisterTypeAs<HtmlFormatter, ICucumberMessageFormatter>("html");
-            container.RegisterTypeAs<FormattersMessageBroker, IFormattersBroker>();
-            container.RegisterTypeAs<FormattersMessagePublisher, IFormattersPublisher>();
+            container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
+            container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
             container.RegisterTypeAs<ShortGuidIdGenerator, IIdGenerator>();
             container.RegisterTypeAs<CucumberMessageFactory, ICucumberMessageFactory>();
             container.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
@@ -129,7 +129,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FeatureExecutionTrackerFactory, IFeatureExecutionTrackerFactory>();
             container.RegisterTypeAs<PickleExecutionTrackerFactory, IPickleExecutionTrackerFactory>();
             container.RegisterTypeAs<TestCaseExecutionTrackerFactory, ITestCaseExecutionTrackerFactory>();
-            container.RegisterFactoryAs<IPublishMessage>(() => container.Resolve<IFormattersBroker>());
+            container.RegisterFactoryAs<IPublishMessage>(() => container.Resolve<ICucumberMessageBroker>());
             container.RegisterTypeAs<StepTrackerFactory, IStepTrackerFactory>();
         }
 

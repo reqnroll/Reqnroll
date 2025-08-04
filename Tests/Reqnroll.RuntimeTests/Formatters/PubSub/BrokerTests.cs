@@ -51,7 +51,7 @@ public class CucumberMessageBrokerTests
     {
         var log = new Mock<IFormatterLog>();
 
-        var sut = new FormattersMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>());
+        var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>());
 
         // Act
         var result = sut.IsEnabled;

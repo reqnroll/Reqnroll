@@ -76,7 +76,7 @@ namespace Reqnroll.Infrastructure
             // Only initialize if the Cucumber message formatters are enabled in the configuration
             var cucumberMessageConfiguration = container.Resolve<IFormattersConfigurationProvider>();
             if (cucumberMessageConfiguration.Enabled)
-                container.Resolve<IFormattersPublisher>().Initialize(runtimePluginEvents);
+                container.Resolve<ICucumberMessagePublisher>().Initialize(runtimePluginEvents);
 
             return container;
         }

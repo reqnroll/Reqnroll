@@ -3,11 +3,10 @@ using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.Formatters.PubSub;
 
-public interface ICucumberMessageBroker
+public interface ICucumberMessageBroker : IPublishMessage
 {
     bool IsEnabled { get; }
 
     void Initialize();
-    Task PublishAsync(Envelope featureMessages);
     void FormatterInitialized(ICucumberMessageFormatter formatterSink, bool enabled);
 }

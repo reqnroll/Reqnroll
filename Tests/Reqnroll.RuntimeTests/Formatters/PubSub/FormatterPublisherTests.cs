@@ -27,7 +27,7 @@ namespace Reqnroll.RuntimeTests.Formatters.PubSub;
 public class FormatterPublisherTests
 {
     private readonly Mock<IObjectContainer> _objectContainerMock;
-    private readonly Mock<IFormattersBroker> _brokerMock;
+    private readonly Mock<ICucumberMessageBroker> _brokerMock;
     private readonly Mock<IBindingRegistry> _bindingRegistryMock;
     private readonly Mock<IIdGenerator> _idGeneratorMock;
     private readonly Mock<IClock> _clockMock;
@@ -38,12 +38,12 @@ public class FormatterPublisherTests
     private readonly Mock<IPublishMessage> _publishMessageMock;
     private readonly RuntimePluginEvents _runtimePluginEvents;
     private readonly IFeatureExecutionTrackerFactory _featureTrackerFactory;
-    private FormattersMessagePublisher _sut;
+    private CucumberMessagePublisher _sut;
 
     public FormatterPublisherTests()
     {
         _objectContainerMock = new Mock<IObjectContainer>();
-        _brokerMock = new Mock<IFormattersBroker>();
+        _brokerMock = new Mock<ICucumberMessageBroker>();
         _bindingRegistryMock = new Mock<IBindingRegistry>();
         _idGeneratorMock = new Mock<IIdGenerator>();
         _clockMock = new Mock<IClock>();
@@ -57,7 +57,7 @@ public class FormatterPublisherTests
 
         _runtimePluginEvents = new RuntimePluginEvents();
         CreateObjectContainerWithBroker(true);
-        _sut = new FormattersMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
+        _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
     }
     private ObjectContainer CreateObjectContainerWithBroker(bool brokerEnabled = true)
     {
@@ -81,7 +81,7 @@ public class FormatterPublisherTests
         // Arrange
         var oC = CreateObjectContainerWithBroker(true);
         oC.RegisterInstanceAs<ITestThreadExecutionEventPublisher>(_eventPublisherMock.Object);
-        var publisher = new FormattersMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
+        var publisher = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
 
         // Act
         _sut.Initialize(_runtimePluginEvents);
@@ -138,7 +138,7 @@ public class FormatterPublisherTests
         _metaMessageGeneratorMock.Setup(m => m.GenerateMetaMessage())
                                  .Returns(new Meta("", new Product("", ""), new Product("", ""), new Product("", ""), new Product("", ""), null));
 
-        _sut = new FormattersMessagePublisher(_brokerMock.Object, bmg, _formatterLoggerMock.Object, _idGeneratorMock.Object, msgFactory, _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
+        _sut = new CucumberMessagePublisher(_brokerMock.Object, bmg, _formatterLoggerMock.Object, _idGeneratorMock.Object, msgFactory, _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
         _sut.Initialize(new RuntimePluginEvents());
 
         // Act

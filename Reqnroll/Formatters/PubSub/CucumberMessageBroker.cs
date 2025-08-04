@@ -9,10 +9,10 @@ namespace Reqnroll.Formatters.PubSub;
 
 /// <summary>
 /// Cucumber Message implementation is a simple Pub/Sub implementation.
-/// This broker mediates between the (singleton) FormattersMessagePublisher and (one or more) Formatters.
+/// This broker mediates between the (singleton) CucumberMessagePublisher and (one or more) Formatters.
 /// The pub/sub mechanism is considered to be turned "OFF" if no sinks are registered or if none of them are configured.
 /// </summary>
-public class FormattersMessageBroker : IFormattersBroker
+public class CucumberMessageBroker : ICucumberMessageBroker
 {
     // This is the list of sinks registered in the container. Not all may be enabled/configured.
     private readonly List<ICucumberMessageFormatter> _registeredFormatters = new();
@@ -27,7 +27,7 @@ public class FormattersMessageBroker : IFormattersBroker
     private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeFormatters = new();
 
 
-    public FormattersMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters)
     {
         _logger = formatterLog;
         _registeredFormatters.AddRange(containerRegisteredFormatters.Values);
