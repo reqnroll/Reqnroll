@@ -245,9 +245,8 @@ namespace Reqnroll.Bindings.Discovery
         private void ProcessStepDefinitionAttribute(BindingSourceMethod bindingSourceMethod, BindingSourceAttribute stepDefinitionAttribute, BindingScope scope)
         {
             var stepDefinitionTypes = GetStepDefinitionTypes(stepDefinitionAttribute);
-
-            // The expressionString what called in Reqnroll v1+v2 Regex, and since v3 Expression
-            string expressionString = stepDefinitionAttribute.TryGetAttributeValue<string>(0);
+            
+            string expressionString = GetExpressionString(stepDefinitionAttribute);
             var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>(nameof(StepDefinitionBaseAttribute.ExpressionType));
 
             var validationResult = ValidateStepDefinition(bindingSourceMethod, stepDefinitionAttribute);
@@ -267,6 +266,15 @@ namespace Reqnroll.Bindings.Discovery
                 var stepDefinitionBindingBuilder = _bindingFactory.CreateStepDefinitionBindingBuilder(stepDefinitionType, bindingSourceMethod.BindingMethod, scope, expressionString, expressionType);
                 _stepDefinitionBindingBuilders.Add(stepDefinitionBindingBuilder);
             }
+        }
+
+        /// <summary>
+        /// Get the <see cref="StepDefinitionBaseAttribute.Expression"/> string from the step definition attribute.
+        /// </summary>
+        /// <remarks>The expressionString what called in Reqnroll v1+v2 Regex, and since v3 Expression</remarks>
+        private static string GetExpressionString(BindingSourceAttribute stepDefinitionAttribute)
+        {
+            return stepDefinitionAttribute.TryGetAttributeValue<string>(0);
         }
 
         protected readonly struct BindingValidationResult
