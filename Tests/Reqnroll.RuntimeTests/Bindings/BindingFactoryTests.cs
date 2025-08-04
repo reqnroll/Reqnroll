@@ -13,7 +13,7 @@ namespace Reqnroll.RuntimeTests.Bindings;
 public class BindingFactoryTests
 {
     [Theory]
-    [InlineData(ExpressionType.Automatic, typeof(RegularExpression))]
+    [InlineData(ExpressionType.Unspecified, typeof(RegularExpression))]
     [InlineData(ExpressionType.RegularExpression, typeof(RegularExpression))]
     [InlineData(ExpressionType.CucumberExpression, typeof(ReqnrollCucumberExpression))]
     public void CreateStepDefinitionBindingBuilderTest(ExpressionType expressionType, Type expected)

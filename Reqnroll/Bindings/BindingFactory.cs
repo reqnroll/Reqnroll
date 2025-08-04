@@ -27,7 +27,7 @@ public class BindingFactory(
             return new MethodNameStepDefinitionBindingBuilder(_stepDefinitionRegexCalculator, stepDefinitionType, bindingMethod, bindingScope);
         }
 
-        bool isCucumberExpression = expressionType is ExpressionType.CucumberExpression || (expressionType is ExpressionType.Automatic && _cucumberExpressionDetector.IsCucumberExpression(expressionString));
+        bool isCucumberExpression = expressionType is ExpressionType.CucumberExpression || (expressionType is ExpressionType.Unspecified && _cucumberExpressionDetector.IsCucumberExpression(expressionString));
         return isCucumberExpression
             ? _cucumberExpressionStepDefinitionBindingBuilderFactory.Create(stepDefinitionType, bindingMethod, bindingScope, expressionString)
             : new RegexStepDefinitionBindingBuilder(stepDefinitionType, bindingMethod, bindingScope, expressionString);

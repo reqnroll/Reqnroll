@@ -21,7 +21,7 @@ namespace Reqnroll
         /// </summary>
         public string Expression { get; set; }
 
-        public ExpressionType ExpressionType { get; set; } = ExpressionType.Automatic;
+        public ExpressionType ExpressionType { get; set; } = ExpressionType.Unspecified;
 
         internal StepDefinitionBaseAttribute(string expression, StepDefinitionType type)
             : this(expression, new[] { type })

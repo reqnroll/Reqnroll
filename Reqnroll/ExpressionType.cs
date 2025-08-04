@@ -3,9 +3,9 @@ namespace Reqnroll;
 public enum ExpressionType
 {
     /// <summary>
-    /// Detect Automatically if the expression is a Regular expression (Regex) or a Cucumber expression
+    /// Unspecified, the expression is a Regular expression (Regex) or a Cucumber expression. The expression type will be determined at runtime based on the expression string.
     /// </summary>
-    Automatic,
+    Unspecified,
     /// <summary>
     /// The expression is a Cucumber Expression
     /// </summary>
