@@ -83,11 +83,11 @@ You can explicitly control the expression type by using the `ExpressionType` par
 
 ```{code-block} csharp
 :caption: Step Definition File - Explicit Cucumber Expression
-[When("I have {int} cucumbers", ExpressionType = ExpressionType.CucumberExpression)]
-public void WhenIHaveCucumbers(int count) { ... }
+[When("I have (one/two) cucumbers", ExpressionType = ExpressionType.CucumberExpression)]
+public void WhenIHaveCucumbers() { ... }
 
-[When("I have {int} cucumbers", ExpressionType = ExpressionType.RegularExpression)]
-public void WhenIHaveCucumbersRegex(int count) { ... }
+[When("I have (one/two) cucumbers", ExpressionType = ExpressionType.RegularExpression)]
+public void WhenIHaveCucumbersRegex(string countText) { ... }
 ```
 
 The `ExpressionType` enum has three values:
