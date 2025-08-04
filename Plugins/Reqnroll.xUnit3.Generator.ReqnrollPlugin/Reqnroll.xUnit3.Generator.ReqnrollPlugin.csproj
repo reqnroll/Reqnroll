@@ -12,7 +12,6 @@
 
     <ItemGroup>
       <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
-      <PackageReference Include="StrongNamer" Version="0.2.5" />
     </ItemGroup>
 
     <ItemGroup>
