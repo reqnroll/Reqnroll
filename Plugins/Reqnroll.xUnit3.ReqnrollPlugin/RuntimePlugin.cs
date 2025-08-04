@@ -31,6 +31,6 @@ public class RuntimePlugin : IRuntimePlugin
     {
         var container = e.ObjectContainer;
         container.RegisterTypeAs<XUnit3TraceListener, ITraceListener>();
-        container.RegisterTypeAs<XUnit3AttachmentHandler, IReqnrollAttachmentHandler>();
+        container.RegisterTypeAs<ReqnrollAttachmentHandler, IReqnrollAttachmentHandler>();
     }
 }
