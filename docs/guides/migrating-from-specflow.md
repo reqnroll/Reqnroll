@@ -388,7 +388,7 @@ As SpecFlow v4 was never officially released and the original GitHub project has
 Breaking Changes:
 
 * Removed the ability to call steps from steps via string
-* Removed .NET 6 and .NET 7 support (min .NET version: 8.0)
+* Removed .NET Core 2.1 support
 * Removed .NET Framework 4.6.1 support (min .NET Framework version: 4.6.2)
 * Bindings declared as `async void` are not allowed. Use `async Task` instead.
 

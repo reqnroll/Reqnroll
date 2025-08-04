@@ -19,7 +19,7 @@ SpecSync is supported on all common operating systems that support .NET, includi
 - .NET 9.0
 
 ```{note}
-Reqnroll can also be installed on any .NET frameworks that supports .NET Standard 2.0, including legacy frameworks, but please note that frameworks before .NET 8 are out of support by Microsoft.
+Reqnroll can also be installed on any .NET frameworks that supports .NET Standard 2.0, including end-of-life (EOL) frameworks, but please note that Reqnroll does not support EOL frameworks and frameworks before .NET 8 are out of support by Microsoft.
 ```
 
 ## Visual Studio

@@ -21,7 +21,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             _targetFrameworkMonikerStringBuilder = targetFrameworkMonikerStringBuilder;
         }
 
-        public virtual string WriteProject(NetCoreSdkInfo sdk, Project project, string projRootPath)
+        public virtual string WriteProject(DotNetSdkInfo sdk, Project project, string projRootPath)
         {
             if (project is null)
             {
@@ -244,7 +244,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             xw.WriteEndElement();
         }
 
-        private void CreateProjectFile(NetCoreSdkInfo sdk, Project project, string projRootPath)
+        private void CreateProjectFile(DotNetSdkInfo sdk, Project project, string projRootPath)
         {
             string template;
 

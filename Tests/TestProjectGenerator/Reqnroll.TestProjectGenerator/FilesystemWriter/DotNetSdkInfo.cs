@@ -1,8 +1,8 @@
 namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 {
-    public class NetCoreSdkInfo
+    public class DotNetSdkInfo
     {
-        internal NetCoreSdkInfo(string version)
+        internal DotNetSdkInfo(string version)
         {
             Version = version;
         }
