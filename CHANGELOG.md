@@ -20,6 +20,7 @@
 * Improved test feature context and feature hook handling for non-parallel or class-parallel scenarios where the scenarios of the feature are not executed in sequence. (#638)
 * Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
 * Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
+* Added ExpressionType option (cucumber/regex) to [Given], [When] and [Then] attributes (#663)
 
 ## Bug fixes:
 
@@ -27,7 +28,7 @@
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 
-*Contributors of this release (in alphabetical order):*  @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 
