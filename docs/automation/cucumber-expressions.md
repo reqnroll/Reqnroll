@@ -86,7 +86,7 @@ You can explicitly control the expression type by using the `ExpressionType` par
 [When("I have (one/two) cucumbers", ExpressionType = ExpressionType.CucumberExpression)]
 public void WhenIHaveCucumbers() { ... }
 
-[When("I have (one/two) cucumbers", ExpressionType = ExpressionType.RegularExpression)]
+[When("I have (one|two) cucumbers", ExpressionType = ExpressionType.RegularExpression)]
 public void WhenIHaveCucumbersRegex(string countText) { ... }
 ```
 
