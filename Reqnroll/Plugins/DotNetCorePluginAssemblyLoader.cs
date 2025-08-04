@@ -3,7 +3,7 @@
 namespace Reqnroll.Plugins;
 
 /// <summary>
-/// This class is used for .NET 5+ based frameworks only. For .NET Framework <see cref="DotNetFrameworkPluginAssemblyLoader"/> is used instead. See <see cref="PlatformCompatibility.PlatformHelper"/>.
+/// This class is used for .NET (not .NET Framework) based frameworks only. For .NET Framework <see cref="DotNetFrameworkPluginAssemblyLoader"/> is used instead. See <see cref="PlatformCompatibility.PlatformHelper"/>.
 /// </summary>
 public class DotNetCorePluginAssemblyLoader : IPluginAssemblyLoader
 {

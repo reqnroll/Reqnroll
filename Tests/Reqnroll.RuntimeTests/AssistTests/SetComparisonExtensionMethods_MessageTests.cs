@@ -165,7 +165,7 @@ AnotherFieldThatDoesNotExist".AgnosticLineBreak());
         [SkippableFact]
         public void Includes_milliseconds_and_ticks_in_error_for_date_time_fields()
         {
-            //Skip if not Windows -> .NET Core 2.1 on Linux converts year from 2018 to 18, thus resulting in an error when comparing
+            //Skip if not Windows -> older .NET versions on Linux convert year from 2018 to 18, thus resulting in an error when comparing
             Skip.IfNot(RuntimeInformation.IsOSPlatform(OSPlatform.Windows));
 
             Thread.CurrentThread.CurrentCulture = new CultureInfo("en-US", false);
