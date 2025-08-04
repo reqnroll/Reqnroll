@@ -4,7 +4,6 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests.Bindings.CucumberExpressions;
 
-
 public class CucumberExpressionDetectorTests
 {
     private readonly CucumberExpressionDetector _sut = new();

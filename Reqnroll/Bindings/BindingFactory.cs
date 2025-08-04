@@ -15,19 +15,15 @@ public class BindingFactory(
         return new HookBinding(bindingMethod, hookType, bindingScope, hookOrder);
     }
 
-    public IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(
-        StepDefinitionType stepDefinitionType,
-        IBindingMethod bindingMethod,
-        BindingScope bindingScope,
-        string expressionString,
-        ExpressionType expressionType)
+    public IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(StepDefinitionType stepDefinitionType, IBindingMethod bindingMethod, BindingScope bindingScope,
+        string expressionString, ExpressionType expressionType)
     {
         if (expressionString == null)
         {
             return new MethodNameStepDefinitionBindingBuilder(_stepDefinitionRegexCalculator, stepDefinitionType, bindingMethod, bindingScope);
         }
 
-        bool isCucumberExpression = expressionType is ExpressionType.CucumberExpression || (expressionType is ExpressionType.Unspecified && _cucumberExpressionDetector.IsCucumberExpression(expressionString));
+        var isCucumberExpression = expressionType is ExpressionType.CucumberExpression || (expressionType is ExpressionType.Unspecified && _cucumberExpressionDetector.IsCucumberExpression(expressionString));
         return isCucumberExpression
             ? _cucumberExpressionStepDefinitionBindingBuilderFactory.Create(stepDefinitionType, bindingMethod, bindingScope, expressionString)
             : new RegexStepDefinitionBindingBuilder(stepDefinitionType, bindingMethod, bindingScope, expressionString);
