@@ -24,8 +24,6 @@ namespace Reqnroll.TestProjectGenerator
             [TargetFramework.Netcoreapp30] = "netcoreapp3.0",
             [TargetFramework.Netcoreapp31] = "netcoreapp3.1",
             [TargetFramework.Net50] = "net5.0",
-            [TargetFramework.Net60] = "net6.0",
-            [TargetFramework.Net70] = "net7.0",
             [TargetFramework.Net80] = "net8.0",
             [TargetFramework.Net90] = "net9.0",
         };

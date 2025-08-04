@@ -18,8 +18,6 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
         private static readonly NetCoreSdkInfo NetCore21 = new("2.1.807");
         private static readonly NetCoreSdkInfo NetCore20 = new("2.1.202");
         private static readonly NetCoreSdkInfo Net50 = new("5.0.404");
-        private static readonly NetCoreSdkInfo Net60 = new("6.0.100");
-        private static readonly NetCoreSdkInfo Net70 = new("7.0.100");
         private static readonly NetCoreSdkInfo Net80 = new("8.0.100");
         private static readonly NetCoreSdkInfo Net90 = new("9.0.100");
 
@@ -32,8 +30,6 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             [TargetFramework.Net48] = DefaultSdk,
             [TargetFramework.Net481] = DefaultSdk,
             [TargetFramework.Net50] = Net50,
-            [TargetFramework.Net60] = Net60,
-            [TargetFramework.Net70] = Net70,
             [TargetFramework.Net80] = Net80,
             [TargetFramework.Net90] = Net90,
             [TargetFramework.Netcoreapp31] = NetCore31,
