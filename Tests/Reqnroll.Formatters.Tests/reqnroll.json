@@ -1,0 +1,11 @@
+{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+
+  "bindingAssemblies": [
+  ],
+  "formatters": {
+    "message": {
+      "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson"
+    }
+  }
+}

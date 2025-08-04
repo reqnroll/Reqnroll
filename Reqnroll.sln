@@ -125,6 +125,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.xUnit3.Generator.R
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.xUnit3.ReqnrollPlugin", "Plugins\Reqnroll.xUnit3.ReqnrollPlugin\Reqnroll.xUnit3.ReqnrollPlugin.csproj", "{53B4DA61-8594-4D17-87C9-2773D4FCA6EA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.TUnit.ReqnrollPlugin", "Plugins\Reqnroll.TUnit.ReqnrollPlugin\Reqnroll.TUnit.ReqnrollPlugin.csproj", "{67EC9444-7D34-4C75-B34D-FBA0F35A25CE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.TUnit.Generator.ReqnrollPlugin", "Plugins\Reqnroll.TUnit.Generator.ReqnrollPlugin\Reqnroll.TUnit.Generator.ReqnrollPlugin.csproj", "{185C7215-66EE-4CB5-ADB5-331DC53EA81F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.Formatters.Tests", "Tests\Reqnroll.Formatters.Tests\Reqnroll.Formatters.Tests.csproj", "{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -263,6 +269,18 @@ Global
 		{53B4DA61-8594-4D17-87C9-2773D4FCA6EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{53B4DA61-8594-4D17-87C9-2773D4FCA6EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{53B4DA61-8594-4D17-87C9-2773D4FCA6EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67EC9444-7D34-4C75-B34D-FBA0F35A25CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67EC9444-7D34-4C75-B34D-FBA0F35A25CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67EC9444-7D34-4C75-B34D-FBA0F35A25CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67EC9444-7D34-4C75-B34D-FBA0F35A25CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{185C7215-66EE-4CB5-ADB5-331DC53EA81F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{185C7215-66EE-4CB5-ADB5-331DC53EA81F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{185C7215-66EE-4CB5-ADB5-331DC53EA81F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{185C7215-66EE-4CB5-ADB5-331DC53EA81F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -305,6 +323,9 @@ Global
 		{D93DD6F6-7AA0-402C-845C-A7FDF722D0A2} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
 		{D3270F02-BD3C-413F-8138-DD6B68B44ACF} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
 		{53B4DA61-8594-4D17-87C9-2773D4FCA6EA} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
+		{67EC9444-7D34-4C75-B34D-FBA0F35A25CE} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
+		{185C7215-66EE-4CB5-ADB5-331DC53EA81F} = {8BE0FE31-6A52-452E-BE71-B8C64A3ED402}
+		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19} = {A10B5CD6-38EC-4D7E-9D1C-2EBA8017E437}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A4D0636F-0160-4FA5-81A3-9784C7E3B3A4}

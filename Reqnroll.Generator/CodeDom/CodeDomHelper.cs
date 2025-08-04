@@ -156,16 +156,20 @@ namespace Reqnroll.Generator.CodeDom
             }
         }
 
+        // FIX #633 by forcing all attributes to use the global:: (GLOBAL. for VB) prefix
         public CodeAttributeDeclaration AddAttribute(CodeTypeMember codeTypeMember, string attrType)
         {
-            var codeAttributeDeclaration = new CodeAttributeDeclaration(attrType);
+            var attributeTypeReference = new CodeTypeReference(attrType, CodeTypeReferenceOptions.GlobalReference);
+            var codeAttributeDeclaration = new CodeAttributeDeclaration(attributeTypeReference);
             codeTypeMember.CustomAttributes.Add(codeAttributeDeclaration);
             return codeAttributeDeclaration;
         }
 
         public CodeAttributeDeclaration AddAttribute(CodeTypeMember codeTypeMember, string attrType, params object[] attrValues)
         {
-            var codeAttributeDeclaration = new CodeAttributeDeclaration(attrType,
+            var attributeTypeReference = new CodeTypeReference(attrType, CodeTypeReferenceOptions.GlobalReference);
+
+            var codeAttributeDeclaration = new CodeAttributeDeclaration(attributeTypeReference,
                 attrValues.Select(attrValue => new CodeAttributeArgument(new CodePrimitiveExpression(attrValue))).ToArray());
             codeTypeMember.CustomAttributes.Add(codeAttributeDeclaration);
             return codeAttributeDeclaration;
@@ -173,7 +177,9 @@ namespace Reqnroll.Generator.CodeDom
 
         public CodeAttributeDeclaration AddAttribute(CodeTypeMember codeTypeMember, string attrType, params CodeAttributeArgument[] attrArguments)
         {
-            var codeAttributeDeclaration = new CodeAttributeDeclaration(attrType, attrArguments);
+            var attributeTypeReference = new CodeTypeReference(attrType, CodeTypeReferenceOptions.GlobalReference);
+
+            var codeAttributeDeclaration = new CodeAttributeDeclaration(attributeTypeReference, attrArguments);
             codeTypeMember.CustomAttributes.Add(codeAttributeDeclaration);
             return codeAttributeDeclaration;
         }
@@ -316,6 +322,13 @@ namespace Reqnroll.Generator.CodeDom
             }
             // Global namespaces not yet supported in VB
             return typeName;
+        }
+
+        public string GetGlobalizedName(string itemName)
+        {
+            string prefix = (TargetLanguage == CodeDomProviderLanguage.CSharp) ? "global::" : "Global.";
+
+            return prefix + itemName;
         }
 
         public CodeExpression CreateOptionalArgumentExpression(string parameterName, CodeVariableReferenceExpression valueExpression)

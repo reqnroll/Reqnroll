@@ -7,5 +7,6 @@ public enum UnitTestProvider
     xUnit3,
     NUnit4,
     NUnit3,
-    NUnit2
+    NUnit2,
+    TUnit
 }

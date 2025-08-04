@@ -241,11 +241,11 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
 
             var ArgValue = row0arguments["DisplayName"] as CodePrimitiveExpression;
             var stringValue = ArgValue?.Value as string;
-            stringValue.Should().Be("Add items(1,red)");
+            stringValue.Should().Be("Add items(1,red,0)");
 
             ArgValue = row1arguments["DisplayName"] as CodePrimitiveExpression;
             stringValue = ArgValue?.Value as string;
-            stringValue.Should().Be("Add items(2,blue)");
+            stringValue.Should().Be("Add items(2,blue,1)");
         }
 
         [Fact]

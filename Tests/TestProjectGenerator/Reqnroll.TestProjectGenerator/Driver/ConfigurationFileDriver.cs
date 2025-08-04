@@ -92,6 +92,7 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 case "xunit": return UnitTestProvider.xUnit;
                 case "xunit3": return UnitTestProvider.xUnit3;
                 case "nunit": return UnitTestProvider.NUnit3;
+                case "tunit": return UnitTestProvider.TUnit;
                 default: throw new ArgumentOutOfRangeException(nameof(providerName), providerName, "Unknown unit test provider");
             }
         }

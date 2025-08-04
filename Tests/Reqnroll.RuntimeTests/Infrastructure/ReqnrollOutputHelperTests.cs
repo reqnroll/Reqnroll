@@ -1,7 +1,9 @@
 using Moq;
+using Reqnroll.Configuration;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using System;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
@@ -18,7 +20,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             outputHelper.WriteLine(message);
 
-            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEvent(It.Is<OutputAddedEvent>(m => m.Text == message)), Times.Once);
+            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEventAsync(It.Is<OutputAddedEvent>(m => m.Text == message)), Times.Once);
         }
 
         [Fact]
@@ -29,7 +31,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             outputHelper.AddAttachment(filePath);
 
-            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEvent(It.Is<AttachmentAddedEvent>(m => m.FilePath == filePath)), Times.Once);
+            _testThreadExecutionEventPublisher.Verify(ep => ep.PublishEventAsync(It.Is<AttachmentAddedEvent>(m => m.FilePath == filePath)), Times.Once);
         }
 
         private ReqnrollOutputHelper CreateReqnrollOutputHelper()
@@ -37,8 +39,13 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             _testThreadExecutionEventPublisher = new Mock<ITestThreadExecutionEventPublisher>();
             var traceListenerMock = new Mock<ITraceListener>();
             var attachmentHandlerMock = new Mock<IReqnrollAttachmentHandler>();
+            var contextManager = new Mock<IContextManager>();
+            var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "test feature", null);
+            var config = new ReqnrollConfiguration(ConfigSource.Json, null, null, null, null, false, MissingOrPendingStepsOutcome.Error, false, false, TimeSpan.FromSeconds(10), Reqnroll.BindingSkeletons.StepDefinitionSkeletonStyle.CucumberExpressionAttribute, null, false, false, new string[] { }, ObsoleteBehavior.Error, false);
+            var featureContext = new FeatureContext(null, featureInfo, config);
+            contextManager.SetupGet(c => c.FeatureContext).Returns(featureContext);
 
-            return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher.Object, traceListenerMock.Object, attachmentHandlerMock.Object);
+            return new ReqnrollOutputHelper(_testThreadExecutionEventPublisher.Object, traceListenerMock.Object, attachmentHandlerMock.Object, contextManager.Object);
         }
     }
 }

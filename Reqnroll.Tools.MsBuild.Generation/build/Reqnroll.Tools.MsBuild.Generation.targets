@@ -76,7 +76,7 @@
       Condition="%(None.Extension) == '.feature' AND %(None.Generator) == 'ReqnrollSingleFileGenerator'"/>
 
     <!-- <PropertyGroup>
-      <ReqnrollCodeBehindOutputPath Condition="'$(ReqnrollCodeBehindOutputPath)' == ''">Features.Generated</ReqnrollCodeBehindOutputPath>
+      <ReqnrollCodeBehindOutputPath Condition=" '$(ReqnrollCodeBehindOutputPath)' == '' ">Features.Generated</ReqnrollCodeBehindOutputPath>
     </PropertyGroup> -->
 
     <PropertyGroup Condition="'$(TargetFrameworkVersion)' != ''">
@@ -147,7 +147,7 @@
       <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
 
-    <ItemGroup>
+    <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
         <LogicalName>%(ReqnrollFeatureFiles.Identity)</LogicalName>
       </EmbeddedResource>

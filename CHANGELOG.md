@@ -2,10 +2,12 @@
 
 ## Improvements:
 
+* Removed unused Culture property from step definition attributes (Given, When, Then, StepDefinition) (#671)
 * Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
 * Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 * Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
 * Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
+* Improvement: Introducing the ability to specify env var "REQNROLL_DRY_RUN=true" to skip invocation of step handlers at runtime (#614)
 * Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
 * Refactored UnitTestFeatureGenerator to provide an output parameter that contains warnings (#624)
 * Improvement: Added a CreateDirectory() function to the Reqnroll.Utils/IFileSystem (#623)
@@ -13,14 +15,19 @@
 * Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
 * Upgrade to Gherkin v32 from v30 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#489)
 * Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
+* Provide AsyncEventHandler in RuntimePluginTestExecutionLifecycleEvents (#634)
 * Improved test execution time by decoupling the telemetry sending from the execution. (#629)
+* Improved test feature context and feature hook handling for non-parallel or class-parallel scenarios where the scenarios of the feature are not executed in sequence. (#638)
+* Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
+* Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
 
 ## Bug fixes:
 
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
+* Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 
-*Contributors of this release (in alphabetical order):* @algirdasN, @clrudolphi, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):*  @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 
@@ -28,7 +35,7 @@
 
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
 * Fix: Scenario, feature and test run finished event is not published when the related "after" hook fails (#560)
-* Fix: Inconsistent hook execution (duble execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
+* Fix: Inconsistent hook execution (double execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
 * Fix: Namespace collisions in generated code when Reqnroll project namespace contains "System" (#583)
 * Fix: InvalidOperationException when calling test teardown method after the Reqnroll test runner has been released (#387)
 

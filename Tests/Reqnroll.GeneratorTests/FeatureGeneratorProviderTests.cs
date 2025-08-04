@@ -5,6 +5,7 @@ using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.UnitTestProvider;
+using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {

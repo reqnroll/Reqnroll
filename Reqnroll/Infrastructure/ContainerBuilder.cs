@@ -6,6 +6,8 @@ using Reqnroll.Configuration;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
+using Reqnroll.Formatters.PubSub;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.Infrastructure
 {
@@ -69,6 +71,12 @@ namespace Reqnroll.Infrastructure
             runtimePluginEvents.RaiseCustomizeGlobalDependencies(container, reqnrollConfiguration);
 
             container.Resolve<IConfigurationLoader>().TraceConfigSource(container.Resolve<ITraceListener>(), reqnrollConfiguration);
+
+            // Initialize the Cucumber message publisher, which will load and initialize the Cucumber message formatters
+            // Only initialize if the Cucumber message formatters are enabled in the configuration
+            var cucumberMessageConfiguration = container.Resolve<IFormattersConfigurationProvider>();
+            if (cucumberMessageConfiguration.Enabled)
+                container.Resolve<ICucumberMessagePublisher>().Initialize(runtimePluginEvents);
 
             return container;
         }

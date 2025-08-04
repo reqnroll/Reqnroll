@@ -174,19 +174,19 @@ namespace Reqnroll.RuntimeTests
         {
             public class AngenommenAttribute : GivenAttribute
             {
-                public AngenommenAttribute(string regex) : base(regex, "de-DE")
+                public AngenommenAttribute(string expression) : base(expression)
                 {
                 }
             }
             public class WennAttribute : WhenAttribute
             {
-                public WennAttribute(string regex) : base(regex, "de-DE")
+                public WennAttribute(string expression) : base(expression)
                 {
                 }
             }
             public class DannAttribute : ThenAttribute
             {
-                public DannAttribute(string regex) : base(regex, "de-DE")
+                public DannAttribute(string expression) : base(expression)
                 {
                 }
             }
@@ -212,8 +212,8 @@ namespace Reqnroll.RuntimeTests
         {
             public class GivenAndWhenAttribute : StepDefinitionBaseAttribute
             {
-                public GivenAndWhenAttribute(string regex)
-                    : base(regex, new[] { StepDefinitionType.Given, StepDefinitionType.When } )
+                public GivenAndWhenAttribute(string expression)
+                    : base(expression, new[] { StepDefinitionType.Given, StepDefinitionType.When } )
                 {
                 }
             }

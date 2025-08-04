@@ -83,23 +83,42 @@ public class CucumberExpressionIntegrationTests
         {
             ExecutedParams.Add((intParam, typeof(int)));
         }
-        
+
         public void StepDefWithFloatParam(float doubleParam)
         {
             ExecutedParams.Add((doubleParam, typeof(float)));
         }
+
         public void StepDefWithDoubleParam(double doubleParam)
         {
             ExecutedParams.Add((doubleParam, typeof(double)));
         }
+
         public void StepDefWithDecimalParam(decimal decimalParam)
         {
             ExecutedParams.Add((decimalParam, typeof(decimal)));
         }
+
         public void StepDefWithEnumParam(SampleColorEnum enumParam)
         {
             ExecutedParams.Add((enumParam, typeof(SampleColorEnum)));
         }
+
+        public void StepDefWithDateTimeParam(DateTime dateTimeParam)
+        {
+            ExecutedParams.Add((dateTimeParam, typeof(DateTime)));
+        }
+
+        public void StepDefWithDateOnlyParam(DateOnly dateParam)
+        {
+            ExecutedParams.Add((dateParam, typeof(DateOnly)));
+        }
+
+        public void StepDefWithTimeOnlyParam(TimeOnly timeParam)
+        {
+            ExecutedParams.Add((timeParam, typeof(TimeOnly)));
+        }
+
         public void StepDefWithCustomClassParam(SampleUser userParam)
         {
             ExecutedParams.Add((userParam, typeof(SampleUser)));
@@ -136,7 +155,7 @@ public class CucumberExpressionIntegrationTests
         }
     }
 
-    private async Task<SampleBindings> PerformStepExecution(string methodName, string expression, string stepText, IStepArgumentTransformationBinding[] transformations = null, Action<IBindingRegistry> onBindingRegistryPreparation = null)
+    private async Task<SampleBindings> PerformStepExecution(string methodName, string expression, string stepText, IStepArgumentTransformationBinding[] transformations = null, Action<IBindingRegistry> onBindingRegistryPreparation = null, string culture = "en-US")
     {
         var containerBuilder = new ContainerBuilder(new TestDependencyProvider());
         var globalContainer = containerBuilder.CreateGlobalContainer(GetType().Assembly);
@@ -183,7 +202,7 @@ public class CucumberExpressionIntegrationTests
         bindingSourceProcessor.BuildingCompleted();
 
         await engine.OnTestRunStartAsync();
-        await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo("en-US"), ".", "Sample feature", null, ProgrammingLanguage.CSharp));
+        await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo(culture), ".", "Sample feature", null, ProgrammingLanguage.CSharp));
         await engine.OnScenarioStartAsync();
         engine.OnScenarioInitialize(new ScenarioInfo("Sample scenario", null, null, null), null);
         await engine.StepAsync(StepDefinitionKeyword.Given, "Given ", stepText, null, null);
@@ -336,6 +355,58 @@ public class CucumberExpressionIntegrationTests
     }
 
     [Fact]
+    public async Task Should_match_step_with_joker_parameter_to_dateTime()
+    {
+        var expression = "The datetime of the system is {}";
+        var stepText = "The datetime of the system is 2024-12-31 23:25";
+        var expectedParam = (new DateTime(2024, 12, 31, 23, 25, 0), typeof(DateTime));
+        var methodName = nameof(SampleBindings.StepDefWithDateTimeParam);
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText);
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async Task Should_match_step_with_joker_parameter_to_dateTime_dutch()
+    {
+        var expression = "The datetime of the system is {}";
+        var stepText = "The datetime of the system is 31-12-2024 23:25";
+        var expectedParam = (new DateTime(2024, 12, 31, 23, 25, 0), typeof(DateTime));
+        var methodName = nameof(SampleBindings.StepDefWithDateTimeParam);
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, culture: "nl-NL");
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async Task Should_match_step_with_joker_parameter_to_dateOnly()
+    {
+        var expression = "The date of the system is {}";
+        var stepText = "The date of the system is 2024-12-31";
+        var expectedParam = (new DateOnly(2024, 12, 31), typeof(DateOnly));
+        var methodName = nameof(SampleBindings.StepDefWithDateOnlyParam);
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText);
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
+    public async Task Should_match_step_with_joker_parameter_to_timeOnly()
+    {
+        var expression = "The time of the system is {}";
+        var stepText = "The time of the system is 23:25";
+        var expectedParam = (new TimeOnly(23, 25, 0), typeof(TimeOnly));
+        var methodName = nameof(SampleBindings.StepDefWithTimeOnlyParam);
+
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText);
+
+        sampleBindings.ExecutedParams.Should().Contain(expectedParam);
+    }
+
+    [Fact]
     public async Task Should_match_step_with_joker_parameter()
     {
         var expression = "there is a user {} registered";
@@ -389,7 +460,7 @@ public class CucumberExpressionIntegrationTests
             "user ([A-Z][a-z]+)",
             new RuntimeBindingMethod(typeof(SampleUser).GetMethod(nameof(SampleUser.Create))));
 
-        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation});
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
 
         sampleBindings.ExecutedParams.Should().Contain(expectedParam);
     }
@@ -407,7 +478,7 @@ public class CucumberExpressionIntegrationTests
             new RuntimeBindingMethod(typeof(SampleUser).GetMethod(nameof(SampleUser.Create))),
             "user");
 
-        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation});
+        var sampleBindings = await PerformStepExecution(methodName, expression, stepText, new[] { transformation });
 
         sampleBindings.ExecutedParams.Should().Contain(expectedParam);
     }

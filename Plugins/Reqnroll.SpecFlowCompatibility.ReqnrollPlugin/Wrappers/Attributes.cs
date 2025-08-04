@@ -15,11 +15,11 @@ public class GivenAttribute : Reqnroll.GivenAttribute
     {
     }
 
-    public GivenAttribute(string regex) : base(regex)
+    public GivenAttribute(string expression) : base(expression)
     {
     }
 
-    public GivenAttribute(string regex, string culture) : base(regex, culture)
+    public GivenAttribute(string expression, string culture) : base(expression)
     {
     }
 }
@@ -33,11 +33,11 @@ public class WhenAttribute : Reqnroll.WhenAttribute
     {
     }
 
-    public WhenAttribute(string regex) : base(regex)
+    public WhenAttribute(string expression) : base(expression)
     {
     }
 
-    public WhenAttribute(string regex, string culture) : base(regex, culture)
+    public WhenAttribute(string expression, string culture) : base(expression)
     {
     }
 }
@@ -51,11 +51,11 @@ public class ThenAttribute : Reqnroll.ThenAttribute
     {
     }
 
-    public ThenAttribute(string regex) : base(regex)
+    public ThenAttribute(string expression) : base(expression)
     {
     }
 
-    public ThenAttribute(string regex, string culture) : base(regex, culture)
+    public ThenAttribute(string expression, string culture) : base(expression)
     {
     }
 }
@@ -69,11 +69,11 @@ public class StepDefinitionAttribute : Reqnroll.StepDefinitionAttribute
     {
     }
 
-    public StepDefinitionAttribute(string regex) : base(regex)
+    public StepDefinitionAttribute(string expression) : base(expression)
     {
     }
 
-    public StepDefinitionAttribute(string regex, string culture) : base(regex, culture)
+    public StepDefinitionAttribute(string expression, string culture) : base(expression)
     {
     }
 }

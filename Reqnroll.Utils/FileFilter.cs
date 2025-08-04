@@ -9,11 +9,11 @@ namespace Reqnroll.Utils
     {
         public static IReadOnlyCollection<string> GetValidFiles(IReadOnlyCollection<string> filePaths)
         {
-            var valids = filePaths.Where(ValidFile).ToList();
+            var valids = filePaths.Where(IsValidFile).ToList();
             return valids;
         }
 
-        private static bool ValidFile(string filePath)
+        public static bool IsValidFile(string filePath)
         {
             try
             {

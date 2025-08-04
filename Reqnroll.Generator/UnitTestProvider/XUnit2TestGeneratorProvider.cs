@@ -53,12 +53,14 @@ namespace Reqnroll.Generator.UnitTestProvider
         protected virtual CodeTypeReference CreateFixtureInterface(TestClassGenerationContext generationContext, CodeTypeReference fixtureDataType)
         {
             // Add a field for the ITestOutputHelper
-            generationContext.TestClass.Members.Add(new CodeMemberField(OUTPUT_INTERFACE, OUTPUT_INTERFACE_FIELD_NAME));
+            generationContext.TestClass.Members.Add(new CodeMemberField(new CodeTypeReference(OUTPUT_INTERFACE, CodeTypeReferenceOptions.GlobalReference), OUTPUT_INTERFACE_FIELD_NAME));
 
             // Store the fixture data type for later use in constructor
             generationContext.CustomData.Add(FIXTUREDATA_PARAMETER_NAME, fixtureDataType);
 
-            return new CodeTypeReference(ICLASSFIXTURE_INTERFACE, fixtureDataType);
+            var classFixtureCodeType =  new CodeTypeReference(ICLASSFIXTURE_INTERFACE, fixtureDataType);
+            classFixtureCodeType.Options = CodeTypeReferenceOptions.GlobalReference;
+            return classFixtureCodeType;
         }
 
         protected CodeDomHelper CodeDomHelper { get; set; }
@@ -93,7 +95,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             constructor.Parameters.Add(
                 new CodeParameterDeclarationExpression((CodeTypeReference)generationContext.CustomData[FIXTUREDATA_PARAMETER_NAME], FIXTUREDATA_PARAMETER_NAME));
             constructor.Parameters.Add(
-                new CodeParameterDeclarationExpression(OUTPUT_INTERFACE, OUTPUT_INTERFACE_PARAMETER_NAME));
+                new CodeParameterDeclarationExpression(new CodeTypeReference(OUTPUT_INTERFACE, CodeTypeReferenceOptions.GlobalReference), OUTPUT_INTERFACE_PARAMETER_NAME));
 
             constructor.Statements.Add(
                 new CodeAssignStatement(
@@ -145,7 +147,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             // otherwise the test runner will not be released.
 
             var callDisposeException = new CodeMethodInvokeExpression(
-                new CodeCastExpression(new CodeTypeReference(IASYNCLIFETIME_INTERFACE), new CodeThisReferenceExpression()),
+                new CodeCastExpression(new CodeTypeReference(IASYNCLIFETIME_INTERFACE, CodeTypeReferenceOptions.GlobalReference), new CodeThisReferenceExpression()),
                 "DisposeAsync");
             CodeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callDisposeException);
 
@@ -215,7 +217,7 @@ namespace Reqnroll.Generator.UnitTestProvider
                                 nameof(ScenarioContext)),
                             nameof(ScenarioContext.ScenarioContainer)),
                         nameof(IObjectContainer.RegisterInstanceAs),
-                        new CodeTypeReference(OUTPUT_INTERFACE)),
+                        new CodeTypeReference(OUTPUT_INTERFACE, CodeTypeReferenceOptions.GlobalReference)),
                     new CodeVariableReferenceExpression(OUTPUT_INTERFACE_FIELD_NAME)));
         }
 
@@ -270,7 +272,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
             // Task IAsyncLifetime.InitializeAsync() { <fixtureSetupMethod>(); }
             var initializeMethod = new CodeMemberMethod();
-            initializeMethod.PrivateImplementationType = new CodeTypeReference(IASYNCLIFETIME_INTERFACE);
+            initializeMethod.PrivateImplementationType = new CodeTypeReference(IASYNCLIFETIME_INTERFACE, CodeTypeReferenceOptions.GlobalReference);
             initializeMethod.Name = "InitializeAsync";
 
             CodeDomHelper.MarkCodeMemberMethodAsAsync(initializeMethod);
@@ -292,7 +294,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
             generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
 
-            var iasyncLifetimeInterface = new CodeTypeReference(IASYNCLIFETIME_INTERFACE);
+            var iasyncLifetimeInterface = new CodeTypeReference(IASYNCLIFETIME_INTERFACE, CodeTypeReferenceOptions.GlobalReference);
 
             // have to add the explicit object base class because of VB.NET
             _currentFixtureDataTypeDeclaration.BaseTypes.Add(typeof(object));
@@ -349,7 +351,7 @@ namespace Reqnroll.Generator.UnitTestProvider
 
             var initializeMethod = new CodeMemberMethod();
             initializeMethod.Attributes = MemberAttributes.Public;
-            initializeMethod.PrivateImplementationType = new CodeTypeReference(IASYNCLIFETIME_INTERFACE);
+            initializeMethod.PrivateImplementationType = new CodeTypeReference(IASYNCLIFETIME_INTERFACE, CodeTypeReferenceOptions.GlobalReference);
             initializeMethod.Name = "InitializeAsync";
 
             CodeDomHelper.MarkCodeMemberMethodAsAsync(initializeMethod);
@@ -363,7 +365,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         {
             // xUnit supports test tear down through the IAsyncLifetime interface
 
-            var iasyncLifetimeInterface = new CodeTypeReference(IASYNCLIFETIME_INTERFACE);
+            var iasyncLifetimeInterface = new CodeTypeReference(IASYNCLIFETIME_INTERFACE, CodeTypeReferenceOptions.GlobalReference);
 
             generationContext.TestClass.BaseTypes.Add(iasyncLifetimeInterface);
 

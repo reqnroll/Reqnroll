@@ -3,6 +3,7 @@ using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Infrastructure;
 using System.Linq;
 using System.Reflection;
@@ -134,6 +135,7 @@ public class BindingProviderService
 #pragma warning disable CS0618
             container.RegisterTypeAs<DryRunBindingInvoker, IBindingInvoker>();
 #pragma warning restore CS0618
+            container.RegisterTypeAs<Formatters.Configuration.FormattersForcedDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
         }
     }
 

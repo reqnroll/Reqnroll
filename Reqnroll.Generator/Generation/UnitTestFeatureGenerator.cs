@@ -1,17 +1,22 @@
-using Reqnroll.Configuration;
-using Reqnroll.Generator.CodeDom;
-using Reqnroll.Generator.UnitTestConverter;
-using Reqnroll.Generator.UnitTestProvider;
-using Reqnroll.Parser;
-using Reqnroll.Tracing;
 using System;
 using System.CodeDom;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Gherkin.CucumberMessages;
+using Reqnroll.Configuration;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.UnitTestConverter;
+using Reqnroll.Generator.UnitTestProvider;
+using Reqnroll.Parser;
+using Reqnroll.Parser.CucumberMessages;
+using Reqnroll.Tracing;
+
 
 namespace Reqnroll.Generator.Generation
 {
@@ -25,6 +30,7 @@ namespace Reqnroll.Generator.Generation
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
         private readonly UnitTestMethodGenerator _unitTestMethodGenerator;
         private readonly LinePragmaHandler _linePragmaHandler;
+        private CodeMemberMethod _cucumberMessagesInitializeMethod;
 
         public UnitTestFeatureGenerator(
             IUnitTestGeneratorProvider testGeneratorProvider,
@@ -67,6 +73,7 @@ namespace Reqnroll.Generator.Generation
 
             //before returning the generated code, call the provider's method in case the generated code needs to be customized            
             _testGeneratorProvider.FinalizeTestClass(generationContext);
+
             generationWarnings = generationContext.GenerationWarnings;
             return codeNamespace;
         }
@@ -152,6 +159,7 @@ namespace Reqnroll.Generator.Generation
             }
 
             DeclareFeatureTagsField(generationContext);
+            DeclareFeatureMessagesFactoryMembers(generationContext);
             DeclareFeatureInfoMember(generationContext);
         }
 
@@ -184,9 +192,117 @@ namespace Reqnroll.Generator.Generation
                 new CodeFieldReferenceExpression(
                     new CodeTypeReferenceExpression(new CodeTypeReference(typeof(ProgrammingLanguage), CodeTypeReferenceOptions.GlobalReference)),
                     _codeDomHelper.TargetLanguage.ToString()),
-                new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME));
+                new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME),
+                new CodeMethodInvokeExpression(null, _cucumberMessagesInitializeMethod.Name));
 
             generationContext.TestClass.Members.Add(featureInfoField);
+        }
+
+        private void DeclareFeatureMessagesFactoryMembers(TestClassGenerationContext generationContext)
+        {
+            // Generation of Cucumber Messages relies on access to the parsed AST from 'generationContext.Document'
+
+            var sourceFileLocation = Path.Combine(generationContext.Document.DocumentLocation.FeatureFolderPath, generationContext.Document.DocumentLocation.SourceFilePath);
+
+            // Adding three static methods to the test class: one each as factory methods for source, gherkinDocument, and pickles Messages
+            // Bodies of these methods are added later inside the try/catch block
+            var sourceFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<Io.Cucumber.Messages.Types.Source>), CodeTypeReferenceOptions.GlobalReference), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "SourceFunc");
+            var sourceFactoryMethod = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Private | MemberAttributes.Static,
+                ReturnType = new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.Source), CodeTypeReferenceOptions.GlobalReference),
+                Name = sourceFunc.MethodName
+            };
+            generationContext.TestClass.Members.Add(sourceFactoryMethod);
+
+            var gherkinDocumentFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<Io.Cucumber.Messages.Types.GherkinDocument>), CodeTypeReferenceOptions.GlobalReference), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "GherkinDocumentFunc");
+            var gherkinDocumentFactoryMethod = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Private | MemberAttributes.Static,
+                ReturnType = new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.GherkinDocument), CodeTypeReferenceOptions.GlobalReference),
+                Name = gherkinDocumentFunc.MethodName
+            };
+            generationContext.TestClass.Members.Add(gherkinDocumentFactoryMethod);
+
+            var picklesFunc = new CodeDelegateCreateExpression(new CodeTypeReference(typeof(Func<IEnumerable<Io.Cucumber.Messages.Types.Pickle>>), CodeTypeReferenceOptions.GlobalReference), new CodeTypeReferenceExpression(generationContext.TestClass.Name), "PicklesFunc");
+            var picklesFactoryMethod = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Private | MemberAttributes.Static,
+                ReturnType = new CodeTypeReference(typeof(IEnumerable<Io.Cucumber.Messages.Types.Pickle>), CodeTypeReferenceOptions.GlobalReference),
+                Name = picklesFunc.MethodName
+            };
+            generationContext.TestClass.Members.Add(picklesFactoryMethod);
+
+            // Create a new method that will be added to the test class.
+            // It will be called to provide the FeatureCucumberMessages property value of the FeatureInfo object when that object is constructed
+            var cucumberMessagesInitializeMethod = new CodeMemberMethod
+            {
+                Attributes = MemberAttributes.Private | MemberAttributes.Static,
+                Name = "InitializeCucumberMessages",
+                ReturnType = new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference)
+            };
+            generationContext.TestClass.Members.Add(cucumberMessagesInitializeMethod);
+            _cucumberMessagesInitializeMethod = cucumberMessagesInitializeMethod;
+
+            // Create a FeatureLevelCucumberMessages object and add it to featureInfo
+            var featureLevelCucumberMessagesExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference),
+                sourceFunc,
+                gherkinDocumentFunc,
+                picklesFunc);
+
+            cucumberMessagesInitializeMethod.Statements.Add(
+                new CodeMethodReturnStatement(
+                    featureLevelCucumberMessagesExpression));
+
+            var sourceReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
+            var gherkinDocumentReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
+            var picklesReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
+            try
+            {
+                var featureSource = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document));
+                var IdGeneratorSeed = featureSource.Uri + featureSource.Data;
+                var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(IdGeneratorSeed));
+                var featureGherkinDocument = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
+                var featurePickles = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocument);
+                var featureGherkinDocumentMessage = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToGherkinDocument(featureGherkinDocument);
+                var featurePickleMessages = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToPickles(featurePickles);
+
+                // generate a CodeDom expression to create the Source object from the featureSourceMessage
+                var sourceExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.Source), CodeTypeReferenceOptions.GlobalReference),
+                    new CodePrimitiveExpression(featureSource.Uri),
+                    new CodePrimitiveExpression(featureSource.Data),
+                    new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.SourceMediaType), CodeTypeReferenceOptions.GlobalReference)), featureSource.MediaType.ToString()));
+
+                // generate a CodeDom expression to create the GherkinDocument object from the featureGherkinDocumentMessage
+                var gherkinDocumentExpressionGenerator = new CucumberGherkinDocumentExpressionGenerator();
+                var gherkinDocumentExpression = gherkinDocumentExpressionGenerator.GenerateGherkinDocumentExpression(featureGherkinDocumentMessage);
+
+                // generate a CodeDom expression to create the Pickles object from the featurePickleMessages
+                var pickleExpressionGenerator = new CucumberPicklesExpressionGenerator();
+                var picklesExpression = pickleExpressionGenerator.GeneratePicklesExpression(featurePickleMessages);
+
+                // wrap these expressions in Func<T>
+
+                sourceReturnStatement = new CodeMethodReturnStatement(sourceExpression);
+
+                gherkinDocumentReturnStatement = new CodeMethodReturnStatement(gherkinDocumentExpression);
+
+                picklesReturnStatement = new CodeMethodReturnStatement(picklesExpression);
+            }
+            catch (Exception e)
+            {
+                generationContext.GenerationWarnings.Add($"WARNING: Failed to process Cucumber Pickles. Support for generating Cucumber Messages will be disabled. Exception: {e.Message}");
+                // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
+                // This effectively turns OFF the Cucumber Messages support for this feature.
+            }
+            finally
+            {
+                sourceFactoryMethod.Statements.Add(sourceReturnStatement);
+
+                gherkinDocumentFactoryMethod.Statements.Add(gherkinDocumentReturnStatement);
+
+                picklesFactoryMethod.Statements.Add(picklesReturnStatement);
+            }
         }
 
         private void SetupTestClassInitializeMethod(TestClassGenerationContext generationContext)
