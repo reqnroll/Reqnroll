@@ -37,13 +37,6 @@ namespace Reqnroll
         /// </summary>
         public string Expression { get; set; }
 
-        /// <summary>
-        /// additional information in which culture the step is written
-        /// it does not affect the matching of the step
-        /// it is only for tooling support needed
-        /// </summary>
-        public string Culture { get; set; }
-
         public ExpressionType ExpressionType { get; set; } = ExpressionType.Automatic;
 
         internal StepDefinitionBaseAttribute(string expression, StepDefinitionType type)
@@ -70,16 +63,10 @@ namespace Reqnroll
         {
         }
 
-
+        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
         public GivenAttribute(string expression)
             : base(expression, StepDefinitionType.Given)
         {
-        }
-
-        public GivenAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
         }
     }
 
@@ -93,15 +80,10 @@ namespace Reqnroll
         {
         }
 
+        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
         public WhenAttribute(string expression)
             : base(expression, StepDefinitionType.When)
         {
-        }
-
-        public WhenAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
         }
     }
 
@@ -114,15 +96,10 @@ namespace Reqnroll
         {
         }
 
+        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
         public ThenAttribute(string expression)
             : base(expression, StepDefinitionType.Then)
         {
-        }
-
-        public ThenAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
         }
     }
 
@@ -136,15 +113,10 @@ namespace Reqnroll
         {
         }
 
+        /// <param name="expression">A cucumber expression or a regular expression (regex) that matches the step text.</param>
         public StepDefinitionAttribute(string expression)
             : base(expression, new[] { StepDefinitionType.Given, StepDefinitionType.When, StepDefinitionType.Then })
         {
-        }
-
-        public StepDefinitionAttribute(string expression, string culture)
-            : this(expression)
-        {
-            Culture = culture;
         }
     }
 }

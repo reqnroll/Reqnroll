@@ -2,6 +2,7 @@
 
 ## Improvements:
 
+* Removed unused Culture property from step definition attributes (Given, When, Then, StepDefinition) (#671)
 * Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
 * Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
 * Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
@@ -18,6 +19,7 @@
 * Improved test execution time by decoupling the telemetry sending from the execution. (#629)
 * Improved test feature context and feature hook handling for non-parallel or class-parallel scenarios where the scenarios of the feature are not executed in sequence. (#638)
 * Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
+* Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
 
 ## Bug fixes:
 
@@ -33,7 +35,7 @@
 
 * Fix: xUnit async `[AfterTestRun]` hook might not execute fully (#530)
 * Fix: Scenario, feature and test run finished event is not published when the related "after" hook fails (#560)
-* Fix: Inconsistent hook execution (duble execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
+* Fix: Inconsistent hook execution (double execution, before/after hook skipped, infrastructure errors) when before or after hooks fail (#526)
 * Fix: Namespace collisions in generated code when Reqnroll project namespace contains "System" (#583)
 * Fix: InvalidOperationException when calling test teardown method after the Reqnroll test runner has been released (#387)
 

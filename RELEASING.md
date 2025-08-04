@@ -45,7 +45,7 @@ To release such a preview release, the following steps has to be done:
    * `custom_version_suffix`: set it to `preYYYYMMDD`, where `YYYYMMDD` refers to the current date, e.g. `pre20240515`
    * `custom_configuration`: leave it on default
 1. The CI workflow runs and ideally passes all core and testing jobs, but will stop for approval before running the `release` job.
-1. Make sure everything is OK. You can even donwload the packages to be published for a smoke test if necessary. 
+1. Make sure everything is OK. You can even download the packages to be published for a smoke test if necessary. 
 1. If everything is fine, approve the deployment job.
 1. The job will publish the packages (but do not change the version or the changelog as this is only a preview release)
 
@@ -62,6 +62,6 @@ To release such a preview release, the following steps has to be done:
    * `custom_version_suffix`: leave it empty
    * `custom_configuration`: leave it on default
 1. The CI workflow runs and ideally passes all core and testing jobs, but will stop for approval before running the `release` job.
-1. Make sure everything is OK. You can even donwload the packages to be published for a smoke test if necessary. 
+1. Make sure everything is OK. You can even download the packages to be published for a smoke test if necessary. 
 1. If everything is fine, approve the deployment job.
 1. The job will publish the packages, tag the current commit and create a new commit with the updated version number and changelog header.

@@ -9,4 +9,5 @@ value-retrievers
 plugins
 decorators
 available-containers
+build-metadata-provider
 ```
