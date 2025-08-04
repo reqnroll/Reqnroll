@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
-    <id>Reqnroll.xUnit.v3</id>
+    <id>Reqnroll.xunit.v3</id>
     <version>$version$</version>
-    <title>Reqnroll.xUnit.v3</title>
+    <title>Reqnroll.xunit.v3</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
     <description>Package to use Reqnroll with xUnit.v3 2.0 and later. $summary$</description>

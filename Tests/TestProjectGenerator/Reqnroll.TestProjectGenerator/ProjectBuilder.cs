@@ -345,9 +345,9 @@ namespace Reqnroll.TestProjectGenerator
             _project.AddNuGetPackage("xunit.runner.visualstudio", "3.0.2");
             if (IsReqnrollFeatureProject)
             {
-                _project.AddNuGetPackage("Reqnroll.xUnit.v3", _currentVersionDriver.ReqnrollNuGetVersion,
+                _project.AddNuGetPackage("Reqnroll.xunit.v3", _currentVersionDriver.ReqnrollNuGetVersion,
                                          new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.xUnit3.ReqnrollPlugin.dll"), "net462\\Reqnroll.xUnit3.ReqnrollPlugin.dll"));
-                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.xUnit.v3", ReqnrollPluginType.Runtime));
+                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.xunit.v3", ReqnrollPluginType.Runtime));
             }
         }
 
