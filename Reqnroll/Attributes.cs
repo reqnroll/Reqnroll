@@ -21,6 +21,9 @@ namespace Reqnroll
         /// </summary>
         public string Expression { get; set; }
 
+        /// <summary>
+        /// The type of <see cref="Expression"/> used for matching the step text, a cucumber expression or a regular expression (regex).
+        /// </summary>
         public ExpressionType ExpressionType { get; set; } = ExpressionType.Unspecified;
 
         internal StepDefinitionBaseAttribute(string expression, StepDefinitionType type)
