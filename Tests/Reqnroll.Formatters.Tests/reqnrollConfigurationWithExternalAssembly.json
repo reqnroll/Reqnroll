@@ -7,7 +7,7 @@
     }
   ],
   "formatters": {
-    "messages": {
+    "message": {
       "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_report.ndjson"
     }
   }

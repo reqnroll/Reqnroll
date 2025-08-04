@@ -13,31 +13,31 @@ public class CucumberMessageBrokerTests
 {
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
     private readonly Mock<IFormatterLog> _logMock;
-    private readonly Mock<ICucumberMessageFormatter> _sinkMock1;
-    private readonly Mock<ICucumberMessageFormatter> _sinkMock2;
-    private readonly FormattersMessageBroker _sut;
+    private readonly Mock<ICucumberMessageFormatter> _formatterMock1;
+    private readonly Mock<ICucumberMessageFormatter> _formatterMock2;
+    private readonly CucumberMessageBroker _sut;
 
     public CucumberMessageBrokerTests()
     {
         _logMock = new Mock<IFormatterLog>();
-        _sinkMock1 = new Mock<ICucumberMessageFormatter>();
-        _sinkMock1.Setup(s => s.Name).Returns("sink1");
-        _sinkMock2 = new Mock<ICucumberMessageFormatter>();
-        _sinkMock2.Setup(s => s.Name).Returns("sink2");
+        _formatterMock1 = new Mock<ICucumberMessageFormatter>();
+        _formatterMock1.Setup(s => s.Name).Returns("formatter1");
+        _formatterMock2 = new Mock<ICucumberMessageFormatter>();
+        _formatterMock2.Setup(s => s.Name).Returns("formatter2");
         // Initialize the system under test (SUT)
-        _sut = new FormattersMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "sink1", _sinkMock1.Object}, { "sink2", _sinkMock2.Object} });
+        _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "formatter1", _formatterMock1.Object}, { "formatter2", _formatterMock2.Object} });
     }
 
     [Fact]
-    public async Task Enabled_Should_Return_True_When_Sinks_Are_Registered()
+    public async Task Enabled_Should_Return_True_When_Formatters_Are_Registered()
     {
         // Arrange
         _sut.Initialize();
-        _sut.SinkInitialized(_sinkMock1.Object, true);
+        _sut.FormatterInitialized(_formatterMock1.Object, true);
 
-        Assert.False(_sut.IsEnabled); // should not be enabled until after both sinks are registered
+        Assert.False(_sut.IsEnabled); // should not be enabled until after both formatters are registered
 
-        _sut.SinkInitialized(_sinkMock2.Object, true);
+        _sut.FormatterInitialized(_formatterMock2.Object, true);
 
         // Act
         var result = _sut.IsEnabled;
@@ -47,7 +47,7 @@ public class CucumberMessageBrokerTests
     }
 
     [Fact]
-    public void Enabled_Should_Return_False_When_No_Sinks_Are_Registered()
+    public void Enabled_Should_Return_False_When_No_Formatters_Are_Registered()
     {
         var log = new Mock<IFormatterLog>();
 
@@ -61,11 +61,11 @@ public class CucumberMessageBrokerTests
     }
 
     [Fact]
-    public async Task PublishAsync_Should_Invoke_PublishAsync_On_All_Sinks()
+    public async Task PublishAsync_Should_Invoke_PublishAsync_On_All_Formatters()
     {
         // Arrange
-        _sut.SinkInitialized(_sinkMock1.Object, true);
-        _sut.SinkInitialized(_sinkMock2.Object, true);
+        _sut.FormatterInitialized(_formatterMock1.Object, true);
+        _sut.FormatterInitialized(_formatterMock2.Object, true);
 
         var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
@@ -73,28 +73,28 @@ public class CucumberMessageBrokerTests
         await _sut.PublishAsync(message);
 
         // Assert
-        _sinkMock1.Verify(sink => sink.PublishAsync(message), Times.Once);
-        _sinkMock2.Verify(sink => sink.PublishAsync(message), Times.Once);
+        _formatterMock1.Verify(sink => sink.PublishAsync(message), Times.Once);
+        _formatterMock2.Verify(sink => sink.PublishAsync(message), Times.Once);
     }
 
     [Fact]
-    public async Task PublishAsync_Should_Swallow_Exceptions_From_Sinks()
+    public async Task PublishAsync_Should_Swallow_Exceptions_From_Formatters()
     {
         // Arrange
-        _sut.SinkInitialized(_sinkMock1.Object, true);
-        _sut.SinkInitialized(_sinkMock2.Object, true);
+        _sut.FormatterInitialized(_formatterMock1.Object, true);
+        _sut.FormatterInitialized(_formatterMock2.Object, true);
 
         var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
-        _sinkMock1
-            .Setup(sink => sink.PublishAsync(message))
-            .ThrowsAsync(new System.Exception("Sink 1 failed"));
+        _formatterMock1
+            .Setup(formatter => formatter.PublishAsync(message))
+            .ThrowsAsync(new System.Exception("Formatter 1 failed"));
 
         // Act
         var exception = await Record.ExceptionAsync(() => _sut.PublishAsync(message));
 
         // Assert
         Assert.Null(exception); // No exception should propagate
-        _sinkMock2.Verify(sink => sink.PublishAsync(message), Times.Once); // Other sinks should still be called
+        _formatterMock2.Verify(formatter => formatter.PublishAsync(message), Times.Once); // Other formatters should still be called
     }
 }

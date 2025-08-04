@@ -2,7 +2,7 @@
 
 The Driver Pattern is simply an additional layer between your step definitions and your automation code.
 
-Over the years, we noticed that a good practice to organize your bindings and automation code is to keep the code in the bindings very short (around 10 lines) and easy understandable.  
+Over the years, we noticed that a good practice to organize your bindings and automation code is to keep the code in the bindings very short (around 10 lines) and easily understandable.  
 
 This gives you following benefits:
 

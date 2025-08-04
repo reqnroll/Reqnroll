@@ -100,7 +100,7 @@ public class CucumberConfigurationTests
 
 
     [Fact]
-    public void GetFormatterConfigurationByName_Should_Return_Empty_For_Nonexistent_Formatter()
+    public void GetFormatterConfigurationByName_Should_Return_Null_For_Nonexistent_Formatter()
     {
         // Arrange
         _fileResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
@@ -112,6 +112,6 @@ public class CucumberConfigurationTests
         var result = _sut.GetFormatterConfigurationByName("nonexistent");
 
         // Assert
-        Assert.Empty(result);
+        Assert.Null(result);
     }
 }

@@ -42,7 +42,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
             ndjsonFileName = Path.Combine(path, ndjsonFileName);
             htmlFileName = Path.Combine(path, htmlFileName);
         }
-        string formatters = "{\"formatters\" : {\"messages\" : { \"outputFilePath\" : \"" + ndjsonFileName.Replace("\\", "\\\\") + "\" }," +
+        string formatters = "{\"formatters\" : {\"message\" : { \"outputFilePath\" : \"" + ndjsonFileName.Replace("\\", "\\\\") + "\" }," +
                             " \"html\" : { \"outputFilePath\" : \"" + htmlFileName.Replace("\\", "\\\\") + "\" } } }";
 
         _testSuiteInitializationDriver.OverrideCucumberMessagesFormatters = formatters;
@@ -167,7 +167,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         };
 
         FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new FormattersDisabledOverrideProvider(env));
-        configurationProvider.GetFormatterConfigurationByName("messages").TryGetValue("outputFilePath", out var outputFilePathElement);
+        configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 
         var outputFilePath = outputFilePathElement!.ToString();
         if (string.IsNullOrEmpty(outputFilePath))
