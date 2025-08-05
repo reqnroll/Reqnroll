@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using FluentAssertions;
 using Reqnroll.SystemTests.Generation;
+using Reqnroll.TestProjectGenerator;
 
 namespace Reqnroll.SystemTests
 {
@@ -21,6 +22,9 @@ namespace Reqnroll.SystemTests
             // 1. NUnit test framework
             // 2. BeforeFeature hook that calls Assert.Ignore
             // 3. Verify no NullReferenceException occurs during teardown
+
+            // Configure the test to use NUnit test framework
+            _testRunConfiguration.UnitTestProvider = UnitTestProvider.NUnit3;
 
             // Create a feature file
             AddFeatureFile(
