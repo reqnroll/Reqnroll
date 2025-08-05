@@ -21,7 +21,6 @@
 * Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
 * Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
 * Updated Reqnroll project template to add TUnit test framework support and remove EOL .NET versions (6.0, 7.0), added .NET 9.0 support (#701)
-* Update Reqnroll template to add TUnit support and remove EOL .NET versions (#704)
 
 ## Bug fixes:
 
