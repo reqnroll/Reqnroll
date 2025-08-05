@@ -29,6 +29,8 @@ body:
     options:
       - .NET 9.0
       - .NET 8.0
+      - .NET 5.0
+      - .NET Core 3.1
       - .NET Framework 4.6.2 or later
   validations:
     required: true

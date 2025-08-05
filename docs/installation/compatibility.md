@@ -13,8 +13,6 @@ SpecSync is supported on all common operating systems that support .NET, includi
 - .NET Framework 4.6.2
 - .NET Framework 4.7.2
 - .NET Framework 4.8.1
-- .NET 6.0
-- .NET 7.0
 - .NET 8.0
 - .NET 9.0
 
