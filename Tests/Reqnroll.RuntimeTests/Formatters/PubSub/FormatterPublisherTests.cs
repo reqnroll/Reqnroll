@@ -70,7 +70,7 @@ public class FormatterPublisherTests
         container.RegisterInstanceAs(_idGeneratorMock.Object);
         container.RegisterInstanceAs(_clockMock.Object);
         container.RegisterInstanceAs(_bindingRegistryMock.Object);
-        _bindingRegistryMock.SetupGet<bool>(br => br.Ready).Returns(true);
+        _bindingRegistryMock.SetupGet(br => br.Ready).Returns(true);
 
         return container;
     }
