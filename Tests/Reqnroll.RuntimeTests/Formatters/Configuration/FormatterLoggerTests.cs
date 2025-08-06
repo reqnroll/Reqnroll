@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Runtime.InteropServices;
 using System.Text.Json;
 using FluentAssertions;
 using FormattersTestLogger;
@@ -15,11 +17,27 @@ public class FormatterLoggerTests : IDisposable
     private readonly Mock<TestLoggerEvents> _testLoggerEventsMock;
     private readonly List<string> _environmentVariablesToCleanup;
 
+    // OS-aware test paths
+    private readonly string _testRunDirectory;
+    private readonly string _expectedOutputPath;
+
     public FormatterLoggerTests()
     {
         _sut = new FormatterLogger();
         _testLoggerEventsMock = new Mock<TestLoggerEvents>();
         _environmentVariablesToCleanup = new List<string>();
+
+        // Create OS-appropriate test paths
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        {
+            _testRunDirectory = @"C:\TestResults";
+        }
+        else
+        {
+            _testRunDirectory = "/tmp/TestResults";
+        }
+
+        _expectedOutputPath = Path.Combine(_testRunDirectory, "reqnroll_report.ndjson");
     }
 
     public void Dispose()
@@ -37,7 +55,7 @@ public class FormatterLoggerTests : IDisposable
         // Arrange
         var parameters = new Dictionary<string, string>
         {
-            { "testRunDirectory", @"C:\TestResults" },
+            { "testRunDirectory", _testRunDirectory },
             { "name", "message" },
             { "outputFilePath", "reqnroll_report.ndjson" }
         };
@@ -60,16 +78,17 @@ public class FormatterLoggerTests : IDisposable
         jsonDocument.RootElement.TryGetProperty("formatters", out var formattersElement).Should().BeTrue();
         formattersElement.TryGetProperty("message", out var messageElement).Should().BeTrue();
         messageElement.TryGetProperty("outputFilePath", out var outputFilePathElement).Should().BeTrue();
-        outputFilePathElement.GetString().Should().Be(@"C:\TestResults\reqnroll_report.ndjson");
+        outputFilePathElement.GetString().Should().Be(_expectedOutputPath);
     }
 
     [Fact]
     public void Initialize_Should_Set_Environment_Variable_With_HTML_Formatter()
     {
         // Arrange
+        var expectedHtmlOutputPath = Path.Combine(_testRunDirectory, "reqnroll_report.html");
         var parameters = new Dictionary<string, string>
         {
-            { "testRunDirectory", @"C:\TestResults" },
+            { "testRunDirectory", _testRunDirectory },
             { "name", "html" },
             { "outputFilePath", "reqnroll_report.html" }
         };
@@ -89,7 +108,7 @@ public class FormatterLoggerTests : IDisposable
         jsonDocument.RootElement.TryGetProperty("formatters", out var formattersElement).Should().BeTrue();
         formattersElement.TryGetProperty("html", out var htmlElement).Should().BeTrue();
         htmlElement.TryGetProperty("outputFilePath", out var outputFilePathElement).Should().BeTrue();
-        outputFilePathElement.GetString().Should().Be(@"C:\TestResults\reqnroll_report.html");
+        outputFilePathElement.GetString().Should().Be(expectedHtmlOutputPath);
     }
 
     [Fact]
@@ -124,9 +143,10 @@ public class FormatterLoggerTests : IDisposable
     public void Initialize_Should_Use_LogFileName_When_OutputFilePath_Not_Present()
     {
         // Arrange
+        var expectedAlternateOutputPath = Path.Combine(_testRunDirectory, "alternate_report.ndjson");
         var parameters = new Dictionary<string, string>
         {
-            { "testRunDirectory", @"C:\TestResults" },
+            { "testRunDirectory", _testRunDirectory },
             { "name", "message" },
             { "LogFileName", "alternate_report.ndjson" }
         };
@@ -146,7 +166,7 @@ public class FormatterLoggerTests : IDisposable
         jsonDocument.RootElement.TryGetProperty("formatters", out var formattersElement).Should().BeTrue();
         formattersElement.TryGetProperty("message", out var messageElement).Should().BeTrue();
         messageElement.TryGetProperty("outputFilePath", out var outputFilePathElement).Should().BeTrue();
-        outputFilePathElement.GetString().Should().Be(@"C:\TestResults\alternate_report.ndjson");
+        outputFilePathElement.GetString().Should().Be(expectedAlternateOutputPath);
     }
 
     [Fact]
@@ -155,7 +175,7 @@ public class FormatterLoggerTests : IDisposable
         // Arrange
         var parameters = new Dictionary<string, string>
         {
-            { "testRunDirectory", @"C:\TestResults" },
+            { "testRunDirectory", _testRunDirectory },
             { "outputFilePath", "reqnroll_report.ndjson" }
         };
 
@@ -176,7 +196,7 @@ public class FormatterLoggerTests : IDisposable
         // Arrange
         var parameters = new Dictionary<string, string>
         {
-            { "testRunDirectory", @"C:\TestResults" },
+            { "testRunDirectory", _testRunDirectory },
             { "name", "message" }
         };
 
@@ -195,7 +215,7 @@ public class FormatterLoggerTests : IDisposable
         jsonDocument.RootElement.TryGetProperty("formatters", out var formattersElement).Should().BeTrue();
         formattersElement.TryGetProperty("message", out var messageElement).Should().BeTrue();
         messageElement.TryGetProperty("outputFilePath", out var outputFilePathElement).Should().BeTrue();
-        outputFilePathElement.GetString().Should().Be(@"C:\TestResults");
+        outputFilePathElement.GetString().Should().Be(_testRunDirectory);
     }
 
     [Fact]
@@ -204,7 +224,7 @@ public class FormatterLoggerTests : IDisposable
         // Arrange
         var parameters = new Dictionary<string, string>
         {
-            { "testRunDirectory", @"C:\TestResults" },
+            { "testRunDirectory", _testRunDirectory },
             { "name", "message" },
             { "outputFilePath", "reqnroll_report.ndjson" }
         };
@@ -218,24 +238,11 @@ public class FormatterLoggerTests : IDisposable
         // Assert
         var environmentVariableValue = Environment.GetEnvironmentVariable(expectedEnvironmentVariableName);
         
-        // Verify it's valid JSON that matches the expected structure:
-        // { "formatters": { "message": { "outputFilePath": "C:\TestResults\reqnroll_report.ndjson" } } }
-        var expectedJson = """
-                          {
-                            "formatters": {
-                              "message": {
-                                "outputFilePath": "C:\\TestResults\\reqnroll_report.ndjson"
-                              }
-                            }
-                          }
-                          """;
-
-        // Parse both actual and expected JSON to compare structure
+        // Verify it's valid JSON that matches the expected structure
         var actualJson = JsonDocument.Parse(environmentVariableValue);
-        var expectedJsonDoc = JsonDocument.Parse(expectedJson);
 
-        // Compare the structure
+        // Compare the structure - the actual path will be OS-appropriate
         actualJson.RootElement.GetProperty("formatters").GetProperty("message").GetProperty("outputFilePath").GetString()
-            .Should().Be(@"C:\TestResults\reqnroll_report.ndjson");
+            .Should().Be(_expectedOutputPath);
     }
 }
