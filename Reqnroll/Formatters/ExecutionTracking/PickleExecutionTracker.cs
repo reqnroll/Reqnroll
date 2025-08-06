@@ -197,7 +197,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-         await _currentTestCaseExecutionTracker.ProcessEvent(attachmentAddedEvent);
+        await _currentTestCaseExecutionTracker.ProcessEvent(attachmentAddedEvent);
     }
 
     public async Task ProcessEvent(OutputAddedEvent outputAddedEvent)
