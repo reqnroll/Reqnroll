@@ -33,14 +33,6 @@
     </PackageReference>
   </ItemGroup>
 
-  <!-- Source Link support for all projects -->
-  <ItemGroup Condition="'$(ContinuousIntegrationBuild)' == 'true'">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-
   <PropertyGroup>
     <Authors>$(Reqnroll_Authors)</Authors>
     <Company>Reqnroll</Company>
