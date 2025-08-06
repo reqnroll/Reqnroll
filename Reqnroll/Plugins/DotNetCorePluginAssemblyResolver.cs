@@ -4,7 +4,7 @@ using System.Runtime.Loader;
 namespace Reqnroll.Plugins;
 
 /// <summary>
-/// This class is used for .NET Core based frameworks (.NET 6+) only. See <see cref="PlatformCompatibility.PlatformHelper"/>.
+/// This class is used for .NET (not .NET Framework) based frameworks only. See <see cref="PlatformCompatibility.PlatformHelper"/>.
 /// </summary>
 public sealed class DotNetCorePluginAssemblyResolver(string path) : AssemblyResolverBase(path)
 {

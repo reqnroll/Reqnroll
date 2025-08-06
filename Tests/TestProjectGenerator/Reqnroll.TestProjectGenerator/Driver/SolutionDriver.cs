@@ -51,7 +51,6 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 // Commented out to allow builds in firewall-restricted environments
                 // NuGetSources.Add(new NuGetSource("NUnit Dev", "https://www.myget.org/F/nunit/api/v3/index.json"));
             }
-
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.RunUniqueFolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }

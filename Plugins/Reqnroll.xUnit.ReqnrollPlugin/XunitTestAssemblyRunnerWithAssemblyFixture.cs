@@ -68,7 +68,7 @@ namespace Reqnroll.xUnit.ReqnrollPlugin
                 {
                     Aggregator.Run(disposable.Dispose);
                 }
-#if NET // IAsyncDisposable supported natively in .NET 5, .NET 6
+#if NET // IAsyncDisposable supported natively in .NET (not .NET Framework)
                 else if (potentialDisposable is IAsyncDisposable asyncDisposable)
                 {
                     await Aggregator.RunAsync(async () => await asyncDisposable.DisposeAsync());

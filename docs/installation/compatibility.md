@@ -13,18 +13,16 @@ SpecSync is supported on all common operating systems that support .NET, includi
 - .NET Framework 4.6.2
 - .NET Framework 4.7.2
 - .NET Framework 4.8.1
-- .NET 6.0
-- .NET 7.0
 - .NET 8.0
 - .NET 9.0
 
 ```{note}
-Reqnroll can also be installed on any .NET frameworks that supports .NET Standard 2.0, including .NET Core 3.1 and .NET 5.0, but please note that these frameworks are out of support already.
+Reqnroll can also be installed on any .NET frameworks that supports .NET Standard 2.0, including end-of-life (EOL) frameworks, but please note that Reqnroll does not support EOL frameworks and frameworks before .NET 8 are out of support by Microsoft.
 ```
 
 ## Visual Studio
 
-- Visual Studio 2022 (Workloads: ASP.NET and web development **or** .NET Desktop environment **or** .NET Core cross-platform development)
+- Visual Studio 2022 (Workloads: ASP.NET and web development **or** .NET desktop development)
 
 ## Test Execution Frameworks
 
