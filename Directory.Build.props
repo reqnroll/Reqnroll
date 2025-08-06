@@ -2,7 +2,6 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Deterministic>true</Deterministic>
     
     <Reqnroll_Copyright>Copyright © Reqnroll</Reqnroll_Copyright>
     <Reqnroll_Authors>Reqnroll</Reqnroll_Authors>
