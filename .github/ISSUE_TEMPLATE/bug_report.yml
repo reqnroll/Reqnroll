@@ -29,10 +29,10 @@ body:
     options:
       - .NET 9.0
       - .NET 8.0
-      - .NET 7.0
-      - .NET 6.0
-      - .NET 5.0
-      - .NET Core 3.1
+      - .NET 7.0 (not supported)
+      - .NET 6.0 (not supported)
+      - .NET 5.0 (not supported)
+      - .NET Core 3.1 (not supported)
       - .NET Framework 4.6.2 or later
   validations:
     required: true

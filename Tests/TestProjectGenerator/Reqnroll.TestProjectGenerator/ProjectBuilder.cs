@@ -59,7 +59,7 @@ namespace Reqnroll.TestProjectGenerator
         public Configuration Configuration { get; }
         public string ProjectName { get; set; }
         public ProgrammingLanguage Language { get; set; } = ProgrammingLanguage.CSharp;
-        public TargetFramework TargetFramework { get; set; } = TargetFramework.Netcoreapp31;
+        public TargetFramework TargetFramework { get; set; } = TargetFramework.Net80;
         public string TargetFrameworkMoniker => _targetFrameworkMonikerStringBuilder.BuildTargetFrameworkMoniker(TargetFramework);
         public ProjectFormat Format { get; set; } = ProjectFormat.New;
         public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Json;
