@@ -6,7 +6,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 {
     public class GlobalJsonBuilder
     {
-        public NetCoreSdkInfo Sdk { get; private set; }
+        public DotNetSdkInfo Sdk { get; private set; }
 
         public ProjectFile ToProjectFile()
         {
@@ -37,7 +37,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             }
         }
 
-        public GlobalJsonBuilder WithSdk(NetCoreSdkInfo sdk)
+        public GlobalJsonBuilder WithSdk(DotNetSdkInfo sdk)
         {
             Sdk = sdk;
             return this;

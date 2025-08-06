@@ -78,12 +78,6 @@ namespace Reqnroll.TestProjectGenerator.Factories
                 case TargetFramework.Net462:
                 case TargetFramework.Net471:
                 case TargetFramework.Net472:
-                case TargetFramework.Netcoreapp20:
-                case TargetFramework.Netcoreapp21:
-                case TargetFramework.Netcoreapp22:
-                case TargetFramework.Netcoreapp30:
-                case TargetFramework.Netcoreapp31:
-                case TargetFramework.Net50:
                 case TargetFramework.NetStandard20:
                     return ProgrammingLanguage.CSharp73;
                 default: return ProgrammingLanguage.CSharp;
