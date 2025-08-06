@@ -23,8 +23,6 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Deterministic>true</Deterministic>
-    <DeterministicSourcePaths>true</DeterministicSourcePaths>
   </PropertyGroup>
 
   <ItemGroup>
