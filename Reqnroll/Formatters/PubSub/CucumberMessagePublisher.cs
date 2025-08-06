@@ -256,7 +256,7 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
     private async Task ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
     {
         var featureTracker = await GetFeatureTracker(scenarioStartedEvent);
-        featureTracker?.ProcessEvent(scenarioStartedEvent);
+        await featureTracker?.ProcessEvent(scenarioStartedEvent);
     }
 
     private async Task ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
