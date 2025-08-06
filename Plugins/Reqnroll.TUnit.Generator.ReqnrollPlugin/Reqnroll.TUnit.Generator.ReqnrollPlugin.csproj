@@ -51,12 +51,7 @@
     </ProjectReference>
   </ItemGroup>
 
-  <!-- Copy PDB file for Reqnroll.TUnit.ReqnrollPlugin to ensure it's included in symbols package -->
-  <Target Name="CopyTUnitReqnrollPluginPdb" AfterTargets="Build">
-    <Copy SourceFiles="..\Reqnroll.TUnit.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.TUnit.ReqnrollPlugin.pdb"
-          DestinationFolder="$(OutputPath)"
-          Condition="Exists('..\Reqnroll.TUnit.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.TUnit.ReqnrollPlugin.pdb')" />
-  </Target>
+
 
   <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\TUnit.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\TUnit.AssemblyHooks.cs" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
