@@ -36,7 +36,6 @@
     <file src="bin\$config$\netstandard2.0\Reqnroll.dll" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.pdb" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.xml" target="lib\netstandard2.0" />
-    <file src="bin\$config$\netstandard2.0\Reqnroll.BoDi.*" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.Utils.*" target="lib\netstandard2.0" />
     <file src="Reqnroll.ExternalAnnotations.xml" target="lib\netstandard2.0" />
 
