@@ -1,5 +1,9 @@
 # Formatter Configuration
 
+```{note}
+Reqnroll formatters are only available in Reqnroll v3.0 or later.
+```
+
 There are two ways to configure [Reqnroll Formatters](../reporting/reqnroll-formatters.md).
 
 * [](#configuration-file)
