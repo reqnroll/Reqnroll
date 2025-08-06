@@ -173,7 +173,7 @@ The filter expression should be provided in the "Test filter criteria" setting i
 
 ![Visual Studio Test task](/_static/images/task_filter2.png)
 
-### Azure DevOps - .NET Core task
+### Azure DevOps - .NET task
 
 Alternatively you could use the dotnet task (DotNetCoreCLI) to run your tests. This works on all kinds of build agents:
 

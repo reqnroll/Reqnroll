@@ -4,7 +4,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
 {
     public interface IProjectWriter
     {
-        string WriteProject(NetCoreSdkInfo sdk, Project project, string path);
+        string WriteProject(DotNetSdkInfo sdk, Project project, string path);
 
         void WriteReferences(Project project, string projectFilePath);
     }
