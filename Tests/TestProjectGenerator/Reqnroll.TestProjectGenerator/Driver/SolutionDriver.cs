@@ -40,10 +40,12 @@ namespace Reqnroll.TestProjectGenerator.Driver
             NuGetSources = new List<NuGetSource>
             {
                 new("LocalReqnrollDevPackages", _folders.NuGetFolder),
-                new("Reqnroll CI", "https://www.myget.org/F/reqnroll/api/v3/index.json"),
-                new("Reqnroll Unstable", "https://www.myget.org/F/reqnroll-unstable/api/v3/index.json")
+                // Commented out MyGet feeds to allow builds in firewall-restricted environments
+                // new("Reqnroll CI", "https://www.myget.org/F/reqnroll/api/v3/index.json"),
+                // new("Reqnroll Unstable", "https://www.myget.org/F/reqnroll-unstable/api/v3/index.json")
             };
 
+            // NUnit special case no longer needed as .NET 5 support was removed
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.RunUniqueFolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }
