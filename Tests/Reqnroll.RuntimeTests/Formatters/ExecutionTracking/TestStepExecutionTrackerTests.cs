@@ -11,7 +11,6 @@ using System.Linq;
 using Xunit;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
-using System.Formats.Asn1;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
