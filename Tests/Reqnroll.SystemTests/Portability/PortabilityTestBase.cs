@@ -36,8 +36,8 @@ public abstract class PortabilityTestBase : SystemTestBase
             && _testRunConfiguration is { UnitTestProvider: UnitTestProvider.xUnit, TargetFramework: TargetFramework.Net462 or TargetFramework.Net472 })
             Assert.Inconclusive("Disabled because xUnit v2 is not supported on Mono");
 
-        if (_testRunConfiguration is { TargetFramework: TargetFramework.Net462 or TargetFramework.Net60 or TargetFramework.Net70, UnitTestProvider: UnitTestProvider.xUnit3 })
-            Assert.Inconclusive("Disabled because xUnit3 is not supported on .NET 4.6.2, .NET 6.0 or .NET 7.0");
+        if (_testRunConfiguration is { TargetFramework: TargetFramework.Net462, UnitTestProvider: UnitTestProvider.xUnit3 })
+            Assert.Inconclusive("Disabled because xUnit3 is not supported on .NET 4.6.2");
 
         try
         {
