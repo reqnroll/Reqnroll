@@ -10,6 +10,7 @@ public class EnvironmentConfigurationResolver : FormattersConfigurationResolverB
 {
     private readonly IEnvironmentWrapper _environmentWrapper;
     private readonly IFormatterLog _log;
+    private readonly string _environmentVariableName; 
 
     public EnvironmentConfigurationResolver(
         IEnvironmentWrapper environmentWrapper,
@@ -17,19 +18,30 @@ public class EnvironmentConfigurationResolver : FormattersConfigurationResolverB
     {
         _environmentWrapper = environmentWrapper;
         _log = log;
+        _environmentVariableName = FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE;
+    }
+
+    internal EnvironmentConfigurationResolver(
+        IEnvironmentWrapper environmentWrapper,
+        string environmentVariableName,
+        IFormatterLog log = null)
+    {
+        _environmentWrapper = environmentWrapper ?? throw new ArgumentNullException(nameof(environmentWrapper));
+        _log = log;
+        _environmentVariableName = environmentVariableName ?? throw new ArgumentNullException(nameof(environmentVariableName));
     }
 
     protected override JsonDocument GetJsonDocument()
     {
         try
         {
-            var formatters = _environmentWrapper.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE);
+            var formatters = _environmentWrapper.GetEnvironmentVariable(_environmentVariableName);
 
             if (formatters is Success<string> formattersSuccess)
             {
                 if (string.IsNullOrWhiteSpace(formattersSuccess.Result))
                 {
-                    _log?.WriteMessage($"Environment variable {FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE} is empty");
+                    _log?.WriteMessage($"Environment variable {_environmentVariableName} is empty");
                     return null;
                 }
 
@@ -43,12 +55,12 @@ public class EnvironmentConfigurationResolver : FormattersConfigurationResolverB
                 }
                 catch (JsonException ex)
                 {
-                    _log?.WriteMessage($"Failed to parse JSON from environment variable {FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE}: {ex.Message}");
+                    _log?.WriteMessage($"Failed to parse JSON from environment variable {_environmentVariableName}: {ex.Message}");
                 }
             }
             else if (formatters is Failure<string> failure)
             {
-                _log?.WriteMessage($"Could not retrieve environment variable {FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE}: {failure.Description}");
+                _log?.WriteMessage($"Could not retrieve environment variable {_environmentVariableName}: {failure.Description}");
             }
         }
         catch (Exception ex) when (ex is not JsonException)

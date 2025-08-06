@@ -81,4 +81,31 @@ public class EnvironmentConfigurationResolverTests
         Assert.Equal("forHtml", first["outputFilePath"]);
         Assert.Equal("forMessages", second["outputFilePath"]);
     }
+
+    [Fact]
+    public void Resolve_Should_Parse_JSON_Format_Environment_Variable()
+    {
+        // Arrange
+        var expectedJson = """
+                          {
+                              "formatters": {
+                                  "message": {
+                                      "outputFilePath": "foo.ndjson"
+                                  }
+                              }
+                          }
+                          """;
+        
+        _environmentWrapperMock
+            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
+            .Returns(new Success<string>(expectedJson));
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().ContainKey("message");
+        result["message"]["outputFilePath"].Should().Be("foo.ndjson");
+        result.Should().HaveCount(1);
+    }
 }

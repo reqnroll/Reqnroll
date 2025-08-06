@@ -166,7 +166,11 @@ public class MessagesCompatibilityTestBase : SystemTestBase
             {"fileBasedResolver",  configFileResolver }
         };
 
-        FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new FormattersDisabledOverrideProvider(env));
+        FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(
+                                                                        resolvers, 
+                                                                        configEnvResolver, 
+                                                                        new Mock<IFormattersLoggerConfigurationProvider>().Object,
+                                                                        new FormattersDisabledOverrideProvider(env));
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 
         var outputFilePath = outputFilePathElement!.ToString();
