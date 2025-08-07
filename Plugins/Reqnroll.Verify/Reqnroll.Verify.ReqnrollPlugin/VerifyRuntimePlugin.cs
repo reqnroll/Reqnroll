@@ -7,7 +7,6 @@ using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using Reqnroll.Verify.ReqnrollPlugin;
 using VerifyTests;
-using VerifyXunit;
 
 [assembly: RuntimePlugin(typeof(VerifyRuntimePlugin))]
 
@@ -23,28 +22,8 @@ public class VerifyRuntimePlugin : IRuntimePlugin
 
     private void RuntimePluginEvents_CustomizeGlobalDependencies(object sender, CustomizeGlobalDependenciesEventArgs e)
     {
-        var runtimePluginTestExecutionLifecycleEvents = e.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
-        runtimePluginTestExecutionLifecycleEvents.BeforeScenario += (_, runtimePluginBeforeScenarioEventArgs) =>
-        {
-            var scenarioContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<ScenarioContext>();
-            var featureContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<FeatureContext>();
-
-            Verifier.DerivePathInfo(
-                (_, projectDirectory, _, _) =>
-                {
-                    string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
-
-                    foreach (DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
-                    {
-                        scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
-                    }
-
-                    return new PathInfo(
-                        Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
-                        featureContext.FeatureInfo.Title,
-                        scenarioInfoTitle);
-                });
-        };
+        // With Verify.Xunit v29+, static configuration should be minimal
+        // Most path configuration is handled per-scenario via VerifySettings in CustomizeScenarioDependencies
     }
 
     private void RuntimePluginEvents_CustomizeScenarioDependencies(object sender, CustomizeScenarioDependenciesEventArgs e)

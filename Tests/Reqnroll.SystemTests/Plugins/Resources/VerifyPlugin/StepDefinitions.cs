@@ -32,7 +32,7 @@ internal class StepDefinitions
     [When(@"I try Verify with Reqnroll with global registered path info")]
     public async Task WhenITryVerifyWithReqnrollWithGlobalRegisteredPathInfo()
     {
-        await Verifier.Verify("value");
+        await Verifier.Verify("value", _settings);
     }
 
     [Then("it works")]
