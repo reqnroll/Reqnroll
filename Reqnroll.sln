@@ -127,7 +127,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.TUnit.Generator.Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.Formatters.Tests", "Tests\Reqnroll.Formatters.Tests\Reqnroll.Formatters.Tests.csproj", "{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormattersTestLogger", "Reqnroll.MessagesLogger.TestLogger\FormattersTestLogger.csproj", "{DA774F90-8287-4364-A736-B3AD94404A5B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FormatterTestLogger", "Reqnroll.MessagesLogger.TestLogger\FormatterTestLogger.csproj", "{DA774F90-8287-4364-A736-B3AD94404A5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
