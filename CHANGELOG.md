@@ -21,6 +21,7 @@
 * Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
 * Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
 * Add xUnit 3 support (#538)
+* Added ExpressionType option (cucumber/regex) to [Given], [When] and [Then] attributes (#663)
 * Updated Reqnroll project template to add TUnit test framework support and remove EOL .NET versions (6.0, 7.0), added .NET 9.0 support (#701)
 * Removed support for end-of-life .NET frameworks (.NET 6, .NET 7, .NET Core) (#706)
 
@@ -29,8 +30,9 @@
 * Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
+* Fixed source link and deterministic compilation for Reqnroll.CustomPlugin package (#719)
 
-*Contributors of this release (in alphabetical order):*  @304NotModified, @algirdasN, @chekkan, @clrudolphi, @DrEsteban, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @chekkan, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 

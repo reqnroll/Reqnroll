@@ -71,6 +71,40 @@ Scenario: Cucumber expresions and Regular expressions are mixed in the same proj
 	Then the binding method 'WhenIHaveCucumbersInMyBelly' is executed
 	And the binding method 'ThereIsAUserRegistered' is executed
 
+Rule: Expressions type is used
+
+Scenario: Expressions type is used to determine the binding method - Cucumber expression
+	Given a scenario 'Simple Scenario' as
+         """
+		When I like programming in C++
+         """
+	And the following step definitions
+        """
+	    [When("I like programming (in C++)", ExpressionType = ExpressionType.CucumberExpression)]
+		public void WhenILikeProgramming()
+		{
+           global::Log.LogStep(); 
+		}
+        """
+	When I execute the tests
+	Then the binding method 'WhenILikeProgramming' is executed
+
+Scenario: Expressions type is used to determine the binding method - Regular expression
+	Given a scenario 'Simple Scenario' as
+         """
+			When I download the large file
+         """
+	And the following step definitions
+        """
+	    [When("I download the (large|small) file", ExpressionType = ExpressionType.RegularExpression)]
+		public void WhenIDownloadTheFile(string text)
+		{
+		    if (text == "large")
+              global::Log.LogStep(); 
+		}
+        """
+	When I execute the tests
+	Then the binding method 'WhenIDownloadTheFile' is executed
 
 
 Rule: Custom parameter types can be used in Cucumber expressions
