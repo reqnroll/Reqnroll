@@ -51,8 +51,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         StepDefinitionsByBinding = stepDefinitionIdsByMethod;
         IdGenerator = idGenerator;
         FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-        Enabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages is not null &&
-                  featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.HasMessages;
+        Enabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages?.HasMessages ?? false;
         _pickleExecutionTrackerFactory = pickleExecutionTrackerFactory;
         _publisher = publisher;
     }

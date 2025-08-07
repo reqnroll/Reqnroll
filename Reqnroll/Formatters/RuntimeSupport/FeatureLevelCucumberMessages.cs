@@ -1,7 +1,6 @@
 ﻿using Io.Cucumber.Messages.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Reqnroll.Formatters.RuntimeSupport;
 
@@ -9,21 +8,10 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 /// This class is used at Code Generation time to provide serialized representations of the Source, GherkinDocument, and Pickles 
 /// to be used at runtime.
 /// </summary>
-public class FeatureLevelCucumberMessages
+public class FeatureLevelCucumberMessages(Func<Source> source, Func<GherkinDocument> gherkinDocument, Func<IEnumerable<Pickle>> pickles)
 {
-
-    private Source _source;
-    private GherkinDocument _gherkinDocument;
-    private IEnumerable<Pickle> _pickles;
-
-    public FeatureLevelCucumberMessages(Func<Source> source, Func<GherkinDocument> gherkinDocument, Func<IEnumerable<Pickle>> pickles)
-    {
-        _source = source();
-        _gherkinDocument = gherkinDocument();
-        _pickles = pickles();
-    }
-    public bool HasMessages => _source is not null && _gherkinDocument is not null && _pickles is not null;
-    public Source Source => _source;
-    public GherkinDocument GherkinDocument => _gherkinDocument;
-    public IEnumerable<Pickle> Pickles => _pickles; 
+    public bool HasMessages => Source is not null && GherkinDocument is not null && Pickles is not null;
+    public Source Source { get; } = source();
+    public GherkinDocument GherkinDocument { get; } = gherkinDocument();
+    public IEnumerable<Pickle> Pickles { get; } = pickles();
 }
