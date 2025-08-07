@@ -7,8 +7,8 @@ namespace Reqnroll.Bindings
         IHookBinding CreateHookBinding(IBindingMethod bindingMethod, HookType hookType, BindingScope bindingScope,
             int hookOrder);
 
-        IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(StepDefinitionType stepDefinitionType, IBindingMethod bindingMethod, 
-            BindingScope bindingScope, string expressionString);
+        IStepDefinitionBindingBuilder CreateStepDefinitionBindingBuilder(StepDefinitionType stepDefinitionType, IBindingMethod bindingMethod, BindingScope bindingScope,
+            string expressionString, ExpressionType expressionType);
 
         IStepArgumentTransformationBinding CreateStepArgumentTransformation(string regexString,
             IBindingMethod bindingMethod, string parameterTypeName = null,
