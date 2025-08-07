@@ -119,7 +119,7 @@
                     },
                     {
                         "condition": "(testExecutionFramework == 'tunit')",
-                        "value": "<PackageReference Include=\"TUnit\" Version=\"0.25.21\" />"
+                        "value": "<PackageReference Include=\"TUnit\" Version=\"0.52.56\" />"
                     }
                 ]
             }
