@@ -47,7 +47,7 @@
     <!-- https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
     <AvailableItemName Include="ReqnrollFeatureFiles"/>
     
-    <ReqnrollFeatureFiles Include="**\*.feature" >
+    <ReqnrollFeatureFiles Include="**/*.feature" >
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
     </ReqnrollFeatureFiles>
@@ -57,7 +57,7 @@
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
      -->
-    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
+    <ReqnrollObsoleteCodeBehindFiles Include="**/*.feature$(DefaultLanguageSourceExtension)" Exclude="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
 
     <!-- Support for Visual Studio Incremental Build
         https://github.com/reqnroll/Reqnroll/issues/1319
