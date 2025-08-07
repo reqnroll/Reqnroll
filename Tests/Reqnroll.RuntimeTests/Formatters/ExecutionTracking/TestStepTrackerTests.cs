@@ -11,22 +11,24 @@ using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Xunit;
 using System.Collections.ObjectModel;
+using Reqnroll.Formatters.PubSub;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
 public class TestStepTrackerTests
 {
     private readonly Mock<ICucumberMessageFactory> _messageFactoryMock = new();
+    private readonly Mock<ITestCaseExecutionTrackerFactory> _testCaseExecutionTrackerFactoryMock = new();
+    private readonly Mock<IMessagePublisher> _publishMessageMock = new();
     private readonly Mock<IIdGenerator> _idGeneratorMock = new();
     private readonly TestCaseTracker _testCaseTracker;
     private readonly PickleExecutionTracker _pickleExecutionTracker;
     public TestStepTrackerTests()
     {
 
-        _pickleExecutionTracker = new PickleExecutionTracker("testCasePickle", "runStartedId", "featureName", true, _idGeneratorMock.Object, null, DateTime.Now, _messageFactoryMock.Object);
+        _pickleExecutionTracker = new PickleExecutionTracker("testCasePickle", "runStartedId", "featureName", true, _idGeneratorMock.Object, null, DateTime.Now, _messageFactoryMock.Object, _testCaseExecutionTrackerFactoryMock.Object, _publishMessageMock.Object);
         _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickle", _pickleExecutionTracker);
     }
-
 
     [Fact]
     public void PopulateStepDefinitionFromExecutionResult_Should_Set_Bound_And_Arguments_When_Bound()
@@ -41,12 +43,12 @@ public class TestStepTrackerTests
         {
             BindingMatch = new BindingMatch(
                 stepBindingMock.Object, // stepBinding
-                0,           // scopeMatches
+                0,                     // scopeMatches
                 [
                     new MatchArgument("arg1", 1 ),
                     new MatchArgument("arg2", 2 )
                 ],
-                null          // stepContext
+                null                   // stepContext
             )
         };
         var stepContextMock = new Mock<IScenarioStepContext>();
@@ -134,10 +136,10 @@ public class TestStepTrackerTests
         // Arrange
         var stepInfo = new StepInfo(
             StepDefinitionType.Given, // stepDefinitionType
-            "Step Text",         // text
-            null,               // table
-            null,         // multilineText
-            "pickleStepId" // pickleStepId
+            "Step Text",              // text
+            null,                     // table
+            null,                     // multilineText
+            "pickleStepId"            // pickleStepId
         )
         {
             BindingMatch = BindingMatch.NonMatching
@@ -169,29 +171,27 @@ public class TestStepTrackerTests
         stepBindingMock.Setup(b => b.Method).Returns(methodMock.Object);
         var bindingMatch = new BindingMatch(
             stepBindingMock.Object, // stepBinding
-            0,           // scopeMatches
+            0,                     // scopeMatches
             [
                 new MatchArgument("arg1", 1 ),
                 new MatchArgument("arg2", 2 )
             ],
-            null          // stepContext
+            null                   // stepContext
         );
 
-        var ambiguousMatchException = new AmbiguousBindingException(
-            "error message",
-            new List<BindingMatch>
-            {
-                bindingMatch,
-                bindingMatch
-            }
+        var ambiguousMatchException = new AmbiguousBindingException("error message", 
+                                                                    new List<BindingMatch> { 
+                                                                        bindingMatch,
+                                                                        bindingMatch
+                                                                    }
         );
 
         var stepInfo = new StepInfo(
             StepDefinitionType.Given, // stepDefinitionType
-            "Step Text",         // text
-            null,               // table
-            null,         // multilineText
-            "pickleStepId" // pickleStepId
+            "Step Text",              // text
+            null,                     // table
+            null,                     // multilineText
+            "pickleStepId"            // pickleStepId
         )
 
         {
@@ -204,6 +204,8 @@ public class TestStepTrackerTests
         stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
         stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.TestError);
 
+        //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
+        //    .Returns("ambiguousPattern");
         _testCaseTracker.Steps.Add(new TestStepTracker("ambiguousId", "pickleStepId", _testCaseTracker));
         _pickleExecutionTracker.StepDefinitionsByBinding = new ReadOnlyDictionary<IBinding, string>(
             new Dictionary<IBinding, string> { { stepBindingMock.Object, "pickleStepId" } });
@@ -220,4 +222,5 @@ public class TestStepTrackerTests
         def.StepDefinitionIds.Should().NotBeNull();
         def.StepDefinitionIds.Should().Contain("pickleStepId");
     }
+
 }

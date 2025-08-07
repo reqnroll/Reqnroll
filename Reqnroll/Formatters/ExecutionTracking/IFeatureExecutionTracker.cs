@@ -1,7 +1,8 @@
 ﻿using Gherkin.CucumberMessages;
-using Io.Cucumber.Messages.Types;
+using Reqnroll.Bindings;
 using Reqnroll.Events;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -11,17 +12,17 @@ public interface IFeatureExecutionTracker
     bool FeatureExecutionSuccess { get; }
     string FeatureName { get; }
     IIdGenerator IdGenerator { get; }
-    IEnumerable<Envelope> RuntimeGeneratedMessages { get; }
-    IEnumerable<Envelope> StaticMessages { get; }
+    IReadOnlyDictionary<IBinding, string> StepDefinitionsByBinding { get; }
     string TestRunStartedId { get; }
 
-    void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent);
-    void ProcessEvent(FeatureFinishedEvent featureFinishedEvent);
-    void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent);
-    void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent);
-    void ProcessEvent(OutputAddedEvent outputAddedEvent);
-    void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent);
-    void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent);
-    void ProcessEvent(StepFinishedEvent stepFinishedEvent);
-    void ProcessEvent(StepStartedEvent stepStartedEvent);
+    Task FinalizeTracking();
+    Task ProcessEvent(FeatureStartedEvent featureStartedEvent);
+    Task ProcessEvent(AttachmentAddedEvent attachmentAddedEvent);
+    Task ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent);
+    Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent);
+    Task ProcessEvent(OutputAddedEvent outputAddedEvent);
+    Task ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent);
+    Task ProcessEvent(ScenarioStartedEvent scenarioStartedEvent);
+    Task ProcessEvent(StepFinishedEvent stepFinishedEvent);
+    Task ProcessEvent(StepStartedEvent stepStartedEvent);
 }

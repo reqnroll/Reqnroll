@@ -1,9 +1,9 @@
 ﻿using Gherkin.CucumberMessages;
-using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -11,7 +11,6 @@ public interface IPickleExecutionTracker
 {
     public bool Finished { get; }
     public string TestRunStartedId { get; }
-    public IEnumerable<Envelope> RuntimeGeneratedMessages { get; }
     public ScenarioExecutionStatus ScenarioExecutionStatus { get; }
     public DateTime TestCaseStartedTimeStamp { get; }
     public int AttemptCount { get; }
@@ -19,12 +18,13 @@ public interface IPickleExecutionTracker
     public TestCaseTracker TestCaseTracker { get; }
     public IReadOnlyDictionary<IBinding, string> StepDefinitionsByBinding { get; }
 
-    void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent);
-    void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent);
-    void ProcessEvent(StepStartedEvent stepStartedEvent);
-    void ProcessEvent(StepFinishedEvent stepFinishedEvent);
-    void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent);
-    void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent);
-    void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent);
-    void ProcessEvent(OutputAddedEvent outputAddedEvent);
+    Task FinalizeTracking();
+    Task ProcessEvent(ScenarioStartedEvent scenarioStartedEvent);
+    Task ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent);
+    Task ProcessEvent(StepStartedEvent stepStartedEvent);
+    Task ProcessEvent(StepFinishedEvent stepFinishedEvent);
+    Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent);
+    Task ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent);
+    Task ProcessEvent(AttachmentAddedEvent attachmentAddedEvent);
+    Task ProcessEvent(OutputAddedEvent outputAddedEvent);
 }

@@ -17,6 +17,8 @@ using System.Globalization;
 using System.Linq;
 using Xunit;
 using HookType = Reqnroll.Bindings.HookType;
+using Reqnroll.Formatters.PubSub;
+using System.Threading.Tasks;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
@@ -24,6 +26,8 @@ public class PickleExecutionTrackerTests
 {
     private readonly Mock<IIdGenerator> _mockIdGenerator;
     private readonly Mock<ICucumberMessageFactory> _mockMessageFactory;
+    private readonly Mock<IMessagePublisher> _mockPublisher;
+    private readonly ITestCaseExecutionTrackerFactory _stubTestCaseExecutionTrackerFactory;
     private FeatureInfo _featureInfoStub;
     private FeatureContext _featureContextStub;
     private ScenarioInfo _scenarioInfoStub;
@@ -39,8 +43,11 @@ public class PickleExecutionTrackerTests
     {
         _mockIdGenerator = new Mock<IIdGenerator>();
         _mockIdGenerator.Setup(x => x.GetNewId()).Returns("test-id");
-
+        _mockPublisher = new Mock<IMessagePublisher>();
         _mockMessageFactory = new Mock<ICucumberMessageFactory>();
+
+        IStepTrackerFactory stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object);
+        _stubTestCaseExecutionTrackerFactory = new TestCaseExecutionTrackerFactory(_mockIdGenerator.Object, _mockMessageFactory.Object, _mockPublisher.Object, stepTrackerFactory);
 
         SetupMockContexts();
 
@@ -58,8 +65,8 @@ public class PickleExecutionTrackerTests
             .Returns(new TestCaseStarted(0, "test-case-started-id", "test-id", "", _testTime));
 
         _mockMessageFactory
-            .Setup(m => m.ToTestCaseFinished(It.IsAny<TestCaseExecutionTracker>()))
-            .Returns(new TestCaseFinished("test-case-started-id", _testTime, false));
+            .Setup(m => m.ToTestCaseFinished(It.IsAny<TestCaseExecutionTracker>(), It.IsAny<bool>()))
+            .Returns((TestCaseExecutionTracker _, bool willBeRetried) => new TestCaseFinished("test-case-started-id", _testTime, willBeRetried));
 
         _mockMessageFactory
             .Setup(m => m.ToTestStepStarted(It.IsAny<TestStepExecutionTracker>()))
@@ -79,11 +86,11 @@ public class PickleExecutionTrackerTests
 
         _mockMessageFactory
             .Setup(m => m.ToAttachment(It.IsAny<AttachmentTracker>()))
-            .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0,1)));
+            .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1)));
 
         _mockMessageFactory
             .Setup(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()))
-            .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0,1)));
+            .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1)));
 
         _stepDefinitionsByMethodSignature.TryAdd(_mockHookBinding.Object, "hook-id");
     }
@@ -104,13 +111,14 @@ public class PickleExecutionTrackerTests
         _mockContextManager = new Mock<IContextManager>();
         _mockContextManager.Setup(x => x.FeatureContext).Returns(_featureContextStub);
         _mockContextManager.Setup(x => x.ScenarioContext).Returns(_scenarioContextSub);
+        //_mockContextManager.Setup(x => x.StepContext).Returns(_mockStepContext.Object);
     }
 
     [Fact]
     public void Constructor_InitializesProperties()
     {
         // Arrange & Act
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
 
         // Assert
         tracker.PickleId.Should().Be("test-pickle-id");
@@ -123,14 +131,14 @@ public class PickleExecutionTrackerTests
     }
 
     [Fact]
-    public void ProcessEvent_ScenarioStartedEvent_IncrementsAttemptCountAndCreatesTestCaseDefinition()
+    public async Task ProcessEvent_ScenarioStartedEvent_IncrementsAttemptCountAndCreatesTestCaseDefinition()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
         var scenarioStartedEvent = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
 
         // Act
-        tracker.ProcessEvent(scenarioStartedEvent);
+        await tracker.ProcessEvent(scenarioStartedEvent);
 
         // Assert
         tracker.AttemptCount.Should().Be(0);
@@ -141,90 +149,110 @@ public class PickleExecutionTrackerTests
     }
 
     [Fact]
-    public void ProcessEvent_ScenarioFinishedEvent_SetsFinishedFlag()
+    public async Task ProcessEvent_ScenarioFinishedEvent_SetsFinishedFlag()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
         var scenarioStartedEvent = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
         var scenarioFinishedEvent = new ScenarioFinishedEvent(_featureContextStub, _scenarioContextSub);
 
-        tracker.ProcessEvent(scenarioStartedEvent);
+        await tracker.ProcessEvent(scenarioStartedEvent);
 
         // Act
-        tracker.ProcessEvent(scenarioFinishedEvent);
+        await tracker.ProcessEvent(scenarioFinishedEvent);
 
         // Assert
         tracker.Finished.Should().BeTrue();
     }
 
     [Fact]
-    public void ProcessEvent_RetryScenario_CreatesMultipleExecutionRecords()
+    public async Task ProcessEvent_RetryScenario_CreatesMultipleExecutionRecords()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
+
+        var publishedEnvelopes = new List<Envelope>();
+        _mockPublisher
+            .Setup(p => p.PublishAsync(It.IsAny<Envelope>()))
+            .Callback<Envelope>(env => publishedEnvelopes.Add(env))
+            .Returns(Task.CompletedTask);
 
         // First execution
         var scenarioStartedEvent1 = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
         var scenarioFinishedEvent1 = new ScenarioFinishedEvent(_featureContextStub, _scenarioContextSub);
+        // Create a StepStartedEvent with a valid step context
+        // Create a StepFinishedEvent with ScenarioExecutionStatus set to Error
+        var errorStepContext = new Mock<IScenarioStepContext>();
+        errorStepContext.Setup(x => x.StepInfo).Returns(new StepInfo(StepDefinitionType.Given, "a test step", null, null, "pickleStepId"));
+        errorStepContext.SetupProperty(x => x.Status, ScenarioExecutionStatus.TestError);
+        var errorStepStartedEvent = new StepStartedEvent(_featureContextStub, _scenarioContextSub, errorStepContext.Object);
+        var errorStepFinishedEvent = new StepFinishedEvent(_featureContextStub, _scenarioContextSub, errorStepContext.Object);
+        errorStepContext.Object.Status = ScenarioExecutionStatus.TestError;
 
         // Second execution (retry)
         var scenarioStartedEvent2 = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
         var scenarioFinishedEvent2 = new ScenarioFinishedEvent(_featureContextStub, _scenarioContextSub);
 
         // Act
-        tracker.ProcessEvent(scenarioStartedEvent1);
-        tracker.ProcessEvent(scenarioFinishedEvent1);
-        tracker.ProcessEvent(scenarioStartedEvent2);
-        tracker.ProcessEvent(scenarioFinishedEvent2);
+
+        await tracker.ProcessEvent(scenarioStartedEvent1);
+        await tracker.ProcessEvent(errorStepStartedEvent);
+        await tracker.ProcessEvent(errorStepFinishedEvent);
+        _scenarioContextSub.ScenarioExecutionStatus = ScenarioExecutionStatus.TestError; // Simulate an error
+        await tracker.ProcessEvent(scenarioFinishedEvent1);
+        await tracker.ProcessEvent(scenarioStartedEvent2);
+        await tracker.ProcessEvent(scenarioFinishedEvent2);
+        await tracker.FinalizeTracking();
 
         // Assert
         tracker.AttemptCount.Should().Be(1);
         tracker.Finished.Should().BeTrue();
 
-        // Check that RuntimeGeneratedMessages produces messages for both executions
-        var messages = tracker.RuntimeGeneratedMessages.ToList();
-        messages.Should().NotBeEmpty();
+        publishedEnvelopes.Should().NotBeEmpty();
 
         // Verify that we have at least one message with willBeRetried=true
-        var envelopesWithTestCaseFinished = messages
-                                            .Where(e => e.Content() is TestCaseFinished)
-                                            .ToList();
+        var envelopesWithTestCaseFinished = publishedEnvelopes
+            .Where(e => e.Content() is TestCaseFinished)
+            .ToList();
 
         envelopesWithTestCaseFinished.Should().HaveCountGreaterThan(1);
 
         // The first TestCaseFinished should have willBeRetried=true
         var firstTestCaseFinished = envelopesWithTestCaseFinished.First().Content() as TestCaseFinished;
         firstTestCaseFinished?.WillBeRetried.Should().BeTrue();
+
+        _scenarioContextSub.ScenarioExecutionStatus = ScenarioExecutionStatus.OK; // Reset for next tests
     }
 
     [Fact]
-    public void ProcessEvent_StepEvents_AddsStepTrackerToExecutionRecord()
+    public async Task ProcessEvent_StepEvents_AddsStepTrackerToExecutionRecord()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
         var scenarioStartedEvent = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
         var stepStartedEvent = new StepStartedEvent(_featureContextStub, _scenarioContextSub, _mockStepContext.Object);
         var stepFinishedEvent = new StepFinishedEvent(_featureContextStub, _scenarioContextSub, _mockStepContext.Object);
 
         // Initial setup
-        tracker.ProcessEvent(scenarioStartedEvent);
+        await tracker.ProcessEvent(scenarioStartedEvent);
 
         // Act
-        tracker.ProcessEvent(stepStartedEvent);
-        tracker.ProcessEvent(stepFinishedEvent);
-        _ = tracker.RuntimeGeneratedMessages;
+        await tracker.ProcessEvent(stepStartedEvent);
+        await tracker.ProcessEvent(stepFinishedEvent);
 
-        // Assert - check that step events are being processed
-        // Since we can't directly access the private fields, we'll verify through the mock message factory
-        _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<TestStepExecutionTracker>()), Times.Once);
-        _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<TestStepExecutionTracker>()), Times.Once);
+        // Assert - check the internal _currentTestCaseExecutionTracker
+        tracker.CurrentTestCaseExecutionTracker.Should().NotBeNull();
+        tracker.ExecutionHistory.Should().NotBeEmpty();
+
+        // Assert there is exactly one execution record
+        tracker.ExecutionHistory.Should().HaveCount(1);
     }
 
     [Fact]
-    public void ProcessEvent_HookEvents_AddsHookTrackerToExecutionRecord()
+    public async Task ProcessEvent_HookEvents_AddsHookTrackerToExecutionRecord()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
         var scenarioStartedEvent = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
 
         _mockHookBinding.Setup(h => h.HookType).Returns(HookType.BeforeScenario);
@@ -233,23 +261,25 @@ public class PickleExecutionTrackerTests
         var hookFinishedEvent = new HookBindingFinishedEvent(_mockHookBinding.Object, new TimeSpan(1), _mockContextManager.Object);
 
         // Initial setup
-        tracker.ProcessEvent(scenarioStartedEvent);
+        await tracker.ProcessEvent(scenarioStartedEvent);
 
         // Act
-        tracker.ProcessEvent(hookStartedEvent);
-        tracker.ProcessEvent(hookFinishedEvent);
-        _ = tracker.RuntimeGeneratedMessages;
+        await tracker.ProcessEvent(hookStartedEvent);
+        await tracker.ProcessEvent(hookFinishedEvent);
 
-        // Assert - check through mock interactions
-        _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<HookStepExecutionTracker>()), Times.AtLeastOnce);
-        _mockMessageFactory.Verify(m => m.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()), Times.AtLeastOnce);
+        // Assert - check the internal _currentTestCaseExecutionTracker
+        tracker.CurrentTestCaseExecutionTracker.Should().NotBeNull();
+        tracker.ExecutionHistory.Should().NotBeEmpty();
+
+        // Assert there is exactly one execution record
+        tracker.ExecutionHistory.Should().HaveCount(1);
     }
 
     [Fact]
-    public void ProcessEvent_IgnoresTestRunHookEvents()
+    public async Task ProcessEvent_IgnoresTestRunHookEvents()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
         var scenarioStartedEvent = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
 
         _mockHookBinding.Setup(h => h.HookType).Returns(HookType.BeforeTestRun);
@@ -258,11 +288,11 @@ public class PickleExecutionTrackerTests
         var hookFinishedEvent = new HookBindingFinishedEvent(_mockHookBinding.Object, new TimeSpan(1), _mockContextManager.Object);
 
         // Initial setup
-        tracker.ProcessEvent(scenarioStartedEvent);
+        await tracker.ProcessEvent(scenarioStartedEvent);
 
         // Act
-        tracker.ProcessEvent(hookStartedEvent);
-        tracker.ProcessEvent(hookFinishedEvent);
+        await tracker.ProcessEvent(hookStartedEvent);
+        await tracker.ProcessEvent(hookFinishedEvent);
 
         // Assert - verify no hook messages were generated for test run hooks
         _mockMessageFactory.Verify(m => m.ToTestStepStarted(It.IsAny<HookStepExecutionTracker>()), Times.Never);
@@ -270,10 +300,10 @@ public class PickleExecutionTrackerTests
     }
 
     [Fact]
-    public void ProcessEvent_AttachmentAddedEvent_CreatesAttachmentMessage()
+    public async Task ProcessEvent_AttachmentAddedEvent_CreatesAttachmentMessage()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
         var scenarioStartedEvent = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
         var stepStartedEvent = new StepStartedEvent(_featureContextStub, _scenarioContextSub, _mockStepContext.Object);
 
@@ -282,21 +312,20 @@ public class PickleExecutionTrackerTests
                                                        _scenarioInfoStub);
 
         // Initial setup
-        tracker.ProcessEvent(scenarioStartedEvent);
-        tracker.ProcessEvent(stepStartedEvent);
+        await tracker.ProcessEvent(scenarioStartedEvent);
+        await tracker.ProcessEvent(stepStartedEvent);
 
         // Act
-        tracker.ProcessEvent(attachmentEvent);
-        _ = tracker.RuntimeGeneratedMessages;
+        await tracker.ProcessEvent(attachmentEvent);
         // Assert
         _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<AttachmentTracker>()), Times.Once);
     }
 
     [Fact]
-    public void ProcessEvent_OutputAddedEvent_CreatesOutputMessage()
+    public async Task ProcessEvent_OutputAddedEvent_CreatesOutputMessage()
     {
         // Arrange
-        var tracker = CreateTestCaseTracker();
+        var tracker = CreatePickleExecTracker();
         var scenarioStartedEvent = new ScenarioStartedEvent(_featureContextStub, _scenarioContextSub);
         var stepStartedEvent = new StepStartedEvent(_featureContextStub, _scenarioContextSub, _mockStepContext.Object);
 
@@ -306,38 +335,17 @@ public class PickleExecutionTrackerTests
         );
 
         // Initial setup
-        tracker.ProcessEvent(scenarioStartedEvent);
-        tracker.ProcessEvent(stepStartedEvent);
+        await tracker.ProcessEvent(scenarioStartedEvent);
+        await tracker.ProcessEvent(stepStartedEvent);
 
         // Act
-        tracker.ProcessEvent(outputEvent);
-        _ = tracker.RuntimeGeneratedMessages;
+        await tracker.ProcessEvent(outputEvent);
 
         // Assert
         _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()), Times.Once);
     }
 
-    [Fact]
-    public void FixupWillBeRetried_SetsWillBeRetriedFlagToTrue()
-    {
-        // Arrange
-        var tracker = CreateTestCaseTracker();
-        var testCaseFinished = new TestCaseFinished("test-case-started-id", _testTime, false);
-        var envelope = Envelope.Create(testCaseFinished);
-
-        // Act
-        var fixedEnvelope = (Envelope)typeof(PickleExecutionTracker)
-                                      .GetMethod("FixupWillBeRetried", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
-                                      .Invoke(tracker, [envelope]);
-
-        var fixedTestCaseFinished = fixedEnvelope.Content() as TestCaseFinished;
-
-        // Assert
-        fixedTestCaseFinished.Should().NotBeNull();
-        fixedTestCaseFinished!.WillBeRetried.Should().BeTrue();
-    }
-
-    private PickleExecutionTracker CreateTestCaseTracker()
+    private PickleExecutionTracker CreatePickleExecTracker()
     {
         return new PickleExecutionTracker(
             "test-pickle-id",
@@ -347,7 +355,9 @@ public class PickleExecutionTrackerTests
             _mockIdGenerator.Object,
             _stepDefinitionsByMethodSignature,
             Converters.ToDateTime(_testTime),
-            _mockMessageFactory.Object
+            _mockMessageFactory.Object,
+            _stubTestCaseExecutionTrackerFactory,
+            _mockPublisher.Object
         );
     }
 }
