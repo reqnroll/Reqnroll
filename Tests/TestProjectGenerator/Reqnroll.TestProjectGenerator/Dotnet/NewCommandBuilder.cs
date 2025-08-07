@@ -5,15 +5,15 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
     public partial class NewCommandBuilder
     {
         private readonly IOutputWriter _outputWriter;
-        private readonly NetCoreSdkInfo _sdk;
+        private readonly DotNetSdkInfo _sdk;
 
-        public NewCommandBuilder(IOutputWriter outputWriter, NetCoreSdkInfo sdk)
+        public NewCommandBuilder(IOutputWriter outputWriter, DotNetSdkInfo sdk)
         {
             _outputWriter = outputWriter;
             _sdk = sdk;
         }
 
-        internal static NewCommandBuilder Create(IOutputWriter outputWriter, NetCoreSdkInfo sdk) => new NewCommandBuilder(outputWriter, sdk);
+        internal static NewCommandBuilder Create(IOutputWriter outputWriter, DotNetSdkInfo sdk) => new NewCommandBuilder(outputWriter, sdk);
 
         public NewSolutionCommandBuilder Solution() => new StubNewSolutionCommandBuilder(_outputWriter, _sdk);
 

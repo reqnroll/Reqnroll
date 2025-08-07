@@ -7,7 +7,6 @@ using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,13 +20,22 @@ public class HtmlFormatter : FileWritingFormatterBase
 {
     private MessagesToHtmlWriter? _htmlWriter;
 
-    public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, fileSystem, "html", ".html", "reqnroll_report.html")
+    protected HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem, string pluginName) : 
+        base(configurationProvider, logger, fileSystem, pluginName, ".html", "reqnroll_report.html")
     {
     }
 
+    public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : 
+        this(configurationProvider, logger, fileSystem, "html")
+    {
+    }
+
+    protected virtual MessagesToHtmlWriter CreateMessagesToHtmlWriter(Stream stream, Func<StreamWriter, Envelope, Task> asyncStreamSerializer) 
+        => new(stream, asyncStreamSerializer);
+
     protected override void OnTargetFileStreamInitialized(Stream targetFileStream)
     {
-        _htmlWriter = new MessagesToHtmlWriter(
+        _htmlWriter = CreateMessagesToHtmlWriter(
             targetFileStream,
             async (sw, e) => await sw.WriteAsync(NdjsonSerializer.Serialize(e)));
     }

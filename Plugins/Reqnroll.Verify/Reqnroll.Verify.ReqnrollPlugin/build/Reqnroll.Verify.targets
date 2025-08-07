@@ -1,7 +1,7 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <_VerifyRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net472</_VerifyRuntimePlugin>
-    <_VerifyRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">net6.0</_VerifyRuntimePlugin>
+    <_VerifyRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">net8.0</_VerifyRuntimePlugin>
     <_VerifyRuntimePluginPath>$(MSBuildThisFileDirectory)..\lib\$(_VerifyRuntimePlugin)\Reqnroll.Verify.ReqnrollPlugin.dll</_VerifyRuntimePluginPath>
   </PropertyGroup>
 </Project>

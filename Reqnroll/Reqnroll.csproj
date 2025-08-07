@@ -30,8 +30,8 @@
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Cucumber.Messages" Version="28.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
-    <!-- System.Runtime.Loader is used for .NET Core based frameworks (.NET 6+) only. 
-         From .NET 6+, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
+    <!-- System.Runtime.Loader is used for .NET (not .NET Framework) based frameworks only. 
+         From .NET, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
          We need 'PrivateAssets="all"' to avoid shipping it with the package and causing conflicts with the runtime. -->
     <PackageReference Include="System.Runtime.Loader" Version="4.3.0" PrivateAssets="all" />
     <PackageReference Include="System.Text.Json" Version="8.0.5" />

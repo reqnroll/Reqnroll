@@ -15,8 +15,6 @@ In order to run all system tests, you will need to have the following SDKs insta
 
 - .NET 4.7.2 SDK
 - .NET 4.8.1 SDK
-- .NET 6.0 SDK
-- .NET 7.0 SDK
 - .NET 8.0 SDK
 - .NET 9.0 SDK
 

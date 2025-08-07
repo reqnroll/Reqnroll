@@ -41,7 +41,7 @@ namespace Reqnroll.TestProjectGenerator.Data
         
         public string Name { get; }
         public Guid ProjectGuid { get; }
-        public TargetFramework TargetFrameworks { get; } //net45, netcoreapp1.1, net471,
+        public TargetFramework TargetFrameworks { get; } //net45, net471, net8.0
         public ProjectType ProjectType { get; }
         public bool? IsTreatWarningsAsErrors { get; }
 

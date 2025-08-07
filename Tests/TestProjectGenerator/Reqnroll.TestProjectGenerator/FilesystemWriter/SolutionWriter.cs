@@ -12,14 +12,14 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
         private readonly IOutputWriter _outputWriter;
         private readonly ProjectWriterFactory _projectWriterFactory;
         private readonly FileWriter _fileWriter;
-        private readonly NetCoreSdkInfoProvider _netCoreSdkInfoProvider;
+        private readonly DotNetSdkInfoProvider _netCoreSdkInfoProvider;
 
         public SolutionWriter(IOutputWriter outputWriter)
         {
             _outputWriter = outputWriter;
             _projectWriterFactory = new ProjectWriterFactory(outputWriter, new TargetFrameworkMonikerStringBuilder(), new TargetFrameworkVersionStringBuilder());
             _fileWriter = new FileWriter();
-            _netCoreSdkInfoProvider = new NetCoreSdkInfoProvider();
+            _netCoreSdkInfoProvider = new DotNetSdkInfoProvider();
         }
 
         public string WriteToFileSystem(Solution solution, string outputPath)
@@ -40,7 +40,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                         .FirstOrDefault();
             
             var sdk = !string.IsNullOrWhiteSpace(solution.SdkVersion) 
-                ? new NetCoreSdkInfo(solution.SdkVersion) 
+                ? new DotNetSdkInfo(solution.SdkVersion) 
                 : _netCoreSdkInfoProvider.GetSdkFromTargetFramework(targetFramework);
 
             if (targetFramework != 0 && sdk != null)
@@ -90,7 +90,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                 Environment.SetEnvironmentVariable("MSBuildSDKsPath", null);
         }
 
-        private void WriteProjects(NetCoreSdkInfo sdk, Solution solution, string outputPath, string solutionFilePath)
+        private void WriteProjects(DotNetSdkInfo sdk, Solution solution, string outputPath, string solutionFilePath)
         {
             var projectPathMappings = new Dictionary<Project, string>();
             foreach (var project in solution.Projects)
@@ -107,7 +107,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             }
         }
 
-        private string WriteProject(NetCoreSdkInfo sdk, Project project, string outputPath, IProjectWriter formatProjectWriter, string solutionFilePath)
+        private string WriteProject(DotNetSdkInfo sdk, Project project, string outputPath, IProjectWriter formatProjectWriter, string solutionFilePath)
         {
             string projPath = formatProjectWriter.WriteProject(sdk, project, Path.Combine(outputPath, project.Name));
 
