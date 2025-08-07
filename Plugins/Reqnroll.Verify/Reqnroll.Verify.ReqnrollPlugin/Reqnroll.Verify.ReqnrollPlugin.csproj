@@ -13,6 +13,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
     <PackageReference Include="Verify.Xunit" Version="24.2.0"/>
   </ItemGroup>
 
