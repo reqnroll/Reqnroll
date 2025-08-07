@@ -159,7 +159,7 @@ jobs:
 
         # Calculate 'test_params'
         $gitHubActionsLoggerSettings = '"GitHubActions;summary.includePassedTests=true;summary.includeSkippedTests=true;annotations.titleFormat=[@traits.Category] @test;annotations.messageFormat=@error\n@trace"'
-        $testParams = "--verbosity normal --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true RunConfiguration.TreatNoTestsAsError=true"
+        $testParams = "--no-restore --verbosity minimal --logger $gitHubActionsLoggerSettings -- RunConfiguration.CollectSourceInformation=true RunConfiguration.TreatNoTestsAsError=true"
         Write-Output "test_params=$testParams" >> $env:GITHUB_OUTPUT
         Write-Output "Test Params: $testParams"
 
