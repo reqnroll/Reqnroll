@@ -24,7 +24,7 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub;
 
-public class CucumberMessagePublisherTests
+public class FormatterPublisherTests
 {
     private readonly Mock<IObjectContainer> _objectContainerMock;
     private readonly Mock<ICucumberMessageBroker> _brokerMock;
@@ -36,10 +36,12 @@ public class CucumberMessagePublisherTests
     private readonly Mock<IBindingMessagesGenerator> _bindingMessagesGeneratorMock;
     private readonly Mock<IFormatterLog> _formatterLoggerMock;
     private readonly Mock<IMetaMessageGenerator> _metaMessageGeneratorMock;
+    private readonly Mock<IMessagePublisher> _publishMessageMock;
     private readonly RuntimePluginEvents _runtimePluginEvents;
+    private readonly IFeatureExecutionTrackerFactory _featureTrackerFactory;
     private CucumberMessagePublisher _sut;
 
-    public CucumberMessagePublisherTests()
+    public FormatterPublisherTests()
     {
         _objectContainerMock = new Mock<IObjectContainer>();
         _brokerMock = new Mock<ICucumberMessageBroker>();
@@ -50,12 +52,14 @@ public class CucumberMessagePublisherTests
         _bindingMessagesGeneratorMock = new Mock<IBindingMessagesGenerator>();
         _formatterLoggerMock = new Mock<IFormatterLog>();
         _metaMessageGeneratorMock = new Mock<IMetaMessageGenerator>();
+        _publishMessageMock = new Mock<IMessagePublisher>();
+        _featureTrackerFactory = new FeatureExecutionTrackerFactory(_idGeneratorMock.Object,
+                                                                        new Mock<IPickleExecutionTrackerFactory>().Object, _publishMessageMock.Object);
 
         _runtimePluginEvents = new RuntimePluginEvents();
         CreateObjectContainerWithBroker();
-        _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object, _metaMessageGeneratorMock.Object );
+        _sut = new CucumberMessagePublisher(_brokerMock.Object, _bindingMessagesGeneratorMock.Object, _formatterLoggerMock.Object, _idGeneratorMock.Object, new CucumberMessageFactory(), _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
     }
-
     private ObjectContainer CreateObjectContainerWithBroker(bool brokerEnabled = true)
     {
         var container = new ObjectContainer();
@@ -76,12 +80,12 @@ public class CucumberMessagePublisherTests
     public void Initialize_Should_Setup_TestThread_Dependencies()
     {
         // Arrange
-        var objectContainerStub = CreateObjectContainerWithBroker();
-        objectContainerStub.RegisterInstanceAs(_eventPublisherMock.Object);
+        var oC = CreateObjectContainerWithBroker();
+        oC.RegisterInstanceAs(_eventPublisherMock.Object);
 
         // Act
         _sut.Initialize(_runtimePluginEvents);
-        _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(objectContainerStub);
+        _runtimePluginEvents.RaiseCustomizeTestThreadDependencies(oC);
 
         // Assert
         _eventPublisherMock.Verify(e => e.AddListener(_sut), Times.Once);
@@ -134,7 +138,7 @@ public class CucumberMessagePublisherTests
         _metaMessageGeneratorMock.Setup(m => m.GenerateMetaMessage())
                                  .Returns(new Meta("", new Product("", ""), new Product("", ""), new Product("", ""), new Product("", ""), null));
 
-        _sut = new CucumberMessagePublisher(_brokerMock.Object, bmg, _formatterLoggerMock.Object, _idGeneratorMock.Object, msgFactory, _clockMock.Object, _metaMessageGeneratorMock.Object);
+        _sut = new CucumberMessagePublisher(_brokerMock.Object, bmg, _formatterLoggerMock.Object, _idGeneratorMock.Object, msgFactory, _clockMock.Object, _metaMessageGeneratorMock.Object, _featureTrackerFactory);
         _sut.Initialize(new RuntimePluginEvents());
 
         // Act
@@ -143,10 +147,10 @@ public class CucumberMessagePublisherTests
         await _sut.PublisherStartup(new TestRunStartedEvent());
 
         // Assert
-        _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.AtLeast(2)); // TestRunStarted and Meta messages
         _bindingRegistryMock.Verify(br => br.GetStepDefinitions(), Times.Exactly(2));
         _bindingRegistryMock.Verify(br => br.GetHooks(), Times.Once);
         _bindingRegistryMock.Verify(br => br.GetStepTransformations(), Times.Once);
+        _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Exactly(2)); // TestRunStarted and Meta messages
     }
 
     // PublisherTestRunComplete/AfterTestRun causes no side effects when Publisher is disabled
@@ -187,9 +191,6 @@ public class CucumberMessagePublisherTests
         _sut.Enabled = true;
 
         // Act
-        await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
-        _sut.AllFeaturesPassed.Should().BeTrue();
-        await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
         await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
         // Assert
@@ -220,18 +221,15 @@ public class CucumberMessagePublisherTests
         _sut.Enabled = true;
 
         // Act
-        await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
-        _sut.AllFeaturesPassed.Should().BeTrue();
-        await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f2Context.Object));
         await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
         // Assert
         _sut.AllFeaturesPassed.Should().BeFalse();
     }
 
-    // PublisherTestRunComplete publishes TestCase messages for Pickles, then Execution messages, followed by the TestRunFinished message
+    // PublisherTestRunComplete informs all running Features to finalize tracking
     [Fact]
-    public async Task PublisherTestRunComplete_Should_PublishTestCase_and_Exec_Messages()
+    public async Task PublisherTestRunComplete_Should_Invoke_FinalizeTracking_on_FeatureTrackers()
     {
         // Arrange
         var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
@@ -242,32 +240,14 @@ public class CucumberMessagePublisherTests
         var f1Context = new Mock<IFeatureContext>();
         f1Context.Setup(x => x.FeatureInfo).Returns(f1);
 
-        var messages = new List<Envelope>
-        {
-            Envelope.Create(new TestCase("t", "p", [], "0")),
-            Envelope.Create(new TestCaseStarted(0, "2", "t", "", new Timestamp(1, 0)))
-        };
-
-
-        IList<Envelope> publishedEnvelopes = new List<Envelope>();
-        _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
-            (e) =>
-            {
-                publishedEnvelopes.Add(e);
-                return Task.CompletedTask;
-            });
-
         _sut.StartedFeatures.TryAdd(f1, new Lazy<Task<IFeatureExecutionTracker>>(() => Task.Run(() => featureTrackerMock.Object)));
         _sut.Enabled = true;
-        _sut.Messages = messages;
 
         // Act
-        await _sut.FeatureFinishedEventHandler(new FeatureFinishedEvent(f1Context.Object));
         await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
         // Assert
-        _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Exactly(3));
-        publishedEnvelopes.Should().HaveCount(3);
+        featureTrackerMock.Verify(ft => ft.FinalizeTracking(), Times.Once);
     }
     // FeatureStartedEvent causes no side effects when broker is disabled
     [Fact]
@@ -317,25 +297,26 @@ public class CucumberMessagePublisherTests
         var featureContextMock = new Mock<IFeatureContext>();
         var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", null);
 
-        Source SourceFunc() 
-            => new("uri", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
-        GherkinDocument GherkinDocFunc() 
-            => new("", new Feature(new Location(1, 1), [], "en", "Feature", "Feature test", "description", []), []);
-        List<Pickle> PicklesFunc() 
-            => new();
+        Source SourceFunc()
+        {
+            return new Source("uri", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
+        }
+
+        GherkinDocument GherkinDocFunc()
+        {
+            return new GherkinDocument("", new Feature(new Location(1, 1), [], "en", "Feature", "Feature test", "description", []), []);
+        }
+
+        List<Pickle> PicklesFunc()
+        {
+            return new List<Pickle>();
+        }
 
         var featureMessagesStub = new FeatureLevelCucumberMessages(SourceFunc, GherkinDocFunc, (Func<List<Pickle>>)PicklesFunc);
         featureInfoStub.FeatureCucumberMessages = featureMessagesStub;
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
         featureContextMock.Setup(fc => fc.FeatureContainer).Returns(_objectContainerMock.Object);
 
-        IList<Envelope> publishedEnvelopes = new List<Envelope>();
-        _brokerMock.Setup(b => b.PublishAsync(It.IsAny<Envelope>())).Returns<Envelope>(
-            (e) =>
-            {
-                publishedEnvelopes.Add(e);
-                return Task.CompletedTask;
-            });
         var bmg = new BindingMessagesGenerator(_idGeneratorMock.Object, new CucumberMessageFactory(), _bindingRegistryMock.Object);
         _sut.BindingMessagesGenerator = bmg;
         bmg.OnBindingRegistryReady(null, null);
@@ -348,10 +329,7 @@ public class CucumberMessagePublisherTests
 
         // Assert
         _sut.StartedFeatures.Count.Should().Be(1);
-        _brokerMock.Verify(b => b.PublishAsync(It.IsAny<Envelope>()), Times.Exactly(2));
-        publishedEnvelopes.Count.Should().Be(2);
-        publishedEnvelopes[0].Content().Should().BeOfType<Source>();
-        publishedEnvelopes[1].Content().Should().BeOfType<GherkinDocument>();
+
     }
 
     // FeatureFinishedEvent delegates to the FeatureExecutionTracker and pulls Execution messages to the Messages collection
@@ -362,12 +340,7 @@ public class CucumberMessagePublisherTests
         var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
         var featureContextMock = new Mock<IFeatureContext>();
         var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
-        var fakeMessages = new List<Envelope>
-        {
-            Envelope.Create(new TestCaseStarted(0, "id", "testCaseId", "", new Timestamp(1, 0)))
-        };
 
-        featureTrackerMock.Setup(ft => ft.RuntimeGeneratedMessages).Returns(fakeMessages);
         featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
         _sut.MessageFactory = new CucumberMessageFactory();
@@ -379,7 +352,9 @@ public class CucumberMessagePublisherTests
         await _sut.OnEventAsync(new TestRunFinishedEvent());
 
         // Assert
-        _sut.Messages.Should().Contain(fakeMessages);
+        _brokerMock.Verify(b => b.PublishAsync(
+            It.Is<Envelope>(e => e.Content() is TestRunFinished)
+            ), Times.Once);
     }
 
 
@@ -408,10 +383,10 @@ public class CucumberMessagePublisherTests
 
         var executionEvent = eventType switch
         {
-            var t when t == typeof(ScenarioStartedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object),
-            var t when t == typeof(ScenarioFinishedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object),
-            var t when t == typeof(StepStartedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object, stepContextMock.Object),
-            var t when t == typeof(StepFinishedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object, stepContextMock.Object),
+            { } t when t == typeof(ScenarioStartedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object),
+            { } t when t == typeof(ScenarioFinishedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object),
+            { } t when t == typeof(StepStartedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object, stepContextMock.Object),
+            { } t when t == typeof(StepFinishedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, featureContextMock.Object, scenarioContextMock.Object, stepContextMock.Object),
             _ => throw new NotSupportedException()
         };
 
@@ -427,16 +402,16 @@ public class CucumberMessagePublisherTests
 
         switch (eventType)
         {
-            case var t1 when t1 == typeof(ScenarioStartedEvent):
+            case { } t1 when t1 == typeof(ScenarioStartedEvent):
                 featureTrackerMock.Verify(ftm => ftm.ProcessEvent(It.Is<ScenarioStartedEvent>(e => e == executionEvent)));
                 break;
-            case var t1 when t1 == typeof(ScenarioFinishedEvent):
+            case { } t1 when t1 == typeof(ScenarioFinishedEvent):
                 featureTrackerMock.Verify(ftm => ftm.ProcessEvent(It.Is<ScenarioFinishedEvent>(e => e == executionEvent)));
                 break;
-            case var t1 when t1 == typeof(StepStartedEvent):
+            case { } t1 when t1 == typeof(StepStartedEvent):
                 featureTrackerMock.Verify(ftm => ftm.ProcessEvent(It.Is<StepStartedEvent>(e => e == executionEvent)));
                 break;
-            case var t1 when t1 == typeof(StepFinishedEvent):
+            case { } t1 when t1 == typeof(StepFinishedEvent):
                 featureTrackerMock.Verify(ftm => ftm.ProcessEvent(It.Is<StepFinishedEvent>(e => e == executionEvent)));
                 break;
         }
@@ -533,7 +508,7 @@ public class CucumberMessagePublisherTests
         cmMock.Setup(cm => cm.FeatureContext).Returns(featureContextStub);
         var dur = new TimeSpan(2);
 
-        var hookTracker = new TestRunHookExecutionTracker("2", "1", "0", messageFactory);
+        var hookTracker = new TestRunHookExecutionTracker("2", "0", "1", messageFactory, _brokerMock.Object);
         _sut.TestRunHookTrackers.TryAdd(hookBindingMock.Object, hookTracker);
         var hookBindingFinished = new HookBindingFinishedEvent(hookBindingMock.Object, dur, cmMock.Object);
 
@@ -541,8 +516,7 @@ public class CucumberMessagePublisherTests
         await _sut.OnEventAsync(hookBindingFinished);
 
         // Assert
-        _sut.Messages.Should().HaveCount(1);
-        _sut.Messages[0].Content().Should().BeOfType<TestRunHookFinished>();
+        _brokerMock.Verify(b => b.PublishAsync(It.Is<Envelope>(e => e.Content() is TestRunHookFinished)));
     }
 
 
@@ -618,7 +592,7 @@ public class CucumberMessagePublisherTests
         var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
         featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
-        var scenarioInfoStub = new ScenarioInfo("Scenario foo", "", [], new OrderedDictionary());
+        var scenarioInfoStub = new ScenarioInfo("My Scenario", "", [], new OrderedDictionary());
 
         var executionEvent = (IExecutionEvent)Activator.CreateInstance(eventType, "", featureInfoStub, scenarioInfoStub);
 
@@ -661,6 +635,7 @@ public class CucumberMessagePublisherTests
     public async Task AttachmentAndOutputEvents_ForTestRunRelatedContent_Should_DirectlyPostMessagesToTheCollection(Type eventType)
     {
         // Arrange
+
         var executionEvent = (IExecutionEvent)Activator.CreateInstance(eventType, "attachment-path", null, null);
 
         _sut.Enabled = true;
@@ -670,16 +645,16 @@ public class CucumberMessagePublisherTests
 
         var mockBinding = new Mock<IHookBinding>();
         var hookId = Guid.NewGuid().ToString();
-        var mockHook = new TestRunHookExecutionTracker(hookId, null, "test-run-started-id", _sut.MessageFactory);
-        mockHook.ProcessEvent(new HookBindingStartedEvent(mockBinding.Object, new Mock<IContextManager>().Object));
-        _sut.TestRunHookTrackers.TryAdd(mockBinding.Object, mockHook);
+        var testRunHookId = Guid.NewGuid().ToString();
+        var hookTracker = new TestRunHookExecutionTracker(testRunHookId, "test-run-started-id", hookId, _sut.MessageFactory, _publishMessageMock.Object);
+        await hookTracker.ProcessEvent(new HookBindingStartedEvent(mockBinding.Object, new Mock<IContextManager>().Object));
+        _sut.TestRunHookTrackers.TryAdd(mockBinding.Object, hookTracker);
 
         // Act 
         await _sut.OnEventAsync(executionEvent);
 
         // Assert
 
-        _sut.Messages.Should().HaveCount(1);
-        _sut.Messages[0].Content().Should().BeOfType<Attachment>();
+        _brokerMock.Verify(b => b.PublishAsync(It.Is<Envelope>(e => e.Content() is Attachment)));
     }
 }

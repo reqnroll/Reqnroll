@@ -1,5 +1,4 @@
-﻿using Cucumber.Messages;
-using Gherkin.CucumberMessages;
+﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.Events;
@@ -25,6 +24,7 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
 {
     private readonly IFormatterLog _logger;
     private readonly IMetaMessageGenerator _metaMessageGenerator;
+    private readonly IFeatureExecutionTrackerFactory _featureExecutionTrackerFactory;
     private readonly IIdGenerator _sharedIdGenerator;
     private readonly string _testRunStartedId;
     private readonly ICucumberMessageBroker _broker;
@@ -38,9 +38,6 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
 
     // This tracks the set of BeforeTestRun and AfterTestRun hooks that were called during the test run
     public ConcurrentDictionary<IBinding, TestRunHookExecutionTracker> TestRunHookTrackers { get; } = new();
-
-    // Holds all Messages that are pending publication (collected from Feature Trackers as each Feature completes)
-    public List<Envelope> Messages { get; internal set; } = new();
 
     public bool Enabled { get; internal set; } = false;
 
@@ -62,7 +59,8 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
                                     IIdGenerator idGenerator,
                                     ICucumberMessageFactory messageFactory,
                                     IClock clock,
-                                    IMetaMessageGenerator metaMessageGenerator
+                                    IMetaMessageGenerator metaMessageGenerator,
+                                    IFeatureExecutionTrackerFactory featureExecutionTrackerFactory
         )
     {
         _logger = logger;
@@ -74,6 +72,7 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         MessageFactory = messageFactory;
         _testRunStartedId = _sharedIdGenerator.GetNewId();
         _metaMessageGenerator = metaMessageGenerator;
+        _featureExecutionTrackerFactory = featureExecutionTrackerFactory;
     }
 
     public void Initialize(RuntimePluginEvents runtimePluginEvents)
@@ -108,9 +107,6 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
                 break;
             case FeatureStartedEvent featureStartedEvent:
                 await FeatureStartedEventHandler(featureStartedEvent);
-                break;
-            case FeatureFinishedEvent featureFinishedEvent:
-                await FeatureFinishedEventHandler(featureFinishedEvent);
                 break;
             case ScenarioStartedEvent scenarioStartedEvent:
                 await ScenarioStartedEventHandler(scenarioStartedEvent);
@@ -157,7 +153,7 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         {
             await _broker.PublishAsync(Envelope.Create(MessageFactory.ToTestRunStarted(_clock.GetNowDateAndTime(), _testRunStartedId)));
             await _broker.PublishAsync(Envelope.Create(_metaMessageGenerator.GenerateMetaMessage()));
-            _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup - published TestRunStarted");
+            _logger.WriteMessage("DEBUG: Formatters.Publisher.PublisherStartup - published TestRunStarted");
 
             foreach (var msg in BindingMessagesGenerator.StaticBindingMessages)
             {
@@ -170,14 +166,9 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         {
             _logger.WriteMessage($"Error publishing messages: {ex.Message}");
         }
-        _logger.WriteMessage($"DEBUG: Formatters.Publisher.PublisherStartup - startup completed");
+        _logger.WriteMessage("DEBUG: Formatters.Publisher.PublisherStartup - startup completed");
 
         StartupCompleted = true;
-    }
-
-    private DateTime RetrieveDateTime(Envelope e)
-    {
-        return Converters.ToDateTime(e.Timestamp());
     }
 
     internal async Task PublisherTestRunCompleteAsync(TestRunFinishedEvent testRunFinishedEvent)
@@ -186,40 +177,22 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         if (!Enabled)
             return;
 
-        foreach (var featureTracker in StartedFeatures.Values)
+        foreach (var featureExecutionTrackerTask in StartedFeatures.Values)
         {
-            var tracker = await featureTracker.Value;
-            Messages.AddRange(tracker.RuntimeGeneratedMessages);
+            var featureExecutionTracker = await featureExecutionTrackerTask.Value;
+            await featureExecutionTracker.FinalizeTracking();
 
-            if (!tracker.FeatureExecutionSuccess)
+            if (!featureExecutionTracker.FeatureExecutionSuccess)
                 AllFeaturesPassed = false;
         }
-        // publish all TestCase messages
-        var testCaseMessages = Messages.Where(e => e.Content() is TestCase).ToList();
-        // sort the remaining Messages by timestamp
-        var executionMessages = Messages.Except(testCaseMessages).OrderBy(RetrieveDateTime).ToList();
-        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: has {testCaseMessages.Count} test case messages & {executionMessages.Count} execution messages.");
-        // publish them in order to the broker
-        foreach (var env in testCaseMessages)
-        {
-            await _broker.PublishAsync(env);
-        }
-        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: testCase messages written.");
-
-        foreach (var env in executionMessages)
-        {
-            await _broker.PublishAsync(env);
-        }
-        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: exec messages written.");
 
         await _broker.PublishAsync(Envelope.Create(MessageFactory.ToTestRunFinished(AllFeaturesPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
-        _logger.WriteMessage($"DEBUG: Formatter:Publisher.TestRunComplete: TestRunFinished Message written");
+        _logger.WriteMessage("DEBUG: Formatter:Publisher.TestRunComplete: TestRunFinished Message written");
     }
 
     #region TestThreadExecutionEventPublisher Event Handling Methods
 
     // The following methods handle the events published by the TestThreadExecutionEventPublisher
-    // When one of these calls the Broker, that method is async; otherwise these are sync methods that return a completed Task (to allow them to be called async from the TestThreadExecutionEventPublisher)
     private async Task FeatureStartedEventHandler(FeatureStartedEvent featureStartedEvent)
     {
         var featureInfo = featureStartedEvent.FeatureContext?.FeatureInfo;
@@ -234,110 +207,80 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         // preventing duplicate trackers and race conditions.
         var trackerTask = StartedFeatures.GetOrAdd(featureInfo, _ =>
             new Lazy<Task<IFeatureExecutionTracker>>(() =>
-                Task.Run<IFeatureExecutionTracker>(async () =>
+                Task.Run(async () =>
                 {
-                    var featureExecutionTracker = new FeatureExecutionTracker(featureStartedEvent, _testRunStartedId, _sharedIdGenerator, StepDefinitionIdByMethodBinding, MessageFactory);
-                    if (featureExecutionTracker.Enabled)
-                    {
-                        try
-                        {
-                            foreach (var msg in featureExecutionTracker.StaticMessages)
-                            {
-                                await _broker.PublishAsync(msg);
-                            }
-                        }
-                        catch (System.Exception ex)
-                        {
-                            _logger.WriteMessage($"Error publishing messages: {ex.Message}");
-                        }
-                    }
+                    var featureExecutionTracker = _featureExecutionTrackerFactory.CreateFeatureTracker(featureStartedEvent, _testRunStartedId, StepDefinitionIdByMethodBinding);
+                    await featureExecutionTracker.ProcessEvent(featureStartedEvent);
                     return featureExecutionTracker;
                 })));
 
         await trackerTask.Value;
     }
 
-    internal async Task FeatureFinishedEventHandler(FeatureFinishedEvent featureFinishedEvent)
-    {
-        // For this and subsequent events, we pull up the FeatureExecutionTracker by featureInfo.
-        var featureInfo = featureFinishedEvent.FeatureContext?.FeatureInfo;
-        if (!Enabled || featureInfo == null)
-        {
-            return;
-        }
-
-        if (StartedFeatures.TryGetValue(featureInfo, out var featureTrackerTask))
-        {
-            var featureTracker = await featureTrackerTask.Value;
-            if (!featureTracker.Enabled)
-            {
-                return;
-            }
-
-            // The following will compute the overall execution status of the feature.
-            // Message generation is deferred until the TestRunFinishedEvent is published (see PublisherTestRunCompleteAsync).
-            // This allows for multiple features to be processed in parallel; we can't tell which of these FeatureFinishedEvents is the final one.
-
-            featureTracker.ProcessEvent(featureFinishedEvent);
-        }
-        // throw an exception if any of the TestCaseExecutionTrackers are not done?
-    }
-
-    private async Task ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
-    {
-        var featureTracker = await GetFeatureTracker(scenarioStartedEvent);
-        featureTracker?.ProcessEvent(scenarioStartedEvent);
-    }
-
-    private async Task<IFeatureExecutionTracker> GetFeatureTracker<T>(T eventData) where T : IExecutionEvent
+    /// <summary>
+    /// Helper method used by the event handlers to retrieve the feature execution tracker for the given event.
+    /// </summary>
+    private async Task<IFeatureExecutionTracker> GetFeatureExecutionTracker<T>(T eventData) where T : IExecutionEvent
     {
         var featureInfo = GetFeatureId(eventData);
 
         if (!Enabled || featureInfo == null)
             return null;
 
-        if (StartedFeatures.TryGetValue(featureInfo, out var featureTrackerTask))
+        if (StartedFeatures.TryGetValue(featureInfo, out var featureExecutionTrackerTask))
         {
-            var featureTracker = await featureTrackerTask.Value;
-            if (!featureTracker.Enabled)
+            var featureExecutionTracker = await featureExecutionTrackerTask.Value;
+            if (!featureExecutionTracker.Enabled)
                 return null;
-            return featureTracker;
+            return featureExecutionTracker;
         }
 
         return null;
     }
 
-    // Helper method to extract feature name from different event types
+    /// <summary>
+    /// Helper method to extract feature name from different event types.
+    /// </summary>
     private FeatureInfo GetFeatureId(IExecutionEvent eventData)
     {
         return eventData switch
         {
             ScenarioStartedEvent sse => sse.FeatureContext?.FeatureInfo,
             ScenarioFinishedEvent sfe => sfe.FeatureContext?.FeatureInfo,
-            StepStartedEvent stse => stse.FeatureContext?.FeatureInfo,
-            StepFinishedEvent stfe => stfe.FeatureContext?.FeatureInfo,
-            HookBindingStartedEvent hbse => hbse.ContextManager.FeatureContext.FeatureInfo,
-            HookBindingFinishedEvent hbfe => hbfe.ContextManager.FeatureContext.FeatureInfo,
+            StepStartedEvent sse => sse.FeatureContext?.FeatureInfo,
+            StepFinishedEvent sfe => sfe.FeatureContext?.FeatureInfo,
+            HookBindingStartedEvent hse => hse.ContextManager.FeatureContext.FeatureInfo,
+            HookBindingFinishedEvent hfe => hfe.ContextManager.FeatureContext.FeatureInfo,
             _ => null
         };
     }
 
+    private async Task ScenarioStartedEventHandler(ScenarioStartedEvent scenarioStartedEvent)
+    {
+        var featureExecutionTracker = await GetFeatureExecutionTracker(scenarioStartedEvent);
+        if (featureExecutionTracker != null)
+            await featureExecutionTracker.ProcessEvent(scenarioStartedEvent);
+    }
+
     private async Task ScenarioFinishedEventHandler(ScenarioFinishedEvent scenarioFinishedEvent)
     {
-        var featureTracker = await GetFeatureTracker(scenarioFinishedEvent);
-        featureTracker?.ProcessEvent(scenarioFinishedEvent);
+        var featureExecutionTracker = await GetFeatureExecutionTracker(scenarioFinishedEvent);
+        if (featureExecutionTracker != null)
+            await featureExecutionTracker.ProcessEvent(scenarioFinishedEvent);
     }
 
     private async Task StepStartedEventHandler(StepStartedEvent stepStartedEvent)
     {
-        var featureTracker = await GetFeatureTracker(stepStartedEvent);
-        featureTracker?.ProcessEvent(stepStartedEvent);
+        var featureExecutionTracker = await GetFeatureExecutionTracker(stepStartedEvent);
+        if (featureExecutionTracker != null)
+            await featureExecutionTracker.ProcessEvent(stepStartedEvent);
     }
 
     private async Task StepFinishedEventHandler(StepFinishedEvent stepFinishedEvent)
     {
-        var featureTracker = await GetFeatureTracker(stepFinishedEvent);
-        featureTracker?.ProcessEvent(stepFinishedEvent);
+        var featureExecutionTracker = await GetFeatureExecutionTracker(stepFinishedEvent);
+        if (featureExecutionTracker != null)
+            await featureExecutionTracker.ProcessEvent(stepFinishedEvent);
     }
 
     private async Task HookBindingStartedEventHandler(HookBindingStartedEvent hookBindingStartedEvent)
@@ -353,16 +296,15 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
             case Bindings.HookType.AfterFeature:
                 var hookRunStartedId = _sharedIdGenerator.GetNewId();
                 var hookId = StepDefinitionIdByMethodBinding[hookBindingStartedEvent.HookBinding];
-                var hookTracker = new TestRunHookExecutionTracker(hookRunStartedId, hookId, _testRunStartedId, MessageFactory);
+                var hookTracker = new TestRunHookExecutionTracker(hookRunStartedId, _testRunStartedId, hookId, MessageFactory, _broker);
                 TestRunHookTrackers.TryAdd(hookBindingStartedEvent.HookBinding, hookTracker);
-
-                hookTracker.ProcessEvent(hookBindingStartedEvent);
-                Messages.AddRange(((IGenerateMessage)hookTracker).GenerateFrom(hookBindingStartedEvent));
+                await hookTracker.ProcessEvent(hookBindingStartedEvent);
                 return;
 
             default:
-                var featureTracker = await GetFeatureTracker(hookBindingStartedEvent);
-                featureTracker?.ProcessEvent(hookBindingStartedEvent);
+                var featureExecutionTracker = await GetFeatureExecutionTracker(hookBindingStartedEvent);
+                if (featureExecutionTracker != null)
+                    await featureExecutionTracker.ProcessEvent(hookBindingStartedEvent);
                 break;
         }
     }
@@ -380,14 +322,13 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
             case Bindings.HookType.AfterFeature:
                 if (!TestRunHookTrackers.TryGetValue(hookBindingFinishedEvent.HookBinding, out var hookTracker)) // should not happen
                     return;
-                hookTracker.ProcessEvent(hookBindingFinishedEvent);
-
-                Messages.AddRange(((IGenerateMessage)hookTracker).GenerateFrom(hookBindingFinishedEvent));
+                await hookTracker.ProcessEvent(hookBindingFinishedEvent);
                 return;
 
             default:
-                var featureTracker = await GetFeatureTracker(hookBindingFinishedEvent);
-                featureTracker?.ProcessEvent(hookBindingFinishedEvent);
+                var featureExecutionTracker = await GetFeatureExecutionTracker(hookBindingFinishedEvent);
+                if (featureExecutionTracker != null)
+                    await featureExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
                 break;
         }
     }
@@ -419,17 +360,15 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
             }
             else
             {
-                var attachmentTracker = new AttachmentTracker(_testRunStartedId, null, null, attachmentIssuedByHookId, MessageFactory);
-                attachmentTracker.ProcessEvent(attachmentAddedEvent);
-
-                Messages.Add(Envelope.Create(MessageFactory.ToAttachment(attachmentTracker)));
+                var attachmentTracker = new AttachmentTracker(_testRunStartedId, null, null, attachmentIssuedByHookId, MessageFactory, _broker);
+                await attachmentTracker.ProcessEvent(attachmentAddedEvent);
             }
             return;
         }
-        if (StartedFeatures.TryGetValue(featureInfo, out var featureTrackerTask))
+        if (StartedFeatures.TryGetValue(featureInfo, out var featureExecutionTrackerTask))
         {
-            var tracker = await featureTrackerTask.Value;
-            tracker?.ProcessEvent(attachmentAddedEvent);
+            var featureExecutionTracker = await featureExecutionTrackerTask.Value;
+            await featureExecutionTracker.ProcessEvent(attachmentAddedEvent);
         }
     }
 
@@ -449,18 +388,16 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
             }
             else
             {
-                var outputMessageTracker = new OutputMessageTracker(_testRunStartedId, null, null, outputIssuedByHookId, MessageFactory);
-                outputMessageTracker.ProcessEvent(outputAddedEvent);
-
-                Messages.Add(Envelope.Create(MessageFactory.ToAttachment(outputMessageTracker)));
+                var outputMessageTracker = new OutputMessageTracker(_testRunStartedId, null, null, outputIssuedByHookId, MessageFactory, _broker);
+                await outputMessageTracker.ProcessEvent(outputAddedEvent);
             }
             return;
         }
 
-        if (StartedFeatures.TryGetValue(featureInfo, out var featureTrackerTask))
+        if (StartedFeatures.TryGetValue(featureInfo, out var featureExecutionTrackerTask))
         {
-            var tracker = await featureTrackerTask.Value;
-            tracker?.ProcessEvent(outputAddedEvent);
+            var featureExecutionTracker = await featureExecutionTrackerTask.Value;
+            await featureExecutionTracker.ProcessEvent(outputAddedEvent);
         }
     }
     #endregion

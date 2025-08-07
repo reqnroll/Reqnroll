@@ -19,15 +19,10 @@ public class DebugFormatterLog : IFormatterLog
     public void DumpMessages()
     {
         if (!_hasDumped)
-        {
-#if DEBUG
             foreach (var msg in _entries)
             {
                 Debug.WriteLine(msg);
             }
-#endif
-        }
-
         _hasDumped = true;
     }
 }

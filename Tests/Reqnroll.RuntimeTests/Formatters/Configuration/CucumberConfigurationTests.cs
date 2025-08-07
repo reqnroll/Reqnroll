@@ -46,10 +46,7 @@ public class CucumberConfigurationTests
     {
         // Arrange
         var mockedSetup = new Dictionary<string, IDictionary<string, object>>();
-        var htmlConfig = new Dictionary<string, object>
-        {
-            { "outputFileName", @"c:\html\html_report.html" }
-        };
+        var htmlConfig = new Dictionary<string, object> { { "outputFileName", @"c:\html\html_report.html" } };
         mockedSetup.Add("html", htmlConfig);
         _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
         _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
@@ -67,10 +64,7 @@ public class CucumberConfigurationTests
     public void GetFormatterConfigurationByName_Should_Return_Configuration_For_Existing_Formatter()
     {
         // Arrange
-        var mockedSetup = new Dictionary<string, IDictionary<string, object>>
-        {
-            { "html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_report.html" } } }
-        };
+        var mockedSetup = new Dictionary<string, IDictionary<string, object>> { { "html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_report.html" } } } };
         _fileResolverMock.Setup(r => r.Resolve()).Returns(mockedSetup);
         _environmentResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
         _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
@@ -86,21 +80,10 @@ public class CucumberConfigurationTests
     public void GetFormatterConfigurationByName_Should_Respect_Formatter_Given_By_EnvironmentVariable_Override()
     {
         // Arrange
-        var configFileSetup = new Dictionary<string, IDictionary<string, object>>
-        {
-            { "html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_report.html" } } }
-        };
+        var configFileSetup = new Dictionary<string, IDictionary<string, object>> { { "html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_report.html" } } } };
         _fileResolverMock.Setup(r => r.Resolve()).Returns(configFileSetup);
 
-        var envVarSetup = new Dictionary<string, IDictionary<string, object>>
-        {
-            {
-                "html", new Dictionary<string, object>
-                {
-                    { "outputFileName", @"c:\html\html_overridden_name.html" }
-                }
-            }
-        };
+        var envVarSetup = new Dictionary<string, IDictionary<string, object>> { { "html", new Dictionary<string, object> { { "outputFileName", @"c:\html\html_overridden_name.html" } } } };
         _environmentResolverMock.Setup(r => r.Resolve()).Returns(envVarSetup);
         _disableOverrideProviderMock.Setup(p => p.Disabled()).Returns(false);
 
