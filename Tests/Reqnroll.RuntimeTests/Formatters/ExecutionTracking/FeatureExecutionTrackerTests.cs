@@ -5,7 +5,6 @@ using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.BoDi;
 using Reqnroll.Formatters.ExecutionTracking;
-using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
@@ -14,7 +13,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using Xunit;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
@@ -23,6 +21,18 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
 public class FeatureExecutionTrackerTests
 {
+    class TestableFeatureExecutionTracker(
+        FeatureStartedEvent featureStartedEvent,
+        string testRunStartedId,
+        ConcurrentDictionary<IBinding, string> stepDefinitionsByBinding,
+        IIdGenerator idGenerator,
+        IPickleExecutionTrackerFactory pickleFactory,
+        IMessagePublisher publisher)
+        : FeatureExecutionTracker(featureStartedEvent, testRunStartedId, stepDefinitionsByBinding, idGenerator, pickleFactory, publisher)
+    {
+        public void SetPickleJar(PickleJar value) => PickleJar = value;
+    }
+
     private Mock<IIdGenerator> _idGeneratorMock;
     private FeatureStartedEvent _featureStartedEventDummy;
     private IFeatureContext _mockFeatureContext;
@@ -33,16 +43,16 @@ public class FeatureExecutionTrackerTests
     private FeatureInfo _featureInfoDummy;
     private Mock<IClock> _clockMock;
     private Mock<IObjectContainer> _featureContainer;
-    private Mock<IPublishMessage> _publisherMock;
+    private Mock<IMessagePublisher> _publisherMock;
 
-    private FeatureExecutionTracker InitializeFeatureTrackerSut()
+    private TestableFeatureExecutionTracker InitializeFeatureTrackerSut()
     {
         _idCounter = 10;
         _idGeneratorMock = new Mock<IIdGenerator>();
         _idGeneratorMock.Setup(g => g.GetNewId()).Returns(() => _idCounter++.ToString());
         _clockMock = new Mock<IClock>();
         _clockMock.Setup(clock => clock.GetNowDateAndTime()).Returns(DateTime.UnixEpoch);
-        _publisherMock = new Mock<IPublishMessage>();
+        _publisherMock = new Mock<IMessagePublisher>();
 
         _featureContainer = new Mock<IObjectContainer>();
         _featureContainer.Setup(c => c.Resolve<IClock>()).Returns(_clockMock.Object);
@@ -70,9 +80,7 @@ public class FeatureExecutionTrackerTests
             .Returns(_pickleTrackerMock.Object);
 
         // Initialize the FeatureExecutionTracker
-        var ft = new FeatureExecutionTracker(_featureStartedEventDummy, "TestRunId", _stepDefinitionsByBinding, _idGeneratorMock.Object, _clockMock.Object, new CucumberMessageFactory(), pickleFactoryMock.Object, _publisherMock.Object);
-
-        return ft;
+        return new TestableFeatureExecutionTracker(_featureStartedEventDummy, "TestRunId", _stepDefinitionsByBinding, _idGeneratorMock.Object, pickleFactoryMock.Object, _publisherMock.Object);
     }
 
     [Fact]
@@ -115,7 +123,6 @@ public class FeatureExecutionTrackerTests
     public async Task ProcessEvent_Should_Calculate_FeatureExecutionFailure_On_FeatureFinishedEventWhenAScenarioFails()
     {
         // Arrange
-        var featureFinishedEventMock = new Mock<FeatureFinishedEvent>(MockBehavior.Strict, null!);
         var sut = InitializeFeatureTrackerSut();
         _pickleTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.TestError);
         _pickleTrackerMock.Setup(t => t.Finished).Returns(true);
@@ -155,8 +162,8 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
@@ -177,8 +184,8 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -200,8 +207,8 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
 
@@ -228,8 +235,8 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -256,8 +263,8 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -282,8 +289,8 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -309,14 +316,16 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
-        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
-        scenarioInfoDummy.PickleId = "0";
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0")
+        {
+            PickleId = "0"
+        };
 
         var attachmentAddedEvent = new AttachmentAddedEvent("attachmentFileName.png", _mockFeatureContext.FeatureInfo,  scenarioInfoDummy);
 
@@ -332,14 +341,16 @@ public class FeatureExecutionTrackerTests
     {
         // Arrange
         var sut = InitializeFeatureTrackerSut();
-        // setup the PickleJar and PickleIds for the Scenario in this test
-        sut._pickleJar = new PickleJar(new List<Pickle> { new Pickle("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) });
+        // set up the PickleJar and PickleIds for the Scenario in this test
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
 
-        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
-        scenarioInfoDummy.PickleId = "0";
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0")
+        {
+            PickleId = "0"
+        };
 
         var outputAddedEvent = new OutputAddedEvent("sample output text", _featureInfoDummy, scenarioInfoDummy);
 

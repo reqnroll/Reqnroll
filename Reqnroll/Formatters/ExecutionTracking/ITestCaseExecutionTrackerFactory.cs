@@ -9,5 +9,5 @@ public interface ITestCaseExecutionTrackerFactory
         int attemptId,
         string testCaseId,
         TestCaseTracker testCaseTracker,
-        IPublishMessage picklePublisher);
+        IMessagePublisher picklePublisher);
 }

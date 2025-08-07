@@ -19,7 +19,7 @@ public class TestStepTrackerTests
 {
     private readonly Mock<ICucumberMessageFactory> _messageFactoryMock = new();
     private readonly Mock<ITestCaseExecutionTrackerFactory> _testCaseExecutionTrackerFactoryMock = new();
-    private readonly Mock<IPublishMessage> _publishMessageMock = new();
+    private readonly Mock<IMessagePublisher> _publishMessageMock = new();
     private readonly Mock<IIdGenerator> _idGeneratorMock = new();
     private readonly TestCaseTracker _testCaseTracker;
     private readonly PickleExecutionTracker _pickleExecutionTracker;
@@ -29,7 +29,6 @@ public class TestStepTrackerTests
         _pickleExecutionTracker = new PickleExecutionTracker("testCasePickle", "runStartedId", "featureName", true, _idGeneratorMock.Object, null, DateTime.Now, _messageFactoryMock.Object, _testCaseExecutionTrackerFactoryMock.Object, _publishMessageMock.Object);
         _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickle", _pickleExecutionTracker);
     }
-
 
     [Fact]
     public void PopulateStepDefinitionFromExecutionResult_Should_Set_Bound_And_Arguments_When_Bound()

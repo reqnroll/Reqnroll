@@ -14,7 +14,7 @@ public interface ICucumberMessageFactory
     TestRunFinished ToTestRunFinished(bool testRunStatus, DateTime timestamp, string testRunStartedId);
     TestCase ToTestCase(TestCaseTracker testCaseTracker);
     TestCaseStarted ToTestCaseStarted(TestCaseExecutionTracker testCaseExecution, string testCaseId);
-    TestCaseFinished ToTestCaseFinished(TestCaseExecutionTracker testCaseExecution);
+    TestCaseFinished ToTestCaseFinished(TestCaseExecutionTracker testCaseExecution, bool willBeRetried = false);
     
     // Step definition methods
     StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator);

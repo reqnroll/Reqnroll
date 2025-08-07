@@ -1,6 +1,5 @@
 ﻿using Reqnroll.Events;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
@@ -24,7 +23,7 @@ public class TestCaseExecutionTracker
     public int AttemptId { get; }
     public string TestCaseId { get; }
 
-    private readonly IPublishMessage _publisher;
+    private readonly IMessagePublisher _publisher;
     private readonly IStepTrackerFactory _stepTrackerFactory;
     private bool _testCaseFinishedHasBeenPublished = false;
 
@@ -41,7 +40,7 @@ public class TestCaseExecutionTracker
 
     public bool IsFirstAttempt => AttemptId == 0;
 
-    public TestCaseExecutionTracker(IPickleExecutionTracker parentTracker, int attemptId, string testCaseStartedId, string testCaseId, TestCaseTracker testCaseTracker, ICucumberMessageFactory messageFactory, IPublishMessage publisher, IStepTrackerFactory stepTrackerFactory)
+    public TestCaseExecutionTracker(IPickleExecutionTracker parentTracker, int attemptId, string testCaseStartedId, string testCaseId, TestCaseTracker testCaseTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IStepTrackerFactory stepTrackerFactory)
     {
         _messageFactory = messageFactory;
         _stepExecutionTrackers = new();
@@ -63,7 +62,7 @@ public class TestCaseExecutionTracker
 
     public async Task ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
     {
-        // If this is the first attempt, at ScenarioFinished,we have enough information about which Hook and Step Bindings were used;
+        // If this is the first attempt, at ScenarioFinished, we have enough information about which Hook and Step Bindings were used;
         // we can now generate the TestCase message and publish it.
         if (AttemptId == 0)
         {
@@ -74,6 +73,8 @@ public class TestCaseExecutionTracker
         TestCaseFinishedTimestamp = scenarioFinishedEvent.Timestamp;
         ScenarioExecutionStatus = scenarioFinishedEvent.ScenarioContext.ScenarioExecutionStatus;
 
+        // We need to delay publishing the TestCaseFinished message to 'FinalizeTracking'
+        // because we might have a retry of the scenario and need to set the 'willBeRetried' flag.
         if (ScenarioExecutionStatus != ScenarioExecutionStatus.TestError)
         {
             // If the scenario has not failed, we can publish the TestCaseFinished message

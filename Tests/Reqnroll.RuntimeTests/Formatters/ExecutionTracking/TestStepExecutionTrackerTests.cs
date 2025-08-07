@@ -7,7 +7,6 @@ using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System;
-using System.Linq;
 using Xunit;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
@@ -18,18 +17,18 @@ public class TestStepExecutionTrackerTests
 {
     private readonly Mock<ICucumberMessageFactory> _messageFactoryMock;
     private readonly Mock<IPickleExecutionTracker> _pickleExecutionTrackerMock;
-    private readonly Mock<IPublishMessage> _publisherMock;
+    private readonly Mock<IMessagePublisher> _publisherMock;
     private readonly Mock<IStepTrackerFactory> _stepTrackerFactoryMock;
     // ReSharper disable once PrivateFieldCanBeConvertedToLocalVariable
-    private TestCaseExecutionTracker _testCaseExecutionTrackerStub;
-    private TestStepExecutionTracker _testStepExecutionTrackerSut;
+    private readonly TestCaseExecutionTracker _testCaseExecutionTrackerStub;
+    private readonly TestStepExecutionTracker _testStepExecutionTrackerSut;
     private readonly TestCaseTracker _testCaseTrackerStub;
         
     public TestStepExecutionTrackerTests()
     {
         _messageFactoryMock = new Mock<ICucumberMessageFactory>();
         _pickleExecutionTrackerMock = new Mock<IPickleExecutionTracker>();
-        _publisherMock = new Mock<IPublishMessage>();
+        _publisherMock = new Mock<IMessagePublisher>();
         _stepTrackerFactoryMock = new Mock<IStepTrackerFactory>();
         _testCaseTrackerStub = new TestCaseTracker("testCaseId", "testCasePickleId", _pickleExecutionTrackerMock.Object);
         _testCaseExecutionTrackerStub = CreateTestCaseExecutionTracker();

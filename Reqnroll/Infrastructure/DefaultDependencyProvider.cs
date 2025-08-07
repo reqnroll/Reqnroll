@@ -129,7 +129,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FeatureExecutionTrackerFactory, IFeatureExecutionTrackerFactory>();
             container.RegisterTypeAs<PickleExecutionTrackerFactory, IPickleExecutionTrackerFactory>();
             container.RegisterTypeAs<TestCaseExecutionTrackerFactory, ITestCaseExecutionTrackerFactory>();
-            container.RegisterFactoryAs<IPublishMessage>(() => container.Resolve<ICucumberMessageBroker>());
+            container.RegisterFactoryAs<IMessagePublisher>(() => container.Resolve<ICucumberMessageBroker>());
             container.RegisterTypeAs<StepTrackerFactory, IStepTrackerFactory>();
         }
 

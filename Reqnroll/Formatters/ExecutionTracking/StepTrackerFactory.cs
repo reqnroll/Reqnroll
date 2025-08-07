@@ -3,29 +3,22 @@ using Reqnroll.Formatters.PubSub;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
-public class StepTrackerFactory : IStepTrackerFactory
+public class StepTrackerFactory(ICucumberMessageFactory messageFactory, IMessagePublisher publisher) : IStepTrackerFactory
 {
-    private readonly ICucumberMessageFactory _messageFactory;
-    private readonly IPublishMessage _publisher;
-    public StepTrackerFactory(ICucumberMessageFactory messageFactory, IPublishMessage publisher)
+    public TestStepExecutionTracker CreateTestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
     {
-        _messageFactory = messageFactory;
-        _publisher = publisher;
+        return new TestStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher);
     }
-    public TestStepExecutionTracker CreateTestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IPublishMessage picklePublisher = null)
+    public HookStepExecutionTracker CreateHookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
     {
-        return new TestStepExecutionTracker(parentTracker, _messageFactory, picklePublisher ?? _publisher);
+        return new HookStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher);
     }
-    public HookStepExecutionTracker CreateHookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IPublishMessage picklePublisher = null)
+    public AttachmentTracker CreateAttachmentTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string testRunHookStartedId, IMessagePublisher picklePublisher = null)
     {
-        return new HookStepExecutionTracker(parentTracker, _messageFactory, picklePublisher ?? _publisher);
+        return new AttachmentTracker(testRunStartedId, testCaseStartedId, testCaseStepId, testRunHookStartedId, messageFactory, picklePublisher ?? publisher);
     }
-    public AttachmentTracker CreateAttachmentTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string testRunHookStartedId, IPublishMessage picklePublisher = null)
+    public OutputMessageTracker CreateOutputMessageTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string outputIssuedByHookStartedId, IMessagePublisher picklePublisher = null)
     {
-        return new AttachmentTracker(testRunStartedId, testCaseStartedId, testCaseStepId, testRunHookStartedId, _messageFactory, picklePublisher ?? _publisher);
-    }
-    public OutputMessageTracker CreateOutputMessageTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string outputIssuedByHookStartedId, IPublishMessage picklePublisher = null)
-    {
-        return new OutputMessageTracker(testRunStartedId, testCaseStartedId, testCaseStepId, outputIssuedByHookStartedId, _messageFactory, picklePublisher ?? _publisher);
+        return new OutputMessageTracker(testRunStartedId, testCaseStartedId, testCaseStepId, outputIssuedByHookStartedId, messageFactory, picklePublisher ?? publisher);
     }
 }

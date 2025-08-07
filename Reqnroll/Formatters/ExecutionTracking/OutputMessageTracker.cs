@@ -1,7 +1,6 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
-using System.Collections.Generic;
 using System;
 using System.Threading.Tasks;
 using Reqnroll.Formatters.PubSub;
@@ -21,12 +20,12 @@ public class OutputMessageTracker
     public string TestCaseStepId { get; }
     public string TestRunHookStartedId { get; }
 
-    private readonly IPublishMessage _publisher;
+    private readonly IMessagePublisher _publisher;
 
     public string Text { get; private set; }
     public DateTime Timestamp { get; private set; }
 
-    internal OutputMessageTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string outputIssuedByHookStartedId, ICucumberMessageFactory messageFactory, IPublishMessage publisher)
+    internal OutputMessageTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string outputIssuedByHookStartedId, ICucumberMessageFactory messageFactory, IMessagePublisher publisher)
     {
         _messageFactory = messageFactory;
 

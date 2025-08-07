@@ -2,7 +2,6 @@
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System;
-using System.Collections.Generic;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
 
@@ -11,7 +10,7 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// <summary>
 /// Captures information about TestRun Hooks (Before/After TestRun and Before/After Feature)
 /// </summary>
-public class TestRunHookExecutionTracker(string hookStartedId, string testRunId, string hookId, ICucumberMessageFactory messageFactory, IPublishMessage publisher)
+public class TestRunHookExecutionTracker(string hookStartedId, string testRunId, string hookId, ICucumberMessageFactory messageFactory, IMessagePublisher publisher)
 {
     public string TestRunId { get; } = testRunId;
     public string HookId { get; } = hookId;

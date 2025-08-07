@@ -1,13 +1,11 @@
 ﻿using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Events;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Reqnroll.Time;
 using Reqnroll.Bindings;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
@@ -20,11 +18,14 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// </summary>
 public class FeatureExecutionTracker : IFeatureExecutionTracker
 {
-    internal PickleJar _pickleJar;
+    private readonly IPickleExecutionTrackerFactory _pickleExecutionTrackerFactory;
+    private readonly IMessagePublisher _publisher;
 
     // ID Generator to use when generating IDs for TestCase messages and beyond
     public IIdGenerator IdGenerator { get; }
     public string TestRunStartedId { get; }
+
+    public PickleJar PickleJar { get; protected set; }
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
@@ -33,8 +34,6 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
 
     // This maintains the list of PickleExecutionTrackers, identified by (string) PickleID, running within this feature
     private readonly ConcurrentDictionary<string, IPickleExecutionTracker> _pickleExecutionTrackersById = new();
-    private readonly IPickleExecutionTrackerFactory _pickleExecutionTrackerFactory;
-    private readonly IPublishMessage _publisher;
 
     // This dictionary maps from (string) PickleIdIndex to (string) PickleID
     public Dictionary<string, string> PickleIds { get; } = new();
@@ -46,14 +45,15 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
     public IEnumerable<IPickleExecutionTracker> PickleExecutionTrackers => _pickleExecutionTrackersById.Values;
 
     // This constructor is used by the Publisher when it sees a Feature (by name) for the first time
-    public FeatureExecutionTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IReadOnlyDictionary<IBinding, string> stepDefinitionIdsByMethod, IIdGenerator idGenerator, IClock clock, ICucumberMessageFactory messageFactory, IPickleExecutionTrackerFactory pickleExecutionTrackerFactory, IPublishMessage publisher)
+    public FeatureExecutionTracker(FeatureStartedEvent featureStartedEvent, string testRunStartedId, IReadOnlyDictionary<IBinding, string> stepDefinitionIdsByMethod, IIdGenerator idGenerator, IPickleExecutionTrackerFactory pickleExecutionTrackerFactory, IMessagePublisher publisher)
     {
         TestRunStartedId = testRunStartedId;
         StepDefinitionsByBinding = stepDefinitionIdsByMethod;
         IdGenerator = idGenerator;
         FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-        var featureHasCucumberMessages = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages != null && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument != null;
-        featureHasCucumberMessages = featureHasCucumberMessages && featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument() != null;
+        var featureHasCucumberMessages = 
+            featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages is { GherkinDocument: not null } &&
+            featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument() != null;
         Enabled = featureHasCucumberMessages;
         _pickleExecutionTrackerFactory = pickleExecutionTrackerFactory;
         _publisher = publisher;
@@ -75,20 +75,20 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         var gherkinDocument = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument();
         if (gherkinDocument != null) await _publisher.PublishAsync(Envelope.Create(gherkinDocument));
 
-        var featurepickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles().ToList();
-        if (featurepickles != null)
+        var featurePickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles()?.ToList();
+        if (featurePickles != null)
         {
-            for (int i = 0; i < featurepickles.Count; i++)
+            for (int i = 0; i < featurePickles.Count; i++)
             {
-                var p = featurepickles[i];
-                PickleIds.Add(i.ToString(), p.Id);
-                await _publisher.PublishAsync(Envelope.Create(p));
+                var pickle = featurePickles[i];
+                PickleIds.Add(i.ToString(), pickle.Id);
+                await _publisher.PublishAsync(Envelope.Create(pickle));
             }
-            _pickleJar = new PickleJar(featurepickles);
+            PickleJar = new PickleJar(featurePickles);
         }
     }
 
-    // This method is called by the Publisher when the TestRun is completed
+    // This method is called by the CucumberMessagePublisher when the TestRun is completed
     // Since we can't rely on the FeatureFinished event as an indicator of Feature completion (due to parallel execution),
     // this artificial event is used to signal that all Features have been processed and the trackers can be finalized (and publish any messages that are pending).
     public async Task FinalizeTracking()
@@ -96,7 +96,6 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         var pickleExecutionTrackers = PickleExecutionTrackers.ToList();
         foreach (var tracker in pickleExecutionTrackers)
         {
-
             await tracker.FinalizeTracking();
         }
         
@@ -121,11 +120,11 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
 
         if (PickleIds.TryGetValue(pickleIndex, out var pickleId))
         {
-            if (_pickleJar == null)
+            if (PickleJar == null)
                 throw new InvalidOperationException("PickleJar is not properly initialized for Cucumber Messages.");
 
             // Fetch the PickleStepSequence for this Pickle and give to the ScenarioInfo
-            var pickleStepSequence = _pickleJar.PickleStepSequenceFor(pickleIndex);
+            var pickleStepSequence = PickleJar.PickleStepSequenceFor(pickleIndex);
             scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleStepSequence = pickleStepSequence;
 
             // Get: This represents a re-execution of the TestCase

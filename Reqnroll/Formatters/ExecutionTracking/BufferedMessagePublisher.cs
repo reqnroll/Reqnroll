@@ -3,41 +3,41 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
-internal class BufferedMessagePublisher : IPublishMessage
+internal class BufferedMessagePublisher : IMessagePublisher
 {
-    private enum BufferringState
+    private enum BufferingState
     {
         Buffering,
         PassThru
     }
-    private BufferringState _state = BufferringState.Buffering;
-    private readonly List<Envelope> _bufferedMessages = new List<Envelope>();
-    private readonly IPublishMessage _publisher;
+    private BufferingState _state = BufferingState.Buffering;
+    private readonly List<Envelope> _bufferedMessages = new();
+    private readonly IMessagePublisher _publisher;
 
-    public BufferedMessagePublisher(IPublishMessage publisher)
+    public BufferedMessagePublisher(IMessagePublisher publisher)
     {
         _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
     }
-    public async Task PublishAsync(Envelope featureMessages)
+
+    public async Task PublishAsync(Envelope message)
     {
-        if (featureMessages.Content() is TestCase)
+        if (message.Content() is TestCase)
         {
-            await _publisher.PublishAsync(featureMessages);
+            await _publisher.PublishAsync(message);
             await FlushBuffer();
-            _state = BufferringState.PassThru;
+            _state = BufferingState.PassThru;
         }
-        else if (_state == BufferringState.Buffering)
+        else if (_state == BufferingState.Buffering)
         {
-            _bufferedMessages.Add(featureMessages);
+            _bufferedMessages.Add(message);
         }
         else
         {
-            await _publisher.PublishAsync(featureMessages);
+            await _publisher.PublishAsync(message);
         }
     }
 

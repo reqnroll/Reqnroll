@@ -33,8 +33,8 @@ public class PickleExecutionTracker : IPickleExecutionTracker
 {
     private readonly ICucumberMessageFactory _messageFactory;
     private readonly ITestCaseExecutionTrackerFactory _testCaseExecutionTrackerFactory;
-    internal readonly List<TestCaseExecutionTracker> _executionHistory = new();
-    internal TestCaseExecutionTracker _currentTestCaseExecutionTracker;
+    private readonly IMessagePublisher _publisher;
+    private readonly List<TestCaseExecutionTracker> _executionHistory = new();
 
     // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
     public string FeatureName { get; }
@@ -46,9 +46,8 @@ public class PickleExecutionTracker : IPickleExecutionTracker
 
     public string TestCaseId { get; }
 
-    private readonly IPublishMessage _publisher;
-
     public TestCaseTracker TestCaseTracker { get; }
+    public TestCaseExecutionTracker CurrentTestCaseExecutionTracker { get; private set; }
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
@@ -57,9 +56,10 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     public int AttemptCount { get; private set; }
     public bool Finished { get; private set; }
 
-    private bool HasCurrentTestCaseExecution => Enabled && _currentTestCaseExecutionTracker != null;
+    private bool HasCurrentTestCaseExecution => Enabled && CurrentTestCaseExecutionTracker != null;
 
     public ScenarioExecutionStatus ScenarioExecutionStatus => _executionHistory.Last().ScenarioExecutionStatus;
+    public IEnumerable<TestCaseExecutionTracker> ExecutionHistory => _executionHistory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PickleExecutionTracker"/> class for a specific scenario (Pickle).
@@ -77,7 +77,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     /// <param name="messageFactory">The factory responsible for creating Cucumber message objects.</param>
     /// <param name="testCaseExecutionTrackerFactory">The factory for creating TestExecutionTracker objects.</param>
     /// <param name="publisher">The service that publishes Messages to Formatters</param>
-    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, IReadOnlyDictionary<IBinding, string> stepDefinitionsByMethod, DateTime instant, ICucumberMessageFactory messageFactory, ITestCaseExecutionTrackerFactory testCaseExecutionTrackerFactory, IPublishMessage publisher)
+    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, IReadOnlyDictionary<IBinding, string> stepDefinitionsByMethod, DateTime instant, ICucumberMessageFactory messageFactory, ITestCaseExecutionTrackerFactory testCaseExecutionTrackerFactory, IMessagePublisher publisher)
     {
         TestRunStartedId = testRunStartedId;
         PickleId = pickleId;
@@ -96,16 +96,9 @@ public class PickleExecutionTracker : IPickleExecutionTracker
 
     private void SetExecutionRecordAsCurrentlyExecuting(TestCaseExecutionTracker testCaseExecutionTracker)
     {
-        _currentTestCaseExecutionTracker = testCaseExecutionTracker;
+        CurrentTestCaseExecutionTracker = testCaseExecutionTracker;
         if (!_executionHistory.Contains(testCaseExecutionTracker))
             _executionHistory.Add(testCaseExecutionTracker);
-    }
-
-    private Envelope FixupWillBeRetried(Envelope lastRunTestCaseFinishedEnvelope)
-    {
-        var testCaseFinished = lastRunTestCaseFinishedEnvelope.Content() as TestCaseFinished;
-        if (testCaseFinished == null) throw new InvalidOperationException("Invalid TestCaseFinished envelope");
-        return Envelope.Create(new TestCaseFinished(testCaseFinished.TestCaseStartedId, testCaseFinished.Timestamp, true));
     }
 
     public async Task FinalizeTracking()
@@ -115,7 +108,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        await _currentTestCaseExecutionTracker.FinalizeTracking();
+        await CurrentTestCaseExecutionTracker.FinalizeTracking();
     }
 
     public async Task ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
@@ -126,16 +119,16 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         AttemptCount++;
         scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId = PickleId;
 
-        if (AttemptCount > 0)
+        if (AttemptCount > 0 && HasCurrentTestCaseExecution) // HasCurrentTestCaseExecution should be true, but for safety we check
         {
             // A ScenarioStartedEvent with an AttemptCount > 0 indicates a retry of the scenario.
             // We need to publish the TestCaseFinished message for the previous (failed) execution and set it's WillBeRetried property to true.
-            var lastRunTestCaseFinishedEnvelope = Envelope.Create(_messageFactory.ToTestCaseFinished(_currentTestCaseExecutionTracker));
-            lastRunTestCaseFinishedEnvelope = FixupWillBeRetried(lastRunTestCaseFinishedEnvelope);
+            var lastRunTestCaseFinishedEnvelope = Envelope.Create(
+                _messageFactory.ToTestCaseFinished(CurrentTestCaseExecutionTracker, willBeRetried: true));
             await _publisher.PublishAsync(lastRunTestCaseFinishedEnvelope);
             // Reset tracking
             Finished = false;
-            _currentTestCaseExecutionTracker = null;
+            CurrentTestCaseExecutionTracker = null; // will be set again in SetExecutionRecordAsCurrentlyExecuting a few lines below
         }
 
         var testCaseExecutionTracker = _testCaseExecutionTrackerFactory.CreateTestCaseExecutionTracker(this, AttemptCount, TestCaseId, TestCaseTracker, _publisher);
@@ -149,7 +142,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
             return;
 
         Finished = true;
-        await _currentTestCaseExecutionTracker.ProcessEvent(scenarioFinishedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(scenarioFinishedEvent);
     }
 
     public async Task ProcessEvent(StepStartedEvent stepStartedEvent)
@@ -157,7 +150,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        await _currentTestCaseExecutionTracker.ProcessEvent(stepStartedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(stepStartedEvent);
     }
 
     public async Task ProcessEvent(StepFinishedEvent stepFinishedEvent)
@@ -165,7 +158,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        await _currentTestCaseExecutionTracker.ProcessEvent(stepFinishedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(stepFinishedEvent);
     }
 
     public async Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
@@ -177,7 +170,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        await _currentTestCaseExecutionTracker.ProcessEvent(hookBindingStartedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(hookBindingStartedEvent);
     }
 
     public async Task ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
@@ -189,7 +182,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        await _currentTestCaseExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
     }
 
     public async Task ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
@@ -197,7 +190,7 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        await _currentTestCaseExecutionTracker.ProcessEvent(attachmentAddedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(attachmentAddedEvent);
     }
 
     public async Task ProcessEvent(OutputAddedEvent outputAddedEvent)
@@ -205,6 +198,6 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        await _currentTestCaseExecutionTracker.ProcessEvent(outputAddedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(outputAddedEvent);
     }
 }

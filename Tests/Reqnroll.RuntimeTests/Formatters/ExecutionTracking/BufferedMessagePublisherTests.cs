@@ -29,7 +29,7 @@ public class BufferedMessagePublisherTests
     [Fact]
     public async Task BuffersNonTestCaseMessagesUntilTestCaseIsPublished()
     {
-        var publisherMock = new Mock<IPublishMessage>();
+        var publisherMock = new Mock<IMessagePublisher>();
         var sut = new BufferedMessagePublisher(publisherMock.Object);
         var attachmentEnvelope = CreateEnvelopeWithAttachment();
         await sut.PublishAsync(attachmentEnvelope);
@@ -39,7 +39,7 @@ public class BufferedMessagePublisherTests
     [Fact]
     public async Task FlushesBufferAndSwitchesToPassThruAfterTestCaseIsPublished()
     {
-        var publisherMock = new Mock<IPublishMessage>();
+        var publisherMock = new Mock<IMessagePublisher>();
         var sut = new BufferedMessagePublisher(publisherMock.Object);
         var attachmentEnvelope = CreateEnvelopeWithAttachment();
         var testCaseEnvelope = CreateEnvelopeWithTestCase();
@@ -52,7 +52,7 @@ public class BufferedMessagePublisherTests
     [Fact]
     public async Task PassesThroughMessagesAfterTestCaseIsPublished()
     {
-        var publisherMock = new Mock<IPublishMessage>();
+        var publisherMock = new Mock<IMessagePublisher>();
         var sut = new BufferedMessagePublisher(publisherMock.Object);
         var testCaseEnvelope = CreateEnvelopeWithTestCase();
         var attachmentEnvelope = CreateEnvelopeWithAttachment();
@@ -65,7 +65,7 @@ public class BufferedMessagePublisherTests
     [Fact]
     public void ThrowsArgumentNullExceptionIfPublisherIsNull()
     {
-        Action act = () => new BufferedMessagePublisher(null!);
+        Action act = () => { _ = new BufferedMessagePublisher(null!); };
         act.Should().Throw<ArgumentNullException>();
     }
 }

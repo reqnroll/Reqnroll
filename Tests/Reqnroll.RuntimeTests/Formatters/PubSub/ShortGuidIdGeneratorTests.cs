@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
@@ -9,34 +8,28 @@ public class ShortGuidIdGeneratorTests
     [Fact]
     public void GetNewId_ReturnsNonEmptyString()
     {
-        using (var generator = new ShortGuidIdGenerator())
-        {
-            var id = generator.GetNewId();
-            Assert.False(string.IsNullOrWhiteSpace(id));
-        }
+        using var generator = new ShortGuidIdGenerator();
+        var id = generator.GetNewId();
+        Assert.False(string.IsNullOrWhiteSpace(id));
     }
 
     [Fact]
     public void GetNewId_ReturnsUniqueIds()
     {
-        using (var generator = new ShortGuidIdGenerator())
-        {
-            var id1 = generator.GetNewId();
-            var id2 = generator.GetNewId();
-            Assert.NotEqual(id1, id2);
-        }
+        using var generator = new ShortGuidIdGenerator();
+        var id1 = generator.GetNewId();
+        var id2 = generator.GetNewId();
+        Assert.NotEqual(id1, id2);
     }
 
     [Fact]
     public void GetNewId_ReturnsBase64UrlSafeString()
     {
-        using (var generator = new ShortGuidIdGenerator())
-        {
-            var id = generator.GetNewId();
-            Assert.DoesNotContain('+', id);
-            Assert.DoesNotContain('/', id);
-            Assert.DoesNotContain('=', id);
-        }
+        using var generator = new ShortGuidIdGenerator();
+        var id = generator.GetNewId();
+        Assert.DoesNotContain('+', id);
+        Assert.DoesNotContain('/', id);
+        Assert.DoesNotContain('=', id);
     }
 
     [Fact]

@@ -3,7 +3,7 @@ using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.Formatters.PubSub;
 
-public interface IPublishMessage
+public interface IMessagePublisher
 {
-    Task PublishAsync(Envelope featureMessages);
+    Task PublishAsync(Envelope message);
 }

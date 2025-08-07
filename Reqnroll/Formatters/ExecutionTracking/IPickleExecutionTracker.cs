@@ -1,5 +1,4 @@
 ﻿using Gherkin.CucumberMessages;
-using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.Events;
 using System;

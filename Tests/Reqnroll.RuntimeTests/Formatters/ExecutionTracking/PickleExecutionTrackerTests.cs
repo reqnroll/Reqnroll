@@ -26,8 +26,7 @@ public class PickleExecutionTrackerTests
 {
     private readonly Mock<IIdGenerator> _mockIdGenerator;
     private readonly Mock<ICucumberMessageFactory> _mockMessageFactory;
-    private readonly Mock<IPublishMessage> _mockPublisher;
-    private readonly IStepTrackerFactory _stepTrackerFactory;
+    private readonly Mock<IMessagePublisher> _mockPublisher;
     private readonly ITestCaseExecutionTrackerFactory _stubTestCaseExecutionTrackerFactory;
     private FeatureInfo _featureInfoStub;
     private FeatureContext _featureContextStub;
@@ -37,18 +36,18 @@ public class PickleExecutionTrackerTests
     private Mock<IContextManager> _mockContextManager;
     private readonly Mock<IHookBinding> _mockHookBinding;
     private readonly ConcurrentDictionary<IBinding, string> _stepDefinitionsByMethodSignature;
-    private readonly Timestamp _testTime = new Timestamp(0, 1);
+    private readonly Timestamp _testTime = new(0, 1);
     private readonly ObjectContainer _objectContainerStub = new();
 
     public PickleExecutionTrackerTests()
     {
         _mockIdGenerator = new Mock<IIdGenerator>();
         _mockIdGenerator.Setup(x => x.GetNewId()).Returns("test-id");
-        _mockPublisher = new Mock<IPublishMessage>();
+        _mockPublisher = new Mock<IMessagePublisher>();
         _mockMessageFactory = new Mock<ICucumberMessageFactory>();
 
-        _stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object);
-        _stubTestCaseExecutionTrackerFactory = new TestCaseExecutionTrackerFactory(_mockIdGenerator.Object, _mockMessageFactory.Object, _mockPublisher.Object, _stepTrackerFactory);
+        IStepTrackerFactory stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object);
+        _stubTestCaseExecutionTrackerFactory = new TestCaseExecutionTrackerFactory(_mockIdGenerator.Object, _mockMessageFactory.Object, _mockPublisher.Object, stepTrackerFactory);
 
         SetupMockContexts();
 
@@ -66,8 +65,8 @@ public class PickleExecutionTrackerTests
             .Returns(new TestCaseStarted(0, "test-case-started-id", "test-id", "", _testTime));
 
         _mockMessageFactory
-            .Setup(m => m.ToTestCaseFinished(It.IsAny<TestCaseExecutionTracker>()))
-            .Returns(new TestCaseFinished("test-case-started-id", _testTime, false));
+            .Setup(m => m.ToTestCaseFinished(It.IsAny<TestCaseExecutionTracker>(), It.IsAny<bool>()))
+            .Returns((TestCaseExecutionTracker _, bool willBeRetried) => new TestCaseFinished("test-case-started-id", _testTime, willBeRetried));
 
         _mockMessageFactory
             .Setup(m => m.ToTestStepStarted(It.IsAny<TestStepExecutionTracker>()))
@@ -242,11 +241,11 @@ public class PickleExecutionTrackerTests
         await tracker.ProcessEvent(stepFinishedEvent);
 
         // Assert - check the internal _currentTestCaseExecutionTracker
-        tracker._currentTestCaseExecutionTracker.Should().NotBeNull();
-        tracker._executionHistory.Should().NotBeEmpty();
+        tracker.CurrentTestCaseExecutionTracker.Should().NotBeNull();
+        tracker.ExecutionHistory.Should().NotBeEmpty();
 
         // Assert there is exactly one execution record
-        tracker._executionHistory.Should().HaveCount(1);
+        tracker.ExecutionHistory.Should().HaveCount(1);
     }
 
     [Fact]
@@ -269,11 +268,11 @@ public class PickleExecutionTrackerTests
         await tracker.ProcessEvent(hookFinishedEvent);
 
         // Assert - check the internal _currentTestCaseExecutionTracker
-        tracker._currentTestCaseExecutionTracker.Should().NotBeNull();
-        tracker._executionHistory.Should().NotBeEmpty();
+        tracker.CurrentTestCaseExecutionTracker.Should().NotBeNull();
+        tracker.ExecutionHistory.Should().NotBeEmpty();
 
         // Assert there is exactly one execution record
-        tracker._executionHistory.Should().HaveCount(1);
+        tracker.ExecutionHistory.Should().HaveCount(1);
     }
 
     [Fact]
@@ -344,26 +343,6 @@ public class PickleExecutionTrackerTests
 
         // Assert
         _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()), Times.Once);
-    }
-
-    [Fact]
-    public void FixupWillBeRetried_SetsWillBeRetriedFlagToTrue()
-    {
-        // Arrange
-        var tracker = CreatePickleExecTracker();
-        var testCaseFinished = new TestCaseFinished("test-case-started-id", _testTime, false);
-        var envelope = Envelope.Create(testCaseFinished);
-
-        // Act
-        var fixedEnvelope = (Envelope)typeof(PickleExecutionTracker)
-                                      .GetMethod("FixupWillBeRetried", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)!
-                                      .Invoke(tracker, [envelope]);
-
-        var fixedTestCaseFinished = fixedEnvelope.Content() as TestCaseFinished;
-
-        // Assert
-        fixedTestCaseFinished.Should().NotBeNull();
-        fixedTestCaseFinished!.WillBeRetried.Should().BeTrue();
     }
 
     private PickleExecutionTracker CreatePickleExecTracker()

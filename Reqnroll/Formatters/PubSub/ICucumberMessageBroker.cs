@@ -1,9 +1,6 @@
-﻿using System.Threading.Tasks;
-using Io.Cucumber.Messages.Types;
+﻿namespace Reqnroll.Formatters.PubSub;
 
-namespace Reqnroll.Formatters.PubSub;
-
-public interface ICucumberMessageBroker : IPublishMessage
+public interface ICucumberMessageBroker : IMessagePublisher
 {
     bool IsEnabled { get; }
 
