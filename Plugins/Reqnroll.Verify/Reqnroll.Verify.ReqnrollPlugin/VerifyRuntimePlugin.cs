@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using Reqnroll.Verify.ReqnrollPlugin;
@@ -37,17 +36,18 @@ public class VerifyRuntimePlugin : IRuntimePlugin
                 var settings = new VerifySettings();
                 string projectDirectory = Directory.GetCurrentDirectory().Split([@"\bin\"], StringSplitOptions.RemoveEmptyEntries).First();
 
-                settings.UseDirectory(Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath));
-                settings.UseTypeName(featureContext.FeatureInfo.Title);
-
-                var methodNameBuilder = new StringBuilder(scenarioContext.ScenarioInfo.Title);
-
+                // Use UseFileName to replicate the PathInfo behavior that was in the static configuration
+                var scenarioTitle = scenarioContext.ScenarioInfo.Title;
                 foreach (DictionaryEntry entry in scenarioContext.ScenarioInfo.Arguments)
                 {
-                    methodNameBuilder.AppendFormat("_{0}", entry.Value);
+                    scenarioTitle += "_" + entry.Value;
                 }
 
-                settings.UseMethodName(methodNameBuilder.ToString());
+                var fileName = $"{featureContext.FeatureInfo.Title}.{scenarioTitle}";
+                var directory = Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath);
+                
+                settings.UseDirectory(directory);
+                settings.UseFileName(fileName);
 
                 return settings;
             });
