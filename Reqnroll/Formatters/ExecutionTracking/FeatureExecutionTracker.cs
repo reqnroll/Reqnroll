@@ -51,10 +51,7 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         StepDefinitionsByBinding = stepDefinitionIdsByMethod;
         IdGenerator = idGenerator;
         FeatureName = featureStartedEvent.FeatureContext.FeatureInfo.Title;
-        var featureHasCucumberMessages = 
-            featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages is { GherkinDocument: not null } &&
-            featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument() != null;
-        Enabled = featureHasCucumberMessages;
+        Enabled = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages?.HasMessages ?? false;
         _pickleExecutionTrackerFactory = pickleExecutionTrackerFactory;
         _publisher = publisher;
     }
@@ -69,13 +66,13 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
             return;
         }
 
-        var source = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source();
+        var source = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Source;
         if (source != null) await _publisher.PublishAsync(Envelope.Create(source));
 
-        var gherkinDocument = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument();
+        var gherkinDocument = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.GherkinDocument;
         if (gherkinDocument != null) await _publisher.PublishAsync(Envelope.Create(gherkinDocument));
 
-        var featurePickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles()?.ToList();
+        var featurePickles = featureStartedEvent.FeatureContext.FeatureInfo.FeatureCucumberMessages.Pickles?.ToList();
         if (featurePickles != null)
         {
             for (int i = 0; i < featurePickles.Count; i++)
