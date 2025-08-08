@@ -2,10 +2,12 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
+using System.Text;
 using Reqnroll.Plugins;
 using Reqnroll.UnitTestProvider;
 using Reqnroll.Verify.ReqnrollPlugin;
 using VerifyTests;
+using VerifyXunit;
 
 [assembly: RuntimePlugin(typeof(VerifyRuntimePlugin))]
 
@@ -39,13 +41,14 @@ public class VerifyRuntimePlugin : IRuntimePlugin
                 settings.UseDirectory(Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath));
                 settings.UseTypeName(featureContext.FeatureInfo.Title);
 
-                var scenarioTitle = scenarioContext.ScenarioInfo.Title;
+                var methodNameBuilder = new StringBuilder(scenarioContext.ScenarioInfo.Title);
+
                 foreach (DictionaryEntry entry in scenarioContext.ScenarioInfo.Arguments)
                 {
-                    scenarioTitle += "_" + entry.Value;
+                    methodNameBuilder.AppendFormat("_{0}", entry.Value);
                 }
 
-                settings.UseMethodName(scenarioTitle);
+                settings.UseMethodName(methodNameBuilder.ToString());
 
                 return settings;
             });
