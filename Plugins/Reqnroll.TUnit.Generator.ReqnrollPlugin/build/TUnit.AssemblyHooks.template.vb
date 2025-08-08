@@ -9,14 +9,14 @@ Imports TUnit.Core
 
 <GeneratedCode("Reqnroll", "REQNROLL_VERSION")>
 Public NotInheritable Class PROJECT_ROOT_NAMESPACE_TUnitAssemblyHooks
-    <TUnit.Core.Before(HookType.Assembly)>
+    <Global.TUnit.Core.Before(Assembly)>
     <MethodImpl(MethodImplOptions.NoInlining)>
     Public Shared Async Function AssemblyInitializeAsync() As Task
         Dim currentAssembly As Assembly = GetType(PROJECT_ROOT_NAMESPACE_TUnitAssemblyHooks).Assembly
         Await Global.Reqnroll.TestRunnerManager.OnTestRunStartAsync(currentAssembly)
     End Function
 
-    <TUnit.Core.After(HookType.Assembly)>
+    <Global.TUnit.Core.After(Assembly)>
     <MethodImpl(MethodImplOptions.NoInlining)>
     Public Shared Async Function AssemblyCleanupAsync() As Task
         Dim currentAssembly As Assembly = GetType(PROJECT_ROOT_NAMESPACE_TUnitAssemblyHooks).Assembly

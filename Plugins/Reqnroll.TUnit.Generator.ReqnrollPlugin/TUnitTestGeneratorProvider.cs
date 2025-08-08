@@ -96,9 +96,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
             generationContext.TestClassInitializeMethod,
             BEFORE_ATTR,
             new CodeAttributeArgument(
-                new CodeFieldReferenceExpression(
-                    new CodeTypeReferenceExpression("TUnit.Core.HookType"),
-                    "Class")));
+                new CodeVariableReferenceExpression("Class")));
         generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;
     }
 
@@ -109,9 +107,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
             generationContext.TestClassCleanupMethod,
             AFTER_ATTR,
             new CodeAttributeArgument(
-                new CodeFieldReferenceExpression(
-                    new CodeTypeReferenceExpression("TUnit.Core.HookType"),
-                    "Class")));
+                new CodeVariableReferenceExpression("Class")));
         generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
 
     }
@@ -123,9 +119,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
             generationContext.TestInitializeMethod,
             BEFORE_ATTR,
             new CodeAttributeArgument(
-                new CodeFieldReferenceExpression(
-                    new CodeTypeReferenceExpression("TUnit.Core.HookType"),
-                    "Test")));
+                new CodeVariableReferenceExpression("Test")));
     }
 
     public void SetTestCleanupMethod(TestClassGenerationContext generationContext)
@@ -135,9 +129,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
             generationContext.TestCleanupMethod,
             AFTER_ATTR,
             new CodeAttributeArgument(
-                new CodeFieldReferenceExpression(
-                    new CodeTypeReferenceExpression("TUnit.Core.HookType"),
-                    "Test")));
+                new CodeVariableReferenceExpression("Test")));
 
     }
 
@@ -175,12 +167,9 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
 
         var tagsArray = tags.ToArray();
 
-        // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://youtrack.jetbrains.com/issue/RSRP-279138
-        var hasExampleTags = tagsArray.Any();
+        // TUnit 0.52.56+ expects an empty string array instead of null for tags
         var exampleTagExpressionList = tagsArray.Select(t => (CodeExpression)new CodePrimitiveExpression(t));
-        var exampleTagsExpression = hasExampleTags
-            ? new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray())
-            : (CodeExpression)new CodePrimitiveExpression(null);
+        var exampleTagsExpression = new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray());
 
         args.Add(new CodeAttributeArgument(exampleTagsExpression));
 
