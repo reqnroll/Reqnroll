@@ -19,9 +19,6 @@ Unless overwritten by using the Reqnroll configuration file and/or environment v
 * - Setting
   - Value
   - Description
-* - Enabled
-  - `true`
-  - Controls whether Reqnroll formatters will be enabled during test execution.
 * - HTML Formatter outputFilePath
   - `reqnroll_report.html`
   - Default output file path for the HTML formatter (relative to project output folder)
@@ -156,16 +153,15 @@ export REQNROLL_FORMATTERS_DISABLED=false
 
 #### REQNROLL_FORMATTERS
 
-**Description:** Allows overriding the entire `formatters` section of the `reqnroll.json` configuration file using JSON format.
+**Description:** Overrides the `formatters` section of the `reqnroll.json` configuration file using JSON format.
 
 **Default Value:** Not set (uses configuration file settings)
 
-**Behavior:** When set, completely replaces the `formatters` section from the configuration file.
+**Behavior:** When set, replaces the named `formatters` sub-section(s) from the configuration file.
 
 ```{note}
-When using an environment variable to overwrite the `formatters` section of the `reqnroll.json` configuration file, the value of the environment variable replaces the `formatters` element in its entirety.
+When using an environment variable to override a `formatters` section, the value of the environment variable must be properly escaped (appropriate to your shell) to remain a valid json representation of the configuration setting.
 ```
-
 ### Environment Variable Configuration Examples
 
 #### Enable HTML formatter with default settings:
