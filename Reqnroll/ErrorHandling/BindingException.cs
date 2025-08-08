@@ -7,7 +7,7 @@ namespace Reqnroll
     [Serializable]
     public class BindingException : ReqnrollException
     {
-        public BindingException()
+        public BindingException() : base("Binding error occurred.")
         {
         }
 

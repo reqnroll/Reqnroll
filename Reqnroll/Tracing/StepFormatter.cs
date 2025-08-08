@@ -37,6 +37,10 @@ namespace Reqnroll.Tracing
 
         public string GetMatchText(BindingMatch match, object[] arguments)
         {
+            if (match?.StepBinding?.Method == null)
+            {
+                return "Unknown step definition";
+            }
             return GetMatchText(match.StepBinding.Method, arguments);
         }
 

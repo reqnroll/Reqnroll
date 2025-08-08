@@ -15,9 +15,10 @@ namespace Reqnroll.Tracing
         void TraceStep(StepInstance stepInstance, bool showAdditionalArguments);
         void TraceWarning(string text);
         void TraceStepDone(BindingMatch match, object[] arguments, TimeSpan duration);
-        void TraceStepSkipped();
-        void TraceStepPending(BindingMatch match, object[] arguments);
-        void TraceBindingError(BindingException ex);
+        void TraceStepSkipped(Exception exception);
+        void TraceStepSkippedBecauseOfPreviousErrors();
+        void TraceStepPending(BindingMatch match, object[] arguments, Exception exception);
+        void TraceBindingError(Exception ex);
         void TraceError(Exception ex, TimeSpan duration);
         void TraceNoMatchingStepDefinition(StepInstance stepInstance, ProgrammingLanguage targetLanguage, CultureInfo bindingCulture, List<BindingMatch> matchesWithoutScopeCheck);
         void TraceDuration(TimeSpan elapsed, IBindingMethod method, object[] arguments);
@@ -66,19 +67,27 @@ namespace Reqnroll.Tracing
             );
         }
 
-        public void TraceStepSkipped()
+        public void TraceStepSkipped(Exception exception)
+        {
+            traceListener.WriteToolOutput("{0}: {1}",
+                colorOutputHelper.Colorize("skipped", colorOutputTheme.Warning),
+                string.IsNullOrEmpty(exception?.Message) ? "Step skipped." : exception.Message);
+        }
+
+        public void TraceStepSkippedBecauseOfPreviousErrors()
         {
             traceListener.WriteToolOutput("skipped because of previous errors");
         }
 
-        public void TraceStepPending(BindingMatch match, object[] arguments)
+        public void TraceStepPending(BindingMatch match, object[] arguments, Exception exception)
         {
-            traceListener.WriteToolOutput("{0}: {1}",
+            traceListener.WriteToolOutput("{0}: {1}: {2}",
                 colorOutputHelper.Colorize("pending", colorOutputTheme.Warning),
-                stepFormatter.GetMatchText(match, arguments));
+                stepFormatter.GetMatchText(match, arguments),
+                exception?.Message ?? PendingStepException.GenericErrorMessage);
         }
 
-        public void TraceBindingError(BindingException ex)
+        public void TraceBindingError(Exception ex)
         {
             traceListener.WriteToolOutput("{0}: {1}", colorOutputHelper.Colorize("binding error", colorOutputTheme.Error), ex.Message);
         }

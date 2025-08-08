@@ -16,7 +16,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         private void RegisterFailingHook(List<IHookBinding> hooks)
         {
             var hookMock = CreateHookMock(hooks);
-            methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, contextManagerStub.Object, null, testTracerStub.Object, It.IsAny<DurationHolder>()))
+            _methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()))
                                     .ThrowsAsync(new Exception(SimulatedErrorMessage));
         }
 
@@ -35,7 +35,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            RegisterFailingHook(beforeTestRunEvents);
+            RegisterFailingHook(_beforeTestRunEvents);
             Func<Task> act = async () => await testExecutionEngine.OnTestRunStartAsync();
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
@@ -58,7 +58,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            RegisterFailingHook(afterTestRunEvents);
+            RegisterFailingHook(_afterTestRunEvents);
             Func<Task> act = async () => await testExecutionEngine.OnTestRunEndAsync();
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
@@ -70,7 +70,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            await testExecutionEngine.OnFeatureStartAsync(featureInfo);
+            await testExecutionEngine.OnFeatureStartAsync(_featureInfo);
 
             _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeFeature, It.IsAny<IObjectContainer>()));
         }
@@ -80,8 +80,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            RegisterFailingHook(beforeFeatureEvents);
-            Func<Task> act = async () => await testExecutionEngine.OnFeatureStartAsync(featureInfo);
+            RegisterFailingHook(_beforeFeatureEvents);
+            Func<Task> act = async () => await testExecutionEngine.OnFeatureStartAsync(_featureInfo);
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
             _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeFeature, It.IsAny<IObjectContainer>()));
@@ -103,7 +103,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            RegisterFailingHook(afterFeatureEvents);
+            RegisterFailingHook(_afterFeatureEvents);
             Func<Task> act = async () => await testExecutionEngine.OnFeatureEndAsync();
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
@@ -126,7 +126,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            RegisterFailingHook(beforeScenarioEvents);
+            RegisterFailingHook(_beforeScenarioEvents);
             Func<Task> act = async () =>
             {
                 //NOTE: the exception will be re-thrown in the OnAfterLastStep
@@ -154,7 +154,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            RegisterFailingHook(afterScenarioEvents);
+            RegisterFailingHook(_afterScenarioEvents);
             Func<Task> act = async () => await testExecutionEngine.OnScenarioEndAsync();
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
@@ -177,7 +177,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
             RegisterStepDefinition();
-            RegisterFailingHook(beforeStepEvents);
+            RegisterFailingHook(_beforeStepEvents);
 
             Func<Task> act = async () =>
             {
@@ -206,7 +206,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
             RegisterStepDefinition();
-            RegisterFailingHook(afterStepEvents);
+            RegisterFailingHook(_afterStepEvents);
 
             Func<Task> act = async () =>
             {
