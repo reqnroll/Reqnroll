@@ -36,18 +36,16 @@ public class VerifyRuntimePlugin : IRuntimePlugin
                 var settings = new VerifySettings();
                 string projectDirectory = Directory.GetCurrentDirectory().Split([@"\bin\"], StringSplitOptions.RemoveEmptyEntries).First();
 
-                // Use UseFileName to replicate the PathInfo behavior that was in the static configuration
+                settings.UseDirectory(Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath));
+                settings.UseTypeName(featureContext.FeatureInfo.Title);
+
                 var scenarioTitle = scenarioContext.ScenarioInfo.Title;
                 foreach (DictionaryEntry entry in scenarioContext.ScenarioInfo.Arguments)
                 {
                     scenarioTitle += "_" + entry.Value;
                 }
 
-                var fileName = $"{featureContext.FeatureInfo.Title}.{scenarioTitle}";
-                var directory = Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath);
-                
-                settings.UseDirectory(directory);
-                settings.UseFileName(fileName);
+                settings.UseMethodName(scenarioTitle);
 
                 return settings;
             });
