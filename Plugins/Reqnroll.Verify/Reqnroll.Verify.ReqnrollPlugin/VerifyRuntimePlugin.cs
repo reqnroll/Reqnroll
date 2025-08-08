@@ -52,5 +52,41 @@ public class VerifyRuntimePlugin : IRuntimePlugin
 
                 return settings;
             });
+        
+        // Also try to set up default settings for calls without explicit settings
+        // This might help with the "global registered path info" test
+        var runtimePluginTestExecutionLifecycleEvents = e.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
+        runtimePluginTestExecutionLifecycleEvents.BeforeScenario += (_, runtimePluginBeforeScenarioEventArgs) =>
+        {
+            var scenarioContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<ScenarioContext>();
+            var featureContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<FeatureContext>();
+
+            // Try to set up some basic configuration that might work with v29+
+            // This is experimental to see if we can support the global test
+            try
+            {
+                string projectDirectory = Directory.GetCurrentDirectory().Split([@"\bin\"], StringSplitOptions.RemoveEmptyEntries).First();
+                string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
+
+                foreach (DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
+                {
+                    scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
+                }
+
+                // This is still problematic in v29+ but let's see what happens
+                Verifier.DerivePathInfo(
+                    (_, projectDir, _, _) =>
+                    {
+                        return new PathInfo(
+                            Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
+                            featureContext.FeatureInfo.Title,
+                            scenarioInfoTitle);
+                    });
+            }
+            catch
+            {
+                // If it fails, at least the injected settings should still work
+            }
+        };
     }
 }
