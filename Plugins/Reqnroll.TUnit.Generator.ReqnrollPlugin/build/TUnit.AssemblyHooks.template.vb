@@ -7,6 +7,8 @@ Imports System.Reflection
 Imports System.Runtime.CompilerServices
 Imports TUnit.Core
 
+<Assembly: TUnit.Core.Parallelizable>
+
 <GeneratedCode("Reqnroll", "REQNROLL_VERSION")>
 Public NotInheritable Class PROJECT_ROOT_NAMESPACE_TUnitAssemblyHooks
     <Global.TUnit.Core.Before(Assembly)>
