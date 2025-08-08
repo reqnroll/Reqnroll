@@ -150,7 +150,9 @@ namespace Reqnroll.Tracing
                stepDefinitionSkeletonProvider.GetStepDefinitionSkeleton(targetLanguage, stepInstance, reqnrollConfiguration.StepDefinitionSkeletonStyle, bindingCulture)
                     .Indent(StepDefinitionSkeletonProvider.METHOD_INDENT));
 
-            traceListener.WriteToolOutput(message.ToString());
+            traceListener.WriteToolOutput("{0}: {1}",
+                colorOutputHelper.Colorize("undefined", colorOutputTheme.Warning),
+                message.ToString());
         }
 
         public void TraceDuration(TimeSpan elapsed, IBindingMethod method, object[] arguments)

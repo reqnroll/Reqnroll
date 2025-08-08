@@ -1,12 +1,7 @@
-using System;
-using System.Diagnostics;
-using System.Linq;
-using System.Runtime.ExceptionServices;
-using System.Threading.Tasks;
-using Reqnroll.BoDi;
 using Reqnroll.Analytics;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
@@ -14,6 +9,12 @@ using Reqnroll.PlatformCompatibility;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Infrastructure
 {
@@ -543,6 +544,7 @@ namespace Reqnroll.Infrastructure
 
             BindingMatch match = null;
             object[] arguments = null;
+            List<BindingMatch> candidatingMatches = null;
             var durationHolder = new DurationHolder();
 
             // 1. Find matching step
@@ -552,7 +554,7 @@ namespace Reqnroll.Infrastructure
                     // GetStepMatch might throw
                     // - BindingException when the binding registry is invalid, e.g. because of an invalid regex
                     // - MissingStepDefinitionException when step is undefined
-                    match = GetStepMatch(stepInstance);
+                    match = GetStepMatch(stepInstance, out candidatingMatches);
                     contextManager.StepContext.StepInfo.BindingMatch = match;
                     contextManager.StepContext.StepInfo.StepInstance = stepInstance;
                     return Task.CompletedTask;
@@ -624,7 +626,7 @@ namespace Reqnroll.Infrastructure
             finally
             {
                 // 7. Trace result & set scenario execution status
-                TraceStepExecutionResult(stepStatus, stepException, durationHolder.Duration, match, arguments, isStepSkippedBecauseOfPreviousErrors);
+                TraceStepExecutionResult(stepStatus, stepException, durationHolder.Duration, match, arguments, isStepSkippedBecauseOfPreviousErrors, stepInstance, candidatingMatches);
                 if (stepStatus != ScenarioExecutionStatus.OK)
                     UpdateStatusOnStepFailure(stepStatus, stepException);
 
@@ -654,7 +656,15 @@ namespace Reqnroll.Infrastructure
             }
         }
 
-        private void TraceStepExecutionResult(ScenarioExecutionStatus status, Exception exception, TimeSpan duration, BindingMatch match, object[] arguments, bool isStepSkippedBecauseOfPreviousErrors)
+        private void TraceStepExecutionResult(
+            ScenarioExecutionStatus status,
+            Exception exception,
+            TimeSpan duration,
+            BindingMatch match,
+            object[] arguments,
+            bool isStepSkippedBecauseOfPreviousErrors,
+            StepInstance stepInstance,
+            List<BindingMatch> candidatingMatches)
         {
             switch (status)
             {
@@ -667,7 +677,8 @@ namespace Reqnroll.Infrastructure
                     _contextManager.ScenarioContext.PendingSteps.Add(_stepFormatter.GetMatchText(match, arguments));
                     return;
                 case ScenarioExecutionStatus.UndefinedStep:
-                    //TODO: nop???
+                    _testTracer.TraceNoMatchingStepDefinition(stepInstance, FeatureContext.FeatureInfo.GenerationTargetLanguage, FeatureContext.BindingCulture, candidatingMatches);
+                    _contextManager.ScenarioContext.MissingSteps.Add(stepInstance);
                     return;
                 case ScenarioExecutionStatus.BindingError:
                     _testTracer.TraceBindingError(exception);
@@ -707,12 +718,12 @@ namespace Reqnroll.Infrastructure
             }
         }
 
-        protected virtual BindingMatch GetStepMatch(StepInstance stepInstance)
+        protected virtual BindingMatch GetStepMatch(StepInstance stepInstance, out List<BindingMatch> candidatingMatches)
         {
             if (!_bindingRegistry.IsValid)
                 throw _errorProvider.GetInvalidBindingRegistryError(_bindingRegistry.GetErrorMessages());
 
-            var match = _stepDefinitionMatchService.GetBestMatch(stepInstance, FeatureContext.BindingCulture, out var ambiguityReason, out var candidatingMatches);
+            var match = _stepDefinitionMatchService.GetBestMatch(stepInstance, FeatureContext.BindingCulture, out var ambiguityReason, out candidatingMatches);
 
             if (match.Success)
                 return match;
@@ -726,8 +737,6 @@ namespace Reqnroll.Infrastructure
                     throw _errorProvider.GetAmbiguousBecauseParamCheckMatchError(candidatingMatches, stepInstance);
             }
 
-            _testTracer.TraceNoMatchingStepDefinition(stepInstance, FeatureContext.FeatureInfo.GenerationTargetLanguage, FeatureContext.BindingCulture, candidatingMatches);
-            _contextManager.ScenarioContext.MissingSteps.Add(stepInstance);
             throw _errorProvider.GetMissingStepDefinitionError();
         }
 
