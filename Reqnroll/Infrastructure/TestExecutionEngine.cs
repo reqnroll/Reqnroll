@@ -206,14 +206,11 @@ namespace Reqnroll.Infrastructure
             {
                 await FireScenarioEventsAsync(HookType.BeforeScenario);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                //TODO: this code is strange... is this needed at all?
-                if (_contextManager.ScenarioContext != null)
-                {
-                    _contextManager.ScenarioContext.ScenarioExecutionStatus = ScenarioExecutionStatus.TestError;
-                    _contextManager.ScenarioContext.TestError = ex;
-                }
+                // Removed code that sets the ScenarioContext.TestError and ScenarioContext.ScenarioExecutionStatus, because
+                // FireEventsAsync called by FireScenarioEventsAsync sets *Context.TestError and ScenarioContext.ScenarioExecutionStatus.
+                // The fact that the exception is not rethrown here is suspicious, but it is the current behavior. We need to check it eventually.
             }
         }
 
@@ -531,7 +528,8 @@ namespace Reqnroll.Infrastructure
                 {
                     stepStatus = GetStatusFromException(ex);
                     stepException = ex;
-                    if (reThrow && _reqnrollConfiguration.StopAtFirstError) //TODO: only here?
+                    // we only throw the exception in this branch to keep the original behavior, but maybe this should be done in the others too
+                    if (reThrow && _reqnrollConfiguration.StopAtFirstError)
                         throw;
                 }
             }
