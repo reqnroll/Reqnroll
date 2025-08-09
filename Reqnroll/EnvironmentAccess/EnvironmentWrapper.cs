@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Reqnroll.CommonModels;
 
 namespace Reqnroll.EnvironmentAccess
@@ -36,5 +38,17 @@ namespace Reqnroll.EnvironmentAccess
         }
 
         public string GetCurrentDirectory() => Environment.CurrentDirectory;
+
+        public IResult<IEnumerable<string>> GetEnvironmentVariableNames(string prefix)
+        {
+            var list = Environment.GetEnvironmentVariables().Keys.Cast<string>();
+            
+            if (!string.IsNullOrEmpty(prefix))
+            {
+                list = list.Where(k => k.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase)).ToList();
+            }
+
+            return Result<IEnumerable<string>>.Success(list);
+        }
     }
 }

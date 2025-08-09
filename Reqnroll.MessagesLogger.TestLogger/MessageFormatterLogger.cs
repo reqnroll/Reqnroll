@@ -1,0 +1,14 @@
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+namespace FormattersTestLogger;
+
+[FriendlyName("message-formatter")]
+[ExtensionUri("logger://formattermessagelogger")]
+public class MessageFormatterLogger : FormatterLoggerBase, ITestLoggerWithParameters
+{
+    public MessageFormatterLogger()
+    {
+        _formatterName = "message";
+    }
+}

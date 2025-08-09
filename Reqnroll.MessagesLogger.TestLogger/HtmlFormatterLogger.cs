@@ -1,0 +1,14 @@
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+
+namespace FormattersTestLogger;
+
+[FriendlyName("html-formatter")]
+[ExtensionUri("logger://formatterhtmllogger")]
+public class HtmlFormatterLogger : FormatterLoggerBase, ITestLoggerWithParameters
+{
+    public HtmlFormatterLogger()
+    {
+        _formatterName = "html";
+    }
+}
