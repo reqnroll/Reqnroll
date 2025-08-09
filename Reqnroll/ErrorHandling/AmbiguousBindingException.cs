@@ -17,10 +17,6 @@ public class AmbiguousBindingException : BindingException
 {
     public IEnumerable<BindingMatch> Matches { get; private set; }
 
-    public AmbiguousBindingException()
-    {
-    }
-
     public AmbiguousBindingException(string message) : base(message)
     {
     }
