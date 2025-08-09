@@ -10,7 +10,7 @@ public class BuiltInCucumberExpressionParameterTypeTransformation : ICucumberExp
     public bool UseForSnippets { get; }
     public int Weight { get; }
 
-    public BuiltInCucumberExpressionParameterTypeTransformation(string regex, IBindingType targetType, string name = null, bool useForSnippets = true, int weight = 0)
+    public BuiltInCucumberExpressionParameterTypeTransformation(string regex, IBindingType targetType, string? name = null, bool useForSnippets = true, int weight = 0)
     {
         Regex = regex;
         TargetType = targetType;

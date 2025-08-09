@@ -21,7 +21,7 @@ public interface IObjectContainer : IDisposable
     /// <remarks>
     ///     <para>Previous registrations can be overridden before the first resolution for the <typeparamref name="TInterface"/>.</para>
     /// </remarks>
-    IStrategyRegistration RegisterTypeAs<TType, TInterface>(string name = null) where TType : class, TInterface;
+    IStrategyRegistration RegisterTypeAs<TType, TInterface>(string? name = null) where TType : class, TInterface;
 
     /// <summary>
     /// Registers an instance 
@@ -36,7 +36,7 @@ public interface IObjectContainer : IDisposable
     ///     <para>Previous registrations can be overridden before the first resolution for the <typeparamref name="TInterface"/>.</para>
     ///     <para>The instance will be registered in the object pool, so if a <see cref="Resolve{T}()"/> (for another interface) would require an instance of the dynamic type of the <paramref name="instance"/>, the <paramref name="instance"/> will be returned.</para>
     /// </remarks>
-    void RegisterInstanceAs<TInterface>(TInterface instance, string name = null, bool dispose = false) where TInterface : class;
+    void RegisterInstanceAs<TInterface>(TInterface instance, string? name = null, bool dispose = false) where TInterface : class;
 
     /// <summary>
     /// Registers an instance 
@@ -51,7 +51,7 @@ public interface IObjectContainer : IDisposable
     ///     <para>Previous registrations can be overridden before the first resolution for the <paramref name="interfaceType"/>.</para>
     ///     <para>The instance will be registered in the object pool, so if a <see cref="Resolve{T}()"/> (for another interface) would require an instance of the dynamic type of the <paramref name="instance"/>, the <paramref name="instance"/> will be returned.</para>
     /// </remarks>
-    void RegisterInstanceAs(object instance, Type interfaceType, string name = null, bool dispose = false);
+    void RegisterInstanceAs(object instance, Type interfaceType, string? name = null, bool dispose = false);
 
     /// <summary>
     /// Registers an instance produced by <paramref name="factoryDelegate"/>. The delegate will be called only once and the instance it returned will be returned in each resolution.
@@ -59,7 +59,7 @@ public interface IObjectContainer : IDisposable
     /// <typeparam name="TInterface">Interface to register as.</typeparam>
     /// <param name="factoryDelegate">The function to run to obtain the instance.</param>
     /// <param name="name">A name to resolve named instance, otherwise null.</param>
-    IStrategyRegistration RegisterFactoryAs<TInterface>(Func<IObjectContainer, TInterface> factoryDelegate, string name = null);
+    IStrategyRegistration RegisterFactoryAs<TInterface>(Func<IObjectContainer, TInterface> factoryDelegate, string? name = null);
 
     /// <summary>
     /// Registers an instance produced by <paramref name="factoryDelegate"/>. The delegate will be called only once and the instance it returned will be returned in each resolution.
@@ -67,7 +67,7 @@ public interface IObjectContainer : IDisposable
     /// <typeparam name="TInterface">Interface to register as.</typeparam>
     /// <param name="factoryDelegate">The function to run to obtain the instance.</param>
     /// <param name="name">A name to resolve named instance, otherwise null.</param>
-    IStrategyRegistration RegisterFactoryAs<TInterface>(Func<TInterface> factoryDelegate, string name = null);
+    IStrategyRegistration RegisterFactoryAs<TInterface>(Func<TInterface> factoryDelegate, string? name = null);
 
     /// <summary>
     /// Resolves an implementation object for an interface or type.
@@ -99,7 +99,7 @@ public interface IObjectContainer : IDisposable
     /// <remarks>
     ///     <para>The container pools the objects, so if the interface is resolved twice or the same type is registered for multiple interfaces, a single instance is created and returned.</para>
     /// </remarks>
-    object Resolve(Type typeToResolve, string name = null);
+    object Resolve(Type typeToResolve, string? name = null);
 
     /// <summary>
     /// Resolves all implementations of an interface or type.
@@ -114,7 +114,7 @@ public interface IObjectContainer : IDisposable
     /// <typeparam name="T">The interface or type.</typeparam>
     /// <param name="name">The name or <c>null</c>.</param>
     /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
-    bool IsRegistered<T>(string name = null);
+    bool IsRegistered<T>(string? name = null);
 
     /// <summary>
     /// Determines whether the interface or type is registered in the container, optionally with the specified name.
@@ -122,5 +122,5 @@ public interface IObjectContainer : IDisposable
     /// <param name="type">The interface or type.</param>
     /// <param name="name">The name.</param>
     /// <returns><c>true</c> if the interface or type is registered; otherwise <c>false</c>.</returns>
-    bool IsRegistered(Type type, string name = null);
+    bool IsRegistered(Type type, string? name = null);
 }

@@ -30,11 +30,11 @@ namespace Reqnroll
 
         Task SkipScenarioAsync();
 
-        Task GivenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        Task WhenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        Task ThenAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        Task AndAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        Task ButAsync(string text, string multilineTextArg, Table tableArg, string keyword = null);
+        Task GivenAsync(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        Task WhenAsync(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        Task ThenAsync(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        Task AndAsync(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        Task ButAsync(string text, string multilineTextArg, Table tableArg, string? keyword = null);
 
         void Pending();
     }

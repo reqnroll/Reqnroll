@@ -5,7 +5,7 @@ using Reqnroll.BoDi;
 namespace Reqnroll.Configuration;
 public class DependencyConfigurationCollection : List<DependencyConfiguration>
 {
-    public void Add(string implementationType, string interfaceType, string name = null)
+    public void Add(string implementationType, string interfaceType, string? name = null)
     {
         Add(new DependencyConfiguration
         {

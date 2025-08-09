@@ -7,7 +7,7 @@ namespace Reqnroll
 {
     public readonly struct CultureInfoScope : IDisposable
     {
-        private readonly CultureInfo originalCultureInfo;
+        private readonly CultureInfo? originalCultureInfo;
 
         public CultureInfoScope(FeatureContext featureContext)
         {

@@ -9,7 +9,7 @@ namespace Reqnroll
         Assembly TestAssembly { get; }
         Assembly[] BindingAssemblies { get; }
         bool IsMultiThreaded { get; }
-        ITestRunner GetTestRunner(FeatureInfo featureHint = null);
+        ITestRunner GetTestRunner(FeatureInfo? featureHint = null);
         void ReleaseTestRunnerToPool(ITestRunner testRunner);
         Task EndFeatureForAvailableTestRunnersAsync(FeatureInfo featureInfo);
         void Initialize(Assembly testAssembly);

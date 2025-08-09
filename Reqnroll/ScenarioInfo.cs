@@ -55,7 +55,7 @@ namespace Reqnroll
         internal string PickleId { get; set; }
 
 
-        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[] inheritedTags = null, string pickleIndex = null)
+        public ScenarioInfo(string title, string description, string[] tags, IOrderedDictionary arguments, string[]? inheritedTags = null, string? pickleIndex = null)
         {
             Title = title;
             Description = description;

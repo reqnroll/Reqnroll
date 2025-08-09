@@ -13,7 +13,7 @@ namespace Reqnroll.Infrastructure
 {
     public interface IContainerBuilder
     {
-        IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider = null);
+        IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider? configurationProvider = null);
         IObjectContainer CreateTestThreadContainer(IObjectContainer globalContainer);
         IObjectContainer CreateScenarioContainer(IObjectContainer testThreadContainer, ScenarioInfo scenarioInfo);
         IObjectContainer CreateFeatureContainer(IObjectContainer testThreadContainer, FeatureInfo featureInfo);
@@ -27,12 +27,12 @@ namespace Reqnroll.Infrastructure
 
         public bool SkipLoadingProvider { get; set; } = false;
 
-        public ContainerBuilder(IDefaultDependencyProvider defaultDependencyProvider = null)
+        public ContainerBuilder(IDefaultDependencyProvider? defaultDependencyProvider = null)
         {
             _defaultDependencyProvider = defaultDependencyProvider ?? DefaultDependencyProvider;
         }
 
-        public virtual IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider = null)
+        public virtual IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider? configurationProvider = null)
         {
             var container = new ObjectContainer();
             container.RegisterInstanceAs<IContainerBuilder>(this);

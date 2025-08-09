@@ -11,7 +11,7 @@ namespace Reqnroll.Bindings
 
         IEnumerable<IStepDefinitionBinding> GetStepDefinitions();
         IEnumerable<IHookBinding> GetHooks();
-        IEnumerable<IStepDefinitionBinding> GetConsideredStepDefinitions(StepDefinitionType stepDefinitionType, string stepText = null);
+        IEnumerable<IStepDefinitionBinding> GetConsideredStepDefinitions(StepDefinitionType stepDefinitionType, string? stepText = null);
         IEnumerable<IHookBinding> GetHooks(HookType bindingEvent);
         IEnumerable<IStepArgumentTransformationBinding> GetStepTransformations();
         IEnumerable<BindingError> GetErrorMessages();

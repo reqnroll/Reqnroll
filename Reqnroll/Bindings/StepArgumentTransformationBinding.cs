@@ -11,7 +11,7 @@ namespace Reqnroll.Bindings
         
         public int Order { get; }
 
-        public StepArgumentTransformationBinding(Regex regex, IBindingMethod bindingMethod, string name = null, 
+        public StepArgumentTransformationBinding(Regex regex, IBindingMethod bindingMethod, string? name = null, 
             int order = StepArgumentTransformationAttribute.DefaultOrder)
             : base(bindingMethod)
         {
@@ -20,7 +20,7 @@ namespace Reqnroll.Bindings
             Order = order;
         }
 
-        public StepArgumentTransformationBinding(string regexString, IBindingMethod bindingMethod, string name = null, 
+        public StepArgumentTransformationBinding(string regexString, IBindingMethod bindingMethod, string? name = null, 
             int order = StepArgumentTransformationAttribute.DefaultOrder)
             : this(CreateRegexOrNull(regexString), bindingMethod, name, order)
         {

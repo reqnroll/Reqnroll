@@ -18,7 +18,7 @@ namespace Reqnroll.Bindings.Discovery
             return defaultValue;
         }
 
-        public TValue[] TryGetParamsAttributeValue<TValue>(int index, TValue[] defaultValue = null)
+        public TValue[] TryGetParamsAttributeValue<TValue>(int index, TValue[]? defaultValue = null)
         {
             if (AttributeValues.Length <= index)
                 return defaultValue;

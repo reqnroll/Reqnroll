@@ -82,7 +82,7 @@ public class TestRunnerManager : ITestRunnerManager
         return _usedTestWorkerContainers.Count - (hasTestRunStartWorker ? 1 : 0);
     }
 
-    public virtual ITestRunner GetOrCreateTestRunner(FeatureInfo featureHint = null)
+    public virtual ITestRunner GetOrCreateTestRunner(FeatureInfo? featureHint = null)
     {
         var testRunner = GetOrCreateTestRunnerInstance(featureHint);
 
@@ -252,7 +252,7 @@ public class TestRunnerManager : ITestRunnerManager
         return false;
     }
 
-    protected virtual ITestRunner GetOrCreateTestRunnerInstance(FeatureInfo featureHint = null)
+    protected virtual ITestRunner GetOrCreateTestRunnerInstance(FeatureInfo? featureHint = null)
     {
         if (TryGetTestRunnerFromAvailableTestWorkerContainers(featureHint, out var testThreadContainer))
         {
@@ -278,7 +278,7 @@ public class TestRunnerManager : ITestRunnerManager
         TestAssembly = assignedTestAssembly;
     }
 
-    public virtual ITestRunner GetTestRunner(FeatureInfo featureHint = null)
+    public virtual ITestRunner GetTestRunner(FeatureInfo? featureHint = null)
     {
         try
         {
@@ -389,7 +389,7 @@ public class TestRunnerManager : ITestRunnerManager
 
     private static readonly ConcurrentDictionary<Assembly, ITestRunnerManager> _testRunnerManagerRegistry = new();
 
-    public static ITestRunnerManager GetTestRunnerManager(Assembly testAssembly = null, IContainerBuilder containerBuilder = null, bool createIfMissing = true)
+    public static ITestRunnerManager GetTestRunnerManager(Assembly? testAssembly = null, IContainerBuilder? containerBuilder = null, bool createIfMissing = true)
     {
         testAssembly ??= GetCallingAssembly();
 
@@ -407,7 +407,7 @@ public class TestRunnerManager : ITestRunnerManager
     /// <summary>
     /// This is a workaround method solving not correctly working Assembly.GetCallingAssembly() when called from async method (due to state machine).
     /// </summary>
-    private static Assembly GetCallingAssembly([CallerMemberName] string callingMethodName = null)
+    private static Assembly GetCallingAssembly([CallerMemberName] string? callingMethodName = null)
     {
         var stackTrace = new StackTrace();
 
@@ -434,7 +434,7 @@ public class TestRunnerManager : ITestRunnerManager
         return result ?? GetCallingAssembly();
     }
         
-    private static ITestRunnerManager CreateTestRunnerManager(Assembly testAssembly, IContainerBuilder containerBuilder = null)
+    private static ITestRunnerManager CreateTestRunnerManager(Assembly testAssembly, IContainerBuilder? containerBuilder = null)
     {
         containerBuilder ??= new ContainerBuilder();
 
@@ -444,7 +444,7 @@ public class TestRunnerManager : ITestRunnerManager
         return testRunnerManager;
     }
 
-    public static async Task OnTestRunEndAsync(Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
+    public static async Task OnTestRunEndAsync(Assembly? testAssembly = null, IContainerBuilder? containerBuilder = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, createIfMissing: false, containerBuilder: containerBuilder);
@@ -455,7 +455,7 @@ public class TestRunnerManager : ITestRunnerManager
         }
     }
 
-    public static async Task OnTestRunStartAsync(Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
+    public static async Task OnTestRunStartAsync(Assembly? testAssembly = null, IContainerBuilder? containerBuilder = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, createIfMissing: true, containerBuilder: containerBuilder);
@@ -472,7 +472,7 @@ public class TestRunnerManager : ITestRunnerManager
     /// <param name="containerBuilder">The container builder to be used to set up Reqnroll dependencies. If omitted or invoked with <c>null</c>, the default container builder is used.</param>
     /// <param name="featureHint">If specified, it is used as a hint for the test runner manager to choose the test runner that has been used for the feature before, if possible.</param>
     /// <returns>A test runner that can be used to interact with Reqnroll.</returns>
-    public static ITestRunner GetTestRunnerForAssembly(Assembly testAssembly = null, IContainerBuilder containerBuilder = null, FeatureInfo featureHint = null)
+    public static ITestRunner GetTestRunnerForAssembly(Assembly? testAssembly = null, IContainerBuilder? containerBuilder = null, FeatureInfo? featureHint = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);
@@ -484,7 +484,7 @@ public class TestRunnerManager : ITestRunnerManager
         testRunner.TestThreadContext.TestThreadContainer.Resolve<ITestRunnerManager>().ReleaseTestRunnerToPool(testRunner);
     }
 
-    public static async Task ReleaseFeatureAsync(FeatureInfo featureInfo, Assembly testAssembly = null, IContainerBuilder containerBuilder = null)
+    public static async Task ReleaseFeatureAsync(FeatureInfo featureInfo, Assembly? testAssembly = null, IContainerBuilder? containerBuilder = null)
     {
         testAssembly ??= GetCallingAssembly();
         var testRunnerManager = GetTestRunnerManager(testAssembly, containerBuilder);

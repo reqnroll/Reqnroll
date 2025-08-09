@@ -350,7 +350,7 @@ public class ObjectContainer : IObjectContainer
         set => _concurrentObjectResolutionTimeout = value;
     }
 
-    public ObjectContainer(IObjectContainer baseContainer = null)
+    public ObjectContainer(IObjectContainer? baseContainer = null)
     {
         if (baseContainer != null && !(baseContainer is ObjectContainer))
             throw new ArgumentException("Base container must be an ObjectContainer", nameof(baseContainer));
@@ -361,20 +361,20 @@ public class ObjectContainer : IObjectContainer
 
     #region Registration
 
-    public IStrategyRegistration RegisterTypeAs<TInterface>(Type implementationType, string name = null) where TInterface : class
+    public IStrategyRegistration RegisterTypeAs<TInterface>(Type implementationType, string? name = null) where TInterface : class
     {
         Type interfaceType = typeof(TInterface);
         return RegisterTypeAsInternal(implementationType, interfaceType, name);
     }
 
-    public IStrategyRegistration RegisterTypeAs<TType, TInterface>(string name = null) where TType : class, TInterface
+    public IStrategyRegistration RegisterTypeAs<TType, TInterface>(string? name = null) where TType : class, TInterface
     {
         Type interfaceType = typeof(TInterface);
         Type implementationType = typeof(TType);
         return RegisterTypeAsInternal(implementationType, interfaceType, name);
     }
 
-    public IStrategyRegistration RegisterTypeAs(Type implementationType, Type interfaceType, string name = null)
+    public IStrategyRegistration RegisterTypeAs(Type implementationType, Type interfaceType, string? name = null)
     {
         if (!IsValidTypeMapping(implementationType, interfaceType))
             throw new InvalidOperationException($"The type mapping is not valid. The {implementationType} is not assignable to the interface {interfaceType}");
@@ -450,7 +450,7 @@ public class ObjectContainer : IObjectContainer
         return typeRegistration;
     }
 
-    public void RegisterInstanceAs(object instance, Type interfaceType, string name = null, bool dispose = false)
+    public void RegisterInstanceAs(object instance, Type interfaceType, string? name = null, bool dispose = false)
     {
         if (instance == null)
             throw new ArgumentNullException(nameof(instance));
@@ -470,27 +470,27 @@ public class ObjectContainer : IObjectContainer
         return (instance is IDisposable) && !dispose ? new NonDisposableWrapper(instance) : instance;
     }
 
-    public void RegisterInstanceAs<TInterface>(TInterface instance, string name = null, bool dispose = false) where TInterface : class
+    public void RegisterInstanceAs<TInterface>(TInterface instance, string? name = null, bool dispose = false) where TInterface : class
     {
         RegisterInstanceAs(instance, typeof(TInterface), name, dispose);
     }
 
-    public IStrategyRegistration RegisterFactoryAs<TInterface>(Func<TInterface> factoryDelegate, string name = null)
+    public IStrategyRegistration RegisterFactoryAs<TInterface>(Func<TInterface> factoryDelegate, string? name = null)
     {
         return RegisterFactoryAs(factoryDelegate, typeof(TInterface), name);
     }
 
-    public IStrategyRegistration RegisterFactoryAs<TInterface>(Func<IObjectContainer, TInterface> factoryDelegate, string name = null)
+    public IStrategyRegistration RegisterFactoryAs<TInterface>(Func<IObjectContainer, TInterface> factoryDelegate, string? name = null)
     {
         return RegisterFactoryAs(factoryDelegate, typeof(TInterface), name);
     }
 
-    public void RegisterFactoryAs<TInterface>(Delegate factoryDelegate, string name = null)
+    public void RegisterFactoryAs<TInterface>(Delegate factoryDelegate, string? name = null)
     {
         RegisterFactoryAs(factoryDelegate, typeof(TInterface), name);
     }
 
-    public IStrategyRegistration RegisterFactoryAs(Delegate factoryDelegate, Type interfaceType, string name = null)
+    public IStrategyRegistration RegisterFactoryAs(Delegate factoryDelegate, Type interfaceType, string? name = null)
     {
         if (factoryDelegate == null) throw new ArgumentNullException(nameof(factoryDelegate));
         if (interfaceType == null) throw new ArgumentNullException(nameof(interfaceType));
@@ -508,10 +508,10 @@ public class ObjectContainer : IObjectContainer
     }
 
     /// <inheritdoc/>
-    public bool IsRegistered<T>(string name = null) => IsRegistered(typeof(T), name);
+    public bool IsRegistered<T>(string? name = null) => IsRegistered(typeof(T), name);
 
     /// <inheritdoc/>
-    public bool IsRegistered(Type type, string name = null)
+    public bool IsRegistered(Type type, string? name = null)
     {
         var keyToResolve = new RegistrationKey(type, name);
 
@@ -560,7 +560,7 @@ public class ObjectContainer : IObjectContainer
         return (T)resolvedObject;
     }
 
-    public object Resolve(Type typeToResolve, string name = null)
+    public object Resolve(Type typeToResolve, string? name = null)
     {
         return Resolve(typeToResolve, new ResolutionList(), name);
     }

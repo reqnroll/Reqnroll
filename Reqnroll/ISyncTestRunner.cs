@@ -24,11 +24,11 @@ namespace Reqnroll
 
         void SkipScenario();
 
-        void Given(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        void When(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        void Then(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        void And(string text, string multilineTextArg, Table tableArg, string keyword = null);
-        void But(string text, string multilineTextArg, Table tableArg, string keyword = null);
+        void Given(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        void When(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        void Then(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        void And(string text, string multilineTextArg, Table tableArg, string? keyword = null);
+        void But(string text, string multilineTextArg, Table tableArg, string? keyword = null);
 
         void Pending();
     }

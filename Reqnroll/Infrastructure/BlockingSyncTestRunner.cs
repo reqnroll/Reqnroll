@@ -70,27 +70,27 @@ public class BlockingSyncTestRunner : ISyncTestRunner
         SyncWrapper(() => _testRunner.OnScenarioEndAsync());
     }
 
-    public void Given(string text, string multilineTextArg, Table tableArg, string keyword = null)
+    public void Given(string text, string multilineTextArg, Table tableArg, string? keyword = null)
     {
         SyncWrapper(() => _testRunner.GivenAsync(text, multilineTextArg, tableArg, keyword));
     }
 
-    public void When(string text, string multilineTextArg, Table tableArg, string keyword = null)
+    public void When(string text, string multilineTextArg, Table tableArg, string? keyword = null)
     {
         SyncWrapper(() => _testRunner.WhenAsync(text, multilineTextArg, tableArg, keyword));
     }
 
-    public void Then(string text, string multilineTextArg, Table tableArg, string keyword = null)
+    public void Then(string text, string multilineTextArg, Table tableArg, string? keyword = null)
     {
         SyncWrapper(() => _testRunner.ThenAsync(text, multilineTextArg, tableArg, keyword));
     }
 
-    public void And(string text, string multilineTextArg, Table tableArg, string keyword = null)
+    public void And(string text, string multilineTextArg, Table tableArg, string? keyword = null)
     {
         SyncWrapper(() => _testRunner.AndAsync(text, multilineTextArg, tableArg, keyword));
     }
 
-    public void But(string text, string multilineTextArg, Table tableArg, string keyword = null)
+    public void But(string text, string multilineTextArg, Table tableArg, string? keyword = null)
     {
         SyncWrapper(() => _testRunner.ButAsync(text, multilineTextArg, tableArg, keyword));
     }

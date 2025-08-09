@@ -4,7 +4,7 @@ namespace Reqnroll.Assist
 {
     public static class ProjectionExtensionMethods
     {
-        public static IEnumerable<Projection<T>> ToProjection<T>(this IEnumerable<T> collection, Table table = null)
+        public static IEnumerable<Projection<T>> ToProjection<T>(this IEnumerable<T> collection, Table? table = null)
         {
             return new EnumerableProjection<T>(table, collection);
         }

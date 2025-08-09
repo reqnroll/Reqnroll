@@ -11,7 +11,7 @@ public class TestCaseExecutionTrackerFactory(IIdGenerator idGenerator, ICucumber
         int attemptId,
         string testCaseId,
         TestCaseTracker testCaseTracker,
-        IMessagePublisher picklePublisher = null)
+        IMessagePublisher? picklePublisher = null)
     {
         return new TestCaseExecutionTracker(
             parentTracker,

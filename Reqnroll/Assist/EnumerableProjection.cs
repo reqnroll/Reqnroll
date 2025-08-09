@@ -9,7 +9,7 @@ namespace Reqnroll.Assist
         private readonly IEnumerable<T> collection;
         private readonly IEnumerable<string> properties;
 
-        public EnumerableProjection(Table table, IEnumerable<T> collection = null)
+        public EnumerableProjection(Table table, IEnumerable<T>? collection = null)
         {
             if (table == null && collection == null)
                 throw new ArgumentNullException(nameof(table), "Either table or projectCollection must be specified");

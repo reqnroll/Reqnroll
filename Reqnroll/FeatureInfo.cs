@@ -46,7 +46,7 @@ namespace Reqnroll
             Tags = tags ?? Array.Empty<string>();
         }
 
-        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, string[] tags, FeatureLevelCucumberMessages featureLevelCucumberMessages = null)
+        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, string[] tags, FeatureLevelCucumberMessages? featureLevelCucumberMessages = null)
             : this(language, folderPath, title, description, programmingLanguage, tags)
         {
             FeatureCucumberMessages = featureLevelCucumberMessages;

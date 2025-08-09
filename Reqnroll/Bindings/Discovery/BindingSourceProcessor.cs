@@ -10,8 +10,8 @@ namespace Reqnroll.Bindings.Discovery
     {
         private readonly IBindingFactory _bindingFactory;
 
-        private BindingSourceType _currentBindingSourceType = null;
-        private BindingScope[] _typeScopes = null;
+        private BindingSourceType? _currentBindingSourceType = null;
+        private BindingScope[]? _typeScopes = null;
         private readonly List<IStepDefinitionBindingBuilder> _stepDefinitionBindingBuilders = new();
 
         protected BindingSourceProcessor(IBindingFactory bindingFactory)

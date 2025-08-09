@@ -15,7 +15,7 @@ public class UserDefinedCucumberExpressionParameterTypeTransformation : ICucumbe
     public bool UseForSnippets => true;
     public int Weight => 0;
 
-    public UserDefinedCucumberExpressionParameterTypeTransformation(IStepArgumentTransformationBinding stepArgumentTransformationBinding, string customName = null)
+    public UserDefinedCucumberExpressionParameterTypeTransformation(IStepArgumentTransformationBinding stepArgumentTransformationBinding, string? customName = null)
     {
         _stepArgumentTransformationBinding = stepArgumentTransformationBinding;
         _customName = customName;

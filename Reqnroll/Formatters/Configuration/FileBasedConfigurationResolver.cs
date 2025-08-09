@@ -18,7 +18,7 @@ public class FileBasedConfigurationResolver : FormattersConfigurationResolverBas
         IReqnrollJsonLocator configurationFileLocator,
         IFileSystem fileSystem,
         IFileService fileService,
-        IFormatterLog log = null)
+        IFormatterLog? log = null)
     {
         _configFileLocator = configurationFileLocator;
         _fileSystem = fileSystem;

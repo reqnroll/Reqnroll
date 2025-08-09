@@ -20,7 +20,7 @@ namespace Reqnroll.BindingSkeletons
         public readonly string WrapText;
         public readonly string CucumberExpressionTypeName;
 
-        public AnalyzedStepParameter(string type, string name, string regexPattern = null, string cucumberExpressionTypeName = null, string wrapText = "")
+        public AnalyzedStepParameter(string type, string name, string? regexPattern = null, string? cucumberExpressionTypeName = null, string wrapText = "")
         {
             Type = type;
             Name = name;

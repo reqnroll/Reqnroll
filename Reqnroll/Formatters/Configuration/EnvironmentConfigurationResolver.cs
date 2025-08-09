@@ -13,7 +13,7 @@ public class EnvironmentConfigurationResolver : FormattersConfigurationResolverB
 
     public EnvironmentConfigurationResolver(
         IEnvironmentWrapper environmentWrapper,
-        IFormatterLog log = null)
+        IFormatterLog? log = null)
     {
         _environmentWrapper = environmentWrapper;
         _log = log;

@@ -17,7 +17,7 @@ namespace Reqnroll
         /// </summary>
         internal string PickleStepId { get; }
 
-        public StepInfo(StepDefinitionType stepDefinitionType, string text, Table table, string multilineText, string pickleStepId = null)
+        public StepInfo(StepDefinitionType stepDefinitionType, string text, Table table, string multilineText, string? pickleStepId = null)
         {
             StepDefinitionType = stepDefinitionType;
             Text = text;
