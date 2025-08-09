@@ -4,7 +4,7 @@ namespace Reqnroll;
 
 public class PendingStepException(string message) : ReqnrollException(message)
 {
-    public const string GenericErrorMessage = "The step definition is not implemented.";
+    internal const string GenericErrorMessage = "The step definition is not implemented.";
 
     public PendingStepException() : this(GenericErrorMessage)
     {
