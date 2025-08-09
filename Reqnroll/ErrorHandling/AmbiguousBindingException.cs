@@ -13,7 +13,7 @@ namespace Reqnroll;
 /// </summary>
 public class AmbiguousBindingException : BindingException
 {
-    public IEnumerable<BindingMatch> Matches { get; private set; }
+    public IEnumerable<BindingMatch> Matches { get; private set; } = [];
 
     public AmbiguousBindingException(string message) : base(message)
     {
@@ -25,6 +25,6 @@ public class AmbiguousBindingException : BindingException
 
     public AmbiguousBindingException(string message, IEnumerable<BindingMatch> matches) : base(message)
     {
-        Matches = new List<BindingMatch>(matches);
+        Matches = [.. matches];
     }
 }
