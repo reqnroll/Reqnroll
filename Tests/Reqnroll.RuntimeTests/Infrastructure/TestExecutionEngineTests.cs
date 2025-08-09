@@ -89,7 +89,7 @@ public partial class TestExecutionEngineTests
         _globalContainer = new ObjectContainer();
         _testThreadContainer = new ObjectContainer(_globalContainer);
         _featureContainer = new ObjectContainer(_testThreadContainer);
-        _scenarioContainer = new ObjectContainer(_scenarioContainer);
+        _scenarioContainer = new ObjectContainer(_featureContainer);
         _testRunContext = new DefaultTestRunContext(_globalContainer, new Mock<ITestRunSettingsProvider>().Object);
 
         _beforeScenarioEvents = new List<IHookBinding>();
