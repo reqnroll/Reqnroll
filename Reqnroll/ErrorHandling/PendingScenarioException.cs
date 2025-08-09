@@ -7,7 +7,7 @@ namespace Reqnroll.ErrorHandling;
 /// </summary>
 public class PendingScenarioException : ReqnrollException
 {
-    public const string GenericErrorMessage = "One or more step definitions are not implemented yet.";
+    internal const string GenericErrorMessage = "One or more step definitions are not implemented yet.";
 
     public PendingScenarioException() : base(GenericErrorMessage)
     {
