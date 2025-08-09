@@ -9,8 +9,6 @@ using global::System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using TUnit.Core;
 
-[assembly: TUnit.Core.Parallelizable]
-
 [GeneratedCode("Reqnroll", "REQNROLL_VERSION")]
 public class PROJECT_ROOT_NAMESPACE_TUnitAssemblyHooks
 {
