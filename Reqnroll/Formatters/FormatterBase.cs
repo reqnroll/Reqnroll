@@ -182,6 +182,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                 {
                     Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - skipping wait on formatters task {Name}.");
                 }
+                _cancellationTokenSource.Dispose();
             }
             catch (System.Exception e)
             {
