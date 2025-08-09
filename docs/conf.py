@@ -13,13 +13,14 @@
 #
 import os
 import sys
+from datetime import datetime
 
 
 # -- Project information -----------------------------------------------------
 
 
 project = 'Reqnroll'
-copyright = '2024-2025, Reqnroll'
+copyright = f"2024-{datetime.now().year}, Reqnroll"
 author = 'Reqnroll'
 
 
