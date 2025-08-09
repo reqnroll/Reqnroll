@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 
 // the exceptions are part of the public API, keep them in Reqnroll namespace
 namespace Reqnroll
 {
-    [Serializable]
     public class ColumnCouldNotBeBoundException : Exception
     {
         public IList<string> Columns { get; }
@@ -31,11 +29,6 @@ namespace Reqnroll
         public ColumnCouldNotBeBoundException(string message, Exception innerException, IList<string> columns) : base(message, innerException)
         {
             Columns = columns;
-        }
-
-        /// <inheritdoc />
-        protected ColumnCouldNotBeBoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
         }
 
         private static string CreateMessage(IList<string> columns)
