@@ -612,7 +612,6 @@ namespace Reqnroll.Infrastructure
                     await HandleStepExecutionExceptions(
                         async () =>
                         {
-                            //isBindingExecuted = true; // setting it before the call, because the call might throw an exception
                             await ExecuteStepMatchAsync(match, arguments, durationHolder);
                         });
                 }
