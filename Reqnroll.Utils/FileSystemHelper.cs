@@ -113,7 +113,7 @@ namespace Reqnroll.Utils
             }
         }
 
-        public static string NormalizeDirectorySeparators(string path)
+        public static string? NormalizeDirectorySeparators(string? path)
         {
             if (path == null)
                 return null;
