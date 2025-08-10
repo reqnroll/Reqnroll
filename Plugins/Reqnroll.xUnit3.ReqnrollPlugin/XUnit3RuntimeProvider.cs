@@ -12,6 +12,12 @@ public class XUnit3RuntimeProvider : IUnitTestRuntimeProvider
     public void TestInconclusive(string message) => throw new XUnitInconclusiveException($"Test inconclusive: {message}");
 
     public void TestIgnore(string message) => Xunit.Assert.Skip(message);
+
+    public ScenarioExecutionStatus? DetectExecutionStatus(Exception exception) => exception switch
+    {
+        SkipException => ScenarioExecutionStatus.Skipped,
+        _ => null
+    };
 }
 
 [Serializable]
