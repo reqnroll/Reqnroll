@@ -22,6 +22,7 @@
 * Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
 * Add xUnit 3 support (#538)
 * Added ExpressionType option (cucumber/regex) to [Given], [When] and [Then] attributes (#663)
+* Remove [Serializable] from exceptions (#738)
 * Updated Reqnroll project template to add TUnit test framework support and remove EOL .NET versions (6.0, 7.0), added .NET 9.0 support (#701)
 * Removed support for end-of-life .NET frameworks (.NET 6, .NET 7, .NET Core) (#706)
 * Allow detecting skipped or pending execution status by the unit test providers (#732)
