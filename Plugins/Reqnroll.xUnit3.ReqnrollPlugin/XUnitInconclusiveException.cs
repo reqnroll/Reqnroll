@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.Serialization;
 using Xunit.Sdk;
 
 namespace Reqnroll.xUnit3.ReqnrollPlugin;

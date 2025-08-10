@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.Serialization;
 using Reqnroll.UnitTestProvider;
 using Xunit.Sdk;
 
