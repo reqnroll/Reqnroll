@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 {
-    [Serializable]
     public class MissingScenarioDependenciesException : ReqnrollException
     {
         public MissingScenarioDependenciesException()
