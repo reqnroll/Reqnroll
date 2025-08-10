@@ -1,4 +1,4 @@
-﻿using Reqnroll;
+using Reqnroll;
 using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Generic;
@@ -16,6 +16,12 @@ namespace CucumberMessages.CompatibilityTests.CCK.skipped
         public Skipped(IUnitTestRuntimeProvider unitTestRuntimeProvider)
         {
             _unitTestRuntimeProvider = unitTestRuntimeProvider;
+        }
+
+        [BeforeScenario("@skip")]
+        public void BeforeScenarioWithSkip()
+        {
+            _unitTestRuntimeProvider.TestIgnore("Skipped before scenario");
         }
 
         [Given("a step that does not skip")]

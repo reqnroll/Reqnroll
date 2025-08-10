@@ -697,6 +697,7 @@ namespace Reqnroll.Infrastructure
         private void UpdateStatusOnStepFailure(ScenarioExecutionStatus stepStatus, Exception exception)
         {
             _contextManager.StepContext.Status = stepStatus;
+            _contextManager.StepContext.StepError = exception;
 
             bool ShouldOverrideScenarioStatus(ScenarioExecutionStatus currentStatus, ScenarioExecutionStatus newStatus)
             {
