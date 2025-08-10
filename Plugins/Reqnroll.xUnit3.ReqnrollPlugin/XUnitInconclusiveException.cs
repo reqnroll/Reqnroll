@@ -3,7 +3,6 @@ using Xunit.Sdk;
 
 namespace Reqnroll.xUnit3.ReqnrollPlugin;
 
-[Serializable]
 public class XUnitInconclusiveException : XunitException
 {
     public XUnitInconclusiveException() : this("The step is inconclusive")

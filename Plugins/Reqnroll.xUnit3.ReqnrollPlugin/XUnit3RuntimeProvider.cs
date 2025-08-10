@@ -19,7 +19,6 @@ public class XUnit3RuntimeProvider : IUnitTestRuntimeProvider
     };
 }
 
-[Serializable]
 internal class XUnitPendingException(string message) : XunitException(message)
 {
 }
