@@ -61,12 +61,12 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             ToTimestamp(testCaseExecution.TestCaseStartedTimestamp));
     }
 
-    public virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionTracker testCaseExecution)
+    public virtual TestCaseFinished ToTestCaseFinished(TestCaseExecutionTracker testCaseExecution, bool willBeRetried = false)
     {
         return new TestCaseFinished(
             testCaseExecution.TestCaseStartedId,
             ToTimestamp(testCaseExecution.TestCaseFinishedTimestamp),
-            false);
+            willBeRetried);
     }
 
     public virtual StepDefinition ToStepDefinition(IStepDefinitionBinding binding, IIdGenerator idGenerator)

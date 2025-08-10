@@ -110,6 +110,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             {
                 throw new NotImplementedException();
             }
+
+            public ScenarioExecutionStatus? DetectExecutionStatus(Exception exception) => null;
         }
 
         public void Dispose()

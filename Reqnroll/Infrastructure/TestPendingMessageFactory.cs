@@ -2,21 +2,13 @@ using System;
 using System.Linq;
 using Reqnroll.ErrorHandling;
 
-namespace Reqnroll.Infrastructure
+namespace Reqnroll.Infrastructure;
+
+public class TestPendingMessageFactory : ITestPendingMessageFactory
 {
-    public class TestPendingMessageFactory : ITestPendingMessageFactory
+    public string BuildFromScenarioContext(ScenarioContext scenarioContext)
     {
-        private readonly IErrorProvider _errorProvider;
-
-        public TestPendingMessageFactory(IErrorProvider errorProvider)
-        {
-            _errorProvider = errorProvider;
-        }
-
-        public string BuildFromScenarioContext(ScenarioContext scenarioContext)
-        {
-            var pendingSteps = scenarioContext.PendingSteps.Distinct().OrderBy(s => s);
-            return $"{_errorProvider.GetPendingStepDefinitionError().Message}{Environment.NewLine}  {string.Join(Environment.NewLine + "  ", pendingSteps)}";
-        }
+        var pendingSteps = scenarioContext.PendingSteps.Distinct().OrderBy(s => s);
+        return $"{PendingScenarioException.GenericErrorMessage}{Environment.NewLine}  {string.Join(Environment.NewLine + "  ", pendingSteps)}";
     }
 }

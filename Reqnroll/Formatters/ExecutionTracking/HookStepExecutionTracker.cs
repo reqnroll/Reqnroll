@@ -1,27 +1,18 @@
-﻿using Io.Cucumber.Messages.Types;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Reqnroll.Formatters.PubSub;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
 /// This class is used to track execution of hook steps.
 /// </summary>
-public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory) : 
-    StepExecutionTrackerBase(parentTracker, messageFactory), IGenerateMessage
+public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher) : 
+    StepExecutionTrackerBase(parentTracker, messageFactory, publisher)
 {
-    IEnumerable<Envelope> IGenerateMessage.GenerateFrom(ExecutionEvent executionEvent)
-    {
-        return executionEvent switch
-        {
-            HookBindingStartedEvent => [Envelope.Create(MessageFactory.ToTestStepStarted(this))],
-            HookBindingFinishedEvent => [Envelope.Create(MessageFactory.ToTestStepFinished(this))],
-            _ => []
-        };
-    }
-
-    public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
+    public async Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
     {
         StepStartedAt = hookBindingStartedEvent.Timestamp;
 
@@ -33,12 +24,16 @@ public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
         }
 
         StepTracker = PickleExecutionTracker.TestCaseTracker.GetHookStepTrackerByHookId(hookId);
+
+        await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepStarted(this)));
     }
 
-    public void ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
+    public async Task ProcessEvent(HookBindingFinishedEvent hookFinishedEvent)
     {
         StepFinishedAt = hookFinishedEvent.Timestamp;
         Exception = hookFinishedEvent.HookException;
         Status = Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
+
+        await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepFinished(this)));
     }
 }

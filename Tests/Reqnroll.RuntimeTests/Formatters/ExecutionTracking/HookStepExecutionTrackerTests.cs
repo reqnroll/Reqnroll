@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Moq;
@@ -12,8 +12,9 @@ using Reqnroll.Infrastructure;
 using System;
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.Linq;
 using Xunit;
+using Reqnroll.Formatters.PubSub;
+using System.Threading.Tasks;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
@@ -21,9 +22,11 @@ public class HookStepExecutionTrackerTests
 {
     private readonly Mock<ICucumberMessageFactory> _messageFactoryMock;
     private readonly Mock<IPickleExecutionTracker> _testCaseTrackerMock;
+    private readonly Mock<IStepTrackerFactory> _stepTrackerFactoryMock;
     private readonly ConcurrentDictionary<IBinding, string> _stepDefinitionsByBinding;
     private readonly TestCaseTracker _testCaseTracker;
     private readonly Mock<IIdGenerator> _idGeneratorMock;
+    private readonly Mock<IMessagePublisher> _publisherMock;
     private HookStepExecutionTracker _hookStepExecutionTracker;
     private FeatureInfo _featureInfoStub;
     private FeatureContext _featureContextStub;
@@ -56,6 +59,8 @@ public class HookStepExecutionTrackerTests
     public HookStepExecutionTrackerTests()
     {
         _messageFactoryMock = new Mock<ICucumberMessageFactory>();
+        _publisherMock = new Mock<IMessagePublisher>();
+        _stepTrackerFactoryMock = new Mock<IStepTrackerFactory>();
         _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
         _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object);
         _idGeneratorMock = new Mock<IIdGenerator>();
@@ -73,36 +78,36 @@ public class HookStepExecutionTrackerTests
         // Create the tracker to test
         _hookStepExecutionTracker = new HookStepExecutionTracker(
             CreateTestCaseExecutionRecord(),
-            _messageFactoryMock.Object
+            _messageFactoryMock.Object,
+            _publisherMock.Object
         );
     }
 
     private TestCaseExecutionTracker CreateTestCaseExecutionRecord(int attemptId = 0) => 
-        new(_testCaseTrackerMock.Object, _messageFactoryMock.Object, attemptId, "testCaseStartedId", "testCaseId", _testCaseTracker);
+        new(_testCaseTrackerMock.Object, attemptId, "testCaseStartedId", "testCaseId", _testCaseTracker, _messageFactoryMock.Object, _publisherMock.Object, _stepTrackerFactoryMock.Object);
 
     [Fact]
-    public void HookStepTracker_GenerateFrom_HookBindingStartedEvent_ReturnsOneEnvelope()
+    public async Task HookStepTracker_ProcessEvent_HookBindingStartedEvent_PublishesOneEnvelope()
     {
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
         var hookBindingStartedEvent = new HookBindingStartedEvent(hookBindingMock.Object, _mockContextManager.Object);
         var testStepStarted = new TestStepStarted("testCaseStartedId", "testsStepId", new Timestamp(0, 1));
-            
+        _stepDefinitionsByBinding[hookBindingMock.Object] = "hook123";
+
         _messageFactoryMock
             .Setup(f => f.ToTestStepStarted(_hookStepExecutionTracker))
             .Returns(testStepStarted);
 
         // Act
-        var envelopes = ((IGenerateMessage)_hookStepExecutionTracker).GenerateFrom(hookBindingStartedEvent).ToList();
+        await _hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
 
         // Assert
-        envelopes.Should().HaveCount(1);
-        envelopes[0].TestStepStarted.Should().Be(testStepStarted);
-        _messageFactoryMock.Verify(f => f.ToTestStepStarted(_hookStepExecutionTracker), Times.Once);
+        _publisherMock.Verify(p => p.PublishAsync(It.Is<Envelope>(e => e.TestStepStarted == testStepStarted)), Times.Once);
     }
 
     [Fact]
-    public void HookStepTracker_GenerateFrom_HookBindingFinishedEvent_ReturnsOneEnvelope()
+    public async Task HookStepTracker_ProcessEvent_HookBindingFinishedEvent_ReturnsOneEnvelope()
     {
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
@@ -114,29 +119,14 @@ public class HookStepExecutionTrackerTests
             .Returns(testStepFinished);
 
         // Act
-        var envelopes = ((IGenerateMessage)_hookStepExecutionTracker).GenerateFrom(hookBindingFinishedEvent).ToList();
+        await _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
 
         // Assert
-        envelopes.Should().HaveCount(1);
-        envelopes[0].TestStepFinished.Should().Be(testStepFinished);
-        _messageFactoryMock.Verify(f => f.ToTestStepFinished(_hookStepExecutionTracker), Times.Once);
+        _publisherMock.Verify(p => p.PublishAsync(It.Is<Envelope>(e => e.TestStepFinished == testStepFinished)), Times.Once);
     }
 
     [Fact]
-    public void HookStepTracker_GenerateFrom_OtherEvent_ReturnsEmptyEnumerable()
-    {
-        // Arrange
-        var otherEvent = new Mock<ExecutionEvent>().Object;
-
-        // Act
-        var envelopes = ((IGenerateMessage)_hookStepExecutionTracker).GenerateFrom(otherEvent).ToList();
-
-        // Assert
-        envelopes.Should().BeEmpty();
-    }
-
-    [Fact]
-    public void HookStepTracker_ProcessEvent_HookBindingStartedEvent_FirstAttempt_CreatesHookStepDefinition()
+    public async Task HookStepTracker_ProcessEvent_HookBindingStartedEvent_FirstAttempt_CreatesHookStepDefinition()
     {
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
@@ -144,8 +134,14 @@ public class HookStepExecutionTrackerTests
 
         var hookId = "hook123";
         var testStepId = "step456";
+        var testStepStarted = new TestStepStarted("testCaseStartedId", testStepId, new Timestamp(0, 1));
+        _stepDefinitionsByBinding[hookBindingMock.Object] = "hook123";
 
-            
+        _messageFactoryMock
+            .Setup(f => f.ToTestStepStarted(_hookStepExecutionTracker))
+            .Returns(testStepStarted);
+
+
         _stepDefinitionsByBinding[hookBindingStartedEvent.HookBinding] = hookId;
             
         _idGeneratorMock.Setup(g => g.GetNewId()).Returns(testStepId);
@@ -153,32 +149,39 @@ public class HookStepExecutionTrackerTests
         _testCaseTrackerMock.SetupGet(t => t.AttemptCount).Returns(0); // First attempt
 
         // Act
-        _hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
+        await _hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
 
         // Assert
         _hookStepExecutionTracker.StepTracker.Should().NotBeNull();
         _hookStepExecutionTracker.StepTracker.Should().BeOfType<HookStepTracker>();
             
         _testCaseTracker.Steps.Should().HaveCount(1);
-        _testCaseTracker.Steps[0].Should().BeOfType<HookStepTracker>()
-                        .Which.HookId.Should().Be(hookId);
+        _testCaseTracker.Steps[0].Should().BeOfType<HookStepTracker>();
+        ((HookStepTracker)_testCaseTracker.Steps[0]).HookId.Should().Be(hookId);
     }
 
     [Fact]
-    public void HookStepTracker_ProcessEvent_HookBindingStartedEvent_Retry_FindsExistingDefinition()
+    public async Task HookStepTracker_ProcessEvent_HookBindingStartedEvent_Retry_FindsExistingDefinition()
     {
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
         var hookBindingStartedEvent = new HookBindingStartedEvent(hookBindingMock.Object, _mockContextManager.Object);
 
         var hookId = "hook123";
-            
+        var testStepId = "step456";
+        var testStepStarted = new TestStepStarted("testCaseStartedId", testStepId, new Timestamp(0, 1));
+
+        _messageFactoryMock
+            .Setup(f => f.ToTestStepStarted(It.IsAny<HookStepExecutionTracker>()))
+            .Returns(testStepStarted);
+
         _stepDefinitionsByBinding[hookBindingStartedEvent.HookBinding] = hookId;
 
         // Create a hook tracker for a Retry
         _hookStepExecutionTracker = new HookStepExecutionTracker(
             CreateTestCaseExecutionRecord(1),
-            _messageFactoryMock.Object
+            _messageFactoryMock.Object,
+            _publisherMock.Object
         );
             
         // Pre-existing definition that should be found
@@ -187,7 +190,7 @@ public class HookStepExecutionTrackerTests
         _testCaseTracker.Steps.Add(existingHookStepDefinition);
 
         // Act
-        _hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
+        await _hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
 
         // Assert
         _hookStepExecutionTracker.StepTracker.Should().Be(existingHookStepDefinition);
@@ -196,7 +199,7 @@ public class HookStepExecutionTrackerTests
     }
 
     [Fact]
-    public void HookStepTracker_ProcessEvent_HookBindingFinishedEvent_WithNoException_SetsStatusToOK()
+    public async Task HookStepTracker_ProcessEvent_HookBindingFinishedEvent_WithNoException_SetsStatusToOK()
     {
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
@@ -205,9 +208,19 @@ public class HookStepExecutionTrackerTests
             TimeSpan.FromMilliseconds(100),
             _mockContextManager.Object
         );
+        var hookId = "hook123";
+        var testStepId = "step456";
+        var testStepFinished = new TestStepFinished("testCaseStartedId", testStepId, new TestStepResult(new Duration(0,0), "", TestStepResultStatus.PASSED, null),new Timestamp(0, 1));
+
+        _messageFactoryMock
+            .Setup(f => f.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()))
+            .Returns(testStepFinished);
+
+        _stepDefinitionsByBinding[hookBindingFinishedEvent.HookBinding] = hookId;
+
 
         // Act
-        _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
+        await _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
 
         // Assert
         _hookStepExecutionTracker.Exception.Should().BeNull();
@@ -215,7 +228,7 @@ public class HookStepExecutionTrackerTests
     }
 
     [Fact]
-    public void HookStepTracker_ProcessEvent_HookBindingFinishedEvent_WithException_SetsStatusToTestError()
+    public async Task HookStepTracker_ProcessEvent_HookBindingFinishedEvent_WithException_SetsStatusToTestError()
     {
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
@@ -226,9 +239,18 @@ public class HookStepExecutionTrackerTests
             _mockContextManager.Object,
             exception
         );
+        var hookId = "hook123";
+        var testStepId = "step456";
+        var testStepFinished = new TestStepFinished("testCaseStartedId", testStepId, new TestStepResult(new Duration(0, 0), "", TestStepResultStatus.PASSED, null), new Timestamp(0, 1));
+
+        _messageFactoryMock
+            .Setup(f => f.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()))
+            .Returns(testStepFinished);
+
+        _stepDefinitionsByBinding[hookBindingFinishedEvent.HookBinding] = hookId;
 
         // Act
-        _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
+        await _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
 
         // Assert
         _hookStepExecutionTracker.Exception.Should().Be(exception);

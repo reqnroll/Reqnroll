@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Bindings;
+using Reqnroll.Formatters.PubSub;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -29,9 +31,68 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// </remarks>
 public class PickleExecutionTracker : IPickleExecutionTracker
 {
+    /// <summary>
+    /// Ensures correct message ordering for Cucumber messages by buffering messages until a <see cref="TestCase"/> message is published.
+    /// <para>
+    /// <b>Responsibilities:</b>
+    /// <list type="bullet">
+    ///   <item>Buffers all messages until a <see cref="TestCase"/> message is encountered.</item>
+    ///   <item>Flushes buffered messages immediately after the <see cref="TestCase"/> message is published.</item>
+    ///   <item>Passes through all subsequent messages directly to the underlying publisher.</item>
+    /// </list>
+    /// </para>
+    /// <para>
+    /// This is necessary because the <see cref="TestCase"/> message has IDs that are referenced in Pickle Execution messages.
+    /// </para>
+    /// </summary>
+    internal class OrderFixingMessagePublisher : IMessagePublisher
+    {
+        private enum BufferingState
+        {
+            Buffering,
+            PassThru
+        }
+        private BufferingState _state = BufferingState.Buffering;
+        private readonly List<Envelope> _bufferedMessages = new();
+        private readonly IMessagePublisher _publisher;
+
+        public OrderFixingMessagePublisher(IMessagePublisher publisher)
+        {
+            _publisher = publisher ?? throw new ArgumentNullException(nameof(publisher));
+        }
+
+        public async Task PublishAsync(Envelope message)
+        {
+            if (message.Content() is TestCase)
+            {
+                await _publisher.PublishAsync(message);
+                await FlushBuffer();
+                _state = BufferingState.PassThru;
+            }
+            else if (_state == BufferingState.Buffering)
+            {
+                _bufferedMessages.Add(message);
+            }
+            else
+            {
+                await _publisher.PublishAsync(message);
+            }
+        }
+
+        private async Task FlushBuffer()
+        {
+            foreach (var message in _bufferedMessages)
+            {
+                await _publisher.PublishAsync(message);
+            }
+            _bufferedMessages.Clear();
+        }
+    }
+
     private readonly ICucumberMessageFactory _messageFactory;
+    private readonly ITestCaseExecutionTrackerFactory _testCaseExecutionTrackerFactory;
+    private readonly IMessagePublisher _publisher;
     private readonly List<TestCaseExecutionTracker> _executionHistory = new();
-    private TestCaseExecutionTracker _currentTestCaseExecutionTracker;
 
     // Feature FeatureName and Pickle ID make up a unique identifier for tracking execution of Test Cases
     public string FeatureName { get; }
@@ -42,7 +103,9 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     public IIdGenerator IdGenerator { get; }
 
     public string TestCaseId { get; }
+
     public TestCaseTracker TestCaseTracker { get; }
+    public TestCaseExecutionTracker CurrentTestCaseExecutionTracker { get; private set; }
 
     // This dictionary tracks the StepDefinitions(ID) by their method signature
     // used during TestCase creation to map from a Step Definition binding to its ID
@@ -51,9 +114,10 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     public int AttemptCount { get; private set; }
     public bool Finished { get; private set; }
 
-    private bool HasCurrentTestCaseExecution => Enabled && _currentTestCaseExecutionTracker != null;
+    private bool HasCurrentTestCaseExecution => Enabled && CurrentTestCaseExecutionTracker != null;
 
     public ScenarioExecutionStatus ScenarioExecutionStatus => _executionHistory.Last().ScenarioExecutionStatus;
+    public IEnumerable<TestCaseExecutionTracker> ExecutionHistory => _executionHistory;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PickleExecutionTracker"/> class for a specific scenario (Pickle).
@@ -69,7 +133,9 @@ public class PickleExecutionTracker : IPickleExecutionTracker
     /// </param>
     /// <param name="instant">The timestamp marking when the test case started execution.</param>
     /// <param name="messageFactory">The factory responsible for creating Cucumber message objects.</param>
-    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, IReadOnlyDictionary<IBinding, string> stepDefinitionsByMethod, DateTime instant, ICucumberMessageFactory messageFactory)
+    /// <param name="testCaseExecutionTrackerFactory">The factory for creating TestExecutionTracker objects.</param>
+    /// <param name="publisher">The service that publishes Messages to Formatters</param>
+    public PickleExecutionTracker(string pickleId, string testRunStartedId, string featureName, bool enabled, IIdGenerator idGenerator, IReadOnlyDictionary<IBinding, string> stepDefinitionsByMethod, DateTime instant, ICucumberMessageFactory messageFactory, ITestCaseExecutionTrackerFactory testCaseExecutionTrackerFactory, IMessagePublisher publisher)
     {
         TestRunStartedId = testRunStartedId;
         PickleId = pickleId;
@@ -80,107 +146,80 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         AttemptCount = -1;
         TestCaseStartedTimeStamp = instant;
         _messageFactory = messageFactory;
-
+        _testCaseExecutionTrackerFactory = testCaseExecutionTrackerFactory;
         TestCaseId = IdGenerator.GetNewId();
+        _publisher = publisher;
         TestCaseTracker = new TestCaseTracker(TestCaseId, PickleId, this);
     }
 
     private void SetExecutionRecordAsCurrentlyExecuting(TestCaseExecutionTracker testCaseExecutionTracker)
     {
-        _currentTestCaseExecutionTracker = testCaseExecutionTracker;
+        CurrentTestCaseExecutionTracker = testCaseExecutionTracker;
         if (!_executionHistory.Contains(testCaseExecutionTracker))
             _executionHistory.Add(testCaseExecutionTracker);
     }
 
-    // Returns all the Cucumber Messages that result from execution of the Test Case (eg, TestCase, TestCaseStarted, TestCaseFinished, TestStepStarted/Finished)
-    public IEnumerable<Envelope> RuntimeGeneratedMessages
+    public async Task FinalizeTracking()
     {
-        get
-        {
-            // ask each execution record for its messages
-            var tempListOfMessages = new List<Envelope>();
-            foreach (var testCaseExecution in _executionHistory)
-            {
-                var aRunsWorth = testCaseExecution.RuntimeMessages;
-                if (tempListOfMessages.Count > 0)
-                {
-                    // there has been a previous run of this scenario that was retried
-                    // We will create a copy of the last TestRunFinished message, but with the 'willBeRetried' flag set to true
-                    // and substitute the copy into the list
-                    var lastRunTestCaseFinished = tempListOfMessages.Last();
+        // The feature has finished (at least for the worker that is processing this scenario),
+        // if our scenario has not yet published its TestCaseFinished message, we need to do it now
+        if (!HasCurrentTestCaseExecution)
+            return;
 
-                    // Guard: confirm that the last message is a TestCaseFinished; if not something went wrong and skip the fixup
-                    if (lastRunTestCaseFinished.Content() is TestCaseFinished)
-                    {
-                        var lastRunTestCaseMarkedAsToBeRetried = FixupWillBeRetried(lastRunTestCaseFinished);
-                        tempListOfMessages.Remove(lastRunTestCaseFinished);
-                        tempListOfMessages.Add(lastRunTestCaseMarkedAsToBeRetried);
-                    }
-                }
-                tempListOfMessages.AddRange(aRunsWorth);
-            }
-            return tempListOfMessages;
-        }
+        await CurrentTestCaseExecutionTracker.FinalizeTracking();
     }
 
-    private Envelope FixupWillBeRetried(Envelope lastRunTestCaseFinishedEnvelope)
-    {
-        var testCaseFinished = lastRunTestCaseFinishedEnvelope.Content() as TestCaseFinished;
-        if (testCaseFinished == null) throw new InvalidOperationException("Invalid TestCaseFinished envelope");
-        return Envelope.Create(new TestCaseFinished(testCaseFinished.TestCaseStartedId, testCaseFinished.Timestamp, true));
-    }
-
-    public void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
+    public async Task ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
     {
         if (!Enabled) 
             return;
 
         AttemptCount++;
         scenarioStartedEvent.ScenarioContext.ScenarioInfo.PickleId = PickleId;
-        // on the first time this Scenario is executed, create a TestCaseTracker
-        if (AttemptCount == 0)
+
+        if (AttemptCount > 0 && HasCurrentTestCaseExecution) // HasCurrentTestCaseExecution should be true, but for safety we check
         {
-            //TestCaseId = IdGenerator.GetNewId();
-            //TestCaseTracker = new TestCaseTracker(TestCaseId, PickleId, this);
-        }
-        else
-        {
+            // A ScenarioStartedEvent with an AttemptCount > 0 indicates a retry of the scenario.
+            // We need to publish the TestCaseFinished message for the previous (failed) execution and set it's WillBeRetried property to true.
+            var lastRunTestCaseFinishedEnvelope = Envelope.Create(
+                _messageFactory.ToTestCaseFinished(CurrentTestCaseExecutionTracker, willBeRetried: true));
+            await _publisher.PublishAsync(lastRunTestCaseFinishedEnvelope);
             // Reset tracking
             Finished = false;
-            _currentTestCaseExecutionTracker = null;
+            CurrentTestCaseExecutionTracker = null; // will be set again in SetExecutionRecordAsCurrentlyExecuting a few lines below
         }
 
-        var testCaseExecutionRecord = new TestCaseExecutionTracker(this, _messageFactory, AttemptCount, IdGenerator.GetNewId(), TestCaseId, TestCaseTracker);
-        SetExecutionRecordAsCurrentlyExecuting(testCaseExecutionRecord);
-        testCaseExecutionRecord.ProcessEvent(scenarioStartedEvent);
+        var testCaseExecutionTracker = _testCaseExecutionTrackerFactory.CreateTestCaseExecutionTracker(this, AttemptCount, TestCaseId, TestCaseTracker, _publisher);
+        SetExecutionRecordAsCurrentlyExecuting(testCaseExecutionTracker);
+        await testCaseExecutionTracker.ProcessEvent(scenarioStartedEvent);
     }
 
-    public void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
+    public async Task ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
     {
         if (!HasCurrentTestCaseExecution)
             return;
 
         Finished = true;
-        _currentTestCaseExecutionTracker.ProcessEvent(scenarioFinishedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(scenarioFinishedEvent);
     }
 
-    public void ProcessEvent(StepStartedEvent stepStartedEvent)
+    public async Task ProcessEvent(StepStartedEvent stepStartedEvent)
     {
         if (!HasCurrentTestCaseExecution)
             return;
 
-        _currentTestCaseExecutionTracker.ProcessEvent(stepStartedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(stepStartedEvent);
     }
 
-    public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
+    public async Task ProcessEvent(StepFinishedEvent stepFinishedEvent)
     {
         if (!HasCurrentTestCaseExecution)
             return;
 
-        _currentTestCaseExecutionTracker.ProcessEvent(stepFinishedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(stepFinishedEvent);
     }
 
-    public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
+    public async Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
     {
         // At this point we only care about hooks that wrap scenarios or steps; Before/AfterTestRun hooks were processed earlier by the _publisher
         if (hookBindingStartedEvent.HookBinding.HookType is Bindings.HookType.AfterTestRun or Bindings.HookType.BeforeTestRun)
@@ -189,10 +228,10 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        _currentTestCaseExecutionTracker.ProcessEvent(hookBindingStartedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(hookBindingStartedEvent);
     }
 
-    public void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
+    public async Task ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
     {
         // At this point we only care about hooks that wrap scenarios or steps; TestRunHooks were processed earlier by the Publisher
         if (hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.AfterTestRun || hookBindingFinishedEvent.HookBinding.HookType == Bindings.HookType.BeforeTestRun)
@@ -201,22 +240,22 @@ public class PickleExecutionTracker : IPickleExecutionTracker
         if (!HasCurrentTestCaseExecution)
             return;
 
-        _currentTestCaseExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
     }
 
-    public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
+    public async Task ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
     {
         if (!HasCurrentTestCaseExecution)
             return;
 
-        _currentTestCaseExecutionTracker.ProcessEvent(attachmentAddedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(attachmentAddedEvent);
     }
 
-    public void ProcessEvent(OutputAddedEvent outputAddedEvent)
+    public async Task ProcessEvent(OutputAddedEvent outputAddedEvent)
     {
         if (!HasCurrentTestCaseExecution)
             return;
 
-        _currentTestCaseExecutionTracker.ProcessEvent(outputAddedEvent);
+        await CurrentTestCaseExecutionTracker.ProcessEvent(outputAddedEvent);
     }
 }

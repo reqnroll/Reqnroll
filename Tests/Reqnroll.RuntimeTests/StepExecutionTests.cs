@@ -305,15 +305,6 @@ namespace Reqnroll.RuntimeTests
                         throw new Exception("catch meee");
                     }));
 
-            //bindingInstance.Expect(b => b.ReturnsATask()).Return(Task.Factory.StartNew(() =>
-            //    {
-            //        Thread.Sleep(800);
-            //        taskFinished = true;
-            //        throw new Exception("catch meee");
-            //    }));
-
-            //MockRepository.ReplayAll();
-
             await testRunner.GivenAsync("Returns a Task");
             Assert.True(taskFinished);
             GetLastTestStatus().Should().Be(ScenarioExecutionStatus.TestError);

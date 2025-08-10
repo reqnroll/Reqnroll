@@ -14,6 +14,7 @@ using Reqnroll.Events;
 using Reqnroll.FileAccess;
 using Reqnroll.Formatters;
 using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.Formatters.Html;
 using Reqnroll.Formatters.Message;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
@@ -111,7 +112,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestAssemblyProvider, ITestAssemblyProvider>();
 
             //Support for publishing Cucumber Messages
-            container.RegisterTypeAs<DebugFormatterLog, IFormatterLog>();
+            container.RegisterTypeAs<NullFormatterLog, IFormatterLog>();
             container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<FormattersDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
             container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
@@ -125,6 +126,11 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<CucumberMessageFactory, ICucumberMessageFactory>();
             container.RegisterTypeAs<BindingMessagesGenerator, IBindingMessagesGenerator>();
             container.RegisterTypeAs<MetaMessageGenerator, IMetaMessageGenerator>();
+            container.RegisterTypeAs<FeatureExecutionTrackerFactory, IFeatureExecutionTrackerFactory>();
+            container.RegisterTypeAs<PickleExecutionTrackerFactory, IPickleExecutionTrackerFactory>();
+            container.RegisterTypeAs<TestCaseExecutionTrackerFactory, ITestCaseExecutionTrackerFactory>();
+            container.RegisterFactoryAs<IMessagePublisher>(() => container.Resolve<ICucumberMessageBroker>());
+            container.RegisterTypeAs<StepTrackerFactory, IStepTrackerFactory>();
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
