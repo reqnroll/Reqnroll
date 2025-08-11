@@ -64,12 +64,6 @@ public abstract class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Handles_different_scenario_and_scenario_outline_outcomes()
     {
-        if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
-        {
-            Assert.IsTrue(true);
-            return;
-        }
-
         AddFeatureFile(
             """
             Feature: Sample Feature
