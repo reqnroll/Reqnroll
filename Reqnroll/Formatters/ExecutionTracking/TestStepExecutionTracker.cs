@@ -1,4 +1,4 @@
-﻿using Io.Cucumber.Messages.Types;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System.Threading.Tasks;
@@ -34,9 +34,9 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
             testStepTracker?.ProcessEvent(stepFinishedEvent);
         }
 
-        Exception = stepFinishedEvent.ScenarioContext.TestError;
         StepFinishedAt = stepFinishedEvent.Timestamp;
         Status = stepFinishedEvent.StepContext.Status;
+        Exception = stepFinishedEvent.StepContext.StepError;
 
         await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepFinished(this)));
     }

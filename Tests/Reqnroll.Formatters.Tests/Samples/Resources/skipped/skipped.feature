@@ -6,7 +6,7 @@ Feature: Skipping scenarios
   This can be useful in certain situations e.g. the current environment doesn't have
   the right conditions for running a particular scenario.
 
-  @ignore
+  @skip
   Scenario: Skipping from a Before hook
     Given a step that is skipped
 

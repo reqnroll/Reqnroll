@@ -141,7 +141,113 @@ public class FeatureExecutionTrackerTests
         sut.FeatureExecutionSuccess.Should().BeFalse(); 
     }
 
+    [Fact]
+    public async Task ProcessEvent_Should_Calculate_FeatureExecutionFailure_On_FeatureFinishedEvent_When_AScenarioFails_And_AScenarioIsSkipped()
+    {
+        // Arrange
+        var sut = InitializeFeatureTrackerSut();
 
+        // Set up one scenario to fail
+        _pickleTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.TestError);
+        _pickleTrackerMock.Setup(t => t.Finished).Returns(true);
+        sut.GetOrAddPickleExecutionTracker("0");
+
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+        var scenarioContextMock = new Mock<IScenarioContext>();
+        scenarioContextMock.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy);
+        var scenarioFinishedEventMock0 = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock.Object);
+
+        // Set up another scenario to be skipped
+        var pickleTrackerMock2 = new Mock<IPickleExecutionTracker>();
+        pickleTrackerMock2.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.Skipped);
+        pickleTrackerMock2.Setup(t => t.Finished).Returns(true);
+        sut.GetOrAddPickleExecutionTracker("1");
+
+        var scenarioInfoDummy1 = new ScenarioInfo("dummy SI", "", null, null, null, "1");
+        var scenarioContextMock1 = new Mock<IScenarioContext>();
+        scenarioContextMock1.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy1);
+        var scenarioFinishedEventMock1 = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock1.Object);
+
+        // Act
+        await sut.ProcessEvent(scenarioFinishedEventMock0.Object);
+        await sut.ProcessEvent(scenarioFinishedEventMock1.Object);
+        await sut.FinalizeTracking();
+
+        // Assert
+        sut.FeatureExecutionSuccess.Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task ProcessEvent_Should_Calculate_FeatureExecutionSuccess_On_FeatureFinishedEvent_When_AScenarioSucceeds_And_AScenarioIsSkipped()
+    {
+        // Arrange
+        var sut = InitializeFeatureTrackerSut();
+
+        // Set up one scenario to succeed
+        _pickleTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.OK);
+        _pickleTrackerMock.Setup(t => t.Finished).Returns(true);
+        sut.GetOrAddPickleExecutionTracker("0");
+
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+        var scenarioContextMock = new Mock<IScenarioContext>();
+        scenarioContextMock.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy);
+        var scenarioFinishedEventMock0 = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock.Object);
+
+        // Set up another scenario to be skipped
+        var pickleTrackerMock2 = new Mock<IPickleExecutionTracker>();
+        pickleTrackerMock2.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.Skipped);
+        pickleTrackerMock2.Setup(t => t.Finished).Returns(true);
+        sut.GetOrAddPickleExecutionTracker("1");
+
+        var scenarioInfoDummy1 = new ScenarioInfo("dummy SI", "", null, null, null, "1");
+        var scenarioContextMock1 = new Mock<IScenarioContext>();
+        scenarioContextMock1.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy1);
+        var scenarioFinishedEventMock1 = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock1.Object);
+
+        // Act
+        await sut.ProcessEvent(scenarioFinishedEventMock0.Object);
+        await sut.ProcessEvent(scenarioFinishedEventMock1.Object);
+        await sut.FinalizeTracking();
+
+        // Assert
+        sut.FeatureExecutionSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ProcessEvent_Should_Calculate_FeatureExecutionSuccess_On_FeatureFinishedEvent_When_All_ScenarioAreSkipped()
+    {
+        // Arrange
+        var sut = InitializeFeatureTrackerSut();
+
+        // Set up one scenario to be skipped
+        _pickleTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.Skipped);
+        _pickleTrackerMock.Setup(t => t.Finished).Returns(true);
+        sut.GetOrAddPickleExecutionTracker("0");
+
+        var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
+        var scenarioContextMock = new Mock<IScenarioContext>();
+        scenarioContextMock.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy);
+        var scenarioFinishedEventMock0 = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock.Object);
+
+        // Set up another scenario to be skipped
+        var pickleTrackerMock2 = new Mock<IPickleExecutionTracker>();
+        pickleTrackerMock2.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.Skipped);
+        pickleTrackerMock2.Setup(t => t.Finished).Returns(true);
+        sut.GetOrAddPickleExecutionTracker("1");
+
+        var scenarioInfoDummy1 = new ScenarioInfo("dummy SI", "", null, null, null, "1");
+        var scenarioContextMock1 = new Mock<IScenarioContext>();
+        scenarioContextMock1.Setup(m => m.ScenarioInfo).Returns(scenarioInfoDummy1);
+        var scenarioFinishedEventMock1 = new Mock<ScenarioFinishedEvent>(MockBehavior.Strict, _mockFeatureContext, scenarioContextMock1.Object);
+
+        // Act
+        await sut.ProcessEvent(scenarioFinishedEventMock0.Object);
+        await sut.ProcessEvent(scenarioFinishedEventMock1.Object);
+        await sut.FinalizeTracking();
+
+        // Assert
+        sut.FeatureExecutionSuccess.Should().BeTrue();
+    }
 
     [Fact]
     public async Task ProcessEvent_Should_Throw_Exception_For_Invalid_ScenarioStartedEvent()
