@@ -1,9 +1,9 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyName>FormatterTestLogger</AssemblyName>
-    <PackageId>FormatterTestLogger</PackageId>
+    <AssemblyName>Reqnroll.FormatterTestLogger</AssemblyName>
+    <PackageId>Reqnroll.FormatterTestLogger</PackageId>
     <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
