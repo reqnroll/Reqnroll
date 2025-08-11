@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.TestProjectGenerator;
 
 namespace Reqnroll.SystemTests.Generation;
@@ -15,5 +16,15 @@ public class TUnitTestGenerationTest : GenerationTestBase
     {
         base.TestInitialize();
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.TUnit;
+    }
+
+    protected override string GetExpectedPendingOutcome() => "Failed";
+    protected override string GetExpectedUndefinedOutcome() => "Failed";
+
+    protected override void AssertIgnoredScenarioOutlineExampleHandled()
+    {
+        _vsTestExecutionDriver.LastTestExecutionResult.LeafTestResults
+                              .Should().ContainSingle(tr => tr.TestName.StartsWith("SO") && tr.TestName.Contains("ignored"))
+                              .Which.Outcome.Should().Be(GetExpectedIgnoredOutcome());
     }
 }
