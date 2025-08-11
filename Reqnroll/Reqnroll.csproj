@@ -16,7 +16,7 @@
 
   <!-- build time dependencies -->
   <ItemGroup>
-    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.13.0" />
+    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.14.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
   </ItemGroup>
