@@ -31,7 +31,15 @@ public class HtmlFormatter : FileWritingFormatterBase
     }
 
     protected virtual MessagesToHtmlWriter CreateMessagesToHtmlWriter(Stream stream, Func<StreamWriter, Envelope, Task> asyncStreamSerializer) 
-        => new(stream, asyncStreamSerializer);
+        => new(stream, asyncStreamSerializer, GetHtmlReportSettings());
+
+    protected virtual HtmlReportSettings GetHtmlReportSettings()
+    {
+        return new HtmlReportSettings
+        {
+            Title = $"Reqnroll Report {DateTime.Now:u}",
+        };
+    }
 
     protected override void OnTargetFileStreamInitialized(Stream targetFileStream)
     {
