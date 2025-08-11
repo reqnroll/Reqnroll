@@ -1,4 +1,4 @@
-﻿using Gherkin.CucumberMessages;
+using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Events;
@@ -97,7 +97,9 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
         }
         
         // Calculate the feature-level execution status
-        FeatureExecutionSuccess = pickleExecutionTrackers.All(tc => tc.Finished && tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK);
+        FeatureExecutionSuccess = pickleExecutionTrackers.All(
+            tc => tc.Finished 
+            && (tc.ScenarioExecutionStatus == ScenarioExecutionStatus.OK || tc.ScenarioExecutionStatus == ScenarioExecutionStatus.Skipped));
     }
 
 
