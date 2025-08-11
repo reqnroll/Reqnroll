@@ -219,7 +219,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
 
-        // Set up one scenario to succeed
+        // Set up one scenario to be skipped
         _pickleTrackerMock.Setup(t => t.ScenarioExecutionStatus).Returns(ScenarioExecutionStatus.Skipped);
         _pickleTrackerMock.Setup(t => t.Finished).Returns(true);
         sut.GetOrAddPickleExecutionTracker("0");

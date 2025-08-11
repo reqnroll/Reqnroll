@@ -17,7 +17,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.skipped
         {
             _unitTestRuntimeProvider = unitTestRuntimeProvider;
         }
-
+         
         [BeforeScenario("@skip")]
         public void BeforeScenarioWithSkip()
         {
