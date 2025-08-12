@@ -10,7 +10,7 @@ Reqnroll is a .NET port of [Cucumber](https://cucumber.io/) and it is based on t
 
 Reqnroll enables writing executable specifications for BDD using [Gherkin](https://cucumber.io/docs/gherkin/), the widely-accepted *feature file* specification format. With that you can define the requirements using *Given-When-Then* style *scenarios* and turn them to automated tests in order to verify their implementation.
 
-Reqnroll works on all major operating systems (Windows, Linux, macOS), on all commonly used .NET implementations (including .NET Framework 4.6.2+ and up to .NET 9.0). For executing the automated scenarios, Reqnroll can use [MsTest](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-mstest), [NUnit](https://nunit.org/) or [xUnit](https://xunit.net/). On Reqnroll projects you can work using Visual Studio 2022, Visual Studio Core and Rider, but you can also use Reqnroll without any IDE.
+Reqnroll works on all major operating systems (Windows, Linux, macOS), on all commonly used .NET implementations (including .NET Framework 4.6.2+ and up to .NET 9.0). For executing the automated scenarios, Reqnroll can use [MsTest](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-mstest), [NUnit](https://nunit.org/), [TUnit](https://tunit.dev/) or [xUnit](https://xunit.net/) (v2 and v3. On Reqnroll projects you can work using Visual Studio 2022, Visual Studio Core and Rider, but you can also use Reqnroll without any IDE.
 
 ## Useful links
 
@@ -23,7 +23,13 @@ Reqnroll works on all major operating systems (Windows, Linux, macOS), on all co
 
 ## Installation
 
-The extension can be installed via NuGet packages from nuget.org. The main package you need to install depends on the test execution framework: [`Reqnroll.NUnit`](https://www.nuget.org/packages/Reqnroll.NUnit), [`Reqnroll.MsTest`](https://www.nuget.org/packages/Reqnroll.MsTest) or [`Reqnroll.xUnit`](https://www.nuget.org/packages/Reqnroll.xUnit). See detailed instructions on the [project setup documentation page](https://go.reqnroll.net/doc-setup-project).
+The extension can be installed via NuGet packages from nuget.org. The main package you need to install depends on the test execution framework: 
+- [`Reqnroll.NUnit`](https://www.nuget.org/packages/Reqnroll.NUnit)
+- [`Reqnroll.MsTest`](https://www.nuget.org/packages/Reqnroll.MsTest)
+- [`Reqnroll.TUnit`](https://www.nuget.org/packages/Reqnroll.TUnit)
+- [`Reqnroll.xUnit`](https://www.nuget.org/packages/Reqnroll.xUnit) for xUnit 2 or [`Reqnroll.xunit.v3`](https://www.nuget.org/packages/Reqnroll.xunit.v3) for xUnit 3
+
+See detailed instructions on the [project setup documentation page](https://go.reqnroll.net/doc-setup-project).
 
 ## Contributing
 
