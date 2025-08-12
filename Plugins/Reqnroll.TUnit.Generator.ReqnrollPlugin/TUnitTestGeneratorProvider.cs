@@ -178,11 +178,8 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
             tagsArray.Add("ignore");
 
         // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://youtrack.jetbrains.com/issue/RSRP-279138
-        var hasExampleTags = tagsArray.Any();
         var exampleTagExpressionList = tagsArray.Select(t => (CodeExpression)new CodePrimitiveExpression(t));
-        var exampleTagsExpression = hasExampleTags
-            ? new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray())
-            : (CodeExpression)new CodePrimitiveExpression(null);
+        var exampleTagsExpression = new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray());
 
         args.Add(new CodeAttributeArgument(exampleTagsExpression));
 
