@@ -301,7 +301,6 @@ namespace Reqnroll.Generator.Generation
                 new CodeExpressionStatement(callScenarioStartMethodExpression)
             };
 
-
             if (generationContext.Feature.HasFeatureBackground())
             {
                 using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statementsWhenScenarioIsExecuted, generationContext.Document.SourceFilePath, generationContext.Feature.Background.Location))
@@ -372,8 +371,9 @@ namespace Reqnroll.Generator.Generation
 
         private CodeMethodInvokeExpression CreateTestRunnerSkipScenarioCall()
         {
+            var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
             var callSkipScenarioExpression = new CodeMethodInvokeExpression(
-                new CodeFieldReferenceExpression(null, TESTRUNNER_FIELD),
+                testRunnerField,
                 nameof(TestRunner.SkipScenarioAsync));
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callSkipScenarioExpression);
 
