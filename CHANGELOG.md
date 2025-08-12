@@ -36,6 +36,7 @@
 ## Deprecations:
 
 * The synchronous test runner API (`ISyncTestRunner`) has been removed. Please use `ITestRunner` instead.
+* Removed obsolete methods on `Reqnroll.Assist.Service` class: `RegisterValueComparer`, `UnregisterValueComparer`, `RegisterValueRetriever`, `UnregisterValueRetriever` use `ValueComparers.Register`, `ValueComparers.Unregister`, `ValueRetrievers.Register`, `ValueRetrievers.Unregister` instead.
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
 
