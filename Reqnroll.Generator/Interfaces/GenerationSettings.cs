@@ -6,7 +6,7 @@ public class GenerationSettings
     /// Specifies whether the generator should check the existing generation results. 
     /// Optional, disabled by default.
     /// </summary>
-    public bool CheckUpToDate { get; set; } = false;
+    public bool CheckUpToDate { get; set; }
 
     /// <summary>
     /// Specifies the way how the up-to-date checking should be performed.
