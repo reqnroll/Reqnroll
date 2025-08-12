@@ -32,6 +32,7 @@
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 * Fixed source link and deterministic compilation for Reqnroll.CustomPlugin package (#719)
+* Fix: Project Names that contain certain special characters cause code generation to fail. (#745)
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
