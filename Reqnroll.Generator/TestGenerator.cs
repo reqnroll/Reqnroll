@@ -188,7 +188,12 @@ namespace Reqnroll.Generator
 
             string targetNamespace = projectSettings == null || string.IsNullOrEmpty(projectSettings.DefaultNamespace)
                 ? null
-                : projectSettings.DefaultNamespace.ToIdentifier();
+                : projectSettings.DefaultNamespace;
+
+            if (targetNamespace != null)
+            {
+                targetNamespace = string.Join(".", targetNamespace.Split('.').Select(f => f.ToIdentifier()).ToArray());
+            }
 
             var directoryName = Path.GetDirectoryName(featureFileInput.ProjectRelativePath);
             string namespaceExtension = string.IsNullOrEmpty(directoryName) ? null :
