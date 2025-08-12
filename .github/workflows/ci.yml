@@ -200,6 +200,44 @@ jobs:
         name: build-trx-v${{ steps.versions.outputs.product_full_version }}
         if-no-files-found: error
         path: "TestResults/*.trx"
+    - name: Install NuGet Package Validation Tool
+      run: dotnet tool install --global Meziantou.Framework.NuGetPackageValidation.Tool
+    - name: Validate NuGet packages
+      shell: pwsh
+      run: |
+        Write-Output "Validating NuGet packages..."
+        $packages = Get-ChildItem "GeneratedNuGetPackages/${{ steps.versions.outputs.product_configuration }}/*.nupkg" -Exclude "*.snupkg"
+        $errorCount = 0
+        $totalPackages = $packages.Count
+        
+        foreach ($package in $packages) {
+          Write-Output "Validating package: $($package.Name)"
+          try {
+            # Run validation excluding deterministic checks (error code 112) as requested (temporary)
+            $validationResult = meziantou.validate-nuget-package $package.FullName --excluded-rule-ids 112 2>&1
+            $exitCode = $LASTEXITCODE
+            
+            if ($exitCode -eq 0) {
+              Write-Output "✅ $($package.Name) passed validation"
+            } else {
+              Write-Output "⚠️ $($package.Name) has validation issues:"
+              Write-Output $validationResult
+              # For now, we'll log warnings but not fail the build to allow gradual improvement
+              # This can be changed to fail the build once all validation issues are resolved
+              Write-Output "Note: Package validation issues detected but not failing build (gradual improvement mode)"
+            }
+          } catch {
+            Write-Output "❌ Error validating $($package.Name): $_"
+            $errorCount++
+          }
+        }
+        
+        if ($errorCount -gt 0) {
+          Write-Output "❌ $errorCount package(s) had validation errors"
+          exit 1
+        } else {
+          Write-Output "✅ Validation completed for $totalPackages packages"
+        }
     - name: Upload packages
       uses: actions/upload-artifact@v4
       with:
