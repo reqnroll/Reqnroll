@@ -101,7 +101,8 @@ namespace Reqnroll.Generator.Generation
 
         private void GenerateTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile, int pickleIndex)
         {
-            var testMethod = CreateTestMethod(generationContext, scenarioDefinitionInFeatureFile.ScenarioDefinition, null);
+            var ruleTags = scenarioDefinitionInFeatureFile.Rule?.Tags ?? [];
+            var testMethod = CreateTestMethod(generationContext, scenarioDefinitionInFeatureFile.ScenarioDefinition, ruleTags);
             GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, testMethod, pickleIndex: pickleIndex);
         }
 

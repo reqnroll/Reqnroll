@@ -76,6 +76,21 @@ namespace Reqnroll.GeneratorTests
         }
 
         [Fact]
+        public void Should_pass_rule_tags_as_test_method_category()
+        {
+            var generator = CreateUnitTestFeatureGenerator();
+            string[] generatedCats = new string[0];
+            UnitTestGeneratorProviderMock.Setup(ug => ug.SetTestMethodCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>(), It.IsAny<IEnumerable<string>>()))
+                .Callback((TestClassGenerationContext ctx, CodeMemberMethod _, IEnumerable<string> cats) => generatedCats = cats.ToArray());
+
+            var theFeature = ParserHelper.CreateDocumentWithRule(ruleTags: new[] { "rule_tag1", "rule_tag2" }, scenarioTags: new[] {"scenarioTag1"});
+
+            GenerateFeature(generator, theFeature);
+
+            generatedCats.Should().BeEquivalentTo(new string[] { "rule_tag1", "rule_tag2", "scenarioTag1" });
+        }
+
+        [Fact]
         public void Should_not_pass_feature_tags_as_test_method_category()
         {
             var generator = CreateUnitTestFeatureGenerator();
