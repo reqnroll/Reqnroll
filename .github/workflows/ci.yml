@@ -214,7 +214,7 @@ jobs:
           Write-Output "Validating package: $($package.Name)"
           try {
             # Run validation excluding deterministic checks (error code 112) as requested (temporary)
-            $validationResult = meziantou.validate-nuget-package $package.FullName --excluded-rule-ids 112 2>&1
+            $validationResult = meziantou.validate-nuget-package $package.FullName
             $exitCode = $LASTEXITCODE
             
             if ($exitCode -eq 0) {
