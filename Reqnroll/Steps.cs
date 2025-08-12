@@ -25,7 +25,7 @@ namespace Reqnroll
             }
         }
 
-        [Obsolete("The synchronous test runner API has been deprecated. Please use TestRunner property instead.", true)]
+        [Obsolete("The synchronous test runner API has been deprecated. Please use TestRunner property instead. Property will be removed in v4.", true)]
         protected ISyncTestRunner SyncTestRunner => throw new NotSupportedException();
 
         public ScenarioContext ScenarioContext
