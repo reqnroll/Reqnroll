@@ -89,11 +89,11 @@ namespace Reqnroll.Generator.Generation
             var exampleTagsParam = new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_OUTLINE_EXAMPLE_TAGS_PARAMETER);
             if (generationContext.GenerateRowTests)
             {
-                GenerateScenarioOutlineExamplesAsRowTests(generationContext, scenarioOutline, scenarioOutlineTestMethod, ref pickleIndex);
+                GenerateScenarioOutlineExamplesAsRowTests(generationContext, scenarioDefinitionInFeatureFile, scenarioOutlineTestMethod, ref pickleIndex);
             }
             else
             {
-                GenerateScenarioOutlineExamplesAsIndividualMethods(scenarioOutline, generationContext, scenarioOutlineTestMethod, paramToIdentifier, ref pickleIndex);
+                GenerateScenarioOutlineExamplesAsIndividualMethods(generationContext, scenarioDefinitionInFeatureFile, scenarioOutlineTestMethod, paramToIdentifier, ref pickleIndex);
             }
 
             GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, scenarioOutlineTestMethod, exampleTagsParam, paramToIdentifier, true);
@@ -101,8 +101,7 @@ namespace Reqnroll.Generator.Generation
 
         private void GenerateTest(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile, int pickleIndex)
         {
-            var ruleTags = scenarioDefinitionInFeatureFile.Rule?.Tags ?? [];
-            var testMethod = CreateTestMethod(generationContext, scenarioDefinitionInFeatureFile.ScenarioDefinition, ruleTags);
+            var testMethod = CreateTestMethod(generationContext, scenarioDefinitionInFeatureFile, null);
             GenerateTestBody(generationContext, scenarioDefinitionInFeatureFile, testMethod, pickleIndex: pickleIndex);
         }
 
@@ -382,12 +381,13 @@ namespace Reqnroll.Generator.Generation
         }
 
         private void GenerateScenarioOutlineExamplesAsIndividualMethods(
-            ScenarioOutline scenarioOutline,
             TestClassGenerationContext generationContext,
+            ScenarioDefinitionInFeatureFile scenarioDefinitionInFeature,
             CodeMemberMethod scenarioOutlineTestMethod, 
             ParameterSubstitution paramToIdentifier,
             ref int pickleIndex)
         {
+            var scenarioOutline = scenarioDefinitionInFeature.ScenarioOutline;
             var exampleSetIndex = 0;
 
             foreach (var exampleSet in scenarioOutline.Examples)
@@ -415,7 +415,7 @@ namespace Reqnroll.Generator.Generation
                 foreach (var example in exampleSet.TableBody.Select((r, i) => new { Row = r, Index = i }))
                 {
                     var variantName = useFirstColumnAsName ? example.Row.Cells.First().Value : $"Variant {example.Index}";
-                    GenerateScenarioOutlineTestVariant(generationContext, scenarioOutline, scenarioOutlineTestMethod, paramToIdentifier, exampleSet.Name ?? "", exampleSetIdentifier, example.Row, pickleIndex, exampleSet.Tags.ToArray(), variantName);
+                    GenerateScenarioOutlineTestVariant(generationContext, scenarioDefinitionInFeature, scenarioOutlineTestMethod, paramToIdentifier, exampleSet.Name ?? "", exampleSetIdentifier, example.Row, pickleIndex, exampleSet.Tags.ToArray(), variantName);
                     pickleIndex++;
                 }
 
@@ -423,9 +423,10 @@ namespace Reqnroll.Generator.Generation
             }
         }
 
-        private void GenerateScenarioOutlineExamplesAsRowTests(TestClassGenerationContext generationContext, ScenarioOutline scenarioOutline, CodeMemberMethod scenarioOutlineTestMethod, ref int pickleIndex)
+        private void GenerateScenarioOutlineExamplesAsRowTests(TestClassGenerationContext generationContext, ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile, CodeMemberMethod scenarioOutlineTestMethod, ref int pickleIndex)
         {
-            SetupTestMethod(generationContext, scenarioOutlineTestMethod, scenarioOutline, null, null, null, true);
+            var scenarioOutline = scenarioDefinitionInFeatureFile.ScenarioOutline;
+            SetupTestMethod(generationContext, scenarioOutlineTestMethod, scenarioDefinitionInFeatureFile, null, null, null, true);
 
             foreach (var examples in scenarioOutline.Examples)
             {
@@ -503,7 +504,7 @@ namespace Reqnroll.Generator.Generation
 
         private void GenerateScenarioOutlineTestVariant(
             TestClassGenerationContext generationContext,
-            ScenarioOutline scenarioOutline,
+            ScenarioDefinitionInFeatureFile scenarioDefinitionInFeatureFile,
             CodeMemberMethod scenarioOutlineTestMethod,
             IEnumerable<KeyValuePair<string, string>> paramToIdentifier,
             string exampleSetTitle,
@@ -513,7 +514,8 @@ namespace Reqnroll.Generator.Generation
             Tag[] exampleSetTags,
             string variantName)
         {
-            var testMethod = CreateTestMethod(generationContext, scenarioOutline, exampleSetTags, variantName, exampleSetIdentifier);
+            var scenarioOutline = scenarioDefinitionInFeatureFile.ScenarioOutline;
+            var testMethod = CreateTestMethod(generationContext, scenarioDefinitionInFeatureFile, exampleSetTags, variantName, exampleSetIdentifier);
 
             //call test implementation with the params
             var argumentExpressions = row.Cells.Select(paramCell => new CodePrimitiveExpression(paramCell.Value)).Cast<CodeExpression>().ToList();
@@ -547,7 +549,7 @@ namespace Reqnroll.Generator.Generation
 
         private CodeMemberMethod CreateTestMethod(
             TestClassGenerationContext generationContext,
-            StepsContainer scenario,
+            ScenarioDefinitionInFeatureFile scenarioDefinition,
             IEnumerable<Tag> additionalTags,
             string variantName = null,
             string exampleSetIdentifier = null)
@@ -555,7 +557,7 @@ namespace Reqnroll.Generator.Generation
             var testMethod = _codeDomHelper.CreateMethod(generationContext.TestClass);
             _codeDomHelper.MarkCodeMemberMethodAsAsync(testMethod);
 
-            SetupTestMethod(generationContext, testMethod, scenario, additionalTags, variantName, exampleSetIdentifier);
+            SetupTestMethod(generationContext, testMethod, scenarioDefinition, additionalTags, variantName, exampleSetIdentifier);
 
             return testMethod;
         }
@@ -563,12 +565,14 @@ namespace Reqnroll.Generator.Generation
         private void SetupTestMethod(
             TestClassGenerationContext generationContext,
             CodeMemberMethod testMethod,
-            StepsContainer scenarioDefinition,
+            ScenarioDefinitionInFeatureFile scenarioDefinitioninFeatureFile,
             IEnumerable<Tag> additionalTags,
             string variantName,
             string exampleSetIdentifier,
             bool rowTest = false)
         {
+            var ruleTags = scenarioDefinitioninFeatureFile.Rule?.Tags ?? [];
+            var scenarioDefinition = scenarioDefinitioninFeatureFile.ScenarioDefinition;
             // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
             testMethod.Attributes = MemberAttributes.Public | MemberAttributes.Final;
             testMethod.Name = GetTestMethodName(scenarioDefinition, variantName, exampleSetIdentifier);
@@ -587,7 +591,7 @@ namespace Reqnroll.Generator.Generation
                 _unitTestGeneratorProvider.SetTestMethod(generationContext, testMethod, friendlyTestName);
             }
 
-            _decoratorRegistry.DecorateTestMethod(generationContext, testMethod, ConcatTags(scenarioDefinition.GetTags(), additionalTags), out var scenarioCategories);
+            _decoratorRegistry.DecorateTestMethod(generationContext, testMethod, ConcatTags(ruleTags, scenarioDefinition.GetTags(), additionalTags), out var scenarioCategories);
 
             if (scenarioCategories.Any())
             {
