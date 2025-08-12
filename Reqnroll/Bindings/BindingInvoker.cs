@@ -47,15 +47,6 @@ namespace Reqnroll.Bindings
                        && isDryRun);
         }
 
-        [Obsolete("Use async version of the method instead")]
-        public virtual object InvokeBinding(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, out TimeSpan duration)
-        {
-            var durationHolder = new DurationHolder();
-            var result = InvokeBindingAsync(binding, contextManager, arguments, testTracer, durationHolder).ConfigureAwait(false).GetAwaiter().GetResult();
-            duration = durationHolder.Duration;
-            return result;
-        }
-
         public virtual async Task<object> InvokeBindingAsync(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, DurationHolder durationHolder)
         {
             EnsureReflectionInfo(binding, out _, out var bindingAction);
