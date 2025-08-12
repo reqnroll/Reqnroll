@@ -33,7 +33,11 @@
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 * Fixed source link and deterministic compilation for Reqnroll.CustomPlugin package (#719)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
+## Deprecations:
+
+* The synchronous test runner API (`ISyncTestRunner`) has been removed. Please use `ITestRunner` instead.
+
+*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 

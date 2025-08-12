@@ -1,3 +1,4 @@
+using System;
 using Gherkin.CucumberMessages;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
@@ -136,7 +137,6 @@ namespace Reqnroll.Infrastructure
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
         {
             testThreadContainer.RegisterTypeAs<TestRunner, ITestRunner>();
-            testThreadContainer.RegisterTypeAs<BlockingSyncTestRunner, ISyncTestRunner>();
             testThreadContainer.RegisterTypeAs<ContextManager, IContextManager>();
             testThreadContainer.RegisterTypeAs<TestExecutionEngine, ITestExecutionEngine>();
 
