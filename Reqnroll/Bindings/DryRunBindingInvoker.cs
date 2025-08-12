@@ -5,9 +5,7 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Bindings;
 
-#pragma warning disable CS0618 // Type or member is obsolete
-public class DryRunBindingInvoker : IAsyncBindingInvoker, IBindingInvoker
-#pragma warning restore CS0618 // Type or member is obsolete
+public class DryRunBindingInvoker : IAsyncBindingInvoker
 {
     public object InvokeBinding(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, out TimeSpan duration)
     {

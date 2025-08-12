@@ -4,10 +4,9 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Bindings
 {
-    [Obsolete("Use async version of the interface (IAsyncBindingInvoker) whenever you can")]
+    [Obsolete("The synchronous code invocation API has been deprecated. Please use IAsyncBindingInvoker instead.", true)]
     public interface IBindingInvoker
     {
-        [Obsolete("Use async version of the method of IAsyncBindingInvoker instead")]
         object InvokeBinding(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, out TimeSpan duration);
     }
 }

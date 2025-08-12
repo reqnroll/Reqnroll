@@ -17,9 +17,7 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Bindings
 {
-#pragma warning disable CS0618
-    public class BindingInvoker : IBindingInvoker, IAsyncBindingInvoker
-#pragma warning restore CS0618
+    public class BindingInvoker : IAsyncBindingInvoker
     {
         internal const string DryRunEnvVarName = "REQNROLL_DRY_RUN";
 

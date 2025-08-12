@@ -59,9 +59,6 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<CucumberExpressionDetector, ICucumberExpressionDetector>();
             container.RegisterTypeAs<StepDefinitionRegexCalculator, IStepDefinitionRegexCalculator>();
             container.RegisterTypeAs<MatchArgumentCalculator, IMatchArgumentCalculator>();
-#pragma warning disable CS0618
-            container.RegisterTypeAs<BindingInvoker, IBindingInvoker>();
-#pragma warning restore CS0618
             container.RegisterTypeAs<BindingInvoker, IAsyncBindingInvoker>();
             container.RegisterTypeAs<BindingDelegateInvoker, IBindingDelegateInvoker>();
             container.RegisterTypeAs<TestObjectResolver, ITestObjectResolver>();
