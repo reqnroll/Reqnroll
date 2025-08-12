@@ -19,6 +19,7 @@ using Xunit;
 using HookType = Reqnroll.Bindings.HookType;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
+using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
@@ -27,6 +28,7 @@ public class PickleExecutionTrackerTests
     private readonly Mock<IIdGenerator> _mockIdGenerator;
     private readonly Mock<ICucumberMessageFactory> _mockMessageFactory;
     private readonly Mock<IMessagePublisher> _mockPublisher;
+    private readonly Mock<IUnitTestRuntimeProvider> _mockUnitTestRuntimeProvider;
     private readonly ITestCaseExecutionTrackerFactory _stubTestCaseExecutionTrackerFactory;
     private FeatureInfo _featureInfoStub;
     private FeatureContext _featureContextStub;
@@ -45,8 +47,9 @@ public class PickleExecutionTrackerTests
         _mockIdGenerator.Setup(x => x.GetNewId()).Returns("test-id");
         _mockPublisher = new Mock<IMessagePublisher>();
         _mockMessageFactory = new Mock<ICucumberMessageFactory>();
+        _mockUnitTestRuntimeProvider = new Mock<IUnitTestRuntimeProvider>();
 
-        IStepTrackerFactory stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object);
+        IStepTrackerFactory stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object, _mockUnitTestRuntimeProvider.Object);
         _stubTestCaseExecutionTrackerFactory = new TestCaseExecutionTrackerFactory(_mockIdGenerator.Object, _mockMessageFactory.Object, _mockPublisher.Object, stepTrackerFactory);
 
         SetupMockContexts();
