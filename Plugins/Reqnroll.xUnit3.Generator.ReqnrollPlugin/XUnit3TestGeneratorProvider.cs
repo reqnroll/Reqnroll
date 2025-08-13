@@ -16,19 +16,34 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     private readonly CodeTypeReference _objectCodeTypeReference = new(typeof(object));
     private readonly CodeDomHelper _codeDomHelper = codeDomHelper;
 
-    const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
+    private const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
+    private const string IASYNC_DISPOSABLE_INTERFACE = "System.IAsyncDisposable";
+    private const string OUTPUT_INTERFACE = "Xunit.ITestOutputHelper";
+    private const string FACT_ATTRIBUTE = "Xunit.FactAttribute";
+    private const string THEORY_ATTRIBUTE = "Xunit.TheoryAttribute";
+    private const string INLINEDATA_ATTRIBUTE = "Xunit.InlineDataAttribute";
+    private const string ICLASSFIXTURE_INTERFACE = "Xunit.IClassFixture";
+    private const string TRAIT_ATTRIBUTE = "Xunit.TraitAttribute";
+    private const string FEATURE_TITLE = "FeatureTitle";
+    private const string SKIP_PROPERTY_NAME = "Skip";
+    private const string IGNORED_REASON = "Ignored";
+    private const string DISPOSE_ASYNC_METHOD = "DisposeAsync";
+    private const string INITIALIZE_ASYNC_METHOD = "InitializeAsync";
+    private const string CATEGORY_PROPERTY_NAME = "Category";
+    private const string TRAIT_DESCRIPTION_ATTRIBUTE = "Description";
+    private const string DISPLAY_NAME_PROPERTY = "DisplayName";
 
     public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests;
 
     public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
     {
         _currentFixtureDataTypeDeclaration = _codeDomHelper.CreateGeneratedTypeDeclaration("FixtureData");
-        
+
         // have to add the explicit object base class because of VB.NET
         _currentFixtureDataTypeDeclaration.BaseTypes.Add(typeof(object));
         var asyncLifetimeInterface = new CodeTypeReference(IASYNCLIFETIME_INTERFACE);
         _currentFixtureDataTypeDeclaration.BaseTypes.Add(asyncLifetimeInterface);
-        
+
         generationContext.TestClass.Members.Add(_currentFixtureDataTypeDeclaration);
 
         var fixtureDataType =
@@ -44,7 +59,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     {
         foreach (string category in featureCategories)
         {
-            SetProperty(_currentFixtureDataTypeDeclaration, "Category", category);
+            SetProperty(_currentFixtureDataTypeDeclaration, CATEGORY_PROPERTY_NAME, category);
         }
     }
 
@@ -65,7 +80,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
                             nameof(ScenarioContext)),
                         nameof(ScenarioContext.ScenarioContainer)),
                     nameof(IObjectContainer.RegisterInstanceAs),
-                    new CodeTypeReference("Xunit.ITestOutputHelper")),
+                    new CodeTypeReference(OUTPUT_INTERFACE)),
                 new CodeVariableReferenceExpression("_testOutputHelper")));
     }
 
@@ -82,8 +97,8 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         // ValueTask IAsyncLifetime.InitializeAsync() { <fixtureSetupMethod>(); }
         var initializeMethod = new CodeMemberMethod
         {
-            PrivateImplementationType = new CodeTypeReference("Xunit.IAsyncLifetime"),
-            Name = "InitializeAsync",
+            PrivateImplementationType = new CodeTypeReference(IASYNCLIFETIME_INTERFACE),
+            Name = INITIALIZE_ASYNC_METHOD,
             ReturnType = new CodeTypeReference(typeof(System.Threading.Tasks.ValueTask))
         };
 
@@ -96,7 +111,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             generationContext.TestClassInitializeMethod.Name);
 
         // Skip awaiting for VB when the method returns ValueTask
-        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB &&
               initializeMethod.ReturnType.BaseType.Contains("ValueTask")))
         {
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
@@ -109,17 +124,17 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     {
         // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
-        
+
         // ValueTask IAsyncDisposable.DisposeAsync() { <fixtureTearDownMethod>(); }
         var disposeMethod = new CodeMemberMethod
         {
-            PrivateImplementationType = new CodeTypeReference("System.IAsyncDisposable"),
-            Name = "DisposeAsync",
+            PrivateImplementationType = new CodeTypeReference(IASYNC_DISPOSABLE_INTERFACE),
+            Name = DISPOSE_ASYNC_METHOD,
             ReturnType = new CodeTypeReference(typeof(System.Threading.Tasks.ValueTask))
         };
 
         _codeDomHelper.MarkCodeMemberMethodAsAsync(disposeMethod);
-            
+
         _currentFixtureDataTypeDeclaration.Members.Add(disposeMethod);
 
         var expression = new CodeMethodInvokeExpression(
@@ -127,7 +142,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             generationContext.TestClassCleanupMethod.Name);
 
         // Skip awaiting for VB when the method returns ValueTask
-        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB &&
               disposeMethod.ReturnType.BaseType.Contains("ValueTask")))
         {
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
@@ -147,16 +162,16 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         generationContext.TestClass.Members.Add(ctorMethod);
 
         SetTestConstructor(generationContext, ctorMethod);
-        
-        var asyncLifetimeInterface = new CodeTypeReference("Xunit.IAsyncLifetime");
+
+        var asyncLifetimeInterface = new CodeTypeReference(IASYNCLIFETIME_INTERFACE);
         generationContext.TestClass.BaseTypes.Add(asyncLifetimeInterface);
-            
+
         // ValueTask IAsyncLifetime.InitializeAsync() { <memberMethod>(); }
         var initializeMethod = new CodeMemberMethod
         {
             Attributes = MemberAttributes.Public,
-            PrivateImplementationType = new CodeTypeReference("Xunit.IAsyncLifetime"),
-            Name = "InitializeAsync",
+            PrivateImplementationType = new CodeTypeReference(IASYNCLIFETIME_INTERFACE),
+            Name = INITIALIZE_ASYNC_METHOD,
             ReturnType = new CodeTypeReference(typeof(System.Threading.Tasks.ValueTask))
         };
 
@@ -172,21 +187,21 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         // ValueTask IAsyncLifetime.DisposeAsync() { <memberMethod>(); }
         var disposeMethod = new CodeMemberMethod
         {
-            PrivateImplementationType = new CodeTypeReference("System.IAsyncDisposable"),
-            Name = "DisposeAsync",
+            PrivateImplementationType = new CodeTypeReference(IASYNC_DISPOSABLE_INTERFACE),
+            Name = DISPOSE_ASYNC_METHOD,
             ReturnType = new CodeTypeReference(typeof(System.Threading.Tasks.ValueTask))
         };
 
         _codeDomHelper.MarkCodeMemberMethodAsAsync(disposeMethod);
-            
+
         generationContext.TestClass.Members.Add(disposeMethod);
 
         var expression = new CodeMethodInvokeExpression(
             new CodeThisReferenceExpression(),
             generationContext.TestCleanupMethod.Name);
-        
+
         // Skip awaiting for VB when the method returns ValueTask
-        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB && 
+        if (!(_codeDomHelper.TargetLanguage == CodeDomProviderLanguage.VB &&
               disposeMethod.ReturnType.BaseType.Contains("ValueTask")))
         {
             _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
@@ -197,8 +212,8 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
     {
-        _codeDomHelper.AddAttribute(testMethod, "Xunit.FactAttribute", new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
-        SetProperty(testMethod, "FeatureTitle", generationContext.Feature.Name);
+        _codeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(friendlyTestName)));
+        SetProperty(testMethod, FEATURE_TITLE, generationContext.Feature.Name);
         SetDescription(testMethod, friendlyTestName);
     }
 
@@ -210,23 +225,23 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     {
         var factAttr = testMethod.CustomAttributes
                                  .OfType<CodeAttributeDeclaration>()
-                                 .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == "Xunit.FactAttribute");
+                                 .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == FACT_ATTRIBUTE);
 
         // set [FactAttribute(Skip="reason")]
-        factAttr?.Arguments.Add(new CodeAttributeArgument("Skip", new CodePrimitiveExpression("Ignored")));
+        factAttr?.Arguments.Add(new CodeAttributeArgument(SKIP_PROPERTY_NAME, new CodePrimitiveExpression(IGNORED_REASON)));
 
         var theoryAttr = testMethod.CustomAttributes
                                    .OfType<CodeAttributeDeclaration>()
-                                   .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == "Xunit.TheoryAttribute");
+                                   .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == THEORY_ATTRIBUTE);
 
         // set [TheoryAttribute(Skip="reason")]
-        theoryAttr?.Arguments.Add(new CodeAttributeArgument("Skip", new CodePrimitiveExpression("Ignored")));
+        theoryAttr?.Arguments.Add(new CodeAttributeArgument(SKIP_PROPERTY_NAME, new CodePrimitiveExpression(IGNORED_REASON)));
     }
 
     public void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
     {
-        _codeDomHelper.AddAttribute(testMethod, "Xunit.TheoryAttribute", new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(scenarioTitle)));
-        SetProperty(testMethod, "FeatureTitle", generationContext.Feature.Name);
+        _codeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(scenarioTitle)));
+        SetProperty(testMethod, FEATURE_TITLE, generationContext.Feature.Name);
         SetDescription(testMethod, scenarioTitle);
     }
 
@@ -244,7 +259,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             new CodeAttributeArgument(
                 new CodeArrayCreateExpression(typeof(string[]), tags.Select(CodeExpression (t) => new CodePrimitiveExpression(t)).ToArray())));
 
-        _codeDomHelper.AddAttribute(testMethod, "Xunit.InlineDataAttribute", args.ToArray());
+        _codeDomHelper.AddAttribute(testMethod, INLINEDATA_ATTRIBUTE, args.ToArray());
     }
 
     public void SetTestMethodAsRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle, string exampleSetName, string variantName, IEnumerable<KeyValuePair<string, string>> arguments)
@@ -256,24 +271,24 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     {
         throw new System.NotImplementedException();
     }
-    
+
     private CodeTypeReference CreateFixtureInterface(TestClassGenerationContext generationContext, CodeTypeReference fixtureDataType)
     {
         // Add a field for the ITestOutputHelper
-        generationContext.TestClass.Members.Add(new CodeMemberField("Xunit.ITestOutputHelper", "_testOutputHelper"));
+        generationContext.TestClass.Members.Add(new CodeMemberField(OUTPUT_INTERFACE, "_testOutputHelper"));
 
         // Store the fixture data type for later use in constructor
         generationContext.CustomData.Add("fixtureData", fixtureDataType);
 
-        return new CodeTypeReference("Xunit.IClassFixture", fixtureDataType);
+        return new CodeTypeReference(ICLASSFIXTURE_INTERFACE, fixtureDataType);
     }
-    
+
     private void SetTestConstructor(TestClassGenerationContext generationContext, CodeConstructor constructor)
     {
         constructor.Parameters.Add(
             new CodeParameterDeclarationExpression((CodeTypeReference)generationContext.CustomData["fixtureData"], "fixtureData"));
         constructor.Parameters.Add(
-            new CodeParameterDeclarationExpression("Xunit.ITestOutputHelper", "testOutputHelper"));
+            new CodeParameterDeclarationExpression(OUTPUT_INTERFACE, "testOutputHelper"));
 
         constructor.Statements.Add(
             new CodeAssignStatement(
@@ -331,21 +346,21 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
         // otherwise the test runner will not be released.
         var callDisposeException = new CodeMethodInvokeExpression(
             new CodeCastExpression(new CodeTypeReference(IASYNCLIFETIME_INTERFACE), new CodeThisReferenceExpression()),
-            "DisposeAsync");
+            DISPOSE_ASYNC_METHOD);
         _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callDisposeException);
 
         method.Statements.Add(
             GetTryCatchStatementWithCombinedErrors(callTestInitializeMethodExpression, callDisposeException));
     }
-    
+
     private void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
     {
-        _codeDomHelper.AddAttribute(codeTypeMember, "Xunit.TraitAttribute", name, value);
+        _codeDomHelper.AddAttribute(codeTypeMember, TRAIT_ATTRIBUTE, name, value);
     }
-    
+
     private void SetDescription(CodeTypeMember codeTypeMember, string description)
     {
         // xUnit doesn't have a DescriptionAttribute so using a TraitAttribute instead
-        SetProperty(codeTypeMember, "Description", description);
+        SetProperty(codeTypeMember, TRAIT_DESCRIPTION_ATTRIBUTE, description);
     }
 }
