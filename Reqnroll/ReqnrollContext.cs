@@ -12,8 +12,14 @@ namespace Reqnroll
     {
         public Exception TestError { get; internal set; }
 
+        /// <summary>
+        /// Used to verify disposal of the context in tests.
+        /// </summary>
+        internal bool IsDisposed { get; private set; }
+
         protected virtual void Dispose()
         {
+            IsDisposed = true;
         }
 
         void IDisposable.Dispose()

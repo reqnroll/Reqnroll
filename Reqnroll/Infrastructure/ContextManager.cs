@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.BoDi;
 using Reqnroll.Bindings;
+using Reqnroll.Configuration;
 using Reqnroll.Tracing;
 
 namespace Reqnroll.Infrastructure
@@ -155,19 +156,34 @@ namespace Reqnroll.Infrastructure
 
         public TestThreadContext TestThreadContext { get; private set; }
 
+        private void RegisterInstanceAsInterfaceAndObjectType<TInterface, TObject>(IObjectContainer objectContainer, TObject instance, string name = null, bool dispose = false)
+            where TInterface : class
+            where TObject : class, TInterface
+        {
+            // We need two registrations, but both should have the same "dispose" setting,
+            // because otherwise the second would override the first one.
+            objectContainer.RegisterInstanceAs<TInterface>(instance, name, dispose);
+            objectContainer.RegisterInstanceAs(instance, name, dispose);
+        }
+
         private void InitializeTestThreadContext()
         {
             // Since both TestThreadContext and ContextManager are in the same container (test thread container)
-            // their lifetime is the same, so we do not need the swop infrastructure like for the other contexts.
+            // their lifetime is the same, so we do not need the swap infrastructure like for the other contexts.
             // We just need to initialize it during construction time.
-            var testThreadContext = testThreadContainer.Resolve<TestThreadContext>();
+            var testThreadContext = new TestThreadContext(testThreadContainer);
+            // make sure that the TestThreadContext can also be resolved through the interface as well
+            RegisterInstanceAsInterfaceAndObjectType<ITestThreadContext, TestThreadContext>(testThreadContainer, testThreadContext, dispose: true);
             this.TestThreadContext = testThreadContext;
         }
 
         public void InitializeFeatureContext(FeatureInfo featureInfo)
         {
             var featureContainer = containerBuilder.CreateFeatureContainer(testThreadContainer, featureInfo);
-            var newContext = featureContainer.Resolve<FeatureContext>();
+            var reqnrollConfiguration = testThreadContainer.Resolve<ReqnrollConfiguration>();
+            var newContext = new FeatureContext(featureContainer, featureInfo, reqnrollConfiguration);
+            // make sure that the FeatureContext can also be resolved through the interface as well
+            RegisterInstanceAsInterfaceAndObjectType<IFeatureContext, FeatureContext>(featureContainer, newContext, dispose: true);
             featureContextManager.Init(newContext, featureContainer);
 #pragma warning disable 618
             FeatureContext.Current = newContext;
@@ -184,7 +200,8 @@ namespace Reqnroll.Infrastructure
             var scenarioContainer = containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo);
             var testObjectResolver = scenarioContainer.Resolve<ITestObjectResolver>();
             var newContext = new ScenarioContext(scenarioContainer, scenarioInfo, ruleInfo, testObjectResolver);
-            scenarioContainer.RegisterInstanceAs(newContext, dispose: true);
+            // make sure that the ScenarioContext can also be resolved through the interface as well
+            RegisterInstanceAsInterfaceAndObjectType<IScenarioContext, ScenarioContext>(scenarioContainer, newContext, dispose: true);
             scenarioContextManager.Init(newContext, scenarioContainer);
 #pragma warning disable 618
             ScenarioContext.Current = newContext;
