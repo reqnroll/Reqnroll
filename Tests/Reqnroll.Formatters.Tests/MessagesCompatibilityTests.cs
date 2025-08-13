@@ -20,7 +20,6 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("undefined", "Undefined steps")]
     [DataRow("stack-traces", "Stack traces")]
     [DataRow("rules", "Usage of a `Rule`")]
-    [DataRow("skipped", "Skipping scenarios")]
     // These CCK scenario examples produce Cucumber Messages that are materially compliant with the CCK.
     // The messages produced match the CCK expected messages, with exceptions for things
     // that are not material to the CCK spec (such as IDs don't have to be generated in the same order, timestamps don't have to match, etc.)
@@ -79,6 +78,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("attachments", "Attachments")]
     [DataRow("hooks-named", "Hooks - Named")]
     [DataRow("unknown-parameter-type", "Unknown Parameter Types")]
+    [DataRow("skipped", "Skipping scenarios")]
     // These scenarios are from the CCK, but Reqnroll cannot provide a compliant implementation. This is usually the result of differences in behavior or support of Gherkin features.
     // When these scenarios are run, expect them to fail.
     public void NonCompliantCCKScenarios(string testName, string featureNameText)

@@ -3,14 +3,13 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System.Threading.Tasks;
 using Reqnroll.Formatters.PubSub;
-using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
 /// This class is used to track execution of hook steps.
 /// </summary>
-public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IUnitTestRuntimeProvider unitTestRuntimeProvider) : 
+public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher) : 
     StepExecutionTrackerBase(parentTracker, messageFactory, publisher)
 {
     public async Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
@@ -33,7 +32,7 @@ public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
     {
         StepFinishedAt = hookFinishedEvent.Timestamp;
         Exception = hookFinishedEvent.HookException;
-        Status = Exception == null ? ScenarioExecutionStatus.OK : unitTestRuntimeProvider.DetectExecutionStatus(Exception) ?? ScenarioExecutionStatus.TestError;
+        Status = Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
 
         await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepFinished(this)));
     }

@@ -1,4 +1,4 @@
-using FluentAssertions;
+﻿using FluentAssertions;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Moq;
@@ -15,7 +15,6 @@ using System.Globalization;
 using Xunit;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
-using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
@@ -28,7 +27,6 @@ public class HookStepExecutionTrackerTests
     private readonly TestCaseTracker _testCaseTracker;
     private readonly Mock<IIdGenerator> _idGeneratorMock;
     private readonly Mock<IMessagePublisher> _publisherMock;
-    private readonly Mock<IUnitTestRuntimeProvider> _unitTestRuntimeProviderMock;   
     private HookStepExecutionTracker _hookStepExecutionTracker;
     private FeatureInfo _featureInfoStub;
     private FeatureContext _featureContextStub;
@@ -66,7 +64,6 @@ public class HookStepExecutionTrackerTests
         _testCaseTrackerMock = new Mock<IPickleExecutionTracker>();
         _testCaseTracker = new TestCaseTracker("testCaseId", "testCasePickleId", _testCaseTrackerMock.Object);
         _idGeneratorMock = new Mock<IIdGenerator>();
-        _unitTestRuntimeProviderMock = new Mock<IUnitTestRuntimeProvider>();
         _stepDefinitionsByBinding = new ConcurrentDictionary<IBinding, string>();
         _objectContainerStub = new ObjectContainer();
 
@@ -82,8 +79,7 @@ public class HookStepExecutionTrackerTests
         _hookStepExecutionTracker = new HookStepExecutionTracker(
             CreateTestCaseExecutionRecord(),
             _messageFactoryMock.Object,
-            _publisherMock.Object,
-            _unitTestRuntimeProviderMock.Object
+            _publisherMock.Object
         );
     }
 
@@ -185,8 +181,7 @@ public class HookStepExecutionTrackerTests
         _hookStepExecutionTracker = new HookStepExecutionTracker(
             CreateTestCaseExecutionRecord(1),
             _messageFactoryMock.Object,
-            _publisherMock.Object,
-            _unitTestRuntimeProviderMock.Object
+            _publisherMock.Object
         );
             
         // Pre-existing definition that should be found
@@ -261,42 +256,6 @@ public class HookStepExecutionTrackerTests
         _hookStepExecutionTracker.Exception.Should().Be(exception);
         _hookStepExecutionTracker.Status.Should().Be(ScenarioExecutionStatus.TestError); // Error status
     }
-
-    private class SkipException : System.Exception
-    {
-        public SkipException(string message) : base(message) { }
-    }
-    [Fact]
-    public async Task HookStepTracker_ProcessEvent_HookBindingFinishedEvent_WithSkipException_SetsStatusToSkipped()
-    {
-        // Arrange
-        var hookBindingMock = new Mock<IHookBinding>();
-        var exception = new SkipException("Test skip exception");
-        _unitTestRuntimeProviderMock.Setup(utp => utp.DetectExecutionStatus(It.IsAny<SkipException>())).Returns(ScenarioExecutionStatus.Skipped);
-        var hookBindingFinishedEvent = new HookBindingFinishedEvent(
-            hookBindingMock.Object,
-            new TimeSpan(1),
-            _mockContextManager.Object,
-            exception
-        );
-        var hookId = "hook123";
-        var testStepId = "step456";
-        var testStepFinished = new TestStepFinished("testCaseStartedId", testStepId, new TestStepResult(new Duration(0, 0), "", TestStepResultStatus.SKIPPED, null), new Timestamp(0, 1));
-
-        _messageFactoryMock
-            .Setup(f => f.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()))
-            .Returns(testStepFinished);
-
-        _stepDefinitionsByBinding[hookBindingFinishedEvent.HookBinding] = hookId;
-
-        // Act
-        await _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
-
-        // Assert
-        _hookStepExecutionTracker.Exception.Should().Be(exception);
-        _hookStepExecutionTracker.Status.Should().Be(ScenarioExecutionStatus.Skipped); // Error status
-    }
-
 
     // Helper method to create a dummy HookStepTracker without mocking
     private HookStepTracker CreateDummyHookStepDefinition(string hookId)

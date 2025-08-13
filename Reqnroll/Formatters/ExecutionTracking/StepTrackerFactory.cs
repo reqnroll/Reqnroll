@@ -1,10 +1,9 @@
-using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+﻿using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
-using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
-public class StepTrackerFactory(ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IUnitTestRuntimeProvider unitTestRuntimeProvider) : IStepTrackerFactory
+public class StepTrackerFactory(ICucumberMessageFactory messageFactory, IMessagePublisher publisher) : IStepTrackerFactory
 {
     public TestStepExecutionTracker CreateTestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
     {
@@ -12,7 +11,7 @@ public class StepTrackerFactory(ICucumberMessageFactory messageFactory, IMessage
     }
     public HookStepExecutionTracker CreateHookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
     {
-        return new HookStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher, unitTestRuntimeProvider);
+        return new HookStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher);
     }
     public AttachmentTracker CreateAttachmentTracker(string testRunStartedId, string testCaseStartedId, string testCaseStepId, string testRunHookStartedId, IMessagePublisher picklePublisher = null)
     {
