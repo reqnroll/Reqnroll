@@ -32,6 +32,7 @@
 * Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
 * Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
 * Fixed source link and deterministic compilation for Reqnroll.CustomPlugin package (#719)
+* Fix: Rule Tags are now properly generated as Test Categories (along with Scenario Tags) (#731)(
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @loraderon, @obligaron
 
