@@ -1,15 +1,10 @@
 using System;
 using System.Collections.Generic;
 
-namespace Reqnroll.Generator.Interfaces
+namespace Reqnroll.Generator.Interfaces;
+
+public interface ITestGeneratorFactory
 {
-    /// IMPORTANT
-    /// This class is used for interop with the Visual Studio Extension
-    /// DO NOT REMOVE OR RENAME FIELDS!
-    /// This breaks binary serialization across AppDomains
-    public interface ITestGeneratorFactory
-    {
-        Version GetGeneratorVersion();
-        ITestGenerator CreateGenerator(ProjectSettings projectSettings, IEnumerable<GeneratorPluginInfo> generatorPlugins);
-    }
+    Version GetGeneratorVersion();
+    ITestGenerator CreateGenerator(ProjectSettings projectSettings, IEnumerable<GeneratorPluginInfo> generatorPlugins);
 }
