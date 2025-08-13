@@ -25,6 +25,7 @@
 * Updated Reqnroll project template to add TUnit test framework support and remove EOL .NET versions (6.0, 7.0), added .NET 9.0 support (#701)
 * Removed support for end-of-life .NET frameworks (.NET 6, .NET 7, .NET Core) (#706)
 * Allow detecting skipped or pending execution status by the unit test providers (#732)
+* Allow `ScenarioContext`, `FeatureContext` and `TestThreadContext` to be resolved or injected through their interfaces, e.g. `ISenarioContext` (#761)
 
 ## Bug fixes:
 
