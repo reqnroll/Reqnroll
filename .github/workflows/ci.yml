@@ -256,20 +256,20 @@ jobs:
             if ($exitCode -eq 0) {
               Write-Output "✅ $($package.Name) passed validation"
             } else {
-              Write-Output "⚠️ $($package.Name) has validation issues:"
+              Write-Output "::warning title=Package Validation Issues::$($package.Name) has validation issues"
               Write-Output $validationResult
               # For now, we'll log warnings but not fail the build to allow gradual improvement
               # This can be changed to fail the build once all validation issues are resolved
-              Write-Output "Note: Package validation issues detected but not failing build (gradual improvement mode)"
+              Write-Output "::notice::Package validation issues detected but not failing build (gradual improvement mode)"
             }
           } catch {
-            Write-Output "❌ Error validating $($package.Name): $_"
+            Write-Output "::error title=Package Validation Error::Error validating $($package.Name): $_"
             $errorCount++
           }
         }
         
         if ($errorCount -gt 0) {
-          Write-Output "❌ $errorCount package(s) had validation errors"
+          Write-Output "::error title=Package Validation Failed::$errorCount package(s) had validation errors"
           exit 1
         } else {
           Write-Output "✅ Validation completed for $totalPackages packages"
