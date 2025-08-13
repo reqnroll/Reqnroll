@@ -200,13 +200,49 @@ jobs:
         name: build-trx-v${{ steps.versions.outputs.product_full_version }}
         if-no-files-found: error
         path: "TestResults/*.trx"
+    - name: Upload packages
+      uses: actions/upload-artifact@v4
+      with:
+        name: packages-v${{ steps.versions.outputs.product_full_version }}
+        if-no-files-found: error
+        path: "GeneratedNuGetPackages/${{ steps.versions.outputs.product_configuration }}/*.*nupkg"
+    - name: Upload SystemTests
+      uses: actions/upload-artifact@v4
+      with:
+        name: SystemTests
+        if-no-files-found: error
+        path: Tests/Reqnroll.SystemTests/bin/
+    - name: Upload Specs
+      uses: actions/upload-artifact@v4
+      with:
+        name: Specs
+        if-no-files-found: error
+        path: Tests/Reqnroll.Specs/bin/
+    - name: Upload Formatters Tests
+      uses: actions/upload-artifact@v4
+      with:
+        name: Formatters
+        if-no-files-found: error
+        path: Tests/Reqnroll.Formatters.Tests/bin/
+
+  validate-packages:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download packages
+      uses: actions/download-artifact@v4
+      with:
+        name: packages-v${{ needs.build.outputs.product_full_version }}
+        path: GeneratedNuGetPackages/${{ needs.build.outputs.product_configuration }}/
     - name: Install NuGet Package Validation Tool
       run: dotnet tool install --global Meziantou.Framework.NuGetPackageValidation.Tool
     - name: Validate NuGet packages
       shell: pwsh
       run: |
         Write-Output "Validating NuGet packages..."
-        $packages = Get-ChildItem "GeneratedNuGetPackages/${{ steps.versions.outputs.product_configuration }}/*.nupkg" -Exclude "*.snupkg"
+        $packages = Get-ChildItem "GeneratedNuGetPackages/${{ needs.build.outputs.product_configuration }}/*.nupkg" -Exclude "*.snupkg"
         $errorCount = 0
         $totalPackages = $packages.Count
         
@@ -239,30 +275,6 @@ jobs:
           Write-Output "✅ Validation completed for $totalPackages packages"
           exit 0
         }
-    - name: Upload packages
-      uses: actions/upload-artifact@v4
-      with:
-        name: packages-v${{ steps.versions.outputs.product_full_version }}
-        if-no-files-found: error
-        path: "GeneratedNuGetPackages/${{ steps.versions.outputs.product_configuration }}/*.*nupkg"
-    - name: Upload SystemTests
-      uses: actions/upload-artifact@v4
-      with:
-        name: SystemTests
-        if-no-files-found: error
-        path: Tests/Reqnroll.SystemTests/bin/
-    - name: Upload Specs
-      uses: actions/upload-artifact@v4
-      with:
-        name: Specs
-        if-no-files-found: error
-        path: Tests/Reqnroll.Specs/bin/
-    - name: Upload Formatters Tests
-      uses: actions/upload-artifact@v4
-      with:
-        name: Formatters
-        if-no-files-found: error
-        path: Tests/Reqnroll.Formatters.Tests/bin/
 
   specs:
     runs-on: ubuntu-latest
@@ -457,7 +469,7 @@ jobs:
     
   release:
     runs-on: ubuntu-latest
-    needs: [build, specs, system-tests-windows, system-tests-linux]
+    needs: [build, validate-packages, specs, system-tests-windows, system-tests-linux]
     environment: production_environment
     if: github.ref == 'refs/heads/main' && needs.build.outputs.deploy_packages == 'true'
     permissions:
