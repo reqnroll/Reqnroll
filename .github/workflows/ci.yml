@@ -213,7 +213,7 @@ jobs:
         foreach ($package in $packages) {
           Write-Output "Validating package: $($package.Name)"
           try {
-            # Run validation excluding deterministic checks (error code 112) as requested (temporary)
+            # Run validation
             $validationResult = meziantou.validate-nuget-package $package.FullName
             $exitCode = $LASTEXITCODE
             
@@ -237,6 +237,7 @@ jobs:
           exit 1
         } else {
           Write-Output "✅ Validation completed for $totalPackages packages"
+          exit 0
         }
     - name: Upload packages
       uses: actions/upload-artifact@v4
