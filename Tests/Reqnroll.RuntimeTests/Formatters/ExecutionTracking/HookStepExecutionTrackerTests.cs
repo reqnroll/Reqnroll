@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Moq;
@@ -39,7 +39,7 @@ public class HookStepExecutionTrackerTests
     private void SetupMockContexts()
     {
         var testObjResolverMock = new Mock<ITestObjectResolver>();
-            
+
         _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "Test Feature", "");
         _featureContextStub = new FeatureContext(_objectContainerStub, _featureInfoStub, ConfigurationLoader.GetDefault());
 
@@ -83,7 +83,7 @@ public class HookStepExecutionTrackerTests
         );
     }
 
-    private TestCaseExecutionTracker CreateTestCaseExecutionRecord(int attemptId = 0) => 
+    private TestCaseExecutionTracker CreateTestCaseExecutionRecord(int attemptId = 0) =>
         new(_testCaseTrackerMock.Object, attemptId, "testCaseStartedId", "testCaseId", _testCaseTracker, _messageFactoryMock.Object, _publisherMock.Object, _stepTrackerFactoryMock.Object);
 
     [Fact]
@@ -111,9 +111,9 @@ public class HookStepExecutionTrackerTests
     {
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
-        var hookBindingFinishedEvent = new HookBindingFinishedEvent(hookBindingMock.Object, TimeSpan.Zero, _mockContextManager.Object);
+        var hookBindingFinishedEvent = new HookBindingFinishedEvent(hookBindingMock.Object, TimeSpan.Zero, _mockContextManager.Object, ScenarioExecutionStatus.OK);
         var testStepFinished = new TestStepFinished("testCaseStartedId", "testsStepId", new TestStepResult(new Duration(0, 1), "message", TestStepResultStatus.PASSED, null), new Timestamp(0, 1));
-            
+
         _messageFactoryMock
             .Setup(f => f.ToTestStepFinished(_hookStepExecutionTracker))
             .Returns(testStepFinished);
@@ -143,9 +143,9 @@ public class HookStepExecutionTrackerTests
 
 
         _stepDefinitionsByBinding[hookBindingStartedEvent.HookBinding] = hookId;
-            
+
         _idGeneratorMock.Setup(g => g.GetNewId()).Returns(testStepId);
-            
+
         _testCaseTrackerMock.SetupGet(t => t.AttemptCount).Returns(0); // First attempt
 
         // Act
@@ -154,7 +154,7 @@ public class HookStepExecutionTrackerTests
         // Assert
         _hookStepExecutionTracker.StepTracker.Should().NotBeNull();
         _hookStepExecutionTracker.StepTracker.Should().BeOfType<HookStepTracker>();
-            
+
         _testCaseTracker.Steps.Should().HaveCount(1);
         _testCaseTracker.Steps[0].Should().BeOfType<HookStepTracker>();
         ((HookStepTracker)_testCaseTracker.Steps[0]).HookId.Should().Be(hookId);
@@ -183,7 +183,7 @@ public class HookStepExecutionTrackerTests
             _messageFactoryMock.Object,
             _publisherMock.Object
         );
-            
+
         // Pre-existing definition that should be found
         var existingHookStepDefinition = CreateDummyHookStepDefinition(hookId);
 
@@ -194,7 +194,7 @@ public class HookStepExecutionTrackerTests
 
         // Assert
         _hookStepExecutionTracker.StepTracker.Should().Be(existingHookStepDefinition);
-            
+
         _testCaseTracker.Steps.Should().HaveCount(1);
     }
 
@@ -204,13 +204,14 @@ public class HookStepExecutionTrackerTests
         // Arrange
         var hookBindingMock = new Mock<IHookBinding>();
         var hookBindingFinishedEvent = new HookBindingFinishedEvent(
-            hookBindingMock.Object, 
+            hookBindingMock.Object,
             TimeSpan.FromMilliseconds(100),
-            _mockContextManager.Object
+            _mockContextManager.Object,
+            ScenarioExecutionStatus.OK
         );
         var hookId = "hook123";
         var testStepId = "step456";
-        var testStepFinished = new TestStepFinished("testCaseStartedId", testStepId, new TestStepResult(new Duration(0,0), "", TestStepResultStatus.PASSED, null),new Timestamp(0, 1));
+        var testStepFinished = new TestStepFinished("testCaseStartedId", testStepId, new TestStepResult(new Duration(0, 0), "", TestStepResultStatus.PASSED, null), new Timestamp(0, 1));
 
         _messageFactoryMock
             .Setup(f => f.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()))
@@ -227,41 +228,12 @@ public class HookStepExecutionTrackerTests
         _hookStepExecutionTracker.Status.Should().Be(ScenarioExecutionStatus.OK); // Success status
     }
 
-    [Fact]
-    public async Task HookStepTracker_ProcessEvent_HookBindingFinishedEvent_WithException_SetsStatusToTestError()
-    {
-        // Arrange
-        var hookBindingMock = new Mock<IHookBinding>();
-        var exception = new ApplicationException("Test hook exception");
-        var hookBindingFinishedEvent = new HookBindingFinishedEvent(
-            hookBindingMock.Object, 
-            new TimeSpan(1),
-            _mockContextManager.Object,
-            exception
-        );
-        var hookId = "hook123";
-        var testStepId = "step456";
-        var testStepFinished = new TestStepFinished("testCaseStartedId", testStepId, new TestStepResult(new Duration(0, 0), "", TestStepResultStatus.PASSED, null), new Timestamp(0, 1));
-
-        _messageFactoryMock
-            .Setup(f => f.ToTestStepFinished(It.IsAny<HookStepExecutionTracker>()))
-            .Returns(testStepFinished);
-
-        _stepDefinitionsByBinding[hookBindingFinishedEvent.HookBinding] = hookId;
-
-        // Act
-        await _hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
-
-        // Assert
-        _hookStepExecutionTracker.Exception.Should().Be(exception);
-        _hookStepExecutionTracker.Status.Should().Be(ScenarioExecutionStatus.TestError); // Error status
-    }
 
     // Helper method to create a dummy HookStepTracker without mocking
     private HookStepTracker CreateDummyHookStepDefinition(string hookId)
     {
         return new HookStepTracker(
-            "dummyTestStepId", 
+            "dummyTestStepId",
             hookId
         );
     }

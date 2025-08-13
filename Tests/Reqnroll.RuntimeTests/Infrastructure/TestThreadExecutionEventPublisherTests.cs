@@ -1,12 +1,13 @@
-using System;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
@@ -115,6 +116,96 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                 te.PublishEventAsync(It.Is<HookBindingFinishedEvent>(e =>
                                                                     e.HookBinding.Equals(expectedHookBinding) &&
                                                                     e.Duration.Equals(expectedDuration))),
+                                                      Times.Once);
+        }
+
+        [Fact]
+        public async Task Should_publish_hook_binding_finished_event_with_OK_status_when_hook_succeeds()
+        {
+            // Arrange
+            var hookType = HookType.AfterScenario;
+            TimeSpan expectedDuration = TimeSpan.FromSeconds(5);
+            var expectedHookBinding = new HookBinding(new Mock<IBindingMethod>().Object, hookType, null, 1);
+            _methodBindingInvokerMock
+                .Setup(i => i.InvokeBindingAsync(expectedHookBinding, _contextManagerStub.Object, It.IsAny<object[]>(), _testTracerStub.Object, It.IsAny<DurationHolder>()))
+                .Callback((IBinding _, IContextManager _, object[] arguments, ITestTracer _, DurationHolder durationHolder) => durationHolder.Duration = expectedDuration)
+                .ReturnsAsync(new object());
+            var testExecutionEngine = CreateTestExecutionEngine();
+
+            // Act
+            await testExecutionEngine.InvokeHookAsync(_methodBindingInvokerMock.Object, expectedHookBinding, hookType);
+
+            // Assert
+            _testThreadExecutionEventPublisher.Verify(te =>
+                te.PublishEventAsync(It.Is<HookBindingFinishedEvent>(e =>
+                                                                    e.HookBinding.Equals(expectedHookBinding) &&
+                                                                    e.Duration.Equals(expectedDuration) &&
+                                                                    e.HookStatus == ScenarioExecutionStatus.OK &&
+                                                                    e.HookException == null)),
+                                                      Times.Once);
+        }
+
+        [Fact]
+        public async Task Should_publish_hook_binding_finished_event_with_unit_test_provider_detected_status()
+        {
+            // Arrange
+            var hookType = HookType.AfterScenario;
+            TimeSpan expectedDuration = TimeSpan.FromSeconds(3);
+            var expectedHookBinding = new HookBinding(new Mock<IBindingMethod>().Object, hookType, null, 1);
+            var expectedException = new Exception("Custom test framework exception");
+
+            // Setup the unit test provider to return a specific status for this exception type
+            _unitTestRuntimeProviderStub.Setup(p => p.DetectExecutionStatus(expectedException))
+                                       .Returns(ScenarioExecutionStatus.Skipped);
+
+            _methodBindingInvokerMock
+                .Setup(i => i.InvokeBindingAsync(expectedHookBinding, _contextManagerStub.Object, It.IsAny<object[]>(), _testTracerStub.Object, It.IsAny<DurationHolder>()))
+                .Callback((IBinding _, IContextManager _, object[] arguments, ITestTracer _, DurationHolder durationHolder) => durationHolder.Duration = expectedDuration)
+                .ThrowsAsync(expectedException);
+            var testExecutionEngine = CreateTestExecutionEngine();
+
+            // Act & Assert
+            await FluentActions.Awaiting(() => testExecutionEngine.InvokeHookAsync(_methodBindingInvokerMock.Object, expectedHookBinding, hookType))
+                               .Should().ThrowAsync<Exception>();
+
+            _testThreadExecutionEventPublisher.Verify(te =>
+                te.PublishEventAsync(It.Is<HookBindingFinishedEvent>(e =>
+                                                                    e.HookBinding.Equals(expectedHookBinding) &&
+                                                                    e.Duration.Equals(expectedDuration) &&
+                                                                    e.HookStatus == ScenarioExecutionStatus.Skipped &&
+                                                                    e.HookException == expectedException)),
+                                                      Times.Once);
+        }
+
+        [Theory]
+        [InlineData(typeof(NotImplementedException), ScenarioExecutionStatus.StepDefinitionPending)]
+        [InlineData(typeof(PendingScenarioException), ScenarioExecutionStatus.StepDefinitionPending)]
+        [InlineData(typeof(InvalidOperationException), ScenarioExecutionStatus.TestError)]
+        [InlineData(typeof(ArgumentException), ScenarioExecutionStatus.TestError)]
+        public async Task Should_publish_hook_binding_finished_event_with_correct_status_for_exception_types(Type exceptionType, ScenarioExecutionStatus expectedStatus)
+        {
+            // Arrange
+            var hookType = HookType.BeforeStep;
+            TimeSpan expectedDuration = TimeSpan.FromSeconds(1);
+            var expectedHookBinding = new HookBinding(new Mock<IBindingMethod>().Object, hookType, null, 1);
+            var expectedException = (Exception)Activator.CreateInstance(exceptionType, "Test exception");
+
+            _methodBindingInvokerMock
+                .Setup(i => i.InvokeBindingAsync(expectedHookBinding, _contextManagerStub.Object, It.IsAny<object[]>(), _testTracerStub.Object, It.IsAny<DurationHolder>()))
+                .Callback((IBinding _, IContextManager _, object[] arguments, ITestTracer _, DurationHolder durationHolder) => durationHolder.Duration = expectedDuration)
+                .ThrowsAsync(expectedException);
+            var testExecutionEngine = CreateTestExecutionEngine();
+
+            // Act & Assert
+            await FluentActions.Awaiting(() => testExecutionEngine.InvokeHookAsync(_methodBindingInvokerMock.Object, expectedHookBinding, hookType))
+                               .Should().ThrowAsync<Exception>();
+
+            _testThreadExecutionEventPublisher.Verify(te =>
+                te.PublishEventAsync(It.Is<HookBindingFinishedEvent>(e =>
+                                                                    e.HookBinding.Equals(expectedHookBinding) &&
+                                                                    e.Duration.Equals(expectedDuration) &&
+                                                                    e.HookStatus == expectedStatus &&
+                                                                    e.HookException == expectedException)),
                                                       Times.Once);
         }
 
