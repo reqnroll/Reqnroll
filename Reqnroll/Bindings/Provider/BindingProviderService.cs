@@ -132,9 +132,6 @@ public class BindingProviderService
         {
             base.RegisterGlobalContainerDefaults(container);
             container.RegisterTypeAs<DryRunBindingInvoker, IAsyncBindingInvoker>();
-#pragma warning disable CS0618
-            container.RegisterTypeAs<DryRunBindingInvoker, IBindingInvoker>();
-#pragma warning restore CS0618
             container.RegisterTypeAs<Formatters.Configuration.FormattersForcedDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
         }
     }
