@@ -510,7 +510,7 @@ public class FormatterPublisherTests
 
         var hookTracker = new TestRunHookExecutionTracker("2", "0", "1", messageFactory, _brokerMock.Object);
         _sut.TestRunHookTrackers.TryAdd(hookBindingMock.Object, hookTracker);
-        var hookBindingFinished = new HookBindingFinishedEvent(hookBindingMock.Object, dur, cmMock.Object);
+        var hookBindingFinished = new HookBindingFinishedEvent(hookBindingMock.Object, dur, cmMock.Object, ScenarioExecutionStatus.OK);
 
         // Act
         await _sut.OnEventAsync(hookBindingFinished);
@@ -556,7 +556,7 @@ public class FormatterPublisherTests
         var executionEvent = eventType switch
         {
             var t when t == typeof(HookBindingStartedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, hookBindingMock.Object, cmMock.Object),
-            var t when t == typeof(HookBindingFinishedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, hookBindingMock.Object, dur, cmMock.Object, null),
+            var t when t == typeof(HookBindingFinishedEvent) => (IExecutionEvent)Activator.CreateInstance(eventType, hookBindingMock.Object, dur, cmMock.Object, ScenarioExecutionStatus.OK, null),
             _ => throw new NotSupportedException()
         };
 

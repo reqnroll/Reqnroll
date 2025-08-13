@@ -258,7 +258,7 @@ public class PickleExecutionTrackerTests
         _mockHookBinding.Setup(h => h.HookType).Returns(HookType.BeforeScenario);
 
         var hookStartedEvent = new HookBindingStartedEvent(_mockHookBinding.Object, _mockContextManager.Object);
-        var hookFinishedEvent = new HookBindingFinishedEvent(_mockHookBinding.Object, new TimeSpan(1), _mockContextManager.Object);
+        var hookFinishedEvent = new HookBindingFinishedEvent(_mockHookBinding.Object, new TimeSpan(1), _mockContextManager.Object, ScenarioExecutionStatus.OK);
 
         // Initial setup
         await tracker.ProcessEvent(scenarioStartedEvent);
@@ -285,7 +285,7 @@ public class PickleExecutionTrackerTests
         _mockHookBinding.Setup(h => h.HookType).Returns(HookType.BeforeTestRun);
 
         var hookStartedEvent = new HookBindingStartedEvent(_mockHookBinding.Object, _mockContextManager.Object);
-        var hookFinishedEvent = new HookBindingFinishedEvent(_mockHookBinding.Object, new TimeSpan(1), _mockContextManager.Object);
+        var hookFinishedEvent = new HookBindingFinishedEvent(_mockHookBinding.Object, new TimeSpan(1), _mockContextManager.Object, ScenarioExecutionStatus.OK);
 
         // Initial setup
         await tracker.ProcessEvent(scenarioStartedEvent);

@@ -406,7 +406,8 @@ namespace Reqnroll.Infrastructure
             }
             finally
             {
-                await _testThreadExecutionEventPublisher.PublishEventAsync(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager, exceptionThrown));
+                var hookStatus = exceptionThrown == null ? ScenarioExecutionStatus.OK : GetStatusFromException(exceptionThrown);
+                await _testThreadExecutionEventPublisher.PublishEventAsync(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager, hookStatus, exceptionThrown));
             }
         }
 
