@@ -135,6 +135,7 @@ public class TestStepExecutionTrackerTests
 
         var stepContextMock = CreateStepContextWithPickleId("stepPickleId");
         stepContextMock.Setup(sc => sc.Status).Returns(status);
+        stepContextMock.Setup(sc => sc.StepError).Returns(testError);
         var testStepFinished = new TestStepFinished("testCaseStartedId", "testStepId", new TestStepResult(new Duration(0, 0), "", TestStepResultStatus.FAILED, new Io.Cucumber.Messages.Types.Exception(testError.GetType().Name, "", null)), new Timestamp(0,0));
 
         _messageFactoryMock
@@ -142,7 +143,6 @@ public class TestStepExecutionTrackerTests
             .Returns(testStepFinished);
 
         var scenarioContextMock = new Mock<IScenarioContext>();
-        scenarioContextMock.SetupGet(s => s.TestError).Returns(testError);
 
         var stepFinishedEvent = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
 

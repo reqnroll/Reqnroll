@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FluentAssertions.Execution;
 
 namespace Reqnroll.Formatters.Tests;
@@ -16,8 +16,8 @@ internal class CucumberMessagesHtmlGenerationValidator
 
     public void GeneratedHtmlContentMatchesJsonMessages() {
 
-        var actual = ExtractMessagesFromHtml(_generatedHtml).Replace(@"\/", "/");
-        var expected = string.Join(',', _expectedJson);
+        var actual = ExtractMessagesFromHtml(_generatedHtml);
+        var expected = string.Join(',', _expectedJson).Replace(@"<", "\\x3C");
         actual.Should().Be(expected);
     }
 

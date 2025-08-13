@@ -1,11 +1,11 @@
-﻿using System.CodeDom;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using Reqnroll.BoDi;
+﻿using Reqnroll.BoDi;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Reqnroll.TUnit.Generator.ReqnrollPlugin;
 
@@ -34,7 +34,6 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
     protected internal const string NOTINPARALLEL_ATTR = "TUnit.Core.NotInParallelAttribute";
     protected internal const string TESTCONTEXT_TYPE = "TUnit.Core.TestContext";
     protected internal const string TESTCONTEXT_INSTANCE = "TUnit.Core.TestContext.Current";
-
 
     public TUnitTestGeneratorProvider(CodeDomHelper codeDomHelper)
     {
@@ -165,7 +164,8 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
     public void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
     {
         // For a row test, mark it as a test with a display name.
-        SetTestMethod(generationContext, testMethod, scenarioTitle);
+        var paramNames = string.Join(", ", testMethod.Parameters.Cast<CodeParameterDeclarationExpression>().Take(testMethod.Parameters.Count - 2).Select(x => $"${x.Name}"));
+        SetTestMethod(generationContext, testMethod, scenarioTitle + " (" + paramNames + ")");
     }
 
     public void SetRow(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> arguments, IEnumerable<string> tags, bool isIgnored)
@@ -173,14 +173,13 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
         var args = arguments.Select(
             arg => new CodeAttributeArgument(new CodePrimitiveExpression(arg))).ToList();
 
-        var tagsArray = tags.ToArray();
+        var tagsArray = tags.ToList();
+        if (isIgnored)
+            tagsArray.Add("ignore");
 
         // addressing ReSharper bug: TestCase attribute with empty string[] param causes inconclusive result - https://youtrack.jetbrains.com/issue/RSRP-279138
-        var hasExampleTags = tagsArray.Any();
         var exampleTagExpressionList = tagsArray.Select(t => (CodeExpression)new CodePrimitiveExpression(t));
-        var exampleTagsExpression = hasExampleTags
-            ? new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray())
-            : (CodeExpression)new CodePrimitiveExpression(null);
+        var exampleTagsExpression = new CodeArrayCreateExpression(typeof(string[]), exampleTagExpressionList.ToArray());
 
         args.Add(new CodeAttributeArgument(exampleTagsExpression));
 

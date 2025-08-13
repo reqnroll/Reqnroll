@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Threading;
 
@@ -8,6 +9,8 @@ namespace Reqnroll
         StepInfo StepInfo { get; }
 
         ScenarioExecutionStatus Status { get; set; }
+        Exception StepError { get; set; }
+
     }
 
     public class ScenarioStepContext : ReqnrollContext, IScenarioStepContext
@@ -45,6 +48,7 @@ namespace Reqnroll
         public StepInfo StepInfo { get; private set; }
 
         public ScenarioExecutionStatus Status { get; set; }
+        public Exception StepError { get; set; }
 
         internal ScenarioStepContext(StepInfo stepInfo)
         {

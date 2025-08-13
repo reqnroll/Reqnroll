@@ -10,8 +10,6 @@ namespace Reqnroll.Utils
         private static TimeSpan _timeout = TimeSpan.FromMinutes(10);
         private static int _timeOutInMilliseconds = Convert.ToInt32(_timeout.TotalMilliseconds);
 
-        public string ConsoleOutput { get; private set; }
-
         public int RunProcess(string executablePath, string argumentsFormat, params object[] arguments)
         {
             var parameters = string.Format(argumentsFormat, arguments);
@@ -33,7 +31,7 @@ namespace Reqnroll.Utils
 
             StringBuilder output = new StringBuilder();
 
-
+            string? consoleOutput;
             using (AutoResetEvent outputWaitHandle = new AutoResetEvent(false))
             {
                 using (AutoResetEvent errorWaitHandle = new AutoResetEvent(false))
@@ -71,7 +69,7 @@ namespace Reqnroll.Utils
                         outputWaitHandle.WaitOne(_timeOutInMilliseconds) &&
                         errorWaitHandle.WaitOne(_timeOutInMilliseconds))
                     {
-                        ConsoleOutput = output.ToString();
+                        consoleOutput = output.ToString();
                     }
                     else
                     {
@@ -80,7 +78,7 @@ namespace Reqnroll.Utils
 
                 }
             }
-            Console.WriteLine(ConsoleOutput);
+            Console.WriteLine(consoleOutput);
 
 
             return process.ExitCode;

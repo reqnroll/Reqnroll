@@ -406,7 +406,8 @@ namespace Reqnroll.Infrastructure
             }
             finally
             {
-                await _testThreadExecutionEventPublisher.PublishEventAsync(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager, exceptionThrown));
+                var hookStatus = exceptionThrown == null ? ScenarioExecutionStatus.OK : GetStatusFromException(exceptionThrown);
+                await _testThreadExecutionEventPublisher.PublishEventAsync(new HookBindingFinishedEvent(hookBinding, durationHolder.Duration, _contextManager, hookStatus, exceptionThrown));
             }
         }
 
@@ -630,18 +631,8 @@ namespace Reqnroll.Infrastructure
                     UpdateStatusOnStepFailure(stepStatus, stepException);
 
                 // 8. Publish StepFinishedEvent event
-                //HACK: temporary hack
-                var testErrorBackup = contextManager.ScenarioContext.TestError;
-                if (stepStatus == ScenarioExecutionStatus.Skipped)
-                    contextManager.ScenarioContext.TestError = null; // clear the error to avoid it being propagated to the step finished event
-                //HACK: end
-
                 var stepFinishedEvent = new StepFinishedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
                 await _testThreadExecutionEventPublisher.PublishEventAsync(stepFinishedEvent);
-
-                //HACK: temporary hack
-                contextManager.ScenarioContext.TestError = testErrorBackup; // restore the error for further processing
-                //HACK: end
 
                 // 9. Invoke AfterStep hook
                 if (onStepStartHookExecuted)
@@ -697,6 +688,7 @@ namespace Reqnroll.Infrastructure
         private void UpdateStatusOnStepFailure(ScenarioExecutionStatus stepStatus, Exception exception)
         {
             _contextManager.StepContext.Status = stepStatus;
+            _contextManager.StepContext.StepError = exception;
 
             bool ShouldOverrideScenarioStatus(ScenarioExecutionStatus currentStatus, ScenarioExecutionStatus newStatus)
             {

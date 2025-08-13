@@ -27,12 +27,6 @@ namespace Reqnroll
             await _executionEngine.OnTestRunStartAsync();
         }
 
-        [Obsolete("TestWorkerId is now managed by Reqnroll internally - Method will be removed in v3")]
-        public void InitializeTestRunner(string testWorkerId)
-        {
-            // do nothing method will be removed
-        }
-
         public async Task OnFeatureStartAsync(FeatureInfo featureInfo)
         {
             await _executionEngine.OnFeatureStartAsync(featureInfo);

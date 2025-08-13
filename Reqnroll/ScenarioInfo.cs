@@ -19,9 +19,6 @@ namespace Reqnroll
         /// </summary>
         public string[] CombinedTags { get; private set; }
 
-        [Obsolete($"Deprecated. Use '{nameof(CombinedTags)}' instead.", false)]
-        public string[] ScenarioAndFeatureTags => CombinedTags;
-        
         /// <summary>
         /// The arguments used to execute a scenario outline example.
         /// </summary>

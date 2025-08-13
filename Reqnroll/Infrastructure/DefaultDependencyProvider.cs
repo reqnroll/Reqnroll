@@ -1,3 +1,4 @@
+using System;
 using Gherkin.CucumberMessages;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
@@ -58,9 +59,6 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<CucumberExpressionDetector, ICucumberExpressionDetector>();
             container.RegisterTypeAs<StepDefinitionRegexCalculator, IStepDefinitionRegexCalculator>();
             container.RegisterTypeAs<MatchArgumentCalculator, IMatchArgumentCalculator>();
-#pragma warning disable CS0618
-            container.RegisterTypeAs<BindingInvoker, IBindingInvoker>();
-#pragma warning restore CS0618
             container.RegisterTypeAs<BindingInvoker, IAsyncBindingInvoker>();
             container.RegisterTypeAs<BindingDelegateInvoker, IBindingDelegateInvoker>();
             container.RegisterTypeAs<TestObjectResolver, ITestObjectResolver>();
@@ -136,7 +134,6 @@ namespace Reqnroll.Infrastructure
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
         {
             testThreadContainer.RegisterTypeAs<TestRunner, ITestRunner>();
-            testThreadContainer.RegisterTypeAs<BlockingSyncTestRunner, ISyncTestRunner>();
             testThreadContainer.RegisterTypeAs<ContextManager, IContextManager>();
             testThreadContainer.RegisterTypeAs<TestExecutionEngine, ITestExecutionEngine>();
 

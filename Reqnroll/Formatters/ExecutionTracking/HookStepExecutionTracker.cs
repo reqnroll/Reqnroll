@@ -32,7 +32,7 @@ public class HookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
     {
         StepFinishedAt = hookFinishedEvent.Timestamp;
         Exception = hookFinishedEvent.HookException;
-        Status = Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
+        Status = hookFinishedEvent.HookStatus;
 
         await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepFinished(this)));
     }

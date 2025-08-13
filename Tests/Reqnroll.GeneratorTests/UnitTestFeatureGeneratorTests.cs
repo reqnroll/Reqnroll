@@ -76,6 +76,65 @@ namespace Reqnroll.GeneratorTests
         }
 
         [Fact]
+        public void Should_pass_scenario_tags_as_test_method_categories_of_scenarioOutline()
+        {
+            var generator = CreateUnitTestFeatureGenerator();
+            List<string> generatedCats = new();
+            UnitTestGeneratorProviderMock.Setup(ug => ug.SetTestMethodCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>(), It.IsAny<IEnumerable<string>>()))
+                .Callback((TestClassGenerationContext ctx, CodeMemberMethod _, IEnumerable<string> cats) => recordTestMethodCategories( cats, generatedCats));
+
+            var theFeature = ParserHelper.CreateDocumentWithScenarioOutline(scenarioOutlineTags: new[] { "foo", "bar" });
+
+            GenerateFeature(generator, theFeature);
+
+            generatedCats.Should().Equal(new string[] { "foo", "bar" });
+
+            void recordTestMethodCategories(IEnumerable<string> cats, List<string> generatedCats)
+            {
+                generatedCats.AddRange(cats);
+            }
+
+        }
+
+
+        [Fact]
+        public void Should_pass_rule_tags_as_test_method_category()
+        {
+            var generator = CreateUnitTestFeatureGenerator();
+            string[] generatedCats = new string[0];
+            UnitTestGeneratorProviderMock.Setup(ug => ug.SetTestMethodCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>(), It.IsAny<IEnumerable<string>>()))
+                .Callback((TestClassGenerationContext ctx, CodeMemberMethod _, IEnumerable<string> cats) => generatedCats = cats.ToArray());
+
+            var theFeature = ParserHelper.CreateDocumentWithRule(ruleTags: new[] { "rule_tag1", "rule_tag2" }, scenarioTags: new[] {"scenarioTag1"});
+
+            GenerateFeature(generator, theFeature);
+
+            generatedCats.Should().BeEquivalentTo(new string[] { "rule_tag1", "rule_tag2", "scenarioTag1" });
+        }
+
+
+        [Fact]
+        public void Should_pass_rule_tags_as_test_method_category_of_scenario_outline()
+        {
+            var generator = CreateUnitTestFeatureGenerator();
+            List<string> generatedCats = new List<string>();
+            UnitTestGeneratorProviderMock.Setup(ug => ug.SetTestMethodCategories(It.IsAny<TestClassGenerationContext>(), It.IsAny<CodeMemberMethod>(), It.IsAny<IEnumerable<string>>()))
+                .Callback((TestClassGenerationContext ctx, CodeMemberMethod _, IEnumerable<string> cats) => recordTestMethodCategories(cats, generatedCats));
+
+            var theFeature = ParserHelper.CreateDocumentWithScenarioOutlineInRule(ruleTags: new[] { "rule_tag1", "rule_tag2" }, scenarioOutlineTags: new[] { "scenarioTag1" });
+
+            GenerateFeature(generator, theFeature);
+
+            generatedCats.Should().BeEquivalentTo(new List<string> { "rule_tag1", "rule_tag2", "scenarioTag1" });
+
+            void recordTestMethodCategories(IEnumerable<string> cats, List<string> generatedCats)
+            {
+                generatedCats.AddRange(cats);
+            }
+        }
+
+
+        [Fact]
         public void Should_not_pass_feature_tags_as_test_method_category()
         {
             var generator = CreateUnitTestFeatureGenerator();
