@@ -44,7 +44,7 @@ Once package validation issues are resolved, the CI can be updated to fail build
 
 You can run package validation locally:
 
-```bash
+```powershell
 # Install the tool
 dotnet tool install --global Meziantou.Framework.NuGetPackageValidation.Tool
 
