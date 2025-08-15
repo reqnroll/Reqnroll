@@ -26,6 +26,7 @@
 * Removed support for end-of-life .NET frameworks (.NET 6, .NET 7, .NET Core) (#706)
 * Allow detecting skipped or pending execution status by the unit test providers (#732)
 * Allow `ScenarioContext`, `FeatureContext` and `TestThreadContext` to be resolved or injected through their interfaces, e.g. `IScenarioContext` (#761)
+* Removed deprecated `<summary>` from NuGet packages (#766)
 
 ## Bug fixes:
 
