@@ -1,10 +1,10 @@
-﻿using System;
-using System.Linq;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using FluentAssertions;
-using System.Text.Json;
-using System.Collections.Generic;
 using Reqnroll.TestProjectGenerator;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 
 namespace Reqnroll.SystemTests.Generation;
 
@@ -27,6 +27,11 @@ public abstract class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void GeneratorAllIn_sample_can_be_handled_with_VisualBasic()
     {
+        if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
+        {
+            Assert.Inconclusive("Issues with current TUnit Version (https://github.com/thomhurst/TUnit/issues/2905 and https://github.com/thomhurst/TUnit/issues/2906). Check again and remove inconclusive if a fix is available.");
+        }
+
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.VB;
 
         PrepareGeneratorAllInSamples();
