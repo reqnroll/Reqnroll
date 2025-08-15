@@ -7,7 +7,6 @@
     <authors>$author$</authors>
     <owners>$owner$</owners>
     <description>Package to enable the code-behind file generation during build time http://reqnroll.net/documentation/Generate-Tests-from-MsBuild/</description>
-    <summary>Package to enable the code-behind file generation during build time http://reqnroll.net/documentation/Generate-Tests-from-MsBuild/</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />

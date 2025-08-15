@@ -7,7 +7,6 @@
     <authors>Mark Hoek, Solid Token, Stef Heyenrath, $author$</authors>
     <owners>Mark Hoek, Solid Token, Stef Heyenrath, $owner$</owners>
     <description>Reqnroll plugin that enables to use Microsoft.Extensions.DependencyInjection for resolving test dependencies.</description>
-    <summary>Reqnroll plugin that enables to use Microsoft.Extensions.DependencyInjection for resolving test dependencies.</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
