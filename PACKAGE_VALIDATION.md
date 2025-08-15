@@ -18,8 +18,9 @@ The tool validates various aspects of NuGet packages including:
 
 The validation is configured in `.github/workflows/ci.yml` and currently:
 
-- ✅ Runs after package building but before artifact upload
-- ✅ Excludes deterministic checks (error code 112) temporarily as requested
+- ✅ Runs after package building in a separate validation job
+- ✅ Includes all validation checks including deterministic builds
+- ✅ Skips assembly optimization validation on non-main branches (to allow Debug builds in PRs)
 - ⚠️ Reports validation issues as warnings but does not fail the build (gradual improvement mode)
 
 ## Error codes
@@ -32,7 +33,7 @@ Common error codes you might encounter:
 - **61**: Readme not set
 - **81**: Assembly not optimized (Debug builds)
 - **101**: XML documentation not found
-- **112**: Deterministic build issues (currently excluded)
+- **112**: Deterministic build issues
 - **119**: Source file not accessible
 
 ## Future improvements
@@ -47,8 +48,11 @@ You can run package validation locally:
 # Install the tool
 dotnet tool install --global Meziantou.Framework.NuGetPackageValidation.Tool
 
-# Validate a package (excluding deterministic checks)
-meziantou.validate-nuget-package path/to/package.nupkg --excluded-rule-ids 112
+# Validate a package
+meziantou.validate-nuget-package path/to/package.nupkg
+
+# Validate a package excluding assembly optimization (for non-main branches)
+meziantou.validate-nuget-package path/to/package.nupkg --excluded-rules AssembliesMustBeOptimized
 
 # See all available rules
 meziantou.validate-nuget-package --help

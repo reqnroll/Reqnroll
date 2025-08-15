@@ -246,11 +246,25 @@ jobs:
         $errorCount = 0
         $totalPackages = $packages.Count
         
+        # Determine excluded rules based on branch
+        $excludedRules = @()
+        if ("${{ github.ref }}" -ne "refs/heads/main") {
+          $excludedRules += "AssembliesMustBeOptimized"
+          Write-Output "::notice::Assembly optimization validation skipped for non-main branch"
+        }
+        
         foreach ($package in $packages) {
           Write-Output "Validating package: $($package.Name)"
           try {
+            # Build validation command with conditional exclusions
+            $validationArgs = @($package.FullName)
+            if ($excludedRules.Count -gt 0) {
+              $validationArgs += "--excluded-rules"
+              $validationArgs += ($excludedRules -join ",")
+            }
+            
             # Run validation
-            $validationResult = meziantou.validate-nuget-package $package.FullName
+            $validationResult = & meziantou.validate-nuget-package @validationArgs
             $exitCode = $LASTEXITCODE
             
             if ($exitCode -eq 0) {
