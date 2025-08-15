@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="System.CodeDom" Version="8.0.0" />
+    <PackageReference Include="UTF.Unknown" Version="2.6.0" />
   </ItemGroup>
 
   <ItemGroup>
