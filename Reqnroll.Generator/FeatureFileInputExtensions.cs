@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using Reqnroll.Generator.Interfaces;
 using UtfUnknown;
 
@@ -22,7 +23,11 @@ namespace Reqnroll.Generator
             DetectionResult charsetResult = CharsetDetector.DetectFromFile(filePath);
             if (charsetResult != null)
             {
-                return new StreamReader(filePath, charsetResult.Detected.Encoding);
+                var enc = charsetResult.Detected.Encoding;
+                if (enc == Encoding.ASCII || enc == Encoding.Unicode || enc == Encoding.BigEndianUnicode)
+                {
+                    return new StreamReader(filePath, enc);
+                }
             }
             return new StreamReader(filePath);
         }
