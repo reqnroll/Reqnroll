@@ -20,6 +20,7 @@
 * Improved test feature context and feature hook handling for non-parallel or class-parallel scenarios where the scenarios of the feature are not executed in sequence. (#638)
 * Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
 * Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
+* Add xUnit 3 support (#538)
 * Added ExpressionType option (cucumber/regex) to [Given], [When] and [Then] attributes (#663)
 * Remove [Serializable] from exceptions (#738)
 * Updated Reqnroll project template to add TUnit test framework support and remove EOL .NET versions (6.0, 7.0), added .NET 9.0 support (#701)
@@ -42,7 +43,7 @@
 * Removed obsolete property `ScenarioInfo.ScenarioAndFeatureTags`. Please use `ScenarioInfo.CombinedTags` instead.
 * Removed obsolete methods on `Reqnroll.Assist.Service` class: `RegisterValueComparer`, `UnregisterValueComparer`, `RegisterValueRetriever`, `UnregisterValueRetriever` use `ValueComparers.Register`, `ValueComparers.Unregister`, `ValueRetrievers.Register`, `ValueRetrievers.Unregister` instead.
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @chekkan, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 

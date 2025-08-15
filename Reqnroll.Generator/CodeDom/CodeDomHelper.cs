@@ -250,6 +250,15 @@ namespace Reqnroll.Generator.CodeDom
 
             var returnTypeArgumentReferences = method.ReturnType.TypeArguments.OfType<CodeTypeReference>().ToArray();
 
+            // Skip adding 'async' prefix for ValueTask in VB
+            bool isValueTaskInVb = TargetLanguage == CodeDomProviderLanguage.VB && 
+                                  method.ReturnType.BaseType.Contains("ValueTask");
+
+            if (isValueTaskInVb)
+            {
+                return;
+            }
+
             var asyncReturnType = new CodeTypeReference($"async {method.ReturnType.BaseType}", returnTypeArgumentReferences);
             method.ReturnType = asyncReturnType;
         }
