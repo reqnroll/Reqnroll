@@ -13,25 +13,24 @@ public class ContextManager : IContextManager, IDisposable
     private class InternalContextManager<TContext>(ITestTracer testTracer) : IDisposable
         where TContext : ReqnrollContext
     {
-        private TContext _instance;
         private IObjectContainer _objectContainer;
 
-        public TContext Instance => _instance;
+        public TContext Instance { get; private set; }
 
         public void Init(TContext newInstance, IObjectContainer newObjectContainer)
         {
-            if (_instance != null)
+            if (Instance != null)
             {
                 testTracer.TraceWarning($"The previous {typeof(TContext).Name} was not disposed.");
                 DisposeInstance();
             }
-            _instance = newInstance;
+            Instance = newInstance;
             _objectContainer = newObjectContainer;
         }
 
         public void Cleanup()
         {
-            if (_instance == null)
+            if (Instance == null)
             {
                 testTracer.TraceWarning($"The previous {typeof(TContext).Name} was already disposed.");
                 return;
@@ -42,13 +41,13 @@ public class ContextManager : IContextManager, IDisposable
         private void DisposeInstance()
         {
             _objectContainer?.Dispose();
-            _instance = null;
+            Instance = null;
             _objectContainer = null;
         }
 
         public void Dispose()
         {
-            if (_instance != null)
+            if (Instance != null)
             {
                 DisposeInstance();
             }
