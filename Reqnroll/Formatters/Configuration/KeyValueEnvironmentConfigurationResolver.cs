@@ -11,7 +11,7 @@ internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentWrapper envi
 
     public IDictionary<string, IDictionary<string, object>> Resolve()
     {
-        var result = new Dictionary<string, IDictionary<string, object>>(StringComparer.InvariantCultureIgnoreCase);
+        var result = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
 
         var environmentVariables = _environmentWrapper.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX);
         foreach (var formatterEnvironmentVariable in environmentVariables)
