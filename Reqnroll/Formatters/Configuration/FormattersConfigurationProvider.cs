@@ -20,7 +20,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersLoggerConfigurationProvider formattersLoggerConfigurationProvider, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
+    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
         var fileResolver = resolvers["fileBasedResolver"];
         _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
