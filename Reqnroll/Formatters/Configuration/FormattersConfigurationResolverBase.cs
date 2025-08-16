@@ -29,19 +29,20 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
             foreach(JsonProperty formatterProperty in formatters.EnumerateObject())
             {
                 var configValues = new Dictionary<string, object>();
-                
+
                 if (formatterProperty.Value.ValueKind == JsonValueKind.Object)
                 {
                     foreach (JsonProperty configProperty in formatterProperty.Value.EnumerateObject())
                     {
-                            configValues.Add(configProperty.Name, GetConfigValue(configProperty.Value));
+                        configValues.Add(configProperty.Name, GetConfigValue(configProperty.Value));
                     }
                 }
-                
+
                 result.Add(formatterProperty.Name, configValues);
             }
         }
     }
+
     private object GetConfigValue(JsonElement valueElement)
     {
         switch (valueElement.ValueKind)
