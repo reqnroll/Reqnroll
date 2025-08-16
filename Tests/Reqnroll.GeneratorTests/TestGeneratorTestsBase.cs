@@ -3,6 +3,7 @@ using Moq;
 using Reqnroll.Configuration;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
@@ -91,7 +92,12 @@ Scenario: Add two numbers
             var generatorRegistryStub = new Mock<IFeatureGeneratorRegistry>();
             generatorRegistryStub.Setup(r => r.CreateGenerator(It.IsAny<ReqnrollDocument>())).Returns(unitTestFeatureGenerator);
 
-            return new TestGenerator(generatorReqnrollConfiguration, projectSettings, TestHeaderWriterStub.Object, TestUpToDateCheckerStub.Object, generatorRegistryStub.Object, codeDomHelper, gherkinParserFactory);
+            var generatorInfo = new GeneratorInfo()
+            {
+                GeneratorVersion = GeneratorInfoProvider.GeneratorVersion,
+            };
+
+            return new TestGenerator(generatorReqnrollConfiguration, projectSettings, TestHeaderWriterStub.Object, TestUpToDateCheckerStub.Object, generatorRegistryStub.Object, codeDomHelper, gherkinParserFactory, generatorInfo);
         }
     }
 }

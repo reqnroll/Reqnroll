@@ -21,7 +21,7 @@ namespace Reqnroll.Generator
             container.RegisterTypeAs<FileSystem, IFileSystem>();
 
             container.RegisterTypeAs<GeneratorConfigurationProvider, IGeneratorConfigurationProvider>();
-            container.RegisterTypeAs<InProcGeneratorInfoProvider, IGeneratorInfoProvider>();
+            container.RegisterTypeAs<GeneratorInfoProvider, IGeneratorInfoProvider>();
             container.RegisterTypeAs<TestGenerator, ITestGenerator>();
             container.RegisterTypeAs<TestHeaderWriter, ITestHeaderWriter>();
             container.RegisterTypeAs<TestUpToDateChecker, ITestUpToDateChecker>();
