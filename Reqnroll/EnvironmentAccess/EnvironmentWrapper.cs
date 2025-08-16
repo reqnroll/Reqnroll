@@ -41,12 +41,14 @@ namespace Reqnroll.EnvironmentAccess
 
         public IResult<IEnumerable<string>> GetEnvironmentVariableNames(string prefix)
         {
-            var list = Environment.GetEnvironmentVariables().Keys.Cast<string>();
-            
-            if (!string.IsNullOrEmpty(prefix))
-            {
-                list = list.Where(k => k.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase)).ToList();
-            }
+            if (string.IsNullOrEmpty(prefix))
+                throw new ArgumentException("Argument cannot be null or empty", nameof(prefix));
+
+            var list = Environment.GetEnvironmentVariables()
+                                  .Keys
+                                  .OfType<string>()
+                                  .Where(k => k.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+                                  .ToArray();
 
             return Result<IEnumerable<string>>.Success(list);
         }

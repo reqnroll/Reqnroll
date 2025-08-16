@@ -24,13 +24,9 @@ public class FormattersLoggerConfigurationProvider : IFormattersLoggerConfigurat
         var listOfFormattersResult = _environmentWrapper.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX);
         if (listOfFormattersResult is Success<IEnumerable<string>> listOfFormattersSuccess)
         {
-            foreach (var formatterName in listOfFormattersSuccess.Result)
+            foreach (var formatterEnvironmentVariableName in listOfFormattersSuccess.Result)
             {
-                if (string.IsNullOrWhiteSpace(formatterName))
-                {
-                    continue;
-                }
-                var resolver = new EnvironmentConfigurationResolver(_environmentWrapper, formatterName, _log);
+                var resolver = new EnvironmentConfigurationResolver(_environmentWrapper, formatterEnvironmentVariableName, _log);
                 formattersConfigurationResolvers.Add(resolver);
             }
         }

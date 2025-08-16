@@ -113,30 +113,6 @@ public class FormattersLoggerConfigurationProviderTests
     }
 
     [Fact]
-    public void GetFormattersConfigurationResolvers_Should_Skip_Null_Or_Empty_Formatter_Names()
-    {
-        // Arrange
-        var formatterNames = new List<string> 
-        { 
-            "REQNROLL_FORMATTERS_LOGGER_message", 
-            null,
-            "",
-            "   ",
-            "REQNROLL_FORMATTERS_LOGGER_html"
-        };
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(new Success<IEnumerable<string>>(formatterNames));
-
-        // Act
-        var result = _sut.GetFormattersConfigurationResolvers().ToArray();
-
-        // Assert
-        result.Should().HaveCount(2);
-        result.Should().AllBeOfType<EnvironmentConfigurationResolver>();
-    }
-
-    [Fact]
     public void GetFormattersConfigurationResolvers_Should_Pass_EnvironmentWrapper_To_Created_Resolvers()
     {
         // Arrange
