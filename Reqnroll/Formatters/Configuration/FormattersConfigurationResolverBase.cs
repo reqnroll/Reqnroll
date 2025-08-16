@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -9,7 +10,7 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
 
     public IDictionary<string, IDictionary<string, object>> Resolve()
     {
-        var result = new Dictionary<string, IDictionary<string, object>>();
+        var result = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
         JsonDocument jsonDocument = GetJsonDocument();
         
         if (jsonDocument != null)
@@ -28,7 +29,7 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
         {
             foreach(JsonProperty formatterProperty in formatters.EnumerateObject())
             {
-                var configValues = new Dictionary<string, object>();
+                var configValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
 
                 if (formatterProperty.Value.ValueKind == JsonValueKind.Object)
                 {

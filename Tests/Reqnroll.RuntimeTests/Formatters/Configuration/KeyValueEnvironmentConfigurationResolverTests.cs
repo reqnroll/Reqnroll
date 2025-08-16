@@ -158,6 +158,27 @@ public class KeyValueEnvironmentConfigurationResolverTests
     }
 
     [Fact]
+    public void Resolve_should_configure_single_formatter_with_case_insensitive_settings()
+    {
+        // Arrange
+        _environmentWrapperMock
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(
+                new Dictionary<string, string>
+                {
+                    { SampleFormatterEnvironmentName, "OUTPUTFilePath=foo.txt" }
+                });
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result.Should().ContainKey(SampleFormatterName)
+              .WhoseValue.Should().Contain("outputFilePath", "foo.txt");
+    }
+
+    [Fact]
     public void Resolve_should_configure_single_formatter_with_multiple_settings()
     {
         // Arrange

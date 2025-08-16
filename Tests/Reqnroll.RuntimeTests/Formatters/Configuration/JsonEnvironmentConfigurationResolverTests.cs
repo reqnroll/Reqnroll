@@ -56,6 +56,30 @@ public class JsonEnvironmentConfigurationResolverTests
         result["formatter1"]["configSetting1"].Should().Be("configValue1");
     }
 
+
+    [Fact]
+    public void Resolve_should_return_configuration_with_case_insensitive_formatter_and_setting_names()
+    {
+        // Arrange
+        var json = """
+                   {
+                       "formatters": {
+                           "FORMATTER1": {
+                               "CONFIGSetting1": "configValue1" }
+                       }
+                   }
+                   """;
+        _environmentWrapperMock
+            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
+            .Returns(new Success<string>(json));
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result["formatter1"]["configSetting1"].Should().Be("configValue1");
+    }
+
     [Fact]
     public void Resolve_Should_Return_MultipleConfigurations_From_Environment_Variables()
     {

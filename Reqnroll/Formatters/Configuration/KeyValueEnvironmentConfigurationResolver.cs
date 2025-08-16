@@ -25,7 +25,7 @@ internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentWrapper envi
 
             if (formatterConfiguration.Equals("true", StringComparison.InvariantCultureIgnoreCase))
             {
-                result[formatterName] = new Dictionary<string, object>();
+                result[formatterName] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
                 continue;
             }
 
@@ -37,7 +37,7 @@ internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentWrapper envi
 
             var settings = formatterConfiguration.Split(';');
 
-            var configValues = new Dictionary<string, object>();
+            var configValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
             foreach (string setting in settings)
             {
                 var keyValue = setting.Split(['='], 2);

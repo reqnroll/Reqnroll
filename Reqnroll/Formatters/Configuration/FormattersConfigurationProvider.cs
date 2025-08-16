@@ -37,7 +37,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 
     private FormattersConfiguration ResolveConfiguration()
     {
-        var combinedConfig = new Dictionary<string, IDictionary<string, object>>(StringComparer.InvariantCultureIgnoreCase);
+        var combinedConfig = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var resolver in _resolvers)
         {
