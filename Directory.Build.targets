@@ -1,4 +1,64 @@
 <Project>
+  <!-- Existing targets... -->
+  
+  <!-- NuGet Package Configuration -->
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' != ''">
+    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <NuspecFile>$(MSBuildProjectDirectory)\$(ReqnrollNuGetPackage).nuspec</NuspecFile>
+    <PackageId>$(ReqnrollNuGetPackage)</PackageId>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.Microsoft.Extensions.DependencyInjection'">
+    <RootNamespace>Reqnroll.Microsoft.Extensions.DependencyInjection</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.Autofac'">
+    <RootNamespace>Reqnroll.Autofac</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.Windsor'">
+    <RootNamespace>Reqnroll.Windsor</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.Assist.Dynamic'">
+    <RootNamespace>Reqnroll.Assist.Dynamic</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.Verify'">
+    <RootNamespace>Reqnroll.Verify</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.MsTest'">
+    <RootNamespace>Reqnroll.MSTest</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.NUnit'">
+    <RootNamespace>Reqnroll.NUnit</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.xUnit'">
+    <RootNamespace>Reqnroll.xUnit</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.TUnit'">
+    <RootNamespace>Reqnroll.TUnit</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.Tools.MsBuild.Generation'">
+    <RootNamespace>Reqnroll.Tools.MsBuild.Generation</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.ExternalData'">
+    <RootNamespace>Reqnroll.ExternalData.ReqnrollPlugin</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ReqnrollNuGetPackage)' == 'Reqnroll.SpecFlowCompatibility'">
+    <RootNamespace>Reqnroll.SpecFlowCompatibility</RootNamespace>
+  </PropertyGroup>
+
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
       <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>

@@ -1,12 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>$(Reqnroll_FullFramework_Tools_TFM);$(Reqnroll_Core_Tools_TFM)</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Tools.MsBuild.Generation.nuspec</NuspecFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    
+    <ReqnrollNuGetPackage>Reqnroll.Tools.MsBuild.Generation</ReqnrollNuGetPackage>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeSymbols>false</IncludeSymbols>
@@ -57,18 +52,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <!-- We create a 'tasks' folder in the output folder with only those files 
-         that are needed for the task to run, according to Reqnroll.Tools.MsBuild.Generation.nuspec.
-         This is needed only for the Reqnroll projects within the solution (Specs, *.IntegrationTest),
-         and not used for producing the NuGet package.
-    -->
-    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_FullFramework_Tools_TFM)'">
-      <TaskFiles Include="$(OutDir)\*.dll" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(TargetFramework)' == '$(Reqnroll_Core_Tools_TFM)'">
-      <TaskFiles Include="$(OutDir)\*.dll;$(OutDir)\*.deps.json" Exclude="$(OutDir)\System.*;$(OutDir)\Microsoft.*" />
-    </ItemGroup>
-    <Copy SourceFiles="@(TaskFiles)" DestinationFolder="$(OutDir)\tasks" />
+    <Exec Command="powershell &quot;Remove-Item '$(TargetDir)*.deps.json'&quot;" ContinueOnError="true" />
   </Target>
 
 </Project>

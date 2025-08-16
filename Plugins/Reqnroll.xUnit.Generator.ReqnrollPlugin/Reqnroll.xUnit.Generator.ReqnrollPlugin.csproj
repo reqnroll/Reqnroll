@@ -1,12 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.xUnit.nuspec</NuspecFile>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Reqnroll.xUnit</PackageId>
+    <ReqnrollNuGetPackage>Reqnroll.xUnit</ReqnrollNuGetPackage>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="build\**\*" />

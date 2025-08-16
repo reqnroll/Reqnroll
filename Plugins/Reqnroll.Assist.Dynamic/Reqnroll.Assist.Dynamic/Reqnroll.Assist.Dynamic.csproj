@@ -1,14 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
-    
-    <PackageId>Reqnroll.Assist.Dynamic</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Assist.Dynamic.nuspec</NuspecFile>
-
+    <ReqnrollNuGetPackage>Reqnroll.Assist.Dynamic</ReqnrollNuGetPackage>
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>10</LangVersion>
 	</PropertyGroup>
