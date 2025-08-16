@@ -1,0 +1,3 @@
+﻿namespace Reqnroll.Formatters.Configuration;
+
+public interface IKeyValueEnvironmentConfigurationResolver : IFormattersConfigurationResolverBase;

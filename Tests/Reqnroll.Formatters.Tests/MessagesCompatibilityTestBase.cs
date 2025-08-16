@@ -166,9 +166,13 @@ public class MessagesCompatibilityTestBase : SystemTestBase
             {"fileBasedResolver",  configFileResolver }
         };
 
+        var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
+        keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
+
         FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(
                                                                         resolvers, 
                                                                         configEnvResolver,
+                                                                        keyValueEnvironmentConfigurationResolverMock.Object,
                                                                         new FormattersDisabledOverrideProvider(env));
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 

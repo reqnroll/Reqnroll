@@ -17,6 +17,8 @@ public class CucumberConfigurationTests
         _disableOverrideProviderMock = new Mock<IFormattersConfigurationDisableOverrideProvider>();
         _fileResolverMock = new Mock<IFormattersConfigurationResolver>();
         _environmentResolverMock = new Mock<IFormattersEnvironmentOverrideConfigurationResolver>();
+        var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
+        keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
 
         var resolvers = new Dictionary<string, IFormattersConfigurationResolver>
         {
@@ -24,6 +26,7 @@ public class CucumberConfigurationTests
         };
 
         _sut = new FormattersConfigurationProvider(resolvers, _environmentResolverMock.Object, 
+                                                   keyValueEnvironmentConfigurationResolverMock.Object,
                                                    _disableOverrideProviderMock.Object);
     }
 
