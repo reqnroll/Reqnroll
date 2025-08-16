@@ -46,10 +46,9 @@ public class FormattersLoggerConfigurationProviderTests
     {
         // Arrange
         // ReSharper disable once CollectionNeverUpdated.Local
-        var emptyList = Array.Empty<string>();
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(emptyList);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(new Dictionary<string, string>());
 
         // Act
         var result = _sut.GetFormattersConfigurationResolvers();
@@ -64,8 +63,8 @@ public class FormattersLoggerConfigurationProviderTests
         // Arrange
         var formatterNames = new[] { "REQNROLL_FORMATTERS_LOGGER_message" };
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(formatterNames);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(formatterNames.ToDictionary(n => n, _ => ""));
 
         // Act
         var result = _sut.GetFormattersConfigurationResolvers().ToArray();
@@ -86,8 +85,8 @@ public class FormattersLoggerConfigurationProviderTests
             "REQNROLL_FORMATTERS_LOGGER_json"
         };
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(formatterNames);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(formatterNames.ToDictionary(n => n, _ => ""));
 
         // Act
         var result = _sut.GetFormattersConfigurationResolvers().ToArray();
@@ -103,8 +102,8 @@ public class FormattersLoggerConfigurationProviderTests
         // Arrange
         var formatterNames = new List<string> { "REQNROLL_FORMATTERS_LOGGER_message" };
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(formatterNames);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(formatterNames.ToDictionary(n => n, _ => ""));
 
         // Mock the GetEnvironmentVariable call that will be made by the EnvironmentConfigurationResolver
         _environmentWrapperMock
@@ -128,8 +127,8 @@ public class FormattersLoggerConfigurationProviderTests
         // Arrange
         var formatterNames = new List<string> { "REQNROLL_FORMATTERS_LOGGER_message" };
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(formatterNames);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(formatterNames.ToDictionary(n => n, _ => ""));
 
         // Mock the GetEnvironmentVariable call to return invalid JSON to trigger logging
         _environmentWrapperMock
@@ -159,8 +158,8 @@ public class FormattersLoggerConfigurationProviderTests
             "REQNROLL_FORMATTERS_LOGGER_junit"
         };
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(formatterNames);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(formatterNames.ToDictionary(n => n, _ => ""));
 
         // Act
         var result = _sut.GetFormattersConfigurationResolvers().ToArray();
@@ -176,8 +175,8 @@ public class FormattersLoggerConfigurationProviderTests
         // Arrange
         var formatterNames = new List<string> { "REQNROLL_FORMATTERS_LOGGER_message" };
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(formatterNames);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(formatterNames.ToDictionary(n => n, _ => ""));
 
         // Act
         var result1 = _sut.GetFormattersConfigurationResolvers().ToArray();
@@ -197,15 +196,15 @@ public class FormattersLoggerConfigurationProviderTests
         // Arrange
         var formatterNames = new List<string> { "REQNROLL_FORMATTERS_LOGGER_test" };
         _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
-            .Returns(formatterNames);
+            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
+            .Returns(formatterNames.ToDictionary(n => n, _ => ""));
 
         // Act
         var result = _sut.GetFormattersConfigurationResolvers();
 
         // Assert
         _environmentWrapperMock.Verify(
-            e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX), 
+            e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX), 
             Times.Once);
         result.Should().HaveCount(1);
     }

@@ -21,10 +21,10 @@ public class FormattersLoggerConfigurationProvider : IFormattersLoggerConfigurat
     {
         var formattersConfigurationResolvers = new List<IFormattersEnvironmentOverrideConfigurationResolver>();
 
-        var listOfFormattersResult = _environmentWrapper.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX);
-        foreach (var formatterEnvironmentVariableName in listOfFormattersResult)
+        var listOfFormattersResult = _environmentWrapper.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX);
+        foreach (var formatterEnvironmentVariable in listOfFormattersResult)
         {
-            var resolver = new EnvironmentConfigurationResolver(_environmentWrapper, formatterEnvironmentVariableName, _log);
+            var resolver = new EnvironmentConfigurationResolver(_environmentWrapper, formatterEnvironmentVariable.Key, _log);
             formattersConfigurationResolvers.Add(resolver);
         }
 

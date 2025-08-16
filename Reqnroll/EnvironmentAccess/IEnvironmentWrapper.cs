@@ -1,5 +1,4 @@
 using Reqnroll.CommonModels;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Reqnroll.EnvironmentAccess
@@ -12,7 +11,7 @@ namespace Reqnroll.EnvironmentAccess
 
         IResult<string> GetEnvironmentVariable(string name);
 
-        IReadOnlyCollection<string> GetEnvironmentVariableNames(string prefix);
+        IDictionary<string,string> GetEnvironmentVariables(string prefix);
 
         void SetEnvironmentVariable(string name, string value);
 

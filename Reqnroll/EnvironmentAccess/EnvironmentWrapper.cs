@@ -1,7 +1,8 @@
+using Reqnroll.CommonModels;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Reqnroll.CommonModels;
 
 namespace Reqnroll.EnvironmentAccess
 {
@@ -39,16 +40,16 @@ namespace Reqnroll.EnvironmentAccess
 
         public string GetCurrentDirectory() => Environment.CurrentDirectory;
 
-        public IReadOnlyCollection<string> GetEnvironmentVariableNames(string prefix)
+        public IDictionary<string, string> GetEnvironmentVariables(string prefix)
         {
             if (string.IsNullOrEmpty(prefix))
                 throw new ArgumentException("Argument cannot be null or empty", nameof(prefix));
 
             return Environment.GetEnvironmentVariables()
-                              .Keys
-                              .OfType<string>()
-                              .Where(k => k.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
-                              .ToArray();
+                              .OfType<DictionaryEntry>()
+                              .Select(e => (Key: e.Key?.ToString() ?? "", Value: e.Value?.ToString() ?? ""))
+                              .Where(e => e.Key.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+                              .ToDictionary(e => e.Key, e => e.Value);
         }
     }
 }
