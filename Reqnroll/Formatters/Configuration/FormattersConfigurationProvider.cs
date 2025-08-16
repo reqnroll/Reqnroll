@@ -15,7 +15,7 @@ namespace Reqnroll.Formatters.Configuration;
 /// </summary>
 public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 {
-    private readonly List<IFormattersConfigurationResolverBase> _resolvers;
+    private readonly IList<IFormattersConfigurationResolverBase> _resolvers;
     private readonly Lazy<FormattersConfiguration> _resolvedConfiguration;
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
