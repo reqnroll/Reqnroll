@@ -1,14 +1,13 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-namespace FormattersTestLogger;
+namespace Reqnroll.FormatterTestLogger;
 
 [FriendlyName("html-formatter")]
 [ExtensionUri("logger://formatterhtmllogger")]
-public class HtmlFormatterLogger : FormatterLoggerBase, ITestLoggerWithParameters
+public class HtmlFormatterLogger : FormatterLoggerBase
 {
     public HtmlFormatterLogger()
     {
-        _formatterName = "html";
+        FormatterName = "html";
     }
 }

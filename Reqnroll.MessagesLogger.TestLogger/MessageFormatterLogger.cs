@@ -1,14 +1,13 @@
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-namespace FormattersTestLogger;
+namespace Reqnroll.FormatterTestLogger;
 
 [FriendlyName("message-formatter")]
 [ExtensionUri("logger://formattermessagelogger")]
-public class MessageFormatterLogger : FormatterLoggerBase, ITestLoggerWithParameters
+public class MessageFormatterLogger : FormatterLoggerBase
 {
     public MessageFormatterLogger()
     {
-        _formatterName = "message";
+        FormatterName = "message";
     }
 }

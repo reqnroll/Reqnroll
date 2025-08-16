@@ -1,33 +1,31 @@
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
-using System.Text.Json.Nodes;
-using System.Linq;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
-namespace FormattersTestLogger;
+namespace Reqnroll.FormatterTestLogger;
 
 public abstract class FormatterLoggerBase : ITestLoggerWithParameters
 {
-    public bool IsInitialized { get; private set; } = false;
+    public bool IsInitialized { get; private set; }
     public Dictionary<string, string> Parameters { get; private set; } = new();
     public string TestRunDirectory { get; private set; } = string.Empty;
 
     private string _originalEnvValue;
-    private bool _envSetByLogger = false;
-    private bool _subscribed = false;
-    protected string _formatterName = null;
+    private bool _envSetByLogger;
+    private bool _subscribed;
+    protected string FormatterName = null;
 
     // Meta-keys to ignore for formatter environment variable
-    private static readonly HashSet<string> MetaKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+    // ReSharper disable once UnusedMember.Global
+    protected static readonly HashSet<string> MetaKeys = new(StringComparer.OrdinalIgnoreCase)
     {
         "TestRunDirectory", "TargetFramework"
     };
 
     private void SetFormattersEnvironmentVariable(Dictionary<string, string> parameters, string testRunDirectory)
     {
-        var envDict = new Dictionary<string, object>();
         string effectiveTestRunDirectory = null;
         if (parameters != null && parameters.TryGetValue("testRunDirectory", out var paramTestRunDir) && !string.IsNullOrEmpty(paramTestRunDir))
         {
@@ -40,11 +38,11 @@ public abstract class FormatterLoggerBase : ITestLoggerWithParameters
 
         if (parameters != null)
         {
-            var outputFilePath = parameters.ContainsKey("outputFilePath") ? parameters["outputFilePath"] : null;
-            var alternateFilePath = parameters.ContainsKey("LogFileName") ? parameters["LogFileName"] : null;
+            var outputFilePath = parameters.TryGetValue("outputFilePath", out string outputFilePathParameter) ? outputFilePathParameter : null;
+            var alternateFilePath = parameters.TryGetValue("LogFileName", out string alternateFilePathParameter) ? alternateFilePathParameter : null;
             outputFilePath ??= alternateFilePath;
 
-            if (string.IsNullOrEmpty(_formatterName))
+            if (string.IsNullOrEmpty(FormatterName))
             {
                 return; // No formatter name provided, nothing to do
             }
@@ -62,9 +60,9 @@ public abstract class FormatterLoggerBase : ITestLoggerWithParameters
             {
                 formatters = new Dictionary<string, object>
                 {
-                    [_formatterName] = new
+                    [FormatterName] = new
                     {
-                        outputFilePath = outputFilePath
+                        outputFilePath
                     }
                 }
             };
@@ -73,9 +71,9 @@ public abstract class FormatterLoggerBase : ITestLoggerWithParameters
             
             if (_originalEnvValue == null)
             {
-                _originalEnvValue = Environment.GetEnvironmentVariable($"REQNROLL_FORMATTERS_LOGGER_{_formatterName}");
+                _originalEnvValue = Environment.GetEnvironmentVariable($"REQNROLL_FORMATTERS_LOGGER_{FormatterName}");
             }
-            Environment.SetEnvironmentVariable($"REQNROLL_FORMATTERS_LOGGER_{_formatterName}", json);
+            Environment.SetEnvironmentVariable($"REQNROLL_FORMATTERS_LOGGER_{FormatterName}", json);
             _envSetByLogger = true;
         }
     }
@@ -84,11 +82,11 @@ public abstract class FormatterLoggerBase : ITestLoggerWithParameters
     {
         if (!_subscribed && events != null)
         {
-            events.TestRunComplete += (s, e) =>
+            events.TestRunComplete += (_, _) =>
             {
                 if (_envSetByLogger)
                 {
-                    Environment.SetEnvironmentVariable($"REQNROLL_FORMATTERS_LOGGER_{_formatterName}", _originalEnvValue);
+                    Environment.SetEnvironmentVariable($"REQNROLL_FORMATTERS_LOGGER_{FormatterName}", _originalEnvValue);
                     _envSetByLogger = false;
                 }
             };
