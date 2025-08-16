@@ -10,6 +10,8 @@
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Autofac.nuspec</NuspecFile>
     
     <RootNamespace>Reqnroll.Autofac</RootNamespace>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

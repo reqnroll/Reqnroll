@@ -6,6 +6,7 @@
     <title>Reqnroll.SpecFlowCompatibility</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
+    <readme>README.md</readme>
     <description>Enables SpecFlow compatibility mode for Reqnroll</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
@@ -35,6 +36,7 @@
     <file src="bin\$config$\netstandard2.0\Reqnroll.SpecFlowCompatibility.*" target="build\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
+    <file src="PackageReadme.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
   </files>
 </package>

@@ -6,6 +6,7 @@
     <title>Reqnroll Windsor integration plugin</title>
     <authors>$author$</authors>
     <owners>Gaspar Nagy, Spec Solutions, $owner$</owners>
+    <readme>README.md</readme>
     <description>Reqnroll plugin that enables to use Windsor for resolving test dependencies.</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
@@ -29,6 +30,7 @@
     <file src="bin\$config$\netstandard2.0\Reqnroll.Windsor.ReqnrollPlugin.pdb" target="lib\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
+    <file src="PackageReadme.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
   </files>
 </package>
