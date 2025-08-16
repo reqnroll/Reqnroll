@@ -128,7 +128,7 @@ You can override different parts of the output file path:
 
 ## Environment Variables
 
-The settings discussed above can be overridden by setting an environment variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overridden by an environment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used. The [formatter specific environment variables](#reqnroll_formatters_formatter) override the general [`REQNROLL_FORMATTERS` environment variable](#reqnroll_formatters) settings. 
+The settings discussed above can be overridden by setting an environment variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overridden by an environment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used. The formatter specific environment variables override the general `REQNROLL_FORMATTERS` environment variable settings. 
 
 ### Available Environment Variables
 
