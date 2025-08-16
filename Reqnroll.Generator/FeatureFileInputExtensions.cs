@@ -1,7 +1,9 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using Reqnroll.Generator.Interfaces;
+using UtfUnknown;
 
 namespace Reqnroll.Generator
 {
@@ -12,11 +14,22 @@ namespace Reqnroll.Generator
             if (featureFileInput == null) throw new ArgumentNullException("featureFileInput");
 
             if (featureFileInput.FeatureFileContent != null)
+            {
                 return new StringReader(featureFileInput.FeatureFileContent);
+            }
 
             Debug.Assert(projectSettings != null);
-
-            return new StreamReader(Path.Combine(projectSettings.ProjectFolder, featureFileInput.ProjectRelativePath));
+            var filePath = Path.Combine(projectSettings.ProjectFolder, featureFileInput.ProjectRelativePath);
+            DetectionResult charsetResult = CharsetDetector.DetectFromFile(filePath);
+            if (charsetResult != null)
+            {
+                var enc = charsetResult.Detected.Encoding;
+                if (enc == Encoding.ASCII || enc == Encoding.Unicode || enc == Encoding.BigEndianUnicode)
+                {
+                    return new StreamReader(filePath, enc);
+                }
+            }
+            return new StreamReader(filePath);
         }
 
         public static string GetFullPath(this FeatureFileInput featureFileInput, ProjectSettings projectSettings)
