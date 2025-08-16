@@ -12,7 +12,7 @@ namespace Reqnroll.EnvironmentAccess
 
         IResult<string> GetEnvironmentVariable(string name);
 
-        IResult<IEnumerable<string>> GetEnvironmentVariableNames(string prefix);
+        IReadOnlyCollection<string> GetEnvironmentVariableNames(string prefix);
 
         void SetEnvironmentVariable(string name, string value);
 
