@@ -40,7 +40,7 @@ namespace Reqnroll.Infrastructure
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
         private readonly ITestPendingMessageFactory _testPendingMessageFactory;
         private readonly ITestUndefinedMessageFactory _testUndefinedMessageFactory;
-        private readonly object _testRunnerEndExecutedLock = new object();
+        private readonly object _testRunnerEndExecutedLock = new();
 
         private bool _testRunnerEndExecuted = false;
         private bool _testRunnerStartExecuted = false;

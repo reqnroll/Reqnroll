@@ -2,57 +2,46 @@ using System;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Reqnroll
+namespace Reqnroll;
+
+public class ScenarioStepContext : ReqnrollContext, IScenarioStepContext
 {
-    public interface IScenarioStepContext : IReqnrollContext
+    #region Singleton
+    private static bool _isCurrentDisabled = false;
+    private static ScenarioStepContext _current;
+    public static ScenarioStepContext Current
     {
-        StepInfo StepInfo { get; }
-
-        ScenarioExecutionStatus Status { get; set; }
-        Exception StepError { get; set; }
-
+        get
+        {
+            if (_isCurrentDisabled)
+                throw new ReqnrollException("The ScenarioStepContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https:///doc-multithreaded for details.");
+            if (_current == null)
+            {
+                Debug.WriteLine("Accessing NULL ScenarioStepContext");
+            }
+            return _current;
+        }
+        internal set
+        {
+            if (!_isCurrentDisabled)
+                _current = value;
+        }
     }
 
-    public class ScenarioStepContext : ReqnrollContext, IScenarioStepContext
+    internal static void DisableSingletonInstance()
     {
-        #region Singleton
-        private static bool isCurrentDisabled = false;
-        private static ScenarioStepContext current;
-        public static ScenarioStepContext Current
-        {
-            get
-            {
-                if (isCurrentDisabled)
-                    throw new ReqnrollException("The ScenarioStepContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https:///doc-multithreaded for details.");
-                if (current == null)
-                {
-                    Debug.WriteLine("Accessing NULL ScenarioStepContext");
-                }
-                return current;
-            }
-            internal set
-            {
-                if (!isCurrentDisabled)
-                    current = value;
-            }
-        }
+        _isCurrentDisabled = true;
+        Thread.MemoryBarrier();
+        _current = null;
+    }
+    #endregion
 
-        internal static void DisableSingletonInstance()
-        {
-            isCurrentDisabled = true;
-            Thread.MemoryBarrier();
-            current = null;
-        }
-        #endregion
+    public StepInfo StepInfo { get; }
+    public ScenarioExecutionStatus Status { get; set; }
+    public Exception StepError { get; set; }
 
-        public StepInfo StepInfo { get; private set; }
-
-        public ScenarioExecutionStatus Status { get; set; }
-        public Exception StepError { get; set; }
-
-        internal ScenarioStepContext(StepInfo stepInfo)
-        {
-            StepInfo = stepInfo;
-        }
+    internal ScenarioStepContext(StepInfo stepInfo)
+    {
+        StepInfo = stepInfo;
     }
 }

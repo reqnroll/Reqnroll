@@ -6,109 +6,94 @@ using Reqnroll.BoDi;
 using Reqnroll.Bindings;
 using Reqnroll.Infrastructure;
 
+namespace Reqnroll;
 
-namespace Reqnroll
+public class ScenarioContext : ReqnrollContext, IScenarioContext
 {
-    public interface IScenarioContext : IReqnrollContext
+    #region Singleton
+    private static bool _isCurrentDisabled = false;
+    private static ScenarioContext _current;
+
+    [Obsolete("Please get the ScenarioContext via Context Injection - https://go.reqnroll.net/doc-migrate-sc-current")]
+    public static ScenarioContext Current
     {
-        ScenarioInfo ScenarioInfo { get; }
-
-        RuleInfo RuleInfo { get; }
-
-        ScenarioBlock CurrentScenarioBlock { get; }
-
-        IObjectContainer ScenarioContainer { get; }
-
-        ScenarioExecutionStatus ScenarioExecutionStatus { get; }
+        get
+        {
+            if (_isCurrentDisabled)
+                throw new ReqnrollException("The ScenarioContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https://go.reqnroll.net/doc-parallel-execution for details.");
+            if (_current == null)
+            {
+                Debug.WriteLine("Accessing NULL ScenarioContext");
+            }
+            return _current;
+        }
+        internal set
+        {
+            if (!_isCurrentDisabled)
+                _current = value;
+        }
     }
 
-    public class ScenarioContext : ReqnrollContext, IScenarioContext
+    internal static void DisableSingletonInstance()
     {
-        #region Singleton
-        private static bool isCurrentDisabled = false;
-        private static ScenarioContext current;
+        _isCurrentDisabled = true;
+        Thread.MemoryBarrier();
+        _current = null;
+    }
+    #endregion
 
-        [Obsolete("Please get the ScenarioContext via Context Injection - https://go.reqnroll.net/doc-migrate-sc-current")]
-        public static ScenarioContext Current
-        {
-            get
-            {
-                if (isCurrentDisabled)
-                    throw new ReqnrollException("The ScenarioContext.Current static accessor cannot be used in multi-threaded execution. Try injecting the scenario context to the binding class. See https://go.reqnroll.net/doc-parallel-execution for details.");
-                if (current == null)
-                {
-                    Debug.WriteLine("Accessing NULL ScenarioContext");
-                }
-                return current;
-            }
-            internal set
-            {
-                if (!isCurrentDisabled)
-                    current = value;
-            }
-        }
+    public ScenarioInfo ScenarioInfo { get; }
+    public RuleInfo RuleInfo { get; }
+    public ScenarioBlock CurrentScenarioBlock { get; internal set; }
+    public IObjectContainer ScenarioContainer { get; }
 
-        internal static void DisableSingletonInstance()
-        {
-            isCurrentDisabled = true;
-            Thread.MemoryBarrier();
-            current = null;
-        }
-        #endregion
+    public ScenarioExecutionStatus ScenarioExecutionStatus { get; internal set; }
+    internal List<string> PendingSteps { get; }
+    internal List<StepInstance> MissingSteps { get; }
+    internal Stopwatch Stopwatch { get; }
 
-        public ScenarioInfo ScenarioInfo { get; }
-        public RuleInfo RuleInfo { get; }
-        public ScenarioBlock CurrentScenarioBlock { get; internal set; }
-        public IObjectContainer ScenarioContainer { get; }
+    private readonly ITestObjectResolver _testObjectResolver;
 
-        public ScenarioExecutionStatus ScenarioExecutionStatus { get; internal set; }
-        internal List<string> PendingSteps { get; }
-        internal List<StepInstance> MissingSteps { get; }
-        internal Stopwatch Stopwatch { get; }
+    internal ScenarioContext(IObjectContainer scenarioContainer, ScenarioInfo scenarioInfo, RuleInfo ruleInfo, ITestObjectResolver testObjectResolver)
+    {
+        ScenarioContainer = scenarioContainer;
+        _testObjectResolver = testObjectResolver;
 
-        private readonly ITestObjectResolver testObjectResolver;
+        Stopwatch = new Stopwatch();
+        Stopwatch.Start();
 
-        internal ScenarioContext(IObjectContainer scenarioContainer, ScenarioInfo scenarioInfo, RuleInfo ruleInfo, ITestObjectResolver testObjectResolver)
-        {
-            this.ScenarioContainer = scenarioContainer;
-            this.testObjectResolver = testObjectResolver;
+        CurrentScenarioBlock = ScenarioBlock.None;
+        ScenarioInfo = scenarioInfo;
+        RuleInfo = ruleInfo;
+        ScenarioExecutionStatus = ScenarioExecutionStatus.OK;
+        PendingSteps = new List<string>();
+        MissingSteps = new List<StepInstance>();
+    }
 
-            Stopwatch = new Stopwatch();
-            Stopwatch.Start();
+    public ScenarioStepContext StepContext => ScenarioContainer.Resolve<IContextManager>().StepContext;
 
-            CurrentScenarioBlock = ScenarioBlock.None;
-            ScenarioInfo = scenarioInfo;
-            RuleInfo = ruleInfo;
-            ScenarioExecutionStatus = ScenarioExecutionStatus.OK;
-            PendingSteps = new List<string>();
-            MissingSteps = new List<StepInstance>();
-        }
+    public void Pending()
+    {
+        throw new PendingStepException();
+    }
 
-        public ScenarioStepContext StepContext => ScenarioContainer.Resolve<IContextManager>().StepContext;
+    public static void StepIsPending()
+    {
+        throw new PendingStepException();
+    }
 
-        public void Pending()
-        {
-            throw new PendingStepException();
-        }
-
-        public static void StepIsPending()
-        {
-            throw new PendingStepException();
-        }
-
-        /// <summary>
-        /// Called by Reqnroll infrastructure when an instance of a binding class is needed.
-        /// </summary>
-        /// <param name="bindingType">The type of the binding class.</param>
-        /// <returns>The binding class instance</returns>
-        /// <remarks>
-        /// The binding classes are the classes with the [Binding] attribute, that might
-        /// contain step definitions, hooks or step argument transformations. The method
-        /// is called when any binding method needs to be called.
-        /// </remarks>
-        public object GetBindingInstance(Type bindingType)
-        {
-            return testObjectResolver.ResolveBindingInstance(bindingType, ScenarioContainer);
-        }
+    /// <summary>
+    /// Called by Reqnroll infrastructure when an instance of a binding class is needed.
+    /// </summary>
+    /// <param name="bindingType">The type of the binding class.</param>
+    /// <returns>The binding class instance</returns>
+    /// <remarks>
+    /// The binding classes are the classes with the [Binding] attribute, that might
+    /// contain step definitions, hooks or step argument transformations. The method
+    /// is called when any binding method needs to be called.
+    /// </remarks>
+    public object GetBindingInstance(Type bindingType)
+    {
+        return _testObjectResolver.ResolveBindingInstance(bindingType, ScenarioContainer);
     }
 }
