@@ -211,7 +211,7 @@ public class ContextManager : IContextManager, IDisposable
         ScenarioStepContext.Current = _stepContextManager.Instance;
         // we do not reset CurrentTopLevelStepDefinitionType in order to "remember" last top level type for "And" and "But" steps
     }
-
+        
     public void Dispose()
     {
         _featureContextManager?.Dispose();
