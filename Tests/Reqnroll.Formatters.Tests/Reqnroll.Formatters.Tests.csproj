@@ -38,10 +38,10 @@
     </PackageReference>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
     <PackageReference Include="Cucumber.Messages" Version="28.0.0" />
-    <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.5.2" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.5.2" />
+    <PackageReference Include="FluentAssertions" Version="7.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="MSTest.TestAdapter" Version="3.10.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.10.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -69,6 +69,10 @@
     <None Update="partialConfiguration.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Samples\CucumberMessages\" />
   </ItemGroup>
 
 </Project>

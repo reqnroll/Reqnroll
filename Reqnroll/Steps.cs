@@ -1,5 +1,6 @@
 using Reqnroll.BoDi;
 using Reqnroll.Infrastructure;
+using System;
 
 namespace Reqnroll
 {
@@ -24,14 +25,8 @@ namespace Reqnroll
             }
         }
 
-        protected ISyncTestRunner SyncTestRunner
-        {
-            get
-            {
-                AssertInitialized();
-                return objectContainer.Resolve<ISyncTestRunner>();
-            }
-        }
+        [Obsolete("The synchronous test runner API has been deprecated. Please use TestRunner property instead. Property will be removed in v4.", true)]
+        protected ISyncTestRunner SyncTestRunner => throw new NotSupportedException();
 
         public ScenarioContext ScenarioContext
         {

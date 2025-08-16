@@ -19,16 +19,12 @@
             "replaces": "$target$",
             "choices": [
                 {
-                    "choice": "net6.0",
-                    "description": ".NET 6.0"
-                },
-                {
-                    "choice": "net7.0",
-                    "description": ".NET 7.0"
-                },
-                {
                     "choice": "net8.0",
                     "description": ".NET 8.0"
+                },
+                {
+                    "choice": "net9.0",
+                    "description": ".NET 9.0"
                 },
                 {
                     "choice": "net462",
@@ -61,6 +57,10 @@
                 {
                     "choice": "mstest",
                     "description": "MSTest"
+                },
+                {
+                    "choice": "tunit",
+                    "description": "TUnit"
                 }
             ]
         },
@@ -89,6 +89,10 @@
                     {
                         "condition": "(testExecutionFramework == 'nunit')",
                         "value": "<PackageReference Include=\"Reqnroll.NUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
+                    },
+                    {
+                        "condition": "(testExecutionFramework == 'tunit')",
+                        "value": "<PackageReference Include=\"Reqnroll.TUnit\" Version=\"$$$NuGetPackageVersion$$$\" />"
                     }
                 ]
             }
@@ -112,6 +116,10 @@
                     {
                         "condition": "(testExecutionFramework == 'nunit')",
                         "value": "<PackageReference Include=\"nunit\" Version=\"4.0.1\" />\n    <PackageReference Include=\"NUnit3TestAdapter\" Version=\"4.5.0\" />"
+                    },
+                    {
+                        "condition": "(testExecutionFramework == 'tunit')",
+                        "value": "<PackageReference Include=\"TUnit\" Version=\"0.25.21\" />"
                     }
                 ]
             }

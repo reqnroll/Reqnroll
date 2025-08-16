@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 
 namespace Reqnroll
@@ -12,9 +11,6 @@ namespace Reqnroll
         FeatureContext FeatureContext { get; }
         ScenarioContext ScenarioContext { get; }
         ITestThreadContext TestThreadContext { get; }
-
-        [Obsolete("TestWorkerId is now managed by Reqnroll internally - Method will be removed in v3")]
-        void InitializeTestRunner(string testWorkerId);
 
         Task OnTestRunStartAsync();
         Task OnTestRunEndAsync();

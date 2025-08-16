@@ -21,7 +21,7 @@
         <dependency id="Gherkin" version="32.1.2"/>
         <dependency id="Cucumber.CucumberExpressions" version="17.1.0"/>
         <dependency id="Cucumber.Messages" version="28.0.0"/>
-        <dependency id="Cucumber.HtmlFormatter" version="21.13.0" />
+        <dependency id="Cucumber.HtmlFormatter" version="21.14.0" />
         <dependency id="Microsoft.Extensions.DependencyModel" version="8.0.2" />
         <dependency id="System.Text.Json" version="8.0.5" />
         <dependency id="System.Threading.Channels" version="9.0.6" />
@@ -36,7 +36,6 @@
     <file src="bin\$config$\netstandard2.0\Reqnroll.dll" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.pdb" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.xml" target="lib\netstandard2.0" />
-    <file src="bin\$config$\netstandard2.0\Reqnroll.BoDi.*" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.Utils.*" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.FormatterTestLogger.*" target="lib\netstandard2.0" />
     <file src="Reqnroll.ExternalAnnotations.xml" target="lib\netstandard2.0" />

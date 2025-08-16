@@ -35,7 +35,6 @@ namespace Reqnroll.RuntimeTests
         }
     }
 
-
     public class StepExecutionTestsWithConversions : StepExecutionTestsBase
     {
         [Fact]

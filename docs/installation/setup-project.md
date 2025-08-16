@@ -82,11 +82,11 @@ This command creates a Reqnroll project with NUnit for the latest .NET framework
 dotnet new reqnroll-project --help
 ```
 
-The following command creates a Reqnroll project with MsTest using .NET 6.0
+The following command creates a Reqnroll project with MsTest using .NET 8.0
 
 ```{code-block} pwsh
 :caption: .NET CLI
-dotnet new reqnroll-project -t mstest -f net6.0
+dotnet new reqnroll-project -t mstest -f net8.0
 ```
 
 As a result, a new Reqnroll project is created with a sample [feature file](../gherkin/feature-files) and [step definition class](../automation/step-definitions).

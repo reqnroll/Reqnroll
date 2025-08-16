@@ -1,9 +1,10 @@
 ﻿using Reqnroll.Events;
 using System;
-using System.Linq;
 using System.Collections.Generic;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Reqnroll.Formatters.PubSub;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -11,18 +12,20 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// Track the execution of a single TestCase (i.e. an execution of a Pickle)
 /// There will be multiple of these for a given TestCase if it is retried.
 /// </summary>
-public class TestCaseExecutionTracker : IGenerateMessage
+public class TestCaseExecutionTracker
 {
     private readonly ICucumberMessageFactory _messageFactory;
     private readonly TestCaseTracker _testCaseTracker;
     private readonly Stack<StepExecutionTrackerBase> _stepExecutionTrackers;
-    // This queue holds ExecutionEvents that will be processed in stage 2
-    private readonly Queue<(IGenerateMessage, ExecutionEvent)> _events = new();
 
     public IPickleExecutionTracker ParentTracker { get; }
 
     public int AttemptId { get; }
     public string TestCaseId { get; }
+
+    private readonly IMessagePublisher _publisher;
+    private readonly IStepTrackerFactory _stepTrackerFactory;
+    private bool _testCaseFinishedHasBeenPublished = false;
 
     /// <summary>
     /// The ID of this particular execution of this Test Case
@@ -37,7 +40,7 @@ public class TestCaseExecutionTracker : IGenerateMessage
 
     public bool IsFirstAttempt => AttemptId == 0;
 
-    public TestCaseExecutionTracker(IPickleExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, int attemptId, string testCaseStartedId, string testCaseId, TestCaseTracker testCaseTracker)
+    public TestCaseExecutionTracker(IPickleExecutionTracker parentTracker, int attemptId, string testCaseStartedId, string testCaseId, TestCaseTracker testCaseTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IStepTrackerFactory stepTrackerFactory)
     {
         _messageFactory = messageFactory;
         _stepExecutionTrackers = new();
@@ -46,119 +49,101 @@ public class TestCaseExecutionTracker : IGenerateMessage
         AttemptId = attemptId;
         TestCaseStartedId = testCaseStartedId;
         TestCaseId = testCaseId;
+        _publisher = publisher;
+        _stepTrackerFactory = stepTrackerFactory;
     }
 
-    public IEnumerable<Envelope> RuntimeMessages
-    {
-        get
-        {
-            while (_events.Count > 0)
-            {
-                var (generator, execEvent) = _events.Dequeue();
-                foreach (var e in generator.GenerateFrom(execEvent))
-                {
-                    yield return e;
-                }
-            }
-        }
-    }
-
-    private void StoreMessageGenerator(IGenerateMessage generator, ExecutionEvent executionEvent)
-    {
-        _events.Enqueue((generator, executionEvent));
-    }
-
-    IEnumerable<Envelope> IGenerateMessage.GenerateFrom(ExecutionEvent executionEvent)
-    {
-        switch (executionEvent)
-        {
-            case ScenarioStartedEvent:
-                // On the first execution of this TestCase we emit a TestCase Message.
-                // On subsequent retries we do not.
-                if (AttemptId == 0)
-                {
-                    var testCase = _messageFactory.ToTestCase(_testCaseTracker);
-                    yield return Envelope.Create(testCase);
-                }
-                var testCaseStarted = _messageFactory.ToTestCaseStarted(this, TestCaseId);
-                yield return Envelope.Create(testCaseStarted);
-                break;
-            case ScenarioFinishedEvent:
-                yield return Envelope.Create(_messageFactory.ToTestCaseFinished(this));
-                break;
-        }
-    }
-
-    public void ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
+    public async Task ProcessEvent(ScenarioStartedEvent scenarioStartedEvent)
     {
         TestCaseStartedTimestamp = scenarioStartedEvent.Timestamp;
-        StoreMessageGenerator(this, scenarioStartedEvent);
+        var testCaseStarted = _messageFactory.ToTestCaseStarted(this, TestCaseId);
+        await _publisher.PublishAsync(Envelope.Create(testCaseStarted));
     }
 
-    public void ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
+    public async Task ProcessEvent(ScenarioFinishedEvent scenarioFinishedEvent)
     {
+        // If this is the first attempt, at ScenarioFinished, we have enough information about which Hook and Step Bindings were used;
+        // we can now generate the TestCase message and publish it.
+        if (AttemptId == 0)
+        {
+            var testCase = _messageFactory.ToTestCase(_testCaseTracker);
+            await _publisher.PublishAsync(Envelope.Create(testCase)); // using the OrderFixingMessagePublisher will ensure that this is published before any other messages related to this TestCase (such as TestCaseStarted, etc)
+        }
+
         TestCaseFinishedTimestamp = scenarioFinishedEvent.Timestamp;
         ScenarioExecutionStatus = scenarioFinishedEvent.ScenarioContext.ScenarioExecutionStatus;
-        StoreMessageGenerator(this, scenarioFinishedEvent);
-    }
 
-    public void ProcessEvent(StepStartedEvent stepStartedEvent)
-    {
-        var testStepTracker = new TestStepExecutionTracker(this, _messageFactory);
-        testStepTracker.ProcessEvent(stepStartedEvent);
-        _stepExecutionTrackers.Push(testStepTracker);
-        StoreMessageGenerator(testStepTracker, stepStartedEvent);
-    }
-
-    public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
-    {
-        if (CurrentStep is TestStepExecutionTracker testStepTracker)
+        // We need to delay publishing the TestCaseFinished message to 'FinalizeTracking'
+        // because we might have a retry of the scenario and need to set the 'willBeRetried' flag.
+        if (ScenarioExecutionStatus != ScenarioExecutionStatus.TestError)
         {
-            testStepTracker.ProcessEvent(stepFinishedEvent);
-            StoreMessageGenerator(testStepTracker, stepFinishedEvent);
+            // If the scenario has not failed, we can publish the TestCaseFinished message
+            // otherwise we will publish it later (if retried, or at the end of the Feature if not retried)
+            await _publisher.PublishAsync(Envelope.Create(_messageFactory.ToTestCaseFinished(this)));
+            _testCaseFinishedHasBeenPublished = true;
+        }
+    }
+
+    public async Task FinalizeTracking()
+    {
+        // The Feature has finished, if our scenario has not yet published its TestCaseFinished message, we need to do it now
+        if (!_testCaseFinishedHasBeenPublished)
+        {
+            await _publisher.PublishAsync(Envelope.Create(_messageFactory.ToTestCaseFinished(this)));
+        }
+    }
+
+    public async Task ProcessEvent(StepStartedEvent stepStartedEvent)
+    {
+        var testStepExecutionTracker = _stepTrackerFactory.CreateTestStepExecutionTracker(this, _publisher);
+        await testStepExecutionTracker.ProcessEvent(stepStartedEvent);
+        _stepExecutionTrackers.Push(testStepExecutionTracker);
+    }
+
+    public async Task ProcessEvent(StepFinishedEvent stepFinishedEvent)
+    {
+        if (CurrentStep is TestStepExecutionTracker testStepExecutionTracker)
+        {
+            await testStepExecutionTracker.ProcessEvent(stepFinishedEvent);
             _stepExecutionTrackers.Pop();
         }
     }
 
-    public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
+    public async Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
     {
-        var hookStepStateTracker = new HookStepExecutionTracker(this, _messageFactory);
-        hookStepStateTracker.ProcessEvent(hookBindingStartedEvent);
-        _stepExecutionTrackers.Push(hookStepStateTracker);
-        StoreMessageGenerator(hookStepStateTracker, hookBindingStartedEvent);
+        var hookStepExecutionTracker = _stepTrackerFactory.CreateHookStepExecutionTracker(this, _publisher);
+        await hookStepExecutionTracker.ProcessEvent(hookBindingStartedEvent);
+        _stepExecutionTrackers.Push(hookStepExecutionTracker);
     }
 
-    public void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
+    public async Task ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
     {
-        if (CurrentStep is HookStepExecutionTracker hookStepTracker)
+        if (CurrentStep is HookStepExecutionTracker hookStepExecutionTracker)
         {
-            hookStepTracker.ProcessEvent(hookBindingFinishedEvent);
+            await hookStepExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
             _stepExecutionTrackers.Pop();
-            StoreMessageGenerator(hookStepTracker, hookBindingFinishedEvent);
         }
     }
 
-    public void ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
+    public async Task ProcessEvent(AttachmentAddedEvent attachmentAddedEvent)
     {
-        var attachmentTracker = new AttachmentTracker(
+        var attachmentTracker = _stepTrackerFactory.CreateAttachmentTracker(
             ParentTracker.TestRunStartedId,
             TestCaseStartedId,
             CurrentStep.StepTracker.TestStepId,
-            "", // TestRunHookStartedId is not applicable here
-            _messageFactory);
-        attachmentTracker.ProcessEvent(attachmentAddedEvent);
-        StoreMessageGenerator(attachmentTracker, attachmentAddedEvent);
+            "",
+            _publisher); // TestRunHookStartedId is not applicable here
+        await attachmentTracker.ProcessEvent(attachmentAddedEvent);
     }
 
-    public void ProcessEvent(OutputAddedEvent outputAddedEvent)
+    public async Task ProcessEvent(OutputAddedEvent outputAddedEvent)
     {
-        var outputMessageTracker = new OutputMessageTracker(
+        var outputMessageTracker = _stepTrackerFactory.CreateOutputMessageTracker(
             ParentTracker.TestRunStartedId,
             TestCaseStartedId,
             CurrentStep.StepTracker.TestStepId,
-            "", // TestRunHookStartedId is not applicable here
-            _messageFactory);
-        outputMessageTracker.ProcessEvent(outputAddedEvent);
-        StoreMessageGenerator(outputMessageTracker, outputAddedEvent);
+            "",
+            _publisher); // TestRunHookStartedId is not applicable here
+        await outputMessageTracker.ProcessEvent(outputAddedEvent);
     }
 }

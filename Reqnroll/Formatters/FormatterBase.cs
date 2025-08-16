@@ -20,7 +20,10 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
     private ICucumberMessageBroker? _broker;
     private readonly IFormattersConfigurationProvider _configurationProvider;
     private readonly IFormatterLog _logger;
-    protected readonly Channel<Envelope> PostedMessages = Channel.CreateUnbounded<Envelope>();
+
+    protected readonly Channel<Envelope> PostedMessages = Channel.CreateUnbounded<Envelope>(
+        new UnboundedChannelOptions { SingleReader = true, SingleWriter = false, AllowSynchronousContinuations = true }
+    );
 
     private bool _isDisposed = false;
     protected bool Closed = false;
@@ -179,6 +182,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                 {
                     Logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - skipping wait on formatters task {Name}.");
                 }
+                _cancellationTokenSource.Dispose();
             }
             catch (System.Exception e)
             {

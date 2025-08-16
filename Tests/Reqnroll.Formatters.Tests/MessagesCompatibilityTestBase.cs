@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using Io.Cucumber.Messages.Types;
 using Moq;
 using Reqnroll.Analytics.UserId;
@@ -215,7 +215,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
 
     protected string[] GetExpectedJsonText(string testName, string featureFileName)
     {
-        var fileName = featureFileName + "." + featureFileName + ".feature.ndjson";
+        var fileName = featureFileName + "." + featureFileName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
         var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         //var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");

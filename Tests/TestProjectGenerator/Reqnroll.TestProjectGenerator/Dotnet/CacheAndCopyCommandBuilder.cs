@@ -8,13 +8,13 @@ namespace Reqnroll.TestProjectGenerator.Dotnet;
 public class CacheAndCopyCommandBuilder : CommandBuilder
 {
     private const string TemplateName = "TName";
-    private readonly NetCoreSdkInfo _sdk;
+    private readonly DotNetSdkInfo _sdk;
     private readonly CommandBuilder _baseCommandBuilder;
     private readonly string _targetPath;
     private readonly string _nameToReplace;
     private static readonly ConcurrentDictionary<string, object> LockObjects = new();
 
-    public CacheAndCopyCommandBuilder(IOutputWriter outputWriter, NetCoreSdkInfo sdk, CommandBuilder baseCommandBuilder, string targetPath, string nameToReplace = null)
+    public CacheAndCopyCommandBuilder(IOutputWriter outputWriter, DotNetSdkInfo sdk, CommandBuilder baseCommandBuilder, string targetPath, string nameToReplace = null)
         : base(outputWriter, baseCommandBuilder.ExecutablePath, baseCommandBuilder.ArgumentsFormat, baseCommandBuilder.WorkingDirectory)
     {
         _sdk = sdk;

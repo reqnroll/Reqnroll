@@ -44,12 +44,6 @@ namespace Reqnroll.TestProjectGenerator.Driver
                 new("Reqnroll Unstable", "https://www.myget.org/F/reqnroll-unstable/api/v3/index.json")
             };
 
-            if (testRunConfiguration.TargetFramework == TargetFramework.Net50 && testRunConfiguration.UnitTestProvider == UnitTestProvider.NUnit3)
-            {
-                //NUnit is not supporting .NET 5 in the latest release (3.12.0), so add the myget feed for the pre-release versions
-                NuGetSources.Add(new NuGetSource("NUnit Dev", "https://www.myget.org/F/nunit/api/v3/index.json"));
-            }
-
             _solution = new Solution(SolutionName);
             testProjectFolders.PathToSolutionFile = Path.Combine(_folders.RunUniqueFolderToSaveGeneratedSolutions, SolutionName, $"{SolutionName}.sln");
         }

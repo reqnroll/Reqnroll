@@ -64,12 +64,6 @@ public abstract class GenerationTestBase : SystemTestBase
     [TestMethod]
     public void Handles_different_scenario_and_scenario_outline_outcomes()
     {
-        if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
-        {
-            Assert.IsTrue(true);
-            return;
-        }
-
         AddFeatureFile(
             """
             Feature: Sample Feature
@@ -673,26 +667,13 @@ public abstract class GenerationTestBase : SystemTestBase
 
         ShouldAllScenariosPass(4);
 
-        if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
-        {
-            _bindingDriver.GetActualLogLines("tags")
-                          .Should()
-                          .BeEquivalentTo(
-                              "-> tags: so1_tag,,feature_tag,rule_tag:StepBinding",
-                              "-> tags: so2_tag,e3_tag,feature_tag,rule_tag:StepBinding",
-                              "-> tags: so2_tag,,feature_tag,rule_tag:StepBinding",
-                              "-> tags: so1_tag,,feature_tag,rule_tag:StepBinding");
-        }
-        else
-        {
-            _bindingDriver.GetActualLogLines("tags")
-                          .Should()
-                          .BeEquivalentTo(
-                              "-> tags: so1_tag,feature_tag,rule_tag:StepBinding",
-                              "-> tags: so1_tag,feature_tag,rule_tag:StepBinding",
-                              "-> tags: so2_tag,feature_tag,rule_tag:StepBinding",
-                              "-> tags: so2_tag,e3_tag,feature_tag,rule_tag:StepBinding");
-        }
+        _bindingDriver.GetActualLogLines("tags")
+            .Should()
+            .BeEquivalentTo(
+                "-> tags: so1_tag,feature_tag,rule_tag:StepBinding",
+                "-> tags: so1_tag,feature_tag,rule_tag:StepBinding",
+                "-> tags: so2_tag,feature_tag,rule_tag:StepBinding",
+                "-> tags: so2_tag,e3_tag,feature_tag,rule_tag:StepBinding");
 
         _bindingDriver.GetActualLogLines("parameters").Should().BeEquivalentTo(
                 "-> parameters: what1=something,person=me:StepBinding",

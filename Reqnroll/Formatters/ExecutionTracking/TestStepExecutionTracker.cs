@@ -1,27 +1,18 @@
-﻿using Io.Cucumber.Messages.Types;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
-using System.Collections.Generic;
+using System.Threading.Tasks;
+using Reqnroll.Formatters.PubSub;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
 /// This class is used to track the execution of test steps.
 /// </summary>
-public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory): 
-    StepExecutionTrackerBase(parentTracker, messageFactory), IGenerateMessage
+public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher): 
+    StepExecutionTrackerBase(parentTracker, messageFactory, publisher)
 {
-    IEnumerable<Envelope> IGenerateMessage.GenerateFrom(ExecutionEvent executionEvent)
-    {
-        return executionEvent switch
-        {
-            StepStartedEvent => [Envelope.Create(MessageFactory.ToTestStepStarted(this))],
-            StepFinishedEvent => [Envelope.Create(MessageFactory.ToTestStepFinished(this))],
-            _ => []
-        };
-    }
-
-    public void ProcessEvent(StepStartedEvent stepStartedEvent)
+    public async Task ProcessEvent(StepStartedEvent stepStartedEvent)
     {
         StepStartedAt = stepStartedEvent.Timestamp;
 
@@ -31,19 +22,22 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
             TestCaseTracker.ProcessEvent(stepStartedEvent);
         }
 
-        StepTracker = PickleExecutionTracker.TestCaseTracker.GetTestStepTrackerByPickleId(stepStartedEvent.StepContext.StepInfo.PickleStepId);
+        StepTracker = TestCaseTracker.GetTestStepTrackerByPickleId(stepStartedEvent.StepContext.StepInfo.PickleStepId);
+        await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepStarted(this)));
     }
 
-    public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
+    public async Task ProcessEvent(StepFinishedEvent stepFinishedEvent)
     {
         if (ParentTracker.IsFirstAttempt)
         {
-            var testStepTracker = PickleExecutionTracker.TestCaseTracker.GetTestStepTrackerByPickleId(stepFinishedEvent.StepContext.StepInfo.PickleStepId);
+            var testStepTracker = TestCaseTracker.GetTestStepTrackerByPickleId(stepFinishedEvent.StepContext.StepInfo.PickleStepId);
             testStepTracker?.ProcessEvent(stepFinishedEvent);
         }
 
-        Exception = stepFinishedEvent.ScenarioContext.TestError;
         StepFinishedAt = stepFinishedEvent.Timestamp;
         Status = stepFinishedEvent.StepContext.Status;
+        Exception = stepFinishedEvent.StepContext.StepError;
+
+        await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepFinished(this)));
     }
 }

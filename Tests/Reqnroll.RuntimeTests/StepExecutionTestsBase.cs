@@ -39,17 +39,22 @@ namespace Reqnroll.RuntimeTests
             {
             }
 
-            public void TraceStepSkipped()
+            public void TraceStepSkipped(Exception exception)
             {
-                Console.WriteLine("TraceStepSkipped");
+                Console.WriteLine("TraceStepSkipped: {0}", exception);
             }
 
-            public void TraceStepPending(BindingMatch match, object[] arguments)
+            public void TraceStepSkippedBecauseOfPreviousErrors()
+            {
+                Console.WriteLine("TraceStepSkippedBecauseOfPreviousErrors");
+            }
+
+            public void TraceStepPending(BindingMatch match, object[] arguments, Exception exception)
             {
                 Console.WriteLine("TraceStepPending");
             }
 
-            public void TraceBindingError(BindingException ex)
+            public void TraceBindingError(Exception ex)
             {
                 Console.WriteLine("TraceBindingError: {0}", ex);
             }

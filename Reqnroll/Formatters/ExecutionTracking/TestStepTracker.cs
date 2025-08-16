@@ -10,7 +10,7 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 /// The test case step needs to be built upon the first execution attempt of a pickle.
 /// </summary>
 public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTracker parentTracker)
-    : StepTracker(testStepId)
+    : StepTrackerBase(testStepId)
 {
     public TestCaseTracker ParentTracker { get; } = parentTracker;
     public string PickleStepId { get; } = pickleStepId;

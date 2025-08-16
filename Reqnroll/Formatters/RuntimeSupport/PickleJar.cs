@@ -8,7 +8,7 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 /// <summary>
 /// This class is used at runtime to provide the appropriate PickleId and PickleStepId to the steps.
 /// </summary>
-internal class PickleJar
+public class PickleJar
 {
     private bool HasPickles => _pickles != null && _pickles.Any();
 

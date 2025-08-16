@@ -2,15 +2,15 @@
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System;
-using System.Collections.Generic;
+using Reqnroll.Formatters.PubSub;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
 /// Captures information about TestRun Hooks (Before/After TestRun and Before/After Feature)
 /// </summary>
-public class TestRunHookExecutionTracker(string hookStartedId, string hookId, string testRunId, ICucumberMessageFactory messageFactory)
-    : IGenerateMessage
+public class TestRunHookExecutionTracker(string hookStartedId, string testRunId, string hookId, ICucumberMessageFactory messageFactory, IMessagePublisher publisher)
 {
     public string TestRunId { get; } = testRunId;
     public string HookId { get; } = hookId;
@@ -23,25 +23,17 @@ public class TestRunHookExecutionTracker(string hookStartedId, string hookId, st
     public bool IsActive => HookStarted.HasValue && !HookFinished.HasValue;
     public ScenarioExecutionStatus Status => Exception == null ? ScenarioExecutionStatus.OK : ScenarioExecutionStatus.TestError;
 
-    IEnumerable<Envelope> IGenerateMessage.GenerateFrom(ExecutionEvent executionEvent)
-    {
-        return executionEvent switch
-        {
-            HookBindingStartedEvent => new List<Envelope> { Envelope.Create(messageFactory.ToTestRunHookStarted(this)) },
-            HookBindingFinishedEvent => new List<Envelope> { Envelope.Create(messageFactory.ToTestRunHookFinished(this)) },
-            _ => throw new ArgumentOutOfRangeException(nameof(executionEvent), executionEvent, null),
-        };
-    }
-
-    public void ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
+    public async Task ProcessEvent(HookBindingStartedEvent hookBindingStartedEvent)
     {
         HookStarted = hookBindingStartedEvent.Timestamp;
+        await publisher.PublishAsync(Envelope.Create(messageFactory.ToTestRunHookStarted(this)));
     }
 
-    public void ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
+    public async Task ProcessEvent(HookBindingFinishedEvent hookBindingFinishedEvent)
     {
         Duration = hookBindingFinishedEvent.Duration;
         Exception = hookBindingFinishedEvent.HookException;
         HookFinished = hookBindingFinishedEvent.Timestamp;
+        await publisher.PublishAsync(Envelope.Create(messageFactory.ToTestRunHookFinished(this)));
     }
 }

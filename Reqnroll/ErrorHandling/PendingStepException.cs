@@ -1,26 +1,12 @@
-using System;
-using System.Runtime.Serialization;
-
 // the exceptions are part of the public API, keep them in Reqnroll namespace
 // ReSharper disable once CheckNamespace
-namespace Reqnroll
+namespace Reqnroll;
+
+public class PendingStepException(string message) : ReqnrollException(message)
 {
-    [Serializable]
-    public class PendingStepException : ReqnrollException
+    internal const string GenericErrorMessage = "The step definition is not implemented.";
+
+    public PendingStepException() : this(GenericErrorMessage)
     {
-        public PendingStepException()
-            : base("One or more step definitions are not implemented yet.")
-        {
-        }
-
-        public PendingStepException(string message) : base(message)
-        {
-        }
-
-        protected PendingStepException(
-            SerializationInfo info,
-            StreamingContext context) : base(info, context)
-        {
-        }
     }
 }

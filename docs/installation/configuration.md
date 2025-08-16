@@ -192,3 +192,10 @@ The `bindingAssemblies` section can contain multiple JSON objects (one for each 
 ### `formatters`
 
 This section can be used to configure [Reqnroll Formatters](../reporting/reqnroll-formatters.md). See [](formatter-configuration.md) for further details.
+
+
+```{toctree}
+:maxdepth: 1
+
+formatter-configuration
+configuring-build

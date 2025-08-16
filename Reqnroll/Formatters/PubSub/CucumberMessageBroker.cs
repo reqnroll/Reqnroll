@@ -9,7 +9,7 @@ namespace Reqnroll.Formatters.PubSub;
 
 /// <summary>
 /// Cucumber Message implementation is a simple Pub/Sub implementation.
-/// This broker mediates between the (singleton) CucumberMessagePublisher and (one or more) CucumberMessageSinks.
+/// This broker mediates between the (singleton) CucumberMessagePublisher and (one or more) Formatters.
 /// The pub/sub mechanism is considered to be turned "OFF" if no sinks are registered or if none of them are configured.
 /// </summary>
 public class CucumberMessageBroker : ICucumberMessageBroker

@@ -17,9 +17,7 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Bindings
 {
-#pragma warning disable CS0618
-    public class BindingInvoker : IBindingInvoker, IAsyncBindingInvoker
-#pragma warning restore CS0618
+    public class BindingInvoker : IAsyncBindingInvoker
     {
         internal const string DryRunEnvVarName = "REQNROLL_DRY_RUN";
 
@@ -45,15 +43,6 @@ namespace Reqnroll.Bindings
                     .GetEnvironmentVariable(DryRunEnvVarName) is ISuccess<string> dryRunEnvVar
                        && bool.TryParse(dryRunEnvVar.Result, out bool isDryRun)
                        && isDryRun);
-        }
-
-        [Obsolete("Use async version of the method instead")]
-        public virtual object InvokeBinding(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, out TimeSpan duration)
-        {
-            var durationHolder = new DurationHolder();
-            var result = InvokeBindingAsync(binding, contextManager, arguments, testTracer, durationHolder).ConfigureAwait(false).GetAwaiter().GetResult();
-            duration = durationHolder.Duration;
-            return result;
         }
 
         public virtual async Task<object> InvokeBindingAsync(IBinding binding, IContextManager contextManager, object[] arguments, ITestTracer testTracer, DurationHolder durationHolder)

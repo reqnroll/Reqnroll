@@ -20,7 +20,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
             _targetFrameworkVersionStringBuilder = targetFrameworkVersionStringBuilder;
         }
 
-        public virtual string WriteProject(NetCoreSdkInfo sdk, Project project, string path)
+        public virtual string WriteProject(DotNetSdkInfo sdk, Project project, string path)
         {
             if (project is null)
             {

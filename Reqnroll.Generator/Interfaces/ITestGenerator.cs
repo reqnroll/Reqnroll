@@ -1,15 +1,10 @@
 using System;
 
-namespace Reqnroll.Generator.Interfaces
+namespace Reqnroll.Generator.Interfaces;
+
+public interface ITestGenerator : IDisposable
 {
-    /// IMPORTANT
-    /// This class is used for interop with the Visual Studio Extension
-    /// DO NOT REMOVE OR RENAME FIELDS!
-    /// This breaks binary serialization accross appdomains
-    public interface ITestGenerator : IDisposable
-    {
-        TestGeneratorResult GenerateTestFile(FeatureFileInput featureFileInput, GenerationSettings settings);
-        Version DetectGeneratedTestVersion(FeatureFileInput featureFileInput);
-        string GetTestFullPath(FeatureFileInput featureFileInput);
-    }
+    TestGeneratorResult GenerateTestFile(FeatureFileInput featureFileInput, GenerationSettings settings);
+    Version DetectGeneratedTestVersion(FeatureFileInput featureFileInput);
+    string GetTestFullPath(FeatureFileInput featureFileInput);
 }

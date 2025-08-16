@@ -64,9 +64,10 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             contextManager.TestThreadContext.Should().NotBeNull();
 
-            var testThreadContext = contextManager.FeatureContext.FeatureContainer.Resolve<TestThreadContext>();
-            var ctxFromScenarioContext = contextManager.ScenarioContext.ScenarioContainer.Resolve<TestThreadContext>();
+            var ctxFromFeatureContext = contextManager.FeatureContext.FeatureContainer.Resolve<TestThreadContext>();
+            ctxFromFeatureContext.Should().BeSameAs(contextManager.TestThreadContext);
 
+            var ctxFromScenarioContext = contextManager.ScenarioContext.ScenarioContainer.Resolve<TestThreadContext>();
             ctxFromScenarioContext.Should().BeSameAs(contextManager.TestThreadContext);
         }
     }

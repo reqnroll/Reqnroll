@@ -4,7 +4,7 @@ namespace Reqnroll.TestProjectGenerator.Dotnet;
 
 public partial class NewCommandBuilder
 {
-    public class StubNewProjectCommandBuilder(IOutputWriter outputWriter, NetCoreSdkInfo _sdk) : NewProjectCommandBuilder(outputWriter)
+    public class StubNewProjectCommandBuilder(IOutputWriter outputWriter, DotNetSdkInfo _sdk) : NewProjectCommandBuilder(outputWriter)
     {
         public override CommandBuilder Build()
         {
