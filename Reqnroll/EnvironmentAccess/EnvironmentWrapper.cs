@@ -48,7 +48,7 @@ namespace Reqnroll.EnvironmentAccess
             return Environment.GetEnvironmentVariables()
                               .OfType<DictionaryEntry>()
                               .Select(e => (Key: e.Key?.ToString() ?? "", Value: e.Value?.ToString() ?? ""))
-                              .Where(e => e.Key.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+                              .Where(e => e.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
                               .ToDictionary(e => e.Key, e => e.Value);
         }
     }
