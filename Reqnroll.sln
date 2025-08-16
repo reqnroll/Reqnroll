@@ -127,6 +127,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.TUnit.Generator.Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.Formatters.Tests", "Tests\Reqnroll.Formatters.Tests\Reqnroll.Formatters.Tests.csproj", "{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Reqnroll.FormatterTestLogger", "Reqnroll.MessagesLogger.TestLogger\Reqnroll.FormatterTestLogger.csproj", "{DA774F90-8287-4364-A736-B3AD94404A5B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -269,6 +271,10 @@ Global
 		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90C5D62C-CE31-2F54-BEF9-F0DA12C8CE19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA774F90-8287-4364-A736-B3AD94404A5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA774F90-8287-4364-A736-B3AD94404A5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA774F90-8287-4364-A736-B3AD94404A5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA774F90-8287-4364-A736-B3AD94404A5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

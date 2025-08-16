@@ -15,15 +15,16 @@ namespace Reqnroll.Formatters.Configuration;
 /// </summary>
 public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 {
-    private readonly IList<IFormattersConfigurationResolverBase> _resolvers;
+    private readonly List<IFormattersConfigurationResolverBase> _resolvers;
     private readonly Lazy<FormattersConfiguration> _resolvedConfiguration;
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
+    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersLoggerConfigurationProvider formattersLoggerConfigurationProvider, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
         var fileResolver = resolvers["fileBasedResolver"];
         _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
+        _resolvers.AddRange(formattersLoggerConfigurationProvider.GetFormattersConfigurationResolvers());
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }

@@ -25,6 +25,11 @@ public class EnvironmentWrapperStub : IEnvironmentWrapper
             ? Result<string>.Success(value)
             : Result<string>.Failure($"Environment variable '{name}' not set in stub");
 
+    public IResult<IEnumerable<string>> GetEnvironmentVariableNames(string prefix)
+    {
+        throw new NotImplementedException();
+    }
+
     public bool IsEnvironmentVariableSet(string name)
         => EnvironmentVariables.ContainsKey(name);
 

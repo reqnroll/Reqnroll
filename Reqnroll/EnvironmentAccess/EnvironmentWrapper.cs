@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Reqnroll.CommonModels;
 
 namespace Reqnroll.EnvironmentAccess
@@ -36,5 +38,19 @@ namespace Reqnroll.EnvironmentAccess
         }
 
         public string GetCurrentDirectory() => Environment.CurrentDirectory;
+
+        public IResult<IEnumerable<string>> GetEnvironmentVariableNames(string prefix)
+        {
+            if (string.IsNullOrEmpty(prefix))
+                throw new ArgumentException("Argument cannot be null or empty", nameof(prefix));
+
+            var list = Environment.GetEnvironmentVariables()
+                                  .Keys
+                                  .OfType<string>()
+                                  .Where(k => k.StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+                                  .ToArray();
+
+            return Result<IEnumerable<string>>.Success(list);
+        }
     }
 }

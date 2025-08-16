@@ -41,3 +41,32 @@ A few common logger use cases can be found in the following table. The complete 
   - `--logger "html;logfilename=result.html"`
   - Produces a basic HTML report.
 ```
+## Reqnroll Formatters
+[Reqnroll Formatters](./reqnroll-formatters.md) may also be configured via the .NET Test logger mechanism. This provides a convenient means to publish the formatter output to the `TestResult` folder.
+
+Reqnroll provides two built-in loggers which configure the built-in formatters and are invoked via the `dotnet test` command line like any other logger.
+```{code-block} pwsh
+:caption: Terminal
+> dotnet test --logger "html-formatter;outputFilePath=result.html"
+[...]
+Results File: C:\MySolution\MyReqnrollProject\TestResults\result.html
+[...]
+```
+The output file name may also be set using `logfilename` in place of using `outputFilePath`.
+
+The built-in formatter loggers can be found in the following table.
+```{list-table}
+:header-rows: 1
+
+* - Logger
+  - Option
+  - Description
+* - `html-formatter`
+  - `--logger "html-formatter;outputFilePath=result.html"`
+  - Can be used to produce an HTML report.
+* - `message-formatter`
+  - `--logger "message-formatter;outputFilePath=myresult.ndjson"`
+  - Produces an ndjson file containing Cucumber Messages.
+```
+
+These formatter loggers override any previous configuration of the formatter (i.e, formatters configured via Environment Variables overrides the `reqnroll.json` and the command-line loggers override both the Environment Variable and the `reqnroll.json`).
