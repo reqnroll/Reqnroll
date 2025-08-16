@@ -20,15 +20,12 @@ public class FormattersLoggerConfigurationProvider : IFormattersLoggerConfigurat
     public IEnumerable<IFormattersEnvironmentOverrideConfigurationResolver> GetFormattersConfigurationResolvers()
     {
         var formattersConfigurationResolvers = new List<IFormattersEnvironmentOverrideConfigurationResolver>();
-        
-        var listOfFormattersResult = _environmentWrapper.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX);
-        if (listOfFormattersResult is Success<IEnumerable<string>> listOfFormattersSuccess)
+
+        var listOfFormattersResult = _environmentWrapper.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX);
+        foreach (var formatterEnvironmentVariable in listOfFormattersResult)
         {
-            foreach (var formatterEnvironmentVariableName in listOfFormattersSuccess.Result)
-            {
-                var resolver = new EnvironmentConfigurationResolver(_environmentWrapper, formatterEnvironmentVariableName, _log);
-                formattersConfigurationResolvers.Add(resolver);
-            }
+            var resolver = new EnvironmentConfigurationResolver(_environmentWrapper, formatterEnvironmentVariable.Key, _log);
+            formattersConfigurationResolvers.Add(resolver);
         }
 
         return formattersConfigurationResolvers;
