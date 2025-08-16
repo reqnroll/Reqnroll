@@ -7,7 +7,6 @@
     <authors>$author$</authors>
     <owners>$owner$</owners>
     <description>Package to use Reqnroll with xUnit 2.x. Note: this package won't support xUnit 3.x. $summary$</description>
-    <summary>Package to use Reqnroll with xUnit 2.x. Note: this package won't support xUnit 3.x. $summary$</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />

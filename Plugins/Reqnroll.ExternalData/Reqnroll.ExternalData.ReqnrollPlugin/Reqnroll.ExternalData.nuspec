@@ -6,7 +6,6 @@
     <authors>$author$</authors>
     <owners>$owner$</owners>
     <description>Package to use external data in Gherkin scenarios</description>
-    <summary>Package to use external data in Gherkin scenarios</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />

@@ -7,7 +7,6 @@
     <authors>$author$</authors>
     <owners>$owner$</owners>
     <description>Package for writing custom generator extensions for Reqnroll.</description>
-    <summary>Package for writing custom generator extensions for Reqnroll.</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
