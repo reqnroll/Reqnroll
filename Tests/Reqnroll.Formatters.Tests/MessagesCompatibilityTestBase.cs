@@ -160,7 +160,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var fileSystem = new FileSystem();
         var fileService = new FileService();
         var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
-        var configEnvResolver = new EnvironmentConfigurationResolver(env);
+        var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(env);
         var resolvers = new Dictionary<string, IFormattersConfigurationResolver>
         {
             {"fileBasedResolver",  configFileResolver }
@@ -171,7 +171,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
 
         FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(
                                                                         resolvers, 
-                                                                        configEnvResolver,
+                                                                        jsonEnvConfigResolver,
                                                                         keyValueEnvironmentConfigurationResolverMock.Object,
                                                                         new FormattersDisabledOverrideProvider(env));
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);

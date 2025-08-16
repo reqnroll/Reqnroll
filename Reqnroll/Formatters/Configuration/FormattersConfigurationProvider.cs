@@ -11,7 +11,7 @@ namespace Reqnroll.Formatters.Configuration;
 /// the class will resolve the configuration (only once).
 /// 
 /// One or more profiles may be read from the configuration file (<see cref="FileBasedConfigurationResolver"/>)
-/// then environment variable overrides are applied (first <see cref="EnvironmentConfigurationResolver"/>, then <see cref="KeyValueEnvironmentConfigurationResolver"/>).
+/// then environment variable overrides are applied (first <see cref="JsonEnvironmentConfigurationResolver"/>, then <see cref="KeyValueEnvironmentConfigurationResolver"/>).
 /// </summary>
 public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 {
@@ -20,10 +20,10 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
+    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
         var fileResolver = resolvers["fileBasedResolver"];
-        _resolvers = [fileResolver, environmentOverrideConfigurationResolver, keyValueEnvironmentConfigurationResolver];
+        _resolvers = [fileResolver, jsonEnvironmentConfigurationResolver, keyValueEnvironmentConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }

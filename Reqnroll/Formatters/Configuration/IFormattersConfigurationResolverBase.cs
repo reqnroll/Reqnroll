@@ -8,5 +8,3 @@ public interface IFormattersConfigurationResolverBase
 }
 
 public interface IFormattersConfigurationResolver : IFormattersConfigurationResolverBase;
-
-public interface IFormattersEnvironmentOverrideConfigurationResolver : IFormattersConfigurationResolverBase;

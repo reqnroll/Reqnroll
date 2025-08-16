@@ -7,15 +7,15 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.Configuration;
 
-public class EnvironmentConfigurationResolverTests
+public class JsonEnvironmentConfigurationResolverTests
 {
     private readonly Mock<IEnvironmentWrapper> _environmentWrapperMock;
-    private readonly EnvironmentConfigurationResolver _sut;
+    private readonly JsonEnvironmentConfigurationResolver _sut;
 
-    public EnvironmentConfigurationResolverTests()
+    public JsonEnvironmentConfigurationResolverTests()
     {
         _environmentWrapperMock = new Mock<IEnvironmentWrapper>();
-        _sut = new EnvironmentConfigurationResolver(_environmentWrapperMock.Object);
+        _sut = new JsonEnvironmentConfigurationResolver(_environmentWrapperMock.Object);
     }
 
     [Fact]

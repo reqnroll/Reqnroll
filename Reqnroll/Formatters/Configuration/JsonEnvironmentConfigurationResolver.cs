@@ -6,13 +6,13 @@ using System.Text.Json;
 
 namespace Reqnroll.Formatters.Configuration;
 
-public class EnvironmentConfigurationResolver : FormattersConfigurationResolverBase, IFormattersEnvironmentOverrideConfigurationResolver
+public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResolverBase, IJsonEnvironmentConfigurationResolver
 {
     private readonly IEnvironmentWrapper _environmentWrapper;
     private readonly IFormatterLog _log;
     private readonly string _environmentVariableName; 
 
-    public EnvironmentConfigurationResolver(
+    public JsonEnvironmentConfigurationResolver(
         IEnvironmentWrapper environmentWrapper,
         IFormatterLog log = null)
     {
@@ -21,7 +21,7 @@ public class EnvironmentConfigurationResolver : FormattersConfigurationResolverB
         _environmentVariableName = FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE;
     }
 
-    internal EnvironmentConfigurationResolver(
+    internal JsonEnvironmentConfigurationResolver(
         IEnvironmentWrapper environmentWrapper,
         string environmentVariableName,
         IFormatterLog log = null)
