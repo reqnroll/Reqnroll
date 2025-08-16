@@ -20,6 +20,11 @@ public class BindingProviderService
         var bindingRegistryBuilder = globalContainer.Resolve<IRuntimeBindingRegistryBuilder>();
         BuildBindingRegistry(testAssembly, bindingRegistryBuilder);
         var bindingRegistry = globalContainer.Resolve<IBindingRegistry>();
+        return GetDiscoveredBindingsFromRegistry(bindingRegistry, testAssembly);
+    }
+
+    internal static string GetDiscoveredBindingsFromRegistry(IBindingRegistry bindingRegistry, Assembly testAssembly)
+    {
         var resultData = ParseDiscoveryResult(bindingRegistry, testAssembly);
         var jsonString = JsonSerializer.Serialize(resultData, BindingJsonSourceGenerator.Default.BindingData);
         return jsonString;

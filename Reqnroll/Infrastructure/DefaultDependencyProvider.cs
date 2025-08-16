@@ -1,4 +1,3 @@
-using System;
 using Gherkin.CucumberMessages;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
@@ -6,6 +5,7 @@ using Reqnroll.Analytics.UserId;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.CucumberExpressions;
 using Reqnroll.Bindings.Discovery;
+using Reqnroll.Bindings.Provider;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
@@ -27,6 +27,7 @@ using Reqnroll.TestFramework;
 using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
+using System;
 
 namespace Reqnroll.Infrastructure
 {
@@ -118,6 +119,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();
             container.RegisterTypeAs<MessageFormatter, ICucumberMessageFormatter>("message");
             container.RegisterTypeAs<HtmlFormatter, ICucumberMessageFormatter>("html");
+            container.RegisterTypeAs<VsxBindingFormatter, ICucumberMessageFormatter>(VsxBindingFormatter.FormatterName);
             container.RegisterTypeAs<CucumberMessageBroker, ICucumberMessageBroker>();
             container.RegisterTypeAs<CucumberMessagePublisher, ICucumberMessagePublisher>();
             container.RegisterTypeAs<ShortGuidIdGenerator, IIdGenerator>();
