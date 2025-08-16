@@ -9,7 +9,8 @@
     <PackageId>Reqnroll.TUnit</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <!-- build incorrectly detects a missing content in the 'lib' folder, we need to skip this warning -->
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <NoWarn>$(NoWarn);NU5128;1591</NoWarn>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 
   <PropertyGroup>

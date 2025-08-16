@@ -6,6 +6,7 @@
     <title>Reqnroll.xUnit</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
+    <readme>README.md</readme>
     <description>Package to use Reqnroll with xUnit 2.x. Note: this package won't support xUnit 3.x. $summary$</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
@@ -40,6 +41,7 @@
     <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit.Generator.ReqnrollPlugin.pdb" target="build\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
+    <file src="PackageReadme.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
   </files>
 </package>
