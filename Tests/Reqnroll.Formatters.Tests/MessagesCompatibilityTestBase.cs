@@ -168,8 +168,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
 
         FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(
                                                                         resolvers, 
-                                                                        configEnvResolver, 
-                                                                        new Mock<IFormattersLoggerConfigurationProvider>().Object,
+                                                                        configEnvResolver,
                                                                         new FormattersDisabledOverrideProvider(env));
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 

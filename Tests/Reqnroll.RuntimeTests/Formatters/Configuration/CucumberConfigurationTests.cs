@@ -24,7 +24,6 @@ public class CucumberConfigurationTests
         };
 
         _sut = new FormattersConfigurationProvider(resolvers, _environmentResolverMock.Object, 
-                                                   new Mock<IFormattersLoggerConfigurationProvider>().Object,
                                                    _disableOverrideProviderMock.Object);
     }
 

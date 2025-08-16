@@ -24,7 +24,6 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     {
         var fileResolver = resolvers["fileBasedResolver"];
         _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
-        _resolvers.AddRange(formattersLoggerConfigurationProvider.GetFormattersConfigurationResolvers());
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }
