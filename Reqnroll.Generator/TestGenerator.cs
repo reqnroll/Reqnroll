@@ -41,7 +41,7 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         ReqnrollConfiguration = reqnrollConfiguration ?? throw new ArgumentNullException(nameof(reqnrollConfiguration));
         TestUpToDateChecker = testUpToDateChecker ?? throw new ArgumentNullException(nameof(testUpToDateChecker));
         _featureGeneratorRegistry = featureGeneratorRegistry ?? throw new ArgumentNullException(nameof(featureGeneratorRegistry));
-        CodeDomHelper = codeDomHelper;
+        CodeDomHelper = codeDomHelper ?? throw new ArgumentNullException(nameof(codeDomHelper));
         TestHeaderWriter = testHeaderWriter ?? throw new ArgumentNullException(nameof(testHeaderWriter));
         ProjectSettings = projectSettings ?? throw new ArgumentNullException(nameof(projectSettings));
         _gherkinParserFactory = gherkinParserFactory ?? throw new ArgumentNullException(nameof(gherkinParserFactory));
