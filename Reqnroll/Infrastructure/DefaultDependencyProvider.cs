@@ -113,7 +113,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<NullFormatterLog, IFormatterLog>();
             container.RegisterTypeAs<FileSystem, IFileSystem>();
             container.RegisterTypeAs<FormattersDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
-            container.RegisterTypeAs<FileBasedConfigurationResolver, IFormattersConfigurationResolver>("fileBasedResolver");
+            container.RegisterTypeAs<FileBasedConfigurationResolver, IFileBasedConfigurationResolver>();
             container.RegisterTypeAs<JsonEnvironmentConfigurationResolver, IJsonEnvironmentConfigurationResolver>();
             container.RegisterTypeAs<KeyValueEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver>();
             container.RegisterTypeAs<FormattersConfigurationProvider, IFormattersConfigurationProvider>();

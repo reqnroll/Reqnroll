@@ -20,10 +20,9 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
+    public FormattersConfigurationProvider(IFileBasedConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
-        var fileResolver = resolvers["fileBasedResolver"];
-        _resolvers = [fileResolver, jsonEnvironmentConfigurationResolver, keyValueEnvironmentConfigurationResolver];
+        _resolvers = [fileBasedConfigurationResolver, jsonEnvironmentConfigurationResolver, keyValueEnvironmentConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }

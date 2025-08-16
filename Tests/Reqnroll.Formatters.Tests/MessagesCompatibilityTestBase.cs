@@ -161,16 +161,12 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var fileService = new FileService();
         var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
         var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(env);
-        var resolvers = new Dictionary<string, IFormattersConfigurationResolver>
-        {
-            {"fileBasedResolver",  configFileResolver }
-        };
 
         var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
         keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
 
         FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(
-                                                                        resolvers, 
+            configFileResolver,
                                                                         jsonEnvConfigResolver,
                                                                         keyValueEnvironmentConfigurationResolverMock.Object,
                                                                         new FormattersDisabledOverrideProvider(env));
