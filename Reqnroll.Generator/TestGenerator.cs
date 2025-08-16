@@ -45,7 +45,7 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         TestHeaderWriter = testHeaderWriter ?? throw new ArgumentNullException(nameof(testHeaderWriter));
         ProjectSettings = projectSettings ?? throw new ArgumentNullException(nameof(projectSettings));
         _gherkinParserFactory = gherkinParserFactory ?? throw new ArgumentNullException(nameof(gherkinParserFactory));
-        _generatorInfo = generatorInfo;
+        _generatorInfo = generatorInfo ?? throw new ArgumentNullException(nameof(generatorInfo));
     }
 
     protected override TestGeneratorResult GenerateTestFileWithExceptions(FeatureFileInput featureFileInput, GenerationSettings settings)
