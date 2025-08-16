@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Reqnroll.Formatters.Configuration;
 
@@ -24,7 +23,7 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersLoggerConfigurationProvider formattersLoggerConfigurationProvider, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
         var fileResolver = resolvers["fileBasedResolver"];
-        _resolvers = new List<IFormattersConfigurationResolverBase>() { fileResolver, environmentOverrideConfigurationResolver };
+        _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
         _resolvers.AddRange(formattersLoggerConfigurationProvider.GetFormattersConfigurationResolvers());
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;

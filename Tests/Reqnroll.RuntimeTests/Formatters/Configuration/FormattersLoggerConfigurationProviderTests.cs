@@ -37,7 +37,7 @@ public class FormattersLoggerConfigurationProviderTests
     public void Constructor_Should_Accept_Null_FormatterLog()
     {
         // Act & Assert
-        var act = () => new FormattersLoggerConfigurationProvider(_environmentWrapperMock.Object, null);
+        var act = () => new FormattersLoggerConfigurationProvider(_environmentWrapperMock.Object);
         act.Should().NotThrow();
     }
 
@@ -60,6 +60,7 @@ public class FormattersLoggerConfigurationProviderTests
     public void GetFormattersConfigurationResolvers_Should_Return_Empty_When_Environment_Variables_List_Is_Empty()
     {
         // Arrange
+        // ReSharper disable once CollectionNeverUpdated.Local
         var emptyList = new List<string>();
         _environmentWrapperMock
             .Setup(e => e.GetEnvironmentVariableNames(FormattersConfigurationConstants.REQNROLL_FORMATTERS_LOGGER_ENVIRONMENT_VARIABLE_PREFIX))
@@ -82,7 +83,7 @@ public class FormattersLoggerConfigurationProviderTests
             .Returns(new Success<IEnumerable<string>>(formatterNames));
 
         // Act
-        var result = _sut.GetFormattersConfigurationResolvers();
+        var result = _sut.GetFormattersConfigurationResolvers().ToArray();
 
         // Assert
         result.Should().HaveCount(1);
@@ -104,7 +105,7 @@ public class FormattersLoggerConfigurationProviderTests
             .Returns(new Success<IEnumerable<string>>(formatterNames));
 
         // Act
-        var result = _sut.GetFormattersConfigurationResolvers();
+        var result = _sut.GetFormattersConfigurationResolvers().ToArray();
 
         // Assert
         result.Should().HaveCount(3);
@@ -128,7 +129,7 @@ public class FormattersLoggerConfigurationProviderTests
             .Returns(new Success<IEnumerable<string>>(formatterNames));
 
         // Act
-        var result = _sut.GetFormattersConfigurationResolvers();
+        var result = _sut.GetFormattersConfigurationResolvers().ToArray();
 
         // Assert
         result.Should().HaveCount(2);
@@ -201,7 +202,7 @@ public class FormattersLoggerConfigurationProviderTests
             .Returns(new Success<IEnumerable<string>>(formatterNames));
 
         // Act
-        var result = _sut.GetFormattersConfigurationResolvers();
+        var result = _sut.GetFormattersConfigurationResolvers().ToArray();
 
         // Assert
         result.Should().HaveCount(4);
@@ -218,8 +219,8 @@ public class FormattersLoggerConfigurationProviderTests
             .Returns(new Success<IEnumerable<string>>(formatterNames));
 
         // Act
-        var result1 = _sut.GetFormattersConfigurationResolvers();
-        var result2 = _sut.GetFormattersConfigurationResolvers();
+        var result1 = _sut.GetFormattersConfigurationResolvers().ToArray();
+        var result2 = _sut.GetFormattersConfigurationResolvers().ToArray();
 
         // Assert
         result1.Should().HaveCount(1);
