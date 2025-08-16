@@ -1,91 +1,85 @@
 using System;
 using System.Collections.Generic;
 
-namespace Reqnroll
+namespace Reqnroll;
+
+public abstract class ReqnrollContext : Dictionary<string, object>, IDisposable
 {
-    public interface IReqnrollContext
+    public Exception TestError { get; internal set; }
+
+    /// <summary>
+    /// Used to verify disposal of the context in tests.
+    /// </summary>
+    internal bool IsDisposed { get; private set; }
+
+    protected virtual void Dispose()
     {
-        Exception TestError { get; }
+        IsDisposed = true;
     }
 
-    public abstract class ReqnrollContext : Dictionary<string, object>, IDisposable
+    void IDisposable.Dispose()
     {
-        public Exception TestError { get; internal set; }
+        Dispose();
+    }
 
-        /// <summary>
-        /// Used to verify disposal of the context in tests.
-        /// </summary>
-        internal bool IsDisposed { get; private set; }
+    public bool TryGetValue<TValue>(out TValue value)
+    {
+        return TryGetValue(GetDefaultKey<TValue>(), out value);
+    }
 
-        protected virtual void Dispose()
+    public bool TryGetValue<TValue>(string key, out TValue value)
+    {
+        if (base.TryGetValue(key, out object result))
         {
-            IsDisposed = true;
+            value = TheValueIsAFactoryMethod<TValue>(result) ? CallTheFactoryMethodToGetTheValue<TValue>(result) : (TValue)result;
+            return true;
         }
 
-        void IDisposable.Dispose()
-        {
-            Dispose();
-        }
+        value = default;
+        return false;
+    }
 
-        public bool TryGetValue<TValue>(out TValue value)
-        {
-            return TryGetValue(GetDefaultKey<TValue>(), out value);
-        }
+    private string GetDefaultKey<T>()
+    {
+        return typeof(T).FullName;
+    }
 
-        public bool TryGetValue<TValue>(string key, out TValue value)
-        {
-            if (base.TryGetValue(key, out object result))
-            {
-                value = TheValueIsAFactoryMethod<TValue>(result) ? CallTheFactoryMethodToGetTheValue<TValue>(result) : (TValue)result;
-                return true;
-            }
+    public void Set<T>(T data)
+    {
+        Set(data, GetDefaultKey<T>());
+    }
 
-            value = default;
-            return false;
-        }
+    public void Set<T>(T data, string key)
+    {
+        this[key] = data;
+    }
 
-        private string GetDefaultKey<T>()
-        {
-            return typeof(T).FullName;
-        }
+    public void Set<T>(Func<T> func)
+    {
+        this[GetDefaultKey<T>()] = func;
+    }
 
-        public void Set<T>(T data)
-        {
-            Set(data, GetDefaultKey<T>());
-        }
+    public T Get<T>()
+    {
+        return Get<T>(GetDefaultKey<T>());
+    }
 
-        public void Set<T>(T data, string key)
-        {
-            this[key] = data;
-        }
+    public T Get<T>(string key)
+    {
+        var value = this[key];
+        if (TheValueIsAFactoryMethod<T>(value))
+            value = CallTheFactoryMethodToGetTheValue<T>(value);
+        return (T)value;
+    }
 
-        public void Set<T>(Func<T> func)
-        {
-            this[GetDefaultKey<T>()] = func;
-        }
+    private static T CallTheFactoryMethodToGetTheValue<T>(object value)
+    {
+        return ((Func<T>) value)();
+    }
 
-        public T Get<T>()
-        {
-            return Get<T>(GetDefaultKey<T>());
-        }
-
-        public T Get<T>(string key)
-        {
-            var value = this[key];
-            if (TheValueIsAFactoryMethod<T>(value))
-                value = CallTheFactoryMethodToGetTheValue<T>(value);
-            return (T)value;
-        }
-
-        private static T CallTheFactoryMethodToGetTheValue<T>(object value)
-        {
-            return ((Func<T>) value)();
-        }
-
-        private static bool TheValueIsAFactoryMethod<T>(object value)
-        {
-            if (value == null) return false;
-            return value.GetType() == typeof(Func<T>);
-        }
+    private static bool TheValueIsAFactoryMethod<T>(object value)
+    {
+        if (value == null) return false;
+        return value.GetType() == typeof(Func<T>);
     }
 }

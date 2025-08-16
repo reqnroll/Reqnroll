@@ -3,23 +3,10 @@ using Reqnroll.TestFramework;
 
 namespace Reqnroll;
 
-public interface ITestRunContext : IReqnrollContext
+public class DefaultTestRunContext(IObjectContainer testRunContainer, ITestRunSettingsProvider testRunSettingsProvider) 
+    : ReqnrollContext, ITestRunContext
 {
-    IObjectContainer TestRunContainer { get; }
-    string TestDirectory { get; }
-}
+    public IObjectContainer TestRunContainer { get; } = testRunContainer;
 
-public class DefaultTestRunContext : ReqnrollContext, ITestRunContext
-{
-    private readonly ITestRunSettingsProvider _testRunSettingsProvider;
-
-    public IObjectContainer TestRunContainer { get; }
-
-    public string TestDirectory => _testRunSettingsProvider.GetTestDirectory();
-
-    public DefaultTestRunContext(IObjectContainer testRunContainer, ITestRunSettingsProvider testRunSettingsProvider)
-    {
-        _testRunSettingsProvider = testRunSettingsProvider;
-        TestRunContainer = testRunContainer;
-    }
+    public string TestDirectory => testRunSettingsProvider.GetTestDirectory();
 }
