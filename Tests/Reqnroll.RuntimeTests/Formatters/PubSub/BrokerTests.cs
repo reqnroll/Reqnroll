@@ -25,7 +25,7 @@ public class CucumberMessageBrokerTests
         _formatterMock2 = new Mock<ICucumberMessageFormatter>();
         _formatterMock2.Setup(s => s.Name).Returns("formatter2");
         // Initialize the system under test (SUT)
-        _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "formatter1", _formatterMock1.Object}, { "formatter2", _formatterMock2.Object} });
+        _sut = new CucumberMessageBroker(_logMock.Object, new Dictionary<string, ICucumberMessageFormatter> { { "formatter1", _formatterMock1.Object}, { "formatter2", _formatterMock2.Object} }, null);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class CucumberMessageBrokerTests
     {
         var log = new Mock<IFormatterLog>();
 
-        var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>());
+        var sut = new CucumberMessageBroker(log.Object, new Dictionary<string, ICucumberMessageFormatter>(), null);
 
         // Act
         var result = sut.IsEnabled;

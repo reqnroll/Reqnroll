@@ -1,4 +1,5 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.Analytics;
 using Reqnroll.Formatters.RuntimeSupport;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,15 +22,17 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // and the Broker can be IsEnabled.
     private int _numberOfFormattersInitialized = 0;
     private readonly IFormatterLog _logger;
+    private readonly IAnalyticsRuntimeTelemetryService _telemetryService;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
     private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeFormatters = new();
 
 
-    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters, IAnalyticsRuntimeTelemetryService telemetryService)
     {
         _logger = formatterLog;
+        _telemetryService = telemetryService;
         _registeredFormatters.AddRange(containerRegisteredFormatters.Values);
     }
 
@@ -63,6 +66,22 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         }
     }
 
+    private async Task SendTelemetryEvents()
+    {
+        if (_telemetryService == null) return;
+
+        foreach (var formatter in _activeFormatters)
+        {
+            await _telemetryService.SendFeatureUseEventAsync(
+                ReqnrollFeatureUseEvent.FeatureNames.Formatter,
+                properties: new Dictionary<string, string>
+                {
+                    { ReqnrollFeatureUseEvent.FormatterNameProperty, formatter.Key }
+                }
+            );
+        }
+    }
+
     private bool HaveAllFormattersRegisteredAndInitialized()
     {
         return _numberOfFormattersInitialized == _registeredFormatters.Count;
@@ -70,6 +89,9 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     public async Task PublishAsync(Envelope message)
     {
+        if (message.TestRunStarted != null)
+            await SendTelemetryEvents();
+
         foreach (var formatter in _activeFormatters.Values)
         {
             // Will catch and swallow any exceptions thrown by sinks so that all get a chance to process each message.

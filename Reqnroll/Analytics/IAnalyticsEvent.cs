@@ -7,6 +7,7 @@ namespace Reqnroll.Analytics
         string EventName { get; }
         DateTime UtcDate { get; }
         string UserId { get; }
+        string SessionId { get; }
         string Platform { get; }
         string PlatformDescription { get; }
         string ReqnrollVersion { get; }
