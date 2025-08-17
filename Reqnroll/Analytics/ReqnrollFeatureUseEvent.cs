@@ -34,7 +34,7 @@ public class ReqnrollFeatureUseEvent(
         targetFramework,
         isDockerContainer)
 {
-    internal static class FeatureNames
+    public static class FeatureNames
     {
         public const string Formatter = "formatter"; // report the individual formatter used with name
     }
