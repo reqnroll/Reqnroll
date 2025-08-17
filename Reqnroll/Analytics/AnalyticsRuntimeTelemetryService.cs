@@ -11,6 +11,16 @@ public class AnalyticsRuntimeTelemetryService(IAnalyticsTransmitter analyticsTra
 {
     private string GetAssemblyName() => testAssemblyProvider.TestAssembly?.GetName().Name;
 
+    public void SendProjectRunningEvent()
+    {
+        SendTelemetryEvent(
+            async () =>
+            {
+                var telemetryEvent = AnalyticsEventProvider.CreateProjectRunningEvent(GetAssemblyName());
+                await AnalyticsTransmitter.TransmitReqnrollProjectRunningEventAsync(telemetryEvent);
+            });
+    }
+
     public void SendFeatureUseEvent(string featureName, Dictionary<string, string> properties = null, Dictionary<string, double> metrics = null)
     {
         SendTelemetryEvent(

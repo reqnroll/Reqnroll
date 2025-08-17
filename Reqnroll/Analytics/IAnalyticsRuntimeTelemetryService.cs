@@ -8,4 +8,6 @@ namespace Reqnroll.Analytics;
 public interface IAnalyticsRuntimeTelemetryService
 {
     void SendFeatureUseEvent(string featureName, Dictionary<string, string> properties = null, Dictionary<string, double> metrics = null);
+
+    void SendProjectRunningEvent();
 }

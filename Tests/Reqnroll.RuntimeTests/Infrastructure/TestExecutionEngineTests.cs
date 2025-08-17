@@ -5,7 +5,6 @@ using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.BoDi;
-using Reqnroll.CommonModels;
 using Reqnroll.Configuration;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
@@ -50,9 +49,7 @@ public partial class TestExecutionEngineTests
     private readonly TestObjectResolver _defaultTestObjectResolver = new();
     private readonly ITestPendingMessageFactory _testPendingMessageFactory;
     private readonly ITestUndefinedMessageFactory _testUndefinedMessageFactory;
-    private readonly Mock<IAnalyticsEventProvider> _analyticsEventProvider;
-    private readonly Mock<IAnalyticsTransmitter> _analyticsTransmitter;
-    private readonly Mock<ITestRunnerManager> _testRunnerManager;
+    private readonly Mock<IAnalyticsRuntimeTelemetryService> _telemetryService;
     private readonly Mock<IRuntimePluginTestExecutionLifecycleEventEmitter> _runtimePluginTestExecutionLifecycleEventEmitter;
     private readonly Mock<ITestThreadExecutionEventPublisher> _testThreadExecutionEventPublisher;
     private readonly Mock<IStepArgumentTypeConverter> _stepArgumentTypeConverterMock;
@@ -149,13 +146,10 @@ public partial class TestExecutionEngineTests
         _testPendingMessageFactory = new TestPendingMessageFactory();
         _testUndefinedMessageFactory = new TestUndefinedMessageFactory(_stepDefinitionSkeletonProviderMock.Object, _errorProviderStub.Object, _reqnrollConfiguration);
 
-        _analyticsEventProvider = new Mock<IAnalyticsEventProvider>();
-        _analyticsTransmitter = new Mock<IAnalyticsTransmitter>();
-        _analyticsTransmitter.Setup(at => at.TransmitReqnrollProjectRunningEventAsync(It.IsAny<ReqnrollProjectRunningEvent>()))
-                             .Callback(() => { });
+        _telemetryService = new Mock<IAnalyticsRuntimeTelemetryService>();
 
-        _testRunnerManager = new Mock<ITestRunnerManager>();
-        _testRunnerManager.Setup(trm => trm.TestAssembly).Returns(Assembly.GetCallingAssembly);
+        var testRunnerManager = new Mock<ITestRunnerManager>();
+        testRunnerManager.Setup(trm => trm.TestAssembly).Returns(Assembly.GetCallingAssembly);
 
         _runtimePluginTestExecutionLifecycleEventEmitter = new Mock<IRuntimePluginTestExecutionLifecycleEventEmitter>();
         _testThreadExecutionEventPublisher = new Mock<ITestThreadExecutionEventPublisher>();
@@ -178,9 +172,7 @@ public partial class TestExecutionEngineTests
             _stepDefinitionMatcherStub.Object,
             _methodBindingInvokerMock.Object,
             _obsoleteTestHandlerMock.Object,
-            _analyticsEventProvider.Object,
-            _analyticsTransmitter.Object,
-            _testRunnerManager.Object,
+            _telemetryService.Object,
             _runtimePluginTestExecutionLifecycleEventEmitter.Object,
             _testThreadExecutionEventPublisher.Object,
             _testPendingMessageFactory,
@@ -889,23 +881,11 @@ public partial class TestExecutionEngineTests
     [Fact]
     public async Task Should_TryToSend_ProjectRunningEvent()
     {
-        var tcs = new TaskCompletionSource();
-
-        _analyticsTransmitter.SetupGet(at => at.IsEnabled).Returns(true);
-        _analyticsTransmitter.Setup(at => at.TransmitReqnrollProjectRunningEventAsync(It.IsAny<ReqnrollProjectRunningEvent>()))
-                             .Returns(() =>
-                             {
-                                 tcs.SetResult();
-                                 return Task.FromResult(Result.Success());
-                             });
-
         var testExecutionEngine = CreateTestExecutionEngine();
 
         await testExecutionEngine.OnTestRunStartAsync();
 
-        await Task.WhenAny(tcs.Task, Task.Delay(60_000));
-
-        _analyticsTransmitter.Verify(at => at.TransmitReqnrollProjectRunningEventAsync(It.IsAny<ReqnrollProjectRunningEvent>()), Times.Once);
+        _telemetryService.Verify(ts => ts.SendProjectRunningEvent(), Times.Once);
     }
 
     [Theory]
