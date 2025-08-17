@@ -160,13 +160,16 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var fileSystem = new FileSystem();
         var fileService = new FileService();
         var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
-        var configEnvResolver = new EnvironmentConfigurationResolver(env);
-        var resolvers = new Dictionary<string, IFormattersConfigurationResolver>
-        {
-            {"fileBasedResolver",  configFileResolver }
-        };
+        var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(env);
 
-        FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(resolvers, configEnvResolver, new FormattersDisabledOverrideProvider(env));
+        var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
+        keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
+
+        FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(
+            configFileResolver,
+                                                                        jsonEnvConfigResolver,
+                                                                        keyValueEnvironmentConfigurationResolverMock.Object,
+                                                                        new FormattersDisabledOverrideProvider(env));
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 
         var outputFilePath = outputFilePathElement!.ToString();

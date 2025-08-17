@@ -7,15 +7,15 @@ using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.Configuration;
 
-public class EnvironmentConfigurationResolverTests
+public class JsonEnvironmentConfigurationResolverTests
 {
     private readonly Mock<IEnvironmentWrapper> _environmentWrapperMock;
-    private readonly EnvironmentConfigurationResolver _sut;
+    private readonly JsonEnvironmentConfigurationResolver _sut;
 
-    public EnvironmentConfigurationResolverTests()
+    public JsonEnvironmentConfigurationResolverTests()
     {
         _environmentWrapperMock = new Mock<IEnvironmentWrapper>();
-        _sut = new EnvironmentConfigurationResolver(_environmentWrapperMock.Object);
+        _sut = new JsonEnvironmentConfigurationResolver(_environmentWrapperMock.Object);
     }
 
     [Fact]
@@ -56,6 +56,30 @@ public class EnvironmentConfigurationResolverTests
         result["formatter1"]["configSetting1"].Should().Be("configValue1");
     }
 
+
+    [Fact]
+    public void Resolve_should_return_configuration_with_case_insensitive_formatter_and_setting_names()
+    {
+        // Arrange
+        var json = """
+                   {
+                       "formatters": {
+                           "FORMATTER1": {
+                               "CONFIGSetting1": "configValue1" }
+                       }
+                   }
+                   """;
+        _environmentWrapperMock
+            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
+            .Returns(new Success<string>(json));
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result["formatter1"]["configSetting1"].Should().Be("configValue1");
+    }
+
     [Fact]
     public void Resolve_Should_Return_MultipleConfigurations_From_Environment_Variables()
     {
@@ -80,5 +104,32 @@ public class EnvironmentConfigurationResolverTests
         var second = result["message"];
         Assert.Equal("forHtml", first["outputFilePath"]);
         Assert.Equal("forMessages", second["outputFilePath"]);
+    }
+
+    [Fact]
+    public void Resolve_Should_Parse_JSON_Format_Environment_Variable()
+    {
+        // Arrange
+        var expectedJson = """
+                          {
+                              "formatters": {
+                                  "message": {
+                                      "outputFilePath": "foo.ndjson"
+                                  }
+                              }
+                          }
+                          """;
+        
+        _environmentWrapperMock
+            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
+            .Returns(new Success<string>(expectedJson));
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().ContainKey("message");
+        result["message"]["outputFilePath"].Should().Be("foo.ndjson");
+        result.Should().HaveCount(1);
     }
 }
