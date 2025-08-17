@@ -128,7 +128,7 @@ You can override different parts of the output file path:
 
 ## Environment Variables
 
-The settings discussed above can be overridden by setting an environment variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overridden by an environment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used.
+The settings discussed above can be overridden by setting an environment variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overridden by an environment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used. The formatter specific environment variables override the general `REQNROLL_FORMATTERS` environment variable settings. 
 
 ### Available Environment Variables
 
@@ -151,6 +151,18 @@ export REQNROLL_FORMATTERS_DISABLED=true
 export REQNROLL_FORMATTERS_DISABLED=false
 ```
 
+#### REQNROLL_FORMATTERS_*formatter*
+
+**Description:** Overrides the configuration of a specific formatter using key-value pair settings. For example the `REQNROLL_FORMATTERS_HTML` environment variable can be used to configure the [html formatter](../reporting/reqnroll-formatters.md#html-formatter). 
+
+**Default Value:** Not set (uses configuration file settings)
+
+**Behavior:** 
+
+* When set to `true` it enables the formatter with default settings
+* When set to `false` it disables the formatter (if it was configured in the configuration file)
+* When set to `setting1=value1;setting2=value2` it configures the formatter with the specified settings and values. For example the value `outputFilePath=result.html` sets the output file to `result.html`.
+
 #### REQNROLL_FORMATTERS
 
 **Description:** Overrides the `formatters` section of the `reqnroll.json` configuration file using JSON format.
@@ -162,29 +174,43 @@ export REQNROLL_FORMATTERS_DISABLED=false
 ```{note}
 When using an environment variable to override a `formatters` section, the value of the environment variable must be properly escaped (appropriate to your shell) to remain a valid json representation of the configuration setting.
 ```
+
 ### Environment Variable Configuration Examples
 
 #### Enable HTML formatter with default settings:
+
 ```bash
-export REQNROLL_FORMATTERS='{"formatters": {"html": {}}}'
+export REQNROLL_FORMATTERS_HTML='true'
 ```
+
+#### Enable HTML formatter with custom output path:
+
+```bash
+export REQNROLL_FORMATTERS_HTML='outputFilePath=result.html'
+```
+
+#### Enable HTML formatter with custom directory only:
+
+```bash
+export REQNROLL_FORMATTERS_HTML='outputFilePath=test-results/'
+```
+
+This setting will generate the HTML report in the specified folder with the default file name (`test-results/reqnroll_report.html`).
 
 #### Enable Message formatter with default settings:
+
 ```bash
-export REQNROLL_FORMATTERS='{"formatters": {"message": {}}}'
+export REQNROLL_FORMATTERS_MESSAGE='true'
 ```
 
-#### Enable both formatters with custom output paths:
+#### Enable both formatters with custom output paths using JSON:
+
 ```bash
 export REQNROLL_FORMATTERS='{"formatters": {"html": {"outputFilePath": "reports/test_report.html"}, "message": {"outputFilePath": "reports/test_messages.ndjson"}}}'
 ```
 
-#### Enable HTML formatter with custom directory only:
-```bash
-export REQNROLL_FORMATTERS='{"formatters": {"html": {"outputFilePath": "test-results/"}}}'
-```
+#### Set JSON value in different shells with correct escaping:
 
-#### Enable formatters with different configurations:
 ```bash
 # Windows Command Prompt
 set REQNROLL_FORMATTERS={"formatters": {"html": {"outputFilePath": "output\\report.html"}, "message": {"outputFilePath": "output\\messages.ndjson"}}}
