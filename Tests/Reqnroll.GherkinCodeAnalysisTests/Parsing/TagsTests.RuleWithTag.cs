@@ -90,12 +90,12 @@ public partial class TagsTests
                                         "The untagged rule description",
                                         TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
-                            members: List([
+                            examples: List([
                                 Example(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
                                         SyntaxKind.ExampleKeyword,
-                                        "Example",
+                                        "Scenario",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -110,7 +110,7 @@ public partial class TagsTests
                                         Step(
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
-                                                SyntaxKind.GivenKeyword,
+                                                SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
                                             LiteralText(
@@ -148,12 +148,12 @@ public partial class TagsTests
                                         "The tagged rule description",
                                         TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                                 ])),
-                            members: List([
+                            examples: List([
                                 Example(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
                                         SyntaxKind.ExampleKeyword,
-                                        "Example",
+                                        "Scenario",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -168,7 +168,7 @@ public partial class TagsTests
                                         Step(
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
-                                                SyntaxKind.GivenKeyword,
+                                                SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
                                             LiteralText(
@@ -186,7 +186,7 @@ public partial class TagsTests
                                     Token(
                                         TriviaList([Whitespace("    ")]),
                                         SyntaxKind.ExampleKeyword,
-                                        "Example",
+                                        "Scenario",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -201,7 +201,7 @@ public partial class TagsTests
                                         Step(
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
-                                                SyntaxKind.GivenKeyword,
+                                                SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
                                             LiteralText(
@@ -234,7 +234,7 @@ public partial class TagsTests
                                         Step(
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
-                                                SyntaxKind.GivenKeyword,
+                                                SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
                                             LiteralText(
@@ -265,34 +265,32 @@ public partial class TagsTests
                                                         Token(
                                                             TriviaList([Whitespace("        ")]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        SeparatedList<PlainTextSyntax>([
-                                                            LiteralText(
+                                                            TriviaList([Space])),
+                                                        TableCellList([
+                                                            TextTableCell(
                                                                 TableLiteral(
-                                                                    TriviaList([Space]),
+                                                                    TriviaList(),
                                                                     "header",
-                                                                    TriviaList([Space]))
-                                                            )
+                                                                    TriviaList()))
                                                         ]),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([EnvironmentNewLine]))),
                                                     TableRow(
                                                         Token(
                                                             TriviaList([Whitespace("        ")]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        SeparatedList<PlainTextSyntax>([
-                                                            LiteralText(
+                                                            TriviaList([Space])),
+                                                        TableCellList([
+                                                            TextTableCell(
                                                                 TableLiteral(
-                                                                    TriviaList([Space]),
+                                                                    TriviaList(),
                                                                     "a",
-                                                                    TriviaList([Whitespace("      ")]))
-                                                            )
+                                                                    TriviaList()))
                                                         ]),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Whitespace("      ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([EnvironmentNewLine])))
                                                 ])))

@@ -44,7 +44,7 @@ public class TriviaTests
         var trivia = Trivia(skippedTokens);
 
         trivia.HasStructure.Should().BeTrue();
-        trivia.GetStructure().Should().BeEquivalentTo(skippedTokens);
+        trivia.        Structure.Should().BeEquivalentTo(skippedTokens);
     }
 
     [Fact]

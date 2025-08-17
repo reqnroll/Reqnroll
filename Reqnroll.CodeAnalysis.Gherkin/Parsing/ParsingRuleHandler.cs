@@ -52,8 +52,7 @@ internal abstract class ParsingRuleHandler(RuleType ruleType)
     protected virtual void AppendEmpty(Token token, TextLine line, ParsingContext context)
     {
         // Empty tokens are all either zero-width or all-whitespace and can be added to leading trivia.
-        // Matched indentation will already be included by the generic line-handling behaviour.
-        context.AddLeadingWhitespace(TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End));
+        context.AddLeadingWhitespace(token, line);
         context.AddLeadingTrivia(line.GetEndOfLineTrivia());
     }
 
@@ -135,4 +134,13 @@ internal abstract class ParsingRuleHandler(RuleType ruleType)
             string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingEndOfFileMarker, GetType().Name));
     }
 
+    public virtual void AppendUnexpectedToken(
+        Token token,
+        TextLine line,
+        UnexpectedTokenException exception,
+        ParsingContext context)
+    {
+        throw new NotSupportedException(
+            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportAddingUnexpectedToken, GetType().Name));
+    }
 }

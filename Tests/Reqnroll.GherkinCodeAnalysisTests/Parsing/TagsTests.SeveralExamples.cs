@@ -51,7 +51,7 @@ public partial class TagsTests
                             TriviaList(),
                             "Tagged Examples",
                             TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([Whitespace("  ")]),
@@ -71,7 +71,7 @@ public partial class TagsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -104,34 +104,32 @@ public partial class TagsTests
                                                 Token(
                                                     TriviaList([Whitespace("      ")]),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList()),
-                                                SeparatedList<PlainTextSyntax>([
-                                                    LiteralText(
+                                                    TriviaList([Space])),
+                                                TableCellList([
+                                                    TextTableCell(
                                                         TableLiteral(
-                                                            TriviaList([Space]),
+                                                            TriviaList(),
                                                             "what",
-                                                            TriviaList([Space]))
-                                                    )
+                                                            TriviaList()))
                                                 ]),
                                                 Token(
-                                                    TriviaList(),
+                                                    TriviaList([Space]),
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("      ")]),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList()),
-                                                SeparatedList<PlainTextSyntax>([
-                                                    LiteralText(
+                                                    TriviaList([Space])),
+                                                TableCellList([
+                                                    TextTableCell(
                                                         TableLiteral(
-                                                            TriviaList([Space]),
+                                                            TriviaList(),
                                                             "foo",
-                                                            TriviaList([Whitespace("  ")]))
-                                                    )
+                                                            TriviaList()))
                                                 ]),
                                                 Token(
-                                                    TriviaList(),
+                                                    TriviaList([Whitespace("  ")]),
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([EnvironmentNewLine])))
                                         ]))
@@ -157,34 +155,32 @@ public partial class TagsTests
                                                 Token(
                                                     TriviaList([Whitespace("      ")]),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList()),
-                                                SeparatedList<PlainTextSyntax>([
-                                                    LiteralText(
+                                                    TriviaList([Space])),
+                                                TableCellList([
+                                                    TextTableCell(
                                                         TableLiteral(
-                                                            TriviaList([Space]),
+                                                            TriviaList(),
                                                             "what",
-                                                            TriviaList([Space]))
-                                                    )
+                                                            TriviaList()))
                                                 ]),
                                                 Token(
-                                                    TriviaList(),
+                                                    TriviaList([Space]),
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([EnvironmentNewLine]))),
                                             TableRow(
                                                 Token(
                                                     TriviaList([Whitespace("      ")]),
                                                     SyntaxKind.VerticalBarToken,
-                                                    TriviaList()),
-                                                SeparatedList<PlainTextSyntax>([
-                                                    LiteralText(
+                                                    TriviaList([Space])),
+                                                TableCellList([
+                                                    TextTableCell(
                                                         TableLiteral(
-                                                            TriviaList([Space]),
+                                                            TriviaList(),
                                                             "bar",
-                                                            TriviaList([Whitespace("  ")]))
-                                                    )
+                                                            TriviaList()))
                                                 ]),
                                                 Token(
-                                                    TriviaList(),
+                                                    TriviaList([Whitespace("  ")]),
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([EnvironmentNewLine])))
                                         ]))
@@ -200,7 +196,7 @@ public partial class TagsTests
                             Token(
                                 TriviaList(),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

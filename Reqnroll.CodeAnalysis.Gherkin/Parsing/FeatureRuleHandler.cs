@@ -10,6 +10,8 @@ internal class FeatureRuleHandler() : BaseRuleHandler(RuleType.Feature)
 {
     private TagsRuleHandler? _featureTagsRuleHandler;
     private FeatureHeaderRuleHandler? _featureHeaderRuleHandler;
+    private BackgroundRuleHandler? _backgroundRuleHandler;
+    private readonly List<ISyntaxBuilder> _memberHandlers = new();
 
     public FeatureSyntax.Internal? CreateFeatureDeclarationSyntax()
     {
@@ -18,14 +20,19 @@ internal class FeatureRuleHandler() : BaseRuleHandler(RuleType.Feature)
             return null;
         }
 
+        var members = _memberHandlers
+            .Select(handler => handler.CreateSyntax()!)
+            .Where(syntax => syntax != null)
+            .ToList();
+
         return Feature(
             _featureTagsRuleHandler?.Tags,
             _featureHeaderRuleHandler.Keyword ?? MissingToken(SyntaxKind.FeatureKeyword),
             _featureHeaderRuleHandler.Colon ?? MissingToken(SyntaxKind.ColonToken),
             _featureHeaderRuleHandler.Name ?? LiteralText(MissingToken(SyntaxKind.LiteralToken)),
             _featureHeaderRuleHandler.Description,
-            null,
-            null,
+            _backgroundRuleHandler?.CreateBackgroundSyntax(),
+            members.Count == 0 ? null : InternalSyntaxList.Create(members),
             null);
     }
 
@@ -41,22 +48,16 @@ internal class FeatureRuleHandler() : BaseRuleHandler(RuleType.Feature)
                 CodeAnalysisDebug.Assert(_featureHeaderRuleHandler == null, "Duplicate feature header from parser.");
                 return _featureHeaderRuleHandler = new FeatureHeaderRuleHandler();
 
-            default:
-                return base.StartChildRule(ruleType);
+            case RuleType.Background:
+                CodeAnalysisDebug.Assert(_backgroundRuleHandler == null, "Duplicate background from parser.");
+                return _backgroundRuleHandler = new BackgroundRuleHandler();
+
+            case RuleType.ScenarioDefinition:
+                var scenarioHandler = new ScenarioDefinitionRuleHandler();
+                _memberHandlers.Add(scenarioHandler);
+                return scenarioHandler;
         }
-    }
 
-    protected override void AppendScenarioLine(Token token, TextLine line, ParsingContext context)
-    {
-        // Scenario lines have the following layout:
-        //
-        // [keyword][colon] [name] [end-of-line]
-        //
-        // Leading whitespace characters are tracked by the Gherkin parser.
-        // The parser also provides the keyword text (without the trailing colon) and position, and the name text.
-    }
-
-    protected override void AppendStepLine(Token token, TextLine line, ParsingContext context)
-    {
+        return base.StartChildRule(ruleType);
     }
 }

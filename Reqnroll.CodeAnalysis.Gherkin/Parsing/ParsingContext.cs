@@ -75,6 +75,21 @@ internal class ParsingContext(SourceText text)
     }
 
     /// <summary>
+    /// Adds any whitespace from the start of a token to be included with the next syntax token.
+    /// </summary>
+    /// <param name="token">The token to check for leading trivia.</param>
+    /// <param name="line">The line to read the trivia from.</param>
+    public void AddLeadingWhitespace(Token token, TextLine line)
+    {
+        if (token.MatchedIndent == 0)
+        {
+            return;
+        }
+
+        AddLeadingWhitespace(new TextSpan(line.Start, token.MatchedIndent));
+    }
+
+    /// <summary>
     /// Adds leading trivia to be included with the next syntax token.
     /// </summary>
     /// <param name="trivia">A raw node representing the trivia to add. If the value is <c>null</c>, no node is added.</param>

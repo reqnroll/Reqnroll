@@ -63,7 +63,7 @@ public partial class BackgroundTests
                             Step(
                                 Token(
                                     TriviaList([Whitespace("    ")]),
-                                    SyntaxKind.GivenKeyword,
+                                    SyntaxKind.ContextStepKeyword,
                                     "Given",
                                     TriviaList([Space])),
                                 LiteralText(
@@ -74,12 +74,16 @@ public partial class BackgroundTests
                                             "the minimalism inside a background",
                                             TriviaList([EnvironmentNewLine])))))
                             ])),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
-                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
+                                TriviaList([
+                                    Whitespace("  "), EnvironmentNewLine,
+                                    Whitespace("  "), EnvironmentNewLine,
+                                    Whitespace("  ")
+                                ]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -93,8 +97,8 @@ public partial class BackgroundTests
                             steps : List([
                                 Step(
                                     Token(
-                                        TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -108,9 +112,12 @@ public partial class BackgroundTests
                                 ])),
                         Example(
                             Token(
-                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
+                                TriviaList([
+                                    Whitespace("  "), EnvironmentNewLine,
+                                    Whitespace("  ")
+                                ]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -124,8 +131,8 @@ public partial class BackgroundTests
                             steps : List([
                                 Step(
                                     Token(
-                                        TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(

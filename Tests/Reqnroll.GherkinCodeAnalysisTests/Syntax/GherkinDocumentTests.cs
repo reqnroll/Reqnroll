@@ -21,7 +21,7 @@ public class GherkinDocumentTests
         featureFile.GetLeadingTrivia().Should().BeEquivalentTo([SyntaxFactory.ElasticMarker]);
         featureFile.GetTrailingTrivia().Should().BeEquivalentTo([SyntaxFactory.ElasticMarker]);
         featureFile.GetDiagnostics().Should().BeEmpty();
-        featureFile.ChildNodesAndTokens().Should().BeEquivalentTo<SyntaxNodeOrToken>([featureFile.EndOfFileToken]);
+        featureFile.ChildNodesAndTokens().Should().BeEquivalentTo<SyntaxNodeOrToken<SyntaxNode>>([featureFile.EndOfFileToken]);
 
         featureFile.FeatureDeclaration.Should().BeNull();
 
@@ -50,7 +50,7 @@ public class GherkinDocumentTests
         featureFile.GetTrailingTrivia().Should().BeEquivalentTo([SyntaxFactory.ElasticMarker]);
         featureFile.GetDiagnostics().Should().BeEmpty();
 
-        featureFile.ChildNodesAndTokens().Should().BeEquivalentTo<SyntaxNodeOrToken>(
+        featureFile.ChildNodesAndTokens().Should().BeEquivalentTo<SyntaxNodeOrToken<SyntaxNode>>(
             [featureFile.FeatureDeclaration, featureFile.EndOfFileToken]);
 
         featureFile.FeatureDeclaration.Should().NotBeNull();

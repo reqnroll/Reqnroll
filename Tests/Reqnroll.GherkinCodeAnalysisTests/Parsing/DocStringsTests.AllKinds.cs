@@ -82,12 +82,12 @@ public partial class DocStringsTests
                             TriviaList(),
                             "DocString variations",
                             TriviaList([EnvironmentNewLine]))),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -102,7 +102,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -147,7 +147,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -194,7 +194,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.AndKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -227,7 +227,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.AndKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -264,7 +264,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.AndKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -305,7 +305,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.AndKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -346,7 +346,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.AndKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -387,7 +387,7 @@ public partial class DocStringsTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.AndKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
                                     LiteralText(

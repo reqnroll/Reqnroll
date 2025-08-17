@@ -1,5 +1,4 @@
 ﻿using Gherkin;
-using System.Runtime.ExceptionServices;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
@@ -15,16 +14,11 @@ internal class SyntaxParser : Parser<GherkinSyntaxTree>
 
     protected override void AddError(ParserContext context, ParserException error)
     {
-        if (error is ParsingException parsingException)
+        if (error is ParserImplementationException parsingException)
         {
             parsingException.Exception.Throw();
         }
 
         _builder.AddError(error);
     }
-}
-
-internal class ParsingException(ExceptionDispatchInfo exception) : ParserException(exception.SourceException.Message)
-{
-    public ExceptionDispatchInfo Exception { get; } = exception;
 }

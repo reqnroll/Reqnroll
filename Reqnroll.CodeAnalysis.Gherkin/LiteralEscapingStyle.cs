@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Reqnroll.CodeAnalysis.Gherkin.Parsing;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 
 namespace Reqnroll.CodeAnalysis.Gherkin;
@@ -38,4 +39,6 @@ internal abstract class LiteralEscapingStyle
     protected bool RequiresEscaping(string value) => value.Any(RequiresEscaping);
 
     protected abstract bool RequiresEscaping(char c);
+
+    public abstract string Unescape(SourceTextSpan value);
 }

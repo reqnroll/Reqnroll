@@ -54,7 +54,7 @@ public partial class FeatureTests
                                 TriviaList([EnvironmentNewLine]))
                         ]))),
                 Token(
-                    TriviaList([EnvironmentNewLine]),
+                    TriviaList(),
                     SyntaxKind.EndOfFileToken,
                     TriviaList())));
 

@@ -131,10 +131,10 @@ internal static class SlotHelper
                     typeName = $"SyntaxList<{((INamedTypeSymbol)property.Type).TypeArguments[0].Name}>";
                     isOptional = true;
                 }
-                else if (property.Type.IsSeparatedSyntaxList())
+                else if (property.Type.IsTableCellSyntaxList())
                 {
                     nodeType = SyntaxNodeType.SyntaxList;
-                    typeName = $"SeparatedSyntaxList<{((INamedTypeSymbol)property.Type).TypeArguments[0].Name}>";
+                    typeName = "TableCellSyntaxList";
                     isOptional = true;
                 }
                 else

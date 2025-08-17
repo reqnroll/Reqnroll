@@ -38,12 +38,12 @@ public partial class ScenarioTests
                             TriviaList(),
                             "Minimal",
                             TriviaList([EnvironmentNewLine]))),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList([Space])),
                             Token(
                                 TriviaList(),
@@ -58,7 +58,7 @@ public partial class ScenarioTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(

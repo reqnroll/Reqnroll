@@ -126,37 +126,40 @@
   <data name="RuleHandlerDoesNotSupportChildRuleType" xml:space="preserve">
     <value>Parsing rule handler "{0}" does not support having child rules of type "{1}".</value>
   </data>
-    <data name="RuleHandlerDoesNotSupportAddingFeatureLines" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding feature lines.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingRuleLines" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding rule lines.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingBackgroundLines" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding background lines.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingScenarioLines" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding scenario lines.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingExamplesLines" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding examples lines.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingStepLines" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding step lines.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingDocStringSeparator" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding doc string separator.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingTableRows" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding table rows.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingLanguageComments" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding language comments.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingOtherText" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding other text.</value>
-</data>
-    <data name="RuleHandlerDoesNotSupportAddingEndOfFileMarker" xml:space="preserve">
-  <value>Parsing rule handler "{0}" does not support adding an end of file marker.</value>
-</data>
+  <data name="RuleHandlerDoesNotSupportAddingFeatureLines" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding feature lines.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingRuleLines" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding rule lines.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingBackgroundLines" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding background lines.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingScenarioLines" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding scenario lines.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingExamplesLines" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding examples lines.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingStepLines" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding step lines.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingDocStringSeparator" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding doc string separator.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingTableRows" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding table rows.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingLanguageComments" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding language comments.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingOtherText" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding other text.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingEndOfFileMarker" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding an end of file marker.</value>
+  </data>
+  <data name="RuleHandlerDoesNotSupportAddingUnexpectedToken" xml:space="preserve">
+    <value>Parsing rule handler "{0}" does not support adding unexpected tokens.</value>
+  </data>
 </root>

@@ -113,11 +113,16 @@ public readonly struct SyntaxTrivia : IEquatable<SyntaxTrivia>
     /// <summary>
     /// Gets the structure of the trivia, if it has structure.
     /// </summary>
-    /// <returns>If the trivia has structure, the <see cref="StructuredTriviaSyntax"/> representing the structure 
-    /// of the trivia; otherwise <c>null</c>.</returns>
-    public StructuredTriviaSyntax? GetStructure() => HasStructure ? 
-        InternalNode!.CreateStructuredTriviaSyntaxNode(this) : 
+    /// <value>If the trivia has structure, the <see cref="StructuredTriviaSyntax"/> representing the structure 
+    /// of the trivia; otherwise <c>null</c>.</value>
+    public StructuredTriviaSyntax? Structure => HasStructure ?
+        InternalNode!.CreateStructuredTriviaSyntaxNode(this) :
         null;
+
+    /// <summary>
+    /// Gets the text contained by this trivia.
+    /// </summary>
+    public string? Text => InternalNode?.ToString();
 
     private string GetDebuggerDisplay() => 
         GetType().Name + " " + Kind.ToString() + " " + ToString();

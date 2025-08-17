@@ -18,8 +18,6 @@ internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
         //
         // [description-literal] [end-of-line]
 
-        InternalNode? trailing;
-
         // Blank lines will be matched as "other" in this context.
         // If these lines occur between text lines, they are treated as part of the text.
         // If they occur at the start of the description, they are treated as leading trivia.
@@ -27,8 +25,8 @@ internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
         if (token.MatchedText.Length == 0)
         {
             // The line is completely empty.
-            trailing = line.GetEndOfLineTrivia();
-            context.AddLeadingTrivia(trailing);
+            var trivia = line.GetEndOfLineTrivia();
+            context.AddLeadingTrivia(trivia);
             return;
         }
         else if (token.MatchedText.All(char.IsWhiteSpace))
@@ -41,12 +39,11 @@ internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
         // We need to trim the start and end of the string to yield the correct output.
         var text = token.MatchedText.AsSpan(token.Line.Indent).TrimEnd().ToString();
 
-        trailing = context.SourceText.ConsumeWhitespace(line.Start + token.Line.Indent + text.Length, line.End) +
+        var leading = context.ConsumeLeadingTriviaAndWhitespace(line, token);
+        var trailing = context.SourceText.ConsumeWhitespace(line.Start + token.Line.Indent + text.Length, line.End) +
             line.GetEndOfLineTrivia();
 
-        // Unfortunately, description text can contain interpolation, which means we need to buffer all the text,
-        // including trivia, then decide at the end of the block whether to encode as literal or interpolated syntax.
-        _plainTextParser.AppendText(context.ConsumeLeadingTrivia(), text, trailing);
+        _plainTextParser.AppendText(leading, text, trailing);
     }
 
     public PlainTextSyntax.Internal? CreateDescriptionSyntax() => _plainTextParser.ParseText();

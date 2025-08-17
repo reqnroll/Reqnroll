@@ -1,4 +1,5 @@
 ﻿using FluentAssertions;
+using FluentAssertions.Equivalency;
 using Microsoft.CodeAnalysis.Text;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
@@ -22,16 +23,19 @@ public class SkippedTokensTriviaTests
 
         skippedTokensTrivia.Span.Should().Be(TextSpan.FromBounds(0, length));
         skippedTokensTrivia.FullSpan.Should().Be(TextSpan.FromBounds(0, fullLength));
+
         skippedTokensTrivia.GetFirstToken().Should().BeEquivalentTo(token);
         skippedTokensTrivia.GetLastToken().Should().BeEquivalentTo(token);
+
         skippedTokensTrivia.HasLeadingTrivia.Should().BeFalse();
         skippedTokensTrivia.HasTrailingTrivia.Should().BeTrue();
-        skippedTokensTrivia.HasDiagnostics.Should().BeFalse();
         skippedTokensTrivia.GetLeadingTrivia().Should().BeEmpty();
         skippedTokensTrivia.GetTrailingTrivia().Should().BeEquivalentTo([Space]);
+
+        skippedTokensTrivia.HasDiagnostics.Should().BeFalse();
         skippedTokensTrivia.GetDiagnostics().Should().BeEmpty();
 
-        skippedTokensTrivia.ChildNodesAndTokens().Should().BeEquivalentTo([ (SyntaxNodeOrToken)token ]);
+        skippedTokensTrivia.ChildNodesAndTokens().Should().BeEquivalentTo([ (SyntaxNodeOrToken<SyntaxNode>)token ]);
 
         skippedTokensTrivia.Kind.Should().Be(SyntaxKind.SkippedTokensTrivia);
         skippedTokensTrivia.Tokens.Should().BeEquivalentTo([Literal(TriviaList(), "invalid", TriviaList([Space]))]);
@@ -70,7 +74,7 @@ public class SkippedTokensTriviaTests
         skippedTrivia.FullSpan.Should().Be(TextSpan.FromBounds(0, "invalid ".Length));
 
         skippedTrivia.Kind.Should().Be(SyntaxKind.SkippedTokensTrivia);
-        var skippedTokens = skippedTrivia.GetStructure()!;
+        var skippedTokens = skippedTrivia.Structure!;
 
         skippedTokens.Should().NotBeNull();
         skippedTokens.Kind.Should().Be(SyntaxKind.SkippedTokensTrivia);

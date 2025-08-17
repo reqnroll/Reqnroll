@@ -1,8 +1,9 @@
-﻿using Reqnroll.CodeAnalysis.Gherkin.Syntax;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
+[DebuggerStepThrough]
 internal static class CodeAnalysisDebug
 {
     /// <inheritdoc cref="Debug.Assert(bool, string)"/>

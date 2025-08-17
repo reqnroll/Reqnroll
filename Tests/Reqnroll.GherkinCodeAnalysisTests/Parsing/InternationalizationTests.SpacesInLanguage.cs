@@ -44,7 +44,7 @@ public partial class InternationalizationTests
                             TriviaList(),
                             "STUFFING",
                             TriviaList([EnvironmentNewLine]))),
-                    members: List<ExampleSyntax>()),
+                    examples: List<ExampleSyntax>()),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,

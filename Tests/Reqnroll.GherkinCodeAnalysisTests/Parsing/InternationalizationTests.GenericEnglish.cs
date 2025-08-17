@@ -56,12 +56,12 @@ public partial class InternationalizationTests
                             TriviaList(),
                             "Language directive",
                             TriviaList([EnvironmentNewLine]))),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -76,7 +76,7 @@ public partial class InternationalizationTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(

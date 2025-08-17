@@ -6,11 +6,11 @@
 [SyntaxNode]
 public abstract partial class BehaviorGroupSyntax : DeclarationSyntax
 {
-    [SyntaxSlot(SyntaxKind.Background, "The optional background of the feature.", LocatedAfter = nameof(Description))]
+    [SyntaxSlot(SyntaxKind.Background, "The optional background of the group.", LocatedAfter = nameof(Description))]
     [ParameterGroup("Untagged")]
     public abstract BackgroundSyntax? Background { get; }
 
     [SyntaxSlot(SyntaxKind.Example, "The examples declared by this group.")]
     [ParameterGroup("Untagged")]
-    public abstract SyntaxList<ExampleSyntax> Members { get; }
+    public abstract SyntaxList<ExampleSyntax> Examples { get; }
 }

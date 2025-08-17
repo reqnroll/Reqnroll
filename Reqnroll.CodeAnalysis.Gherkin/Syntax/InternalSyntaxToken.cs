@@ -165,6 +165,7 @@ internal partial class InternalSyntaxToken : InternalNode
     {
         return kind switch
         {
+            SyntaxKind.VerticalBarToken => "|",
             SyntaxKind.ColonToken => ":",
             SyntaxKind.AtToken => "@",
             SyntaxKind.HashToken => "#",

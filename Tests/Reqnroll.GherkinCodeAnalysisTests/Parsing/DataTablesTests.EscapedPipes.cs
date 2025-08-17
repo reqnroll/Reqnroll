@@ -23,6 +23,7 @@ public partial class DataTablesTests
                 Given they have arrived
                   | \|æ\\n     | \o\no\  |
                   | \\\|a\\\\n | ø\\\nø\\|
+
             """;
 
         var tree = GherkinSyntaxTree.ParseText(source);
@@ -53,14 +54,14 @@ public partial class DataTablesTests
                             Literal(
                                 TriviaList([Whitespace("    ")]),
                                 "iff it is followed by a |-character, a \\-character or an n.",
-                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
+                                TriviaList([EnvironmentNewLine]))
                         ])),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
-                                TriviaList([Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -75,82 +76,13 @@ public partial class DataTablesTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
                                         TokenList([
-                                            Token(
+                                            Literal(
                                                 TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "they have arrived",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
-                                    StepTable(
-                                        Table(
-                                            List([
-                                                TableRow(
-                                                    Token(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        SyntaxKind.VerticalBarToken,
-                                                        TriviaList()),
-                                                    SeparatedList<PlainTextSyntax>([
-                                                        LiteralText(
-                                                            TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "æ",
-                                                                TriviaList([Space]))),
-                                                        Token(
-                                                            TriviaList(),
-                                                            SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
-                                                            TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "o",
-                                                                TriviaList([Space])))
-                                                    ]),
-                                                    Token(
-                                                        TriviaList(),
-                                                        SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewLine]))),
-                                                TableRow(
-                                                    Token(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        SyntaxKind.VerticalBarToken,
-                                                        TriviaList()),
-                                                    SeparatedList<PlainTextSyntax>([
-                                                        LiteralText(
-                                                            TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "a",
-                                                                TriviaList([Space]))),
-                                                        Token(
-                                                            TriviaList(),
-                                                            SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
-                                                            TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "ø",
-                                                                TriviaList([Space])))
-                                                    ]),
-                                                    Token(
-                                                        TriviaList(),
-                                                        SyntaxKind.VerticalBarToken,
-                                                        TriviaList([EnvironmentNewLine])))
-                                            ])))),
-                                Step(
-                                    Token(
-                                        TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
-                                        "Given",
-                                        TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
                                                 "they have arrived",
                                                 TriviaList([EnvironmentNewLine]))
                                         ])),
@@ -162,49 +94,116 @@ public partial class DataTablesTests
                                                         TriviaList([Whitespace("      ")]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    SeparatedList<PlainTextSyntax>([
-                                                        LiteralText(
+                                                    TableCellList([
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "\\|æ\\\\n",
-                                                                "|æ\n",
-                                                                TriviaList([Whitespace("     ")]))),
+                                                                TriviaList(),
+                                                                "æ",
+                                                                TriviaList())),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "\\o\\no\\",
-                                                                "\\o\\no\\",
-                                                                TriviaList([Whitespace("  ")])))
+                                                                TriviaList(),
+                                                                "o",
+                                                                TriviaList()))
                                                     ]),
                                                     Token(
-                                                        TriviaList(),
+                                                        TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
                                                         TriviaList([Whitespace("      ")]),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList()),
-                                                    SeparatedList<PlainTextSyntax>([
-                                                        LiteralText(
+                                                        TriviaList([Space])),
+                                                    TableCellList([
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "\\\\\\|a\\\\\\\\n",
-                                                                "\\|a\\\\n",
-                                                                TriviaList([Space]))),
+                                                                TriviaList(),
+                                                                "a",
+                                                                TriviaList())),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
-                                                                "ø\\\\\\nø\\\\|",
-                                                                "ø\\\nø\\\\|",
+                                                                TriviaList(),
+                                                                "ø",
+                                                                TriviaList()))
+                                                    ]),
+                                                    Token(
+                                                        TriviaList([Space]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewLine])))
+                                            ])))),
+                                Step(
+                                    Token(
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.ContextStepKeyword,
+                                        "Given",
+                                        TriviaList([Space])),
+                                    LiteralText(
+                                        TokenList([
+                                            Literal(
+                                                TriviaList(),
+                                                "they have arrived",
+                                                TriviaList([EnvironmentNewLine]))
+                                        ])),
+                                    StepTable(
+                                        Table(
+                                            List([
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([Space])),
+                                                    TableCellList([
+                                                        TextTableCell(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                @"\|æ\\n",
+                                                                "|æ\\n",
+                                                                TriviaList())),
+                                                        Token(
+                                                            TriviaList([Whitespace("     ")]),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                @"\o\no\",
+                                                                "\\o\no\\",
+                                                                TriviaList()))
+                                                    ]),
+                                                    Token(
+                                                        TriviaList([Whitespace("  ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([EnvironmentNewLine]))),
+                                                TableRow(
+                                                    Token(
+                                                        TriviaList([Whitespace("      ")]),
+                                                        SyntaxKind.VerticalBarToken,
+                                                        TriviaList([Space])),
+                                                    TableCellList([
+                                                        TextTableCell(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                @"\\\|a\\\\n",
+                                                                "\\|a\\\\n",
+                                                                TriviaList())),
+                                                        Token(
+                                                            TriviaList([Space]),
+                                                            SyntaxKind.VerticalBarToken,
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
+                                                            TableLiteral(
+                                                                TriviaList(),
+                                                                @"ø\\\nø\\",
+                                                                "ø\\\nø\\",
                                                                 TriviaList()))
                                                     ]),
                                                     Token(

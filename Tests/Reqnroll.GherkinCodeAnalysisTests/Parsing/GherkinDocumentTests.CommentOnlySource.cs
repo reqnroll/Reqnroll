@@ -21,7 +21,7 @@ public partial class GherkinDocumentTests
             GherkinDocument()
                 .WithEndOfFileToken(
                     Token(
-                        TriviaList([Comment("# Just a comment"), EnvironmentNewLine]),
+                        TriviaList([Comment("# Just a comment")]),
                         SyntaxKind.EndOfFileToken,
                         TriviaList()))
         );

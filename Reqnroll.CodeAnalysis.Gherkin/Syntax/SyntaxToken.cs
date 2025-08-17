@@ -46,12 +46,12 @@ public readonly struct SyntaxToken : IEquatable<SyntaxToken>
     /// <summary>
     /// Determines whether this node has any leading trivia.
     /// </summary>
-    public bool HasLeadingTrivia => LeadingTrivia.Count > 0;
+    public bool HasLeadingTrivia => InternalNode?.HasLeadingTrivia ?? false;
 
     /// <summary>
     /// Determines whether this node has any leading trivia.
     /// </summary>
-    public bool HasTrailingTrivia => TrailingTrivia.Count > 0;
+    public bool HasTrailingTrivia => InternalNode?.HasTrailingTrivia ?? false;
 
     /// <summary>
     /// Gets the absolute span of this node in characters, not including its leading and trailing trivia.

@@ -4,7 +4,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 using static SyntaxFactory;
 
-public partial class FeatureTests
+public partial class GherkinDocumentTests
 {
     [Fact]
     public void InvalidFeatureSourceTextCreatesTreeWithSkippedTokensAndDiagnostic()

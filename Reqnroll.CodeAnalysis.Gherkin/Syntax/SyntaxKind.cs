@@ -38,11 +38,6 @@ public enum SyntaxKind : ushort
     AtToken,
 
     /// <summary>
-    /// The token is the asterisk symbol <c>*</c>
-    /// </summary>
-    AsteriskToken,
-
-    /// <summary>
     /// The token is the less-than symbol <c>&lt;</c>
     /// </summary>
     LessThanToken,
@@ -95,29 +90,29 @@ public enum SyntaxKind : ushort
     ExamplesKeyword,
 
     /// <summary>
-    /// The token is a "given" keyword.
+    /// The token is a step keyword to establish context (e.g. "Given".)
     /// </summary>
-    GivenKeyword,
+    ContextStepKeyword,
 
     /// <summary>
-    /// The token is a "when" keyword.
+    /// The token is a step keyword to perform an action (e.g. "When".)
     /// </summary>
-    WhenKeyword,
+    ActionStepKeyword,
 
     /// <summary>
-    /// The token is a "then" keyword.
+    /// The token is a step keyword to test the outcome (e.g "Then".)
     /// </summary>
-    ThenKeyword,
+    OutcomeStepKeyword,
 
     /// <summary>
-    /// The token is an "and" keyword.
+    /// The token is a step keyword that represents a continuation of a previous step (e.g. "And", "But".)
     /// </summary>
-    AndKeyword,
+    ConjunctionStepKeyword,
 
     /// <summary>
-    /// The token is a "but" keyword.
+    /// The token is a step keyword that matches any step type (e.g. "*".)
     /// </summary>
-    ButKeyword,
+    WildcardStepKeyword,
 
     // Other text-containing tokens //
 
@@ -234,6 +229,16 @@ public enum SyntaxKind : ushort
     /// The node is a data row within a table.
     /// </summary>
     TableRow,
+
+    /// <summary>
+    /// The node is a cell within a table row which contains text.
+    /// </summary>
+    TextTableCell,
+
+    /// <summary>
+    /// The node is a cell within a table row which has no content.
+    /// </summary>
+    EmptyTableCell,
 
     /// <summary>
     /// The node is a Doc String, a delimited, multi-line block of text.

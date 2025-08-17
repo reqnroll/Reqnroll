@@ -1,74 +1,41 @@
 ﻿using Gherkin;
 using Microsoft.CodeAnalysis.Text;
 using Reqnroll.CodeAnalysis.Gherkin.Syntax;
-using System.Diagnostics;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
-
-using static InternalSyntaxFactory;
 
 internal class FeatureHeaderRuleHandler() : BaseRuleHandler(RuleType.FeatureHeader)
 {
     private DescriptionRuleHandler? _descriptionRuleHandler;
 
-    public InternalNode? Keyword { get; private set; }
+    private TagsRuleHandler? _tagsRuleHandler;
 
-    public InternalNode? Colon { get; private set; }
+    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.FeatureKeyword);
 
-    public InternalNode? Name { get; private set; }
+    public InternalNode? Keyword => _declarationHelper.Keyword;
+
+    public InternalNode? Colon => _declarationHelper.Colon;
+
+    public InternalNode? Name => _declarationHelper.Name;
 
     protected override void AppendFeatureLine(Token token, TextLine line, ParsingContext context)
     {
-        // Convert the line into tokens such that all characters are consumed.
-        // Feature lines have the following layout:
-        //
-        // [keyword][colon] [name] [end-of-line]
-        //
-        // Leading whitespace characters are tracked by the Gherkin parser.
-        // The parser also provides the keyword text (without the trailing colon) and position, and the name text.
+        CodeAnalysisDebug.Assert(_declarationHelper.Keyword == null, "Duplicate feature line from parser.");
 
-        // Extract the whitespace between the colon and feature name.
-        // Should just be a space, but we can read to be sure.
-        var colonPosition = line.Start + token.Line.Indent + token.MatchedKeyword.Length;
-        var colonWhitespace = context.SourceText.ConsumeWhitespace(colonPosition + 1, line.End);
-
-        var leading = context.ConsumeLeadingTriviaAndWhitespace(line, token);
-
-        Keyword = Token(leading, SyntaxKind.FeatureKeyword, token.MatchedKeyword, null);
-        Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
-
-        InternalNode? nameToken;
-
-        if (string.IsNullOrEmpty(token.MatchedText))
-        {
-            // If the feature name is empty, we create a missing token for it.
-            nameToken = MissingToken(null, SyntaxKind.LiteralToken, line.GetEndOfLineTrivia());
-        }
-        else
-        {
-            // Extract any whitespace between the end of the feature name and the end of the line.
-            var featureNameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
-            InternalNode? nameWhitespace = context.SourceText
-                .ConsumeWhitespace(featureNameEndPosition, line.End);
-
-            nameWhitespace += line.GetEndOfLineTrivia();
-
-            nameToken = Literal(
-                null,
-                LiteralEscapingStyle.Default.Escape(token.MatchedText),
-                token.MatchedText,
-                nameWhitespace);
-        }
-
-        Name = LiteralText(nameToken);
+        _declarationHelper.DeconstructDeclarationToken(token, line, context);
     }
 
     public override ParsingRuleHandler StartChildRule(RuleType ruleType)
     {
-        if (ruleType == RuleType.Description)
+        switch (ruleType)
         {
-            Debug.Assert(_descriptionRuleHandler == null, "Duplicate description from parser.");
-            return _descriptionRuleHandler = new();
+            case RuleType.Tags:
+                CodeAnalysisDebug.Assert(_tagsRuleHandler == null, "Duplicate tags from parser.");
+                return _tagsRuleHandler = new();
+
+            case RuleType.Description:
+                CodeAnalysisDebug.Assert(_descriptionRuleHandler == null, "Duplicate description from parser.");
+                return _descriptionRuleHandler = new();
         }
 
         return base.StartChildRule(ruleType);

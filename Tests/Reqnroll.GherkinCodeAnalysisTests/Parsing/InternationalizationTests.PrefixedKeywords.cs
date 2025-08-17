@@ -64,7 +64,7 @@ public partial class InternationalizationTests
                                 "In this scenario the parser should prefer the longest keyword.",
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
                         ])),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([Whitespace("  ")]),
@@ -84,7 +84,7 @@ public partial class InternationalizationTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Sipoze ke",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -95,7 +95,7 @@ public partial class InternationalizationTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.AndKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "Ak",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -106,7 +106,7 @@ public partial class InternationalizationTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.WhenKeyword,
+                                        SyntaxKind.ActionStepKeyword,
                                         "Le",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -117,7 +117,7 @@ public partial class InternationalizationTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.ThenKeyword,
+                                        SyntaxKind.OutcomeStepKeyword,
                                         "Le sa a",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -128,7 +128,7 @@ public partial class InternationalizationTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.ButKeyword,
+                                        SyntaxKind.ConjunctionStepKeyword,
                                         "Men",
                                         TriviaList([Space])),
                                     LiteralText(

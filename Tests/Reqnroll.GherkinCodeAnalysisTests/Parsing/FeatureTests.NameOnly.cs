@@ -35,7 +35,7 @@ public partial class FeatureTests
                             TriviaList(),
                             "Empty feature",
                             TriviaList([EnvironmentNewLine]))),
-                    members: List<ExampleSyntax>()
+                    examples: List<ExampleSyntax>()
                 ),
                 Token(
                     TriviaList(),

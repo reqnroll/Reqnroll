@@ -55,7 +55,7 @@ public partial class InternationalizationTests
                             TriviaList(),
                             "i18n support",
                             TriviaList([EnvironmentNewLine]))),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),

@@ -156,8 +156,8 @@
   <data name="TokenMustBeLiteralToken" xml:space="preserve">
     <value>Value must be a literal token.</value>
   </data>
-  <data name="TokenMustBeOneOfGivenKeywordWhenKeywordThenKeywordAndKeywordButKeywordAsteriskToken" xml:space="preserve">
-    <value>Value must be one of a "given", "when", "then", "and" or "but" keyword tokens or an asterisk ("*") token.</value>
+  <data name="TokenMustBeOneOfContextStepKeywordActionStepKeywordOutcomeStepKeywordConjunctionStepKeywordConjunctionStepKeywordWildcardStepKeyword" xml:space="preserve">
+    <value>Value must be one of a "given", "when", "then", "and" or "but" keyword tokens or a token that matches any step.</value>
   </data>
   <data name="TokenMustBeOneOfInterpolatedLiteralTokenInterpolatedTableLiteralToken" xml:space="preserve">
     <value>Value must be an interpolated literal token.</value>

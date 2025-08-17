@@ -24,6 +24,7 @@ public partial class DataTablesTests
                 Given a pirate crew
                   | Luffy | Zorro | Doflamingo \
                   | Nami  | Brook | BlackBeard
+
             """;
 
         var tree = GherkinSyntaxTree.ParseText(source);
@@ -60,24 +61,20 @@ public partial class DataTablesTests
                                 "the table.",
                                 TriviaList([EnvironmentNewLine])),
                             Literal(
-                                TriviaList([Whitespace("  ")]),
-                                Environment.NewLine,
-                                TriviaList([EnvironmentNewLine])),
-                            Literal(
-                                TriviaList([Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 "It is not recommended to use this feature, but",
                                 TriviaList([EnvironmentNewLine])),
                             Literal(
                                 TriviaList([Whitespace("  ")]),
                                 "it is how the implementation currently works.",
-                                TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
+                                TriviaList([EnvironmentNewLine]))
                         ])),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
-                                TriviaList([Whitespace("  ")]),
+                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -92,7 +89,7 @@ public partial class DataTablesTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -107,29 +104,30 @@ public partial class DataTablesTests
                                                     Token(
                                                         TriviaList([Whitespace("      ")]),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList()),
-                                                    SeparatedList<PlainTextSyntax>([
-                                                        LiteralText(
+                                                        TriviaList([Space])),
+                                                    TableCellList([
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
+                                                                TriviaList(),
                                                                 "Luffy",
-                                                                TriviaList([Space]))),
+                                                                TriviaList())),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
+                                                                TriviaList(),
                                                                 "Zorro",
-                                                                TriviaList([Space]))),
+                                                                TriviaList())),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
+                                                                TriviaList(),
+                                                                "Doflamingo \\",
                                                                 "Doflamingo \\",
                                                                 TriviaList()))
                                                     ]),
@@ -139,31 +137,31 @@ public partial class DataTablesTests
                                                         TriviaList([EnvironmentNewLine]))),
                                                 TableRow(
                                                     Token(
-                                                        TriviaList([Whitespace("    ")]),
+                                                        TriviaList([Whitespace("      ")]),
                                                         SyntaxKind.VerticalBarToken,
-                                                        TriviaList()),
-                                                    SeparatedList<PlainTextSyntax>([
-                                                        LiteralText(
+                                                        TriviaList([Space])),
+                                                    TableCellList([
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
+                                                                TriviaList(),
                                                                 "Nami",
-                                                                TriviaList([Whitespace("  ")]))),
+                                                                TriviaList())),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "Brook",
-                                                                TriviaList([Space]))),
+                                                                TriviaList())),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        LiteralText(
+                                                            TriviaList([Space])),
+                                                        TextTableCell(
                                                             TableLiteral(
-                                                                TriviaList([Space]),
+                                                                TriviaList(),
                                                                 "BlackBeard",
                                                                 TriviaList()))
                                                     ]),

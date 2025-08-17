@@ -11,7 +11,7 @@ public sealed partial class FeatureSyntax : BehaviorGroupSyntax
     [ParameterGroup("Minimal")]
     public partial SyntaxToken FeatureKeyword { get; }
 
-    [SyntaxSlot(SyntaxKind.Rule, "The rules which form the feature.", LocatedAfter = nameof(Members))]
+    [SyntaxSlot(SyntaxKind.Rule, "The rules which form the feature.", LocatedAfter = nameof(Examples))]
     [ParameterGroup("Untagged")]
     public partial SyntaxList<RuleSyntax> Rules { get; }
 

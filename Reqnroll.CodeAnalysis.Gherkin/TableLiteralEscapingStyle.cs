@@ -1,4 +1,6 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using Reqnroll.CodeAnalysis.Gherkin.Parsing;
+using System.Diagnostics.CodeAnalysis;
+using System.Text;
 
 namespace Reqnroll.CodeAnalysis.Gherkin;
 
@@ -19,5 +21,17 @@ internal class TableLiteralEscapingStyle : DefaultLiteralEscapingStyle
         }
 
         return base.TryEncode(c, out encoded);
+    }
+
+    protected override bool TryUnescapeSequence(SourceTextSpan sourceTextSpan, StringBuilder stringBuilder, out int consumed)
+    {
+        if (sourceTextSpan[0] == '|')
+        {
+            stringBuilder.Append('|');
+            consumed = 1;
+            return true;
+        }
+
+        return base.TryUnescapeSequence(sourceTextSpan, stringBuilder, out consumed);
     }
 }

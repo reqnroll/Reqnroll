@@ -76,7 +76,7 @@ public partial class RuleTests
                                     Step(
                                         Token(
                                             TriviaList([Whitespace("      ")]),
-                                            SyntaxKind.GivenKeyword,
+                                            SyntaxKind.ContextStepKeyword,
                                             "Given",
                                             TriviaList([Space])),
                                         LiteralText(
@@ -89,12 +89,12 @@ public partial class RuleTests
                                             ])))
                                 ])
                             ),
-                            members: List([
+                            examples: List([
                                 Example(
                                     Token(
                                         TriviaList([EnvironmentNewLine, Whitespace("    ")]),
                                         SyntaxKind.ExampleKeyword,
-                                        "Example",
+                                        "Scenario",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -109,7 +109,7 @@ public partial class RuleTests
                                         Step(
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
-                                                SyntaxKind.GivenKeyword,
+                                                SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
                                             LiteralText(

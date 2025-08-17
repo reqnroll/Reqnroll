@@ -39,16 +39,6 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
 
     private readonly CancellationToken _cancellationToken;
 
-    private static readonly string[] TriviaTokenTypes = 
-        [
-            "#Language",
-            "#Comment",
-            "#Empty",
-            "#EOF"
-        ];
-
-    private static readonly HashSet<string> FeatureTagTokenTypes = ["#FeatureLine", "#TagLine"];
-
     public ParsedSyntaxTreeBuilder(
         GherkinParseOptions parseOptions,
         SourceText text,
@@ -81,7 +71,26 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
     public void StartRule(RuleType ruleType)
     {
         _cancellationToken.ThrowIfCancellationRequested();
-        _ruleHandlers.Push(CurrentRuleHandler.StartChildRule(ruleType));
+
+        ParsingRuleHandler childHandler;
+
+        try
+        {
+            childHandler = CurrentRuleHandler.StartChildRule(ruleType);
+        }
+        catch (Exception ex)
+        {
+            throw new ParserImplementationException(ExceptionDispatchInfo.Capture(ex));
+        }
+
+        CodeAnalysisDebug.Assert(
+            childHandler.RuleType == ruleType,
+            "Parser recieved a handler of wrong type.",
+            "The parser requested a handler for a rule of type {0} but got a handler for type {1}",
+            ruleType,
+            childHandler.RuleType);
+
+        _ruleHandlers.Push(childHandler);
     }
 
     /// <summary>
@@ -109,15 +118,15 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
     /// <param name="token">The token to add.</param>
     public void Build(Token token)
     {
+        _cancellationToken.ThrowIfCancellationRequested();
+
         try
         {
-            _cancellationToken.ThrowIfCancellationRequested();
-
             CurrentRuleHandler.AppendToken(token, _context);
         }
         catch (Exception ex)
         {
-            throw new ParsingException(ExceptionDispatchInfo.Capture(ex));
+            throw new ParserImplementationException(ExceptionDispatchInfo.Capture(ex));
         }
     }
 
@@ -131,6 +140,8 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
 
     internal void AddError(ParserException error)
     {
+        _cancellationToken.ThrowIfCancellationRequested();
+
         // If the parser encounters an error, we still want to include the source text in the syntax tree.
         //
         // Where possible, we'll take a partially-valid line and include the syntax in the tree with missing tokens added
@@ -139,19 +150,18 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         // If the line is completely invalid, we add it to the tree as "skipped tokens", in the trivia of tokens
         // at the point at which the parser was able to recover.
 
-        var message = error.Message.Substring(error.Message.IndexOf(')') + 1);
-
         switch (error)
         {
             case UnexpectedTokenException ute:
-                {
-                    AddUnexpectedToken(ute, message);
-                    break;
-                }
+                AddUnexpectedToken(ute);
+                break;
+
+            default:
+                throw new NotImplementedException();
         }
     }
 
-    private void AddUnexpectedToken(UnexpectedTokenException exception, string message)
+    private void AddUnexpectedToken(UnexpectedTokenException exception)
     {
         // Unexpected tokens are the parser's way of indicating it doesn't know how to interpret the current line.
         // A misspelled keyword or incorrect formatting of a line can cause this.
@@ -159,43 +169,7 @@ internal partial class ParsedSyntaxTreeBuilder : IAstBuilder<GherkinSyntaxTree>
         // for now we'll treat all these errors generically and treat them as skipped tokens.
         var token = exception.ReceivedToken;
         var line = _context.SourceText.Lines[token.Line.LineNumber - 1];
-        var contentSpan = TextSpan.FromBounds(line.Start + token.MatchedIndent, line.End);
 
-        InternalNode? leadingTrivia = Whitespace(_context.SourceText, line.Start, token.MatchedIndent);
-        var leadingWhitespace = _context.SourceText.ConsumeWhitespace(contentSpan);
-
-        leadingTrivia += leadingWhitespace;
-
-        var trailingWhitespace = _context.SourceText.ReverseConsumeWhitespace(contentSpan);
-        InternalNode? trailingTrivia = trailingWhitespace + line.GetEndOfLineTrivia();
-
-        // All text remaining between any whitespace we'll treat as a literal.
-        var literalSpan = TextSpan.FromBounds(
-            contentSpan.Start + (leadingWhitespace?.Width ?? 0),
-            contentSpan.End - (trailingWhitespace?.Width ?? 0));
-
-        var text = _context.SourceText.ToString(literalSpan);
-
-        var literal = Literal(leadingTrivia, LiteralEscapingStyle.Default.Escape(text), text, trailingTrivia);
-
-        // Add the skipped tokens to be included as leading trivia in the next token.
-        // Inkeeping with the CS compiler error codes, we'll create a unique error for each combination of expected tokens.
-        var diagnostic = GetUnexpectedTokenDiagnostic(exception.ExpectedTokenTypes);
-
-        _context.AddSkippedToken(literal, diagnostic);
-    }
-
-    private static InternalDiagnostic GetUnexpectedTokenDiagnostic(string[] expectedTokenTypes)
-    {
-        var expectedTokenSet = expectedTokenTypes.Except(TriviaTokenTypes).ToArray();
-
-        if (FeatureTagTokenTypes.SetEquals(expectedTokenSet))
-        {
-            return InternalDiagnostic.Create(DiagnosticDescriptors.ErrorExpectedFeatureOrTag);
-        }
-
-        throw new NotImplementedException(
-            "No error-code exists to handle when an unexpected token was encountered whilst expecting " +
-            $"tokens {string.Join(", ", expectedTokenSet)}");
+        CurrentRuleHandler.AppendUnexpectedToken(token, line, exception, _context);
     }
 }

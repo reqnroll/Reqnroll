@@ -23,10 +23,33 @@ public static class SyntaxList
     public static SyntaxList<TNode> Create<TNode>(ReadOnlySpan<TNode> nodes)
         where TNode : SyntaxNode
     {
-        throw new NotImplementedException();
+        if (nodes.Length == 0)
+        {
+            return default;
+        }
+
+        if (nodes.Length == 1)
+        {
+            return new SyntaxList<TNode>(nodes[0]?.InternalNode);
+        }
+
+        var internalNodes = ImmutableArray.CreateBuilder<InternalNode>(nodes.Length);
+
+        foreach (var node in nodes)
+        {
+            internalNodes.Add(node.InternalNode);
+        }
+
+        var list = InternalSyntaxList.Create(internalNodes.ToImmutable());
+
+        return new SyntaxList<TNode>(list);
     }
 }
 
+/// <summary>
+/// Represents a list of syntax nodes.
+/// </summary>
+/// <typeparam name="TNode">The type of syntax nodes in the list.</typeparam>
 #if NET8_0_OR_GREATER
 [CollectionBuilder(typeof(SyntaxList), methodName: nameof(SyntaxList.Create))]
 #endif
@@ -71,6 +94,11 @@ public readonly struct SyntaxList<TNode> : IEquatable<SyntaxList<TNode>>, IReadO
         InternalNode = node;
         _parent = parent;
         Position = position;
+    }
+
+    internal SyntaxList(InternalNode? node)
+    {
+        InternalNode = node;
     }
 
     public SyntaxList(TNode node)

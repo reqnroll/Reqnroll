@@ -2,11 +2,12 @@
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
-public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyList<SyntaxNodeOrToken>
+public readonly struct ChildSyntaxList(SyntaxNode parent) : 
+    IEquatable<ChildSyntaxList>, IReadOnlyList<SyntaxNodeOrToken<SyntaxNode>>
 {
-    private class EnumeratorProxy(Enumerator enumerator) : IEnumerator<SyntaxNodeOrToken>
+    private class EnumeratorProxy(Enumerator enumerator) : IEnumerator<SyntaxNodeOrToken<SyntaxNode>>
     {
-        public SyntaxNodeOrToken Current => enumerator.Current;
+        public SyntaxNodeOrToken<SyntaxNode> Current => enumerator.Current;
 
         object IEnumerator.Current => Current;
 
@@ -21,12 +22,12 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
 
     public struct Enumerator(SyntaxNode parent)
     {
-        private SyntaxNodeOrToken _current;
+        private SyntaxNodeOrToken<SyntaxNode> _current;
         private int _slotIndex = -1;
         private int _listIndex = -1;
         private int _position = parent.Position;
 
-        public readonly SyntaxNodeOrToken Current
+        public readonly SyntaxNodeOrToken<SyntaxNode> Current
         {
             get
             {
@@ -105,7 +106,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
                 }
 
                 // Otherwise, assume a syntax node.
-                _current = node;
+                _current = (SyntaxNode?)node;
                 _position += slotContent.FullWidth;
                 return true;
             }
@@ -164,13 +165,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
         }
     }
 
-    private readonly SyntaxNode _parent;
-
-    public ChildSyntaxList(SyntaxNode parent)
-    {
-        _parent = parent;
-        Count = CountChildren(parent);
-    }
+    private readonly SyntaxNode _parent = parent;
 
     private static int CountChildren(SyntaxNode parent)
     {
@@ -197,7 +192,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
         return count;
     }
 
-    public SyntaxNodeOrToken this[int index]
+    public SyntaxNodeOrToken<SyntaxNode> this[int index]
     {
         get
         {
@@ -221,7 +216,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
         }
     }
 
-    public SyntaxNodeOrToken First()
+    public SyntaxNodeOrToken<SyntaxNode> First()
     {
         foreach (var item in this)
         {
@@ -231,7 +226,7 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
         return default;
     }
 
-    public SyntaxNodeOrToken Last()
+    public SyntaxNodeOrToken<SyntaxNode> Last()
     {
         foreach (var item in this.Reverse())
         {
@@ -241,21 +236,37 @@ public readonly struct ChildSyntaxList : IEquatable<ChildSyntaxList>, IReadOnlyL
         return default;
     }
 
-    public int Count { get; }
+    public int Count { get; } = CountChildren(parent);
+
+    public override bool Equals(object? obj)
+    {
+        if (obj is ChildSyntaxList other)
+        {
+            return Equals(other);
+        }
+
+        return false;
+    }
+
+    public override int GetHashCode() => _parent.GetHashCode();
 
     public bool Equals(ChildSyntaxList other) => _parent.Equals(other._parent);
 
+    public static bool operator ==(ChildSyntaxList left, ChildSyntaxList right) => left.Equals(right);
+
+    public static bool operator !=(ChildSyntaxList left, ChildSyntaxList right) => !left.Equals(right);
+
     public Enumerator GetEnumerator() => new(_parent);
 
-    IEnumerator<SyntaxNodeOrToken> IEnumerable<SyntaxNodeOrToken>.GetEnumerator()
+    IEnumerator<SyntaxNodeOrToken<SyntaxNode>> IEnumerable<SyntaxNodeOrToken<SyntaxNode>>.GetEnumerator()
     {
         if (_parent.InternalNode == null)
         {
-            return Enumerable.Empty<SyntaxNodeOrToken>().GetEnumerator();
+            return Enumerable.Empty<SyntaxNodeOrToken<SyntaxNode>>().GetEnumerator();
         }
 
         return new EnumeratorProxy(new Enumerator(_parent));
     }
 
-    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<SyntaxNodeOrToken>)this).GetEnumerator();
+    IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable<SyntaxNodeOrToken<SyntaxNode>>)this).GetEnumerator();
 }

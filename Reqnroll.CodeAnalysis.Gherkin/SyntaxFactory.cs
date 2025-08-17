@@ -42,6 +42,11 @@ public static partial class SyntaxFactory
 
     public static SyntaxTrivia Space { get; } = InternalSyntaxFactory.Space;
 
+    /// <summary>
+    /// A token with kind <see cref="SyntaxKind.VerticalBarToken"/> representing a vertical bar character ('|').
+    /// </summary>
+    public static SyntaxToken VerticalBar { get; } = Token(SyntaxKind.VerticalBarToken);
+
     public static GherkinDocumentSyntax GherkinDocument() => GherkinDocument(null);
 
     /// <summary>
@@ -67,8 +72,18 @@ public static partial class SyntaxFactory
     public static SyntaxToken Token(SyntaxTriviaList leading, SyntaxKind kind, SyntaxTriviaList trailing) => 
         InternalSyntaxFactory.Token(leading.InternalNode, kind, trailing.InternalNode);
 
-    public static SyntaxToken Token(SyntaxTriviaList leading, SyntaxKind kind, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.Token(leading.InternalNode, kind, text, trailing.InternalNode);
+    public static SyntaxToken Token(SyntaxTriviaList leading, SyntaxKind kind, string text, SyntaxTriviaList trailing)
+    {
+        CodeAnalysisDebug.Assert(
+            kind != SyntaxKind.LiteralToken,
+            "Do not use Token to create literal tokens. Use Literal instead.");
+
+        CodeAnalysisDebug.Assert(
+            kind != SyntaxKind.TableLiteralToken,
+            "Do not use Token to create table literal tokens. Use TableLiteral instead.");
+
+        return InternalSyntaxFactory.Token(leading.InternalNode, kind, text, trailing.InternalNode);
+    }
 
     public static SyntaxToken DirectiveIdentifier(string text) =>
         InternalSyntaxFactory.DirectiveIdentifier(null, text, null);
@@ -143,6 +158,9 @@ public static partial class SyntaxFactory
     public static SyntaxToken TableLiteral(SyntaxTriviaList leading, string text, string value, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.TableLiteral(leading.InternalNode, text, value, trailing.InternalNode);
 
+    public static TableTextCellSyntax TextTableCell(string text) => SyntaxFactory.
+        TextTableCell(TableLiteral(text));
+
     public static SyntaxTriviaList TriviaList() => default;
 
     public static SyntaxTriviaList TriviaList(SyntaxTrivia trivia) => new(trivia);
@@ -159,11 +177,11 @@ public static partial class SyntaxFactory
 
     public static SyntaxList<TNode> List<TNode>(IEnumerable<TNode> nodes) where TNode : SyntaxNode => new(nodes);
 
-    public static SeparatedSyntaxList<TNode> SeparatedList<TNode>()
-        where TNode : SyntaxNode => new();
+    public static TableCellSyntaxList TableCellList() => new();
 
-    public static SeparatedSyntaxList<TNode> SeparatedList<TNode>(IEnumerable<SyntaxNodeOrToken> nodes) 
-        where TNode : SyntaxNode => new(nodes);
+    public static TableCellSyntaxList TableCellList(IEnumerable<TableCellSyntax> nodes) => new(nodes);
+
+    public static TableCellSyntaxList TableCellList(IEnumerable<SyntaxNodeOrToken<TableCellSyntax>> nodes) => new(nodes);
 
     public static SyntaxTrivia Whitespace(string text) => InternalSyntaxFactory.Whitespace(text);
 
@@ -176,4 +194,18 @@ public static partial class SyntaxFactory
 
     public static SkippedTokensTriviaSyntax SkippedTokensTrivia(SyntaxTokenList tokens) =>
         (SkippedTokensTriviaSyntax)InternalSyntaxFactory.SkippedTokensTrivia(tokens.InternalNode).CreateSyntaxNode();
+
+    /// <summary>
+    /// Creates a new <see cref="TableRowSyntax"/> instance, specifying the values in the row.
+    /// </summary>
+    /// <param name="values">The values in the row.</param>
+    /// <returns>A new <see cref="TableRowSyntax"/> instance.</returns>
+    public static TableRowSyntax TableRow(TableCellSyntaxList values)
+    {
+        return new(
+            InternalSyntaxFactory.TableRow(
+                VerticalBar.InternalNode!,
+                values.InternalNode,
+                VerticalBar.InternalNode!));
+    }
 }

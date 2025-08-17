@@ -85,7 +85,7 @@ public partial class BackgroundTests
                             Step(
                                 Token(
                                     TriviaList([Whitespace("    ")]),
-                                    SyntaxKind.GivenKeyword,
+                                    SyntaxKind.ContextStepKeyword,
                                     "Given",
                                     TriviaList([Space])),
                                 LiteralText(
@@ -98,12 +98,12 @@ public partial class BackgroundTests
                                     ])))
                         ])
                     ),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -118,7 +118,7 @@ public partial class BackgroundTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -134,7 +134,7 @@ public partial class BackgroundTests
                             Token(
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -149,7 +149,7 @@ public partial class BackgroundTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -192,7 +192,7 @@ public partial class BackgroundTests
                                     Step(
                                         Token(
                                             TriviaList([Whitespace("      ")]),
-                                            SyntaxKind.GivenKeyword,
+                                            SyntaxKind.ContextStepKeyword,
                                             "Given",
                                             TriviaList([Space])),
                                         LiteralText(
@@ -205,12 +205,12 @@ public partial class BackgroundTests
                                             ])))
                                 ])
                             ),
-                            members: List([
+                            examples: List([
                                 Example(
                                     Token(
                                         TriviaList([EnvironmentNewLine, Whitespace("    ")]),
                                         SyntaxKind.ExampleKeyword,
-                                        "Example",
+                                        "Scenario",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
@@ -225,7 +225,7 @@ public partial class BackgroundTests
                                         Step(
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
-                                                SyntaxKind.GivenKeyword,
+                                                SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
                                             LiteralText(
@@ -254,48 +254,48 @@ public partial class BackgroundTests
                                                         Token(
                                                             TriviaList([Whitespace("      ")]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        SeparatedList<PlainTextSyntax>([
-                                                            LiteralText(
+                                                            TriviaList([Space])),
+                                                        TableCellList([
+                                                            TextTableCell(
                                                                 TableLiteral(
-                                                                    TriviaList([Space]),
+                                                                    TriviaList(),
                                                                     "value",
-                                                                    TriviaList([Space])))
+                                                                    TriviaList()))
                                                         ]),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([EnvironmentNewLine]))),
                                                     TableRow(
                                                         Token(
                                                             TriviaList([Whitespace("      ")]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        SeparatedList<PlainTextSyntax>([
-                                                            LiteralText(
+                                                            TriviaList([Space])),
+                                                        TableCellList([
+                                                            TextTableCell(
                                                                 TableLiteral(
-                                                                    TriviaList([Space]),
+                                                                    TriviaList(),
                                                                     "1",
-                                                                    TriviaList([Space])))
+                                                                    TriviaList()))
                                                             ]),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([EnvironmentNewLine]))),
                                                     TableRow(
                                                         Token(
                                                             TriviaList([Whitespace("      ")]),
                                                             SyntaxKind.VerticalBarToken,
-                                                            TriviaList()),
-                                                        SeparatedList<PlainTextSyntax>([
-                                                            LiteralText(
+                                                            TriviaList([Space])),
+                                                        TableCellList([
+                                                            TextTableCell(
                                                                 TableLiteral(
-                                                                    TriviaList([Space]),
+                                                                    TriviaList(),
                                                                     "2",
-                                                                    TriviaList([Space])))
+                                                                    TriviaList()))
                                                         ]),
                                                         Token(
-                                                            TriviaList(),
+                                                            TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([EnvironmentNewLine])))
                                                 ])))

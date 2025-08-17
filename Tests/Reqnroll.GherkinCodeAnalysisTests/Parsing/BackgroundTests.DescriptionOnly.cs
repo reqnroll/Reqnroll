@@ -66,12 +66,12 @@ public partial class BackgroundTests
                         ),
                         steps: List<StepSyntax>()
                     ),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -85,8 +85,9 @@ public partial class BackgroundTests
                             steps: List([
                                 Step(
                                     Token(
-                                        TriviaList([Whitespace("  ")]),
-                                        SyntaxKind.AsteriskToken,
+                                        TriviaList([Whitespace("    ")]),
+                                        SyntaxKind.WildcardStepKeyword,
+                                        "*",
                                         TriviaList([Space])),
                                     LiteralText(
                                         TokenList([

@@ -6,20 +6,25 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 /// A wrapper for either a <see cref="SyntaxNode"/> or <see cref="SyntaxToken"/>.
 /// </summary>
 [DebuggerDisplay("{GetDebuggerDisplay(), nq}")]
-public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
+public readonly struct SyntaxNodeOrToken<TNode> : IEquatable<SyntaxNodeOrToken<TNode>>
+    where TNode : SyntaxNode
 {
     private readonly SyntaxNode? _node;
     private readonly InternalNode? _token;
     private readonly int _position;
 
-    private SyntaxNodeOrToken(SyntaxNode node)
+    public SyntaxNodeOrToken(TNode node)
     {
         _node = node;
     }
 
-    private SyntaxNodeOrToken(SyntaxNode? node, InternalNode? token, int position)
+    public SyntaxNodeOrToken(SyntaxToken token) : this(token.Parent, token.InternalNode, token.Position)
     {
-        _node = node;
+    }
+
+    private SyntaxNodeOrToken(SyntaxNode? parent, InternalNode? token, int position)
+    {
+        _node = parent;
         _token = token;
         _position = position;
     }
@@ -27,6 +32,8 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
     public bool IsToken => _token != null;
 
     public bool IsNode => _node != null && _token == null;
+
+    internal InternalNode? InternalNode => _token ?? _node?.InternalNode;
 
     public SyntaxKind Kind
     {
@@ -56,11 +63,11 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
         return default;
     }
 
-    public SyntaxNode? AsNode()
-    {
+    public TNode? AsNode()
+    { 
         if (_token == null)
         {
-            return _node;
+            return (TNode?)_node;
         }
 
         return null;
@@ -96,7 +103,7 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
         return string.Empty;
     }
 
-    public bool Equals(SyntaxNodeOrToken other)
+    public bool Equals(SyntaxNodeOrToken<TNode> other)
     {
         if (_token != null)
         {
@@ -113,7 +120,7 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
 
     public override bool Equals(object? obj)
     {
-        if (obj is SyntaxNodeOrToken other)
+        if (obj is SyntaxNodeOrToken<TNode> other)
         {
             return Equals(other);
         }
@@ -135,24 +142,21 @@ public readonly struct SyntaxNodeOrToken : IEquatable<SyntaxNodeOrToken>
         }
     }
 
-    public static implicit operator SyntaxNodeOrToken(SyntaxNode? node)
+    public static implicit operator SyntaxNodeOrToken<TNode>(TNode? node)
     {
         if (node == null)
         {
             return default;
         }
 
-        return new SyntaxNodeOrToken(node);
+        return new SyntaxNodeOrToken<TNode>(node);
     }
 
-    public static implicit operator SyntaxNodeOrToken(SyntaxToken token)
-    {
-        return new SyntaxNodeOrToken(token.Parent, token.InternalNode, token.Position);
-    }
+    public static implicit operator SyntaxNodeOrToken<TNode>(SyntaxToken token) => new(token);
 
     internal string GetDebuggerDisplay() => GetType().Name + " " + Kind + " " + ToString();
 
-    public static bool operator ==(SyntaxNodeOrToken left, SyntaxNodeOrToken right) => left.Equals(right);
+    public static bool operator ==(SyntaxNodeOrToken<TNode> left, SyntaxNodeOrToken<TNode> right) => left.Equals(right);
 
-    public static bool operator !=(SyntaxNodeOrToken left, SyntaxNodeOrToken right) => !(left == right);
+    public static bool operator !=(SyntaxNodeOrToken<TNode> left, SyntaxNodeOrToken<TNode> right) => !(left == right);
 }

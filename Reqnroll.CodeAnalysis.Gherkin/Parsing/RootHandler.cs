@@ -15,8 +15,7 @@ internal class RootHandler() : ParsingRuleHandler(RuleType.None)
             return _gherkinDocumentHandler = new GherkinDocumentRuleHandler();
         }
 
-        throw new NotSupportedException(
-            string.Format(ParsingExceptionMessages.RuleHandlerDoesNotSupportChildRuleType, nameof(RootHandler), ruleType));
+        return base.StartChildRule(ruleType);
     }
 
     public SyntaxNode BuildFeatureFileSyntax()

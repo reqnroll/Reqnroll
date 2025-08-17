@@ -168,7 +168,7 @@ public abstract class SyntaxNode
 
             CodeAnalysisDebug.AssertNotNull(node, nameof(node));
 
-            field = (TNode)node!.CreateSyntaxNode(this, InternalNode.GetSlotOffset(slot));
+            field = (TNode)node!.CreateSyntaxNode(this, Position + InternalNode.GetSlotOffset(slot));
         }
 
         return field;
@@ -182,7 +182,7 @@ public abstract class SyntaxNode
 
             if (node != null)
             {
-                field = (TNode)node.CreateSyntaxNode(this, InternalNode.GetSlotOffset(slot));
+                field = (TNode)node.CreateSyntaxNode(this, Position + InternalNode.GetSlotOffset(slot));
             }
         }
 
@@ -234,8 +234,16 @@ public abstract class SyntaxNode
 
     public virtual void WriteTo(TextWriter writer) => InternalNode.WriteTo(writer);
 
+    /// <summary>
+    /// Gets a string representation of the node.
+    /// </summary>
+    /// <returns>The content of the node.</returns>
     public override string ToString() => InternalNode?.ToString() ?? string.Empty;
 
+    /// <summary>
+    /// Gets a string representation of the node, including its leading and trailing trivia.
+    /// </summary>
+    /// <returns>A string containing the leading trivia, content and trailing trivia of the node.</returns>
     public string ToFullString() => InternalNode?.ToFullString() ?? string.Empty;
 
     private string GetDebuggerDisplay() => GetType().Name + " " + (Kind.ToString()) + " " + ToString();

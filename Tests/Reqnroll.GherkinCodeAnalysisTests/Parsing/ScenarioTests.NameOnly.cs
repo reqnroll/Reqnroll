@@ -59,7 +59,7 @@ public partial class ScenarioTests
                             Step(
                                 Token(
                                     TriviaList([Whitespace("    ")]),
-                                    SyntaxKind.AsteriskToken,
+                                    SyntaxKind.WildcardStepKeyword,
                                     TriviaList([Space])),
                                 LiteralText(
                                     TokenList([
@@ -70,12 +70,12 @@ public partial class ScenarioTests
                                             TriviaList([EnvironmentNewLine]))
                                     ])))
                         ])),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),

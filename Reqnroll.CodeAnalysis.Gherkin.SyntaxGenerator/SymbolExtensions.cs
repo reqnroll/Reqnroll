@@ -29,13 +29,13 @@ internal static class SymbolExtensions
         return symbol.OriginalDefinition.ToDisplayString() == "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxList<TNode>";
     }
 
-    public static bool IsSeparatedSyntaxList(this ITypeSymbol symbol)
+    public static bool IsTableCellSyntaxList(this ITypeSymbol symbol)
     {
         if (symbol.OriginalDefinition == null)
         {
             return false;
         }
 
-        return symbol.OriginalDefinition.ToDisplayString() == "Reqnroll.CodeAnalysis.Gherkin.Syntax.SeparatedSyntaxList<TNode>";
+        return symbol.OriginalDefinition.ToDisplayString() == "Reqnroll.CodeAnalysis.Gherkin.Syntax.TableCellSyntaxList";
     }
 }

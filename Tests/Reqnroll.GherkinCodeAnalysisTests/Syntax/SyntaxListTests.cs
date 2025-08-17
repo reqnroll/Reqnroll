@@ -15,7 +15,7 @@ public class SyntaxListTests
     [InlineData(21)]
     public void CountReturnsCorrectNumberOfItems(int count)
     {
-        var list = List(Enumerable.Range(0, count).Select(i => Example("Example", LiteralText(i.ToString()))));
+        var list = List(Enumerable.Range(0, count).Select(i => Example("Scenario", LiteralText(i.ToString()))));
 
         list.Count.Should().Be(count);
     }
@@ -24,9 +24,50 @@ public class SyntaxListTests
     public void ToStringReturnsItemsInOrder()
     {
         var list = List([ 
-            Example("Example", LiteralText("One")),
-            Example("Example", LiteralText("Two"))]);
+            Example("Scenario", LiteralText("One")),
+            Example("Scenario", LiteralText("Two"))
+        ]);
 
-        list.ToString().Should().Be("Example:OneScenario:Two");
+        list.ToString().Should().Be("Scenario:OneScenario:Two");
+    }
+
+    [Fact]
+    public void GetEnumeratorReturnsListItemsInOrder()
+    {
+        var list = List([ 
+            Example("Scenario", LiteralText("One")),
+            Example("Scenario", LiteralText("Two")),
+            Example("Scenario", LiteralText("Three"))
+        ]);
+
+        var enumerator = list.GetEnumerator();
+
+        enumerator.MoveNext().Should().BeTrue();
+        enumerator.Current.ToString().Should().Be("Scenario:One");
+        enumerator.MoveNext().Should().BeTrue();
+        enumerator.Current.ToString().Should().Be("Scenario:Two");
+        enumerator.MoveNext().Should().BeTrue();
+        enumerator.Current.ToString().Should().Be("Scenario:Three");
+        enumerator.MoveNext().Should().BeFalse();
+    }
+
+    [Fact]
+    public void GetEnumeratorReturnsListItemsInOrderEvenWhenBoxed()
+    {
+        var list = List([
+            Example("Scenario", LiteralText("One")),
+            Example("Scenario", LiteralText("Two")),
+            Example("Scenario", LiteralText("Three"))
+        ]);
+
+        var enumerator = ((IEnumerable<ExampleSyntax>)list).GetEnumerator();
+
+        enumerator.MoveNext().Should().BeTrue();
+        enumerator.Current.ToString().Should().Be("Scenario:One");
+        enumerator.MoveNext().Should().BeTrue();
+        enumerator.Current.ToString().Should().Be("Scenario:Two");
+        enumerator.MoveNext().Should().BeTrue();
+        enumerator.Current.ToString().Should().Be("Scenario:Three");
+        enumerator.MoveNext().Should().BeFalse();
     }
 }

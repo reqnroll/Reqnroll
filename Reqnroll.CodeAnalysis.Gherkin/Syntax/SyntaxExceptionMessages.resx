@@ -120,7 +120,13 @@
   <data name="CannotCreateSyntaxNodeFromSyntaxToken" xml:space="preserve">
     <value>Cannot create a syntax node from a syntax token.</value>
   </data>
-  <data name="String1" xml:space="preserve">
-    <value>Cool</value>
+  <data name="AllElementsInSequenceMustBeTypeAOrB" xml:space="preserve">
+    <value>All elements in the sequence must be either a {0} or a {1}.</value>
+  </data>
+  <data name="SequenceMustBeSyntaxNodesSeparatedBySyntaxTokens" xml:space="preserve">
+    <value>The sequence must be syntax nodes separated by syntax tokens.</value>
+  </data>
+  <data name="SequenceMustBeSeparatedByTokensOfKind" xml:space="preserve">
+    <value>All nodes in the sequence must be separated by the same token kind. Found a {0} token initially but encountered a {1} token afterwards.</value>
   </data>
 </root>

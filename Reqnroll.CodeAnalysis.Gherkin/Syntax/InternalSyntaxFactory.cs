@@ -1,7 +1,8 @@
-using Microsoft.CodeAnalysis.Text;
 using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.Text;
 using System.Diagnostics;
 using System.Text;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -134,14 +135,35 @@ internal static partial class InternalSyntaxFactory
 
         var whitespace = text.ToString(span);
 
-        Debug.Assert(whitespace.All(char.IsWhiteSpace), "Non-whitespace characters found in whitespace text.");
+        CodeAnalysisDebug.Assert(whitespace.All(char.IsWhiteSpace), "Non-whitespace characters found in text.");
 
         return new(SyntaxKind.WhitespaceTrivia, whitespace);
     }
 
-    public static InternalSyntaxTrivia Comment(string text)
+    public static InternalSyntaxTrivia? Comment(string text)
     {
+        if (text.Length == 0)
+        {
+            return null;
+        }
+
+        CodeAnalysisDebug.Assert(text[0] == '#', "Comment does not start with a hash.");
+
         return new InternalSyntaxTrivia(SyntaxKind.CommentTrivia, text);
+    }
+
+    public static InternalSyntaxTrivia? Comment(SourceText text, TextSpan span)
+    {
+        if (span.IsEmpty)
+        {
+            return null;
+        }
+
+        var comment = text.ToString(span);
+
+        CodeAnalysisDebug.Assert(comment[0] == '#', "Comment does not start with a hash.");
+
+        return new(SyntaxKind.CommentTrivia, comment);
     }
 
     public static InternalSyntaxToken Token(SyntaxKind kind) => Token(null, kind, null);
@@ -196,14 +218,14 @@ internal static partial class InternalSyntaxFactory
 
         var whitespace = text.ToString(new TextSpan(start, length));
 
-        Debug.Assert(whitespace.All(char.IsWhiteSpace), "Non-whitespace characters found in whitespace text.");
+        CodeAnalysisDebug.Assert(whitespace.All(char.IsWhiteSpace), "Non-whitespace characters found in text.");
 
         return new(SyntaxKind.WhitespaceTrivia, whitespace);
     }
 
     public static InternalSkippedTokensTriviaSyntax SkippedTokensTrivia(InternalNode? tokens) => new(tokens);
 
-    internal static SyntaxToken TableLiteral(
+    internal static InternalSyntaxToken TableLiteral(
         InternalNode? leadingTrivia,
         string text,
         string value,

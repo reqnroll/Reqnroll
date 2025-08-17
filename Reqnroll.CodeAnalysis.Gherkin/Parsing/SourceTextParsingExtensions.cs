@@ -61,7 +61,7 @@ internal static class SourceTextParsingExtensions
     /// if there is no whitespace at the end of the text-span.</returns>
     public static InternalSyntaxTrivia? ReverseConsumeWhitespace(this SourceText sourceText, TextSpan textSpan)
     {
-        return sourceText.ReverseConsumeWhitespace(textSpan.End - 1, textSpan.Start - 1);
+        return sourceText.ReverseConsumeWhitespace(textSpan.End - 1, textSpan.Start);
     }
 
     /// <summary>
@@ -75,9 +75,14 @@ internal static class SourceTextParsingExtensions
     /// if there is no whitespace at the specified index.</returns>
     public static InternalSyntaxTrivia? ReverseConsumeWhitespace(this SourceText sourceText, int startIndex, int endIndex)
     {
+        if (startIndex >= sourceText.Length)
+        {
+            return null;
+        }
+
         var builder = new StringBuilder();
 
-        for (var index = startIndex; index < endIndex; index--)
+        for (var index = startIndex; index > endIndex; index--)
         {
             var c = sourceText[index];
 

@@ -48,12 +48,12 @@ public partial class FeatureTests
                             TriviaList(),
                             "Explicit language specification",
                             TriviaList([EnvironmentNewLine]))),
-                    members: List([
+                    examples: List([
                         Example(
                             Token(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 SyntaxKind.ExampleKeyword,
-                                "Example",
+                                "Scenario",
                                 TriviaList()),
                             Token(
                                 TriviaList(),
@@ -68,7 +68,7 @@ public partial class FeatureTests
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
-                                        SyntaxKind.GivenKeyword,
+                                        SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
                                     LiteralText(
@@ -79,7 +79,7 @@ public partial class FeatureTests
                             ]))
                     ])),
                 Token(
-                    TriviaList([EnvironmentNewLine]),
+                    TriviaList(),
                     SyntaxKind.EndOfFileToken,
                     TriviaList())));
 

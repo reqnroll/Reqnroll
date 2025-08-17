@@ -61,11 +61,15 @@ internal class InternalSyntaxTrivia : InternalNode
 
     public override string ToFullString() => Text;
 
-    public static implicit operator SyntaxTrivia(InternalSyntaxTrivia trivia) => new(new SyntaxToken(), trivia, 0);
+    public static implicit operator SyntaxTrivia(InternalSyntaxTrivia? trivia) => new(new SyntaxToken(), trivia, 0);
 
     public override InternalNode WithAnnotations(ImmutableArray<SyntaxAnnotation> annotations) =>
         new InternalSyntaxTrivia(Kind, Text, GetAttachedDiagnostics(), annotations);
 
     public override InternalNode WithDiagnostics(ImmutableArray<InternalDiagnostic> diagnostics) => 
         new InternalSyntaxTrivia(Kind, Text, diagnostics, GetAnnotations());
+
+    public override InternalNode WithLeadingTrivia(InternalNode? trivia) => throw new InvalidOperationException();
+
+    public override InternalNode WithTrailingTrivia(InternalNode? trivia) => throw new InvalidOperationException();
 }
