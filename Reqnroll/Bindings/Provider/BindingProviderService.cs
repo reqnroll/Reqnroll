@@ -2,17 +2,31 @@
 using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
+using Reqnroll.CommonModels;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Infrastructure;
+using System;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 
 namespace Reqnroll.Bindings.Provider;
 
-public class BindingProviderService
+public interface IBindingProviderService
 {
+    void OnBindingRegistryBuildingCompleted();
+}
+
+public class BindingProviderService(IBindingRegistry bindingRegistry, ITestAssemblyProvider testAssemblyProvider, IEnvironmentWrapper environmentWrapper) : IBindingProviderService
+{
+    /// <summary>
+    /// Invoked by the Visual Studio extension connectors. Do not remove or change the signature.
+    /// </summary>
     public static string DiscoverBindings(Assembly testAssembly, string jsonConfiguration)
     {
         if (string.IsNullOrWhiteSpace(jsonConfiguration)) jsonConfiguration = "{}";
@@ -21,6 +35,39 @@ public class BindingProviderService
         BuildBindingRegistry(testAssembly, bindingRegistryBuilder);
         var bindingRegistry = globalContainer.Resolve<IBindingRegistry>();
         return GetDiscoveredBindingsFromRegistry(bindingRegistry, testAssembly);
+    }
+
+    private const string REQNROLL_BINDING_OUTPUT_ENVIRONMENT_VARIABLE = "REQNROLL_BINDING_OUTPUT";
+
+    public void OnBindingRegistryBuildingCompleted()
+    {
+        // Experimental feature: This code allows the Visual Studio extension to instruct saving the discovered bindings to a file
+        // using an environment variable during the test run.
+        // This might be used as an alternative to invoking the `DiscoverBindings` method, because that needs the test assembly to be
+        // fully loaded and this is sometimes problematic.
+
+        if (environmentWrapper.GetEnvironmentVariable(REQNROLL_BINDING_OUTPUT_ENVIRONMENT_VARIABLE) is ISuccess<string> environmentVariable &&
+            !string.IsNullOrWhiteSpace(environmentVariable.Result))
+        {
+            var outputFilePath = environmentVariable.Result.Equals("true", StringComparison.OrdinalIgnoreCase) ? "reqnroll_bindings.json" :
+                environmentVariable.Result.Trim();
+
+            outputFilePath = Path.GetFullPath(outputFilePath);
+            TrySaveBindings(outputFilePath);
+        }
+    }
+
+    private void TrySaveBindings(string outputFilePath)
+    {
+        try
+        {
+            var bindingsJson = GetDiscoveredBindingsFromRegistry(bindingRegistry, testAssemblyProvider.TestAssembly);
+            File.WriteAllText(outputFilePath, bindingsJson, Encoding.UTF8);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine(ex, "Writing bindings failed.");
+        }
     }
 
     internal static string GetDiscoveredBindingsFromRegistry(IBindingRegistry bindingRegistry, Assembly testAssembly)
@@ -150,5 +197,4 @@ public class BindingProviderService
         var configurationProvider = new JsonStringRuntimeConfigurationProvider(jsonConfiguration);
         return containerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
     }
-
 }
