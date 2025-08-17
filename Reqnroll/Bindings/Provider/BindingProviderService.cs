@@ -70,7 +70,7 @@ public class BindingProviderService(IBindingRegistry bindingRegistry, ITestAssem
         }
     }
 
-    internal static string GetDiscoveredBindingsFromRegistry(IBindingRegistry bindingRegistry, Assembly testAssembly)
+    private static string GetDiscoveredBindingsFromRegistry(IBindingRegistry bindingRegistry, Assembly testAssembly)
     {
         var resultData = ParseDiscoveryResult(bindingRegistry, testAssembly);
         var jsonString = JsonSerializer.Serialize(resultData, BindingJsonSourceGenerator.Default.BindingData);
