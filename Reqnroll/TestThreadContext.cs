@@ -1,27 +1,17 @@
 using System;
 using Reqnroll.BoDi;
 
-namespace Reqnroll
+namespace Reqnroll;
+
+public class TestThreadContext(IObjectContainer testThreadContainer) 
+    : ReqnrollContext, ITestThreadContext
 {
-    public interface ITestThreadContext : IReqnrollContext
+    public event Action<TestThreadContext> Disposing;
+    public IObjectContainer TestThreadContainer { get; } = testThreadContainer;
+
+    protected override void Dispose()
     {
-        IObjectContainer TestThreadContainer { get; }
-    }
-
-    public class TestThreadContext : ReqnrollContext, ITestThreadContext
-    {
-        public event Action<TestThreadContext> Disposing;
-        public IObjectContainer TestThreadContainer { get; }
-
-        public TestThreadContext(IObjectContainer testThreadContainer)
-        {
-            TestThreadContainer = testThreadContainer;
-        }
-
-        protected override void Dispose()
-        {
-            Disposing?.Invoke(this);
-            base.Dispose();
-        }
+        Disposing?.Invoke(this);
+        base.Dispose();
     }
 }

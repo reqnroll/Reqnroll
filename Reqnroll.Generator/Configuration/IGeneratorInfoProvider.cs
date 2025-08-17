@@ -1,7 +1,6 @@
-namespace Reqnroll.Generator.Configuration
+namespace Reqnroll.Generator.Configuration;
+
+public interface IGeneratorInfoProvider
 {
-    public interface IGeneratorInfoProvider
-    {
-        GeneratorInfo GetGeneratorInfo();
-    }
+    GeneratorInfo GetGeneratorInfo();
 }
