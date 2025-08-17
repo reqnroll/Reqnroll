@@ -62,17 +62,18 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         // The system is enabled if we have at least one registered formatter that is IsEnabled
         if (HaveAllFormattersRegisteredAndInitialized())
         {
+            SendTelemetryEvents();
             _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
         }
     }
 
-    private async Task SendTelemetryEvents()
+    private void SendTelemetryEvents()
     {
         if (_telemetryService == null) return;
 
         foreach (var formatter in _activeFormatters)
         {
-            await _telemetryService.SendFeatureUseEventAsync(
+            _telemetryService.SendFeatureUseEvent(
                 ReqnrollFeatureUseEvent.FeatureNames.Formatter,
                 properties: new Dictionary<string, string>
                 {
@@ -89,9 +90,6 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     public async Task PublishAsync(Envelope message)
     {
-        if (message.TestRunStarted != null)
-            await SendTelemetryEvents();
-
         foreach (var formatter in _activeFormatters.Values)
         {
             // Will catch and swallow any exceptions thrown by sinks so that all get a chance to process each message.

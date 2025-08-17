@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Reqnroll.Analytics;
 
@@ -8,5 +7,5 @@ namespace Reqnroll.Analytics;
 /// </summary>
 public interface IAnalyticsRuntimeTelemetryService
 {
-    Task SendFeatureUseEventAsync(string featureName, Dictionary<string, string> properties = null, Dictionary<string, double> metrics = null);
+    void SendFeatureUseEvent(string featureName, Dictionary<string, string> properties = null, Dictionary<string, double> metrics = null);
 }
