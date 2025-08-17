@@ -6,6 +6,7 @@
     <title>Reqnroll.Tools.MsBuild.Generation</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
+    <readme>README.md</readme>
     <description>Package to enable the code-behind file generation during build time http://reqnroll.net/documentation/Generate-Tests-from-MsBuild/</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
@@ -29,6 +30,7 @@
 
     <file src="$SolutionDir$\Licenses\**\*" target="licenses" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
+    <file src="PackageReadme.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
   </files>
 </package>
