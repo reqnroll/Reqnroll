@@ -101,6 +101,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<AppInsightsEventSerializer, IAppInsightsEventSerializer>();
             container.RegisterTypeAs<HttpClientWrapper, HttpClientWrapper>();
             container.RegisterTypeAs<AnalyticsEventProvider, IAnalyticsEventProvider>();
+            container.RegisterTypeAs<AnalyticsRuntimeTelemetryService, IAnalyticsRuntimeTelemetryService>();
 
             container.RegisterTypeAs<ReqnrollJsonLocator, IReqnrollJsonLocator>();
 

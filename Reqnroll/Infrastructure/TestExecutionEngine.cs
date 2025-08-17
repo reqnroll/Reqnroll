@@ -33,9 +33,7 @@ namespace Reqnroll.Infrastructure
         private readonly ITestRunContext _testRunContext;
         private readonly ITestTracer _testTracer;
         private readonly IUnitTestRuntimeProvider _unitTestRuntimeProvider;
-        private readonly IAnalyticsEventProvider _analyticsEventProvider;
-        private readonly IAnalyticsTransmitter _analyticsTransmitter;
-        private readonly ITestRunnerManager _testRunnerManager;
+        private readonly IAnalyticsRuntimeTelemetryService _telemetryService;
         private readonly IRuntimePluginTestExecutionLifecycleEventEmitter _runtimePluginTestExecutionLifecycleEventEmitter;
         private readonly ITestThreadExecutionEventPublisher _testThreadExecutionEventPublisher;
         private readonly ITestPendingMessageFactory _testPendingMessageFactory;
@@ -57,9 +55,7 @@ namespace Reqnroll.Infrastructure
             IStepDefinitionMatchService stepDefinitionMatchService,
             IAsyncBindingInvoker bindingInvoker,
             IObsoleteStepHandler obsoleteStepHandler,
-            IAnalyticsEventProvider analyticsEventProvider,
-            IAnalyticsTransmitter analyticsTransmitter,
-            ITestRunnerManager testRunnerManager,
+            IAnalyticsRuntimeTelemetryService telemetryService,
             IRuntimePluginTestExecutionLifecycleEventEmitter runtimePluginTestExecutionLifecycleEventEmitter,
             ITestThreadExecutionEventPublisher testThreadExecutionEventPublisher,
             ITestPendingMessageFactory testPendingMessageFactory,
@@ -80,9 +76,7 @@ namespace Reqnroll.Infrastructure
             _testObjectResolver = testObjectResolver;
             _testRunContext = testRunContext;
             _obsoleteStepHandler = obsoleteStepHandler;
-            _analyticsEventProvider = analyticsEventProvider;
-            _analyticsTransmitter = analyticsTransmitter;
-            _testRunnerManager = testRunnerManager;
+            _telemetryService = telemetryService;
             _runtimePluginTestExecutionLifecycleEventEmitter = runtimePluginTestExecutionLifecycleEventEmitter;
             _testThreadExecutionEventPublisher = testThreadExecutionEventPublisher;
             _testPendingMessageFactory = testPendingMessageFactory;
@@ -102,10 +96,7 @@ namespace Reqnroll.Infrastructure
                 return;
             }
 
-            if (_analyticsTransmitter.IsEnabled)
-            {
-                _ = Task.Run(TryTransmitReqnrollProjectRunningEventAsync);
-            }
+            SendTelemetryEvents();
 
             _testRunnerStartExecuted = true;
 
@@ -116,19 +107,11 @@ namespace Reqnroll.Infrastructure
             await FireEventsAsync(HookType.BeforeTestRun);
         }
 
-        async Task TryTransmitReqnrollProjectRunningEventAsync()
+        private void SendTelemetryEvents()
         {
-            try
-            {
-                var testAssemblyName = _testRunnerManager.TestAssembly.GetName().Name;
-                var projectRunningEvent = _analyticsEventProvider.CreateProjectRunningEvent(testAssemblyName);
-                await _analyticsTransmitter.TransmitReqnrollProjectRunningEventAsync(projectRunningEvent);
-            }
-            catch (Exception ex)
-            {
-                // catch all exceptions since we do not want to break anything
-                Debug.WriteLine(ex, "Sending telemetry failed");
-            }
+            if (_telemetryService == null) return;
+
+            _telemetryService.SendProjectRunningEvent();
         }
 
         public virtual async Task OnTestRunEndAsync()

@@ -36,7 +36,8 @@ namespace Reqnroll.Analytics.AppInsights
             TelemetryTags = new Dictionary<string, string>
             {
                 { "ai.user.id", analyticsEvent.UserId },
-                { "ai.user.accountId", analyticsEvent.UserId }
+                { "ai.user.accountId", analyticsEvent.UserId },
+                { "ai.session.id", analyticsEvent.SessionId }
             };
 
             TelemetryData = new TelemetryData
@@ -68,6 +69,22 @@ namespace Reqnroll.Analytics.AppInsights
                 TelemetryData.TelemetryDataItem.Properties.Add("MSBuildVersion", reqnrollProjectCompiledEvent.MSBuildVersion);
                 TelemetryData.TelemetryDataItem.Properties.Add("ProjectGuid", reqnrollProjectCompiledEvent.ProjectGuid ?? DefaultValue);
             }
+
+            if (analyticsEvent is ReqnrollFeatureUseEvent featureUseEvent)
+            {
+                TelemetryData.TelemetryDataItem.Properties.Add(ReqnrollFeatureUseEvent.FeatureNameProperty, featureUseEvent.FeatureName);
+                if (featureUseEvent.Properties != null)
+                {
+                    foreach (var property in featureUseEvent.Properties)
+                        TelemetryData.TelemetryDataItem.Properties.Add(property.Key, property.Value ?? DefaultValue);
+                }
+                if (featureUseEvent.Metrics != null)
+                {
+                    TelemetryData.TelemetryDataItem.Metrics ??= new Dictionary<string, double>();
+                    foreach (var metric in featureUseEvent.Metrics)
+                        TelemetryData.TelemetryDataItem.Metrics.Add(metric.Key, metric.Value);
+                }
+            }
         }
     }
     public class TelemetryData
@@ -87,5 +104,7 @@ namespace Reqnroll.Analytics.AppInsights
         public string EventName { get; set; }
         [JsonPropertyName("properties")]
         public Dictionary<string, string> Properties { get; set; }
+        [JsonPropertyName("measurements")]
+        public Dictionary<string, double> Metrics { get; set; }
     }
 }
