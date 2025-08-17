@@ -38,7 +38,7 @@ public class ReqnrollFeatureUseEvent(
     {
         public const string Formatter = "formatter"; // report the individual formatter used with name
     }
-    internal const string FeatureNameProperty = "feature_name";
+
     public const string FeatureNameProperty = "feature_name";
     public const string FormatterNameProperty = "formatter_name";
 
