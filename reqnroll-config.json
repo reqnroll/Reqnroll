@@ -97,9 +97,9 @@
           "enum": [ "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
         },
         "coloredOutput": {
-            "description": "Determine whether Reqnroll should color the test result output.",
-            "type": "boolean",
-            "default": false
+          "description": "Determine whether Reqnroll should color the test result output.",
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -118,38 +118,38 @@
         }
       }
     },
-	"formatters": {
-	  "description": "This section can be used to configure formatters and their specific settings.",
-	  "type": "object",
-	  "properties": {
-		"html": {
-		  "type": "object",
-		  "description": "Settings for the HTML formatter.",
-		  "properties": {
-			"outputFilePath": {
-			  "type": "string",
-			  "description": "File path where the HTML report will be output."
-			}
-		  },
-		  "additionalProperties": true
-		},
-		"message": {
-		  "type": "object",
-		  "description": "Settings for the message formatter.",
-		  "properties": {
-			"outputFilePath": {
-			  "type": "string",
-			  "description": "File path where the message ndjson output will be saved."
-			}
-		  },
-		  "additionalProperties": true
-		}
-	  },
-	  "additionalProperties": {
-		"type": "object",
-		"description": "Configuration options for a custom formatter; arbitrary structure allowed."
-	  }
-	},
+    "formatters": {
+      "description": "This section can be used to configure formatters and their specific settings.",
+      "type": "object",
+      "properties": {
+        "html": {
+          "type": "object",
+          "description": "Settings for the HTML formatter.",
+          "properties": {
+            "outputFilePath": {
+              "type": "string",
+              "description": "File path where the HTML report will be output."
+            }
+          },
+          "additionalProperties": true
+        },
+        "message": {
+          "type": "object",
+          "description": "Settings for the message formatter.",
+          "properties": {
+            "outputFilePath": {
+              "type": "string",
+              "description": "File path where the message ndjson output will be saved."
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": {
+        "type": "object",
+        "description": "Configuration options for a custom formatter; arbitrary structure allowed."
+      }
+    },
     "ide": {
       "description": "This section contains all the extension configurations related to the IDE.",
       "type": "object",
@@ -290,11 +290,11 @@
               "type": "integer",
               "default": 1
             },
-			"tableCellRightAlignNumericContent": {
-			  "description": "Specifies whether Table cells that contain digits should be right-aligned within the table column.",
-			  "type": "boolean",
-			  "default": true
-			}
+            "tableCellRightAlignNumericContent": {
+              "description": "Specifies whether Table cells that contain digits should be right-aligned within the table column.",
+              "type": "boolean",
+              "default": true
+            }
           }
         }
       }
