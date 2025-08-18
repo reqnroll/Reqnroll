@@ -5,6 +5,9 @@
 
   Changelog:
 
+  3.0
+  - Added formatters
+ 
   1.1
   - Added ide/bindingDiscovery
 
@@ -115,6 +118,40 @@
         }
       }
     },
+	"formatters": {
+	  "description": "This section can be used to configure formatters and their specific settings.",
+	  "type": "object",
+	  "properties": {
+		"html": {
+		  "type": "object",
+		  "description": "Settings for the HTML formatter.",
+		  "properties": {
+			"outputFilePath": {
+			  "type": "string",
+			  "description": "File path where the HTML report will be output."
+			}
+		  },
+		  "required": ["outputFilePath"],
+		  "additionalProperties": true
+		},
+		"message": {
+		  "type": "object",
+		  "description": "Settings for the message formatter.",
+		  "properties": {
+			"outputFilePath": {
+			  "type": "string",
+			  "description": "File path where the message ndjson output will be saved."
+			}
+		  },
+		  "required": ["outputFilePath"],
+		  "additionalProperties": true
+		}
+	  },
+	  "additionalProperties": {
+		"type": "object",
+		"description": "Configuration options for a custom formatter; arbitrary structure allowed."
+	  }
+	},
     "ide": {
       "description": "This section contains all the extension configurations related to the IDE.",
       "type": "object",
@@ -254,7 +291,12 @@
               "description": "The number of space characters to be used on each sides as table cell padding.",
               "type": "integer",
               "default": 1
-            }
+            },
+			"tableCellRightAlignNumericContent": {
+			  "description": "Specifies whether Table cells that contain digits should be right-aligned within the table column.",
+			  "type": "boolean",
+			  "default": true
+			}
           }
         }
       }
