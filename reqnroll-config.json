@@ -131,7 +131,6 @@
 			  "description": "File path where the HTML report will be output."
 			}
 		  },
-		  "required": ["outputFilePath"],
 		  "additionalProperties": true
 		},
 		"message": {
@@ -143,7 +142,6 @@
 			  "description": "File path where the message ndjson output will be saved."
 			}
 		  },
-		  "required": ["outputFilePath"],
 		  "additionalProperties": true
 		}
 	  },
