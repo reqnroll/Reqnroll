@@ -259,13 +259,11 @@ namespace Reqnroll.Generator.Generation
             var picklesReturnStatement = new CodeMethodReturnStatement(new CodePrimitiveExpression(null));
             try
             {
-                var featureSource = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToSource(CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document));
+                var featureSource = CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document);
                 var IdGeneratorSeed = featureSource.Uri + featureSource.Data;
                 var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(IdGeneratorSeed));
-                var featureGherkinDocument = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
-                var featurePickles = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocument);
-                var featureGherkinDocumentMessage = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToGherkinDocument(featureGherkinDocument);
-                var featurePickleMessages = Formatters.PayloadProcessing.Cucumber.CucumberMessageTransformer.ToPickles(featurePickles);
+                var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
+                var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocumentMessage);
 
                 // generate a CodeDom expression to create the Source object from the featureSourceMessage
                 var sourceExpression = new CodeObjectCreateExpression(new CodeTypeReference(typeof(Io.Cucumber.Messages.Types.Source), CodeTypeReferenceOptions.GlobalReference),

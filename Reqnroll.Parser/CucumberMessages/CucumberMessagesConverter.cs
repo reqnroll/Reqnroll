@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.IO;
 using Gherkin.CucumberMessages;
-using Gherkin.CucumberMessages.Types;
+using Io.Cucumber.Messages.Types;
 
 namespace Reqnroll.Parser.CucumberMessages;
 
@@ -9,7 +9,6 @@ namespace Reqnroll.Parser.CucumberMessages;
 /// Utility class that converts Reqnroll AST types in to 'CucumberMessages.Types' types.
 /// It uses two classes from the Gherkin project: AstMessagesConverter and PickleCompiler
 /// 
-/// Once the Gherkin project implementation directly emits CucumberMessages (eliminating the use of the Gherkin.CucumberMessages.Types namespace), this class can be removed
 /// </summary>
 public class CucumberMessagesConverter
 {
@@ -49,20 +48,18 @@ public class CucumberMessagesConverter
         if (File.Exists(gherkinDocument.SourceFilePath))
         {
             var sourceText = File.ReadAllText(gherkinDocument.SourceFilePath);
-            return new Source
-            {
-                Uri = CombinePathsWithSlash(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath)),
-                Data = sourceText,
-                MediaType = "text/x.cucumber.gherkin+plain"
-            };
+            return new Source(
+                CombinePathsWithSlash(gherkinDocument.DocumentLocation.FeatureFolderPath, Path.GetFileName(gherkinDocument.SourceFilePath)),
+                sourceText,
+                SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN
+            );
         }
 
-        return new Source
-        {
-            Uri = "Unknown",
-            Data = $"Source Document: {gherkinDocument.SourceFilePath} not found.",
-            MediaType = "text/x.cucumber.gherkin+plain"
-        };
+        return new Source(
+            "Unknown",
+            $"Source Document: {gherkinDocument.SourceFilePath} not found.",
+            SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN
+        );
     }
 
     public IEnumerable<Pickle> ConvertToCucumberMessagesPickles(GherkinDocument gherkinDocument)
