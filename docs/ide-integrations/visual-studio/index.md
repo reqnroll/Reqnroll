@@ -1,10 +1,13 @@
-# Reqnroll Visual Studio integration
+# Reqnroll IDE Integrations
 
-For setting up Reqnroll Visual Studio integration, please check the related [Setup Visual Studio 2022](../../installation/setup-ide.md#setup-visual-studio-2022) section of our IDE setup guide.
+This documentation covers the IDE integrations for Reqnroll.
 
-% TODO
-```{admonition} Documentation is in progress
-:class: warning
+## Visual Studio Integration
 
-This documentation page is in progress. Please come back later or help contributing to it in out [open-source GitHub project](https://github.com/reqnroll/Reqnroll).
-```
+* [Integration Overview](visual-studio-integration.md) - Overview of all Visual Studio integration features
+* [Installation](visual-studio-installation.md) - How to install the Reqnroll Visual Studio extension
+* [Editing Features](Visual-Studio-Integration-Editing-Features.md) - Syntax highlighting, IntelliSense, and editing features
+* [Navigation Features](Visual-Studio-Integration-Navigation-Features.md) - Navigate between steps and bindings
+* [Test Explorer Support](visual-studio-test-explorer-support.md) - Running scenarios from Visual Studio Test Explorer
+* [Settings/Options](settings-options.md) - Configure the extension settings
+* [Generating Skeleton Code](Generating-Skeleton-Code.md) - Generate step definition skeleton code
