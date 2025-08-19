@@ -10,7 +10,7 @@ bound.
 Various default styles have been defined for the Gherkin syntax. You can
 customize these colours in Visual Studio\'s settings (**Tools \| Options
 \| Environment \| Fonts and Colors**). The names of the corresponding
-**Display items** in the list begin with \"Gherkin\".
+**Display items** in the list begin with \"Reqnroll\".
 
 In addition to highlighting keywords, comments, tags etc., unbound steps
 and parameters in feature files are highlighted when editing the file in
@@ -23,14 +23,10 @@ Visual Studio. The following syntax highlighting is used by default:
 You can thus tell immediately which steps in a feature file have been
 bound.
 
-::: note
-::: title
-Note
-:::
-
+```{note}
 In Reqnroll Visual Studio 2022 plugin a project must be **built** for
 syntax highlighting to update.
-:::
+```
 
 ## IntelliSense (auto-completion) for Keywords and Steps
 
@@ -47,33 +43,15 @@ IntelliSense is available in feature files for the following:
     statement, providing quick access to your current steps definitions.
     Bound steps are indicated with \"\--\>\".
 
-::: note
-::: title
-Note
-:::
-
+```{note}
 Note that all the steps in all \"\*.feature\" files\" that match the
 current type (Given, When, Then) are displayed
-:::
+```
 
-::: tabs
-::: tab
-VS2019
+## VS2022
 
-<figure>
-<img src="../_static/images/intellisense2.png"
-alt="../_static/images/intellisense2.png" />
-<figcaption>The entries in the list that are marked with
-<strong>"--&gt;"</strong> indicate that the step is bound.</figcaption>
-</figure>
-:::
+![image](../../_static/images/vs2022inteli.png)
 
-::: tab
-VS2022
-
-![image](../_static/images/vs2022inteli.png)
-:::
-:::
 
 ### Code Files
 
@@ -92,27 +70,11 @@ To do this, simply navigate to **Tools \| Options \| Reqnroll \| General
 \| IntelliSense** and set the desired number of suggestions you wish to
 see against the **Max Step Instances Suggestions** value:
 
-::: tabs
-::: tab
-VS2019
+#### VS2022
 
-Navigate to **Tools \| Options \| Reqnroll \| General\| IntelliSense**
-and set the desired number of suggestions you wish to see against the
-**Max Step Instances Suggestions** value: .. figure::
-/\_static/images/intellisetting.png :alt: vs2019
+You must edit the [reqnroll.json](https://reqnroll.net/wp-content/uploads/reqnrollconfigs/reqnroll-config.json) config file to turn IntelliSense on or off and also access other settings as per below:
 
-*\> Note: Setting this value to 0 will only show the template.*
-:::
-
-::: tab
-VS2022
-
-You must edit the
-[reqnroll.json](https://reqnroll.net/wp-content/uploads/reqnrollconfigs/reqnroll-config.json)
-config file to turn inteli on or off and also access other settings as
-per below: .. figure:: ../\_static/images/inteli2022.png :alt: vs2022
-:::
-:::
+![IntelliSense 2022](../../_static/images/inteli2022.png)
 
 ## Outlining and Comments in Feature Files
 
@@ -124,18 +86,18 @@ files, for example:
     from the menu
 -   You can use the options in the **Edit \| Outlining** menu to expand
     and contract sections of your feature files ![VS2010 Edit
-    menu](/_static/images/outlining_editor.png)
+    menu](../../_static/images/outlining_editor.png)
 
 ## Table Formatting
 
 Tables in Reqnroll are also expanded and formatted automatically as you
 enter column names and values:
 
-<figure>
-<img src="/_static/images/tablegifvs.gif"
-alt="/_static/images/tablegifvs.gif" />
-<figcaption>Formatted table</figcaption>
-</figure>
+```{figure} /_static/images/tablegifvs.gif
+:alt: Formatted table
+
+Formatted table
+```
 
 ## Document Formatting
 
@@ -145,27 +107,27 @@ and fixes blank lines, comments, etc.
 You can find this option under Edit-\>Advanced-\>Format document or
 alternatively use the Ctrl+K, Ctrl+D shortcut:
 
-<figure>
-<img src="/_static/images/format-doc.png"
-alt="/_static/images/format-doc.png" />
-<figcaption>Format document</figcaption>
-</figure>
+```{figure} /_static/images/format-doc.png
+:alt: Format document
+
+Format document
+```
 
 Below is a feature file document which is not indented correctly:
 
-<figure>
-<img src="/_static/images/format-doc-before.png"
-alt="/_static/images/format-doc-before.png" />
-<figcaption>Unformatted document</figcaption>
-</figure>
+```{figure} /_static/images/format-doc-before.png
+:alt: Unformatted document
+
+Unformatted document
+```
 
 After the `Format Document` command:
 
-<figure>
-<img src="/_static/images/format-doc-after.png"
-alt="/_static/images/format-doc-after.png" />
-<figcaption>Formatted document</figcaption>
-</figure>
+```{figure} /_static/images/format-doc-after.png
+:alt: Formatted document
+
+Formatted document
+```
 
 ## Renaming Steps
 
@@ -178,26 +140,11 @@ automatically. To do so:
 3.  Enter the new text for the step in the dialog and confirm with OK.
 4.  Your bindings and all feature files containing the step are updated.
 
-::: tabs
-::: tab
-VS2019
+#### VS2022
 
-![image](../_static/images/renamestep2019.png)
-:::
+![Rename Step 2022](../../_static/images/renamestep2022.png)
 
-::: tab
-VS2022
 
-![image](../_static/images/renamestep2022.png)
-:::
-:::
-
-::: note
-::: title
-Note
-:::
-
-If the rename function is not affecting your feature files, you may need
-to restart Visual Studio to flush the cache.
-:::
+> **Note:**
+> If the rename function is not affecting your feature files, you may need to restart Visual Studio to flush the cache.
 

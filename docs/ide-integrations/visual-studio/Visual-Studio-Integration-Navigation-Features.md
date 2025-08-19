@@ -9,27 +9,9 @@ steps in your Gherkin feature files.
 You can navigate from a step definition method to the matching step(s)
 in your Gherkin feature file(s):
 
-::: tabs
-::: tab
-VS2019
+Right click the binding and select *Find step definition usages*
 
-Right click the binding and select *\`Go to Reqnroll step definition
-usages\`*
-
-![](/_static/images/gotogherkin2019.gif)
-
-alt
-
-:   vs2019
-:::
-
-::: tab
-VS2022
-
-Right click the binding and select *\`Find step definition usages\`* ..
-figure:: ../\_static/images/gotogherkin2022.gif :alt: vs2022
-:::
-:::
+![](../../_static/images/gotogherkin2022.gif)
 
 ## Navigating from a Gherkin Step to a Binding
 
