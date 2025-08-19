@@ -140,8 +140,6 @@ automatically. To do so:
 3.  Enter the new text for the step in the dialog and confirm with OK.
 4.  Your bindings and all feature files containing the step are updated.
 
-#### VS2022
-
 ![Rename Step 2022](../../_static/images/renamestep2022.png)
 
 

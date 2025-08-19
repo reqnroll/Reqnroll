@@ -1,4 +1,8 @@
-## Reqnroll Visual Studio Integration
+---
+hide-toc: true
+---
+
+# Reqnroll Visual Studio Integration
 
 This documentation covers the IDE integrations for Reqnroll.
 
@@ -9,3 +13,14 @@ This documentation covers the IDE integrations for Reqnroll.
 * [Test Explorer Support](visual-studio-test-explorer-support.md) - Running scenarios from Visual Studio Test Explorer
 * [Settings/Options](settings-options.md) - Configure the extension settings
 * [Generating Skeleton Code](Generating-Skeleton-Code.md) - Generate step definition skeleton code
+
+```{toctree}
+:hidden:
+
+visual-studio-integration
+Visual-Studio-Integration-Editing-Features
+Visual-Studio-Integration-Navigation-Features
+visual-studio-test-explorer-support
+settings-options
+Generating-Skeleton-Code
+```
