@@ -15,9 +15,7 @@ internal static class AssertionOptionsInitializer
                 .ComparingByMembers<SyntaxTrivia>()
                 .ComparingByMembers<Microsoft.CodeAnalysis.Diagnostic>()
                 .ComparingByMembers<TableCellSyntaxList>()
-                .WithStrictOrderingFor(obj => 
-                    obj.GetType().IsGenericType && 
-                    obj.GetType().GetGenericTypeDefinition() == typeof(SyntaxList<>))
+                .WithStrictOrdering()
                 .Using(new SyntaxNodeOrTokenStep())
                 .Excluding(member => member.DeclaringType == typeof(SyntaxNode) &&
                     member.Name == nameof(SyntaxNode.Parent))
