@@ -23,4 +23,6 @@ Visual-Studio-Integration-Navigation-Features
 visual-studio-test-explorer-support
 settings-options
 Generating-Skeleton-Code
+editorconfig
+reqnroll_json_ide_section_description
 ```

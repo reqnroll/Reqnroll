@@ -5,6 +5,10 @@ The Visual Studio integration includes the following features to make it
 easier to edit feature files and identify which steps have already been
 bound.
 
+```{note}
+Many of the formatting behaviors can be controlled by an [.editorconfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](reqnroll_json_ide_section_description.md).
+```
+
 ## Gherkin Syntax Highlighting
 
 Various default styles have been defined for the Gherkin syntax. You can
@@ -18,7 +22,7 @@ Visual Studio. The following syntax highlighting is used by default:
 
 -   Purple: unbound steps
 -   Black: bound steps
--   Grey italics: parameters in bound steps
+-   Red: parameters in bound steps
 
 You can thus tell immediately which steps in a feature file have been
 bound.
@@ -41,14 +45,11 @@ IntelliSense is available in feature files for the following:
 -   Gherkin keywords (e.g. `Scenario`, `Given` etc.)
 -   Existing steps are listed after a `Given`, `When` or `Then`
     statement, providing quick access to your current steps definitions.
-    Bound steps are indicated with \"\--\>\".
 
 ```{note}
 Note that all the steps in all \"\*.feature\" files\" that match the
 current type (Given, When, Then) are displayed
 ```
-
-## VS2022
 
 ![image](../../_static/images/vs2022inteli.png)
 
@@ -60,19 +61,7 @@ files.
 
 ### IntelliSense settings
 
-As much as having a suggested list of previous entries could speed up
-your work, the list may become too long in a big project and not really
-usable. To fix this problem, Reqnroll gives you the option to limit the
-number of IntelliSense step instances suggestions for each step
-template.
-
-To do this, simply navigate to **Tools \| Options \| Reqnroll \| General
-\| IntelliSense** and set the desired number of suggestions you wish to
-see against the **Max Step Instances Suggestions** value:
-
-#### VS2022
-
-You must edit the [reqnroll.json](https://reqnroll.net/wp-content/uploads/reqnrollconfigs/reqnroll-config.json) config file to turn IntelliSense on or off and also access other settings as per below:
+You must edit the [reqnroll.json](../../installation/configuration.md) config file access other settings as per below:
 
 ![IntelliSense 2022](../../_static/images/inteli2022.png)
 
