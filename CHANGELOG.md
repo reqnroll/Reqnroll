@@ -1,5 +1,13 @@
 # [vNext]
 
+## Improvements:
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.0.0 - 2025-08-21
+
 ## New features:
 
 * Formatters: An infrastructure for implementing integrated reporting formatters has been introduced. The infrastructure allows writing custom formatters, but Reqnroll provides two built-in formatters as well: the HTML and Message formatters. (#233)
