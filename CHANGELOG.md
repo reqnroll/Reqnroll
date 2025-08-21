@@ -5,6 +5,7 @@
 * Formatters: An infrastructure for implementing integrated reporting formatters has been introduced. The infrastructure allows writing custom formatters, but Reqnroll provides two built-in formatters as well: the HTML and Message formatters. (#233)
 	* HTML Formatter: A formatter that can produce single page HTML reports using the [Cucumber React components](https://github.com/cucumber/react-components). This formatter can be used as a replacement for the "SpecFlow+ LivingDoc Generator"
 	* Message Formatter: A formatter that can produce [Cucumber Messages](https://github.com/cucumber/messages/) `.ndjson` file. Cucumber messages contain all information about the test run, therefore this formatter can be used to integrate Reqnroll with other tools.
+* Support for [TUnit test framework](https://tunit.dev/). Use the package `Reqnroll.TUnit` in a TUnit project to enable Reqnroll TUnit support. Can be used with TUnit v0.55.23 and later. (#442)
 * Allow test execution without invoking binding (step definition, hook, step argument transformation) code by setting the `REQNROLL_DRY_RUN` environment variable to `true`. This is useful for quickly verifying if all steps have been defined. (#614)
 
 ## Improvements:
@@ -56,7 +57,7 @@
 * Removed unused `Culture` property from step definition attributes (`Given`, `When`, `Then`, `StepDefinition`) (#671)
 * Use scenario names for generated MsTest tests instead of the method name (#588)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @algirdasN, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
 
 # v2.4.1 - 2025-04-29
 
