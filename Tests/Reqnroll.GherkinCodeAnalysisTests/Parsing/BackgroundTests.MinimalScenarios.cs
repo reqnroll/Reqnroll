@@ -68,9 +68,8 @@ public partial class BackgroundTests
                                     TriviaList([Space])),
                                 LiteralText(
                                     TokenList(
-                                        Token(
+                                        Literal(
                                             TriviaList(),
-                                            SyntaxKind.LiteralToken,
                                             "the minimalism inside a background",
                                             TriviaList([EnvironmentNewLine])))))
                             ])),
@@ -103,9 +102,8 @@ public partial class BackgroundTests
                                         TriviaList([Space])),
                                     LiteralText(
                                         TokenList([
-                                            Token(
+                                            Literal(
                                                 TriviaList(),
-                                                SyntaxKind.LiteralToken,
                                                 "the minimalism",
                                                 TriviaList([EnvironmentNewLine]))
                                             ])))
@@ -137,9 +135,8 @@ public partial class BackgroundTests
                                         TriviaList([Space])),
                                     LiteralText(
                                         TokenList([
-                                            Token(
+                                            Literal(
                                                 TriviaList(),
-                                                SyntaxKind.LiteralToken,
                                                 "the minimalism",
                                                 TriviaList([EnvironmentNewLine]))
                                             ])))
