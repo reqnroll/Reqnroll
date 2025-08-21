@@ -2,10 +2,10 @@
 
 ## New features:
 
-* Formatters: An infrastructure for implementing integrated reporting formatters has been introduced. The infrastucture allows writing custom formatters, but Reqnroll provides two built-in formattes as well: the HTML and Message formatters. (#233)
+* Formatters: An infrastructure for implementing integrated reporting formatters has been introduced. The infrastructure allows writing custom formatters, but Reqnroll provides two built-in formatters as well: the HTML and Message formatters. (#233)
 	* HTML Formatter: A formatter that can produce single page HTML reports using the [Cucumber React components](https://github.com/cucumber/react-components). This formatter can be used as a replacement for the "SpecFlow+ LivingDoc Generator"
 	* Message Formatter: A formatter that can produce [Cucumber Messages](https://github.com/cucumber/messages/) `.ndjson` file. Cucumber messages contain all information about the test run, therefore this formatter can be used to integrate Reqnroll with other tools.
-* Allow test execution without invoking binding (step definition, hook, step argument transformation) code by setting the `REQNROLL_DRY_RUN` environment variable to `true`. This is useful for quikcly verify if all steps have been defined. (#614)
+* Allow test execution without invoking binding (step definition, hook, step argument transformation) code by setting the `REQNROLL_DRY_RUN` environment variable to `true`. This is useful for quickly verifying if all steps have been defined. (#614)
 
 ## Improvements:
 
@@ -27,7 +27,7 @@
 
 ## Improvements for plugins:
 
-* Refactrored `ExecutionEvent` classes and event publishing. Events carry more context information; publication is now async. (#621)
+* Refactored `ExecutionEvent` classes and event publishing. Events carry more context information; publication is now async. (#621)
 * Provide `AsyncEventHandler` in `RuntimePluginTestExecutionLifecycleEvents` (#634)
 
 ## Bug fixes:
