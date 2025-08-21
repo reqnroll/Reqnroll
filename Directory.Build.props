@@ -13,7 +13,7 @@
     <VersionPrefix>3.0.0</VersionPrefix>
     <VersionSuffix>local</VersionSuffix>
     <AssemblyVersion>3.0.0</AssemblyVersion>
-    <CompatibilityVersionUpperRange>3</CompatibilityVersionUpperRange>
+    <CompatibilityVersionUpperRange>4</CompatibilityVersionUpperRange>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
