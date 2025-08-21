@@ -27,6 +27,7 @@
 * Allow detecting skipped or pending execution status by the unit test providers (#732)
 * Allow `ScenarioContext`, `FeatureContext` and `TestThreadContext` to be resolved or injected through their interfaces, e.g. `IScenarioContext` (#761)
 * Removed deprecated `<summary>` from NuGet packages (#766)
+* Updated step definition template that is shown on test output when an undefined step is executed (#781)
 
 ## Bug fixes:
 
