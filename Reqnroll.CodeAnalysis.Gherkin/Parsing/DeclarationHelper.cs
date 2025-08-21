@@ -47,15 +47,24 @@ internal class DeclarationHelper(SyntaxKind keywordKind)
         // Obtain any trailing trivia.
         var trailing = line.GetEndOfLineTrivia();
 
-        if (!string.IsNullOrEmpty(token.MatchedText))
+        Keyword = CreateKeywordToken(leading, token.MatchedKeyword, null);
+
+        if (string.IsNullOrEmpty(token.MatchedText))
         {
-            var nameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
-            trailing = context.SourceText.ConsumeWhitespace(nameEndPosition, line.End) + trailing;
+            Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace + trailing);
+            return;
         }
 
-        Keyword = CreateKeywordToken(leading, token.MatchedKeyword, null);
+        var nameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
+        trailing = context.SourceText.ConsumeWhitespace(nameEndPosition, line.End) + trailing;
+
         Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
-        Name = CreateNameToken(null, token.MatchedText, trailing);
+        Name = LiteralText(
+            Literal(
+                null,
+                LiteralEscapingStyle.Default.Escape(token.MatchedText),
+                token.MatchedText,
+                trailing));
     }
 
     protected virtual InternalNode CreateKeywordToken(
@@ -63,18 +72,8 @@ internal class DeclarationHelper(SyntaxKind keywordKind)
         string value,
         InternalNode? trailingTrivia)
     {
-        return Token(leadingTrivia, keywordKind, value, trailingTrivia);
-    }
-
-    protected virtual InternalNode CreateNameToken(
-        InternalNode? leadingTrivia,
-        string? value,
-        InternalNode? trailingTrivia)
-    {
-        var token = string.IsNullOrEmpty(value) ?
-            MissingToken(leadingTrivia, SyntaxKind.LiteralToken, trailingTrivia) :
-            Literal(leadingTrivia, LiteralEscapingStyle.Default.Escape(value!), value!, trailingTrivia);
-
-        return LiteralText(token);
+        return string.IsNullOrEmpty(value) ?
+            MissingToken(leadingTrivia, keywordKind, trailingTrivia) :
+            Token(leadingTrivia, keywordKind, value, trailingTrivia);
     }
 }

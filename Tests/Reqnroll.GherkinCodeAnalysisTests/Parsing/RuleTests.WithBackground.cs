@@ -81,9 +81,8 @@ public partial class RuleTests
                                             TriviaList([Space])),
                                         LiteralText(
                                             TokenList([
-                                                Token(
+                                                Literal(
                                                     TriviaList(),
-                                                    SyntaxKind.LiteralToken,
                                                     "a rule background step",
                                                     TriviaList([EnvironmentNewLine]))
                                             ])))
@@ -114,9 +113,8 @@ public partial class RuleTests
                                                 TriviaList([Space])),
                                             LiteralText(
                                                 TokenList([
-                                                    Token(
+                                                    Literal(
                                                         TriviaList(),
-                                                        SyntaxKind.LiteralToken,
                                                         "the minimalism",
                                                         TriviaList([EnvironmentNewLine]))
                                                 ])))

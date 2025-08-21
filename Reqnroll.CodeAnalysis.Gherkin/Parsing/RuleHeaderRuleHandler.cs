@@ -4,13 +4,13 @@ using Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
-internal class FeatureHeaderRuleHandler() : BaseRuleHandler(RuleType.FeatureHeader)
+internal class RuleHeaderRuleHandler() : BaseRuleHandler(RuleType.RuleHeader)
 {
+    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.RuleKeyword);
+
     private DescriptionRuleHandler? _descriptionRuleHandler;
 
     private TagsRuleHandler? _tagsRuleHandler;
-
-    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.FeatureKeyword);
 
     public InternalNode? Keyword => _declarationHelper.Keyword;
 
@@ -21,13 +21,6 @@ internal class FeatureHeaderRuleHandler() : BaseRuleHandler(RuleType.FeatureHead
     public PlainTextSyntax.Internal? Description => _descriptionRuleHandler?.CreateDescriptionSyntax();
 
     public InternalNode? Tags => _tagsRuleHandler?.Tags;
-
-    protected override void AppendFeatureLine(Token token, TextLine line, ParsingContext context)
-    {
-        CodeAnalysisDebug.Assert(_declarationHelper.Keyword == null, "Duplicate feature line from parser.");
-
-        _declarationHelper.DeconstructDeclarationToken(token, line, context);
-    }
 
     public override ParsingRuleHandler StartChildRule(RuleType ruleType)
     {
@@ -43,5 +36,12 @@ internal class FeatureHeaderRuleHandler() : BaseRuleHandler(RuleType.FeatureHead
         }
 
         return base.StartChildRule(ruleType);
+    }
+
+    protected override void AppendRuleLine(Token token, TextLine line, ParsingContext context)
+    {
+        CodeAnalysisDebug.Assert(_declarationHelper.Keyword == null, "Duplicate feature line from parser.");
+
+        _declarationHelper.DeconstructDeclarationToken(token, line, context);
     }
 }
