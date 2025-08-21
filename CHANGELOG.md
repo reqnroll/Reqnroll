@@ -42,6 +42,7 @@
 * The synchronous code invocation API (`IBindingInvoker`) has been deprecated. Please use `IAsyncBindingInvoker` instead.
 * Removed obsolete property `ScenarioInfo.ScenarioAndFeatureTags`. Please use `ScenarioInfo.CombinedTags` instead.
 * Removed obsolete methods on `Reqnroll.Assist.Service` class: `RegisterValueComparer`, `UnregisterValueComparer`, `RegisterValueRetriever`, `UnregisterValueRetriever` use `ValueComparers.Register`, `ValueComparers.Unregister`, `ValueRetrievers.Register`, `ValueRetrievers.Unregister` instead.
+* The methods `ScenarioContext.Pending` and `ScenarioContext.StepIsPending` have been deprecated and going to be removed in v4. Use `throw new PendingStepException()` instead.
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
 

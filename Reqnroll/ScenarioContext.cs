@@ -72,11 +72,13 @@ public class ScenarioContext : ReqnrollContext, IScenarioContext
 
     public ScenarioStepContext StepContext => ScenarioContainer.Resolve<IContextManager>().StepContext;
 
+    [Obsolete("This method has been deprecated and going to be removed in v4. Use 'throw new PendingStepException()' instead.")]
     public void Pending()
     {
         throw new PendingStepException();
     }
 
+    [Obsolete("This method has been deprecated and going to be removed in v4. Use 'throw new PendingStepException()' instead.")]
     public static void StepIsPending()
     {
         throw new PendingStepException();
