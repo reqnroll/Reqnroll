@@ -36,7 +36,7 @@ The `ide` section configures all extension settings related to the **Integrated 
 - **Properties**:
     - `tagLinks` (array): Defines patterns for tags and the corresponding external URLs.
         - Each entry:
-            - `tagPattern` (string): Regex to match tag names (e.g., `"issue\\:(?&lt;id&gt;\\d+)"`).
+            - `tagPattern` (string): Regex to match tag names (e.g., `"issue\\:(?<id>\\d+)"`).
             - `urlTemplate` (string): URL template using captured regex groups (e.g., `"https://github.com/org/repo/issues/{id}"`).
 
 
@@ -46,7 +46,7 @@ The `ide` section configures all extension settings related to the **Integrated 
 "traceability": {
   "tagLinks": [
     {
-      "tagPattern": "issue\\:(?&lt;id&gt;\\d+)",
+      "tagPattern": "issue\\:(?<id>\\d+)",
       "urlTemplate": "https://github.com/org/repo/issues/{id}"
     }
   ]
@@ -120,7 +120,7 @@ The `ide` section configures all extension settings related to the **Integrated 
   "traceability": {
     "tagLinks": [
       {
-        "tagPattern": "issue\\:(?&lt;id&gt;\\d+)",
+        "tagPattern": "issue\\:(?<id>;\\d+)",
         "urlTemplate": "https://github.com/org/repo/issues/{id}"
       }
     ]
