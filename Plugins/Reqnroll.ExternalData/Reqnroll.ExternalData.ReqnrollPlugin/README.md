@@ -1,4 +1,4 @@
-﻿Reqnroll.ExternalData (pronounced as [reknroʊl]) provides external data loading capabilities for Reqnroll scenarios.
+﻿Reqnroll.ExternalData provides external data loading capabilities for Reqnroll scenarios.
 
 This package enables Reqnroll to load test data from external sources such as CSV files, JSON files, and other data formats, allowing for more flexible and maintainable test scenarios.
 
@@ -14,16 +14,16 @@ This package enables Reqnroll to load test data from external sources such as CS
 
 Install this package to add external data loading support to your Reqnroll project:
 
-```bash
+```powershell
 dotnet add package Reqnroll.ExternalData
 ```
 
 ## Documentation
 
-For more information about using external data with Reqnroll, visit the [documentation](https://docs.reqnroll.net/).
+For more information about using external data with Reqnroll, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

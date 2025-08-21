@@ -1,4 +1,4 @@
-﻿Reqnroll.NUnit (pronounced as [reknroʊl]) enables using Reqnroll with NUnit test framework.
+﻿Reqnroll.NUnit enables using Reqnroll with [NUnit test framework](https://nunit.org/).
 
 This package provides integration between Reqnroll and NUnit, allowing you to write BDD tests using Gherkin syntax that run with the NUnit test framework.
 
@@ -15,7 +15,7 @@ This package provides integration between Reqnroll and NUnit, allowing you to wr
 
 Install this package to add Reqnroll support to your NUnit project:
 
-```bash
+```powershell
 dotnet add package Reqnroll.NUnit
 ```
 
@@ -26,10 +26,10 @@ This package automatically includes:
 
 ## Documentation
 
-For more information about using Reqnroll with NUnit, visit the [documentation](https://docs.reqnroll.net/).
+For more information about using Reqnroll with NUnit, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

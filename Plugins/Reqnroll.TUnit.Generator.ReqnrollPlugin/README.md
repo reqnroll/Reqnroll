@@ -1,6 +1,6 @@
-﻿Reqnroll.TUnit (pronounced as [reknroʊl]) enables using Reqnroll with TUnit test framework.
+﻿Reqnroll.TUnit enables using Reqnroll with TUnit test framework.
 
-This package provides integration between Reqnroll and TUnit, allowing you to write BDD tests using Gherkin syntax that run with the TUnit test framework.
+This package provides integration between Reqnroll and [TUnit](https://tunit.dev/), allowing you to write BDD tests using Gherkin syntax that run with the TUnit test framework.
 
 ## Key Features
 
@@ -15,7 +15,7 @@ This package provides integration between Reqnroll and TUnit, allowing you to wr
 
 Install this package to add Reqnroll support to your TUnit project:
 
-```bash
+```powershell
 dotnet add package Reqnroll.TUnit
 ```
 
@@ -26,10 +26,10 @@ This package automatically includes:
 
 ## Documentation
 
-For more information about using Reqnroll with TUnit, visit the [documentation](https://docs.reqnroll.net/).
+For more information about using Reqnroll with TUnit, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

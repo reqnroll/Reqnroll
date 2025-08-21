@@ -1,6 +1,6 @@
-﻿Reqnroll.SpecFlowCompatibility (pronounced as [reknroʊl]) provides compatibility layer for migrating from SpecFlow to Reqnroll.
+﻿Reqnroll.SpecFlowCompatibility provides compatibility layer for migrating from SpecFlow to Reqnroll.
 
-This package helps ease the migration from SpecFlow by providing compatibility shims and adapters, allowing you to gradually migrate your existing SpecFlow tests to Reqnroll.
+This package helps ease the [migration from SpecFlow](https://docs.reqnroll.net/latest/guides/migrating-from-specflow.html) by providing compatibility shims and adapters, allowing you to gradually migrate your existing SpecFlow tests to Reqnroll.
 
 ## Key Features
 
@@ -14,16 +14,16 @@ This package helps ease the migration from SpecFlow by providing compatibility s
 
 Install this package to add SpecFlow compatibility support to your Reqnroll project:
 
-```bash
+```powershell
 dotnet add package Reqnroll.SpecFlowCompatibility
 ```
 
 ## Documentation
 
-For more information about migrating from SpecFlow to Reqnroll, visit the [documentation](https://docs.reqnroll.net/).
+For more information about migrating from SpecFlow to Reqnroll, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

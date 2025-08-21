@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="PackageReadme.md" Pack="true" PackagePath="README.md" />
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
   </ItemGroup>
 
   <ItemGroup>

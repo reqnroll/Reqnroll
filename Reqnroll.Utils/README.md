@@ -1,4 +1,4 @@
-﻿Reqnroll.Utils (pronounced as [reknroʊl]) provides utility classes and helper functions for the Reqnroll framework.
+﻿Reqnroll.Utils provides utility classes and helper functions for the Reqnroll framework.
 
 This package contains common utilities and helper classes used by various components of the Reqnroll BDD test automation framework for .NET.
 
@@ -15,6 +15,6 @@ For more information about Reqnroll and its components, visit the [documentation
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

@@ -30,7 +30,7 @@
     <file src="bin\$config$\netstandard2.0\Reqnroll.Windsor.ReqnrollPlugin.pdb" target="lib\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
-    <file src="PackageReadme.md" target="README.md" />
+    <file src="README.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
   </files>
 </package>

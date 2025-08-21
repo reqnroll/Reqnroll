@@ -1,4 +1,4 @@
-﻿Reqnroll.Templates.DotNet (pronounced as [reknroʊl]) provides dotnet new templates for creating Reqnroll projects and files.
+﻿Reqnroll.Templates.DotNet provides dotnet new templates for creating Reqnroll projects and files.
 
 This package contains project templates and item templates that can be used with the `dotnet new` command to quickly scaffold Reqnroll projects and add common files to existing projects.
 
@@ -14,7 +14,7 @@ This package contains project templates and item templates that can be used with
 
 Install the templates globally to use with dotnet new:
 
-```bash
+```powershell
 dotnet new install Reqnroll.Templates.DotNet
 ```
 
@@ -22,7 +22,7 @@ dotnet new install Reqnroll.Templates.DotNet
 
 After installation, you can create new projects and files:
 
-```bash
+```powershell
 # Create a new Reqnroll project
 dotnet new reqnroll-project
 
@@ -35,10 +35,10 @@ dotnet new reqnroll-feature
 
 ## Documentation
 
-For more information about Reqnroll templates and getting started, visit the [documentation](https://docs.reqnroll.net/).
+For more information about Reqnroll templates and getting started, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

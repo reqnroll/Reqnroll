@@ -1,4 +1,4 @@
-﻿Reqnroll.CustomPlugin (pronounced as [reknroʊl]) provides a sample custom plugin for Reqnroll.
+﻿Reqnroll.CustomPlugin provides a sample custom plugin for Reqnroll.
 
 This package serves as a template and example for creating custom plugins that extend Reqnroll functionality. It demonstrates how to create custom generators, transformations, and other extensions.
 
@@ -14,16 +14,16 @@ This package serves as a template and example for creating custom plugins that e
 
 This package is primarily for development and educational purposes:
 
-```bash
+```powershell
 dotnet add package Reqnroll.CustomPlugin
 ```
 
 ## Documentation
 
-For more information about creating custom Reqnroll plugins, visit the [documentation](https://docs.reqnroll.net/).
+For more information about creating custom Reqnroll plugins, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="PackageReadme.md" Pack="true" PackagePath="README.md" />
+    <None Include="README.md" Pack="true" PackagePath="README.md" />
     <MetaTemplate Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
     <Compile Remove="**\*" />
     <None Include="$(SolutionDir)reqnroll-icon.png" Pack="true" PackagePath="images" />

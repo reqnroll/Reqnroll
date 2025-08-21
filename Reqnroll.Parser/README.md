@@ -1,4 +1,4 @@
-﻿Reqnroll.Parser (pronounced as [reknroʊl]) is the Gherkin parsing component of the Reqnroll framework.
+﻿Reqnroll.Parser is the Gherkin parsing component of the Reqnroll framework.
 
 This package provides Gherkin feature file parsing capabilities that convert Gherkin syntax into structured data models for the Reqnroll BDD test automation framework for .NET.
 
@@ -15,6 +15,6 @@ For more information about Reqnroll and its components, visit the [documentation
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

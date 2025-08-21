@@ -1,4 +1,4 @@
-﻿Reqnroll.Tools.MsBuild.Generation (pronounced as [reknroʊl]) enables code-behind file generation during build time for Reqnroll projects.
+﻿Reqnroll.Tools.MsBuild.Generation enables code-behind file generation during build time for Reqnroll projects.
 
 This package provides MSBuild tasks and targets that automatically generate test code from Gherkin feature files during the build process, eliminating the need for manual code generation.
 
@@ -24,6 +24,6 @@ For more information about build configuration and code generation, see:
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

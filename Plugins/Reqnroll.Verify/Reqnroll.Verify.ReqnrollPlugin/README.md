@@ -1,4 +1,4 @@
-﻿Reqnroll.Verify (pronounced as [reknroʊl]) provides integration with Verify for snapshot testing in Reqnroll scenarios.
+﻿Reqnroll.Verify provides integration with [Verify](https://github.com/VerifyTests/Verify) for snapshot testing in Reqnroll scenarios.
 
 This package enables Reqnroll to use Verify for approval/snapshot testing, allowing you to verify complex objects, text outputs, and other test results using the Verify library.
 
@@ -14,16 +14,16 @@ This package enables Reqnroll to use Verify for approval/snapshot testing, allow
 
 Install this package to add Verify snapshot testing support to your Reqnroll project:
 
-```bash
+```powershell
 dotnet add package Reqnroll.Verify
 ```
 
 ## Documentation
 
-For more information about using Verify with Reqnroll, visit the [documentation](https://docs.reqnroll.net/).
+For more information about using Verify with Reqnroll, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)

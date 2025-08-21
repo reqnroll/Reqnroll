@@ -1,4 +1,4 @@
-﻿Reqnroll.Microsoft.Extensions.DependencyInjection (pronounced as [reknroʊl]) provides Microsoft.Extensions.DependencyInjection integration for Reqnroll.
+﻿Reqnroll.Microsoft.Extensions.DependencyInjection provides [Microsoft.Extensions.DependencyInjection](https://learn.microsoft.com/en-us/dotnet/core/extensions/dependency-injection-usage) integration for Reqnroll.
 
 This package enables Reqnroll to use the standard .NET dependency injection container for resolving step definitions, hooks, and other dependencies in your BDD tests.
 
@@ -14,16 +14,16 @@ This package enables Reqnroll to use the standard .NET dependency injection cont
 
 Install this package to add Microsoft.Extensions.DependencyInjection support to your Reqnroll project:
 
-```bash
+```powershell
 dotnet add package Reqnroll.Microsoft.Extensions.DependencyInjection
 ```
 
 ## Documentation
 
-For more information about using dependency injection with Reqnroll, visit the [documentation](https://docs.reqnroll.net/).
+For more information about using dependency injection with Reqnroll, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
 
 ## Support
 
-- [Documentation](https://docs.reqnroll.net/)
+- [Reqnroll Documentation](https://docs.reqnroll.net/)
 - [GitHub Issues](https://github.com/reqnroll/Reqnroll/issues)
 - [Community Discussions](https://github.com/reqnroll/Reqnroll/discussions)
