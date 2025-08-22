@@ -6,16 +6,16 @@ You can fine-tune the formatting for Gherkin files in your project by tweaking s
 
 | Setting Name | Description | Value Type | Default |
 | :-- | :-- | :-- | :-- |
-| `gherkin_indent_feature_children` | Indent child elements of Feature (Background, Rule, Scenario, Scenario Outline) | `true`/`false` | `false` |
-| `gherkin_indent_rule_children` | Indent child elements of Rule (Background, Scenario, Scenario Outline) | `true`/`false` | `false` |
-| `gherkin_indent_steps` | Indent steps in scenarios | `true`/`false` | `true` |
-| `gherkin_indent_and_steps` | Apply additional indentation to `And`/`But` steps in scenarios | `true`/`false` | `false` |
-| `gherkin_indent_datatable` | Indent DataTable arguments within steps | `true`/`false` | `true` |
-| `gherkin_indent_docstring` | Indent DocString arguments within steps | `true`/`false` | `true` |
-| `gherkin_indent_examples` | Indent the Examples block in Scenario Outlines | `true`/`false` | `false` |
-| `gherkin_indent_examples_table` | Indent the Examples table within Examples blocks | `true`/`false` | `true` |
+| `gherkin_indent_feature_children` | Indent child elements of Feature (Background, Rule, Scenario, Scenario Outline) | boolean | `false` |
+| `gherkin_indent_rule_children` | Indent child elements of Rule (Background, Scenario, Scenario Outline) | boolean | `false` |
+| `gherkin_indent_steps` | Indent steps in scenarios | boolean | `true` |
+| `gherkin_indent_and_steps` | Apply additional indentation to `And`/`But` steps in scenarios | boolean | `false` |
+| `gherkin_indent_datatable` | Indent DataTable arguments within steps | boolean | `true` |
+| `gherkin_indent_docstring` | Indent DocString arguments within steps | boolean | `true` |
+| `gherkin_indent_examples` | Indent the Examples block in Scenario Outlines | boolean | `false` |
+| `gherkin_indent_examples_table` | Indent the Examples table within Examples blocks | boolean | `true` |
 | `gherkin_table_cell_padding_size` | Number of spaces to pad table cells on each side | integer | `1` |
-| `gherkin_table_cell_right_align_numeric_content` | Right-align numeric values in table cells | `true`/`false` | `true` |
+| `gherkin_table_cell_right_align_numeric_content` | Right-align numeric values in table cells | boolean | `true` |
 
 **Note:** Only options with explicit default values are shown here; others default to their unspecified .NET/C# behavior.
 
