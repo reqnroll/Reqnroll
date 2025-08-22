@@ -12,6 +12,7 @@ externaldata
 fsharp
 mstest
 nunit
+tunit
 windsor
 xunit
 verify
