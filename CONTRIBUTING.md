@@ -236,8 +236,8 @@ To build documentation using the dev container approach, follow these steps:
 }
 ```
 
-2. **Open the repository in the dev container**:
-    - Open VS Code in the Reqnroll repository root
+2. **Open the docs folder in the dev container**:
+    - Open VS Code and navigate to the `docs` folder within the Reqnroll repository
     - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the command palette
     - Type "Dev Containers: Reopen in Container" and select it
     - VS Code will build and start the dev container automatically
