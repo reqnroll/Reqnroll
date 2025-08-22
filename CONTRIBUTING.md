@@ -156,7 +156,9 @@ Currently we have the following projects in this category:
 
 If you do not wish to contribute by coding you can help us in documentation.
 
-To build local documentation:
+The documentation may be built locally or within a VS Code dev container.
+
+### To build local documentation:
 
 - Install Python:
 
@@ -191,6 +193,68 @@ To build local documentation:
   ```
 
   - Result: the documentation is available at http://localhost:8000
+
+### Using VS Code Dev Containers (Alternative Approach)
+
+If you prefer not to install Python directly on your local machine, you can use VS Code with dev containers to build the documentation in an isolated environment.[^1_1]
+
+#### Prerequisites
+
+Before using this approach, ensure you have the following installed:
+
+- **Visual Studio Code** with the Dev Containers extension
+- **Docker Desktop** (or compatible Docker runtime)
+- **Git** for cloning the repository
+
+
+#### Setup and Usage
+
+To build documentation using the dev container approach, follow these steps:
+
+1. **Create the dev container configuration**: In the root of your Reqnroll repository, create a `.devcontainer` folder and add the following `devcontainer.json` file:[^1_1]
+```json
+{
+    "name": "Python & Sphinx Dev Container",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "features": {},
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python"
+            }
+        }
+    },
+    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+    "mounts": [
+        "source=${localWorkspaceFolder}/requirements.txt,target=/workspace/requirements.txt,type=bind,consistency=cached"
+    ],
+    "remoteUser": "vscode"
+}
+```
+
+2. **Open the repository in the dev container**:
+    - Open VS Code in the Reqnroll repository root
+    - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the command palette
+    - Type "Dev Containers: Reopen in Container" and select it
+    - VS Code will build and start the dev container automatically
+3. **Build the documentation**: Once the container is running and the environment is set up:
+
+```bash
+cd ./docs
+./make.cmd html
+```
+
+4. **Use autobuild for development**: For continuous documentation editing with automatic rebuilds:
+
+```bash
+./autobuild.cmd
+```
+
+The documentation will be available at http://localhost:8000
 
 ## Where can I go for help?
 

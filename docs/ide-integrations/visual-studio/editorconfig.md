@@ -17,8 +17,6 @@ You can fine-tune the formatting for Gherkin files in your project by tweaking s
 | `gherkin_table_cell_padding_size` | Number of spaces to pad table cells on each side | integer | `1` |
 | `gherkin_table_cell_right_align_numeric_content` | Right-align numeric values in table cells | boolean | `true` |
 
-**Note:** Only options with explicit default values are shown here; others default to their unspecified .NET/C# behavior.
-
 ## Sample `.editorconfig` for Gherkin Files
 
 Below is an example of an `.editorconfig` section for `*.feature` files, including a setting for UTF-8 charset:
