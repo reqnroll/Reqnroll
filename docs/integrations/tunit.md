@@ -115,10 +115,6 @@ public class Hooks
 }
 ```
 
-## Migrating from SpecFlow
-
-Reqnroll generates Task-based async code, which is different from the SpecFlow generated synchronous code. TUnit natively supports async test methods, so this transition should be smooth.
-
 ## Parallel Execution
 
 TUnit supports parallel test execution by default. You can control parallel execution at the test or class level using the `[NotInParallel]` attribute:
