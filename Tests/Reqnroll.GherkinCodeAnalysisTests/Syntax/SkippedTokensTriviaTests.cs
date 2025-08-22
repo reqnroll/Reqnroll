@@ -1,6 +1,7 @@
 ﻿using FluentAssertions;
 using FluentAssertions.Equivalency;
 using Microsoft.CodeAnalysis.Text;
+using Reqnroll.CodeAnalysis.Gherkin.Assertions;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -30,7 +31,11 @@ public class SkippedTokensTriviaTests
         skippedTokensTrivia.HasLeadingTrivia.Should().BeFalse();
         skippedTokensTrivia.HasTrailingTrivia.Should().BeTrue();
         skippedTokensTrivia.GetLeadingTrivia().Should().BeEmpty();
-        skippedTokensTrivia.GetTrailingTrivia().Should().BeEquivalentTo([Space]);
+        skippedTokensTrivia.GetTrailingTrivia().Should().BeEquivalentTo(
+            [Space],
+            options => options.ExcludingSyntaxPositions());
+        skippedTokensTrivia.GetTrailingTrivia()[0].Span.Should().Be(new TextSpan(7, 1));
+        skippedTokensTrivia.GetTrailingTrivia()[0].FullSpan.Should().Be(new TextSpan(7, 1));
 
         skippedTokensTrivia.HasDiagnostics.Should().BeFalse();
         skippedTokensTrivia.GetDiagnostics().Should().BeEmpty();
@@ -69,16 +74,18 @@ public class SkippedTokensTriviaTests
 
         var skippedTrivia = token.LeadingTrivia[0];
 
-        skippedTrivia.Token.Should().Be(token);
-        skippedTrivia.Span.Should().Be(TextSpan.FromBounds(0, "invalid".Length));
-        skippedTrivia.FullSpan.Should().Be(TextSpan.FromBounds(0, "invalid ".Length));
+        skippedTrivia.Token.Should().BeEquivalentTo(token, options => options.ExcludingSyntaxPositions());
+        skippedTrivia.Token.Span.Should().Be(new TextSpan(8, 1));
+        skippedTrivia.Token.FullSpan.Should().Be(new TextSpan(0, 9));
+        skippedTrivia.Span.Should().Be(new TextSpan(0, 7));
+        skippedTrivia.FullSpan.Should().Be(new TextSpan(0, 8));
 
         skippedTrivia.Kind.Should().Be(SyntaxKind.SkippedTokensTrivia);
         var skippedTokens = skippedTrivia.Structure!;
 
         skippedTokens.Should().NotBeNull();
         skippedTokens.Kind.Should().Be(SyntaxKind.SkippedTokensTrivia);
-        skippedTrivia.Span.Should().Be(TextSpan.FromBounds(0, "invalid".Length));
-        skippedTrivia.FullSpan.Should().Be(TextSpan.FromBounds(0, "invalid ".Length));
+        skippedTokens.Span.Should().Be(new TextSpan(0, 7));
+        skippedTokens.FullSpan.Should().Be(new TextSpan(0, 8));
     }
 }

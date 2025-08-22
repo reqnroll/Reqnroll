@@ -75,10 +75,18 @@ public class TokenTests
         token.HasLeadingTrivia.Should().BeTrue();
         token.HasTrailingTrivia.Should().BeTrue();
 
-        token.LeadingTrivia.Should().BeEquivalentTo([whitespace]);
+        token.LeadingTrivia.Should().BeEquivalentTo(
+            [whitespace],
+            options => options
+                .Excluding(trivia => trivia.Span)
+                .Excluding(trivia => trivia.FullSpan));
         token.LeadingTrivia[0].Span.Should().Be(new TextSpan(0, 4));
 
-        token.TrailingTrivia.Should().BeEquivalentTo([whitespace]);
+        token.TrailingTrivia.Should().BeEquivalentTo(
+            [whitespace],
+            options => options
+                .Excluding(trivia => trivia.Span)
+                .Excluding(trivia => trivia.FullSpan));
         token.TrailingTrivia[0].Span.Should().Be(new TextSpan(5, 4));
 
         token.Parent.Should().BeNull();
