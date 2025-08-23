@@ -1,0 +1,31 @@
+# Visual Studio 2022 Integration
+
+The Visual Studio integration includes a number of features that make it easier to edit Gherkin files and navigate to and from bindings in Visual Studio. You can also generate skeleton code for step definition methods from feature files. The Visual Studio integration also allows you to execute tests from Visual Studio's Test Explorer.
+
+You can install the integration from the Visual Studio Gallery (Marketplace) or directly in Visual Studio. Detailed instructions can be found [here](../../installation/setup-ide.md#setup-visual-studio-2022).
+
+The integration provides the following features:
+
+* [Editing](Visual-Studio-Integration-Editing-Features)
+  * [Gherkin syntax highlighting](Visual-Studio-Integration-Editing-Features.md#gherkin-syntax-highlighting) in feature files, highlighting unbound steps and parameters
+  * [IntelliSense](Visual-Studio-Integration-Editing-Features.md#intellisense-auto-completion-for-keywords-and-steps) (auto-completion) for keywords and steps
+  * [Outlining](Visual-Studio-Integration-Editing-Features.md#outlining-and-comments-in-feature-files) (folding) sections of the feature file
+  * [Comment/uncomment](Visual-Studio-Integration-Editing-Features.md#outlining-and-comments-in-feature-files) feature file lines
+  * Automatic Gherkin [table formatting](Visual-Studio-Integration-Editing-Features.md#table-formatting)
+  * [Document formatting](Visual-Studio-Integration-Editing-Features.md#document-formatting)
+* [Navigation](Visual-Studio-Integration-Navigation-Features)
+  * Navigate from [steps in scenarios to binding methods and vice versa](Visual-Studio-Integration-Navigation-Features.md#navigating-from-a-binding-to-steps-in-gherkin-files)
+  * Find Unused binding methods (those not yet bound to a step)
+  * Detect bindings from the Reqnroll project, from project references and from assembly references
+  * Cached step analysis for faster solution startup
+* Generic Test Runner Support
+  * You can execute tests using the Visual Studio and ReSharper test runners. You can execute Reqnroll scenarios on all supported unit testing platforms (e.g. NUnit, xUnit, MSTest, and TUnit).
+* [Visual Studio Test Explorer Support](visual-studio-test-explorer-support)
+  * Run/debug (including from feature files)
+  * Scenario title displayed in Test Explorer
+  * Full access to Test Explorer functions
+* Other
+  * [Generate skeleton step definition methods](Generating-Skeleton-Code) from feature files
+  * Re-generate feature files (from project node context menu and automatically on configuration change)
+  * Configurable options
+  * Support for ReSharper command shortcuts (when ReSharper is installed): commenting, navigation, test execution
