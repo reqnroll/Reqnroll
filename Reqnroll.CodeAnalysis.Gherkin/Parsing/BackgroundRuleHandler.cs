@@ -8,7 +8,7 @@ using static InternalSyntaxFactory;
 
 internal class BackgroundRuleHandler() : BaseRuleHandler(RuleType.Background)
 {
-    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.BackgroundKeyword);
+    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.BackgroundKeyword, false);
 
     private readonly List<StepRuleHandler> _steps = [];
     private DescriptionRuleHandler? _descriptionRuleHandler;

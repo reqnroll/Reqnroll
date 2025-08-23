@@ -8,7 +8,7 @@ using static InternalSyntaxFactory;
 
 internal class ScenarioRuleHandler() : BaseRuleHandler(RuleType.Scenario)
 {
-    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.ExampleKeyword);
+    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.ExampleKeyword, true);
 
     private readonly List<StepRuleHandler> _steps = [];
 

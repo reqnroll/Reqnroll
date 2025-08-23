@@ -20,7 +20,7 @@ using static InternalSyntaxFactory;
 /// of the raw text values to their token representations, including the associated trivia. These methods can
 /// be overriden to provide addtional behaviours, such as adding diagnostic information.</para>
 /// </remarks>
-internal class DeclarationHelper(SyntaxKind keywordKind) 
+internal class DeclarationHelper(SyntaxKind keywordKind, bool nameExpected) 
 {
     public InternalNode? Keyword { get; private set; }
 
@@ -44,27 +44,36 @@ internal class DeclarationHelper(SyntaxKind keywordKind)
 
         var leading = context.ConsumeLeadingTriviaAndWhitespace(line, token);
 
-        // Obtain any trailing trivia.
-        var trailing = line.GetEndOfLineTrivia();
-
         Keyword = CreateKeywordToken(leading, token.MatchedKeyword, null);
 
-        if (string.IsNullOrEmpty(token.MatchedText))
+        // If there is no name text and a name is not expected, we associate all remaining whitespace with the colon token.
+        if (token.MatchedText.Length == 0 && !nameExpected)
         {
-            Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace + trailing);
+            Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace + line.GetEndOfLineTrivia());
             return;
         }
 
-        var nameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
-        trailing = context.SourceText.ConsumeWhitespace(nameEndPosition, line.End) + trailing;
+        InternalNode nameLiteral;
 
-        Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
-        Name = LiteralText(
-            Literal(
+        // If there is no name text, we create a missing token and associate the end-of-line trivia with it.
+        if (token.MatchedText.Length == 0)
+        {
+            nameLiteral = MissingToken(null, SyntaxKind.LiteralToken, line.GetEndOfLineTrivia());
+        }
+        else
+        {
+            var nameEndPosition = colonPosition + (colonWhitespace?.Width ?? 0) + token.MatchedText.Length;
+            var trailing = context.SourceText.ConsumeWhitespace(nameEndPosition, line.End);
+
+            nameLiteral = Literal(
                 null,
                 LiteralEscapingStyle.Default.Escape(token.MatchedText),
                 token.MatchedText,
-                trailing));
+                trailing + line.GetEndOfLineTrivia());
+        }
+
+        Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
+        Name = LiteralText(nameLiteral);
     }
 
     protected virtual InternalNode CreateKeywordToken(

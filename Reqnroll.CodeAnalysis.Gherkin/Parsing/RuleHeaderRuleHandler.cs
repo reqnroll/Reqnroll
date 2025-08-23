@@ -6,7 +6,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 internal class RuleHeaderRuleHandler() : BaseRuleHandler(RuleType.RuleHeader)
 {
-    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.RuleKeyword);
+    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.RuleKeyword, true);
 
     private DescriptionRuleHandler? _descriptionRuleHandler;
 

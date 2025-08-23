@@ -10,7 +10,7 @@ internal class FeatureHeaderRuleHandler() : BaseRuleHandler(RuleType.FeatureHead
 
     private TagsRuleHandler? _tagsRuleHandler;
 
-    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.FeatureKeyword);
+    private readonly DeclarationHelper _declarationHelper = new(SyntaxKind.FeatureKeyword, true);
 
     public InternalNode? Keyword => _declarationHelper.Keyword;
 
