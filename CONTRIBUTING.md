@@ -211,44 +211,19 @@ Before using this approach, ensure you have the following installed:
 
 To build documentation using the dev container approach, follow these steps:
 
-1. **Create the dev container configuration**: In the root of your Reqnroll repository, create a `.devcontainer` folder and add the following `devcontainer.json` file:[^1_1]
-```json
-{
-    "name": "Python & Sphinx Dev Container",
-    "image": "mcr.microsoft.com/devcontainers/python:3.11",
-    "features": {},
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "ms-python.python",
-                "ms-python.vscode-pylance"
-            ],
-            "settings": {
-                "python.defaultInterpreterPath": "/usr/local/bin/python"
-            }
-        }
-    },
-    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
-    "mounts": [
-        "source=${localWorkspaceFolder}/requirements.txt,target=/workspace/requirements.txt,type=bind,consistency=cached"
-    ],
-    "remoteUser": "vscode"
-}
-```
-
-2. **Open the docs folder in the dev container**:
+1. **Open the docs folder in the dev container**:
     - Open VS Code and navigate to the `docs` folder within the Reqnroll repository
     - Press `Ctrl+Shift+P` (or `Cmd+Shift+P` on Mac) to open the command palette
     - Type "Dev Containers: Reopen in Container" and select it
     - VS Code will build and start the dev container automatically
-3. **Build the documentation**: Once the container is running and the environment is set up:
+2. **Build the documentation**: Once the container is running and the environment is set up:
 
 ```bash
 cd ./docs
 ./make.cmd html
 ```
 
-4. **Use autobuild for development**: For continuous documentation editing with automatic rebuilds:
+3. **Use autobuild for development**: For continuous documentation editing with automatic rebuilds:
 
 ```bash
 ./autobuild.cmd
