@@ -15,10 +15,17 @@ internal static class DiagnosticDescriptors
         new(resourceKey, ResourceManager, typeof(DiagnosticDescriptor));
 
     public static readonly DiagnosticDescriptor ErrorExpectedFeatureOrTag = new(
-
         id: DiagnosticIds.ErrorExpectedFeatureOrTag,
         title: GetLocalizableResourceString("ErrorExpectedFeatureOrTagTitle"),
         messageFormat: GetLocalizableResourceString("ErrorExpectedFeatureOrTagMessage"),
+        "Reqnroll.Gherkin",
+        DiagnosticSeverity.Error,
+        true);
+
+    public static readonly DiagnosticDescriptor ErrorFeatureIsMissingName = new(
+        id: DiagnosticIds.ErrorFeatureIsMissingName,
+        title: GetLocalizableResourceString("ErrorFeatureIsMissingNameTitle"),
+        messageFormat: GetLocalizableResourceString("ErrorFeatureIsMissingNameMessage"),
         "Reqnroll.Gherkin",
         DiagnosticSeverity.Error,
         true);

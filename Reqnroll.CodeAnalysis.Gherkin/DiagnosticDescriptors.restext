@@ -1,2 +1,5 @@
 ﻿ErrorExpectedFeatureOrTagMessage = Feature keyword or tag expected
 ErrorExpectedFeatureOrTagTitle = Feature keyword or tag expected
+
+ErrorFeatureIsMissingNameTitle = Feature is missing its name
+ErrorFeatureIsMissingNameMessage = Feature is missing its name
