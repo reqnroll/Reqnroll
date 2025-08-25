@@ -25,7 +25,8 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
                 .Setup(m => m.GenerateFilesForProject(
                     It.IsAny<List<string>>(),
                     It.IsAny<string>(),
-                    It.IsAny<string>()))
+                    It.IsAny<string>(),
+                    It.IsAny<bool>()))
                 .Returns(new List<string>());
             return generatorMock;
         }

@@ -29,6 +29,7 @@ namespace Reqnroll.Generator
         public IDictionary<string, object> CustomData { get; private set; }
 
         public ICollection<string> GenerationWarnings { get; private set; }
+        public bool FeatureFilesEmbedded { get; private set; }
 
         public TestClassGenerationContext(
             IUnitTestGeneratorProvider unitTestGeneratorProvider,
@@ -44,7 +45,8 @@ namespace Reqnroll.Generator
             CodeMemberMethod scenarioStartMethod,
             CodeMemberMethod scenarioCleanupMethod,
             CodeMemberMethod featureBackgroundMethod,
-            bool generateRowTests)
+            bool generateRowTests,
+            bool featureFilesEmbedded = false)
         {
             UnitTestGeneratorProvider = unitTestGeneratorProvider;
             Document = document;
@@ -60,6 +62,7 @@ namespace Reqnroll.Generator
             ScenarioCleanupMethod = scenarioCleanupMethod;
             FeatureBackgroundMethod = featureBackgroundMethod;
             GenerateRowTests = generateRowTests;
+            FeatureFilesEmbedded = featureFilesEmbedded;
 
             CustomData = new Dictionary<string, object>();
             GenerationWarnings = new List<string>();

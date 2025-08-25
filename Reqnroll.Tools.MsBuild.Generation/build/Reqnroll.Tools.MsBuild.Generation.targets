@@ -102,6 +102,7 @@
       TargetFrameworks="$(Reqnroll_TargetFrameworks)"
       TargetFramework="$(Reqnroll_TargetFramework)"
       ProjectGuid="$(ProjectGuid)"
+      ReqnrollFeatureFilesEmbedded="$(ReqnrollEmbedFeatureFiles)"
       >
 
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />

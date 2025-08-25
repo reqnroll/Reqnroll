@@ -36,6 +36,8 @@ namespace Reqnroll.Tools.MsBuild.Generation
         public string TargetFramework { get; set; }
         public string ProjectGuid { get; set; }
 
+        public bool ReqnrollFeatureFilesEmbedded { get; set; } = false;
+
         public override bool Execute()
         {
             var generateFeatureFileCodeBehindTaskContainerBuilder = new GenerateFeatureFileCodeBehindTaskContainerBuilder();
@@ -44,7 +46,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
             var msbuildInformationProvider = new MSBuildInformationProvider(MSBuildVersion);
             var generateFeatureFileCodeBehindTaskConfiguration = new GenerateFeatureFileCodeBehindTaskConfiguration(AnalyticsTransmitter, CodeBehindGenerator);
-            var generateFeatureFileCodeBehindTaskInfo = new ReqnrollProjectInfo(generatorPlugins, featureFiles, ProjectPath, ProjectFolder, ProjectGuid, AssemblyName, OutputPath, RootNamespace, TargetFrameworks, TargetFramework);
+            var generateFeatureFileCodeBehindTaskInfo = new ReqnrollProjectInfo(generatorPlugins, featureFiles, ProjectPath, ProjectFolder, ProjectGuid, AssemblyName, OutputPath, RootNamespace, TargetFrameworks, TargetFramework, ReqnrollFeatureFilesEmbedded);
 
             using (var taskRootContainer = generateFeatureFileCodeBehindTaskContainerBuilder.BuildRootContainer(Log, generateFeatureFileCodeBehindTaskInfo, msbuildInformationProvider, generateFeatureFileCodeBehindTaskConfiguration))
             {

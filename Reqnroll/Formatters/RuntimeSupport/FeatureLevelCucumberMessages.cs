@@ -41,8 +41,11 @@ public class FeatureLevelCucumberMessages
     internal Source ProcessSource(Func<Source> sourceGeneratorFunc)
     {
         var fromCompiler = sourceGeneratorFunc();
-        if (fromCompiler != null && fromCompiler.Data != null)
+        if (fromCompiler != null && !String.IsNullOrEmpty(fromCompiler.Data) )
             return fromCompiler;
+
+        // If the SourceFunc returns a Source object with an empty Data field (the source text),
+        // then the source of the feature has been embedded in the assembly
 
         // Determine the assembly that contains the provided delegate (feature class)
         var assembly = sourceGeneratorFunc?.Method?.DeclaringType?.Assembly
@@ -51,7 +54,7 @@ public class FeatureLevelCucumberMessages
         if (fromCompiler == null || string.IsNullOrEmpty(fromCompiler.Uri))
             throw new InvalidOperationException("Compiler-provided Source is missing or has no Uri.");
 
-        return CreateSourceFromEmbeddedResource(fromCompiler.Uri, assembly);
+        return CreateSourceFromEmbeddedResource(fromCompiler.Uri.Replace('/', '\\'), assembly);
     }
 
     // Retrieves text from an embedded resource and returns a Cucumber Messages Source.
