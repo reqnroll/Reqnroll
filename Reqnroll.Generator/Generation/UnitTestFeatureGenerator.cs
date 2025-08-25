@@ -49,13 +49,13 @@ namespace Reqnroll.Generator.Generation
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";
 
-        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> generationWarnings)
+        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> generationWarnings, bool featureFilesEmbedded = false)
         {
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
 
             testClassName = testClassName ?? string.Format(TestClassNameFormat, feature.Name.ToIdentifier());
-            var generationContext = CreateTestClassStructure(codeNamespace, testClassName, document);
+            var generationContext = CreateTestClassStructure(codeNamespace, testClassName, document, featureFilesEmbedded);
 
             SetupTestClass(generationContext);
             SetupTestClassInitializeMethod(generationContext);
@@ -79,7 +79,7 @@ namespace Reqnroll.Generator.Generation
         }
 
 
-        private TestClassGenerationContext CreateTestClassStructure(CodeNamespace codeNamespace, string testClassName, ReqnrollDocument document)
+        private TestClassGenerationContext CreateTestClassStructure(CodeNamespace codeNamespace, string testClassName, ReqnrollDocument document, bool featureFilesEmbedded)
         {
             var testClass = _codeDomHelper.CreateGeneratedTypeDeclaration(testClassName);
             codeNamespace.Types.Add(testClass);
@@ -98,7 +98,8 @@ namespace Reqnroll.Generator.Generation
                 _codeDomHelper.CreateMethod(testClass),
                 _codeDomHelper.CreateMethod(testClass),
                 document.ReqnrollFeature.HasFeatureBackground() ? _codeDomHelper.CreateMethod(testClass) : null,
-                _testGeneratorProvider.GetTraits().HasFlag(UnitTestGeneratorTraits.RowTests) && _reqnrollConfiguration.AllowRowTests);
+                _testGeneratorProvider.GetTraits().HasFlag(UnitTestGeneratorTraits.RowTests) && _reqnrollConfiguration.AllowRowTests,
+                featureFilesEmbedded);
         }
 
         private CodeNamespace CreateNamespace(string targetNamespace)
@@ -260,6 +261,10 @@ namespace Reqnroll.Generator.Generation
             try
             {
                 var featureSource = CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document);
+                if (generationContext.FeatureFilesEmbedded)
+                {
+                    featureSource = new Io.Cucumber.Messages.Types.Source(featureSource.Uri, "", Io.Cucumber.Messages.Types.SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
+                }
                 var IdGeneratorSeed = featureSource.Uri + featureSource.Data;
                 var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(IdGeneratorSeed));
                 var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);

@@ -27,4 +27,12 @@ public class ProjectSettings
     /// The reference of the unparsed Reqnroll configuration of the project. Mandatory.
     /// </summary>
     public ReqnrollConfigurationHolder ConfigurationHolder { get; set; } = new();
+
+    /// <summary>
+    /// Gets or sets a value indicating whether feature files will be embedded as resources in the output assembly. Optional.
+    /// </summary>
+    /// <remarks>When set to <see langword="true"/>, feature files will be included in the compiled assembly
+    /// as embedded resources by the build system. This flag informs the code-behind generator to expect that, but it is 
+    /// not the responsibility of the generator to perform the embedding.</remarks>
+    public bool FeatureFilesEmbedded { get; set; }
 }

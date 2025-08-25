@@ -16,7 +16,9 @@ namespace Reqnroll.Tools.MsBuild.Generation
             string outputPath,
             string rootNamespace,
             string targetFrameworks,
-            string currentTargetFramework)
+            string currentTargetFramework,
+            bool featureFilesEmbedded = false
+            )
         {
             GeneratorPlugins = generatorPlugins;
             FeatureFiles = FileFilter.GetValidFiles(featureFiles);
@@ -28,6 +30,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             ProjectGuid = projectGuid;
             ProjectAssemblyName = projectAssemblyName;
             ProjectPath = projectPath;
+            FeatureFilesEmbedded = featureFilesEmbedded;
         }
 
         public IReadOnlyCollection<GeneratorPluginInfo> GeneratorPlugins { get; }
@@ -35,7 +38,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
         public IReadOnlyCollection<string> FeatureFiles { get; }
 
         public string ProjectPath { get; }
-
+        public bool FeatureFilesEmbedded { get; }
         public string ProjectFolder { get; }
 
         public string ProjectGuid { get; }

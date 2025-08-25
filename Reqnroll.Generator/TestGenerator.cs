@@ -62,7 +62,7 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
                 return new TestGeneratorResult(null, true, null);
         }
 
-        string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings);
+        string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings, settings.FeatureFilesEmbedded);
         if(string.IsNullOrEmpty(generatedTestCode))
             return new TestGeneratorResult(null, true, generatedWarnings);
 
@@ -81,13 +81,13 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return new TestGeneratorResult(generatedTestCode, false, generatedWarnings);
     }
 
-    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
+    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, bool featureFilesEmbedded = false)
     {
         generationWarnings = Array.Empty<string>();
         using (var outputWriter = new IndentProcessingWriter(new StringWriter()))
         {
             var codeProvider = CodeDomHelper.CreateCodeDomProvider();
-            var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings);
+            var codeNamespace = GenerateTestFileCode(featureFileInput, featureFilesEmbedded, out generationWarnings);
             if (codeNamespace == null) return "";
 
             var options = new CodeGeneratorOptions
@@ -137,7 +137,7 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return result;
     }
         
-    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
+    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, bool featureFilesEmbedded, out IEnumerable<string> generationWarnings)
     {
         generationWarnings = Array.Empty<string>();
         string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
@@ -153,7 +153,7 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
 
         var featureGenerator = _featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
 
-        var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out generationWarnings);
+        var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out generationWarnings, featureFilesEmbedded);
         return codeNamespace;
     }
 

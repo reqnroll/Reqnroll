@@ -22,7 +22,8 @@ namespace Reqnroll.Tools.MsBuild.Generation
         public IEnumerable<string> GenerateFilesForProject(
             IReadOnlyCollection<string> featureFiles,
             string projectFolder,
-            string outputPath)
+            string outputPath,
+            bool featureFilesEmbedded = false)
         {
             var codeBehindWriter = new CodeBehindWriter(null);
 
@@ -34,7 +35,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             foreach (var featureFile in featureFiles)
             {
                 string featureFileItemSpec = featureFile;
-                var generatorResult = _featureCodeBehindGenerator.GenerateCodeBehindFile(featureFileItemSpec);
+                var generatorResult = _featureCodeBehindGenerator.GenerateCodeBehindFile(featureFileItemSpec, featureFilesEmbedded);
 
                 if (!generatorResult.Success)
                 {

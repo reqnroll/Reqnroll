@@ -18,4 +18,6 @@ public class GenerationSettings
     /// disabled by default.
     /// </summary>
     public bool WriteResultToFile { get; set; } = false;
+
+    public bool FeatureFilesEmbedded { get; set; } = false;
 }

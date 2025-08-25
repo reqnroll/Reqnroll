@@ -46,6 +46,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             try
             {
                 var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
+                reqnrollProject.ProjectSettings.FeatureFilesEmbedded = _reqnrollProjectInfo.FeatureFilesEmbedded;
 
                 using var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
                     reqnrollProject.ProjectSettings.ConfigurationHolder,
