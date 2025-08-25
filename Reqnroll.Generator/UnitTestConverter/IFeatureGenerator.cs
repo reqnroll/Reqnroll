@@ -6,6 +6,6 @@ namespace Reqnroll.Generator.UnitTestConverter
 {
     public interface IFeatureGenerator
     {
-        CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> warnings);
+        CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> warnings, out IEnumerable<string> featureNdjsonMessages);
     }
 }

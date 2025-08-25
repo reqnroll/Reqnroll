@@ -25,6 +25,11 @@ public class TestGeneratorResult
     /// Warning messages from code generation, if any.
     /// </summary>
     public IEnumerable<string> Warnings { get; private set; }
+
+    /// <summary>
+    /// The collection of feature-level Messages in Newline Delimited JSON (NDJSON) format.
+    /// </summary>
+    public IEnumerable<string> FeatureNdjsonMessages { get; private set; }
     public TestGeneratorResult(params TestGenerationError[] errors)
         : this((IEnumerable<TestGenerationError>)errors)
     {
@@ -40,10 +45,11 @@ public class TestGeneratorResult
         Warnings = Array.Empty<string>();
     }
 
-    public TestGeneratorResult(string generatedTestCode, bool isUpToDate, IEnumerable<string> warnings)
+    public TestGeneratorResult(string generatedTestCode, bool isUpToDate, IEnumerable<string> warnings, IEnumerable<string> featureNdjsonMessages)
     {
         IsUpToDate = isUpToDate;
         GeneratedTestCode = generatedTestCode;
         Warnings = warnings is null ? Array.Empty<string>() : warnings.ToList();
+        FeatureNdjsonMessages = featureNdjsonMessages;
     }
 }

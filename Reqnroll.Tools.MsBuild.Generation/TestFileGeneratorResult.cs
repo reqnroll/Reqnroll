@@ -20,6 +20,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             IsUpToDate = generatorResult.IsUpToDate;
             GeneratedTestCode = generatorResult.GeneratedTestCode;
             Warnings = generatorResult.Warnings;
+            FeatureNdjsonMessages = generatorResult.FeatureNdjsonMessages;
         }
 
         /// <summary>
@@ -42,5 +43,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
         public string Filename { get; }
 
         public IEnumerable<string> Warnings { get; }
+
+        public IEnumerable<string> FeatureNdjsonMessages { get; }
     }
 }

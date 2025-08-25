@@ -1,7 +1,10 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Build.Utilities;
 using Reqnroll.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
@@ -66,6 +69,16 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     generatorResult.Filename);
 
                 string resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, featureFile, generatorResult);
+
+                if (generatorResult.FeatureNdjsonMessages != null && generatorResult.FeatureNdjsonMessages.Count() > 0)
+                {
+                    string ndjsonFilename = Path.Combine(
+                        Path.GetDirectoryName(targetFilePath) ?? string.Empty,
+                        Path.GetFileNameWithoutExtension(targetFilePath) + ".ndjson"
+                    );
+                    File.WriteAllLines(ndjsonFilename, generatorResult.FeatureNdjsonMessages, Encoding.UTF8);
+                }
+
 
                 yield return FileSystemHelper.GetRelativePath(resultedFile, projectFolder);
             }

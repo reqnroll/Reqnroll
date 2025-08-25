@@ -59,18 +59,18 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         {
             preliminaryUpToDateCheckResult = TestUpToDateChecker.IsUpToDatePreliminary(featureFileInput, generatedTestFullPath, settings.UpToDateCheckingMethod);
             if (preliminaryUpToDateCheckResult == true)
-                return new TestGeneratorResult(null, true, null);
+                return new TestGeneratorResult(null, true, null, null);
         }
 
-        string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings);
+        string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings, out var featureNdjsonMessages);
         if(string.IsNullOrEmpty(generatedTestCode))
-            return new TestGeneratorResult(null, true, generatedWarnings);
+            return new TestGeneratorResult(null, true, generatedWarnings, null);
 
         if (settings.CheckUpToDate && preliminaryUpToDateCheckResult != false)
         {
             var isUpToDate = TestUpToDateChecker.IsUpToDate(featureFileInput, generatedTestFullPath, generatedTestCode, settings.UpToDateCheckingMethod);
             if (isUpToDate)
-                return new TestGeneratorResult(null, true, generatedWarnings);
+                return new TestGeneratorResult(null, true, generatedWarnings, null);
         }
 
         if (settings.WriteResultToFile)
@@ -78,16 +78,17 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
             File.WriteAllText(generatedTestFullPath, generatedTestCode, Encoding.UTF8);
         }
 
-        return new TestGeneratorResult(generatedTestCode, false, generatedWarnings);
+        return new TestGeneratorResult(generatedTestCode, false, generatedWarnings, featureNdjsonMessages);
     }
 
-    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
+    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out IEnumerable<string> featureNdjsonMessages)
     {
         generationWarnings = Array.Empty<string>();
+        featureNdjsonMessages = Array.Empty<string>();
         using (var outputWriter = new IndentProcessingWriter(new StringWriter()))
         {
             var codeProvider = CodeDomHelper.CreateCodeDomProvider();
-            var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings);
+            var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings, out featureNdjsonMessages);
             if (codeNamespace == null) return "";
 
             var options = new CodeGeneratorOptions
@@ -137,9 +138,10 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return result;
     }
         
-    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings)
+    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out IEnumerable<string> featureNdjsonMessages)
     {
         generationWarnings = Array.Empty<string>();
+        featureNdjsonMessages = Array.Empty<string>();
         string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
 
         var parser = _gherkinParserFactory.Create(ReqnrollConfiguration.FeatureLanguage);
@@ -153,7 +155,7 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
 
         var featureGenerator = _featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
 
-        var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out generationWarnings);
+        var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out generationWarnings, out featureNdjsonMessages);
         return codeNamespace;
     }
 

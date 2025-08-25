@@ -152,7 +152,16 @@
         <LogicalName>%(ReqnrollFeatureFiles.Identity)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
-    
+    <ItemGroup>
+      <ReqnrollGeneratedNdjsonFiles Include="@(ReqnrollGeneratedFiles->'%(RootDir)%(Directory)%(Filename).ndjson')" />
+    </ItemGroup>
+    <Message Text="ReqnrollGeneratedNdjsonFiles: @(ReqnrollGeneratedNdjsonFiles)" Importance="high" />
+    <ItemGroup>
+      <EmbeddedResource Include="@(ReqnrollGeneratedNdjsonFiles)">
+        <LogicalName>%(ReqnrollGeneratedNdjsonFiles.Identity)</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+
   </Target>
 
   <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject">
