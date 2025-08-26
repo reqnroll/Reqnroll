@@ -1,4 +1,3 @@
-
 # Editing Features
 
 The Visual Studio integration includes the following features to make it
@@ -6,7 +5,7 @@ easier to edit feature files and identify which steps have already been
 bound.
 
 ```{note}
-Many of the formatting behaviors can be controlled by an [.editorconfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](reqnroll_json_ide_section_description.md).
+Many of the formatting behaviors can be controlled by an [.editorconfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](reqnroll-json-ide-section-description.md).
 ```
 
 ## Gherkin Syntax Highlighting
@@ -52,18 +51,6 @@ current type (Given, When, Then) are displayed
 ```
 
 ![image](../../_static/images/vs2022inteli.png)
-
-
-### Code Files
-
-IntelliSense is also available for the Gherkin keywords in your code
-files.
-
-### IntelliSense settings
-
-You must edit the [reqnroll.json](../../installation/configuration.md) config file access other settings as per below:
-
-![IntelliSense 2022](../../_static/images/inteli2022.png)
 
 ## Outlining and Comments in Feature Files
 
@@ -118,20 +105,29 @@ After the `Format Document` command:
 Formatted document
 ```
 
+```{note}
+Settings controlling the formatting and identation behavior of the feature editor may be customized via the **[Reqnroll config file](reqnroll-json-ide-section-description)** 
+
+![IntelliSense 2022](../../_static/images/inteli2022.png) 
+
+or via an [`.editorconfig` file](editorconfig).
+```
+
+
 ## Renaming Steps
 
-You can globally rename steps and update the associated bindings
+You can globally rename steps and update the associated step definitions
 automatically. To do so:
 
 1.  Open the feature file containing the step.
 2.  Right-click on the step you want to rename and select Rename from
     the context menu.
 3.  Enter the new text for the step in the dialog and confirm with OK.
-4.  Your bindings and all feature files containing the step are updated.
+4.  Your step definitions and all feature files containing the step are updated.
 
 ![Rename Step 2022](../../_static/images/renamestep2022.png)
 
 
-> **Note:**
-> If the rename function is not affecting your feature files, you may need to restart Visual Studio to flush the cache.
-
+```{note}
+**Step Rename** is an experimental feature. It only works for those step methods that do not have parameters. If the rename function is not affecting your feature files, you may need to restart Visual Studio to flush the cache.
+```
