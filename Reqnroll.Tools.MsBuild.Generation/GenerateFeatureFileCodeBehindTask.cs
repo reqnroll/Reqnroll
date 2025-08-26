@@ -22,7 +22,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public string ProjectFolder => Path.GetDirectoryName(ProjectPath);
         public string OutputPath { get; set; }
-
+        public string IntermediateOutputPath { get; set; }
         public ITaskItem[] FeatureFiles { get; set; }
 
         public ITaskItem[] GeneratorPlugins { get; set; }
@@ -30,6 +30,8 @@ namespace Reqnroll.Tools.MsBuild.Generation
         [Output]
         public ITaskItem[] GeneratedFiles { get; private set; }
 
+        [Output]
+        public ITaskItem[] GeneratedNdjsonFiles { get; private set; }
         public string MSBuildVersion { get; set; }
         public string AssemblyName { get; set; }
         public string TargetFrameworks { get; set; }
@@ -44,7 +46,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
             var msbuildInformationProvider = new MSBuildInformationProvider(MSBuildVersion);
             var generateFeatureFileCodeBehindTaskConfiguration = new GenerateFeatureFileCodeBehindTaskConfiguration(AnalyticsTransmitter, CodeBehindGenerator);
-            var generateFeatureFileCodeBehindTaskInfo = new ReqnrollProjectInfo(generatorPlugins, featureFiles, ProjectPath, ProjectFolder, ProjectGuid, AssemblyName, OutputPath, RootNamespace, TargetFrameworks, TargetFramework);
+            var generateFeatureFileCodeBehindTaskInfo = new ReqnrollProjectInfo(generatorPlugins, featureFiles, ProjectPath, ProjectFolder, ProjectGuid, AssemblyName, OutputPath, IntermediateOutputPath, RootNamespace, TargetFrameworks, TargetFramework);
 
             using (var taskRootContainer = generateFeatureFileCodeBehindTaskContainerBuilder.BuildRootContainer(Log, generateFeatureFileCodeBehindTaskInfo, msbuildInformationProvider, generateFeatureFileCodeBehindTaskConfiguration))
             {
@@ -59,7 +61,9 @@ namespace Reqnroll.Tools.MsBuild.Generation
                         return false;
                     }
 
-                    GeneratedFiles = success.Result.ToArray();
+                    GeneratedFiles = success.Result.Where(i =>  i.ItemSpec.EndsWith(".cs")).ToArray();
+                    GeneratedNdjsonFiles = success.Result.Where(i => i.ItemSpec.EndsWith(".ndjson")).ToArray();
+
                     return true;
                 }
             }

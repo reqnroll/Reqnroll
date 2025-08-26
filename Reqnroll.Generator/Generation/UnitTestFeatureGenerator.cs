@@ -51,9 +51,9 @@ namespace Reqnroll.Generator.Generation
         }
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";
-        private IEnumerable<string> _featureNdJsonMessages = new List<string>();
+        private string _featureNdJsonMessages = null;
 
-        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> generationWarnings, out IEnumerable<string> featureNdjsonMessages)
+        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> generationWarnings, out string featureNdjsonMessages)
         {
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
@@ -253,7 +253,7 @@ namespace Reqnroll.Generator.Generation
             }
             finally
             {
-                _featureNdJsonMessages = ndjsonLines;
+                _featureNdJsonMessages = String.Join(Environment.NewLine, ndjsonLines);
             }
 
             // Create a FeatureLevelCucumberMessages object and add it to featureInfo

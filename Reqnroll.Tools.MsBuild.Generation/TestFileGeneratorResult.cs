@@ -44,6 +44,6 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public IEnumerable<string> Warnings { get; }
 
-        public IEnumerable<string> FeatureNdjsonMessages { get; }
+        public string FeatureNdjsonMessages { get; }
     }
 }

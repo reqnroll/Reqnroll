@@ -29,7 +29,7 @@ public class TestGeneratorResult
     /// <summary>
     /// The collection of feature-level Messages in Newline Delimited JSON (NDJSON) format.
     /// </summary>
-    public IEnumerable<string> FeatureNdjsonMessages { get; private set; }
+    public string FeatureNdjsonMessages { get; private set; }
     public TestGeneratorResult(params TestGenerationError[] errors)
         : this((IEnumerable<TestGenerationError>)errors)
     {
@@ -45,7 +45,7 @@ public class TestGeneratorResult
         Warnings = Array.Empty<string>();
     }
 
-    public TestGeneratorResult(string generatedTestCode, bool isUpToDate, IEnumerable<string> warnings, IEnumerable<string> featureNdjsonMessages)
+    public TestGeneratorResult(string generatedTestCode, bool isUpToDate, IEnumerable<string> warnings, string featureNdjsonMessages)
     {
         IsUpToDate = isUpToDate;
         GeneratedTestCode = generatedTestCode;

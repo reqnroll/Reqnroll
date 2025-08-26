@@ -297,23 +297,12 @@ public class FormatterPublisherTests
         var featureContextMock = new Mock<IFeatureContext>();
         var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", null);
 
-        Source SourceFunc()
-        {
-            return new Source("uri", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
-        }
+        var featureLevelCucumberMessagesMock = new Mock<IFeatureLevelCucumberMessages>();
+        featureLevelCucumberMessagesMock.Setup(m => m.Source).Returns(new Source("uri", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN));
+        featureLevelCucumberMessagesMock.Setup(m => m.GherkinDocument).Returns(new GherkinDocument("", new Feature(new Location(1, 1), [], "en", "Feature", "Feature test", "description", []), []));
+        featureLevelCucumberMessagesMock.Setup(m => m.Pickles).Returns(new List<Pickle>());
 
-        GherkinDocument GherkinDocFunc()
-        {
-            return new GherkinDocument("", new Feature(new Location(1, 1), [], "en", "Feature", "Feature test", "description", []), []);
-        }
-
-        List<Pickle> PicklesFunc()
-        {
-            return new List<Pickle>();
-        }
-
-        var featureMessagesStub = new FeatureLevelCucumberMessages(SourceFunc, GherkinDocFunc, (Func<List<Pickle>>)PicklesFunc);
-        featureInfoStub.FeatureCucumberMessages = featureMessagesStub;
+        featureInfoStub.FeatureCucumberMessages = featureLevelCucumberMessagesMock.Object;
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
         featureContextMock.Setup(fc => fc.FeatureContainer).Returns(_objectContainerMock.Object);
 

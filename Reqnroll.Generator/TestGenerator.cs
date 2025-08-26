@@ -81,10 +81,11 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return new TestGeneratorResult(generatedTestCode, false, generatedWarnings, featureNdjsonMessages);
     }
 
-    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out IEnumerable<string> featureNdjsonMessages)
+    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureNdjsonMessages)
     {
         generationWarnings = Array.Empty<string>();
-        featureNdjsonMessages = Array.Empty<string>();
+        featureNdjsonMessages = null;
+
         using (var outputWriter = new IndentProcessingWriter(new StringWriter()))
         {
             var codeProvider = CodeDomHelper.CreateCodeDomProvider();
@@ -138,10 +139,10 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return result;
     }
         
-    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out IEnumerable<string> featureNdjsonMessages)
+    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureNdjsonMessages)
     {
         generationWarnings = Array.Empty<string>();
-        featureNdjsonMessages = Array.Empty<string>();
+        featureNdjsonMessages = null;
         string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
 
         var parser = _gherkinParserFactory.Create(ReqnrollConfiguration.FeatureLanguage);

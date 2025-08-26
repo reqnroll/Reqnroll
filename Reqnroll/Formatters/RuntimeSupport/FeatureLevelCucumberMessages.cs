@@ -13,7 +13,7 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 /// This class is used at Code Generation time to provide serialized representations of the Source, GherkinDocument, and Pickles 
 /// to be used at runtime.
 /// </summary>
-public class FeatureLevelCucumberMessages
+public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 {
     private Lazy<IEnumerable<Envelope>> _embeddedEnvelopes;
 

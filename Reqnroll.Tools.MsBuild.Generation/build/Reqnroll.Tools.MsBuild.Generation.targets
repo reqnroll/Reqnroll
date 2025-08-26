@@ -92,6 +92,7 @@
 
     <GenerateFeatureFileCodeBehindTask
       ProjectPath="$(MSBuildProjectFullPath)"
+      IntermediateOutputPath="$(BaseIntermediateOutputPath)"
       OutputPath="$(ReqnrollCodeBehindOutputPath)"
       FeatureFiles="@(ReqnrollFeatureFiles)"
       RootNamespace="$(RootNamespace)"
@@ -105,6 +106,7 @@
       >
 
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />
+      <Output TaskParameter="GeneratedNdjsonFiles" ItemName="ReqnrollGeneratedNdjsonFiles" />
     </GenerateFeatureFileCodeBehindTask>
 
     <Message Text="[Reqnroll] GeneratedFile: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
@@ -152,9 +154,7 @@
         <LogicalName>%(ReqnrollFeatureFiles.Identity)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
-    <ItemGroup>
-      <ReqnrollGeneratedNdjsonFiles Include="@(ReqnrollGeneratedFiles->'%(RootDir)%(Directory)%(Filename).ndjson')" />
-    </ItemGroup>
+    
     <Message Text="ReqnrollGeneratedNdjsonFiles: @(ReqnrollGeneratedNdjsonFiles)" Importance="high" />
     <ItemGroup>
       <EmbeddedResource Include="@(ReqnrollGeneratedNdjsonFiles)">

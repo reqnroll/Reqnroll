@@ -38,7 +38,7 @@ namespace Reqnroll.GeneratorTests
 
         protected void GenerateFeature(IFeatureGenerator generator, ReqnrollDocument document)
         {
-            generator.GenerateUnitTestFixture(document, "dummy", "dummyNS", out var generationWarnings);
+            generator.GenerateUnitTestFixture(document, "dummy", "dummyNS", out var generationWarnings, out var featureNdjsonMessages);
         }
     }
 

@@ -21,7 +21,8 @@ namespace Reqnroll.Tools.MsBuild.Generation
             var generatedFiles = _featureFileCodeBehindGenerator.GenerateFilesForProject(
                 _reqnrollProjectInfo.FeatureFiles,
                 _reqnrollProjectInfo.ProjectFolder,
-                _reqnrollProjectInfo.OutputPath);
+                _reqnrollProjectInfo.OutputPath,
+                _reqnrollProjectInfo.IntermediateOutputPath);
 
             return generatedFiles.Select(file => new TaskItem { ItemSpec = file })
                                  .Cast<ITaskItem>()

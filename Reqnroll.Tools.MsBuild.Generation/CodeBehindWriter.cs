@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Build.Utilities;
 using Reqnroll.Utils;
@@ -28,11 +29,28 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
             Log?.LogWithNameTag(Log.LogMessage, $"Writing data to {outputPath}; path = {directoryPath}; generatedFilename = {testFileGeneratorResult.Filename}");
 
-            if (File.Exists(outputPath))
+            WriteFileIfChanged(outputPath, directoryPath, testFileGeneratorResult.GeneratedTestCode);
+
+            return outputPath;
+        }
+
+        internal object WriteNdjsonFile(string targetNdjsonFilePath, string ndjsonFilename, TestFileGeneratorResult generatorResult)
+        {
+            Log?.LogWithNameTag(Log.LogMessage, $"Writing ndjson to {targetNdjsonFilePath}");
+            var directoryPath = Path.GetDirectoryName(targetNdjsonFilePath);
+
+            WriteFileIfChanged(targetNdjsonFilePath, directoryPath, generatorResult.FeatureNdjsonMessages);
+
+            return null;
+        }
+
+        private void WriteFileIfChanged(string filePath, string directoryPath, string content)
+        {
+            if (File.Exists(filePath))
             {
-                if (!FileSystemHelper.FileCompareContent(outputPath, testFileGeneratorResult.GeneratedTestCode))
+                if (!FileSystemHelper.FileCompareContent(filePath, content))
                 {
-                    WriteAllTextWithRetry(outputPath, testFileGeneratorResult.GeneratedTestCode, Encoding.UTF8);
+                    WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
                 }
             }
             else
@@ -42,10 +60,8 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     Directory.CreateDirectory(directoryPath);
                 }
 
-                WriteAllTextWithRetry(outputPath, testFileGeneratorResult.GeneratedTestCode, Encoding.UTF8);
+                WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
             }
-
-            return outputPath;
         }
 
         /// <summary>
