@@ -5,7 +5,7 @@ This page guides you through setting up your Reqnroll project. It is also recomm
 {#choosing-your-test-execution-framework}
 ## Choosing your test execution framework
 
-Reqnroll uses *test execution frameworks* (MsTest, NUnit or xUnit) to run the tests. So first of all, you need to decide, which one you would like to use. Reqnroll does not have a favorite one, so you should better choose the one you have the most experience with. If you don't have any preference, choose NUnit. The following table gives you a quick comparison of the different supported execution frameworks.
+Reqnroll uses *test execution frameworks* (MsTest, NUnit, TUnit or xUnit) to run the tests. So first of all, you need to decide, which one you would like to use. Reqnroll does not have a favorite one, so you should better choose the one you have the most experience with. If you don't have any preference, choose NUnit. The following table gives you a quick comparison of the different supported execution frameworks.
 
 ```{list-table}
 :header-rows: 1
@@ -19,6 +19,9 @@ Reqnroll uses *test execution frameworks* (MsTest, NUnit or xUnit) to run the te
 * - [MsTest](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-with-mstest)
   - [`Reqnroll.MsTest`](https://www.nuget.org/packages/Reqnroll.MsTest)
   - A widely supported framework by Microsoft. Supports test attachments and input parameters through the [`TestContext`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.visualstudio.testtools.unittesting.testcontext?view=visualstudiosdk-2022) class.
+* - [TUnit](https://tunit.dev/)
+  - [`Reqnroll.TUnit`](https://www.nuget.org/packages/Reqnroll.TUnit)
+  - A modern testing framework for .NET built with performance in mind. Leveraging source generation and AOT compilation for efficient test execution. 
 * - [xUnit](https://xunit.net/)
   - [`Reqnroll.xUnit`](https://www.nuget.org/packages/Reqnroll.xUnit)
   - Simple and modern testing framework that reports the original names of the scenarios during execution. It does not support test attachments and writing test execution output cannot be done with `Console.WriteLine`, so it is less practical for integration tests.
