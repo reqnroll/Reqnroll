@@ -8,6 +8,9 @@ To access the extension settings, edit the [reqnroll.json](/installation/configu
 
 The configuration file has a JSON [schema](https://reqnroll.net/wp-content/uploads/reqnrollconfigs/reqnroll-config.json), therefore you will see all available properties as you start typing.
 
+![IntelliSense 2022](../../_static/images/inteli2022.png) 
+
+
 ## Reqnroll Configuration: `ide` Section
 
 The `ide` section configures all extension settings related to the **Integrated Development Environment (IDE)** for Reqnroll projects. This section is extensible and allows fine-tuning of your development experience with Reqnroll.

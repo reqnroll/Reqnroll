@@ -5,7 +5,7 @@ easier to edit feature files and identify which steps have already been
 bound.
 
 ```{note}
-Many of the formatting behaviors can be controlled by an [.editorconfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](reqnroll-json-ide-section-description.md).
+Many of the formatting behaviors can be controlled by an [.editorconfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings-options.md).
 ```
 
 ## Gherkin Syntax Highlighting
@@ -104,15 +104,6 @@ After the `Format Document` command:
 
 Formatted document
 ```
-
-```{note}
-Settings controlling the formatting and identation behavior of the feature editor may be customized via the **[Reqnroll config file](reqnroll-json-ide-section-description)** 
-
-![IntelliSense 2022](../../_static/images/inteli2022.png) 
-
-or via an [`.editorconfig` file](editorconfig).
-```
-
 
 ## Renaming Steps
 
