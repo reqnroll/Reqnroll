@@ -14,7 +14,18 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin
     {
         private readonly IncludeExternalDataTransformation _includeExternalDataTransformation;
 
-        public ExternalDataTestGenerator(ReqnrollConfiguration reqnrollConfiguration, ProjectSettings projectSettings, ITestHeaderWriter testHeaderWriter, ITestUpToDateChecker testUpToDateChecker, IFeatureGeneratorRegistry featureGeneratorRegistry, CodeDomHelper codeDomHelper, IGherkinParserFactory gherkinParserFactory, GeneratorInfo generatorInfo, IncludeExternalDataTransformation includeExternalDataTransformation) 
+        public ExternalDataTestGenerator(
+            ReqnrollConfiguration reqnrollConfiguration, 
+            ProjectSettings projectSettings, 
+#pragma warning disable CS0618 // Type or member is obsolete
+            ITestHeaderWriter testHeaderWriter, 
+#pragma warning restore CS0618 // Type or member is obsolete
+            ITestUpToDateChecker testUpToDateChecker, 
+            IFeatureGeneratorRegistry featureGeneratorRegistry, 
+            CodeDomHelper codeDomHelper, 
+            IGherkinParserFactory gherkinParserFactory, 
+            GeneratorInfo generatorInfo, 
+            IncludeExternalDataTransformation includeExternalDataTransformation) 
             : base(reqnrollConfiguration, projectSettings, testHeaderWriter, testUpToDateChecker, featureGeneratorRegistry, codeDomHelper, gherkinParserFactory, generatorInfo)
         {
             _includeExternalDataTransformation = includeExternalDataTransformation;

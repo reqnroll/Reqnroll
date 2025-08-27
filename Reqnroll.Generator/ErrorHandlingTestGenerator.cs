@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using Gherkin;
 using Reqnroll.Generator.Interfaces;
@@ -29,23 +28,7 @@ public abstract class ErrorHandlingTestGenerator
         }
     }
 
-    public Version DetectGeneratedTestVersion(FeatureFileInput featureFileInput)
-    {
-        if (featureFileInput == null) throw new ArgumentNullException(nameof(featureFileInput));
-
-        try
-        {
-            return DetectGeneratedTestVersionWithExceptions(featureFileInput);
-        }
-        catch(Exception exception)
-        {
-            Debug.WriteLine(exception, "ErrorHandlingTestGenerator.DetectGeneratedTestVersion");
-            return null;
-        }
-    }
-
     protected abstract TestGeneratorResult GenerateTestFileWithExceptions(FeatureFileInput featureFileInput, GenerationSettings settings);
-    protected abstract Version DetectGeneratedTestVersionWithExceptions(FeatureFileInput featureFileInput);
 
     public virtual void Dispose()
     {

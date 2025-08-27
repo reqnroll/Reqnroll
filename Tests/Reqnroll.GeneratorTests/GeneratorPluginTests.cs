@@ -2,7 +2,6 @@ using System;
 using Reqnroll.BoDi;
 using FluentAssertions;
 using Xunit;
-using Reqnroll.Generator;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Plugins;
 using Reqnroll.UnitTestProvider;
@@ -54,13 +53,13 @@ namespace Reqnroll.GeneratorTests
             var container = new ObjectContainer();
             var reqnrollProjectConfiguration = new ReqnrollProjectConfiguration();
             generatorPluginEvents.RaiseCustomizeDependencies(container, reqnrollProjectConfiguration);
-            container.ResolveAll<ITestHeaderWriter>().Should().BeEmpty();
+            container.ResolveAll<ICustomDependency>().Should().BeEmpty();
 
             reqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError = true;
             generatorPluginEvents.RaiseCustomizeDependencies(container, reqnrollProjectConfiguration);
             
-            var customHeaderWriter = container.Resolve<ITestHeaderWriter>();
-            customHeaderWriter.Should().BeOfType<CustomHeaderWriter>();
+            var customHeaderWriter = container.Resolve<ICustomDependency>();
+            customHeaderWriter.Should().BeOfType<CustomDependency>();
         }
 
         //[Fact]
@@ -121,19 +120,11 @@ namespace Reqnroll.GeneratorTests
 
         }
 
-        public class CustomHeaderWriter : ITestHeaderWriter
-        {
-            public Version DetectGeneratedTestVersion(string generatedTestContent)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public class PluginWithCustomDependency : IGeneratorPlugin
         {
             public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
             {
-                generatorPluginEvents.RegisterDependencies += (sender, args) => args.ObjectContainer.RegisterTypeAs<CustomDependency, ICustomDependency>();
+                generatorPluginEvents.RegisterDependencies += (_, args) => args.ObjectContainer.RegisterTypeAs<CustomDependency, ICustomDependency>();
             }
         }
 
@@ -141,10 +132,10 @@ namespace Reqnroll.GeneratorTests
         {
             public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
             {
-                generatorPluginEvents.CustomizeDependencies += (sender, args) =>
+                generatorPluginEvents.CustomizeDependencies += (_, args) =>
                 {
                     if (args.ReqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError)
-                        args.ObjectContainer.RegisterTypeAs<CustomHeaderWriter, ITestHeaderWriter>();
+                        args.ObjectContainer.RegisterTypeAs<CustomDependency, ICustomDependency>();
                 };
             }
             
@@ -152,16 +143,16 @@ namespace Reqnroll.GeneratorTests
 
         public class PluginWithCustomConfiguration : IGeneratorPlugin
         {
-            private readonly Action<ReqnrollProjectConfiguration> specifyDefaults;
+            private readonly Action<ReqnrollProjectConfiguration> _specifyDefaults;
 
             public PluginWithCustomConfiguration(Action<ReqnrollProjectConfiguration> specifyDefaults)
             {
-                this.specifyDefaults = specifyDefaults;
+                _specifyDefaults = specifyDefaults;
             }
 
             public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
             {
-                generatorPluginEvents.ConfigurationDefaults += (sender, args) => { specifyDefaults(args.ReqnrollProjectConfiguration); };
+                generatorPluginEvents.ConfigurationDefaults += (_, args) => { _specifyDefaults(args.ReqnrollProjectConfiguration); };
             }
         }
     }

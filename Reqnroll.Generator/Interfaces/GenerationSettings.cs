@@ -11,7 +11,7 @@ public class GenerationSettings
     /// <summary>
     /// Specifies the way how the up-to-date checking should be performed.
     /// </summary>
-    public UpToDateCheckingMethod UpToDateCheckingMethod { get; set; } = UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion;
+    public UpToDateCheckingMethod UpToDateCheckingMethod { get; set; } = UpToDateCheckingMethod.ModificationTime;
 
     /// <summary>
     /// Specifies whether the generation result should be written out to a file. Optional, 

@@ -9,22 +9,20 @@ namespace Reqnroll.Generator
     public class TestUpToDateChecker : ITestUpToDateChecker
     {
         protected readonly GeneratorInfo generatorInfo;
-        private readonly ITestHeaderWriter testHeaderWriter;
         private readonly ProjectSettings projectSettings;
 
-        public TestUpToDateChecker(ITestHeaderWriter testHeaderWriter, GeneratorInfo generatorInfo, ProjectSettings projectSettings)
+        public TestUpToDateChecker(GeneratorInfo generatorInfo, ProjectSettings projectSettings)
         {
-            this.testHeaderWriter = testHeaderWriter;
             this.generatorInfo = generatorInfo;
             this.projectSettings = projectSettings;
         }
 
-        private bool IsUpToDateByModificationTimeAndGeneratorVersion(FeatureFileInput featureFileInput, string generatedTestFullPath)
+        private bool IsUpToDateByModificationTime(FeatureFileInput featureFileInput, string generatedTestFullPath)
         {
             if (generatedTestFullPath == null)
                 return false;
 
-            // check existance of the target file
+            // check existence of the target file
             if (!File.Exists(generatedTestFullPath))
                 return false;
 
@@ -34,31 +32,21 @@ namespace Reqnroll.Generator
                 var featureFileModificationTime = File.GetLastWriteTime(featureFileInput.GetFullPath(projectSettings));
                 var codeFileModificationTime = File.GetLastWriteTime(generatedTestFullPath);
 
-                if (featureFileModificationTime > codeFileModificationTime)
-                    return false;
-
-                // check tools version
-                var codeFileVersion = testHeaderWriter.DetectGeneratedTestVersion(featureFileInput.GetGeneratedTestContent(generatedTestFullPath));
-                if (codeFileVersion == null || codeFileVersion != generatorInfo.GeneratorVersion)
-                    return false;
+                return featureFileModificationTime <= codeFileModificationTime;
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
                 return false;
             }
-
-            return true;
         }
 
         public bool? IsUpToDatePreliminary(FeatureFileInput featureFileInput, string generatedTestFullPath, UpToDateCheckingMethod upToDateCheckingMethod)
         {
-            bool byUpdateTimeCheckResult = IsUpToDateByModificationTimeAndGeneratorVersion(featureFileInput, generatedTestFullPath);
-            if (upToDateCheckingMethod == UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion)
-                return byUpdateTimeCheckResult;
-
-            if (byUpdateTimeCheckResult == false)
-                return false;
+            if (upToDateCheckingMethod == UpToDateCheckingMethod.ModificationTime)
+            {
+                return IsUpToDateByModificationTime(featureFileInput, generatedTestFullPath);
+            }
 
             return null;
         }

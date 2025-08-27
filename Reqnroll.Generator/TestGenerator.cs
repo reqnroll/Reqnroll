@@ -21,7 +21,6 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
 {
     protected readonly ReqnrollConfiguration ReqnrollConfiguration;
     protected readonly ProjectSettings ProjectSettings;
-    protected readonly ITestHeaderWriter TestHeaderWriter;
     protected readonly ITestUpToDateChecker TestUpToDateChecker;
     protected readonly CodeDomHelper CodeDomHelper;
 
@@ -31,7 +30,9 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
 
     public TestGenerator(ReqnrollConfiguration reqnrollConfiguration,
         ProjectSettings projectSettings,
+#pragma warning disable CS0618 // Type or member is obsolete
         ITestHeaderWriter testHeaderWriter,
+#pragma warning restore CS0618 // Type or member is obsolete
         ITestUpToDateChecker testUpToDateChecker,
         IFeatureGeneratorRegistry featureGeneratorRegistry,
         CodeDomHelper codeDomHelper,
@@ -42,7 +43,6 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         TestUpToDateChecker = testUpToDateChecker ?? throw new ArgumentNullException(nameof(testUpToDateChecker));
         _featureGeneratorRegistry = featureGeneratorRegistry ?? throw new ArgumentNullException(nameof(featureGeneratorRegistry));
         CodeDomHelper = codeDomHelper ?? throw new ArgumentNullException(nameof(codeDomHelper));
-        TestHeaderWriter = testHeaderWriter ?? throw new ArgumentNullException(nameof(testHeaderWriter));
         ProjectSettings = projectSettings ?? throw new ArgumentNullException(nameof(projectSettings));
         _gherkinParserFactory = gherkinParserFactory ?? throw new ArgumentNullException(nameof(gherkinParserFactory));
         _generatorInfo = generatorInfo ?? throw new ArgumentNullException(nameof(generatorInfo));
@@ -214,12 +214,6 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
     }
 
     #region Header & Footer
-    protected override Version DetectGeneratedTestVersionWithExceptions(FeatureFileInput featureFileInput)
-    {
-        var generatedTestFullPath = GetTestFullPath(featureFileInput);
-        return TestHeaderWriter.DetectGeneratedTestVersion(featureFileInput.GetGeneratedTestContent(generatedTestFullPath));
-    }
-
     protected void AddReqnrollHeader(CodeDomProvider codeProvider, TextWriter outputWriter)
     {
         const string reqnrollHeaderTemplate = @"------------------------------------------------------------------------------

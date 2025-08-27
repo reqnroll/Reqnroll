@@ -2,6 +2,6 @@ namespace Reqnroll.Generator.Interfaces;
 
 public enum UpToDateCheckingMethod
 {
-    ModificationTimeAndGeneratorVersion,
+    ModificationTime,
     FileContent
 }
