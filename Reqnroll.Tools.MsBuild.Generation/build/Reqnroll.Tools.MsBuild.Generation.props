@@ -36,7 +36,7 @@
     <!--
       feature flag to enable/disable removing code-behind files during clean
     -->
-    <ReqnrollDeleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteCodeBehindFilesOnClean>
+    <ReqnrollDeleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)'==''">true</ReqnrollDeleteCodeBehindFilesOnClean>
 
     <!--
       net.sdk support: feature flag to enable experimental support for net.sdk project system
