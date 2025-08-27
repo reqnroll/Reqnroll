@@ -65,9 +65,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     featureFile,
                     generatorResult.Filename);
 
-                string resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, featureFile, generatorResult);
-
-                yield return FileSystemHelper.GetRelativePath(resultedFile, projectFolder);
+                if (!generatorResult.IsUpToDate)
+                {
+                    string resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, featureFile, generatorResult);
+                    yield return FileSystemHelper.GetRelativePath(resultedFile, projectFolder);
+                }
             }
         }
     }
