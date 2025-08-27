@@ -16,23 +16,22 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 {
     private Lazy<IEnumerable<Envelope>> _embeddedEnvelopes;
+    private readonly int _expectedEnvelopeCount;
 
-    public FeatureLevelCucumberMessages(string resourceNameOfEmbeddedNdJson)
+    public FeatureLevelCucumberMessages(string resourceNameOfEmbeddedMessages, int envelopeCount)
     {
         var assm = Assembly.GetCallingAssembly();
-        _embeddedEnvelopes = new Lazy<IEnumerable<Envelope>>(() => ReadEnvelopesFromAssembly(assm, resourceNameOfEmbeddedNdJson));
+        _embeddedEnvelopes = new Lazy<IEnumerable<Envelope>>(() => ReadEnvelopesFromAssembly(assm, resourceNameOfEmbeddedMessages));
+        _expectedEnvelopeCount = envelopeCount;
     }
 
     private IEnumerable<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string resourceNameOfEmbeddedNdJson)
     {
-        var targetResourceName = resourceNameOfEmbeddedNdJson.Replace("/", "\\") + ".ndjson";
-        var resourceName = assembly
-            .GetManifestResourceNames()
-            .FirstOrDefault(n => n.EndsWith(targetResourceName, StringComparison.OrdinalIgnoreCase));
+        var targetResourceName = Path.Combine("obj", resourceNameOfEmbeddedNdJson.Replace("/", "\\") + ".ndjson");
 
-        if (resourceName != null)
+        if (targetResourceName != null)
         {
-            using (var stream = assembly.GetManifestResourceStream(resourceName))
+            using (var stream = assembly.GetManifestResourceStream(targetResourceName))
             {
                 if (stream != null)
                     using (var sr = new StreamReader(stream))
@@ -47,7 +46,19 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     }
 
 
-    public bool HasMessages => Source is not null && GherkinDocument is not null;
+    public bool HasMessages
+    {
+        get
+        {
+            var hasSourceAndGD = Source is not null && GherkinDocument is not null;
+            var hasPickles = Pickles is not null;
+            var envelopeCount = hasSourceAndGD ? 
+                hasPickles ? Pickles.Count() + 2 :  2
+                : 0;
+            return envelopeCount == _expectedEnvelopeCount;
+        }
+    }
+
     public Source Source => _embeddedEnvelopes.Value.Select(e => e.Source).FirstOrDefault(s => s != null);
     public GherkinDocument GherkinDocument => _embeddedEnvelopes.Value.Select(e => e.GherkinDocument).FirstOrDefault(g => g != null);
     public IEnumerable<Pickle> Pickles => _embeddedEnvelopes.Value.Select(e => e.Pickle).Where(p => p != null);
