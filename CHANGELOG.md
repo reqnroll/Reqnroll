@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Build URL is invalid in HTML report for Azure DevOps builds (#795)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy 
 
 # v3.0.0 - 2025-08-21
 
