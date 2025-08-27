@@ -27,20 +27,27 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 
     private IEnumerable<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string resourceNameOfEmbeddedNdJson)
     {
-        var targetResourceName = Path.Combine("obj", resourceNameOfEmbeddedNdJson.Replace("/", "\\") + ".ndjson");
+        var targetResourceName = resourceNameOfEmbeddedNdJson.Replace("/", "\\") + ".ndjson";
 
-        if (targetResourceName != null)
+        try
         {
-            using (var stream = assembly.GetManifestResourceStream(targetResourceName))
+            if (targetResourceName != null)
             {
-                if (stream != null)
-                    using (var sr = new StreamReader(stream))
-                    {
-                        var content = sr.ReadToEnd();
-                        var lines = content.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-                        return lines.Select(l => NdjsonSerializer.Deserialize(l)).ToList();
-                    }
+                using (var stream = assembly.GetManifestResourceStream(targetResourceName))
+                {
+                    if (stream != null)
+                        using (var sr = new StreamReader(stream))
+                        {
+                            var content = sr.ReadToEnd();
+                            var lines = content.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
+                            return lines.Select(l => NdjsonSerializer.Deserialize(l)).ToArray();
+                        }
+                }
             }
+        }
+        catch (System.Exception)
+        {
+            return Enumerable.Empty<Envelope>();
         }
         return Enumerable.Empty<Envelope>();
     }
@@ -51,11 +58,10 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         get
         {
             var hasSourceAndGD = Source is not null && GherkinDocument is not null;
-            var hasPickles = Pickles is not null;
             var envelopeCount = hasSourceAndGD ? 
-                hasPickles ? Pickles.Count() + 2 :  2
+                Pickles?.Count() + 2 
                 : 0;
-            return envelopeCount == _expectedEnvelopeCount;
+            return envelopeCount > 0 && envelopeCount == _expectedEnvelopeCount;
         }
     }
 

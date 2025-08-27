@@ -106,7 +106,6 @@
       >
 
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />
-      <Output TaskParameter="GeneratedNdjsonFiles" ItemName="ReqnrollGeneratedNdjsonFiles" />
     </GenerateFeatureFileCodeBehindTask>
 
     <Message Text="[Reqnroll] GeneratedFile: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
@@ -155,10 +154,12 @@
       </EmbeddedResource>
     </ItemGroup>
     
-    <Message Text="ReqnrollGeneratedNdjsonFiles: @(ReqnrollGeneratedNdjsonFiles)" Importance="high" />
+    <!-- TODO: Remove this Message after Messages Development -->
+    <Message Text="ReqnrollGeneratedNdjsonFiles: @(ReqnrollGeneratedFiles->'%(EmbeddedMessageStoragePath)')" Importance="high" />
+
     <ItemGroup>
-      <EmbeddedResource Include="@(ReqnrollGeneratedNdjsonFiles)">
-        <LogicalName>%(ReqnrollGeneratedNdjsonFiles.Identity)</LogicalName>
+      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')">
+        <LogicalName>%(EmbeddedMessagesResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
 

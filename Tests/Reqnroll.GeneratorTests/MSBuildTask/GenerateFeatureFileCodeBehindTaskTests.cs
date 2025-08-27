@@ -27,7 +27,7 @@ namespace Reqnroll.GeneratorTests.MSBuildTask
                     It.IsAny<string>(),
                     It.IsAny<string>(),
                     It.IsAny<string>()))
-                .Returns(new List<string>());
+                .Returns(new List<FeatureFileCodeBehindGeneratorResult>());
             return generatorMock;
         }
 

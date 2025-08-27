@@ -68,7 +68,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings, out var featureNdjsonMessages);
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -109,7 +109,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings, out var featureNdjsonMessages);
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -156,7 +156,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings, out var featureNdjsonMessages);
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -201,7 +201,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings, out var featureNdjsonMessages);
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline");
@@ -268,7 +268,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
 
                 var featureGenerator = CreateFeatureGenerator(parallelCode, addNonParallelizableMarkerForTags);
 
-                code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace", out var generationWarnings, out var featureNdjsonMessages);
+                code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
             }
 
             return code;

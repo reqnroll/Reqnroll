@@ -30,8 +30,6 @@ namespace Reqnroll.Tools.MsBuild.Generation
         [Output]
         public ITaskItem[] GeneratedFiles { get; private set; }
 
-        [Output]
-        public ITaskItem[] GeneratedNdjsonFiles { get; private set; }
         public string MSBuildVersion { get; set; }
         public string AssemblyName { get; set; }
         public string TargetFrameworks { get; set; }
@@ -61,8 +59,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
                         return false;
                     }
 
-                    GeneratedFiles = success.Result.Where(i =>  i.ItemSpec.EndsWith(".cs")).ToArray();
-                    GeneratedNdjsonFiles = success.Result.Where(i => i.ItemSpec.EndsWith(".ndjson")).ToArray();
+                    GeneratedFiles = success.Result.ToArray();
 
                     return true;
                 }

@@ -22,7 +22,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public TaskLoggingHelper Log { get; }
 
-        public IEnumerable<string> GenerateFilesForProject(
+        public IEnumerable<FeatureFileCodeBehindGeneratorResult> GenerateFilesForProject(
             IReadOnlyCollection<string> featureFiles,
             string projectFolder,
             string outputPath,
@@ -71,9 +71,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
                 string resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, featureFile, generatorResult);
 
-                yield return FileSystemHelper.GetRelativePath(resultedFile, projectFolder);
-
-                if (!String.IsNullOrEmpty(generatorResult.FeatureNdjsonMessages))
+                if (!String.IsNullOrEmpty(generatorResult.FeatureMessages))
                 {
                     // If Feature-level Cucumber Messages were emitted by the code generator
                     // Save them in the 'obj' directory in a sub-folder structure that mirrors the location of the feature file relative to the project root folder.
@@ -85,22 +83,21 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     string relativeFeaturePath = FileSystemHelper.GetRelativePath(featureFile, projectFolder);
                     string relativeFeatureDir = Path.GetDirectoryName(relativeFeaturePath) ?? string.Empty;
 
-                    string targetndjsonFilePath = Path.Combine(
+                    string targetStorageDir = Path.Combine(
                         projectFolder,
                         intermediateOutputPath,
                         relativeFeatureDir
                     );
 
-                    string ndjsonFilename = Path.Combine(Path.GetFileNameWithoutExtension(targetFilePath) + ".ndjson");
+                    string ndjsonFilename = Path.GetFileNameWithoutExtension(targetFilePath) + ".ndjson";
 
-                    string ndjsonFilePathAndName = Path.Combine(targetndjsonFilePath, ndjsonFilename);
-
+                    string ndjsonFilePathAndName = Path.Combine(targetStorageDir, ndjsonFilename);
+                    string messageResourceName = Path.Combine(relativeFeatureDir, ndjsonFilename);
                     _ = codeBehindWriter.WriteNdjsonFile(ndjsonFilePathAndName, ndjsonFilename, generatorResult);
 
-                    // We interleave the names of the generated code-behind cs files with the names of the generated ndjson files for convenience
-                    // These are sorted out in the GenerateFeatureFileCodeBehindTask by sorting on file extension.
-
-                    yield return FileSystemHelper.GetRelativePath(ndjsonFilePathAndName, projectFolder);
+                    yield return new FeatureFileCodeBehindGeneratorResult(  FileSystemHelper.GetRelativePath(resultedFile, projectFolder),
+                                                                            FileSystemHelper.GetRelativePath(ndjsonFilePathAndName, projectFolder),
+                                                                            messageResourceName);
                 }
 
             }

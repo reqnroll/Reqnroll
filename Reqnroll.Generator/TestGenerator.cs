@@ -155,8 +155,10 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         if (reqnrollDocument.ReqnrollFeature == null) return null;
 
         var featureGenerator = _featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
-
-        var codeNamespace = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace, out generationWarnings, out featureNdjsonMessages);
+        var generationResult = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace);
+        var codeNamespace = generationResult.CodeNameSpace;
+        featureNdjsonMessages = generationResult.FeatureMessages;
+        generationWarnings = generationResult.GenerationWarnings;
         return codeNamespace;
     }
 

@@ -4,6 +4,7 @@ using Reqnroll.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
@@ -54,7 +55,7 @@ namespace Reqnroll.Generator.Generation
         public string TestClassNameFormat { get; set; } = "{0}Feature";
         private string _featureMessages = null;
 
-        public CodeNamespace GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace, out IEnumerable<string> generationWarnings, out string featureMessages)
+        public UnitTestFeatureGenerationResult GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
         {
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
@@ -79,9 +80,7 @@ namespace Reqnroll.Generator.Generation
             //before returning the generated code, call the provider's method in case the generated code needs to be customized            
             _testGeneratorProvider.FinalizeTestClass(generationContext);
 
-            generationWarnings = generationContext.GenerationWarnings;
-            featureMessages = _featureMessages;
-            return codeNamespace;
+            return new UnitTestFeatureGenerationResult(codeNamespace, _featureMessages, generationContext.GenerationWarnings);
         }
 
 
@@ -239,19 +238,7 @@ namespace Reqnroll.Generator.Generation
                 envelopeCount = envelopes.Count();
 
                 // Serialize each envelope individually
-                var ndjsonLines = envelopes
-                    .Select(NdjsonSerializer.Serialize)
-                    .ToArray();
-                var messagesBuilder = new StringBuilder(envelopeCount);
-
-                for (int i = 0; i < ndjsonLines.Length; i++)
-                {
-                    if (i < ndjsonLines.Length - 1)
-                        messagesBuilder.AppendLine(ndjsonLines[i]);
-                    else
-                        messagesBuilder.Append(ndjsonLines[i]);
-                }
-                _featureMessages = messagesBuilder.ToString();
+                _featureMessages = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
 
             }
             catch (System.Exception e)

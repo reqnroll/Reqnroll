@@ -39,7 +39,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             Log?.LogWithNameTag(Log.LogMessage, $"Writing ndjson to {targetNdjsonFilePath}");
             var directoryPath = Path.GetDirectoryName(targetNdjsonFilePath);
 
-            WriteFileIfChanged(targetNdjsonFilePath, directoryPath, generatorResult.FeatureNdjsonMessages);
+            WriteFileIfChanged(targetNdjsonFilePath, directoryPath, generatorResult.FeatureMessages);
 
             return null;
         }
