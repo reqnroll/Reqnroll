@@ -161,7 +161,7 @@
     <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
   </Target>
 
-  <Target Name="CleanFeatureFilesInProject" Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)' == 'true'">
+  <Target Name="CleanFeatureFilesInProject" Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)' == 'true'">
     <!-- remove known codebehind files for existing feature files -->
     <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
 

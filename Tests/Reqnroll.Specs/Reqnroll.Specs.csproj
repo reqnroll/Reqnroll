@@ -12,7 +12,7 @@
     <PackageId>Reqnroll.Specs</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
-    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>true</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollDeleteCodeBehindFilesOnClean>true</ReqnrollDeleteCodeBehindFilesOnClean>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
     <NoWarn>$(NoWarn);CS2002</NoWarn>
 

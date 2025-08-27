@@ -34,9 +34,9 @@
     <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
 
     <!--
-      feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
+      feature flag to enable/disable removing code-behind files during clean
     -->
-    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)'==''">false</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollDeleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteCodeBehindFilesOnClean>
 
     <!--
       net.sdk support: feature flag to enable experimental support for net.sdk project system
