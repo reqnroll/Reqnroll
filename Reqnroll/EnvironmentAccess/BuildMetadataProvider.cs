@@ -78,7 +78,10 @@ namespace Reqnroll.EnvironmentAccess
                 return null;
             }
 
-            var buildUrl = GetVariable("BUILD_BUILDURI");
+            var collectionUri = GetVariable("SYSTEM_COLLECTIONURI");
+            var teamProject = GetVariable("SYSTEM_TEAMPROJECT");
+            var buildId = GetVariable("BUILD_BUILDID");
+            var buildUrl = $"{collectionUri}{teamProject}/_build/results?buildId={buildId}&_a=summary";
             var buildNumber = GetVariable("BUILD_BUILDNUMBER");
             var remote = GetVariable("BUILD_REPOSITORY_URI");
             var revision = GetVariable("BUILD_SOURCEVERSION");
