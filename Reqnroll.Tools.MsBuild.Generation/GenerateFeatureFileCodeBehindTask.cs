@@ -7,6 +7,7 @@ using Microsoft.Build.Utilities;
 using Reqnroll.Analytics;
 using Reqnroll.CommonModels;
 using Reqnroll.Generator;
+using Reqnroll.Generator.Interfaces;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
@@ -35,6 +36,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
         public string TargetFrameworks { get; set; }
         public string TargetFramework { get; set; }
         public string ProjectGuid { get; set; }
+        public bool ForceGeneration { get; set; }
 
         public override bool Execute()
         {
@@ -45,8 +47,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
             var msbuildInformationProvider = new MSBuildInformationProvider(MSBuildVersion);
             var generateFeatureFileCodeBehindTaskConfiguration = new GenerateFeatureFileCodeBehindTaskConfiguration(AnalyticsTransmitter, CodeBehindGenerator);
             var generateFeatureFileCodeBehindTaskInfo = new ReqnrollProjectInfo(generatorPlugins, featureFiles, ProjectPath, ProjectFolder, ProjectGuid, AssemblyName, OutputPath, RootNamespace, TargetFrameworks, TargetFramework);
+            var generationSettings = new GenerationSettings();
+            if (ForceGeneration)
+                generationSettings.CheckUpToDate = false;
 
-            using (var taskRootContainer = generateFeatureFileCodeBehindTaskContainerBuilder.BuildRootContainer(Log, generateFeatureFileCodeBehindTaskInfo, msbuildInformationProvider, generateFeatureFileCodeBehindTaskConfiguration))
+            using (var taskRootContainer = generateFeatureFileCodeBehindTaskContainerBuilder.BuildRootContainer(Log, generateFeatureFileCodeBehindTaskInfo, msbuildInformationProvider, generateFeatureFileCodeBehindTaskConfiguration, generationSettings))
             {
                 var assemblyResolveLoggerFactory = taskRootContainer.Resolve<IAssemblyResolveLoggerFactory>();
                 using (assemblyResolveLoggerFactory.Build())

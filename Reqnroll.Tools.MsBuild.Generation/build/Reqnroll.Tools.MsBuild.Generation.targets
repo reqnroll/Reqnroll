@@ -60,7 +60,7 @@
 
   <Target Name="SwitchToForceGenerate">
     <PropertyGroup>
-      <ForceGeneration>true</ForceGeneration>
+      <Reqnroll_ForceGeneration>true</Reqnroll_ForceGeneration>
     </PropertyGroup>
   </Target>
 
@@ -102,6 +102,8 @@
       TargetFrameworks="$(Reqnroll_TargetFrameworks)"
       TargetFramework="$(Reqnroll_TargetFramework)"
       ProjectGuid="$(ProjectGuid)"
+
+      ForceGeneration="$(Reqnroll_ForceGeneration)"
       >
 
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />

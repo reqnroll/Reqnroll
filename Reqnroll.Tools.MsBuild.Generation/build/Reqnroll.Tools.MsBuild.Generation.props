@@ -12,9 +12,11 @@
     <UseHostCompilerIfAvailable>$(Reqnroll_UseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
   </PropertyGroup>
 
-
+  <!--
+    property group for internal or debug settings
+  -->
   <PropertyGroup>
-    <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
+    <Reqnroll_ForceGeneration Condition="'$(Reqnroll_ForceGeneration)'==''">false</Reqnroll_ForceGeneration>
 
     <Reqnroll_DebugMSBuildTask Condition="'$(Reqnroll_DebugMSBuildTask)' == ''">false</Reqnroll_DebugMSBuildTask>
 
