@@ -29,6 +29,11 @@
   <PropertyGroup>
 
     <!--
+      feature flag to enable embedding of feature files as resources in the assembly
+    -->
+    <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
+
+    <!--
       feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
     -->
     <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)'==''">false</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
