@@ -158,11 +158,10 @@
     <Message Text="ReqnrollGeneratedNdjsonFiles: @(ReqnrollGeneratedFiles->'%(EmbeddedMessageStoragePath)')" Importance="high" />
 
     <ItemGroup>
-      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')">
-        <LogicalName>%(EmbeddedMessagesResourceName)</LogicalName>
+      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Condition="'%(ReqnrollGeneratedFiles.EmbeddedMessagesStoragePath)' != ''">
+        <LogicalName>%(ReqnrollGeneratedFiles.EmbeddedMessagesResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
-
   </Target>
 
   <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject">
