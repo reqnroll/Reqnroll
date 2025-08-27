@@ -3,8 +3,10 @@
 ## Improvements:
 
 ## Bug fixes:
+* Fix Formatters Fail under .NET Framework when OutputFilePath is not configured (#797)
 
 *Contributors of this release (in alphabetical order):* 
+@clrudolphi
 
 # v3.0.0 - 2025-08-21
 
