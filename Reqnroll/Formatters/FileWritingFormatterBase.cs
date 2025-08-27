@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.Configuration;
@@ -30,6 +30,10 @@ public abstract class FileWritingFormatterBase : FormatterBase
         string defaultFileExtension,
         string defaultFileName) : base(configurationProvider, logger, pluginName)
     {
+        if (String.IsNullOrEmpty(defaultFileExtension))
+            throw new ArgumentNullException(nameof(defaultFileExtension));
+        if (String.IsNullOrEmpty(defaultFileName))
+            throw new ArgumentNullException(nameof(defaultFileName));
         _defaultFileExtension = defaultFileExtension;
         _defaultFileName = defaultFileName;
         _fileSystem = fileSystem;
@@ -40,23 +44,45 @@ public abstract class FileWritingFormatterBase : FormatterBase
     public override void LaunchInner(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
     {
         var defaultBaseDirectory = ".";
+        var configuredPath = ConfiguredOutputFilePath(formatterConfiguration)?.Trim() ?? string.Empty;
+        string outputPath;
+        string baseDirectory;
 
-        var outputFilePath = ConfiguredOutputFilePath(formatterConfiguration);
-        var fileName = Path.GetFileName(outputFilePath);
-        var baseDirectory = Path.GetDirectoryName(outputFilePath) ?? "";
-
-        if (baseDirectory.IsNullOrEmpty())
-            baseDirectory = defaultBaseDirectory;
-
-        if (fileName.IsNullOrEmpty())
-            fileName = _defaultFileName;
-
-        if (Path.GetExtension(fileName).IsNullOrEmpty())
+        if (string.IsNullOrEmpty(configuredPath))
         {
-            fileName += _defaultFileExtension;
+            // Use safe fallback
+            outputPath = Path.Combine(defaultBaseDirectory, _defaultFileName);
+            baseDirectory = Path.GetDirectoryName(outputPath);
+        }
+        else
+        {
+            string fileName;
+
+            // Path.GetFileName and GetDirectoryName may under .NET 4.6.2
+            try
+            {
+                fileName = Path.GetFileName(configuredPath);
+                baseDirectory = Path.GetDirectoryName(configuredPath);
+            }
+            catch (System.Exception e)
+            {
+                onInitialized(false);
+                Logger.WriteMessage($"Invalid output file path string: {e.Message}. Formatter {Name} will be disabled.");
+                return;
+            }
+
+            if (string.IsNullOrEmpty(baseDirectory))
+                baseDirectory = defaultBaseDirectory;
+
+            if (string.IsNullOrEmpty(fileName))
+                fileName = _defaultFileName;
+
+            if (string.IsNullOrEmpty(Path.GetExtension(fileName)))
+                fileName += _defaultFileExtension;
+
+            outputPath = Path.Combine(baseDirectory, fileName);
         }
 
-        var outputPath = Path.Combine(baseDirectory, fileName);
         if (!FileFilter.IsValidFile(outputPath))
         {
             onInitialized(false);
