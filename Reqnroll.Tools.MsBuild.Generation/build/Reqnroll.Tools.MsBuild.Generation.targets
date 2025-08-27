@@ -65,8 +65,33 @@
   </Target>
 
 
+  <!--
+  Creates metadata for additional inputs to feature source generation that are used to determine whether generation is up-to-date
+  or needs to be re-run.
+  -->
+  <Target Name="ComputeFeatureGenerationDependencies">
+    <PropertyGroup>
+      <ReqnrollConfigThumbprint>0</ReqnrollConfigThumbprint>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="@(ReqnrollConfigFile) != ''">
+      <ReqnrollConfigThumbprint>@(ReqnrollConfigFile -> '%(ModifiedTime)', '|')</ReqnrollConfigThumbprint>
+    </PropertyGroup>
+
+    <!-- Attach the thumbprint to the feature files for input tracking -->
+    <ItemGroup>
+      <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)">
+        <ConfigThumbprint>$(ReqnrollConfigThumbprint)</ConfigThumbprint>
+      </ReqnrollFeatureFiles>
+    </ItemGroup>
+  </Target>
+
+
   <Target Name="UpdateFeatureFilesInProject"
-          DependsOnTargets="BeforeUpdateFeatureFilesInProject">
+          DependsOnTargets="ComputeFeatureGenerationDependencies;BeforeUpdateFeatureFilesInProject"
+          Inputs="@(ReqnrollFeatureFiles -> '%(FullPath)');
+                  @(ReqnrollFeatureFiles -> '%(ReqnrollConfigThumbprint)')"
+          Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)')">
 
     <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
 
@@ -95,7 +120,7 @@
       OutputPath="$(ReqnrollCodeBehindOutputPath)"
       FeatureFiles="@(ReqnrollFeatureFiles)"
       RootNamespace="$(RootNamespace)"
-      GeneratorPlugins="@(ReqnrollGeneratorPlugins)" 
+      GeneratorPlugins="@(ReqnrollGeneratorPlugins)"
       
       MSBuildVersion="$(MSBuildVersion)"
       AssemblyName="$(AssemblyName)"

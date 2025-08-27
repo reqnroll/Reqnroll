@@ -22,6 +22,10 @@
     <_ReqnrollPropsImported Condition="'$(_ReqnrollPropsImported)'==''">true</_ReqnrollPropsImported>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ReqnrollConfigFile Include="./reqnroll.json" />
+  </ItemGroup>
+
   <!--
     property group for feature flags
   -->
