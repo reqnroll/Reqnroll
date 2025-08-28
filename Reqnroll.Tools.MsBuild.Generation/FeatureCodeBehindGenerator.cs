@@ -7,10 +7,12 @@ namespace Reqnroll.Tools.MsBuild.Generation
     public class FeatureCodeBehindGenerator : IDisposable
     {
         private readonly ITestGenerator _testGenerator;
+        private readonly GenerationSettings _generationSettings;
 
-        public FeatureCodeBehindGenerator(ITestGenerator testGenerator)
+        public FeatureCodeBehindGenerator(ITestGenerator testGenerator, GenerationSettings generationSettings)
         {
             _testGenerator = testGenerator;
+            _generationSettings = generationSettings;
         }
 
         public TestFileGeneratorResult GenerateCodeBehindFile(string featureFile)
@@ -19,7 +21,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
             var generatedFeatureFileName = Path.GetFileName(_testGenerator.GetTestFullPath(featureFileInput));
 
-            var testGeneratorResult = _testGenerator.GenerateTestFile(featureFileInput, new GenerationSettings());
+            var testGeneratorResult = _testGenerator.GenerateTestFile(featureFileInput, _generationSettings);
 
             return new TestFileGeneratorResult(testGeneratorResult, generatedFeatureFileName);
         }

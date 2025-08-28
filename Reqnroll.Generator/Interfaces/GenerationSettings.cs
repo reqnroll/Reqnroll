@@ -6,12 +6,12 @@ public class GenerationSettings
     /// Specifies whether the generator should check the existing generation results. 
     /// Optional, disabled by default.
     /// </summary>
-    public bool CheckUpToDate { get; set; }
+    public bool CheckUpToDate { get; set; } = true;
 
     /// <summary>
     /// Specifies the way how the up-to-date checking should be performed.
     /// </summary>
-    public UpToDateCheckingMethod UpToDateCheckingMethod { get; set; } = UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion;
+    public UpToDateCheckingMethod UpToDateCheckingMethod { get; set; } = UpToDateCheckingMethod.ModificationTime;
 
     /// <summary>
     /// Specifies whether the generation result should be written out to a file. Optional, 

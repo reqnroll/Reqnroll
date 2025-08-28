@@ -20,7 +20,6 @@ namespace Reqnroll.GeneratorTests
         protected ProjectSettings net35CSProjectSettings;
         protected ProjectSettings net35VBProjectSettings;
         protected GenerationSettings defaultSettings;
-        protected Mock<ITestHeaderWriter> TestHeaderWriterStub;
         protected Mock<ITestUpToDateChecker> TestUpToDateCheckerStub;
 
         public TestGeneratorTestsBase()
@@ -38,7 +37,6 @@ namespace Reqnroll.GeneratorTests
             net35VBProjectSettings = new ProjectSettings { ProjectFolder = Path.GetTempPath(), ProjectPlatformSettings = net35VBSettings };
             defaultSettings = new GenerationSettings();
 
-            TestHeaderWriterStub = new Mock<ITestHeaderWriter>();
             TestUpToDateCheckerStub = new Mock<ITestUpToDateChecker>();
         }
 
@@ -97,7 +95,10 @@ Scenario: Add two numbers
                 GeneratorVersion = GeneratorInfoProvider.GeneratorVersion,
             };
 
-            return new TestGenerator(generatorReqnrollConfiguration, projectSettings, TestHeaderWriterStub.Object, TestUpToDateCheckerStub.Object, generatorRegistryStub.Object, codeDomHelper, gherkinParserFactory, generatorInfo);
+#pragma warning disable CS0618 // Type or member is obsolete
+            var testHeaderWriterStub = new Mock<ITestHeaderWriter>().Object;
+#pragma warning restore CS0618 // Type or member is obsolete
+            return new TestGenerator(generatorReqnrollConfiguration, projectSettings, testHeaderWriterStub, TestUpToDateCheckerStub.Object, generatorRegistryStub.Object, codeDomHelper, gherkinParserFactory, generatorInfo);
         }
     }
 }

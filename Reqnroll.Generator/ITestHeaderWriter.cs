@@ -1,9 +1,15 @@
 using System;
 
-namespace Reqnroll.Generator
+namespace Reqnroll.Generator;
+
+[Obsolete("This interface is not used anymore and will be removed in v4.")]
+public interface ITestHeaderWriter
 {
-    public interface ITestHeaderWriter
-    {
-        Version DetectGeneratedTestVersion(string generatedTestContent);
-    }
+}
+
+#pragma warning disable CS0618 // Type or member is obsolete
+public class NullTestHeaderWriter : ITestHeaderWriter
+#pragma warning restore CS0618 // Type or member is obsolete
+{
+    // nop
 }

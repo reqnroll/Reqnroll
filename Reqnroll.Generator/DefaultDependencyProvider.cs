@@ -23,7 +23,9 @@ namespace Reqnroll.Generator
             container.RegisterTypeAs<GeneratorConfigurationProvider, IGeneratorConfigurationProvider>();
             container.RegisterTypeAs<GeneratorInfoProvider, IGeneratorInfoProvider>();
             container.RegisterTypeAs<TestGenerator, ITestGenerator>();
-            container.RegisterTypeAs<TestHeaderWriter, ITestHeaderWriter>();
+#pragma warning disable CS0618 // Type or member is obsolete
+            container.RegisterTypeAs<NullTestHeaderWriter, ITestHeaderWriter>();
+#pragma warning restore CS0618 // Type or member is obsolete
             container.RegisterTypeAs<TestUpToDateChecker, ITestUpToDateChecker>();
 
             PlatformHelper.RegisterPluginAssemblyLoader(container);

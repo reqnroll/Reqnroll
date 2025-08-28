@@ -1,10 +1,8 @@
 using FluentAssertions;
 using Moq;
-using Reqnroll.Generator;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.GeneratorTests.Helper;
-using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using Xunit;
@@ -106,55 +104,6 @@ namespace Reqnroll.GeneratorTests
                     defaultSettings);
                 result.Success.Should().Be(true);
             }
-        }
-
-        [Fact]
-        public void Should_return_detected_version()
-        {
-            Version version = new Version();
-            TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion("any")).Returns(version);
-
-            var testGenerator = CreateTestGenerator();
-            FeatureFileInput featureFileInput = CreateSimpleValidFeatureFileInput();
-            featureFileInput.GeneratedTestFileContent = "any";
-            var result = testGenerator.DetectGeneratedTestVersion(featureFileInput);
-
-            result.Should().NotBeNull();
-            result.Should().Be(version);
-        }
-
-        [Fact]
-        public void Should_return_detected_version_from_file()
-        {
-            Version version = new Version();
-            TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion("any")).Returns(version);
-
-            using (var tempFile = new TempFile(".cs"))
-            {
-                tempFile.SetContent("any");
-
-                ProjectSettings projectSettings = new ProjectSettings { ProjectFolder = tempFile.FolderName, ProjectPlatformSettings = net35CSSettings };
-                var testGenerator = CreateTestGenerator(projectSettings);
-                FeatureFileInput featureFileInput = CreateSimpleValidFeatureFileInput();
-                featureFileInput.GeneratedTestProjectRelativePath = tempFile.FileName;
-                var result = testGenerator.DetectGeneratedTestVersion(featureFileInput);
-
-                result.Should().NotBeNull();
-                result.Should().Be(version);
-            }
-        }
-
-        [Fact]
-        public void Should_return_unknown_version_when_there_is_an_error()
-        {
-            TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion("any")).Throws(new Exception());
-
-            var testGenerator = CreateTestGenerator();
-            FeatureFileInput featureFileInput = CreateSimpleValidFeatureFileInput();
-            featureFileInput.GeneratedTestFileContent = "any";
-            var result = testGenerator.DetectGeneratedTestVersion(featureFileInput);
-
-            result.Should().Be(null);
         }
 
         [Fact]
