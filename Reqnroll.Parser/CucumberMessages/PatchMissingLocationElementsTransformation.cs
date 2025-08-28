@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Gherkin.Ast;
 
 namespace Reqnroll.Parser.CucumberMessages;
@@ -46,7 +46,9 @@ internal class PatchMissingLocationElementsTransformation : ScenarioTransformati
         // We will use the location of the Examples table header, if it exists, or the location of the last step in the scenario outline (plus one).
         var lastExampleLocation = exampleTables.FirstOrDefault()?.TableHeader?.Location;
         var lastStepLocation = scenarioOutline.Steps.LastOrDefault()?.Location;
-        var defaultLocation = lastExampleLocation != null && lastExampleLocation.Value.Line > 0 ? lastExampleLocation : new Location((int)lastStepLocation?.Line + 1);
+        var defaultLocation = lastExampleLocation != null && lastExampleLocation.Value.Line > 0 ? lastExampleLocation  // If the Examples table has a header and that header row has a location, use it
+            : lastStepLocation == null ? new Location(0)  // If the ScenarioOutline has an Examples table but NO steps, use a default Location of line 0
+            : new Location((int)lastStepLocation?.Line + 1); // Else use the location of the last step, plus 1 line
 
         var transformedExamples = exampleTables.Select(ext => PatchExamplesLocations(ext, defaultLocation)).ToArray();
 
