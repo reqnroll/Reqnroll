@@ -44,7 +44,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
     public override void LaunchInner(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
     {
         var defaultBaseDirectory = ".";
-        var configuredPath = ConfiguredOutputFilePath(formatterConfiguration)?.Trim() ?? string.Empty;
+        var configuredPath = ConfiguredOutputFilePath(formatterConfiguration)?.Trim();
         string outputPath;
         string baseDirectory;
 
