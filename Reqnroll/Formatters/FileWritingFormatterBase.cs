@@ -30,9 +30,9 @@ public abstract class FileWritingFormatterBase : FormatterBase
         string defaultFileExtension,
         string defaultFileName) : base(configurationProvider, logger, pluginName)
     {
-        if (String.IsNullOrEmpty(defaultFileExtension))
+        if (string.IsNullOrEmpty(defaultFileExtension))
             throw new ArgumentNullException(nameof(defaultFileExtension));
-        if (String.IsNullOrEmpty(defaultFileName))
+        if (string.IsNullOrEmpty(defaultFileName))
             throw new ArgumentNullException(nameof(defaultFileName));
         _defaultFileExtension = defaultFileExtension;
         _defaultFileName = defaultFileName;
