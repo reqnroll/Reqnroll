@@ -15,7 +15,7 @@ The integration provides the following features:
   * [Document formatting](visual-studio-integration-editing-features.md#document-formatting)
 * [Navigation](visual-studio-integration-navigation-features)
   * Navigate from [steps in scenarios to step definitions and vice versa](visual-studio-integration-navigation-features.md#navigating-from-a-step-definition-method-to-steps-in-gherkin-files)
-  * Navigate from a scenario to Hook methods (** GO TO HOOKS **)
+  * Navigate from a [scenario to Hook methods](visual-studio-integration-navigation-features.md#navigating-from-a-feature-file-to-a-hook-definition)
   * Find Unused step definitions (those not yet bound to a step)
   * Detects step definitions within the Reqnroll project to enable navigation features and indication of defined status of a step
 * Other

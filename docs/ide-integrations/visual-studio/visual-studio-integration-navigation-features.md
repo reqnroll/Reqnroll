@@ -24,3 +24,16 @@ step definition method:
 3.  The file containing the step definition is opened at the appropriate step
     definition method.
 
+![](../../_static/images/vs2022_Goto_StepDefinitions.gif)
+
+## Navigating from a Feature file to a Hook Definition
+
+To navigate from a feature file to the hooks that are bound to that feature:
+
+1.  Place your cursor anywhere in your feature file.
+2.  Right-click and select **Go To Hooks** from the menu
+3.  Select a hook from the pop-up menu
+4.  The file containing the hook definition is opened at the appropriate hook
+    definition method.
+
+![](../../_static/images/vs2022_Goto_Hooks.gif)
