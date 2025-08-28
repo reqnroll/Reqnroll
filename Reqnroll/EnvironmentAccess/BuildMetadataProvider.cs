@@ -78,7 +78,14 @@ namespace Reqnroll.EnvironmentAccess
                 return null;
             }
 
-            var buildUrl = GetVariable("BUILD_BUILDURI");
+            // According to the predefined Azure DevOps variables documentation (https://learn.microsoft.com/en-us/azure/devops/pipelines/build/variables?view=azure-devops&tabs=yaml)
+            // there is no direct way to query the build URL. The BUILD_BUILDURI variable returns a URI, like 'vstfs:///Build/Build/1234' which is not a clickable link.
+            // Therefore, we construct the build URL manually from the available Azure DevOps predefined variables.
+            // The hint was taken from https://stackoverflow.com/a/52111404/26530.
+            var collectionUri = GetVariable("SYSTEM_COLLECTIONURI"); // contains trailing slash
+            var teamProject = GetVariable("SYSTEM_TEAMPROJECT");
+            var buildId = GetVariable("BUILD_BUILDID");
+            var buildUrl = $"{collectionUri}{teamProject}/_build/results?buildId={buildId}&_a=summary";
             var buildNumber = GetVariable("BUILD_BUILDNUMBER");
             var remote = GetVariable("BUILD_REPOSITORY_URI");
             var revision = GetVariable("BUILD_SOURCEVERSION");
