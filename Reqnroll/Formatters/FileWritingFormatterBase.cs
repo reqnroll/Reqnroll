@@ -58,7 +58,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
         {
             string fileName;
 
-            // Path.GetFileName and GetDirectoryName may under .NET 4.6.2
+            // Path.GetFileName and GetDirectoryName may throw exceptions under .NET 4.6.2 while .net core will return null
             try
             {
                 fileName = Path.GetFileName(configuredPath);
