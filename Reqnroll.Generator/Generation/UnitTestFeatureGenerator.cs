@@ -11,7 +11,6 @@ using Reqnroll.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Generator.CodeDom;
-using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;

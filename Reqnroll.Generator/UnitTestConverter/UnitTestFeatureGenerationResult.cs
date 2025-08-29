@@ -3,17 +3,17 @@ using System.CodeDom;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Reqnroll.Generator.Interfaces;
+namespace Reqnroll.Generator.UnitTestConverter;
 
 public class UnitTestFeatureGenerationResult
 {
-    public CodeNamespace CodeNameSpace { get; }
+    public CodeNamespace CodeNamespace { get; }
     public string FeatureMessages { get; }
     public IEnumerable<string> GenerationWarnings { get; }
 
-    public UnitTestFeatureGenerationResult(CodeNamespace codeNameSpace, string featureMessages, IEnumerable<string> generationWarnings)
+    public UnitTestFeatureGenerationResult(CodeNamespace codeNamespace, string featureMessages, IEnumerable<string> generationWarnings)
     {
-        CodeNameSpace = codeNameSpace;
+        CodeNamespace = codeNamespace;
         FeatureMessages = featureMessages;
         GenerationWarnings = generationWarnings;
     }

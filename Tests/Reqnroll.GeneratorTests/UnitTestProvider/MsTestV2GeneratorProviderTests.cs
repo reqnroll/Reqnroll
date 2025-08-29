@@ -32,7 +32,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             code.Class().CustomAttributes().Any(a => a.Name == TestDeploymentItemAttributeName).Should().BeFalse();
@@ -55,7 +55,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var deploymentItemAttributeForClass = code.Class().CustomAttributes().Single(a => a.Name == TestDeploymentItemAttributeName);
@@ -88,7 +88,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
@@ -112,7 +112,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
@@ -140,7 +140,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenario");
@@ -161,7 +161,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "SimpleScenario");
@@ -187,7 +187,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethods = code.Class().Members().Where(x => x.CustomAttributes().Any(a => a.Name == TestMethodAttributeName)).ToList();
@@ -219,7 +219,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethod = code.Class().Members().Single(m => m.Name == "AddItems");
@@ -271,7 +271,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator();
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethods = code.Class().Members().Where(x => x.CustomAttributes().Any(a => a.Name == TestMethodAttributeName)).ToList();

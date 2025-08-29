@@ -201,7 +201,7 @@ namespace Reqnroll.GeneratorTests
 
             var result = generator.GenerateUnitTestFixture(theDocument, "TestClass", "TestNamespace");
 
-            var testClass = result.CodeNameSpace.Types[0];
+            var testClass = result.CodeNamespace.Types[0];
             var initMethod = testClass.Members.OfType<CodeMemberMethod>()
                 .FirstOrDefault(m => m.Name == "InitializeCucumberMessages");
 
@@ -218,7 +218,7 @@ namespace Reqnroll.GeneratorTests
 
             var result = generator.GenerateUnitTestFixture(theDocument, "TestClass", "TestNamespace");
 
-            var testClass = result.CodeNameSpace.Types[0];
+            var testClass = result.CodeNamespace.Types[0];
             var featureInfoField = testClass.Members.OfType<CodeMemberField>()
                 .FirstOrDefault(f => f.Name.EndsWith("featureInfo"));
 
@@ -238,7 +238,7 @@ namespace Reqnroll.GeneratorTests
             var result = generator.GenerateUnitTestFixture(invalidDocument, "TestClass", "TestNamespace");
 
             result.Should().NotBeNull();
-            result.CodeNameSpace.Should().NotBeNull();
+            result.CodeNamespace.Should().NotBeNull();
             // Should not throw exception even if cucumber messages generation fails
         }
 

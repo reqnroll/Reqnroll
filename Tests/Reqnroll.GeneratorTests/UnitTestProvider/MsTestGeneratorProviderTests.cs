@@ -122,7 +122,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
 
             // ACT
             var generationResult = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace");
-            var code = generationResult.CodeNameSpace;
+            var code = generationResult.CodeNamespace;
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_Something").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
@@ -142,7 +142,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_Variant0").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
@@ -160,7 +160,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_Something").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
@@ -178,7 +178,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var descriptionAttributeForFirstScenarioOutline = code.Class().Members().Single(m => m.Name == "SimpleScenarioOutline_ExampleSet0_Something").CustomAttributes().Single(a => a.Name == TestDescriptionAttributeName);
@@ -217,7 +217,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new[] { "nonparallelizable" });
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
@@ -238,7 +238,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: ["nonparallelizable"]);
 
             // ACT
-            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
@@ -255,7 +255,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
             // ACT
-            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNameSpace;
+            var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethodAttributeForFirstScenario = code.Class().Members().Single(m => m.Name == "SimpleScenario").CustomAttributes().Single(a => a.Name == TestMethodAttributeName);

@@ -62,7 +62,7 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
                 return new TestGeneratorResult(null, true, null, null);
         }
 
-        string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings, out var featureNdjsonMessages);
+        string generatedTestCode = GetGeneratedTestCode(featureFileInput, out IEnumerable<string> generatedWarnings, out var featureMessages);
         if(string.IsNullOrEmpty(generatedTestCode))
             return new TestGeneratorResult(null, true, generatedWarnings, null);
 
@@ -78,18 +78,18 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
             File.WriteAllText(generatedTestFullPath, generatedTestCode, Encoding.UTF8);
         }
 
-        return new TestGeneratorResult(generatedTestCode, false, generatedWarnings, featureNdjsonMessages);
+        return new TestGeneratorResult(generatedTestCode, false, generatedWarnings, featureMessages);
     }
 
-    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureNdjsonMessages)
+    protected string GetGeneratedTestCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureMessages)
     {
         generationWarnings = Array.Empty<string>();
-        featureNdjsonMessages = null;
+        featureMessages = null;
 
         using (var outputWriter = new IndentProcessingWriter(new StringWriter()))
         {
             var codeProvider = CodeDomHelper.CreateCodeDomProvider();
-            var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings, out featureNdjsonMessages);
+            var codeNamespace = GenerateTestFileCode(featureFileInput, out generationWarnings, out featureMessages);
             if (codeNamespace == null) return "";
 
             var options = new CodeGeneratorOptions
@@ -139,10 +139,10 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
         return result;
     }
         
-    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureNdjsonMessages)
+    private CodeNamespace GenerateTestFileCode(FeatureFileInput featureFileInput, out IEnumerable<string> generationWarnings, out string featureMessages)
     {
         generationWarnings = Array.Empty<string>();
-        featureNdjsonMessages = null;
+        featureMessages = null;
         string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
 
         var parser = _gherkinParserFactory.Create(ReqnrollConfiguration.FeatureLanguage);
@@ -156,8 +156,8 @@ public class TestGenerator : ErrorHandlingTestGenerator, ITestGenerator
 
         var featureGenerator = _featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
         var generationResult = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace);
-        var codeNamespace = generationResult.CodeNameSpace;
-        featureNdjsonMessages = generationResult.FeatureMessages;
+        var codeNamespace = generationResult.CodeNamespace;
+        featureMessages = generationResult.FeatureMessages;
         generationWarnings = generationResult.GenerationWarnings;
         return codeNamespace;
     }
