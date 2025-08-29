@@ -92,7 +92,7 @@
 
     <GenerateFeatureFileCodeBehindTask
       ProjectPath="$(MSBuildProjectFullPath)"
-      IntermediateOutputPath="$(BaseIntermediateOutputPath)"
+      IntermediateOutputPath="$(IntermediateOutputPath)"
       OutputPath="$(ReqnrollCodeBehindOutputPath)"
       FeatureFiles="@(ReqnrollFeatureFiles)"
       RootNamespace="$(RootNamespace)"
