@@ -27,7 +27,7 @@ You can thus tell immediately which steps in a feature file have been
 bound.
 
 ```{note}
-In Reqnroll Visual Studio 2022 plugin a project must be **built** for
+A project must be **built** for
 syntax highlighting to update.
 ```
 

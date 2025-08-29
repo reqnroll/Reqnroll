@@ -69,10 +69,6 @@ You must build your project for the changes in `reqnroll.json` to take effect.
         - `tableCellPaddingSize` (integer): Padding for table cells (spaces, default: `1`).
         - `tableCellRightAlignNumericContent` (boolean): Specifies whether Table cells that contain digits should be right-aligned. Default: `true`.
 
-```{note}
-The formatting behavior can also be controlled by an [EditorConfig file](editorconfig.md).
-```
-
 ### Example
 
 ```json
