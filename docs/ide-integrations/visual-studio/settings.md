@@ -132,4 +132,3 @@ Specifying this section is only required for special cases when the built-in bin
 - **Purpose**: Manages settings for discovering step bindings within the IDE.
 - **Settings**:
     - `connectorPath` (string): File path to custom binding connector. Can reference environment variables (e.g., `%ENV_VAR%`). Relative paths use the default connector folder as base.
-

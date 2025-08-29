@@ -1,4 +1,3 @@
-
 # Navigation Features
 
 You can navigate between the the step definition methods and the associated

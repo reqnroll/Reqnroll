@@ -5,7 +5,7 @@ easier to edit feature files and identify which steps have already been
 bound.
 
 ```{note}
-Many of the formatting behaviors can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings-options.md#configuring-the-visual-studio-integration-in-the-configuration-file).
+Many of the formatting behaviors can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings.md#configuring-the-visual-studio-integration-in-the-configuration-file).
 ```
 
 ## Gherkin Syntax Highlighting
@@ -106,7 +106,7 @@ Formatted document
 ```
 
 ```{note}
-The formatting behavior can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings-options.md#configuring-the-visual-studio-integration-in-the-configuration-file).
+The formatting behavior can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings.md#configuring-the-visual-studio-integration-in-the-configuration-file).
 ```
 
 
