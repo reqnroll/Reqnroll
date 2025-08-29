@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 
 namespace Reqnroll.EnvironmentAccess
 {
@@ -24,7 +24,7 @@ namespace Reqnroll.EnvironmentAccess
                      Branch: "UNKNOWN",
                      Tag: "UNKNOWN")
                 {
-                    ProductName = "UNKNOWN"
+                    ProductName = ""
                 };
             }
         }
