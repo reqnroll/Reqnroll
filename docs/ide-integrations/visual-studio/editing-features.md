@@ -11,9 +11,9 @@ Many of the formatting behaviors can be controlled by an [EditorConfig file](edi
 ## Gherkin Syntax Highlighting
 
 Various default styles have been defined for the Gherkin syntax. You can
-customize these colors in Visual Studio\'s settings (**Tools \| Options
-\| Environment \| Fonts and Colors**). The names of the corresponding
-**Display items** in the list begin with \"Reqnroll\".
+customize these colors in Visual Studio's settings (**Tools | Options
+| Environment | Fonts and Colors**). The names of the corresponding
+**Display items** in the list begin with "Reqnroll".
 
 In addition to highlighting keywords, comments, tags etc., unbound steps
 and parameters in feature files are highlighted when editing the file in
@@ -46,8 +46,7 @@ IntelliSense is available in feature files for the following:
     statement, providing quick access to your current steps definitions.
 
 ```{note}
-Note that all the steps in all \"\*.feature\" files\" that match the
-current type (Given, When, Then) are displayed
+Note that all the step definitions that match the current type (Given, When, Then) are displayed initially, but the list can be filtered by typing additional keywords.
 ```
 
 ![image](../../_static/images/vs2022inteli.png)
@@ -57,10 +56,10 @@ current type (Given, When, Then) are displayed
 Most of the items in the **Edit** menu work well with Reqnroll feature
 files, for example:
 
--   You can comment and uncomment selected lines (\'#\' character) with
+-   You can comment and uncomment selected lines (`#` character) with
     the default shortcut for comments (Ctrl+K Ctrl+C/Ctrl+K Ctrl+U) or
     from the menu
--   You can use the options in the **Edit \| Outlining** menu to expand
+-   You can use the options in the **Edit | Outlining** menu to expand
     and contract sections of your feature files ![VS2010 Edit
     menu](../../_static/images/outlining_editor.png)
 
@@ -80,7 +79,7 @@ Formatted table
 Document formatting is also available. It automatically re-indents code
 and fixes blank lines, comments, etc.
 
-You can find this option under Edit-\>Advanced-\>Format document or
+You can find this option under *Edit->Advanced->Format document* or
 alternatively use the Ctrl+K, Ctrl+D shortcut:
 
 ```{figure} /_static/images/format-doc.png
@@ -108,8 +107,6 @@ Formatted document
 ```{note}
 The formatting behavior can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings.md#configuring-the-visual-studio-integration-in-the-configuration-file).
 ```
-
-
 
 ## Renaming Steps
 

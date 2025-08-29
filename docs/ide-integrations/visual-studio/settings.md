@@ -4,6 +4,9 @@ To change the Visual Studio integration settings, edit the [`reqnroll.json`](/in
 
 ![VS2022 Config File](../../_static/images/vs2022configfile.png)
 
+```{note}
+The formatting behavior can also be controlled by an [EditorConfig file](editorconfig.md).
+```
 
 The configuration file has a [JSON schema](https://schemas.reqnroll.net/reqnroll-config-latest.json), therefore you will see all available properties as you start typing.
 
@@ -40,7 +43,7 @@ You must build your project for the changes in `reqnroll.json` to take effect.
   "traceability": {
     "tagLinks": [
       {
-        "tagPattern": "issue\\:(?<id>;\\d+)",
+        "tagPattern": "issue:(?<id>\\d+)",
         "urlTemplate": "https://github.com/org/repo/issues/{id}"
       }
     ]
@@ -66,6 +69,9 @@ You must build your project for the changes in `reqnroll.json` to take effect.
         - `tableCellPaddingSize` (integer): Padding for table cells (spaces, default: `1`).
         - `tableCellRightAlignNumericContent` (boolean): Specifies whether Table cells that contain digits should be right-aligned. Default: `true`.
 
+```{note}
+The formatting behavior can also be controlled by an [EditorConfig file](editorconfig.md).
+```
 
 ### Example
 
@@ -89,7 +95,7 @@ You must build your project for the changes in `reqnroll.json` to take effect.
 - **Settings**:
     - `tagLinks` (array): Defines patterns for tags and the corresponding external URLs.
         - Each entry:
-            - `tagPattern` (string): Regex to match tag names (e.g., `"issue\\:(?<id>\\d+)"`).
+            - `tagPattern` (string): Regex to match tag names (e.g., `"issue:(?<id>\\d+)"`).
             - `urlTemplate` (string): URL template using captured regex groups (e.g., `"https://github.com/org/repo/issues/{id}"`).
 
 
@@ -102,7 +108,7 @@ The following example configures the extension to turn `@issue:1234` tags to cli
   "traceability": {
     "tagLinks": [
       {
-        "tagPattern": "issue\\:(?<id>\\d+)",
+        "tagPattern": "issue:(?<id>\\d+)",
         "urlTemplate": "https://github.com/org/repo/issues/{id}"
       }
     ]
