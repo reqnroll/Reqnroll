@@ -92,7 +92,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     string ndjsonFilename = Path.GetFileNameWithoutExtension(targetFilePath) + ".ndjson";
 
                     string ndjsonFilePathAndName = Path.Combine(targetStorageDir, ndjsonFilename);
-                    string messageResourceName = Path.Combine(relativeFeatureDir, ndjsonFilename);
+                    string messageResourceName = Path.Combine(relativeFeatureDir, ndjsonFilename).Replace("\\", "/");
                     _ = codeBehindWriter.WriteNdjsonFile(ndjsonFilePathAndName, ndjsonFilename, generatorResult);
 
                     yield return new FeatureFileCodeBehindGeneratorResult(  FileSystemHelper.GetRelativePath(resultedFile, projectFolder),
