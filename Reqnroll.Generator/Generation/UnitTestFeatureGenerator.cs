@@ -1,4 +1,11 @@
-using Gherkin.CucumberMessages;
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
@@ -10,17 +17,6 @@ using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 using Reqnroll.Parser.CucumberMessages;
 using Reqnroll.Tracing;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 
 namespace Reqnroll.Generator.Generation
@@ -35,7 +31,6 @@ namespace Reqnroll.Generator.Generation
         private readonly IUnitTestGeneratorProvider _testGeneratorProvider;
         private readonly UnitTestMethodGenerator _unitTestMethodGenerator;
         private readonly LinePragmaHandler _linePragmaHandler;
-        private CodeMemberMethod _cucumberMessagesInitializeMethod;
 
         public UnitTestFeatureGenerator(
             IUnitTestGeneratorProvider testGeneratorProvider,
@@ -53,7 +48,6 @@ namespace Reqnroll.Generator.Generation
         }
 
         public string TestClassNameFormat { get; set; } = "{0}Feature";
-        private string _featureMessages = null;
 
         public UnitTestFeatureGenerationResult GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
         {
@@ -80,7 +74,7 @@ namespace Reqnroll.Generator.Generation
             //before returning the generated code, call the provider's method in case the generated code needs to be customized            
             _testGeneratorProvider.FinalizeTestClass(generationContext);
 
-            return new UnitTestFeatureGenerationResult(codeNamespace, _featureMessages, generationContext.GenerationWarnings);
+            return new UnitTestFeatureGenerationResult(codeNamespace, (string)generationContext.CustomData[GeneratorConstants.FEATURE_MESSAGES_CONTEXT_KEY], generationContext.GenerationWarnings);
         }
 
 
@@ -103,6 +97,7 @@ namespace Reqnroll.Generator.Generation
                 _codeDomHelper.CreateMethod(testClass),
                 _codeDomHelper.CreateMethod(testClass),
                 document.ReqnrollFeature.HasFeatureBackground() ? _codeDomHelper.CreateMethod(testClass) : null,
+                _codeDomHelper.CreateMethod(testClass),
                 _testGeneratorProvider.GetTraits().HasFlag(UnitTestGeneratorTraits.RowTests) && _reqnrollConfiguration.AllowRowTests);
         }
 
@@ -198,7 +193,7 @@ namespace Reqnroll.Generator.Generation
                     new CodeTypeReferenceExpression(new CodeTypeReference(typeof(ProgrammingLanguage), CodeTypeReferenceOptions.GlobalReference)),
                     _codeDomHelper.TargetLanguage.ToString()),
                 new CodeFieldReferenceExpression(null, GeneratorConstants.FEATURE_TAGS_VARIABLE_NAME),
-                new CodeMethodInvokeExpression(null, _cucumberMessagesInitializeMethod.Name));
+                new CodeMethodInvokeExpression(null, generationContext.CucumberMessagesInitializationMethod.Name));
 
             generationContext.TestClass.Members.Add(featureInfoField);
         }
@@ -207,16 +202,11 @@ namespace Reqnroll.Generator.Generation
         {
             // Generation of Cucumber Messages relies on access to the parsed AST from 'generationContext.Document'
 
-            // Create a new method that will be added to the test class.
-            // It will be called to provide the FeatureCucumberMessages property value of the FeatureInfo object when that object is constructed
-            var cucumberMessagesInitializeMethod = new CodeMemberMethod
-            {
-                Attributes = MemberAttributes.Private | MemberAttributes.Static,
-                Name = "InitializeCucumberMessages",
-                ReturnType = new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference)
-            };
-            generationContext.TestClass.Members.Add(cucumberMessagesInitializeMethod);
-            _cucumberMessagesInitializeMethod = cucumberMessagesInitializeMethod;
+            // This method will be called to provide the FeatureCucumberMessages property value of the FeatureInfo object when that object is constructed
+            var cucumberMessagesInitializationMethod = generationContext.CucumberMessagesInitializationMethod;
+            cucumberMessagesInitializationMethod.Attributes = MemberAttributes.Private | MemberAttributes.Static;
+            cucumberMessagesInitializationMethod.Name = GeneratorConstants.FEATURE_MESSAGES_INITIALIZATION_NAME;
+            cucumberMessagesInitializationMethod.ReturnType = new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference);
 
             string featureFileName = null;
             int envelopeCount = 0;
@@ -237,8 +227,8 @@ namespace Reqnroll.Generator.Generation
                 envelopes.AddRange(featurePickleMessages.Select(p => Envelope.Create(p)));
                 envelopeCount = envelopes.Count();
 
-                // Serialize each envelope individually
-                _featureMessages = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
+                // Serialize each envelope and append into an ndjson format
+                generationContext.CustomData[GeneratorConstants.FEATURE_MESSAGES_CONTEXT_KEY] = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
 
             }
             catch (System.Exception e)
@@ -247,6 +237,8 @@ namespace Reqnroll.Generator.Generation
                 // Should any error occur during pickling or serialization of Cucumber Messages, we will abort and not add the Cucumber Messages to the featureInfo.
                 // This effectively turns OFF the Cucumber Messages support for this feature.
                 featureFileName = null;
+                generationContext.CustomData[GeneratorConstants.FEATURE_MESSAGES_CONTEXT_KEY] = null;
+                envelopeCount = 0;
             }
 
             // Create a FeatureLevelCucumberMessages object and add it to featureInfo
@@ -255,7 +247,7 @@ namespace Reqnroll.Generator.Generation
                 new CodePrimitiveExpression(featureFileName),
                 new CodePrimitiveExpression(envelopeCount));
 
-            cucumberMessagesInitializeMethod.Statements.Add(
+            cucumberMessagesInitializationMethod.Statements.Add(
                 new CodeMethodReturnStatement(
                     featureLevelCucumberMessagesExpression));
         }

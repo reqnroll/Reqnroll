@@ -22,5 +22,7 @@ namespace Reqnroll.Generator.Generation
         public const string FEATURE_TAGS_VARIABLE_NAME = "featureTags";
         public const string PICKLEINDEX_PARAMETER_NAME = "__pickleIndex";
         public const string PICKLEINDEX_VARIABLE_NAME = "pickleIndex";
+        public const string FEATURE_MESSAGES_INITIALIZATION_NAME = "InitializeCucumberMessages";
+        public const string FEATURE_MESSAGES_CONTEXT_KEY = "FeatureMessages";
     }
 }

@@ -195,6 +195,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 scenarioStartMethod: null,
                 scenarioCleanupMethod: null,
                 featureBackgroundMethod: null,
+                cucumberMessagesInitializationMethod: null,
                 generateRowTests: false);
             var codeMemberMethod = new CodeMemberMethod();
 
@@ -292,6 +293,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 scenarioStartMethod: null,
                 scenarioCleanupMethod: null,
                 featureBackgroundMethod: null,
+                cucumberMessagesInitializationMethod: null,
                 generateRowTests: false);
             var codeMemberMethod = new CodeMemberMethod();
 
