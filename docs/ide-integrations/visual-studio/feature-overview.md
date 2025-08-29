@@ -1,10 +1,10 @@
 # Feature Overview
 
-The Visual Studio integration includes a number of features that make it easier to edit Gherkin files and navigate to and from step definitions in Visual Studio. You can also generate code snippets for step definition methods from feature files.
+The Visual Studio extension includes a number of features that make it easier to edit Gherkin files and navigate to and from step definitions in Visual Studio. You can also generate code snippets for step definition methods from feature files.
 
-You can install the integration from the Visual Studio Gallery (Marketplace) or directly in Visual Studio. Detailed instructions can be found [here](../../installation/setup-ide.md#setup-visual-studio-2022).
+You can install the extension from the Visual Studio Gallery (Marketplace) or directly in Visual Studio. Detailed instructions can be found [here](../../installation/setup-ide.md#setup-visual-studio-2022).
 
-The integration provides the following features:
+The extension provides the following features:
 
 * [Editing Feature Files](editing-features)
   * [Gherkin syntax highlighting](editing-features.md#gherkin-syntax-highlighting) in feature files, highlighting unbound steps and parameters

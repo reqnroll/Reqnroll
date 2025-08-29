@@ -1,11 +1,11 @@
 # Editing Features
 
-The Visual Studio integration includes the following features to make it
+The Visual Studio extension includes the following features to make it
 easier to edit feature files and identify which steps have already been
 bound.
 
 ```{note}
-Many of the formatting behaviors can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings.md#configuring-the-visual-studio-integration-in-the-configuration-file).
+Many of the formatting behaviors can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings.md#configuring-the-visual-studio-extension-in-the-configuration-file).
 ```
 
 ## Gherkin Syntax Highlighting
@@ -60,7 +60,7 @@ files, for example:
     the default shortcut for comments (Ctrl+K Ctrl+C/Ctrl+K Ctrl+U) or
     from the menu
 -   You can use the options in the **Edit | Outlining** menu to expand
-    and contract sections of your feature files ![VS2010 Edit
+    and contract sections of your feature files ![VS2022 Edit
     menu](../../_static/images/vs-integration-outlining.png)
 
 ## Table Formatting
@@ -105,7 +105,7 @@ Formatted document
 ```
 
 ```{note}
-The formatting behavior can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings.md#configuring-the-visual-studio-integration-in-the-configuration-file).
+The formatting behavior can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings.md#configuring-the-visual-studio-extension-in-the-configuration-file).
 ```
 
 ## Renaming Steps

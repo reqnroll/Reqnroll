@@ -1,6 +1,6 @@
-# Visual Studio Integration Settings
+# Visual Studio Extension Settings
 
-To change the Visual Studio integration settings, edit the [`reqnroll.json`](/installation/configuration.md) config file. If you don't have the `reqnroll.json` file you can add it by right clicking on the *Reqnroll project -> Add -> New item... -> Add Reqnroll configuration file*.
+To change the Visual Studio extension settings, edit the [`reqnroll.json`](/installation/configuration.md) config file. If you don't have the `reqnroll.json` file you can add it by right clicking on the *Reqnroll project -> Add -> New item... -> Add Reqnroll configuration file*.
 
 ![VS2022 Config File](../../_static/images/vs-integration-config-file.png)
 
@@ -13,7 +13,7 @@ The configuration file has a [JSON schema](https://schemas.reqnroll.net/reqnroll
 ![IntelliSense 2022](../../_static/images/vs-integration-config-intellisense.png) 
 
 
-## Configuring the Visual Studio Integration in the configuration file
+## Configuring the Visual Studio extension in the configuration file
 
 The `ide` section of the `reqnroll.json` file configures all settings related to the **Integrated Development Environment (IDE)** for Reqnroll projects. This section is extensible and allows fine-tuning of your development experience with Reqnroll. For other sections of the configuration file, please check the [Reqnroll Configuration Reference](/installation/configuration.md).
 
