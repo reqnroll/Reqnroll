@@ -1,4 +1,6 @@
-# Gherkin Formatting Settings for .editorconfig
+# Gherkin Formatting Settings with EditorConfig
+
+EditorConfig is a file format specification consistent coding styles maintained by [EditorConfig.org](https://editorconfig.org/) and can be used by adding an `.editorconfig` file to your solution or project. Check the [EditorConfig support documentation of Visual Studio](https://learn.microsoft.com/en-us/visualstudio/ide/create-portable-custom-editor-options?view=vs-2022) for more details about EditorConfig files.
 
 You can fine-tune the formatting for Gherkin files in your project by tweaking settings in your `.editorconfig` file. These options control indentation, table styling, and more for `*.feature` files recognized by the Reqnroll Visual Studio Extension.
 
@@ -19,7 +21,11 @@ You can fine-tune the formatting for Gherkin files in your project by tweaking s
 
 ## Sample `.editorconfig` for Gherkin Files
 
-Below is an example of an `.editorconfig` section for `*.feature` files, including a setting for UTF-8 charset:
+Below is an example of an `.editorconfig` section for `*.feature` files.
+
+```{note}
+The Gherkin file format supports non-ASCII characters only with UTF-8 format. In order to ensure that the feature files are saved as UTF-8, you can specify the `charset` setting in the EditorConfig file as shown in the example below.
+```
 
 ```ini
 [*.feature]
@@ -34,6 +40,3 @@ gherkin_table_cell_right_align_numeric_content = true
 ```
 
 Adjust the values above to match your project's formatting needs.
-
-
-

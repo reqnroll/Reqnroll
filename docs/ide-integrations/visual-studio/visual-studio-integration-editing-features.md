@@ -5,13 +5,13 @@ easier to edit feature files and identify which steps have already been
 bound.
 
 ```{note}
-Many of the formatting behaviors can be controlled by an [.editorconfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings-options.md).
+Many of the formatting behaviors can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings-options.md#configuring-the-visual-studio-integration-in-the-configuration-file).
 ```
 
 ## Gherkin Syntax Highlighting
 
 Various default styles have been defined for the Gherkin syntax. You can
-customize these colours in Visual Studio\'s settings (**Tools \| Options
+customize these colors in Visual Studio\'s settings (**Tools \| Options
 \| Environment \| Fonts and Colors**). The names of the corresponding
 **Display items** in the list begin with \"Reqnroll\".
 
@@ -105,6 +105,12 @@ After the `Format Document` command:
 Formatted document
 ```
 
+```{note}
+The formatting behavior can be controlled by an [EditorConfig file](editorconfig.md) and the `ide` section of the [`reqnroll.json` config file](settings-options.md#configuring-the-visual-studio-integration-in-the-configuration-file).
+```
+
+
+
 ## Renaming Steps
 
 You can globally rename steps and update the associated step definitions
@@ -120,5 +126,5 @@ automatically. To do so:
 
 
 ```{note}
-**Step Rename** is an experimental feature. It only works for those step methods that do not have parameters. If the rename function is not affecting your feature files, you may need to restart Visual Studio to flush the cache.
+**Step Rename** is an experimental feature. It only works for those step methods that do not have parameters.
 ```

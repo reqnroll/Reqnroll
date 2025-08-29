@@ -4,14 +4,15 @@ hide-toc: true
 
 # Reqnroll Visual Studio Integration
 
-This documentation covers the IDE integrations for Reqnroll.
+This documentation covers the Visual Studio 2022 Integration for Reqnroll.
 
-* [Integration Overview](visual-studio-integration.md) - Overview of all Visual Studio integration features
+* [Feature Overview](visual-studio-integration.md) - Overview of the Visual Studio integration features
 * [Installation](../../installation/setup-ide.md#setup-visual-studio-2022) - How to install the Reqnroll Visual Studio extension
 * [Editing Features](visual-studio-integration-editing-features.md) - Syntax highlighting, IntelliSense, and editing features
 * [Navigation Features](visual-studio-integration-navigation-features.md) - Navigate between steps and step definitions
-* [Settings/Options](settings-options.md) - Configure the extension settings
 * [Define Step](define-steps.md) - Generate step definition code snippets
+* [Settings](settings-options.md) - Configure the Visual Studio integration settings
+* [Configurable Gherkin formatting settings with EditorConfig](editorconfig.md) - Define consistent Gherkin formatting styles with EditorConfig
 
 ```{toctree}
 :hidden:
@@ -19,7 +20,7 @@ This documentation covers the IDE integrations for Reqnroll.
 visual-studio-integration
 visual-studio-integration-editing-features
 visual-studio-integration-navigation-features
-settings-options
 define-steps
+settings-options
 editorconfig
 ```
