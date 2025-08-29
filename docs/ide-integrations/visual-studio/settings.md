@@ -2,7 +2,7 @@
 
 To change the Visual Studio integration settings, edit the [`reqnroll.json`](/installation/configuration.md) config file. If you don't have the `reqnroll.json` file you can add it by right clicking on the *Reqnroll project -> Add -> New item... -> Add Reqnroll configuration file*.
 
-![VS2022 Config File](../../_static/images/vs2022configfile.png)
+![VS2022 Config File](../../_static/images/vs-integration-config-file.png)
 
 ```{note}
 The formatting behavior can also be controlled by an [EditorConfig file](editorconfig.md).
@@ -10,7 +10,7 @@ The formatting behavior can also be controlled by an [EditorConfig file](editorc
 
 The configuration file has a [JSON schema](https://schemas.reqnroll.net/reqnroll-config-latest.json), therefore you will see all available properties as you start typing.
 
-![IntelliSense 2022](../../_static/images/inteli2022.png) 
+![IntelliSense 2022](../../_static/images/vs-integration-config-intellisense.png) 
 
 
 ## Configuring the Visual Studio Integration in the configuration file

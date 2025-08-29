@@ -7,4 +7,4 @@ You can automatically create a suitable class with step definition method snippe
 - Enter a name for your class in the **Class name** field.
 - Click on **Create** to generate a new step definition file or use the **Copy methods to clipboard** method to paste the snippet of code in an existing step definition file.
 
-![Generating Code Snippets for Step Definition Methods](../../_static/images/generatedef2022.gif)
+![Generating Code Snippets for Step Definition Methods](../../_static/images/vs-integration-define-steps.gif)

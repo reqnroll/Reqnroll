@@ -49,7 +49,7 @@ IntelliSense is available in feature files for the following:
 Note that all the step definitions that match the current type (Given, When, Then) are displayed initially, but the list can be filtered by typing additional keywords.
 ```
 
-![image](../../_static/images/vs2022inteli.png)
+![image](../../_static/images/vs-integration-intellisense.png)
 
 ## Outlining and Comments in Feature Files
 
@@ -61,14 +61,14 @@ files, for example:
     from the menu
 -   You can use the options in the **Edit | Outlining** menu to expand
     and contract sections of your feature files ![VS2010 Edit
-    menu](../../_static/images/outlining_editor.png)
+    menu](../../_static/images/vs-integration-outlining.png)
 
 ## Table Formatting
 
 Tables in Reqnroll are also expanded and formatted automatically as you
 enter column names and values:
 
-```{figure} /_static/images/tablegifvs.gif
+```{figure} /_static/images/vs-integration-table-formatting.gif
 :alt: Formatted table
 
 Formatted table
@@ -82,7 +82,7 @@ and fixes blank lines, comments, etc.
 You can find this option under *Edit->Advanced->Format document* or
 alternatively use the Ctrl+K, Ctrl+D shortcut:
 
-```{figure} /_static/images/format-doc.png
+```{figure} /_static/images/vs-integration-format-document.png
 :alt: Format document
 
 Format document
@@ -90,7 +90,7 @@ Format document
 
 Below is a feature file document which is not indented correctly:
 
-```{figure} /_static/images/format-doc-before.png
+```{figure} /_static/images/vs-integration-format-document-before.png
 :alt: Unformatted document
 
 Unformatted document
@@ -98,7 +98,7 @@ Unformatted document
 
 After the `Format Document` command:
 
-```{figure} /_static/images/format-doc-after.png
+```{figure} /_static/images/vs-integration-format-document-after.png
 :alt: Formatted document
 
 Formatted document
@@ -119,7 +119,7 @@ automatically. To do so:
 3.  Enter the new text for the step in the dialog and confirm with OK.
 4.  Your step definitions and all feature files containing the step are updated.
 
-![Rename Step 2022](../../_static/images/renamestep2022.png)
+![Rename Step 2022](../../_static/images/vs-integration-rename-step.png)
 
 
 ```{note}
