@@ -89,7 +89,7 @@
 
   <Target Name="UpdateFeatureFilesInProject"
           DependsOnTargets="ComputeFeatureGenerationDependencies;BeforeUpdateFeatureFilesInProject"
-          Inputs="@(ReqnrollFeatureFiles -> '%(FullPath)');
+          Inputs="@(ReqnrollFeatureFiles);
                   @(ReqnrollFeatureFiles -> '%(ReqnrollConfigThumbprint)')"
           Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)')">
 
