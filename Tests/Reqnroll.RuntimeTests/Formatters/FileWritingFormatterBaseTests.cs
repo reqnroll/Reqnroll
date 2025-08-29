@@ -1,19 +1,20 @@
 #nullable enable
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using FluentAssertions;
 using Io.Cucumber.Messages.Types;
 using Moq;
 using Reqnroll.Formatters;
 using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.PubSub;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
-using Xunit;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
-using Reqnroll.Formatters.PubSub;
+using System.Threading;
+using System.Threading.Tasks;
+using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters;
 
@@ -89,6 +90,11 @@ public class FileWritingFormatterBaseTests
         {
             await PostedMessages.Writer.WriteAsync(envelope);
         }
+
+        public string TestConfiguredOutputFilePath(IDictionary<string, object> formatterConfiguration)
+        {
+            return ConfiguredOutputFilePath(formatterConfiguration);
+        }
     }
 
     private readonly Mock<IFormattersConfigurationProvider> _configMock = new();
@@ -100,6 +106,25 @@ public class FileWritingFormatterBaseTests
     {
         _sut = new TestFileWritingFormatter(_configMock.Object, _loggerMock.Object, _fileSystemMock.Object);
     }
+
+    [Fact]
+    public void LaunchInner_InvalidPathCharacters_HandlesGracefully()
+    {
+        _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
+        var config = new Dictionary<string, object> { { "outputFilePath", "invalid\0path.txt" } };
+        _sut.LaunchInner(config, enabled => enabled.Should().BeFalse());
+        _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains( "is invalid or missing."))), Times.Once);
+    }
+
+    [Fact]
+    public void LaunchInner_EmptyFileName_UsesDefaultFileName()
+    {
+        _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
+        var config = new Dictionary<string, object> { { "outputFilePath", "somedir/" } };
+        _sut.LaunchInner(config, enabled => enabled.Should().BeTrue());
+        _sut.LastOutputPath.Should().EndWith("default.txt");
+    }
+
 
     [Fact]
     public void LaunchInner_InvalidFile_DisablesFormatter()
@@ -209,24 +234,6 @@ public class FileWritingFormatterBaseTests
         _sut.OnTargetFileStreamDisposingCalled.Should().BeTrue();
     }
 
-
-    [Fact]
-    public void LaunchFormatter_Should_Create_Output_File_With_Default_Name_If_No_Configuration()
-    {
-        var sp = Path.DirectorySeparatorChar;
-        _configMock.Setup(c => c.Enabled).Returns(true);
-        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "" } });
-        _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
-
-        // Act
-        _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
-        _sut.Dispose();
-
-        // Assert
-        _sut.LastOutputPath.Should().NotBeNull();
-        _sut.LastOutputPath.Should().EndWith($".{sp}default.txt");
-    }
-
     [Fact]
     public void LaunchFormatter_Should_Create_Local_Path_When_No_Path_Provided_in_Configuration()
     {
@@ -319,5 +326,21 @@ public class FileWritingFormatterBaseTests
 
         _sut.LastEnvelope.Should().Be(message);
         _sut.OnCancellationCalled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ConfiguredOutputFilePath_MissingKey_ReturnsEmptyString()
+    {
+        var config = new Dictionary<string, object>();
+        var result = _sut.TestConfiguredOutputFilePath(config);
+        result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ConfiguredOutputFilePath_NullValue_ReturnsEmptyString()
+    {
+        var config = new Dictionary<string, object> { { "outputFilePath", null! } };
+        var result = _sut.TestConfiguredOutputFilePath(config);
+        result.Should().BeEmpty();
     }
 }
