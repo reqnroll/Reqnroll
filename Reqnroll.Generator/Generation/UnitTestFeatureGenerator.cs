@@ -212,7 +212,7 @@ namespace Reqnroll.Generator.Generation
             try
             {
                 var featureSource = CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document);
-                featureFileName = featureSource.Uri;
+                featureFileName = featureSource.Uri.Replace("\\", "/");      // by convention, embedded resources will use the forward-slash path separator
                 var IdGeneratorSeed = featureSource.Uri + featureSource.Data;
                 var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(IdGeneratorSeed));
                 var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);

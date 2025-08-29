@@ -27,21 +27,23 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 
     private IEnumerable<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string resourceNameOfEmbeddedNdJson)
     {
-        var targetResourceName = resourceNameOfEmbeddedNdJson.Replace("/", "\\") + ".ndjson";
+        var targetResourceName = resourceNameOfEmbeddedNdJson.Replace("\\", "/") + ".ndjson";
 
         try
         {
+            IEnumerable<string> ReadAllLines(StreamReader reader)
+            {
+                while (reader.ReadLine() is { } line)
+                    yield return line;
+            }
+
             if (targetResourceName != null)
             {
-                using (var stream = assembly.GetManifestResourceStream(targetResourceName))
+                using var stream = assembly.GetManifestResourceStream(targetResourceName);
+                if (stream != null)
                 {
-                    if (stream != null)
-                        using (var sr = new StreamReader(stream))
-                        {
-                            var content = sr.ReadToEnd();
-                            var lines = content.Split(new[] { "\r\n", "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries);
-                            return lines.Select(l => NdjsonSerializer.Deserialize(l)).ToArray();
-                        }
+                    using var sr = new StreamReader(stream);
+                    return ReadAllLines(sr).Select(NdjsonSerializer.Deserialize).ToArray();
                 }
             }
         }
@@ -57,8 +59,8 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     {
         get
         {
-            var hasSourceAndGD = Source is not null && GherkinDocument is not null;
-            var envelopeCount = hasSourceAndGD ? 
+            var hasSourceAndGherkinDocument = Source is not null && GherkinDocument is not null;
+            var envelopeCount = hasSourceAndGherkinDocument ? 
                 Pickles?.Count() + 2 
                 : 0;
             return envelopeCount > 0 && envelopeCount == _expectedEnvelopeCount;
