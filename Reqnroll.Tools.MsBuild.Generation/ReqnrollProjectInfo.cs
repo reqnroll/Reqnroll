@@ -14,6 +14,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             string projectGuid,
             string projectAssemblyName,
             string outputPath,
+            string intermediateOutputPath,
             string rootNamespace,
             string targetFrameworks,
             string currentTargetFramework)
@@ -22,6 +23,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             FeatureFiles = FileFilter.GetValidFiles(featureFiles);
             ProjectFolder = projectFolder;
             OutputPath = outputPath;
+            IntermediateOutputPath = intermediateOutputPath;
             RootNamespace = rootNamespace;
             TargetFrameworks = targetFrameworks;
             CurrentTargetFramework = currentTargetFramework;
@@ -43,6 +45,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
         public string ProjectAssemblyName { get; }
 
         public string OutputPath { get; }
+        public string IntermediateOutputPath { get; }
 
         public string RootNamespace { get; }
 

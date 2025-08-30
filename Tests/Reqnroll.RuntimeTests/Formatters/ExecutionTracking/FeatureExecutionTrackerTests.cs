@@ -61,12 +61,13 @@ public class FeatureExecutionTrackerTests
 
 
         _stepDefinitionsByBinding = new ConcurrentDictionary<IBinding, string>();
-        var featureLevelCucumberMessagesDummy = new FeatureLevelCucumberMessages(
-            () => new Source("c:\\file", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN),
-            () => new GherkinDocument("", new Feature(new Location(0, 0), [], "en", "Feature", "Dummy Feature", "", new List<FeatureChild>()), []),
-            () => new List<Pickle>([new Pickle("0", "", "", "en", [new PickleStep(null, [], "step1", PickleStepType.ACTION, "I eat a cuke")], [], [])]));
+        var featureLevelCucumberMessagesMock = new Mock<IFeatureLevelCucumberMessages>();
+        featureLevelCucumberMessagesMock.SetupGet(m => m.Source).Returns(new Source("c:\\file", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN));
+        featureLevelCucumberMessagesMock.SetupGet(m => m.GherkinDocument).Returns(new GherkinDocument("", new Feature(new Location(0, 0), [], "en", "Feature", "Dummy Feature", "", new List<FeatureChild>()), []));
+        featureLevelCucumberMessagesMock.SetupGet(m => m.Pickles).Returns( new List<Pickle>([new Pickle("0", "", "", "en", [new PickleStep(null, [], "step1", PickleStepType.ACTION, "I eat a cuke")], [], [])]));
+        featureLevelCucumberMessagesMock.SetupGet(m => m.HasMessages).Returns(true);
 
-        _featureInfoDummy = new FeatureInfo(CultureInfo.InvariantCulture, null, "Test Feature", null, ProgrammingLanguage.CSharp, null, featureLevelCucumberMessagesDummy);
+        _featureInfoDummy = new FeatureInfo(CultureInfo.InvariantCulture, null, "Test Feature", null, ProgrammingLanguage.CSharp, null, featureLevelCucumberMessagesMock.Object);
         mockFeatureContext.Setup(m => m.FeatureInfo).Returns(_featureInfoDummy);
         mockFeatureContext.Setup(m => m.FeatureContainer).Returns(_featureContainer.Object);
 

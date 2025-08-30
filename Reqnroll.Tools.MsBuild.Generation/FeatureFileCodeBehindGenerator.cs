@@ -1,7 +1,10 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.Build.Utilities;
 using Reqnroll.Utils;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
@@ -19,10 +22,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
         public TaskLoggingHelper Log { get; }
 
-        public IEnumerable<string> GenerateFilesForProject(
+        public IEnumerable<FeatureFileCodeBehindGeneratorResult> GenerateFilesForProject(
             IReadOnlyCollection<string> featureFiles,
             string projectFolder,
-            string outputPath)
+            string outputPath,
+            string intermediateOutputPath)
         {
             var codeBehindWriter = new CodeBehindWriter(null);
 
@@ -67,7 +71,35 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
                 string resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, featureFile, generatorResult);
 
-                yield return FileSystemHelper.GetRelativePath(resultedFile, projectFolder);
+                if (!String.IsNullOrEmpty(generatorResult.FeatureMessages))
+                {
+                    // If Feature-level Cucumber Messages were emitted by the code generator
+                    // Save them in the 'obj' directory in a sub-folder structure that mirrors the location of the feature file relative to the project root folder.
+
+                    // The value of 'obj' is passed from the .targets file as the IntermediateOutputPath property of the GenerateFeatureFileCodeBehindTask.
+                    // It's value may be the $(BaseIntermediateOutputPath), ie, 'obj' or the $(IntermediateOutputPath), 'obj/<Configuration>/<TargetFramework>'
+
+
+                    string relativeFeaturePath = FileSystemHelper.GetRelativePath(featureFile, projectFolder);
+                    string relativeFeatureDir = Path.GetDirectoryName(relativeFeaturePath) ?? string.Empty;
+
+                    string targetStorageDir = Path.Combine(
+                        projectFolder,
+                        intermediateOutputPath,
+                        relativeFeatureDir
+                    );
+
+                    string ndjsonFilename = Path.GetFileNameWithoutExtension(targetFilePath) + ".ndjson";
+
+                    string ndjsonFilePathAndName = Path.Combine(targetStorageDir, ndjsonFilename);
+                    string messageResourceName = Path.Combine(relativeFeatureDir, ndjsonFilename).Replace("\\", "/");
+                    _ = codeBehindWriter.WriteNdjsonFile(ndjsonFilePathAndName, ndjsonFilename, generatorResult);
+
+                    yield return new FeatureFileCodeBehindGeneratorResult(  FileSystemHelper.GetRelativePath(resultedFile, projectFolder),
+                                                                            FileSystemHelper.GetRelativePath(ndjsonFilePathAndName, projectFolder),
+                                                                            messageResourceName);
+                }
+
             }
         }
     }
