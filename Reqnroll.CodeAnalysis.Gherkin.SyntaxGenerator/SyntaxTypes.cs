@@ -8,5 +8,5 @@ internal static class SyntaxTypes
     public const string StructuredTriviaSyntax = "Reqnroll.CodeAnalysis.Gherkin.Syntax.StructuredTriviaSyntax";
     public const string SyntaxSlotAttribute = "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxSlotAttribute";
     public const string SyntaxNodeAttribute = "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxNodeAttribute";
-    public const string ParameterGroupAttribute = "Reqnroll.CodeAnalysis.Gherkin.Syntax.ParameterGroupAttribute";
+    public const string SyntaxConstructorAttribute = "Reqnroll.CodeAnalysis.Gherkin.Syntax.SyntaxConstructorAttribute";
 }

@@ -145,11 +145,6 @@ internal static class SlotHelper
                 break;
         }
 
-        var attributes = property.GetAttributes();
-        var parameterGroups = attributes
-            .Where(attr => attr.AttributeClass?.ToDisplayString() == SyntaxTypes.ParameterGroupAttribute)
-            .Select(attr => (string)attr.ConstructorArguments[0].Value!);
-
         return new BareSyntaxSlotPropertyInfo(
             nodeType,
             property.Name,
@@ -159,8 +154,7 @@ internal static class SlotHelper
             description,
             isOptional,
             !SymbolEqualityComparer.Default.Equals(property.ContainingType, symbol),
-            property.IsAbstract,
-            ComparableArray.CreateRange(parameterGroups));
+            property.IsAbstract);
     }
 
     private static IEnumerable<(IPropertySymbol Property, AttributeData Attribute)> EnumerateSlotProperties(
@@ -183,5 +177,135 @@ internal static class SlotHelper
                 yield return (property, slotAttribute);
             }
         }
+    }
+
+    public static (ImmutableArray<ComparableArray<string>>, ImmutableArray<GenerationDiagnostic>) CreateConstructorGroups(
+        ISymbol symbol,
+        SemanticModel semanticModel,
+        ImmutableArray<BareSyntaxSlotPropertyInfo> slots,
+        CancellationToken cancellationToken)
+    {
+        var syntaxConstructorAttributes = symbol
+            .GetAttributes()
+            .Where(attribute => attribute.AttributeClass?.ToDisplayString() == SyntaxTypes.SyntaxConstructorAttribute);
+
+        var constructorGroups = ImmutableArray.CreateBuilder<ComparableArray<string>>();
+        var diagnostics = ImmutableArray.CreateBuilder<GenerationDiagnostic>();
+
+        foreach (var syntaxConstructorAttribute in syntaxConstructorAttributes)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+
+            var group = ImmutableArray.CreateBuilder<string>();
+            var groupHasError = false;
+
+            foreach (var slotNameExpression in GetConstructorSlotNameSyntax(syntaxConstructorAttribute, cancellationToken))
+            {
+                var constant = semanticModel.GetConstantValue(slotNameExpression);
+
+                if (!constant.HasValue || constant.Value is not string value)
+                {
+                    continue;
+                }
+
+                if (!slots.Any(slot => slot.Name != value))
+                {
+                    // Add diagnostic for unknown slot name.
+                    var args = ImmutableArray.CreateBuilder<string>();
+
+                    args.Add(value);
+                    args.Add(symbol.ToDisplayString());
+                    args.Add(string.Join(", ", slots.Select(slot => $"'{slot.Name}'")));
+
+                    diagnostics.Add(
+                        new GenerationDiagnostic(
+                            slotNameExpression.SyntaxTree?.FilePath ?? "",
+                            slotNameExpression.Span,
+                            DiagnosticDescriptors.SyntaxConstructorContainsInvalidSlotName,
+                            args.ToImmutable()));
+
+                    groupHasError = true;
+
+                    break;
+                }
+
+                group.Add(value);
+            }
+
+            if (group.Count > 0 && !groupHasError)
+            {
+                constructorGroups.Add(new ComparableArray<string>(group.ToImmutable()));
+            }
+        }
+
+        return (constructorGroups.ToImmutable(), diagnostics.ToImmutable());
+    }
+
+    private static IEnumerable<ExpressionSyntax> GetConstructorSlotNameSyntax(
+        AttributeData syntaxConstructorAttribute,
+        CancellationToken cancellationToken)
+    {
+        var syntax = (AttributeSyntax?)syntaxConstructorAttribute.ApplicationSyntaxReference?.GetSyntax(cancellationToken);
+
+        if (syntax == null)
+        {
+            yield break;
+        }
+
+        foreach (var arg in syntax.ArgumentList?.Arguments ?? default)
+        {
+            switch (arg.Expression)
+            {
+                case LiteralExpressionSyntax literal when literal.IsKind(SyntaxKind.StringLiteralExpression):
+                    cancellationToken.ThrowIfCancellationRequested();
+                    yield return literal;
+                    break;
+
+                case InvocationExpressionSyntax invocation when invocation.IsNameOfInvocation():
+                    yield return invocation;
+                    break;
+
+                case ImplicitArrayCreationExpressionSyntax implicitArrayCreation:
+                    foreach (var expression in implicitArrayCreation.Initializer.Expressions)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if (expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression))
+                        {
+                            yield return literal;
+                        }
+                        else if (expression is InvocationExpressionSyntax invocation && 
+                            invocation.IsNameOfInvocation())
+                        {
+                            yield return invocation;
+                        }
+                    }
+                    break;
+
+                case ArrayCreationExpressionSyntax arrayCreation:
+                    foreach (var expression in arrayCreation.Initializer?.Expressions ?? default)
+                    {
+                        cancellationToken.ThrowIfCancellationRequested();
+                        if (expression is LiteralExpressionSyntax literal && literal.IsKind(SyntaxKind.StringLiteralExpression))
+                        {
+                            yield return literal;
+                        }
+                        else if (expression is InvocationExpressionSyntax invocation &&
+                            invocation.IsNameOfInvocation())
+                        {
+                            yield return invocation;
+                        }
+                    }
+                    break;
+            }
+        }
+    }
+}
+
+public static class NameOfInvocationExtensions
+{
+    public static bool IsNameOfInvocation(this InvocationExpressionSyntax invocationExpression)
+    {
+        return invocationExpression.Expression is IdentifierNameSyntax invocationIdentifier &&
+            invocationIdentifier.Identifier.Text == "nameof";
     }
 }

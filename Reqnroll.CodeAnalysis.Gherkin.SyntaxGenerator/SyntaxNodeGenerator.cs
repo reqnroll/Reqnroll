@@ -60,10 +60,22 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                 }
 
                 var syntaxNodeAttribute = context.Attributes[0];
-
                 var syntaxKindValue = syntaxNodeAttribute.ConstructorArguments.Length == 0 ?
                     (ushort)0 :
                     syntaxNodeAttribute.ConstructorArguments[0].Value as ushort? ?? 0;
+
+                var constructorGroups = ImmutableArray<ComparableArray<string>>.Empty;
+                var diagnostics = ImmutableArray<GenerationDiagnostic>.Empty;
+
+                // If the type is not abstract, we generate constructor methods.
+                if (!symbol.IsAbstract)
+                {
+                    (constructorGroups, diagnostics) = SlotHelper.CreateConstructorGroups(
+                        context.TargetSymbol,
+                        context.SemanticModel,
+                        slots,
+                        cancellationToken);
+                }
 
                 return new BareSyntaxNodeClassInfo(
                     symbol.ContainingNamespace.ToDisplayString(),
@@ -71,7 +83,9 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                     syntaxKindValue,
                     symbol.BaseType?.Name!,
                     slots,
-                    symbol.IsAbstract);
+                    constructorGroups,
+                    symbol.IsAbstract,
+                    diagnostics);
             });
 
         var syntaxNodeClasses = bareSyntaxNodeClasses
@@ -98,9 +112,10 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             info.Description, 
                             !info.IsOptional,
                             info.IsInherited,
-                            info.IsAbstract,
-                            info.ParameterGroups))
-                        .ToImmutableArray());
+                            info.IsAbstract))
+                        .ToImmutableArray(),
+                    syntaxClass.SlotGroups,
+                    syntaxClass.Diagnostics);
             });
 
         var baseSyntaxNodeClasses = bareSyntaxNodeClasses
@@ -127,9 +142,10 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
                             info.Description,
                             !info.IsOptional,
                             info.IsInherited,
-                            info.IsAbstract,
-                            info.ParameterGroups))
-                        .ToImmutableArray());
+                            info.IsAbstract))
+                        .ToImmutableArray(),
+                    syntaxClass.SlotGroups,
+                    syntaxClass.Diagnostics);
             });
 
         context.RegisterSourceOutput(syntaxNodeClasses, static (context, classInfo) =>
@@ -160,6 +176,35 @@ public class SyntaxNodeGenerator : IIncrementalGenerator
             context.AddSource(
                 $"Syntax/{classInfo.ClassName}.{InternalNodeClassEmitter.ClassName}.g.cs",
                 new BaseInternalNodeClassEmitter(classInfo).EmitRawSyntaxNodeClass());
+        });
+
+        // If there are any diagnostics to report, we do that now.
+        var syntaxNodeClassDiagnostics = syntaxNodeClasses
+            .Where(classInfo => classInfo.Diagnostics.Length > 0)
+            .Combine(context.CompilationProvider);
+
+        var baseSyntaxNodeClassDiagnostics = baseSyntaxNodeClasses
+            .Where(classInfo => classInfo.Diagnostics.Length > 0)
+            .Combine(context.CompilationProvider);
+
+        context.RegisterSourceOutput(syntaxNodeClassDiagnostics, static (context, tuple) =>
+        {
+            var (classInfo, compilation) = tuple;
+
+            foreach (var diagnostic in classInfo.Diagnostics)
+            {
+                context.ReportDiagnostic(diagnostic.ToDiagnostic(compilation));
+            }
+        });
+
+        context.RegisterSourceOutput(baseSyntaxNodeClassDiagnostics, static (context, tuple) =>
+        {
+            var (classInfo, compilation) = tuple;
+
+            foreach (var diagnostic in classInfo.Diagnostics)
+            {
+                context.ReportDiagnostic(diagnostic.ToDiagnostic(compilation));
+            }
         });
     }
 }

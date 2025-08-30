@@ -6,4 +6,6 @@ internal record BareSyntaxNodeClassInfo(
     ushort SyntaxKind,
     string BaseClassName,
     ComparableArray<BareSyntaxSlotPropertyInfo> SlotProperties,
-    bool IsAbstract);
+    ComparableArray<ComparableArray<string>> SlotGroups,
+    bool IsAbstract,
+    ComparableArray<GenerationDiagnostic> Diagnostics);

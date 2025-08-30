@@ -9,5 +9,4 @@ internal record BareSyntaxSlotPropertyInfo(
     string? Description,
     bool IsOptional,
     bool IsInherited,
-    bool IsAbstract,
-    ComparableArray<string> ParameterGroups);
+    bool IsAbstract);

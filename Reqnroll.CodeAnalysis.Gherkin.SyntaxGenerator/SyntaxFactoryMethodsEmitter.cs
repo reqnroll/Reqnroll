@@ -1,4 +1,5 @@
 ﻿
+using System.Collections.Immutable;
 using System.Reflection.Metadata;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.SyntaxGenerator;
@@ -38,26 +39,24 @@ internal class SyntaxFactoryMethodsEmitter(SyntaxNodeClassInfo classInfo)
         {
             AppendFullFactoryMethodTo(builder);
 
-            var parameterGroups = classInfo.SlotProperties
-                .SelectMany(property => property.ParameterGroups)
-                .Distinct();
+            var parameterGroups = classInfo.SlotGroups
+                .Distinct()
+                .Select(group => group
+                    .Select(name => classInfo.SlotProperties.First(prop => prop.Name == name))
+                    .ToArray());
 
-            foreach (var groupName in parameterGroups)
+            foreach (var group in parameterGroups)
             {
                 builder.AppendLine();
-                AppendParameterGroupFactoryMethodsTo(builder, groupName);
+                AppendParameterGroupFactoryMethodsTo(builder, group);
             }
         });
 
         return builder.ToString();
     }
 
-    private void AppendParameterGroupFactoryMethodsTo(CSharpBuilder builder, string groupName)
+    private void AppendParameterGroupFactoryMethodsTo(CSharpBuilder builder, SyntaxSlotPropertyInfo[] parameters)
     {
-        var parameters = classInfo.SlotProperties
-            .Where(property => property.ParameterGroups.Contains(groupName))
-            .ToArray();
-
         builder.AppendLine("/// <summary>");
         builder.Append("/// Creates a new <see cref=\"").Append(classInfo.ClassName).AppendLine("\"/> instance.");
         builder.AppendLine("/// </summary>");

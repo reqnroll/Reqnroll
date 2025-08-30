@@ -5,4 +5,6 @@ internal record SyntaxNodeClassInfo(
     string ClassName,
     SyntaxKindInfo SyntaxKind,
     string BaseClassName,
-    ComparableArray<SyntaxSlotPropertyInfo> SlotProperties);
+    ComparableArray<SyntaxSlotPropertyInfo> SlotProperties,
+    ComparableArray<ComparableArray<string>> SlotGroups,
+    ComparableArray<GenerationDiagnostic> Diagnostics);

@@ -14,10 +14,7 @@ internal class InternalSyntaxFactoryMethodEmitter(SyntaxNodeClassInfo classInfo)
         builder.AppendLine("namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;");
 
         builder.AppendLine("internal static partial class InternalSyntaxFactory");
-        builder.AppendBodyBlock(builder =>
-        {
-            AppendFactoryMethodTo(builder);
-        });
+        builder.AppendBodyBlock(AppendFactoryMethodTo);
 
         return builder.ToString();
     }

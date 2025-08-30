@@ -44,7 +44,21 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
 
                 var slots = SlotHelper.GetSlotProperties(symbol, cancellationToken);
 
-                var syntaxKindValue = (ushort)context.Attributes.First().ConstructorArguments[0].Value!;
+                var syntaxNodeAttribute = context.Attributes.Single();
+                var syntaxKindValue = (ushort)syntaxNodeAttribute.ConstructorArguments[0].Value!;
+
+                var constructorGroups = ImmutableArray<ComparableArray<string>>.Empty;
+                var diagnostics = ImmutableArray<GenerationDiagnostic>.Empty;
+
+                // If the type is not abstract, we generate constructor methods.
+                if (!symbol.IsAbstract)
+                {
+                    (constructorGroups, diagnostics) = SlotHelper.CreateConstructorGroups(
+                        context.TargetSymbol,
+                        context.SemanticModel,
+                        slots,
+                        cancellationToken);
+                }
 
                 return new BareSyntaxNodeClassInfo(
                     symbol.ContainingNamespace.ToDisplayString(),
@@ -52,7 +66,9 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                     syntaxKindValue,
                     symbol.BaseType?.ToDisplayString() ?? "",
                     slots,
-                    symbol.IsAbstract);
+                    constructorGroups,
+                    symbol.IsAbstract,
+                    diagnostics);
             });
 
         var structuredTriviaClasses = bareStructuredTriviaClasses.Where(syntax => syntax != null).Combine(syntaxKinds)
@@ -77,9 +93,10 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
                             info.Description,
                             !info.IsOptional,
                             info.IsInherited,
-                            info.IsAbstract,
-                            info.ParameterGroups))
-                        .ToImmutableArray());
+                            info.IsAbstract))
+                        .ToImmutableArray(),
+                    syntaxClass.SlotGroups,
+                    syntaxClass.Diagnostics);
             });
 
         context.RegisterSourceOutput(structuredTriviaClasses, static (context, classInfo) =>
@@ -106,6 +123,21 @@ public class StructuredTriviaGenerator : IIncrementalGenerator
             context.AddSource(
                 $"Syntax/InternalSyntaxFactory.{classInfo.ClassName}.g.cs",
                 internalFactoryMethodEmitter.EmitInternalSyntaxFactoryMethod());
+        });
+
+        // If there are any diagnostics to report, we do that now.
+        var structuredTriviaClassDiagnostics = structuredTriviaClasses
+            .Where(classInfo => classInfo.Diagnostics.Length > 0)
+            .Combine(context.CompilationProvider);
+
+        context.RegisterSourceOutput(structuredTriviaClassDiagnostics, static (context, tuple) =>
+        {
+            var (classInfo, compilation) = tuple;
+
+            foreach (var diagnostic in classInfo.Diagnostics)
+            {
+                context.ReportDiagnostic(diagnostic.ToDiagnostic(compilation));
+            }
         });
     }
 }
