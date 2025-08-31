@@ -29,26 +29,22 @@ public partial class FeatureTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Guess the word",
-                            TriviaList([EnvironmentNewLine]))),
-                    LiteralText(
+                        "Guess the word",
+                        TriviaList([EnvironmentNewLine])),
+                    Description(
                         TokenList([
-                            Literal(
+                            DescriptionText(
                                 TriviaList([EnvironmentNewLine, Whitespace("      ")]),
                                 "The word guess game is a turn-based game for two players.",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("      ")]),
                                 "The Maker makes a word for the Breaker to guess. The game",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("      ")]),
                                 "is over when the Breaker guesses the Maker's word.",
                                 TriviaList([EnvironmentNewLine]))

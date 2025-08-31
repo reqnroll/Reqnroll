@@ -47,6 +47,12 @@ public static partial class SyntaxFactory
     /// </summary>
     public static SyntaxToken VerticalBar { get; } = Token(SyntaxKind.VerticalBarToken);
 
+    /// <summary>
+    /// A token with kind <see cref="SyntaxKind.ColonToken"/> representing a colon character (':'), followed immediately by
+    /// a single trivia space.
+    /// </summary>
+    public static SyntaxToken ColonWithSpace { get; } = Token(TriviaList(), SyntaxKind.ColonToken, TriviaList(Space));
+
     public static GherkinDocumentSyntax GherkinDocument() => GherkinDocument(null);
 
     /// <summary>
@@ -75,7 +81,7 @@ public static partial class SyntaxFactory
     public static SyntaxToken Token(SyntaxTriviaList leading, SyntaxKind kind, string text, SyntaxTriviaList trailing)
     {
         CodeAnalysisDebug.Assert(
-            kind != SyntaxKind.LiteralToken,
+            kind != SyntaxKind.NameToken,
             "Do not use Token to create literal tokens. Use Literal instead.");
 
         CodeAnalysisDebug.Assert(
@@ -85,62 +91,85 @@ public static partial class SyntaxFactory
         return InternalSyntaxFactory.Token(leading.InternalNode, kind, text, trailing.InternalNode);
     }
 
-    public static SyntaxToken DirectiveIdentifier(string text) =>
-        InternalSyntaxFactory.DirectiveIdentifier(null, text, null);
+    public static SyntaxToken Name(string value) =>
+        InternalSyntaxFactory.Literal(null, SyntaxKind.NameToken, LiteralEscapingStyle.Default.Escape(value), value, null);
 
-    public static SyntaxToken DirectiveIdentifier(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.DirectiveIdentifier(leading.InternalNode, text, trailing.InternalNode);
-
-    public static SyntaxToken Literal(string value) =>
-        InternalSyntaxFactory.Literal(null, LiteralEscapingStyle.Default.Escape(value), value, null);
-
-    public static SyntaxToken Literal(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
+    public static SyntaxToken Name(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.Literal(
             leading.InternalNode,
+            SyntaxKind.NameToken,
             LiteralEscapingStyle.Default.Escape(value),
             value,
             trailing.InternalNode);
 
-    public static SyntaxToken Literal(string text, string value) =>
-        InternalSyntaxFactory.Literal(null, text, value, null);
+    public static SyntaxToken DescriptionText(string value) =>
+        InternalSyntaxFactory.Literal(null, SyntaxKind.DescriptionTextToken, LiteralEscapingStyle.Default.Escape(value), value, null);
 
-    public static SyntaxToken Literal(SyntaxTriviaList leading, string text, string value, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.Literal(leading.InternalNode, text, value, trailing.InternalNode);
+    public static SyntaxToken DescriptionText(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.Literal(
+            leading.InternalNode,
+            SyntaxKind.DescriptionTextToken,
+            LiteralEscapingStyle.Default.Escape(value),
+            value,
+            trailing.InternalNode);
 
-    public static LiteralTextSyntax LiteralText(string text) => LiteralText(TokenList([Literal(text)]));
+    public static SyntaxToken Name(string text, string value) =>
+        InternalSyntaxFactory.Literal(null, SyntaxKind.NameToken, text, value, null);
 
-    public static LiteralTextSyntax LiteralText(SyntaxToken text) => LiteralText(TokenList([text]));
+    public static SyntaxToken Name(SyntaxTriviaList leading, string text, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.Literal(leading.InternalNode, SyntaxKind.NameToken, text, value, trailing.InternalNode);
+
+    public static SyntaxToken StepText(string value) =>
+        InternalSyntaxFactory.Literal(null, SyntaxKind.NameToken, LiteralEscapingStyle.Default.Escape(value), value, null);
+
+    public static SyntaxToken StepText(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.Literal(
+            leading.InternalNode,
+            SyntaxKind.NameToken,
+            LiteralEscapingStyle.Default.Escape(value),
+            value,
+            trailing.InternalNode);
+
+    public static SyntaxToken StepText(string text, string value) =>
+        InternalSyntaxFactory.Literal(null, SyntaxKind.NameToken, text, value, null);
+
+    public static SyntaxToken StepText(SyntaxTriviaList leading, string text, string value, SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.Literal(leading.InternalNode, SyntaxKind.NameToken, text, value, trailing.InternalNode);
+
+    public static SyntaxToken Literal(SyntaxKind kind, string text, string value) =>
+        InternalSyntaxFactory.Literal(null, kind, text, value, null);
+
+    public static SyntaxToken Literal(
+        SyntaxTriviaList leading,
+        SyntaxKind kind,
+        string text,
+        string value,
+        SyntaxTriviaList trailing) =>
+        InternalSyntaxFactory.Literal(leading.InternalNode, kind, text, value, trailing.InternalNode);
 
     /// <summary>
-    /// Creates a new <see cref="FeatureSyntax"/> instance.
+    /// Creates a new <see cref="ExamplesSyntax"/> instance.
     /// </summary>
-    /// <param name="featureKeyword">The "Feature" keyword.</param>
-    /// <param name="name">The name of the feature.</param>
-    /// <returns>A new <see cref="FeatureSyntax"/> instance.</returns>
-    public static FeatureSyntax Feature(string featureKeyword, string name) => Feature(
-        Token(SyntaxKind.FeatureKeyword, featureKeyword),
-        LiteralText(name));
-
-    /// <summary>
-    /// Creates a new <see cref="ExampleSyntax"/> instance.
-    /// </summary>
-    /// <param name="exampleKeyword">The token that represents the "Example" keyword.</param>
-    /// <param name="name">The name of the example.</param>
-    /// <param name="steps">The steps of the example.</param>
-    /// <returns>A new <see cref="ExampleSyntax"/> instance.</returns>
-    public static ExampleSyntax Example(
-        string exampleKeyword,
-        string name,
-        SyntaxList<StepSyntax> steps = default) => Example(
-            Token(SyntaxKind.ExampleKeyword, exampleKeyword),
-            LiteralText(name),
-            steps: steps);
-
-    public static SyntaxToken StepTextLiteral(string text) =>
-        InternalSyntaxFactory.StepTextLiteral(null, text, null);
-
-    public static SyntaxToken StepTextLiteral(SyntaxTriviaList leading, string text, SyntaxTriviaList trailing) =>
-        InternalSyntaxFactory.StepTextLiteral(leading.InternalNode, text, trailing.InternalNode);
+    /// <param name="examplesKeyword">The token that represents the "Examples" keyword.</param>
+    /// <param name="colonToken">The token that represents the colon following the keyword.</param>
+    /// <param name="name">The name which identifies the declaration.</param>
+    /// <param name="description">The optional description of the scenario.</param>
+    /// <param name="table">The table which forms the examples.</param>
+    /// <returns>A new <see cref="ExamplesSyntax"/> instance.</returns>
+    public static ExamplesSyntax Examples(
+        SyntaxToken examplesKeyword,
+        SyntaxToken colonToken,
+        DescriptionSyntax? description = default,
+        TableSyntax? table = default)
+    {
+        return Examples(
+            default,
+            examplesKeyword,
+            colonToken,
+            MissingToken(SyntaxKind.NameToken),
+            description,
+            table);
+    }
 
     public static SyntaxToken TableLiteral(string value) =>
         InternalSyntaxFactory.TableLiteral(null, LiteralEscapingStyle.Table.Escape(value), value, null);
@@ -158,8 +187,7 @@ public static partial class SyntaxFactory
     public static SyntaxToken TableLiteral(SyntaxTriviaList leading, string text, string value, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.TableLiteral(leading.InternalNode, text, value, trailing.InternalNode);
 
-    public static TableTextCellSyntax TextTableCell(string text) => SyntaxFactory.
-        TextTableCell(TableLiteral(text));
+    public static TableCellSyntax TableCell(string text) => TableCell(TableLiteral(text));
 
     public static SyntaxTriviaList TriviaList() => default;
 

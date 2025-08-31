@@ -150,15 +150,16 @@ internal partial class InternalSyntaxToken : InternalNode
         SyntaxKind kind,
         string text,
         string value,
+        bool containsPlaceholder,
         InternalNode? leading,
         InternalNode? trailing)
     {
-        if (!kind.IsToken())
+        if (!kind.IsLiteralToken())
         {
-            throw new ArgumentOutOfRangeException(nameof(kind), kind, "This method can only be used to create tokens.");
+            throw new ArgumentOutOfRangeException(nameof(kind), kind, "This method can only be used to literal tokens.");
         }
 
-        return new InternalSyntaxTokenWithValue<string>(kind, text, value, leading, trailing);
+        return new InternalSyntaxTokenWithValue<string>(kind, text, value, containsPlaceholder, leading, trailing);
     }
 
     private static string GetText(SyntaxKind kind)

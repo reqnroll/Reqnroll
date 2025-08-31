@@ -11,12 +11,14 @@ public class FeatureTests
             default,
             Token(SyntaxKind.FeatureKeyword, "Feature"),
             Token(TriviaList(), SyntaxKind.ColonToken, TriviaList([Whitespace(" ")])),
-            LiteralText(Literal(TriviaList(), "Guess the word", TriviaList([CarriageReturnLineFeed, CarriageReturnLineFeed]))),
-            LiteralText(
-                Literal(
-                    TriviaList(),
-                    "An example feature from the Gherkin reference.",
-                    TriviaList([CarriageReturnLineFeed]))));
+            Name(TriviaList(), "Guess the word", TriviaList([CarriageReturnLineFeed, CarriageReturnLineFeed])),
+            Description(
+                TokenList([
+                    DescriptionText(
+                        TriviaList(),
+                        "An example feature from the Gherkin reference.",
+                        TriviaList([CarriageReturnLineFeed]))
+                ])));
 
         feature.ToString().Should().Be(
             "Feature: Guess the word" + 

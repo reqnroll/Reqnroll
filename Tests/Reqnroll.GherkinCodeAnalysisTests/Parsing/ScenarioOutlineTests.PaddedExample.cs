@@ -43,15 +43,11 @@ public partial class ScenarioOutlineTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "test",
-                            TriviaList([EnvironmentNewLine]))),
+                        "test",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -59,15 +55,11 @@ public partial class ScenarioOutlineTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "test",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "test",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -75,13 +67,10 @@ public partial class ScenarioOutlineTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "a <color> ball with:",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    Name(
+                                        TriviaList(),
+                                        "a <color> ball with:",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -91,7 +80,7 @@ public partial class ScenarioOutlineTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "type",
@@ -100,7 +89,7 @@ public partial class ScenarioOutlineTests
                                                             TriviaList([Whitespace("     ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "diameter",
@@ -116,7 +105,7 @@ public partial class ScenarioOutlineTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "football",
@@ -125,7 +114,7 @@ public partial class ScenarioOutlineTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("       ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "69",
@@ -141,7 +130,7 @@ public partial class ScenarioOutlineTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("   ")])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "pool",
@@ -150,7 +139,7 @@ public partial class ScenarioOutlineTests
                                                             TriviaList([Whitespace("   ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("      ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "5.6",
@@ -181,7 +170,7 @@ public partial class ScenarioOutlineTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "color",
@@ -197,7 +186,7 @@ public partial class ScenarioOutlineTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Whitespace("\u00A0\u0020\u0009")])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "red",

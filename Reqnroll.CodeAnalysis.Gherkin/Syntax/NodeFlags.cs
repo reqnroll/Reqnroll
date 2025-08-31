@@ -35,4 +35,9 @@ internal enum NodeFlags
     /// The node contains skipped text, either directly or one of its descendants.
     /// </summary>
     ContainsSkippedText = 16,
+
+    /// <summary>
+    /// The node contains a placeholder, either directly or one of its descendants.
+    /// </summary>
+    ContainsPlaceholder = 32,
 }

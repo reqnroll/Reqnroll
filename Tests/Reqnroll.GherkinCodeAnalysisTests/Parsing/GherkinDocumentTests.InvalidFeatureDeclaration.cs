@@ -21,7 +21,7 @@ public partial class GherkinDocumentTests
                         Trivia(
                             SkippedTokensTrivia(
                                 TokenList([
-                                    Literal(TriviaList(), "invalid", TriviaList([Space]))
+                                    Name(TriviaList(), "invalid", TriviaList([Space]))
                                 ])))
                         ]),
                     SyntaxKind.EndOfFileToken,

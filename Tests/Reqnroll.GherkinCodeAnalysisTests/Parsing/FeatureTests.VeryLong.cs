@@ -877,17 +877,14 @@ public partial class FeatureTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
+                        "Long feature file",
+                        TriviaList([EnvironmentNewLine, Whitespace("  ")])),
+                    Description(
                         TokenList([
-                            Literal(
-                                TriviaList(),
-                                "Long feature file",
-                                TriviaList([EnvironmentNewLine, Whitespace("  ")])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList(),
                                 "This is a long feature file",
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
@@ -899,15 +896,11 @@ public partial class FeatureTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "scenario 01",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "scenario 01",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -915,11 +908,10 @@ public partial class FeatureTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "a simple data table",
-                                            TriviaList([EnvironmentNewLine]))),
+                                    StepText(
+                                        TriviaList(),
+                                        "a simple data table",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -929,7 +921,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "foo",
@@ -938,7 +930,7 @@ public partial class FeatureTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "bar",
@@ -955,7 +947,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boz",
@@ -964,7 +956,7 @@ public partial class FeatureTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boo",
@@ -982,11 +974,10 @@ public partial class FeatureTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "a data table with a single cell",
-                                            TriviaList([EnvironmentNewLine]))),
+                                    StepText(
+                                        TriviaList(),
+                                        "a data table with a single cell",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -996,7 +987,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "foo",
@@ -1014,11 +1005,10 @@ public partial class FeatureTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "a data table with different fromatting",
-                                            TriviaList([EnvironmentNewLine]))),
+                                    StepText(
+                                        TriviaList(),
+                                        "a data table with different fromatting",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -1028,7 +1018,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space, Space, Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "foo",
@@ -1037,7 +1027,7 @@ public partial class FeatureTests
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList()),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "bar",
@@ -1046,7 +1036,7 @@ public partial class FeatureTests
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("    ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boz",
@@ -1064,11 +1054,10 @@ public partial class FeatureTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "a data table with an empty cell",
-                                            TriviaList([EnvironmentNewLine]))),
+                                    StepText(
+                                        TriviaList(),
+                                        "a data table with an empty cell",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -1078,7 +1067,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList()),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "foo",
@@ -1087,12 +1076,12 @@ public partial class FeatureTests
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList()),
-                                                        EmptyTableCell(),
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken)),
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList()),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boz",
@@ -1109,11 +1098,10 @@ public partial class FeatureTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "a data table with comments and newlines inside",
-                                            TriviaList([EnvironmentNewLine]))),
+                                    StepText(
+                                        TriviaList(),
+                                        "a data table with comments and newlines inside",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -1123,7 +1111,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "foo",
@@ -1132,7 +1120,7 @@ public partial class FeatureTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "bar",
@@ -1149,7 +1137,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boz",
@@ -1158,7 +1146,7 @@ public partial class FeatureTests
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boo",
@@ -1175,7 +1163,7 @@ public partial class FeatureTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boz2",
@@ -1184,7 +1172,7 @@ public partial class FeatureTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "boo2",

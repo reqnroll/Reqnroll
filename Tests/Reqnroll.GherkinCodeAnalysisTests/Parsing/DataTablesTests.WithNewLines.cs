@@ -36,11 +36,10 @@ public partial class DataTablesTests
                         TriviaList(),
                         SyntaxKind.ColonToken,
                         TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "DataTables",
-                            TriviaList([EnvironmentNewLine]))),
+                    Name(
+                        TriviaList(),
+                        "DataTables",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -48,15 +47,11 @@ public partial class DataTablesTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "some whitespace is important",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "some whitespace is important",
+                                TriviaList([EnvironmentNewLine])),
                             steps : List([
                                 Step(
                                     Token(
@@ -64,13 +59,10 @@ public partial class DataTablesTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "3 lines of poetry on 5 lines",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "3 lines of poetry on 5 lines",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -80,7 +72,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("  ")])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 @"\nraindrops--\nher last kiss\ngoodbye.\n",
@@ -98,13 +90,10 @@ public partial class DataTablesTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "an example of negative space",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "an example of negative space",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -114,7 +103,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("        ")])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "lost        i n        space",

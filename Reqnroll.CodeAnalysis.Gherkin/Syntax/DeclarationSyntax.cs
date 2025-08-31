@@ -10,17 +10,13 @@ public abstract partial class DeclarationSyntax : SyntaxNode
     public abstract SyntaxList<TagSyntax> Tags { get; }
 
     [SyntaxSlot(SyntaxKind.ColonToken, "The token that represents the colon following the keyword.")]
-    [ParameterGroup("Untagged")]
     public abstract SyntaxToken ColonToken { get; }
 
-    [SyntaxSlot(SyntaxKind.LiteralText, "The name of the scenario.")]
-    [ParameterGroup("Minimal")]
-    [ParameterGroup("Untagged")]
-    public abstract PlainTextSyntax? Name { get; }
+    [SyntaxSlot(SyntaxKind.NameToken, "The name which identifies the declaration.")]
+    public abstract SyntaxToken Name { get; }
 
-    [SyntaxSlot(SyntaxKind.LiteralText, "The optional description of the scenario.")]
-    [ParameterGroup("Untagged")]
-    public abstract PlainTextSyntax? Description { get; }
+    [SyntaxSlot(SyntaxKind.Description, "The optional description of the scenario.")]
+    public abstract DescriptionSyntax? Description { get; }
 
     /// <summary>
     /// Gets the keyword token for this declaration.

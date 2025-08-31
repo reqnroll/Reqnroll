@@ -29,15 +29,11 @@ public partial class RuleTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Rule support",
-                            TriviaList([EnvironmentNewLine]))),
+                        "Rule support",
+                        TriviaList([EnvironmentNewLine])),
                     rules: List([
                         Rule(
                             Token(
@@ -45,15 +41,11 @@ public partial class RuleTests
                                 SyntaxKind.RuleKeyword,
                                 "Rule",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "A rule",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "A rule",
+                                TriviaList([EnvironmentNewLine])),
                             examples: List([
                                 Example(
                                     Token(
@@ -61,15 +53,11 @@ public partial class RuleTests
                                         SyntaxKind.ExampleKeyword,
                                         "Scenario",
                                         TriviaList()),
-                                    Token(
+                                    ColonWithSpace,
+                                    Name(
                                         TriviaList(),
-                                        SyntaxKind.ColonToken,
-                                        TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "scenario in a rule",
-                                            TriviaList([EnvironmentNewLine]))),
+                                        "scenario in a rule",
+                                        TriviaList([EnvironmentNewLine])),
                                     steps: List([
                                         Step(
                                             Token(
@@ -77,13 +65,10 @@ public partial class RuleTests
                                                 SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList(),
-                                                        "the minimalism",
-                                                        TriviaList([EnvironmentNewLine]))
-                                                ])))
+                                            StepText(
+                                                TriviaList(),
+                                                "the minimalism",
+                                                TriviaList([EnvironmentNewLine])))
                                     ]))
                             ]))
                     ])),

@@ -31,23 +31,19 @@ public partial class FeatureTests
                             Trivia(
                                 DirectiveCommentTrivia(
                                     Token(TriviaList(), SyntaxKind.HashToken, TriviaList()),
-                                    DirectiveIdentifier(TriviaList(), "language", TriviaList()),
+                                    Token(TriviaList(), SyntaxKind.DirectiveIdentifierToken, "language", TriviaList()),
                                     Token(TriviaList(), SyntaxKind.ColonToken, TriviaList()),
-                                    Literal(TriviaList(), "en", TriviaList([EnvironmentNewLine])))),
+                                    Literal(TriviaList(), SyntaxKind.DirectiveValueToken, "en", "en", TriviaList([EnvironmentNewLine])))),
                             EnvironmentNewLine
                         ]),
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Explicit language specification",
-                            TriviaList([EnvironmentNewLine]))),
+                        "Explicit language specification",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -55,15 +51,11 @@ public partial class FeatureTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "minimalistic",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "minimalistic",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -71,11 +63,10 @@ public partial class FeatureTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "the minimalism",
-                                            TriviaList([EnvironmentNewLine]))))
+                                    StepText(
+                                        TriviaList(),
+                                        "the minimalism",
+                                        TriviaList([EnvironmentNewLine])))
                             ]))
                     ])),
                 Token(

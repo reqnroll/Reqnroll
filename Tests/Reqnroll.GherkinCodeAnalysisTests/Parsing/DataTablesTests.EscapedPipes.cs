@@ -36,22 +36,18 @@ public partial class DataTablesTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Escaped pipes",
-                            TriviaList([EnvironmentNewLine]))),
-                    description: LiteralText(
+                        "Escaped pipes",
+                        TriviaList([EnvironmentNewLine])),
+                    description: Description(
                         TokenList([
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("    ")]),
                                 "The \\-character will be considered as an escape in table cell",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("    ")]),
                                 "iff it is followed by a |-character, a \\-character or an n.",
                                 TriviaList([EnvironmentNewLine]))
@@ -63,15 +59,11 @@ public partial class DataTablesTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "They are the future",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "They are the future",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -79,13 +71,10 @@ public partial class DataTablesTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "they have arrived",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "they have arrived",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -95,7 +84,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "æ",
@@ -104,7 +93,7 @@ public partial class DataTablesTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "o",
@@ -120,7 +109,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "a",
@@ -129,7 +118,7 @@ public partial class DataTablesTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "ø",
@@ -146,13 +135,10 @@ public partial class DataTablesTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "they have arrived",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "they have arrived",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -162,7 +148,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 @"\|æ\\n",
@@ -172,7 +158,7 @@ public partial class DataTablesTests
                                                             TriviaList([Whitespace("     ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 @"\o\no\",
@@ -189,7 +175,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 @"\\\|a\\\\n",
@@ -199,7 +185,7 @@ public partial class DataTablesTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 @"ø\\\nø\\",

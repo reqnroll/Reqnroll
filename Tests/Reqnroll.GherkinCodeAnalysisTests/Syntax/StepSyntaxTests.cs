@@ -10,17 +10,17 @@ public class StepSyntaxTests
     {
         var step = Step(
             Token(TriviaList(), SyntaxKind.ContextStepKeyword, "Given", TriviaList([Space])),
-            LiteralText(Literal(TriviaList(), "a table with data", TriviaList([EnvironmentNewLine]))),
+            StepText(TriviaList(), "a table with data", TriviaList([EnvironmentNewLine])),
             StepTable(
                 Table(
                     List([
                         TableRow(
                             VerticalBar,
-                            TableCellList([ TextTableCell("foo"), TextTableCell("bar") ]),
+                            TableCellList([ TableCell("foo"), TableCell("bar") ]),
                             VerticalBar.WithTrailingTrivia(TriviaList([EnvironmentNewLine]))),
                         TableRow(
                             VerticalBar,
-                            TableCellList([TextTableCell("baz"), TextTableCell("bop") ]),
+                            TableCellList([TableCell("baz"), TableCell("bop") ]),
                             VerticalBar.WithTrailingTrivia(TriviaList([EnvironmentNewLine])))
                     ]))));
 

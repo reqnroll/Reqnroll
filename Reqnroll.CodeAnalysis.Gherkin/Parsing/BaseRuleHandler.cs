@@ -79,6 +79,7 @@ internal class BaseRuleHandler : ParsingRuleHandler
         var nameWhitespace = context.SourceText.ConsumeWhitespace(nameIndex + token.MatchedText.Length, line.End);
         var name = Literal(
             null,
+            SyntaxKind.NameToken,
             LiteralEscapingStyle.Default.Escape(token.MatchedText),
             token.MatchedText,
             nameWhitespace + line.GetEndOfLineTrivia());
@@ -118,7 +119,12 @@ internal class BaseRuleHandler : ParsingRuleHandler
 
         var text = context.SourceText.ToString(literalSpan);
 
-        var literal = Literal(leadingTrivia, LiteralEscapingStyle.Default.Escape(text), text, trailingTrivia);
+        var literal = Literal(
+            leadingTrivia,
+            SyntaxKind.NameToken,
+            LiteralEscapingStyle.Default.Escape(text),
+            text,
+            trailingTrivia);
 
         // Add the skipped tokens to be included as leading trivia in the next token.
         // Inkeeping with the CS compiler error codes, we'll create a unique error for each combination of expected tokens.

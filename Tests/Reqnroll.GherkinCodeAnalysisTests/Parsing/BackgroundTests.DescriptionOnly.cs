@@ -36,11 +36,10 @@ public partial class BackgroundTests
                         TriviaList(),
                         SyntaxKind.ColonToken,
                         TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Incomplete backgrounds, Part 2",
-                            TriviaList([EnvironmentNewLine]))),
+                    Name(
+                        TriviaList(),
+                        "Incomplete backgrounds, Part 2",
+                        TriviaList([EnvironmentNewLine])),
                     background: Background(
                         Token(
                             TriviaList([EnvironmentNewLine, Whitespace("  ")]),
@@ -51,14 +50,13 @@ public partial class BackgroundTests
                             TriviaList(),
                             SyntaxKind.ColonToken,
                             TriviaList([Space])),
-                        LiteralText(
-                            Literal(
-                                TriviaList(),
-                                "just a description",
-                                TriviaList([EnvironmentNewLine]))),
-                        description: LiteralText(
+                        Name(
+                            TriviaList(),
+                            "just a description",
+                            TriviaList([EnvironmentNewLine])),
+                        description: Description(
                             TokenList([
-                                Literal(
+                                DescriptionText(
                                     TriviaList([Whitespace("    ")]),
                                     "A short description",
                                     TriviaList([EnvironmentNewLine]))
@@ -77,11 +75,10 @@ public partial class BackgroundTests
                                 TriviaList(),
                                 SyntaxKind.ColonToken,
                                 TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "still pickles up",
-                                    TriviaList([EnvironmentNewLine]))),
+                            Name(
+                                TriviaList(),
+                                "still pickles up",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -89,14 +86,10 @@ public partial class BackgroundTests
                                         SyntaxKind.WildcardStepKeyword,
                                         "*",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a step",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])))
+                                    StepText(
+                                        TriviaList(),
+                                        "a step",
+                                        TriviaList([EnvironmentNewLine])))
                             ])
                         )
                     ])

@@ -31,30 +31,28 @@ public partial class InternationalizationTests
                                         TriviaList(),
                                         SyntaxKind.HashToken,
                                         TriviaList()),
-                                    DirectiveIdentifier(
+                                    Token(
                                         TriviaList(),
+                                        SyntaxKind.DirectiveIdentifierToken,
                                         "language",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
                                         TriviaList()),
-                                    Literal(
+                                    Token(
                                         TriviaList(),
+                                        SyntaxKind.DirectiveValueToken,
                                         "no",
                                         TriviaList([EnvironmentNewLine]))))]),
                         SyntaxKind.FeatureKeyword,
                         "Egenskap",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "i18n støtte",
-                            TriviaList([EnvironmentNewLine]))),
+                        "i18n støtte",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -62,25 +60,17 @@ public partial class InternationalizationTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
-                                TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
+                            ColonWithSpace,
+                                Name(
                                     TriviaList(),
                                     "Støtte for spesialtegn",
-                                    TriviaList([EnvironmentNewLine, Whitespace("  "), EnvironmentNewLine]))
-                            ),
-                            steps: List<StepSyntax>()
-                        )
-                    ])
-                ),
+                                    TriviaList([EnvironmentNewLine, Whitespace("  "), EnvironmentNewLine])),
+                            steps: default)
+                    ])),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,
-                    TriviaList()))
-        );
+                    TriviaList())));
 
         tree.ToString().Should().Be(source);
     }

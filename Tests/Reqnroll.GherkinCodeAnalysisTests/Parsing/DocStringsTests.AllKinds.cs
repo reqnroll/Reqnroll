@@ -73,15 +73,11 @@ public partial class DocStringsTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "DocString variations",
-                            TriviaList([EnvironmentNewLine]))),
+                        "DocString variations",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -89,15 +85,11 @@ public partial class DocStringsTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "minimalistic",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "minimalistic",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -105,14 +97,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a simple DocString",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a simple DocString",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -120,25 +108,18 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "first line (no indent)" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("        ")]),
-                                                        "second line (indented with two spaces)" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList(),
-                                                        Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "third line was empty" + Environment.NewLine,
-                                                        TriviaList([EnvironmentNewLine]))
-                                                ])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "      first line (no indent)" + Environment.NewLine +
+                                                "        second line (indented with two spaces)" + Environment.NewLine +
+                                                Environment.NewLine +
+                                                "      third line was empty" + Environment.NewLine,
+                                                "first line (no indent)" + Environment.NewLine +
+                                                "  second line (indented with two spaces)" + Environment.NewLine +
+                                                Environment.NewLine +
+                                                "third line was empty" + Environment.NewLine,
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -150,14 +131,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a DocString with content type",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a DocString with content type",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -165,27 +142,21 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
                                                 TriviaList()),
-                                            DocStringContentType(
-                                                Token(
-                                                    TriviaList(),
-                                                    SyntaxKind.DocStringContentTypeIdentifierToken,
-                                                    "xml",
-                                                    TriviaList([EnvironmentNewLine]))),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "<foo>" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "  <bar />"  + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "</foo>"  + Environment.NewLine,
-                                                        TriviaList())
-                                                ])),
+                                            Token(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentTypeIdentifierToken,
+                                                "xml",
+                                                TriviaList([EnvironmentNewLine])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "      <foo>" + Environment.NewLine +
+                                                "        <bar />"  + Environment.NewLine +
+                                                "      </foo>"  + Environment.NewLine,
+                                                "<foo>" + Environment.NewLine +
+                                                "  <bar />"  + Environment.NewLine +
+                                                "</foo>"  + Environment.NewLine,
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("    ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -197,14 +168,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a DocString with wrong indentation",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a DocString with wrong indentation",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -212,13 +179,12 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("    ")]),
-                                                        "wrongly indented line",
-                                                        TriviaList([EnvironmentNewLine]))
-                                                ])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "    wrongly indented line" + Environment.NewLine,
+                                                "wrongly indented line",
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -230,14 +196,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a DocString with alternative separator",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a DocString with alternative separator",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -245,17 +207,14 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "```",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "first line" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "second line" + Environment.NewLine,
-                                                        TriviaList())
-                                                ])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "      first line" + Environment.NewLine +
+                                                "      second line" + Environment.NewLine,
+                                                "first line" + Environment.NewLine +
+                                                "second line" + Environment.NewLine,
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -267,14 +226,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a DocString with normal separator inside",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a DocString with normal separator inside",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -282,21 +237,16 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "```",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "first line" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "\"\"\"" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "third line" + Environment.NewLine,
-                                                        TriviaList())
-                                                ])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "      first line" + Environment.NewLine +
+                                                "      \"\"\"" + Environment.NewLine +
+                                                "      third line" + Environment.NewLine,
+                                                "first line" + Environment.NewLine +
+                                                "\"\"\"" + Environment.NewLine +
+                                                "third line" + Environment.NewLine,
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -308,14 +258,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a DocString with alternative separator inside",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a DocString with alternative separator inside",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -323,21 +269,16 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "first line" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "```" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "third line" + Environment.NewLine,
-                                                        TriviaList())
-                                                ])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "      first line" + Environment.NewLine +
+                                                "      ```" + Environment.NewLine +
+                                                "      third line" + Environment.NewLine,
+                                                "first line" + Environment.NewLine +
+                                                "```" + Environment.NewLine +
+                                                "third line" + Environment.NewLine,
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -349,14 +290,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a DocString with escaped separator inside",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a DocString with escaped separator inside",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -364,21 +301,16 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "first line" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "\\\"\\\"\\\"" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "third line" + Environment.NewLine,
-                                                        TriviaList())
-                                                ])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "      first line" + Environment.NewLine +
+                                                "      \\\"\\\"\\\"" + Environment.NewLine +
+                                                "      third line" + Environment.NewLine,
+                                                "first line" + Environment.NewLine +
+                                                "\"\"\"" + Environment.NewLine +
+                                                "third line" + Environment.NewLine,
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -390,14 +322,10 @@ public partial class DocStringsTests
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "a DocString with an escaped alternative separator inside",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a DocString with an escaped alternative separator inside",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -405,21 +333,16 @@ public partial class DocStringsTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "```",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "first line" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "\\`\\`\\`" + Environment.NewLine,
-                                                        TriviaList()),
-                                                    Literal(
-                                                        TriviaList([Whitespace("      ")]),
-                                                        "third line" + Environment.NewLine,
-                                                        TriviaList())
-                                                ])),
+                                            Literal(
+                                                TriviaList(),
+                                                SyntaxKind.DocStringContentToken,
+                                                "      first line" + Environment.NewLine +
+                                                "      \\`\\`\\`" + Environment.NewLine +
+                                                "      third line" + Environment.NewLine,
+                                                "first line" + Environment.NewLine +
+                                                "```" + Environment.NewLine +
+                                                "third line" + Environment.NewLine,
+                                                TriviaList()),
                                             Token(
                                                 TriviaList([Whitespace("      ")]),
                                                 SyntaxKind.DocStringDelimiterToken,

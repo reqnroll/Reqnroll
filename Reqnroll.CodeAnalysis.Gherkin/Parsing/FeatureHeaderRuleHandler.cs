@@ -18,7 +18,7 @@ internal class FeatureHeaderRuleHandler() : BaseRuleHandler(RuleType.FeatureHead
 
     public InternalNode? Name => _declarationHelper.Name;
 
-    public PlainTextSyntax.Internal? Description => _descriptionRuleHandler?.CreateDescriptionSyntax();
+    public DescriptionSyntax.Internal? Description => _descriptionRuleHandler?.CreateDescriptionSyntax();
 
     public InternalNode? Tags => _tagsRuleHandler?.Tags;
 

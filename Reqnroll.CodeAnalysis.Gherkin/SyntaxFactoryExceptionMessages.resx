@@ -153,8 +153,8 @@
   <data name="TokenMustBeLessThanToken" xml:space="preserve">
     <value>Value must be a less-than ("&lt;") token.</value>
   </data>
-  <data name="TokenMustBeLiteralToken" xml:space="preserve">
-    <value>Value must be a literal token.</value>
+  <data name="TokenMustBeNameToken" xml:space="preserve">
+    <value>Value must be a name token.</value>
   </data>
   <data name="TokenMustBeOneOfContextStepKeywordActionStepKeywordOutcomeStepKeywordConjunctionStepKeywordConjunctionStepKeywordWildcardStepKeyword" xml:space="preserve">
     <value>Value must be one of a "given", "when", "then", "and" or "but" keyword tokens or a token that matches any step.</value>
@@ -179,5 +179,14 @@
   </data>
   <data name="TokenMustBeDocStringContentTypeIdentifierToken" xml:space="preserve">
     <value>Value must be a Doc String content-type identifier token.</value>
+  </data>
+  <data name="TokenMustBeDirectiveValueToken" xml:space="preserve">
+    <value>Value must be a directive value token.</value>
+  </data>
+  <data name="TokenMustBeDocStringContentToken" xml:space="preserve">
+    <value>Value must be a Doc String content token.</value>
+  </data>
+  <data name="TokenMustBeStepTextToken" xml:space="preserve">
+    <value>Value must be a step text token.</value>
   </data>
 </root>

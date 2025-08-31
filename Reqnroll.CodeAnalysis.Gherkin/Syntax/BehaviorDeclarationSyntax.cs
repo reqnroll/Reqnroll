@@ -7,7 +7,5 @@
 public abstract partial class BehaviorDeclarationSyntax : DeclarationSyntax
 {
     [SyntaxSlot(SyntaxKind.Step, "The steps which define the behavior.", LocatedAfter = nameof(Description))]
-    [ParameterGroup("Untagged")]
-    [ParameterGroup("Minimal")]
     public abstract SyntaxList<StepSyntax> Steps { get; }
 }

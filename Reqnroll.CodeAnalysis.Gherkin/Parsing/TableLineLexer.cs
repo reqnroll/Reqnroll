@@ -90,17 +90,14 @@ internal class TableLineLexer(TextLine line)
 
         bool ConsumeEscapedCharacter(char current)
         {
-            // Always switch back toe standard consume.
+            // Always switch back to standard consume.
             consumeCurrent = ConsumeCharacter;
 
-            switch (current)
+            return current switch
             {
-                case '#':
-                    return false; // Comment ends the literal.
-
-                default:
-                    return true; // Any other character is part of the literal.
-            }
+                '#' => false,// Comment ends the literal.
+                _ => true,// Any other character is part of the literal.
+            };
         }
 
         do

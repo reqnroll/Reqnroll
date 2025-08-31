@@ -43,12 +43,12 @@ internal class StepRuleHandler() : ParsingRuleHandler(RuleType.Step)
 
         // Create the tokens for the step.
         Keyword = Token(leading, keywordKind, keywordText, keywordWhitespace);
-        Text = LiteralText(
-            Literal(
+        Text = Literal(
             null,
+            SyntaxKind.StepTextToken,
             LiteralEscapingStyle.Default.Escape(text),
             text,
-            textWhitespace + trailing));
+            textWhitespace + trailing);
     }
 
     private static SyntaxKind GetKeywordKind(GherkinDialect dialect, string matchedKeyword)
@@ -84,7 +84,7 @@ internal class StepRuleHandler() : ParsingRuleHandler(RuleType.Step)
         return base.StartChildRule(ruleType);
     }
 
-    internal InternalNode CreateStepSyntax()
+    internal StepSyntax.Internal CreateStepSyntax()
     {
         InternalNode? data = null;
 
@@ -95,8 +95,7 @@ internal class StepRuleHandler() : ParsingRuleHandler(RuleType.Step)
 
         return Step(
             Keyword ?? MissingToken(SyntaxKind.WildcardStepKeyword),
-            Text ?? LiteralText(
-                MissingToken(SyntaxKind.LiteralToken)),
+            Text ?? MissingToken(SyntaxKind.NameToken),
             data);
     }
 

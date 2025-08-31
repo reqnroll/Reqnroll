@@ -58,7 +58,7 @@ internal class DeclarationHelper(SyntaxKind keywordKind, bool nameExpected)
         // If there is no name text, we create a missing token and associate the end-of-line trivia with it.
         if (token.MatchedText.Length == 0)
         {
-            nameLiteral = MissingToken(null, SyntaxKind.LiteralToken, line.GetEndOfLineTrivia());
+            nameLiteral = MissingToken(null, SyntaxKind.NameToken, line.GetEndOfLineTrivia());
         }
         else
         {
@@ -67,13 +67,14 @@ internal class DeclarationHelper(SyntaxKind keywordKind, bool nameExpected)
 
             nameLiteral = Literal(
                 null,
+                SyntaxKind.NameToken,
                 LiteralEscapingStyle.Default.Escape(token.MatchedText),
                 token.MatchedText,
                 trailing + line.GetEndOfLineTrivia());
         }
 
         Colon = Token(null, SyntaxKind.ColonToken, colonWhitespace);
-        Name = LiteralText(nameLiteral);
+        Name = nameLiteral;
     }
 
     protected virtual InternalNode CreateKeywordToken(

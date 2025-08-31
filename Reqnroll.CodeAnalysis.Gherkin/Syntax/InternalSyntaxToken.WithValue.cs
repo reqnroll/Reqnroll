@@ -21,23 +21,37 @@ internal partial class InternalSyntaxToken
             SyntaxKind kind,
             string text,
             T value,
+            bool containsPlaceholder,
             InternalNode? leading,
             InternalNode? trailing) : base(kind, text, leading, trailing)
         {
             _value = value;
+
+            if (containsPlaceholder)
+            {
+                SetFlag(NodeFlags.ContainsPlaceholder);
+            }
         }
 
         public InternalSyntaxTokenWithValue(
             SyntaxKind kind,
             string text,
             T value,
+            bool containsPlaceholder,
             InternalNode? leading,
             InternalNode? trailing,
             ImmutableArray<InternalDiagnostic> diagnostics,
             ImmutableArray<SyntaxAnnotation> annotations) : base(kind, text, leading, trailing, diagnostics, annotations)
         {
             _value = value;
+
+            if (containsPlaceholder) 
+            {
+                SetFlag(NodeFlags.ContainsPlaceholder);
+            }
         }
+
+        public bool ContainsPlaceholder => HasFlag(NodeFlags.ContainsPlaceholder);
 
         public override object? GetValue() => _value;
 
@@ -47,6 +61,7 @@ internal partial class InternalSyntaxToken
                 Kind,
                 _text,
                 _value,
+                ContainsPlaceholder,
                 trivia,
                 _trailing,
                 GetAttachedDiagnostics(),
@@ -59,6 +74,7 @@ internal partial class InternalSyntaxToken
                 Kind,
                 _text,
                 _value,
+                ContainsPlaceholder,
                 _leading,
                 trivia,
                 GetAttachedDiagnostics(),
@@ -71,6 +87,7 @@ internal partial class InternalSyntaxToken
                 Kind,
                 _text,
                 _value,
+                ContainsPlaceholder,
                 _leading,
                 _trailing,
                 GetAttachedDiagnostics(),
@@ -83,6 +100,7 @@ internal partial class InternalSyntaxToken
                 Kind,
                 _text,
                 _value,
+                ContainsPlaceholder,
                 _leading,
                 _trailing,
                 diagnostics,

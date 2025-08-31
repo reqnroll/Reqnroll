@@ -15,6 +15,6 @@ public sealed partial class DirectiveCommentTriviaSyntax : StructuredTriviaSynta
     [SyntaxSlot(SyntaxKind.ColonToken, "The token that represents the colon following the keyword.")]
     public partial SyntaxToken ColonToken { get; }
 
-    [SyntaxSlot(SyntaxKind.LiteralToken, "The token containing the value of the directive.")]
+    [SyntaxSlot(SyntaxKind.DirectiveValueToken, "The token containing the value of the directive.")]
     public partial SyntaxToken Value { get; }
 }

@@ -36,30 +36,26 @@ public partial class InternationalizationTests
                             Trivia(
                                 DirectiveCommentTrivia(
                                     Token(TriviaList(), SyntaxKind.HashToken, TriviaList()),
-                                    DirectiveIdentifier(TriviaList(), "language", TriviaList()),
+                                    Token(TriviaList(), SyntaxKind.DirectiveIdentifierToken, "language", TriviaList()),
                                     Token(TriviaList(), SyntaxKind.ColonToken, TriviaList()),
-                                    Literal(TriviaList(), "ht", TriviaList([EnvironmentNewLine])))),
+                                    Literal(TriviaList(), SyntaxKind.DirectiveValueToken, "ht", "ht", TriviaList([EnvironmentNewLine])))),
                             EnvironmentNewLine
                         ]),
                         SyntaxKind.FeatureKeyword,
                         "Karakteristik",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Keywords can be a prefix of another",
-                            TriviaList([EnvironmentNewLine]))),
-                    description: LiteralText(
+                        "Keywords can be a prefix of another",
+                        TriviaList([EnvironmentNewLine])),
+                    description: Description(
                         TokenList([
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("  ")]),
                                 "Some times keywords are a prefix of another keyword.",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("  ")]),
                                 "In this scenario the parser should prefer the longest keyword.",
                                 TriviaList([EnvironmentNewLine, EnvironmentNewLine]))
@@ -71,15 +67,11 @@ public partial class InternationalizationTests
                                 SyntaxKind.ExampleKeyword,
                                 "Senaryo",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "Erasing agent memory",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "Erasing agent memory",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -87,55 +79,50 @@ public partial class InternationalizationTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Sipoze ke",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "there is agent J",
-                                            TriviaList([EnvironmentNewLine])))),
+                                    StepText(
+                                        TriviaList(),
+                                        "there is agent J",
+                                        TriviaList([EnvironmentNewLine]))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "Ak",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "there is agent K",
-                                            TriviaList([EnvironmentNewLine])))),
+                                    StepText(
+                                        TriviaList(),
+                                        "there is agent K",
+                                        TriviaList([EnvironmentNewLine]))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
                                         SyntaxKind.ActionStepKeyword,
                                         "Le",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "I erase agent K's memory",
-                                            TriviaList([EnvironmentNewLine])))),
+                                    StepText(
+                                        TriviaList(),
+                                        "I erase agent K's memory",
+                                        TriviaList([EnvironmentNewLine]))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
                                         SyntaxKind.OutcomeStepKeyword,
                                         "Le sa a",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "there should be agent J",
-                                            TriviaList([EnvironmentNewLine])))),
+                                    StepText(
+                                        TriviaList(),
+                                        "there should be agent J",
+                                        TriviaList([EnvironmentNewLine]))),
                                 Step(
                                     Token(
                                         TriviaList([Whitespace("    ")]),
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "Men",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "there should not be agent K",
-                                            TriviaList([EnvironmentNewLine]))))
+                                    StepText(
+                                        TriviaList(),
+                                        "there should not be agent K",
+                                        TriviaList([EnvironmentNewLine])))
                             ]))
                     ])),
                 Token(

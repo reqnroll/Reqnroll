@@ -37,34 +37,30 @@ public partial class DataTablesTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Extra table content",
-                            TriviaList([EnvironmentNewLine]))),
-                    LiteralText(
+                        "Extra table content",
+                        TriviaList([EnvironmentNewLine])),
+                    Description(
                         TokenList([
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("  ")]),
                                 "Tables are delimited by pipes on both sides.",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("  ")]),
                                 "Anything that isn't enclosed is not part of",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("  ")]),
                                 "the table.",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([EnvironmentNewLine, Whitespace("  ")]),
                                 "It is not recommended to use this feature, but",
                                 TriviaList([EnvironmentNewLine])),
-                            Literal(
+                            DescriptionText(
                                 TriviaList([Whitespace("  ")]),
                                 "it is how the implementation currently works.",
                                 TriviaList([EnvironmentNewLine]))
@@ -76,15 +72,11 @@ public partial class DataTablesTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "We're a bit extra",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "We're a bit extra",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -92,11 +84,10 @@ public partial class DataTablesTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        Literal(
-                                            TriviaList(),
-                                            "a pirate crew",
-                                            TriviaList([EnvironmentNewLine]))),
+                                    StepText(
+                                        TriviaList(),
+                                        "a pirate crew",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -106,7 +97,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "Luffy",
@@ -115,7 +106,7 @@ public partial class DataTablesTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "Zorro",
@@ -124,7 +115,7 @@ public partial class DataTablesTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "Doflamingo \\",
@@ -141,7 +132,7 @@ public partial class DataTablesTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "Nami",
@@ -150,7 +141,7 @@ public partial class DataTablesTests
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "Brook",
@@ -159,7 +150,7 @@ public partial class DataTablesTests
                                                             TriviaList([Space]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Space])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "BlackBeard",

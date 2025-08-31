@@ -48,11 +48,10 @@ public partial class DataTablesTests(ITestOutputHelper output)
                         TriviaList(),
                         SyntaxKind.ColonToken,
                         TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Complex DataTables",
-                            TriviaList([EnvironmentNewLine]))),
+                    Name(
+                        TriviaList(),
+                        "Complex DataTables",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -64,11 +63,10 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                 TriviaList(),
                                 SyntaxKind.ColonToken,
                                 TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "multi-line and complex tables",
-                                    TriviaList([EnvironmentNewLine]))),
+                            Name(
+                                TriviaList(),
+                                "multi-line and complex tables",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -76,13 +74,10 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "a table with",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a table with",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -91,7 +86,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "foo",
@@ -100,7 +95,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "bar",
@@ -109,7 +104,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "baz",
@@ -125,7 +120,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("  ")])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "1",
@@ -134,7 +129,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "2",
@@ -143,7 +138,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "3",
@@ -159,7 +154,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("  ")])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "4",
@@ -168,7 +163,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "5",
@@ -177,7 +172,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "6",
@@ -194,13 +189,10 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "a table with empty cells",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a table with empty cells",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -209,7 +201,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "foo",
@@ -218,7 +210,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "bar",
@@ -227,7 +219,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "baz",
@@ -243,12 +235,12 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("     ")])),
                                                     TableCellList([
-                                                        EmptyTableCell(),
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken)),
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "2",
@@ -257,7 +249,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("     ")])),
-                                                        EmptyTableCell()
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken))
                                                     ]),
                                                     Token(
                                                         TriviaList(),
@@ -269,7 +261,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("  ")])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "4",
@@ -278,12 +270,12 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("     ")])),
-                                                        EmptyTableCell(),
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken)),
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "6",
@@ -300,13 +292,10 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                         SyntaxKind.ConjunctionStepKeyword,
                                         "And",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "a table with whitespace",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "a table with whitespace",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -315,7 +304,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "foo",
@@ -324,7 +313,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "bar",
@@ -333,7 +322,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "baz",
@@ -349,17 +338,17 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("     ")])),
                                                     TableCellList([
-                                                        EmptyTableCell(),
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken)),
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("     ")])),
-                                                        EmptyTableCell(),
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken)),
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("     ")])),
-                                                        EmptyTableCell()
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken))
                                                     ]),
                                                     Token(
                                                         TriviaList(),
@@ -371,7 +360,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("  ")])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "4",
@@ -380,7 +369,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "5",
@@ -389,7 +378,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("     ")])),
-                                                        EmptyTableCell()
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken))
                                                     ]),
                                                     Token(
                                                         TriviaList(),
@@ -401,12 +390,12 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Whitespace("     ")])),
                                                     TableCellList([
-                                                        EmptyTableCell(),
+                                                        TableCell(MissingToken(SyntaxKind.TableLiteralToken)),
                                                         Token(
                                                             TriviaList(),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "8",
@@ -415,7 +404,7 @@ public partial class DataTablesTests(ITestOutputHelper output)
                                                             TriviaList([Whitespace("  ")]),
                                                             SyntaxKind.VerticalBarToken,
                                                             TriviaList([Whitespace("  ")])),
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "9",

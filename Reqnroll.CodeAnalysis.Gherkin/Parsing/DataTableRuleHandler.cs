@@ -92,7 +92,7 @@ internal class DataTableRuleHandler() : BaseRuleHandler(RuleType.DataTable)
                     if (previousTokenType == SyntaxKind.VerticalBarToken)
                     {
                         // No literal between these bars, so we append an empty cell to the list.
-                        values.Add(EmptyTableCell());
+                        values.Add(TableCell(MissingToken(SyntaxKind.TableLiteralToken)));
                     }
 
                     // Include leading trivia.
@@ -124,7 +124,7 @@ internal class DataTableRuleHandler() : BaseRuleHandler(RuleType.DataTable)
                     trivia = ConsumeTrivia();
 
                     // Include the token as a text cell.
-                    values.Add(TextTableCell(node));
+                    values.Add(TableCell(node));
                     break;
 
                 default:

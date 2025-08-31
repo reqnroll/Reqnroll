@@ -5,7 +5,7 @@ public class SyntaxNodeOrTokenTests
     [Fact]
     public void EqualsReturnsTrueForSameNode()
     {
-        var node = SyntaxFactory.Example("Scenario", SyntaxFactory.LiteralText("Test"));
+        var node = SyntaxFactory.Example("Scenario", "Test");
         var token = SyntaxFactory.Token(SyntaxKind.ExampleKeyword, "Example");
 
         var syntaxNodeOrToken1 = new SyntaxNodeOrToken<SyntaxNode>(node);

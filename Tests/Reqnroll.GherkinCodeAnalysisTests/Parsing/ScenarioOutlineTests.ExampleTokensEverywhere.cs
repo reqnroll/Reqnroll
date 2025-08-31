@@ -38,15 +38,11 @@ public partial class ScenarioOutlineTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Example tokens everywhere",
-                            TriviaList([EnvironmentNewLine]))),
+                        "Example tokens everywhere",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -54,17 +50,11 @@ public partial class ScenarioOutlineTests
                                 SyntaxKind.ExampleKeyword,
                                 "Example Outline",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                TokenList([
-                                    Literal(
-                                        TriviaList(),
-                                        "the <one>",
-                                        TriviaList([EnvironmentNewLine]))
-                                ])),
+                                "the <one>",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -72,13 +62,10 @@ public partial class ScenarioOutlineTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "the <two>:",
-                                                TriviaList([EnvironmentNewLine])),
-                                    ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "the <two>:",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepDocString(
                                         DocString(
                                             Token(
@@ -86,13 +73,12 @@ public partial class ScenarioOutlineTests
                                                 SyntaxKind.DocStringDelimiterToken,
                                                 "\"\"\"",
                                                 TriviaList([EnvironmentNewLine])),
-                                            LiteralText(
-                                                TokenList([
-                                                    Literal(
-                                                        TriviaList([Whitespace("    ")]),
-                                                        "<three>",
-                                                        TriviaList([EnvironmentNewLine]))
-                                                ])),
+                                            Literal(
+                                                TriviaList([Whitespace("    ")]),
+                                                SyntaxKind.DocStringContentToken,
+                                                "<three>",
+                                                "<three>",
+                                                TriviaList([EnvironmentNewLine])),
                                             Token(
                                                 TriviaList([Whitespace("    ")]),
                                                 SyntaxKind.DocStringDelimiterToken,
@@ -104,13 +90,10 @@ public partial class ScenarioOutlineTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Literal(
-                                                TriviaList(),
-                                                "the <four>:",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])),
+                                    StepText(
+                                        TriviaList(),
+                                        "the <four>:",
+                                        TriviaList([EnvironmentNewLine])),
                                     StepTable(
                                         Table(
                                             List([
@@ -120,7 +103,7 @@ public partial class ScenarioOutlineTests
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
                                                     TableCellList([
-                                                        TextTableCell(
+                                                        TableCell(
                                                             TableLiteral(
                                                                 TriviaList(),
                                                                 "<five>",
@@ -151,7 +134,7 @@ public partial class ScenarioOutlineTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "one",
@@ -160,7 +143,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "two",
@@ -169,7 +152,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Whitespace("  ")]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "three",
@@ -178,7 +161,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "four",
@@ -187,7 +170,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Whitespace("  ")]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "five",
@@ -203,7 +186,7 @@ public partial class ScenarioOutlineTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "un",
@@ -212,7 +195,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "deux",
@@ -221,7 +204,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Whitespace("  ")]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "trois",
@@ -230,7 +213,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "quatre",
@@ -239,7 +222,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Whitespace("  ")]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "cinq",
@@ -255,7 +238,7 @@ public partial class ScenarioOutlineTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "uno",
@@ -264,7 +247,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Space]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "dos",
@@ -273,7 +256,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList([Whitespace("  ")]),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "tres",
@@ -282,7 +265,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "quatro",
@@ -291,7 +274,7 @@ public partial class ScenarioOutlineTests
                                                         TriviaList(),
                                                         SyntaxKind.VerticalBarToken,
                                                         TriviaList([Space])),
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "cinco",

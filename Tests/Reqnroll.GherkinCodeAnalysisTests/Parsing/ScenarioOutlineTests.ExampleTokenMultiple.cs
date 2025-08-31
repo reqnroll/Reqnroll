@@ -32,15 +32,11 @@ public partial class ScenarioOutlineTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Example token used multiple times",
-                            TriviaList([EnvironmentNewLine]))),
+                        "Example token used multiple times",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -48,15 +44,11 @@ public partial class ScenarioOutlineTests
                                 SyntaxKind.ExampleKeyword,
                                 "Example Outline",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "Token used twice in a single step",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "Token used twice in a single step",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -64,14 +56,10 @@ public partial class ScenarioOutlineTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "<what> <what>",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])))
+                                    StepText(
+                                        TriviaList(),
+                                        "<what> <what>",
+                                        TriviaList([EnvironmentNewLine])))
                             ]),
                             examples: List([
                                 Examples(
@@ -92,7 +80,7 @@ public partial class ScenarioOutlineTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "what",
@@ -108,7 +96,7 @@ public partial class ScenarioOutlineTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "usage",

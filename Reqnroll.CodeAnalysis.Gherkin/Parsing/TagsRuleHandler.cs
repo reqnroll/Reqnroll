@@ -57,7 +57,7 @@ internal class TagsRuleHandler() : ParsingRuleHandler(RuleType.Tags)
                 var identifierWhitespace = context.SourceText.ReverseConsumeWhitespace(end, atSymbolPosition);
                 var identifierEnd = end - (identifierWhitespace?.Width ?? 0);
                 var identifierText = context.SourceText.ToString(TextSpan.FromBounds(atSymbolPosition + 1, identifierEnd + 1));
-                var identifier = Literal(null, identifierText, identifierText, identifierWhitespace);
+                var identifier = Literal(null, SyntaxKind.NameToken, identifierText, identifierText, identifierWhitespace);
 
                 var tag = Tag(atSymbol, identifier);
 

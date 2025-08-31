@@ -15,7 +15,7 @@ public class SyntaxListTests
     [InlineData(21)]
     public void CountReturnsCorrectNumberOfItems(int count)
     {
-        var list = List(Enumerable.Range(0, count).Select(i => Example("Scenario", LiteralText(i.ToString()))));
+        var list = List(Enumerable.Range(0, count).Select(i => Example("Scenario", i.ToString())));
 
         list.Count.Should().Be(count);
     }
@@ -24,8 +24,8 @@ public class SyntaxListTests
     public void ToStringReturnsItemsInOrder()
     {
         var list = List([ 
-            Example("Scenario", LiteralText("One")),
-            Example("Scenario", LiteralText("Two"))
+            Example("Scenario", "One"),
+            Example("Scenario", "Two")
         ]);
 
         list.ToString().Should().Be("Scenario:OneScenario:Two");
@@ -35,9 +35,9 @@ public class SyntaxListTests
     public void GetEnumeratorReturnsListItemsInOrder()
     {
         var list = List([ 
-            Example("Scenario", LiteralText("One")),
-            Example("Scenario", LiteralText("Two")),
-            Example("Scenario", LiteralText("Three"))
+            Example("Scenario", "One"),
+            Example("Scenario", "Two"),
+            Example("Scenario", "Three")
         ]);
 
         var enumerator = list.GetEnumerator();
@@ -55,9 +55,9 @@ public class SyntaxListTests
     public void GetEnumeratorReturnsListItemsInOrderEvenWhenBoxed()
     {
         var list = List([
-            Example("Scenario", LiteralText("One")),
-            Example("Scenario", LiteralText("Two")),
-            Example("Scenario", LiteralText("Three"))
+            Example("Scenario", "One"),
+            Example("Scenario", "Two"),
+            Example("Scenario", "Three")
         ]);
 
         var enumerator = ((IEnumerable<ExampleSyntax>)list).GetEnumerator();

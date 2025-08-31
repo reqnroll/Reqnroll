@@ -5,7 +5,7 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Assertions;
 
 public static class SyntaxEquivalencyAssertionOptionExtensions
 {
-    public static EquivalencyAssertionOptions<T> ExcludingSyntaxPositions<T>(this EquivalencyAssertionOptions<T> options)
+    public static EquivalencyAssertionOptions<T> IgnoringSyntaxPositions<T>(this EquivalencyAssertionOptions<T> options)
     {
         options.Excluding(member => member.DeclaringType == typeof(SyntaxNode) &&
             (member.Name == nameof(SyntaxNode.Span) || member.Name == nameof(SyntaxNode.FullSpan)));

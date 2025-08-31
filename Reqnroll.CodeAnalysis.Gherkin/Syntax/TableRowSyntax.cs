@@ -9,7 +9,7 @@ public sealed partial class TableRowSyntax : SyntaxNode
     [SyntaxSlot(SyntaxKind.VerticalBarToken, "The token that marks the start of the row.")]
     public partial SyntaxToken StartVerticalBarToken { get; }
 
-    [SyntaxSlot(SyntaxKind.LiteralText, "The values in the row.")]
+    [SyntaxSlot(SyntaxKind.TableLiteralToken, "The values in the row.")]
     public partial TableCellSyntaxList Values { get; }
 
     [SyntaxSlot(SyntaxKind.VerticalBarToken, "The token that marks the end of the header row.")]

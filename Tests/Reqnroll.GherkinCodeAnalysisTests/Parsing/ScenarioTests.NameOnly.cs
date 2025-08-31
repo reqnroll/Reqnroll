@@ -23,78 +23,73 @@ public partial class ScenarioTests
 
         var tree = GherkinSyntaxTree.ParseText(source);
 
-        tree.GetRoot().Should().BeEquivalentTo(
-            GherkinDocument(
-                Feature(
-                    Token(
-                        TriviaList(),
-                        SyntaxKind.FeatureKeyword,
-                        "Feature",
-                        TriviaList()),
-                    Token(
-                        TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Incomplete scenarios",
-                            TriviaList([EnvironmentNewLine]))),
-                    background: Background(
-                        Token(
-                            TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                            SyntaxKind.BackgroundKeyword,
-                            "Background",
-                            TriviaList()),
-                        Token(
-                            TriviaList(),
-                            SyntaxKind.ColonToken,
-                            TriviaList([Space])),
-                        LiteralText(
-                            Literal(
-                                TriviaList(),
-                                "Adding a background won't make a pickle",
-                                TriviaList([EnvironmentNewLine]))),
-                        steps: List([
-                            Step(
-                                Token(
-                                    TriviaList([Whitespace("    ")]),
-                                    SyntaxKind.WildcardStepKeyword,
-                                    TriviaList([Space])),
-                                LiteralText(
-                                    TokenList([
-                                        Token(
-                                            TriviaList(),
-                                            SyntaxKind.LiteralToken,
-                                            "a step",
-                                            TriviaList([EnvironmentNewLine]))
-                                    ])))
-                        ])),
-                    examples: List([
-                        Example(
-                            Token(
-                                TriviaList([EnvironmentNewLine, Whitespace("  ")]),
-                                SyntaxKind.ExampleKeyword,
-                                "Scenario",
-                                TriviaList()),
-                            Token(
-                                TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "no steps",
-                                    TriviaList([EnvironmentNewLine]))),
-                            steps: List<StepSyntax>()
-                        )
-                    ])
-                ),
+        var expected = GherkinDocument(
+            Feature(
                 Token(
                     TriviaList(),
-                    SyntaxKind.EndOfFileToken,
-                    TriviaList()))
-        );
+                    SyntaxKind.FeatureKeyword,
+                    "Feature",
+                    TriviaList()),
+                ColonWithSpace,
+                Name(
+                    TriviaList(),
+                    "Incomplete scenarios",
+                    TriviaList([EnvironmentNewLine])),
+                background: Background(
+                    Token(
+                        TriviaList([EnvironmentNewLine, Whitespace("  ")]),
+                        SyntaxKind.BackgroundKeyword,
+                        "Background",
+                        TriviaList()),
+                    ColonWithSpace,
+                    Name(
+                        TriviaList(),
+                        "Adding a background won't make a pickle",
+                        TriviaList([EnvironmentNewLine])),
+                    steps: List([
+                        Step(
+                            Token(
+                                TriviaList([Whitespace("    ")]),
+                                SyntaxKind.WildcardStepKeyword,
+                                "*",
+                                TriviaList([Space])),
+                            StepText(
+                                TriviaList(),
+                                "a step",
+                                TriviaList([EnvironmentNewLine])))
+                    ])),
+                examples: List([
+                    Example(
+                        Token(
+                            TriviaList([EnvironmentNewLine, Whitespace("  ")]),
+                            SyntaxKind.ExampleKeyword,
+                            "Scenario",
+                            TriviaList()),
+                        ColonWithSpace,
+                        Name(
+                            TriviaList(),
+                            "no steps",
+                            TriviaList([EnvironmentNewLine])),
+                        steps: default)
+                ])),
+            Token(
+                TriviaList(),
+                SyntaxKind.EndOfFileToken,
+                TriviaList()));
+
+        var actual = (GherkinDocumentSyntax)tree.GetRoot();
+
+        var actualExample = actual.FeatureDeclaration!.Examples.Single();
+        var expectedExample = expected.FeatureDeclaration!.Examples.Single();
+
+        var actualTrailing = actualExample.GetTrailingTrivia();
+        var expectedTrailing = expectedExample.GetTrailingTrivia();
+
+        actualTrailing.Should().BeEquivalentTo(expectedTrailing);
+
+        actualExample.Should().BeEquivalentTo(expectedExample);
+
+        tree.GetRoot().Should().BeEquivalentTo(expected);
 
         tree.ToString().Should().Be(source);
     }

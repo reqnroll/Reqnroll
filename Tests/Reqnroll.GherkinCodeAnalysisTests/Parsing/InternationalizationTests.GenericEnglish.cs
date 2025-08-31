@@ -32,30 +32,28 @@ public partial class InternationalizationTests
                                         TriviaList(),
                                         SyntaxKind.HashToken,
                                         TriviaList()),
-                                    DirectiveIdentifier(
+                                    Token(
                                         TriviaList(),
+                                        SyntaxKind.DirectiveIdentifierToken,
                                         "language",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
                                         TriviaList()),
-                                    Literal(
+                                    Token(
                                         TriviaList(),
+                                        SyntaxKind.DirectiveValueToken,
                                         "en",
                                         TriviaList([EnvironmentNewLine]))))]),
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Language directive",
-                            TriviaList([EnvironmentNewLine]))),
+                        "Language directive",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -63,15 +61,11 @@ public partial class InternationalizationTests
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "language is ignored",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "language is ignored",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -79,23 +73,16 @@ public partial class InternationalizationTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            Token(
-                                                TriviaList(),
-                                                SyntaxKind.LiteralToken,
-                                                "the minimalism",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])))
-                            ])
-                        )
-                    ])
-                ),
+                                    StepText(
+                                        TriviaList(),
+                                        "the minimalism",
+                                        TriviaList([EnvironmentNewLine])))
+                            ]))
+                    ])),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,
-                    TriviaList()))
-        );
+                    TriviaList())));
 
         tree.ToString().Should().Be(source);
     }

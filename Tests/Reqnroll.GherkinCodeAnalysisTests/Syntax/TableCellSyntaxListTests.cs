@@ -7,7 +7,7 @@ public class TableCellSyntaxListTests
     [Fact]
     public static void CreateThrowsForSequenceWithNoSeparators()
     {
-        var action = () => TableCellSyntaxList.Create([ TextTableCell("Party"), TextTableCell("Hard") ]);
+        var action = () => TableCellSyntaxList.Create([ TableCell("Party"), TableCell("Hard") ]);
 
         action.Should().Throw<ArgumentException>()
             .And.ParamName.Should().Be("nodes");
@@ -17,9 +17,9 @@ public class TableCellSyntaxListTests
     public static void CreateThrowsForSequenceEndingWithASeparator()
     {
         var action = () => TableCellSyntaxList.Create([
-            TextTableCell("Party"),
+            TableCell("Party"),
             Token(SyntaxKind.VerticalBarToken),
-            TextTableCell("Hard"),
+            TableCell("Hard"),
             Token(SyntaxKind.VerticalBarToken)
         ]);
 
@@ -38,7 +38,7 @@ public class TableCellSyntaxListTests
     [Fact]
     public static void CreateWithOneNodeCreatesList()
     {
-        var singleNode = TextTableCell("Party");
+        var singleNode = TableCell("Party");
         var list = TableCellSyntaxList.Create([ singleNode ]);
         
         list.Should().HaveCount(1);
@@ -50,9 +50,9 @@ public class TableCellSyntaxListTests
     public static void CreateWithTwoSeparatedNodesCreatesList()
     {
         var list = TableCellSyntaxList.Create([
-            TextTableCell("Party"),
+            TableCell("Party"),
             Token(SyntaxKind.VerticalBarToken),
-            TextTableCell("Hard")
+            TableCell("Hard")
         ]);
 
         list.Should().HaveCount(3);
@@ -66,7 +66,7 @@ public class TableCellSyntaxListTests
     public static void CreateWithNullNodeCreatesList()
     {
         var list = TableCellSyntaxList.Create([
-            TextTableCell("Party"),
+            TableCell("Party"),
             Token(SyntaxKind.VerticalBarToken),
             null
         ]);
@@ -81,7 +81,7 @@ public class TableCellSyntaxListTests
     [Fact]
     public static void EnumeratorReturnsAllNodes()
     {
-        var list = TableCellList([TextTableCell("Party"), TextTableCell("Hard")]);
+        var list = TableCellList([TableCell("Party"), TableCell("Hard")]);
 
         list.Should().HaveCount(3);
     }
@@ -89,7 +89,7 @@ public class TableCellSyntaxListTests
     [Fact]
     public static void EnumeratorReturnsNodesInOrder()
     {
-        var list = TableCellList([TextTableCell("Party"), TextTableCell("Hard")]);
+        var list = TableCellList([TableCell("Party"), TableCell("Hard")]);
 
         var result = list.ToList();
 
@@ -101,8 +101,8 @@ public class TableCellSyntaxListTests
     [Fact]
     public static void AddSingleCellAddsBarSeparatorBetweenAddedNodeAndList()
     {
-        var firstCell = TextTableCell("Party");
-        var secondCell = TextTableCell("Hard");
+        var firstCell = TableCell("Party");
+        var secondCell = TableCell("Hard");
 
         var list = TableCellList([firstCell]);
 
@@ -118,9 +118,9 @@ public class TableCellSyntaxListTests
     [Fact]
     public static void InsertCellsAddsBarSeparatorsBetweenInsertedNodes()
     {
-        var firstCell = TextTableCell("Uno");
-        var secondCell = TextTableCell("Dos");
-        var thirdCell = TextTableCell("Tres");
+        var firstCell = TableCell("Uno");
+        var secondCell = TableCell("Dos");
+        var thirdCell = TableCell("Tres");
 
         var list = TableCellList([firstCell, thirdCell]);
 
@@ -136,9 +136,9 @@ public class TableCellSyntaxListTests
     [Fact]
     public static void InsertCellsBeyondExistingCellsThrowsArgumentOutOfRangeException()
     {
-        var firstCell = TextTableCell("Uno");
-        var secondCell = TextTableCell("Dos");
-        var thirdCell = TextTableCell("Tres");
+        var firstCell = TableCell("Uno");
+        var secondCell = TableCell("Dos");
+        var thirdCell = TableCell("Tres");
 
         var list = TableCellList([firstCell, secondCell]);
 
@@ -149,9 +149,9 @@ public class TableCellSyntaxListTests
     public static void CellsReturnsCellValuesInOrder()
     {
         var list = TableCellSyntaxList.Create([
-            TextTableCell("Party"),
+            TableCell("Party"),
             Token(SyntaxKind.VerticalBarToken),
-            TextTableCell("Hard")
+            TableCell("Hard")
         ]);
 
         list.Cells.Should().HaveCount(2);
@@ -163,9 +163,9 @@ public class TableCellSyntaxListTests
     public static void CellsReturnsEmptyCellValues()
     {
         var list = TableCellSyntaxList.Create([
-            TextTableCell("Party"),
+            TableCell("Party"),
             Token(SyntaxKind.VerticalBarToken),
-            EmptyTableCell()
+            TableCell(MissingToken(SyntaxKind.TableLiteralToken))
         ]);
         
         list.Cells.Should().HaveCount(2);

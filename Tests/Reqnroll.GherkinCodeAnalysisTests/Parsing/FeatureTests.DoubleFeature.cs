@@ -28,18 +28,14 @@ public partial class FeatureTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Guess the word",
-                            TriviaList([CarriageReturnLineFeed]))),
-                    LiteralText(
+                        "Guess the word",
+                        TriviaList([CarriageReturnLineFeed])),
+                    Description(
                         TokenList([
-                            Literal(
+                            DescriptionText(
                                 TriviaList([ CarriageReturnLineFeed, Whitespace("    ") ]),
                                 "Feature: Guess the word again",
                                 TriviaList([ Space, CarriageReturnLineFeed ]))

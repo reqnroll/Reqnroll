@@ -105,14 +105,11 @@ internal static partial class InternalSyntaxFactory
         return buffer.ToString();
     }
 
-    public static InternalSyntaxToken StepTextLiteral(string text) =>
-        new(SyntaxKind.LiteralToken, text);
-
-    public static InternalSyntaxToken StepTextLiteral(
+    public static InternalSyntaxToken StepText(
         InternalNode? leadingTrivia,
         string text,
         InternalNode? trailingTrivia) =>
-        new(SyntaxKind.LiteralToken, text, leadingTrivia, trailingTrivia);
+        new(SyntaxKind.StepTextToken, text, leadingTrivia, trailingTrivia);
 
     public static InternalSyntaxTrivia Whitespace(string text, bool elastic = false)
     {
@@ -196,10 +193,32 @@ internal static partial class InternalSyntaxFactory
 
     public static InternalSyntaxToken Literal(
         InternalNode? leadingTrivia,
+        SyntaxKind kind,
+        string text,
+        string value,
+        bool containsPlaceholder,
+        InternalNode? trailingTrivia) =>
+        InternalSyntaxToken.Create(kind, text, value, containsPlaceholder, leadingTrivia, trailingTrivia);
+
+    public static InternalSyntaxToken Literal(
+        InternalNode? leadingTrivia,
+        SyntaxKind kind,
         string text,
         string value,
         InternalNode? trailingTrivia) =>
-        InternalSyntaxToken.Create(SyntaxKind.LiteralToken, text, value, leadingTrivia, trailingTrivia);
+        InternalSyntaxToken.Create(kind, text, value, ContainsPlaceholder(value), leadingTrivia, trailingTrivia);
+
+    private static bool ContainsPlaceholder(string value)
+    {
+        var openChevronIndex = value.IndexOf('<');
+
+        if (openChevronIndex < 0)
+        {
+            return false;
+        }
+
+        return value.IndexOf('>', openChevronIndex) > -1;
+    }
 
     /// <summary>
     /// Reads characters from source text as whitespace trivia.
@@ -231,6 +250,12 @@ internal static partial class InternalSyntaxFactory
         string value,
         InternalNode? trailingTrivia)
     {
-        return InternalSyntaxToken.Create(SyntaxKind.TableLiteralToken, text, value, leadingTrivia, trailingTrivia);
+        return InternalSyntaxToken.Create(
+            SyntaxKind.TableLiteralToken,
+            text,
+            value,
+            ContainsPlaceholder(value),
+            leadingTrivia,
+            trailingTrivia);
     }
 }

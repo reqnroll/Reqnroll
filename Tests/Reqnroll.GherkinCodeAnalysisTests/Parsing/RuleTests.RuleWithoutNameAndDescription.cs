@@ -30,9 +30,10 @@ public partial class RuleTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    MissingToken(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
+                        SyntaxKind.NameToken,
                         TriviaList([EnvironmentNewLine])),
                     rules: List([
                         Rule(
@@ -41,9 +42,10 @@ public partial class RuleTests
                                 SyntaxKind.RuleKeyword,
                                 "Rule",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            MissingToken(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
+                                SyntaxKind.NameToken,
                                 TriviaList([EnvironmentNewLine])),
                             examples: List([
                                 Example(
@@ -52,9 +54,10 @@ public partial class RuleTests
                                         SyntaxKind.ExampleKeyword,
                                         "Scenario",
                                         TriviaList()),
-                                    Token(
+                                    ColonWithSpace,
+                                    MissingToken(
                                         TriviaList(),
-                                        SyntaxKind.ColonToken,
+                                        SyntaxKind.NameToken,
                                         TriviaList([EnvironmentNewLine])),
                                     steps: List([
                                         Step(
@@ -63,11 +66,10 @@ public partial class RuleTests
                                                 SyntaxKind.ContextStepKeyword,
                                                 "Given",
                                                 TriviaList([Space])),
-                                            LiteralText(
-                                                Literal(
-                                                    TriviaList(),
-                                                    "text",
-                                                    TriviaList([EnvironmentNewLine]))))
+                                            StepText(
+                                                TriviaList(),
+                                                "text",
+                                                TriviaList([EnvironmentNewLine])))
                                     ]))
                             ]))
                     ])),

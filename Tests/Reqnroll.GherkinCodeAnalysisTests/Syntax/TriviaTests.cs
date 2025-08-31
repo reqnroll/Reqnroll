@@ -35,10 +35,10 @@ public class TriviaTests
     {
         var skippedTokens = SkippedTokensTrivia(
             TokenList([ 
-                Literal("fibble"),
-                Literal("wibble"),
-                Literal("bibble"),
-                Literal("bobble")
+                Name("fibble"),
+                Name("wibble"),
+                Name("bibble"),
+                Name("bobble")
             ]));
 
         var trivia = Trivia(skippedTokens);
@@ -75,7 +75,7 @@ public class TriviaTests
     {
         var trivia = Comment("# Commentary");
 
-        var literal = Literal(TriviaList([trivia]), "Literally", TriviaList());
+        var literal = Name(TriviaList([trivia]), "Literally", TriviaList());
 
         literal.LeadingTrivia[0].Token.Should().Be(literal);
     }
@@ -83,7 +83,7 @@ public class TriviaTests
     [Fact]
     public void TriviaAttachedToAParentAreEqualToThemselves()
     {
-        var literal = Literal(TriviaList([Comment("# Commentary")]), "Literally", TriviaList(Comment("# Commentary")));
+        var literal = Name(TriviaList([Comment("# Commentary")]), "Literally", TriviaList(Comment("# Commentary")));
 
         var trivia1 = literal.LeadingTrivia[0];
         var trivia2 = literal.TrailingTrivia[0];
@@ -117,7 +117,7 @@ public class TriviaTests
     {
         var trivia = Comment("# Commentary");
 
-        var literal = Literal(TriviaList([trivia]), "Literally", TriviaList());
+        var literal = Name(TriviaList([trivia]), "Literally", TriviaList());
 
         literal.LeadingTrivia[0].Equals(trivia).Should().BeFalse();
     }
@@ -127,8 +127,8 @@ public class TriviaTests
     {
         var comment = Comment("# Commentary");
 
-        var literal1 = Literal(TriviaList([comment]), "Literally", TriviaList());
-        var literal2 = Literal(TriviaList([comment]), "Literally", TriviaList());
+        var literal1 = Name(TriviaList([comment]), "Literally", TriviaList());
+        var literal2 = Name(TriviaList([comment]), "Literally", TriviaList());
 
         var trivia1 = literal1.LeadingTrivia[0];
         var trivia2 = literal2.LeadingTrivia[0];

@@ -21,21 +21,17 @@ public partial class FeatureTests
         tree.GetRoot().Should().BeEquivalentTo(
             GherkinDocument(
                 Feature(
-                    default,
                     Token(
                         TriviaList([Whitespace("    "), CarriageReturnLineFeed, Whitespace("    ")]),
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Guess the word",
-                            TriviaList([CarriageReturnLineFeed])))),
+                        "Guess the word",
+                        TriviaList([CarriageReturnLineFeed])),
+                    examples: default),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,

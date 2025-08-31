@@ -34,7 +34,7 @@ internal class FeatureRuleHandler() : BaseRuleHandler(RuleType.Feature)
             _tags?.Tags,
             _featureHeader.Keyword ?? MissingToken(SyntaxKind.FeatureKeyword),
             _featureHeader.Colon ?? MissingToken(SyntaxKind.ColonToken),
-            _featureHeader.Name ?? LiteralText(MissingToken(SyntaxKind.LiteralToken)),
+            _featureHeader.Name ?? MissingToken(SyntaxKind.NameToken),
             _featureHeader.Description,
             _background?.CreateBackgroundSyntax(),
             members.Count == 0 ? null : InternalSyntaxList.Create(members),

@@ -114,17 +114,7 @@ public enum SyntaxKind : ushort
     /// </summary>
     WildcardStepKeyword,
 
-    // Other text-containing tokens //
-
-    /// <summary>
-    /// The token is a delimiter that marks the start or end of a Doc String, typically """ or ```.
-    /// </summary>
-    DocStringDelimiterToken,
-
-    /// <summary>
-    /// The token is the identifier of a Doc String content type, such as "json" or "xml".
-    /// </summary>
-    DocStringContentTypeIdentifierToken,
+    // Text literal tokens //
 
     /// <summary>
     /// The token is the identifier of a directive.
@@ -132,14 +122,46 @@ public enum SyntaxKind : ushort
     DirectiveIdentifierToken,
 
     /// <summary>
-    /// The token is text from inside a table.
+    /// The token is the value of a directive.
+    /// </summary>
+    DirectiveValueToken,
+
+    /// <summary>
+    /// The token is text from inside a table cell.
     /// </summary>
     TableLiteralToken,
 
     /// <summary>
-    /// The token is literal text.
+    /// The token is text from a description block, such as the description of a feature or scenario.
     /// </summary>
-    LiteralToken, // This is assumed to be the last syntax token.
+    DescriptionTextToken,
+
+    /// <summary>
+    /// The token is text from a step.
+    /// </summary>
+    StepTextToken,
+
+    /// <summary>
+    /// The token is the name of a declaration, such as a feature or scenario.
+    /// </summary>
+    NameToken,
+
+    /// <summary>
+    /// The token is the identifier of a Doc String content type, such as "json" or "xml".
+    /// </summary>
+    DocStringContentTypeIdentifierToken,
+
+    /// <summary>
+    /// The token is the content of a Doc String.
+    /// </summary>
+    DocStringContentToken,
+
+    // Other text-containing tokens //
+
+    /// <summary>
+    /// The token is a delimiter that marks the start or end of a Doc String, typically """ or ```.
+    /// </summary>
+    DocStringDelimiterToken, // This is the last syntax token, used as a marker for checking enum ranges.
 
     // Trivia tokens //
 
@@ -186,6 +208,11 @@ public enum SyntaxKind : ushort
     Background,
 
     /// <summary>
+    /// The node is a description block.
+    /// </summary>
+    Description,
+
+    /// <summary>
     /// The node is an example declaration.
     /// </summary>
     Example,
@@ -216,11 +243,6 @@ public enum SyntaxKind : ushort
     StepDocString,
 
     /// <summary>
-    /// The node is text with no additional meaning.
-    /// </summary>
-    LiteralText,
-
-    /// <summary>
     /// The node is a table.
     /// </summary>
     Table,
@@ -231,22 +253,12 @@ public enum SyntaxKind : ushort
     TableRow,
 
     /// <summary>
-    /// The node is a cell within a table row which contains text.
+    /// The node is a cell within a table row.
     /// </summary>
-    TextTableCell,
-
-    /// <summary>
-    /// The node is a cell within a table row which has no content.
-    /// </summary>
-    EmptyTableCell,
+    TableCell,
 
     /// <summary>
     /// The node is a Doc String, a delimited, multi-line block of text.
     /// </summary>
     DocString,
-
-    /// <summary>
-    /// The node is the content-type identifier of a Doc String, such as "json" or "xml".
-    /// </summary>
-    DocStringContentType,
 }

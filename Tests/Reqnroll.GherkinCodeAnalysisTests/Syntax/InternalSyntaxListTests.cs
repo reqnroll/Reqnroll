@@ -9,9 +9,9 @@ public class InternalSyntaxListTests
     [Fact]
     public void CreateWithSpanOfNodesCreatesList()
     {
-        var first = LiteralText(Literal(null, "Alpha", "Alpha", null));
-        var second = LiteralText(Literal(null, "Beta", "Beta", null));
-        var third = LiteralText(Literal(null, "Gamma", "Gamma", null));
+        var first = TableCell(TableLiteral(null, "Alpha", "Alpha", null));
+        var second = TableCell(TableLiteral(null, "Beta", "Beta", null));
+        var third = TableCell(TableLiteral(null, "Gamma", "Gamma", null));
 
         var list = InternalSyntaxList.Create([first, second, third]);
 
@@ -25,9 +25,9 @@ public class InternalSyntaxListTests
     [Fact]
     public void EnumeratorReturnsNodesInOrder()
     {
-        var first = LiteralText(Literal(null, "Alpha", "Alpha", null));
-        var second = LiteralText(Literal(null, "Beta", "Beta", null));
-        var third = LiteralText(Literal(null, "Gamma", "Gamma", null));
+        var first = TableCell(TableLiteral(null, "Alpha", "Alpha", null));
+        var second = TableCell(TableLiteral(null, "Beta", "Beta", null));
+        var third = TableCell(TableLiteral(null, "Gamma", "Gamma", null));
 
         var list = InternalSyntaxList.Create([first, second, third]);
 
@@ -37,9 +37,9 @@ public class InternalSyntaxListTests
     [Fact]
     public void EnumeratorReturnsTheCorrectNumberOfNodes()
     {
-        var first = LiteralText(Literal(null, "Alpha", "Alpha", null));
-        var second = LiteralText(Literal(null, "Beta", "Beta", null));
-        var third = LiteralText(Literal(null, "Gamma", "Gamma", null));
+        var first = TableCell(TableLiteral(null, "Alpha", "Alpha", null));
+        var second = TableCell(TableLiteral(null, "Beta", "Beta", null));
+        var third = TableCell(TableLiteral(null, "Gamma", "Gamma", null));
 
         var list = InternalSyntaxList.Create([first, second, third]);
 
@@ -49,9 +49,9 @@ public class InternalSyntaxListTests
     [Fact]
     public void WithAnnotationsReturnsNewListWithAnnotations()
     {
-        var first = LiteralText(Literal(null, "Alpha", "Alpha", null));
-        var second = LiteralText(Literal(null, "Beta", "Beta", null));
-        var third = LiteralText(Literal(null, "Gamma", "Gamma", null));
+        var first = TableCell(TableLiteral(null, "Alpha", "Alpha", null));
+        var second = TableCell(TableLiteral(null, "Beta", "Beta", null));
+        var third = TableCell(TableLiteral(null, "Gamma", "Gamma", null));
 
         var list = InternalSyntaxList.Create([first, second, third]);
 
@@ -65,9 +65,9 @@ public class InternalSyntaxListTests
     [Fact]
     public void WithDiagnosticsReturnsNewListWithDiagnostics()
     {
-        var first = LiteralText(Literal(null, "Alpha", "Alpha", null));
-        var second = LiteralText(Literal(null, "Beta", "Beta", null));
-        var third = LiteralText(Literal(null, "Gamma", "Gamma", null));
+        var first = TableCell(TableLiteral(null, "Alpha", "Alpha", null));
+        var second = TableCell(TableLiteral(null, "Beta", "Beta", null));
+        var third = TableCell(TableLiteral(null, "Gamma", "Gamma", null));
 
         var list = InternalSyntaxList.Create([first, second, third]);
 

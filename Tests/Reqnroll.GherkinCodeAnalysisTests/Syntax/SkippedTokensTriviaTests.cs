@@ -12,7 +12,7 @@ public class SkippedTokensTriviaTests
     [Fact]
     public void CanCreateSkippedTokensTriviaFromLiteralText()
     {
-        var token = Literal(TriviaList(), "invalid", TriviaList([Space]));
+        var token = Name(TriviaList(), "invalid", TriviaList([Space]));
 
         var skippedTokensTrivia = SkippedTokensTrivia(TokenList([token]));
 
@@ -33,7 +33,7 @@ public class SkippedTokensTriviaTests
         skippedTokensTrivia.GetLeadingTrivia().Should().BeEmpty();
         skippedTokensTrivia.GetTrailingTrivia().Should().BeEquivalentTo(
             [Space],
-            options => options.ExcludingSyntaxPositions());
+            options => options.IgnoringSyntaxPositions());
         skippedTokensTrivia.GetTrailingTrivia()[0].Span.Should().Be(new TextSpan(7, 1));
         skippedTokensTrivia.GetTrailingTrivia()[0].FullSpan.Should().Be(new TextSpan(7, 1));
 
@@ -43,7 +43,7 @@ public class SkippedTokensTriviaTests
         skippedTokensTrivia.ChildNodesAndTokens().Should().BeEquivalentTo([ (SyntaxNodeOrToken<SyntaxNode>)token ]);
 
         skippedTokensTrivia.Kind.Should().Be(SyntaxKind.SkippedTokensTrivia);
-        skippedTokensTrivia.Tokens.Should().BeEquivalentTo([Literal(TriviaList(), "invalid", TriviaList([Space]))]);
+        skippedTokensTrivia.Tokens.Should().BeEquivalentTo([Name(TriviaList(), "invalid", TriviaList([Space]))]);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class SkippedTokensTriviaTests
             TriviaList([
                 Trivia(
                     SkippedTokensTrivia(
-                        TokenList([Literal(TriviaList(), "invalid", TriviaList([ Space ])) ])))
+                        TokenList([Name(TriviaList(), "invalid", TriviaList([ Space ])) ])))
                 ]),
             SyntaxKind.ColonToken,
             TriviaList());
@@ -74,7 +74,7 @@ public class SkippedTokensTriviaTests
 
         var skippedTrivia = token.LeadingTrivia[0];
 
-        skippedTrivia.Token.Should().BeEquivalentTo(token, options => options.ExcludingSyntaxPositions());
+        skippedTrivia.Token.Should().BeEquivalentTo(token, options => options.IgnoringSyntaxPositions());
         skippedTrivia.Token.Span.Should().Be(new TextSpan(8, 1));
         skippedTrivia.Token.FullSpan.Should().Be(new TextSpan(0, 9));
         skippedTrivia.Span.Should().Be(new TextSpan(0, 7));

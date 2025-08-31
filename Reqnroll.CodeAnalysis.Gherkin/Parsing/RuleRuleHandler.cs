@@ -31,7 +31,7 @@ internal class RuleRuleHandler() :
             _header.Tags,
             _header.Keyword ?? MissingToken(SyntaxKind.RuleKeyword),
             _header.Colon ?? MissingToken(SyntaxKind.ColonToken),
-            _header.Name,
+            _header.Name ?? MissingToken(SyntaxKind.NameToken),
             _header.Description,
             _background?.CreateBackgroundSyntax(),
             members.Count == 0 ? null : InternalSyntaxList.Create(members));

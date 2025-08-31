@@ -16,8 +16,8 @@ public partial class StepSyntax : SyntaxNode
         "The token that represents the keyword of the step.")]
     public partial SyntaxToken StepKeyword { get; }
 
-    [SyntaxSlot(SyntaxKind.LiteralText, "The text of the step following the keyword.")]
-    public partial PlainTextSyntax Text { get; }
+    [SyntaxSlot(SyntaxKind.StepTextToken, "The text of the step following the keyword.")]
+    public partial SyntaxToken Text { get; }
 
     [SyntaxSlot([SyntaxKind.StepTable, SyntaxKind.StepDocString], "The optional data associated with the step.")]
     public partial StepDataSyntax? Data { get; }

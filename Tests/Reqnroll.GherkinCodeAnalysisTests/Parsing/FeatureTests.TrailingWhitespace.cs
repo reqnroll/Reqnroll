@@ -26,15 +26,12 @@ public partial class FeatureTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Guess the word",
-                            TriviaList([CarriageReturnLineFeed])))),
+                        "Guess the word",
+                        TriviaList([CarriageReturnLineFeed])),
+                    default),
                 Token(
                     TriviaList([Whitespace("    "), CarriageReturnLineFeed]),
                     SyntaxKind.EndOfFileToken,

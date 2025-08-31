@@ -2,6 +2,7 @@ using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 
 namespace Reqnroll.CodeAnalysis.Gherkin.Syntax;
 
@@ -314,10 +315,13 @@ internal abstract class InternalNode
             return last?.HasTrailingTrivia ?? false;
         }
     }
+    
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    internal bool HasFlag(NodeFlags flag) => (_flags & flag) == flag;
 
-    public bool ContainsDiagnostics => (_flags & NodeFlags.ContainsDiagnostics) == NodeFlags.ContainsDiagnostics;
+    public bool ContainsDiagnostics => HasFlag(NodeFlags.ContainsDiagnostics);
 
-    public bool ContainsAnnotations => (_flags & NodeFlags.ContainsAnnotations) == NodeFlags.ContainsAnnotations;
+    public bool ContainsAnnotations => HasFlag(NodeFlags.ContainsAnnotations);
 
     /// <summary>
     /// Gets whether the node is a list of nodes.
@@ -564,6 +568,8 @@ internal abstract class InternalNode
     /// <param name="node">The child node to incorporate into this node.</param>
     protected void IncludeChild(InternalNode node)
     {
+        CodeAnalysisDebug.Assert(!node.IsList || node.SlotCount > 0, "A zero-length list should not be included as a child.");
+
         _flags |= node._flags & (NodeFlags.ContainsAnnotations | NodeFlags.ContainsDiagnostics | NodeFlags.IsNotMissing);
         FullWidth += node.FullWidth;
     }

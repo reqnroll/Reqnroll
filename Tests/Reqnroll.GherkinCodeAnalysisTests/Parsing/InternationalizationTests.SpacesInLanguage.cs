@@ -27,24 +27,20 @@ public partial class InternationalizationTests
                             Trivia(
                                 DirectiveCommentTrivia(
                                     Token(TriviaList([Whitespace("  ")]), SyntaxKind.HashToken, TriviaList([Whitespace("  ")])),
-                                    DirectiveIdentifier(TriviaList(), "language", TriviaList([Whitespace("  ")])),
+                                    Token(TriviaList(), SyntaxKind.DirectiveIdentifierToken, "language", TriviaList([Whitespace("  ")])),
                                     Token(TriviaList(), SyntaxKind.ColonToken, TriviaList([Whitespace("   ")])),
-                                    Literal(TriviaList(), "en-lol", TriviaList([EnvironmentNewLine])))),
+                                    Literal(TriviaList(), SyntaxKind.DirectiveValueToken, "en-lol", "en-lol", TriviaList([EnvironmentNewLine])))),
                             EnvironmentNewLine
                         ]),
                         SyntaxKind.FeatureKeyword,
                         "OH HAI",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "STUFFING",
-                            TriviaList([EnvironmentNewLine]))),
-                    examples: List<ExampleSyntax>()),
+                        "STUFFING",
+                        TriviaList([EnvironmentNewLine])),
+                    default),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,

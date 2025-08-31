@@ -6,8 +6,6 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
 {
-    private readonly PlainTextParser _plainTextParser = new(LiteralEscapingStyle.Default);
-
     protected override void AppendOther(Token token, TextLine line, ParsingContext context)
     {
         // In the context of parsing a feature, "other" tokens are the plain-text lines that form the descriptive text
@@ -43,8 +41,8 @@ internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
         var trailing = context.SourceText.ConsumeWhitespace(line.Start + token.Line.Indent + text.Length, line.End) +
             line.GetEndOfLineTrivia();
 
-        _plainTextParser.AppendText(leading, text, trailing);
+        throw new NotImplementedException();
     }
 
-    public PlainTextSyntax.Internal? CreateDescriptionSyntax() => _plainTextParser.ParseText();
+    public DescriptionSyntax.Internal? CreateDescriptionSyntax() => throw new NotImplementedException();
 }

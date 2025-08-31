@@ -31,30 +31,28 @@ public partial class InternationalizationTests
                                         TriviaList(),
                                         SyntaxKind.HashToken,
                                         TriviaList()),
-                                    DirectiveIdentifier(
+                                    Token(
                                         TriviaList(),
+                                        SyntaxKind.DirectiveIdentifierToken,
                                         "language",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
                                         TriviaList()),
-                                    Literal(
+                                    Token(
                                         TriviaList(),
+                                        SyntaxKind.DirectiveValueToken,
                                         "emoji",
                                         TriviaList([EnvironmentNewLine]))))]),
                         SyntaxKind.FeatureKeyword,
                         "🏷️",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "i18n support",
-                            TriviaList([EnvironmentNewLine]))),
+                        "i18n support",
+                        TriviaList([EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -62,20 +60,13 @@ public partial class InternationalizationTests
                                 SyntaxKind.ExampleKeyword,
                                 "🎬",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "Support for emoji keywords",
-                                    TriviaList([EnvironmentNewLine, Whitespace("  "), EnvironmentNewLine]))
-                            ),
-                            steps: List<StepSyntax>()
-                        )
-                    ])
-                ),
+                                "Support for emoji keywords",
+                                TriviaList([EnvironmentNewLine, Whitespace("  "), EnvironmentNewLine])),
+                            steps: default)
+                    ])),
                 Token(
                     TriviaList(),
                     SyntaxKind.EndOfFileToken,

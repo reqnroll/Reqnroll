@@ -41,14 +41,19 @@ internal class BackgroundRuleHandler() : BaseRuleHandler(RuleType.Background)
 
     internal InternalNode? CreateBackgroundSyntax()
     {
-        var steps = _steps.Select(handler => handler.CreateStepSyntax()).ToList();
+        InternalSyntaxList<StepSyntax.Internal>? steps = null;
+
+        if (_steps.Count > 0)
+        {
+            steps = InternalSyntaxList.Create(_steps.Select(handler => handler.CreateStepSyntax()));
+        }
 
         return Background(
             null,
             _declarationHelper.Keyword ?? MissingToken(SyntaxKind.BackgroundKeyword),
             _declarationHelper.Colon ?? MissingToken(SyntaxKind.ColonToken),
-            _declarationHelper.Name,
+            _declarationHelper.Name ?? MissingToken(SyntaxKind.NameToken),
             _descriptionRuleHandler?.CreateDescriptionSyntax(),
-            steps.Count == 0 ? null : InternalSyntaxList.Create(steps));
+            steps);
     }
 }

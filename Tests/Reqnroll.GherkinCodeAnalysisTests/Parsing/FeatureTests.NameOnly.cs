@@ -26,16 +26,12 @@ public partial class FeatureTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,
+                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Empty feature",
-                            TriviaList([EnvironmentNewLine]))),
-                    examples: List<ExampleSyntax>()
+                        "Empty feature",
+                        TriviaList([EnvironmentNewLine])),
+                    examples: default
                 ),
                 Token(
                     TriviaList(),

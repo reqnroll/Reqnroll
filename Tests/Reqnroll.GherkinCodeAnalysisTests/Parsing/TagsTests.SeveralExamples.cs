@@ -42,15 +42,10 @@ public partial class TagsTests
                         SyntaxKind.FeatureKeyword,
                         "Feature",
                         TriviaList()),
-                    Token(
+                    ColonWithSpace,                    Name(
                         TriviaList(),
-                        SyntaxKind.ColonToken,
-                        TriviaList([Space])),
-                    LiteralText(
-                        Literal(
-                            TriviaList(),
-                            "Tagged Examples",
-                            TriviaList([EnvironmentNewLine, EnvironmentNewLine]))),
+                        "Tagged Examples",
+                        TriviaList([EnvironmentNewLine, EnvironmentNewLine])),
                     examples: List([
                         Example(
                             Token(
@@ -58,15 +53,11 @@ public partial class TagsTests
                                 SyntaxKind.ExampleKeyword,
                                 "Example Outline",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "minimalistic",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "minimalistic",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List([
                                 Step(
                                     Token(
@@ -74,20 +65,17 @@ public partial class TagsTests
                                         SyntaxKind.ContextStepKeyword,
                                         "Given",
                                         TriviaList([Space])),
-                                    LiteralText(
-                                        TokenList([
-                                            StepTextLiteral(
-                                                TriviaList(),
-                                                "the <what>",
-                                                TriviaList([EnvironmentNewLine]))
-                                        ])))
+                                    StepText(
+                                        TriviaList(),
+                                        "the <what>",
+                                        TriviaList([EnvironmentNewLine])))
                             ]),
                             examples: List([
                                 Examples(
                                     List([
                                         Tag(
                                             Token(TriviaList([EnvironmentNewLine, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
-                                            Literal(TriviaList(), "foo", TriviaList([EnvironmentNewLine])))
+                                            Name(TriviaList(), "foo", TriviaList([EnvironmentNewLine])))
                                     ]),
                                     Token(
                                         TriviaList(),
@@ -97,6 +85,10 @@ public partial class TagsTests
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
+                                        TriviaList()),
+                                    MissingToken(
+                                        TriviaList(),
+                                        SyntaxKind.NameToken,
                                         TriviaList([EnvironmentNewLine])),
                                     table: Table(
                                         List([
@@ -106,7 +98,7 @@ public partial class TagsTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "what",
@@ -122,7 +114,7 @@ public partial class TagsTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "foo",
@@ -138,16 +130,20 @@ public partial class TagsTests
                                     List([
                                         Tag(
                                             Token(TriviaList([EnvironmentNewLine, Whitespace("    ")]), SyntaxKind.AtToken, TriviaList()),
-                                            Literal(TriviaList(), "bar", TriviaList([EnvironmentNewLine])))
+                                            Name(TriviaList(), "bar", TriviaList([EnvironmentNewLine])))
                                     ]),
                                     Token(
-                                        TriviaList(),
+                                        TriviaList([Whitespace("    ")]),
                                         SyntaxKind.ExamplesKeyword,
                                         "Examples",
                                         TriviaList()),
                                     Token(
                                         TriviaList(),
                                         SyntaxKind.ColonToken,
+                                        TriviaList()),
+                                    MissingToken(
+                                        TriviaList(),
+                                        SyntaxKind.NameToken,
                                         TriviaList([EnvironmentNewLine])),
                                     table: Table(
                                         List([
@@ -157,7 +153,7 @@ public partial class TagsTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "what",
@@ -173,7 +169,7 @@ public partial class TagsTests
                                                     SyntaxKind.VerticalBarToken,
                                                     TriviaList([Space])),
                                                 TableCellList([
-                                                    TextTableCell(
+                                                    TableCell(
                                                         TableLiteral(
                                                             TriviaList(),
                                                             "bar",
@@ -191,22 +187,18 @@ public partial class TagsTests
                             List([
                                 Tag(
                                     Token(TriviaList([EnvironmentNewLine, Whitespace("  ")]), SyntaxKind.AtToken, TriviaList()),
-                                    Literal(TriviaList(), "zap", TriviaList([EnvironmentNewLine])))
+                                    Name(TriviaList(), "zap", TriviaList([EnvironmentNewLine])))
                             ]),
                             Token(
                                 TriviaList(),
                                 SyntaxKind.ExampleKeyword,
                                 "Scenario",
                                 TriviaList()),
-                            Token(
+                            ColonWithSpace,
+                            Name(
                                 TriviaList(),
-                                SyntaxKind.ColonToken,
-                                TriviaList([Space])),
-                            LiteralText(
-                                Literal(
-                                    TriviaList(),
-                                    "ha ok",
-                                    TriviaList([EnvironmentNewLine]))),
+                                "ha ok",
+                                TriviaList([EnvironmentNewLine])),
                             steps: List<StepSyntax>())
                     ])),
                 Token(
