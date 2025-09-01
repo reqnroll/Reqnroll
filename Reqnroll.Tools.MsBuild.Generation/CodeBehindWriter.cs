@@ -30,7 +30,8 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
             if (File.Exists(outputPath))
             {
-                if (!FileSystemHelper.FileCompareContent(outputPath, testFileGeneratorResult.GeneratedTestCode))
+                //TODO: remove the "only write the output file when it's different" approach properly as it doesn't work with file timestamps based up-to-date checks
+                //if (!FileSystemHelper.FileCompareContent(outputPath, testFileGeneratorResult.GeneratedTestCode))
                 {
                     WriteAllTextWithRetry(outputPath, testFileGeneratorResult.GeneratedTestCode, Encoding.UTF8);
                 }
