@@ -49,7 +49,7 @@ public class ChildSyntaxListTests
                         "Scenario",
                         TriviaList()),
                     ColonWithSpace,
-                    StepText(
+                    Name(
                         TriviaList(),
                         "no steps",
                         TriviaList([EnvironmentNewLine])),
@@ -122,7 +122,7 @@ public class ChildSyntaxListTests
 
         walker.Visit(document);
 
-        walker.NodeCount.Should().Be(9);
+        walker.NodeCount.Should().Be(5);
         walker.TokenCount.Should().Be(12);
         walker.TriviaCount.Should().Be(13);
     }
