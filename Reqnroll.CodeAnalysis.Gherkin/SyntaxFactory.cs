@@ -125,7 +125,7 @@ public static partial class SyntaxFactory
     public static SyntaxToken StepText(SyntaxTriviaList leading, string value, SyntaxTriviaList trailing) =>
         InternalSyntaxFactory.Literal(
             leading.InternalNode,
-            SyntaxKind.NameToken,
+            SyntaxKind.StepTextToken,
             LiteralEscapingStyle.Default.Escape(value),
             value,
             trailing.InternalNode);

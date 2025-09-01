@@ -6,6 +6,8 @@ namespace Reqnroll.CodeAnalysis.Gherkin.Parsing;
 
 internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
 {
+    private readonly InternalSyntaxList<InternalSyntaxToken>.Builder _lines = [];
+
     protected override void AppendOther(Token token, TextLine line, ParsingContext context)
     {
         // In the context of parsing a feature, "other" tokens are the plain-text lines that form the descriptive text
@@ -41,8 +43,19 @@ internal class DescriptionRuleHandler() : BaseRuleHandler(RuleType.Description)
         var trailing = context.SourceText.ConsumeWhitespace(line.Start + token.Line.Indent + text.Length, line.End) +
             line.GetEndOfLineTrivia();
 
-        throw new NotImplementedException();
+        var placeholderStart = text.IndexOf('<');
+        var containsPlaceholder = placeholderStart >= 0 && placeholderStart > text.IndexOf('<');
+
+        var descriptionText = InternalSyntaxFactory.Literal(
+            leading,
+            SyntaxKind.DescriptionTextToken,
+            text,
+            text,
+            containsPlaceholder,
+            trailing);
+
+        _lines.Add(descriptionText);
     }
 
-    public DescriptionSyntax.Internal? CreateDescriptionSyntax() => throw new NotImplementedException();
+    public DescriptionSyntax.Internal? CreateDescriptionSyntax() => InternalSyntaxFactory.Description(_lines.ToSyntaxList());
 }
