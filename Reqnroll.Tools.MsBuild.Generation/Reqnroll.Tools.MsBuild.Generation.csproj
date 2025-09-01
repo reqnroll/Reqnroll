@@ -34,8 +34,8 @@
   </ItemGroup>
   
   <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <PackageReference Update="Microsoft.VisualStudio.Composition" Version="17.11.13" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.9.28307" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.8.28010" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading" Version="15.8.209" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
