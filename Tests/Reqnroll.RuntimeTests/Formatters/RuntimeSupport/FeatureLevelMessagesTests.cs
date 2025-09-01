@@ -114,7 +114,7 @@ public class FeatureLevelMessagesTests
             {"gherkinDocument":{"uri":"Features/Calculator.feature","feature":{"location":{"line":1,"column":1},"tags":[],"language":"en-US","keyword":"Feature","name":"Calculator","description":"Simple calculator for adding two numbers","children":[{"scenario":{"location":{"line":6,"column":1},"tags":[{"location":{"line":5,"column":1},"name":"@mytag","id":"9faee3c6b313125e9c77bf04c9d75fa6"}],"keyword":"Scenario","name":"Add two numbers","description":"","steps":[{"location":{"line":7,"column":2},"keyword":"Given ","keywordType":"Context","text":"the first number is 50","id":"e2aa567c918dee5c9b2a6e777fad585d"},{"location":{"line":8,"column":2},"keyword":"And ","keywordType":"Conjunction","text":"the second number is 70","id":"edea8fd465cbb65aabe0a4c97ccee706"},{"location":{"line":9,"column":2},"keyword":"When ","keywordType":"Action","text":"the two numbers are added","id":"bada27e1f4687750a07d3e3036445756"},{"location":{"line":10,"column":2},"keyword":"Then ","keywordType":"Outcome","text":"the result should be 120","id":"645176625268df5f9cfda379a4659a15"}],"examples":[],"id":"d332a3eb5951985da32f78ff459d7a01"}}]},"comments":[]}}
             """;
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(ndjsonContent));
-        var sut = new FeatureLevelCucumberMessages([], 0);
+        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
         var result = sut.ReadEnvelopesFromStream(stream, "test");
@@ -131,7 +131,7 @@ public class FeatureLevelMessagesTests
         // Arrange
         var malformedJson = "{ invalid json content }";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(malformedJson));
-        var sut = new FeatureLevelCucumberMessages([], 0);
+        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
         var result = sut.ReadEnvelopesFromStream(stream, "test");
@@ -145,7 +145,7 @@ public class FeatureLevelMessagesTests
     {
         // Arrange
         using var stream = new MemoryStream();
-        var sut = new FeatureLevelCucumberMessages([], 0);
+        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
         var result = sut.ReadEnvelopesFromStream(stream, "test");
@@ -159,7 +159,7 @@ public class FeatureLevelMessagesTests
     {
         // Arrange
         var assembly = Assembly.GetExecutingAssembly();
-        var sut = new FeatureLevelCucumberMessages([], 0);
+        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
         var result = sut.ReadEnvelopesFromAssembly(assembly, "nonexistent/resource");
@@ -327,7 +327,7 @@ public class FeatureLevelMessagesTests
     public void HasMessages_WithEmptyEnvelopes_ShouldReturnFalse()
     {
         // Arrange
-        var sut = new FeatureLevelCucumberMessages([], 0);
+        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act & Assert
         sut.HasMessages.Should().BeFalse();
