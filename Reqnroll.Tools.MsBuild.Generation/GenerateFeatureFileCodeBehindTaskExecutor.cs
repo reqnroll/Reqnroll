@@ -38,7 +38,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             _exceptionTaskLogger = exceptionTaskLogger;
         }
 
-        public IResult<IReadOnlyCollection<ITaskItem>> Execute()
+        public async Task<IResult<IReadOnlyCollection<ITaskItem>>> ExecuteAsync()
         {
             _processInfoDumper.DumpProcessInfo();
             _taskLoggingWrapper.LogMessage("Starting GenerateFeatureFileCodeBehind");
@@ -47,7 +47,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             {
                 var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
 
-                using var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
+                await using var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
                     reqnrollProject.ProjectSettings.ConfigurationHolder,
                     reqnrollProject.ProjectSettings,
                     _reqnrollProjectInfo.GeneratorPlugins,

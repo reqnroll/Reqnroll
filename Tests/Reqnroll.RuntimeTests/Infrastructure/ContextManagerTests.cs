@@ -4,6 +4,7 @@ using Reqnroll.BoDi;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
 using System.Globalization;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Infrastructure;
@@ -15,15 +16,15 @@ public class ContextManagerTests : StepExecutionTestsBase
         return new ContextManager(new Mock<ITestTracer>().Object, testThreadContainer ?? TestThreadContainer, ContainerBuilderStub);
     }
 
-    private static void InitializeFeatureContext(ContextManager sut)
+    private static Task InitializeFeatureContext(ContextManager sut)
     {
-        sut.InitializeFeatureContext(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+        return sut.InitializeFeatureContextAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
     }
 
-    private void InitializeScenarioContext(ContextManager sut)
+    private Task InitializeScenarioContext(ContextManager sut)
     {
         InitializeFeatureContext(sut);
-        sut.InitializeScenarioContext(new ScenarioInfo("the next scenario", "description of the next scenario", null, null), null);
+        return sut.InitializeScenarioContextAsync(new ScenarioInfo("the next scenario", "description of the next scenario", null, null), null);
     }
 
     [Fact]
@@ -52,7 +53,7 @@ public class ContextManagerTests : StepExecutionTestsBase
         var scenarioContext = sut.ScenarioContext;
         scenarioContext.Should().NotBeNull();
 
-        sut.CleanupScenarioContext();
+        sut.CleanupScenarioContextAsync();
 
         scenarioContext.IsDisposed.Should().BeTrue();
     }
@@ -98,7 +99,7 @@ public class ContextManagerTests : StepExecutionTestsBase
         var featureContext = sut.FeatureContext;
         featureContext.Should().NotBeNull();
 
-        sut.CleanupFeatureContext();
+        sut.CleanupFeatureContextAsync();
 
         featureContext.IsDisposed.Should().BeTrue();
     }
@@ -149,7 +150,7 @@ public class ContextManagerTests : StepExecutionTestsBase
     }
 
     [Fact]
-    public void Should_dispose_test_thread_context_when_test_thread_context_cleaned_up()
+    public async Task Should_dispose_test_thread_context_when_test_thread_context_cleaned_up()
     {
         var sut = CreateContextManager();
         // the test thread context is already initialized in the constructor of ContextManager
@@ -158,7 +159,7 @@ public class ContextManagerTests : StepExecutionTestsBase
         testThreadContext.Should().NotBeNull();
 
         var testThreadContainer = testThreadContext.TestThreadContainer;
-        testThreadContainer.Dispose();
+        await testThreadContainer.DisposeAsync();
 
         testThreadContext.IsDisposed.Should().BeTrue();
     }

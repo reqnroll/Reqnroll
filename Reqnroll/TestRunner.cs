@@ -39,7 +39,7 @@ namespace Reqnroll
 
         public void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
-            _executionEngine.OnScenarioInitialize(scenarioInfo, ruleInfo);
+            _executionEngine.OnScenarioInitializeAsync(scenarioInfo, ruleInfo);
         }
 
         public async Task OnScenarioStartAsync()

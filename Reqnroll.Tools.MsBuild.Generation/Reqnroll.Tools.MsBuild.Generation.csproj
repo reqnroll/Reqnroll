@@ -13,8 +13,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.VisualStudio.Composition" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading" />
     <PackageReference Include="System.Collections.Immutable" />
   </ItemGroup>
 
@@ -32,9 +30,12 @@
     <PackageReference Include="Microsoft.Build.Framework" Version="17.11.4" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" />
     <PackageReference Update="@(PackageReference)" PrivateAssets="All" />
-    <PackageReference Update="Microsoft.VisualStudio.Composition" Version="17.11.13" />
-    <PackageReference Update="Microsoft.VisualStudio.Threading" Version="17.11.20" />
     <PackageReference Update="System.Collections.Immutable" Version="8.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup Condition="'$(TargetFramework)' == 'net462'">
+    <PackageReference Update="Microsoft.VisualStudio.Composition" Version="17.11.13" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.9.28307" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -44,7 +45,6 @@
     <Reference Include="Microsoft.Build.Utilities.Core">
       <HintPath>Microsoft.Build.Utilities.Core</HintPath>
     </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
 
   <ItemGroup>

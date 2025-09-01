@@ -214,7 +214,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+            await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
 
             _testThreadExecutionEventPublisher.Verify(te =>
@@ -229,7 +229,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+            await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();
@@ -250,7 +250,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             _methodBindingInvokerMock.Setup(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()))
                                     .Throws(new Exception("simulated hook error"));
 
-            testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+            await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await FluentActions.Awaiting(testExecutionEngine.OnScenarioEndAsync)
@@ -272,7 +272,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await testExecutionEngine.OnTestRunStartAsync();
             await testExecutionEngine.OnFeatureStartAsync(_featureInfo);
 
-            testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+            await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
             await testExecutionEngine.OnScenarioStartAsync();
             await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
             await testExecutionEngine.OnAfterLastStepAsync();
@@ -296,7 +296,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         {
             var testExecutionEngine = CreateTestExecutionEngine();
 
-            testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+            await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
             await testExecutionEngine.OnScenarioSkippedAsync();
             await testExecutionEngine.OnAfterLastStepAsync();
             await testExecutionEngine.OnScenarioEndAsync();
