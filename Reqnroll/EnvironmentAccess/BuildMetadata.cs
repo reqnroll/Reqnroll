@@ -1,5 +1,3 @@
-using System.Runtime.CompilerServices;
-
 namespace Reqnroll.EnvironmentAccess
 {
     public record BuildMetadata(
