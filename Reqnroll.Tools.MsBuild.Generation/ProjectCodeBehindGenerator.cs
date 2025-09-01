@@ -7,6 +7,9 @@ namespace Reqnroll.Tools.MsBuild.Generation
 {
     public class ProjectCodeBehindGenerator : IProjectCodeBehindGenerator
     {
+        public static string EmbeddedMessagesStoragePath = "EmbeddedMessagesStoragePath";
+        public static string EmbeddedMessagesResourceName = "EmbeddedMessagesResourceName";
+
         private readonly IFeatureFileCodeBehindGenerator _featureFileCodeBehindGenerator;
         private readonly ReqnrollProjectInfo _reqnrollProjectInfo;
 
@@ -21,11 +24,18 @@ namespace Reqnroll.Tools.MsBuild.Generation
             var generatedFiles = _featureFileCodeBehindGenerator.GenerateFilesForProject(
                 _reqnrollProjectInfo.FeatureFiles,
                 _reqnrollProjectInfo.ProjectFolder,
-                _reqnrollProjectInfo.OutputPath);
+                _reqnrollProjectInfo.OutputPath,
+                _reqnrollProjectInfo.IntermediateOutputPath);
 
-            return generatedFiles.Select(file => new TaskItem { ItemSpec = file })
-                                 .Cast<ITaskItem>()
-                                 .ToArray();
+            return generatedFiles.Select(item =>
+                                {
+                                    var result = new TaskItem { ItemSpec = item.CodeBehindRelativePath };
+                                    result.SetMetadata(EmbeddedMessagesStoragePath, item.EmbeddedMessagesStoragePath);
+                                    result.SetMetadata(EmbeddedMessagesResourceName, item.EmbeddedMessagesResourceName);
+                                    return result;
+                                })
+                                .Cast<ITaskItem>()
+                                .ToArray();
         }
     }
 }

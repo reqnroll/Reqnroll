@@ -3,10 +3,12 @@
 ## Improvements:
 
 ## Bug fixes:
-* Fix Formatters Fail under .NET Framework when OutputFilePath is not configured (#797)
-* Fix: Build URL is invalid in HTML report for Azure DevOps builds (#795)
 
-*Contributors of this release (in alphabetical order):* @gasparnagy @clrudolphi
+* Fix: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
+* Fix: Build URL is invalid in HTML report for Azure DevOps builds (#795)
+* Fix: Build fails with "error CS8103: Combined length of user strings used by the program exceeds allowed limit." when a project contains many long feature files. (#785)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy, @clrudolphi
 
 # v3.0.0 - 2025-08-21
 

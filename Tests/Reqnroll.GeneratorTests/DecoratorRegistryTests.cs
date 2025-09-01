@@ -69,7 +69,7 @@ namespace Reqnroll.GeneratorTests
 
         private static TestClassGenerationContext CreateGenerationContext(string tag)
         {
-            return new TestClassGenerationContext(null, ParserHelper.CreateAnyDocument(new []{ tag }), null, null, null, null, null, null, null, null, null, null, null, true);
+            return new TestClassGenerationContext(null, ParserHelper.CreateAnyDocument(new []{ tag }), null, null, null, null, null, null, null, null, null, null, null, null, true);
         }
 
         [Fact]
