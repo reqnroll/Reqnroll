@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Formatters: Upgraded conformance test to Cucumber/Cucumber-compatibility-Kit v21.0.0
 
 ## Bug fixes:
 * Fix Formatters Fail under .NET Framework when OutputFilePath is not configured (#797)
