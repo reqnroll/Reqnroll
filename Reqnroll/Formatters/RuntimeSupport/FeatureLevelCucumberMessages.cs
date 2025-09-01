@@ -15,7 +15,7 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 /// </summary>
 public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 {
-    private Lazy<IEnumerable<Envelope>> _embeddedEnvelopes;
+    private Lazy<IReadOnlyCollection<Envelope>> _embeddedEnvelopes;
     internal readonly int _expectedEnvelopeCount;
     private Lazy<Source> _source;
     private Lazy<GherkinDocument> _gherkinDocument;
@@ -27,7 +27,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
             throw new ArgumentNullException(nameof(resourceNameOfEmbeddedMessages));
 
         var assm = Assembly.GetCallingAssembly();
-        _embeddedEnvelopes = new Lazy<IEnumerable<Envelope>>(() => ReadEnvelopesFromAssembly(assm, resourceNameOfEmbeddedMessages));
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromAssembly(assm, resourceNameOfEmbeddedMessages));
         _expectedEnvelopeCount = envelopeCount;
 
         InitializeLazyProperties();
@@ -36,16 +36,16 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     // Internal constructor for testing with direct stream access
     internal FeatureLevelCucumberMessages(Stream stream, string resourceNameOfEmbeddedMessages, int envelopeCount)
     {
-        _embeddedEnvelopes = new Lazy<IEnumerable<Envelope>>(() => ReadEnvelopesFromStream(stream, resourceNameOfEmbeddedMessages));
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromStream(stream, resourceNameOfEmbeddedMessages));
         _expectedEnvelopeCount = envelopeCount;
 
         InitializeLazyProperties();
     }
 
     // Internal constructor for testing with pre-loaded envelopes
-    internal FeatureLevelCucumberMessages(IEnumerable<Envelope> envelopes, int expectedEnvelopeCount)
+    internal FeatureLevelCucumberMessages(IReadOnlyCollection<Envelope> envelopes, int expectedEnvelopeCount)
     {
-        _embeddedEnvelopes = new Lazy<IEnumerable<Envelope>>(() => envelopes);
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => envelopes);
         _expectedEnvelopeCount = expectedEnvelopeCount;
 
         InitializeLazyProperties();
@@ -57,7 +57,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         _pickles = new Lazy<IEnumerable<Pickle>>(() => _embeddedEnvelopes.Value.Select(e => e.Pickle).Where(p => p != null));
     }
 
-    internal IEnumerable<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string resourceNameOfEmbeddedNdJson)
+    internal IReadOnlyCollection<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string resourceNameOfEmbeddedNdJson)
     {
         var targetResourceName = resourceNameOfEmbeddedNdJson.Replace("\\", "/") + ".ndjson";
 
@@ -71,12 +71,12 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         }
         catch (System.Exception)
         {
-            return Enumerable.Empty<Envelope>();
+            return Array.Empty<Envelope>();
         }
-        return Enumerable.Empty<Envelope>();
+        return Array.Empty<Envelope>();
     }
 
-    internal IEnumerable<Envelope> ReadEnvelopesFromStream(Stream stream, string resourceNameOfEmbeddedNdJson)
+    internal IReadOnlyCollection<Envelope> ReadEnvelopesFromStream(Stream stream, string resourceNameOfEmbeddedNdJson)
     {
         try
         {
@@ -91,7 +91,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         }
         catch (System.Exception)
         {
-            return Enumerable.Empty<Envelope>();
+            return Array.Empty<Envelope>();
         }
     }
 
