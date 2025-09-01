@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Text;
 using Microsoft.Build.Utilities;
 using Reqnroll.Utils;
@@ -34,14 +33,12 @@ namespace Reqnroll.Tools.MsBuild.Generation
             return outputPath;
         }
 
-        internal object WriteNdjsonFile(string targetNdjsonFilePath, string ndjsonFilename, TestFileGeneratorResult generatorResult)
+        internal void WriteNdjsonFile(string targetNdjsonFilePath, string ndjsonFilename, TestFileGeneratorResult generatorResult)
         {
             Log?.LogWithNameTag(Log.LogMessage, $"Writing ndjson to {targetNdjsonFilePath}");
             var directoryPath = Path.GetDirectoryName(targetNdjsonFilePath);
 
             WriteFileIfChanged(targetNdjsonFilePath, directoryPath, generatorResult.FeatureMessages);
-
-            return null;
         }
 
         private void WriteFileIfChanged(string filePath, string directoryPath, string content)

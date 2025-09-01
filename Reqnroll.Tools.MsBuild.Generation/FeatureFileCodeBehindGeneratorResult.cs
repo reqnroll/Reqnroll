@@ -1,16 +1,10 @@
-namespace Reqnroll.Tools.MsBuild.Generation
-{
-    public class FeatureFileCodeBehindGeneratorResult
-    {
-        public string CodeBehindRelativePath { get; }
-        public string EmbeddedMessagesStoragePath { get; }
-        public string EmbeddedMessagesResourceName { get; }
+namespace Reqnroll.Tools.MsBuild.Generation;
 
-        public FeatureFileCodeBehindGeneratorResult(string codeBehindRelativePath, string embeddedMessagesStoragePath, string embeddedMessagesResourceName)
-        {
-            CodeBehindRelativePath = codeBehindRelativePath;
-            EmbeddedMessagesStoragePath = embeddedMessagesStoragePath;
-            EmbeddedMessagesResourceName = embeddedMessagesResourceName;
-        }
-    }
+public class FeatureFileCodeBehindGeneratorResult(string codeBehindRelativePath, string embeddedMessagesStoragePath, string embeddedMessagesResourceName)
+{
+    public string CodeBehindRelativePath { get; } = codeBehindRelativePath;
+
+    public string EmbeddedMessagesStoragePath { get; } = embeddedMessagesStoragePath;
+
+    public string EmbeddedMessagesResourceName { get; } = embeddedMessagesResourceName;
 }

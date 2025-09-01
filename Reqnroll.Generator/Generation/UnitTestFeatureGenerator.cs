@@ -53,7 +53,7 @@ namespace Reqnroll.Generator.Generation
             var codeNamespace = CreateNamespace(targetNamespace);
             var feature = document.ReqnrollFeature;
 
-            testClassName = testClassName ?? string.Format(TestClassNameFormat, feature.Name.ToIdentifier());
+            testClassName ??= string.Format(TestClassNameFormat, feature.Name.ToIdentifier());
             var generationContext = CreateTestClassStructure(codeNamespace, testClassName, document);
 
             SetupTestClass(generationContext);
@@ -102,7 +102,7 @@ namespace Reqnroll.Generator.Generation
 
         private CodeNamespace CreateNamespace(string targetNamespace)
         {
-            targetNamespace = targetNamespace ?? GeneratorConstants.DEFAULT_NAMESPACE;
+            targetNamespace ??= GeneratorConstants.DEFAULT_NAMESPACE;
 
             if (!targetNamespace.StartsWith("global", StringComparison.CurrentCultureIgnoreCase))
             {
@@ -207,14 +207,14 @@ namespace Reqnroll.Generator.Generation
             cucumberMessagesInitializationMethod.Name = GeneratorConstants.FEATURE_MESSAGES_INITIALIZATION_NAME;
             cucumberMessagesInitializationMethod.ReturnType = new CodeTypeReference(typeof(FeatureLevelCucumberMessages), CodeTypeReferenceOptions.GlobalReference);
 
-            string featureFileName = null;
-            int envelopeCount = 0;
+            string featureFileName;
+            int envelopeCount;
             try
             {
                 var featureSource = CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document);
                 featureFileName = featureSource.Uri.Replace("\\", "/");      // by convention, embedded resources will use the forward-slash path separator
-                var IdGeneratorSeed = featureSource.Uri + featureSource.Data;
-                var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(IdGeneratorSeed));
+                var idGeneratorSeed = featureSource.Uri + featureSource.Data;
+                var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(idGeneratorSeed));
                 var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
                 var featurePickleMessages = messageConverter.ConvertToCucumberMessagesPickles(featureGherkinDocumentMessage);
                 // Collect all envelopes
@@ -223,10 +223,10 @@ namespace Reqnroll.Generator.Generation
                     Envelope.Create(featureSource),
                     Envelope.Create(featureGherkinDocumentMessage)
                 };
-                envelopes.AddRange(featurePickleMessages.Select(p => Envelope.Create(p)));
-                envelopeCount = envelopes.Count();
+                envelopes.AddRange(featurePickleMessages.Select(Envelope.Create));
+                envelopeCount = envelopes.Count;
 
-                // Serialize each envelope and append into an ndjson format
+                // Serialize each envelope and append into a ndjson format
                 generationContext.CustomData[GeneratorConstants.FEATURE_MESSAGES_CONTEXT_KEY] = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
 
             }
@@ -487,14 +487,14 @@ namespace Reqnroll.Generator.Generation
 
             // Unassign TestRunner to make sure it won't be reused if the test framework runs AfterScenario multiple times
             // testRunner = null;
-            var unasignTestRunnerInstance = new CodeAssignStatement(testRunnerField, new CodePrimitiveExpression(null));
+            var unassignTestRunnerInstance = new CodeAssignStatement(testRunnerField, new CodePrimitiveExpression(null));
 
             // add ReleaseTestRunner to the finally block of OnScenarioEndAsync 
             testCleanupMethod.Statements.Add(
                 new CodeTryCatchFinallyStatement(
                     [onScenarioEndCallStatement],
                     [],
-                    [releaseTestRunnerCallStatement, unasignTestRunnerInstance]
+                    [releaseTestRunnerCallStatement, unassignTestRunnerInstance]
                 ));
         }
 

@@ -1,15 +1,12 @@
 using FluentAssertions;
 using Io.Cucumber.Messages.Types;
-using Moq;
 using Reqnroll.Formatters.RuntimeSupport;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
-using System.Threading.Tasks;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.RuntimeSupport;
@@ -26,13 +23,14 @@ public class FeatureLevelMessagesTests
 
         // Assert
         sut.Should().NotBeNull();
-        sut._expectedEnvelopeCount.Should().Be(3);
+        sut.ExpectedEnvelopeCount.Should().Be(3);
     }
 
     [Fact]
     public void Constructor_WithNullResourceName_ShouldThrowArgumentException()
     {
         // Act & Assert
+        // ReSharper disable once ObjectCreationAsStatement
         Action act = () => new FeatureLevelCucumberMessages((string)null, 1);
 
         act.Should().Throw<ArgumentException>();
@@ -42,6 +40,7 @@ public class FeatureLevelMessagesTests
     public void Constructor_WithEmptyResourceName_ShouldThrowArgumentException()
     {
         // Act & Assert
+        // ReSharper disable once ObjectCreationAsStatement
         Action act = () => new FeatureLevelCucumberMessages("", 1);
 
         act.Should().Throw<ArgumentException>();
@@ -57,7 +56,7 @@ public class FeatureLevelMessagesTests
         var sut = new FeatureLevelCucumberMessages("test/resource", envelopeCount);
 
         // Assert
-        sut._expectedEnvelopeCount.Should().Be(envelopeCount);
+        sut.ExpectedEnvelopeCount.Should().Be(envelopeCount);
     }
 
     #endregion
@@ -80,7 +79,7 @@ public class FeatureLevelMessagesTests
 
         // Assert
         sut.Should().NotBeNull();
-        sut._expectedEnvelopeCount.Should().Be(3);
+        sut.ExpectedEnvelopeCount.Should().Be(3);
     }
 
     [Fact]
@@ -99,7 +98,7 @@ public class FeatureLevelMessagesTests
 
         // Assert
         sut.Should().NotBeNull();
-        sut._expectedEnvelopeCount.Should().Be(2);
+        sut.ExpectedEnvelopeCount.Should().Be(2);
     }
 
     #endregion
@@ -115,7 +114,7 @@ public class FeatureLevelMessagesTests
             {"gherkinDocument":{"uri":"Features/Calculator.feature","feature":{"location":{"line":1,"column":1},"tags":[],"language":"en-US","keyword":"Feature","name":"Calculator","description":"Simple calculator for adding two numbers","children":[{"scenario":{"location":{"line":6,"column":1},"tags":[{"location":{"line":5,"column":1},"name":"@mytag","id":"9faee3c6b313125e9c77bf04c9d75fa6"}],"keyword":"Scenario","name":"Add two numbers","description":"","steps":[{"location":{"line":7,"column":2},"keyword":"Given ","keywordType":"Context","text":"the first number is 50","id":"e2aa567c918dee5c9b2a6e777fad585d"},{"location":{"line":8,"column":2},"keyword":"And ","keywordType":"Conjunction","text":"the second number is 70","id":"edea8fd465cbb65aabe0a4c97ccee706"},{"location":{"line":9,"column":2},"keyword":"When ","keywordType":"Action","text":"the two numbers are added","id":"bada27e1f4687750a07d3e3036445756"},{"location":{"line":10,"column":2},"keyword":"Then ","keywordType":"Outcome","text":"the result should be 120","id":"645176625268df5f9cfda379a4659a15"}],"examples":[],"id":"d332a3eb5951985da32f78ff459d7a01"}}]},"comments":[]}}
             """;
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(ndjsonContent));
-        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
+        var sut = new FeatureLevelCucumberMessages([], 0);
 
         // Act
         var result = sut.ReadEnvelopesFromStream(stream, "test");
@@ -132,7 +131,7 @@ public class FeatureLevelMessagesTests
         // Arrange
         var malformedJson = "{ invalid json content }";
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(malformedJson));
-        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
+        var sut = new FeatureLevelCucumberMessages([], 0);
 
         // Act
         var result = sut.ReadEnvelopesFromStream(stream, "test");
@@ -146,7 +145,7 @@ public class FeatureLevelMessagesTests
     {
         // Arrange
         using var stream = new MemoryStream();
-        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
+        var sut = new FeatureLevelCucumberMessages([], 0);
 
         // Act
         var result = sut.ReadEnvelopesFromStream(stream, "test");
@@ -160,7 +159,7 @@ public class FeatureLevelMessagesTests
     {
         // Arrange
         var assembly = Assembly.GetExecutingAssembly();
-        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
+        var sut = new FeatureLevelCucumberMessages([], 0);
 
         // Act
         var result = sut.ReadEnvelopesFromAssembly(assembly, "nonexistent/resource");
@@ -328,17 +327,15 @@ public class FeatureLevelMessagesTests
     public void HasMessages_WithEmptyEnvelopes_ShouldReturnFalse()
     {
         // Arrange
-        var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
+        var sut = new FeatureLevelCucumberMessages([], 0);
 
         // Act & Assert
         sut.HasMessages.Should().BeFalse();
     }
 
     #endregion
-    private Source Source1 => new Source("Source1URI", "Feature 1", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
-    private Source Source2 => new Source("Source2URI", "Feature 2", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
-    private GherkinDocument GherkinDocument1 => new GherkinDocument("URI1", new Feature(new Location(0,0), new List<Tag>(), "en", "Feature", "gherkin doc", "", new List<FeatureChild>()), new List<Comment>());
-    private Pickle Pickle1 => new Pickle("pickleId1", "URI1", "pickle 1", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
-    private Pickle Pickle2 => new Pickle("pickleId2", "URI2", "pickle 2", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
-
+    private Source Source1 => new("Source1URI", "Feature 1", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN);
+    private GherkinDocument GherkinDocument1 => new("URI1", new Feature(new Location(0,0), new List<Tag>(), "en", "Feature", "gherkin doc", "", new List<FeatureChild>()), new List<Comment>());
+    private Pickle Pickle1 => new("pickleId1", "URI1", "pickle 1", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
+    private Pickle Pickle2 => new("pickleId2", "URI2", "pickle 2", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
 }

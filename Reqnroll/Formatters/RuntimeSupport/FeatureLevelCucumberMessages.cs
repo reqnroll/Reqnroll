@@ -2,7 +2,6 @@ using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,20 +14,21 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 /// </summary>
 public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 {
-    private Lazy<IReadOnlyCollection<Envelope>> _embeddedEnvelopes;
-    internal readonly int _expectedEnvelopeCount;
+    private readonly Lazy<IReadOnlyCollection<Envelope>> _embeddedEnvelopes;
     private Lazy<Source> _source;
     private Lazy<GherkinDocument> _gherkinDocument;
     private Lazy<IEnumerable<Pickle>> _pickles;
+
+    internal int ExpectedEnvelopeCount { get; }
 
     public FeatureLevelCucumberMessages(string resourceNameOfEmbeddedMessages, int envelopeCount)
     {
         if (string.IsNullOrEmpty(resourceNameOfEmbeddedMessages))
             throw new ArgumentNullException(nameof(resourceNameOfEmbeddedMessages));
 
-        var assm = Assembly.GetCallingAssembly();
-        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromAssembly(assm, resourceNameOfEmbeddedMessages));
-        _expectedEnvelopeCount = envelopeCount;
+        var assembly = Assembly.GetCallingAssembly();
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromAssembly(assembly, resourceNameOfEmbeddedMessages));
+        ExpectedEnvelopeCount = envelopeCount;
 
         InitializeLazyProperties();
     }
@@ -37,16 +37,16 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     internal FeatureLevelCucumberMessages(Stream stream, string resourceNameOfEmbeddedMessages, int envelopeCount)
     {
         _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromStream(stream, resourceNameOfEmbeddedMessages));
-        _expectedEnvelopeCount = envelopeCount;
+        ExpectedEnvelopeCount = envelopeCount;
 
         InitializeLazyProperties();
     }
 
-    // Internal constructor for testing with pre-loaded envelopes
+    // Internal constructor for testing with preloaded envelopes
     internal FeatureLevelCucumberMessages(IReadOnlyCollection<Envelope> envelopes, int expectedEnvelopeCount)
     {
         _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => envelopes);
-        _expectedEnvelopeCount = expectedEnvelopeCount;
+        ExpectedEnvelopeCount = expectedEnvelopeCount;
 
         InitializeLazyProperties();
     }
@@ -71,9 +71,9 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         }
         catch (System.Exception)
         {
-            return Array.Empty<Envelope>();
+            return [];
         }
-        return Array.Empty<Envelope>();
+        return [];
     }
 
     internal IReadOnlyCollection<Envelope> ReadEnvelopesFromStream(Stream stream, string resourceNameOfEmbeddedNdJson)
@@ -91,7 +91,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         }
         catch (System.Exception)
         {
-            return Array.Empty<Envelope>();
+            return [];
         }
     }
 
@@ -103,7 +103,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
             var envelopeCount = hasSourceAndGherkinDocument ?
                 Pickles?.Count() + 2
                 : 0;
-            return envelopeCount > 0 && envelopeCount == _expectedEnvelopeCount;
+            return envelopeCount > 0 && envelopeCount == ExpectedEnvelopeCount;
         }
     }
 

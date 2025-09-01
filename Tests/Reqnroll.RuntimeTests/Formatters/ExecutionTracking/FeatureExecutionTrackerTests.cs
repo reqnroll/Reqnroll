@@ -409,7 +409,7 @@ public class FeatureExecutionTrackerTests
         var contextManagerMock = new Mock<IContextManager>();
         contextManagerMock.Setup(cm => cm.ScenarioContext).Returns(new ScenarioContext(null, scenarioInfoDummy, null, testOjbResolverMock.Object));
 
-        var hookBindingFinished = new HookBindingFinishedEvent(null, new TimeSpan(), contextManagerMock.Object, ScenarioExecutionStatus.OK);
+        var hookBindingFinished = new HookBindingFinishedEvent(null, TimeSpan.Zero, contextManagerMock.Object, ScenarioExecutionStatus.OK);
 
         // Act
         await sut.ProcessEvent(hookBindingFinished);

@@ -1,10 +1,8 @@
-using Microsoft.Build.Utilities;
-using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
+using Microsoft.Build.Utilities;
+using Reqnroll.Utils;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
@@ -77,8 +75,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
                     // Save them in the 'obj' directory in a sub-folder structure that mirrors the location of the feature file relative to the project root folder.
 
                     // The value of 'obj' is passed from the .targets file as the IntermediateOutputPath property of the GenerateFeatureFileCodeBehindTask.
-                    // It's value may be the $(BaseIntermediateOutputPath), ie, 'obj' or the $(IntermediateOutputPath), 'obj/<Configuration>/<TargetFramework>'
-
+                    // It's value should be $(IntermediateOutputPath), i.e. 'obj/<Configuration>/<TargetFramework>'
 
                     string relativeFeaturePath = FileSystemHelper.GetRelativePath(featureFile, projectFolder);
                     string relativeFeatureDir = Path.GetDirectoryName(relativeFeaturePath) ?? string.Empty;
@@ -93,7 +90,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
                     string ndjsonFilePathAndName = Path.Combine(targetStorageDir, ndjsonFilename);
                     string messageResourceName = Path.Combine(relativeFeatureDir, ndjsonFilename).Replace("\\", "/");
-                    _ = codeBehindWriter.WriteNdjsonFile(ndjsonFilePathAndName, ndjsonFilename, generatorResult);
+                    codeBehindWriter.WriteNdjsonFile(ndjsonFilePathAndName, ndjsonFilename, generatorResult);
 
                     yield return new FeatureFileCodeBehindGeneratorResult(  FileSystemHelper.GetRelativePath(resultedFile, projectFolder),
                                                                             FileSystemHelper.GetRelativePath(ndjsonFilePathAndName, projectFolder),
