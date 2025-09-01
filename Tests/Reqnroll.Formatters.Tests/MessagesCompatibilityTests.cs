@@ -13,6 +13,8 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("empty", "Empty Scenarios")]
     [DataRow("examples-tables", "Examples Tables")]
     [DataRow("examples-tables-attachment", "Examples Tables - With attachments")]
+    [DataRow("global-hooks", " Global hooks")]
+    [DataRow("global-hooks-afterall-error", " Global hooks - AfterAll error")]
     [DataRow("hooks", "Hooks")]
     [DataRow("hooks-attachment", "Hooks - Attachments")]
     [DataRow("hooks-conditional", "Hooks - Conditional execution")]
@@ -77,8 +79,10 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [Ignore]
     [TestMethod]
     [DataRow("attachments", "Attachments")]
+    [DataRow("global-hooks-beforeall-error", " Global hooks - BeforeAll error")]
     [DataRow("hooks-named", "Hooks - Named")]
     [DataRow("unknown-parameter-type", "Unknown Parameter Types")]
+    [DataRow("regular-expression", "regular expression")]
     // These scenarios are from the CCK, but Reqnroll cannot provide a compliant implementation. This is usually the result of differences in behavior or support of Gherkin features.
     // When these scenarios are run, expect them to fail.
     public void NonCompliantCCKScenarios(string testName, string featureNameText)
