@@ -7,6 +7,7 @@
 * Fix: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
 * Fix: Build URL is invalid in HTML report for Azure DevOps builds (#795)
 * Fix: Build fails with "error CS8103: Combined length of user strings used by the program exceeds allowed limit." when a project contains many long feature files. (#785)
+* Fix: Embedded feature file resource generates different resource names in Windows/Linux (#799)
 
 *Contributors of this release (in alphabetical order):* @gasparnagy, @clrudolphi
 
