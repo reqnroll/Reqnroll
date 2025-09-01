@@ -1,0 +1,21 @@
+{
+    "name": "Python & Sphinx Dev Container",
+    "image": "mcr.microsoft.com/devcontainers/python:3.11",
+    "features": {},
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance"
+            ],
+            "settings": {
+                "python.defaultInterpreterPath": "/usr/local/bin/python"
+            }
+        }
+    },
+    "postCreateCommand": "pip install --upgrade pip && pip install -r requirements.txt",
+    "mounts": [
+        "source=${localWorkspaceFolder}/requirements.txt,target=/workspace/requirements.txt,type=bind,consistency=cached"
+    ],
+    "remoteUser": "vscode"
+}

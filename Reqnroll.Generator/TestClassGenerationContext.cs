@@ -23,6 +23,7 @@ namespace Reqnroll.Generator
         public CodeMemberMethod ScenarioCleanupMethod { get; private set; }
         public CodeMemberMethod FeatureBackgroundMethod { get; private set; }
         public CodeMemberField TestRunnerField { get; private set; }
+        public CodeMemberMethod CucumberMessagesInitializationMethod { get; private set; }
 
         public bool GenerateRowTests { get; private set; }
 
@@ -44,6 +45,7 @@ namespace Reqnroll.Generator
             CodeMemberMethod scenarioStartMethod,
             CodeMemberMethod scenarioCleanupMethod,
             CodeMemberMethod featureBackgroundMethod,
+            CodeMemberMethod cucumberMessagesInitializationMethod,
             bool generateRowTests)
         {
             UnitTestGeneratorProvider = unitTestGeneratorProvider;
@@ -59,6 +61,7 @@ namespace Reqnroll.Generator
             ScenarioStartMethod = scenarioStartMethod;
             ScenarioCleanupMethod = scenarioCleanupMethod;
             FeatureBackgroundMethod = featureBackgroundMethod;
+            CucumberMessagesInitializationMethod = cucumberMessagesInitializationMethod;
             GenerateRowTests = generateRowTests;
 
             CustomData = new Dictionary<string, object>();
