@@ -60,7 +60,7 @@
 
   <Target Name="SwitchToForceGenerate">
     <PropertyGroup>
-      <ForceGeneration>true</ForceGeneration>
+      <Reqnroll_ForceGeneration>true</Reqnroll_ForceGeneration>
     </PropertyGroup>
   </Target>
 
@@ -102,6 +102,8 @@
       TargetFrameworks="$(Reqnroll_TargetFrameworks)"
       TargetFramework="$(Reqnroll_TargetFramework)"
       ProjectGuid="$(ProjectGuid)"
+
+      ForceGeneration="$(Reqnroll_ForceGeneration)"
       >
 
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />
@@ -159,7 +161,7 @@
     <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
   </Target>
 
-  <Target Name="CleanFeatureFilesInProject" Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)' == 'true'">
+  <Target Name="CleanFeatureFilesInProject" Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)' == 'true'">
     <!-- remove known codebehind files for existing feature files -->
     <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
 

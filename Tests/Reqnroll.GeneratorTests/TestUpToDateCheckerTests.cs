@@ -1,7 +1,5 @@
-using System;
 using System.IO;
 using System.Threading;
-using Moq;
 using Xunit;
 using Reqnroll.Generator;
 using Reqnroll.Generator.Configuration;
@@ -14,23 +12,16 @@ namespace Reqnroll.GeneratorTests
     
     public class TestUpToDateCheckerTests
     {
-        protected Mock<ITestHeaderWriter> TestHeaderWriterStub;
-
-        public TestUpToDateCheckerTests()
-        {
-            TestHeaderWriterStub = new Mock<ITestHeaderWriter>();
-        }
-
         private TestUpToDateChecker CreateUpToDateChecker()
         {
-            var net35CSSettings = new ProjectPlatformSettings
+            var net35CsSettings = new ProjectPlatformSettings
             {
                 Language = GenerationTargetLanguage.CSharp
             };
 
-            return new TestUpToDateChecker(TestHeaderWriterStub.Object, 
+            return new TestUpToDateChecker(
                 new GeneratorInfo { GeneratorVersion = GeneratorInfoProvider.GeneratorVersion}, 
-                new ProjectSettings { ProjectFolder = Path.GetTempPath(), ProjectPlatformSettings = net35CSSettings });
+                new ProjectSettings { ProjectFolder = Path.GetTempPath(), ProjectPlatformSettings = net35CsSettings });
         }
 
         [Fact]
@@ -47,37 +38,10 @@ namespace Reqnroll.GeneratorTests
 
                     var testUpToDateChecker = CreateUpToDateChecker();
 
-                    TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion(It.IsAny<string>())).Returns(GeneratorInfoProvider.GeneratorVersion);
-
                     var result = testUpToDateChecker.IsUpToDatePreliminary(new FeatureFileInput(tempFile.FileName),
-                        tempTestFile.FullPath, UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion);
+                        tempTestFile.FullPath, UpToDateCheckingMethod.ModificationTime);
 
                     result.Should().Be(true);
-                }
-            }
-        }
-
-        [Fact]
-        public void Should_detect_outdated_date_test_file_if_feature_file_has_outdated_generator_version()
-        {
-            using (var tempFile = new TempFile(".feature"))
-            {
-                tempFile.SetContent("any");
-
-                using (var tempTestFile = new TempFile(".cs"))
-                {
-                    // set test content
-                    tempTestFile.SetContent("any_code");
-
-                    var testUpToDateChecker = CreateUpToDateChecker();
-
-                    TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion(It.IsAny<string>())).Returns(new Version(1, 0));
-                    // version 1.0 is surely older than the current one
-
-                    var result = testUpToDateChecker.IsUpToDatePreliminary(new FeatureFileInput(tempFile.FileName),
-                        tempTestFile.FullPath, UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion);
-
-                    result.Should().Be(false);
                 }
             }
         }
@@ -91,7 +55,7 @@ namespace Reqnroll.GeneratorTests
 
                 var testUpToDateChecker = CreateUpToDateChecker();
                 var result = testUpToDateChecker.IsUpToDatePreliminary(new FeatureFileInput(tempFile.FileName),
-                    tempFile.FileName + ".cs", UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion);
+                    tempFile.FileName + ".cs", UpToDateCheckingMethod.ModificationTime);
 
                 result.Should().Be(false);
             }
@@ -115,10 +79,8 @@ namespace Reqnroll.GeneratorTests
 
                     var testUpToDateChecker = CreateUpToDateChecker();
 
-                    TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion(It.IsAny<string>())).Returns(GeneratorInfoProvider.GeneratorVersion);
-
                     var result = testUpToDateChecker.IsUpToDatePreliminary(new FeatureFileInput(tempFile.FileName),
-                        tempTestFile.FullPath, UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion);
+                        tempTestFile.FullPath, UpToDateCheckingMethod.ModificationTime);
 
                     result.Should().Be(false);
                 }
@@ -138,8 +100,6 @@ namespace Reqnroll.GeneratorTests
                     tempTestFile.SetContent("any_code");
 
                     var testUpToDateChecker = CreateUpToDateChecker();
-
-                    TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion(It.IsAny<string>())).Returns(GeneratorInfoProvider.GeneratorVersion);
 
                     var result = testUpToDateChecker.IsUpToDatePreliminary(new FeatureFileInput(tempFile.FileName),
                         tempTestFile.FullPath, UpToDateCheckingMethod.FileContent);
@@ -163,8 +123,6 @@ namespace Reqnroll.GeneratorTests
 
                     var testUpToDateChecker = CreateUpToDateChecker();
 
-                    TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion(It.IsAny<string>())).Returns(GeneratorInfoProvider.GeneratorVersion);
-
                     var result = testUpToDateChecker.IsUpToDate(new FeatureFileInput(tempFile.FileName),
                         tempTestFile.FullPath, "any_code", UpToDateCheckingMethod.FileContent);
 
@@ -187,8 +145,6 @@ namespace Reqnroll.GeneratorTests
 
                     var testUpToDateChecker = CreateUpToDateChecker();
 
-                    TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion(It.IsAny<string>())).Returns(GeneratorInfoProvider.GeneratorVersion);
-
                     var result = testUpToDateChecker.IsUpToDate(new FeatureFileInput(tempFile.FileName) { GeneratedTestFileContent = "any_code" },
                         tempTestFile.FullPath, "any_code", UpToDateCheckingMethod.FileContent);
 
@@ -210,8 +166,6 @@ namespace Reqnroll.GeneratorTests
                     tempTestFile.SetContent("any_code");
 
                     var testUpToDateChecker = CreateUpToDateChecker();
-
-                    TestHeaderWriterStub.Setup(thw => thw.DetectGeneratedTestVersion(It.IsAny<string>())).Returns(GeneratorInfoProvider.GeneratorVersion);
 
                     var result = testUpToDateChecker.IsUpToDate(new FeatureFileInput(tempFile.FileName),
                         tempTestFile.FullPath, "new_code", UpToDateCheckingMethod.FileContent);

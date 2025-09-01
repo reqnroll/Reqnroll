@@ -1,11 +1,12 @@
-using Reqnroll.BoDi;
 using Microsoft.Build.Utilities;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
 using Reqnroll.Analytics.UserId;
+using Reqnroll.BoDi;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Generator.Configuration;
+using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.Project;
 
 namespace Reqnroll.Tools.MsBuild.Generation
@@ -16,7 +17,8 @@ namespace Reqnroll.Tools.MsBuild.Generation
             TaskLoggingHelper taskLoggingHelper,
             ReqnrollProjectInfo reqnrollProjectInfo,
             IMSBuildInformationProvider msbuildInformationProvider,
-            GenerateFeatureFileCodeBehindTaskConfiguration generateFeatureFileCodeBehindTaskConfiguration)
+            GenerateFeatureFileCodeBehindTaskConfiguration generateFeatureFileCodeBehindTaskConfiguration,
+            GenerationSettings generationSettings)
         {
             var objectContainer = new ObjectContainer();
 
@@ -25,6 +27,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             objectContainer.RegisterInstanceAs(reqnrollProjectInfo);
             objectContainer.RegisterInstanceAs(msbuildInformationProvider);
             objectContainer.RegisterInstanceAs(generateFeatureFileCodeBehindTaskConfiguration);
+            objectContainer.RegisterInstanceAs(generationSettings);
 
             // types
             objectContainer.RegisterTypeAs<TaskLoggingHelperWithNameTagWrapper, ITaskLoggingWrapper>();
