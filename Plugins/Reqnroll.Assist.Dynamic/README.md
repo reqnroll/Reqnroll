@@ -10,11 +10,13 @@ CLI : dotnet add package ReqnrollExtra.Assist.Dynamic
 
 Add to reqnroll.json
 ```json
-"stepAssemblies": [
+{
+  stepAssemblies: [
     {
-      "assembly": "Reqnroll.Assist.DynamSic"
+      "assembly": "Reqnroll.Assist.Dynamic"
     }
   ]
+}
 ```
 ---
 ---
