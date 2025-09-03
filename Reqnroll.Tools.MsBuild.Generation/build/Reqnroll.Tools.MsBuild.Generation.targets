@@ -150,7 +150,7 @@
 
     <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
-        <LogicalName>%(ReqnrollFeatureFiles.Identity)</LogicalName>
+        <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
     
