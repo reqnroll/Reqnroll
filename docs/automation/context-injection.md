@@ -11,7 +11,7 @@ To use context injection:
 Rules:
 
 * The life-time of these objects is limited to a scenario's execution. 
-* If the injected objects implement `IDisposable`, they will be disposed after the scenario is executed.
+* If the injected objects implement `IDisposable` or `IAsyncDisposable`, they will be disposed after the scenario is executed. If they implement both, only `DisposeAsync` will be called.
 * The injection is resolved recursively, i.e. the injected class can also have dependencies. 
 * Resolution is done using public constructors only. 
 * If there are multiple public constructors, Reqnroll takes the first one.
