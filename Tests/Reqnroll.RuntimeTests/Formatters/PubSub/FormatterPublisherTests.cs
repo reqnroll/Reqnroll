@@ -194,7 +194,7 @@ public class FormatterPublisherTests
         await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
         // Assert
-        _sut.AllFeaturesPassed.Should().BeTrue();
+        _sut.TestRunPassed.Should().BeTrue();
     }
 
     // PublisherTestRunComplete calculates test run status as Failed when any started feature is are Failed
@@ -224,7 +224,7 @@ public class FormatterPublisherTests
         await _sut.PublisherTestRunCompleteAsync(new TestRunFinishedEvent());
 
         // Assert
-        _sut.AllFeaturesPassed.Should().BeFalse();
+        _sut.TestRunPassed.Should().BeFalse();
     }
 
     // PublisherTestRunComplete informs all running Features to finalize tracking
