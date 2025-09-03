@@ -11,7 +11,7 @@ CLI : dotnet add package ReqnrollExtra.Assist.Dynamic
 Add to reqnroll.json
 ```json
 {
-  bindingAssemblies: [
+  "bindingAssemblies": [
     {
       "assembly": "Reqnroll.Assist.Dynamic"
     }
