@@ -138,7 +138,7 @@ namespace Reqnroll.Infrastructure
 
         public virtual async Task OnFeatureStartAsync(FeatureInfo featureInfo)
         {
-            _contextManager.InitializeFeatureContext(featureInfo);
+            await _contextManager.InitializeFeatureContextAsync(featureInfo);
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new FeatureStartedEvent(FeatureContext));
 
@@ -173,13 +173,13 @@ namespace Reqnroll.Infrastructure
 
                 await _testThreadExecutionEventPublisher.PublishEventAsync(new FeatureFinishedEvent(FeatureContext));
 
-                _contextManager.CleanupFeatureContext();
+                await _contextManager.CleanupFeatureContextAsync();
             }
         }
 
-        public virtual void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
+        public virtual Task OnScenarioInitializeAsync(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
         {
-            _contextManager.InitializeScenarioContext(scenarioInfo, ruleInfo);
+            return _contextManager.InitializeScenarioContextAsync(scenarioInfo, ruleInfo);
         }
 
         public virtual async Task OnScenarioStartAsync()
@@ -258,7 +258,7 @@ namespace Reqnroll.Infrastructure
             {
                 await _testThreadExecutionEventPublisher.PublishEventAsync(new ScenarioFinishedEvent(FeatureContext, ScenarioContext));
 
-                _contextManager.CleanupScenarioContext();
+                await _contextManager.CleanupScenarioContextAsync();
             }
         }
 

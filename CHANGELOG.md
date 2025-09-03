@@ -2,6 +2,7 @@
 
 ## Improvements:
 * Formatters: Upgraded conformance test to Cucumber/Cucumber-compatibility-Kit v21.0.0
+* Added support for asynchronously disposing objects implementing IAsyncDisposable when the Reqnroll object container is disposed.
 
 ## Bug fixes:
 
@@ -11,7 +12,7 @@
 * Fix: Embedded feature file resource generates different resource names in Windows/Linux (#799)
 * Fix: Formatters: The Build Info banner of HTML reports shows UNKNOWN banner when the Build Server cannot be determined (#800)
 
-*Contributors of this release (in alphabetical order):* @gasparnagy, @clrudolphi
+*Contributors of this release (in alphabetical order):* @Code-Grump, @clrudolphi, @gasparnagy
 
 # v3.0.0 - 2025-08-21
 

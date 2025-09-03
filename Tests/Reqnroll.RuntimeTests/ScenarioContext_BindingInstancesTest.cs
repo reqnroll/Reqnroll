@@ -4,6 +4,7 @@ using Xunit;
 using FluentAssertions;
 using Moq;
 using Reqnroll.Infrastructure;
+using System.Threading.Tasks;
 
 namespace Reqnroll.RuntimeTests
 {
@@ -89,13 +90,13 @@ namespace Reqnroll.RuntimeTests
         }
 
         [Fact]
-        public void Should_dispose_disposable_binding_instances()
+        public async Task Should_dispose_disposable_binding_instances()
         {
             var scenarioContext = CreateScenarioContext();
 
             var displosableInstance = (DisplosableClass)scenarioContext.GetBindingInstance(typeof(DisplosableClass));
 
-            scenarioContext.ScenarioContainer.Dispose();
+            await scenarioContext.ScenarioContainer.DisposeAsync();
 
             displosableInstance.WasDisposed.Should().BeTrue();
         }

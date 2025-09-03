@@ -291,13 +291,13 @@ public class TestRunnerManagerTests : IAsyncLifetime
     {
         var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder());
         await testRunner1.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
-        testRunner1.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null), null);
+        await testRunner1.OnScenarioInitializeAsync(new ScenarioInfo("foo", "foo_desc", null, null), null);
         await testRunner1.OnScenarioStartAsync();
         var tracer1 = testRunner1.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
 
         var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder());
         await testRunner2.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
-        testRunner2.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null), null);
+        await testRunner2.OnScenarioInitializeAsync(new ScenarioInfo("foo", "foo_desc", null, null), null);
         await testRunner1.OnScenarioStartAsync();
         var tracer2 = testRunner2.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
 
@@ -316,7 +316,7 @@ public class TestRunnerManagerTests : IAsyncLifetime
         // Feature 1 started
         var testRunnerFeature1Scenario = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder(), featureHint: feature1);
         await testRunnerFeature1Scenario.OnFeatureStartAsync(feature1);
-        testRunnerFeature1Scenario.OnScenarioInitialize(new ScenarioInfo("foo1.1", "foo_desc", null, null), null);
+        await testRunnerFeature1Scenario.OnScenarioInitializeAsync(new ScenarioInfo("foo1.1", "foo_desc", null, null), null);
         await testRunnerFeature1Scenario.OnScenarioStartAsync();
         await testRunnerFeature1Scenario.OnScenarioEndAsync();
         TestRunnerManager.ReleaseTestRunner(testRunnerFeature1Scenario);
@@ -326,7 +326,7 @@ public class TestRunnerManagerTests : IAsyncLifetime
         var testRunnerFeature2Scenario = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder(), featureHint: feature2);
         testRunnerFeature2Scenario.Should().NotBeSameAs(testRunnerFeature1Scenario, because: "because one testrunner should be reserved for feature1");
         await testRunnerFeature2Scenario.OnFeatureStartAsync(feature2);
-        testRunnerFeature2Scenario.OnScenarioInitialize(new ScenarioInfo("foo2.1", "foo_desc", null, null), null);
+        await testRunnerFeature2Scenario.OnScenarioInitializeAsync(new ScenarioInfo("foo2.1", "foo_desc", null, null), null);
         await testRunnerFeature2Scenario.OnScenarioStartAsync();
         await testRunnerFeature2Scenario.OnScenarioEndAsync();
         TestRunnerManager.ReleaseTestRunner(testRunnerFeature2Scenario);
