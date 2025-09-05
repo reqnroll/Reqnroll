@@ -1,5 +1,13 @@
 # [vNext]
 
+## Improvements:
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.0.1 - 2025-09-05
+
 ## Bug fixes:
 
 * Fix: Formatters: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
