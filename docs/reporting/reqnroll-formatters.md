@@ -130,3 +130,47 @@ The created formatter can be enabled with a `custom` section in the configuratio
 ```
 
 For a complete example that contains a custom formatter, please check our [Custom Formatter Test Project](https://github.com/reqnroll/Reqnroll.ExploratoryTestProjects/tree/main/ReqnrollFormatters/ReqnrollFormatters.Custom).
+
+## Troubleshooting formatter errors
+
+In order to diagnose formatter errors you can enable formatter logging.
+
+```{warning}
+The formatter logging infrastructure is experimental. In later versions we will provide easier configuration. The method described here might also change even during minor version updates. 
+```
+
+In order to enable formatter log, you need to add the following class to your project. The class is a simple [Reqnroll runtime plugin](../extend/plugins.md#runtime-plugins) that configures a formatter logger.
+
+```{code-block} c#
+:caption: EnableFormatterLogPlugin.cs
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Plugins;
+using Reqnroll.UnitTestProvider;
+
+[assembly: RuntimePlugin(typeof(EnableFormatterLogPlugin))]
+
+namespace Reqnroll.Formatters.RuntimeSupport;
+
+public class EnableFormatterLogPlugin : IRuntimePlugin
+{
+    public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
+    {
+        runtimePluginEvents.CustomizeGlobalDependencies += (_, args) =>
+        {
+            args.ObjectContainer.RegisterTypeAs<TraceListenerFormatterLog, IFormatterLog>();
+        };
+    }
+}
+```
+
+Once the formatter log is enabled, you can run the tests in with verbose console mode and investigate the result if you see any errors.
+
+```
+dotnet test --logger "console;verbosity=detailed"
+```
+
+Because the lengthy log, it is recommended to save the console output to a file.
+
+```
+dotnet test --logger "console;verbosity=detailed" > log.txt
+```
