@@ -1,15 +1,13 @@
 # [vNext]
 
-## Improvements:
-* Formatters: Upgraded conformance test to Cucumber/Cucumber-compatibility-Kit v21.0.0
-
 ## Bug fixes:
 
-* Fix: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
-* Fix: Build URL is invalid in HTML report for Azure DevOps builds (#795)
+* Fix: Formatters: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
+* Fix: Formatters: Build URL is invalid in HTML report for Azure DevOps builds (#795)
 * Fix: Build fails with "error CS8103: Combined length of user strings used by the program exceeds allowed limit." when a project contains many long feature files. (#785)
 * Fix: Embedded feature file resource generates different resource names in Windows/Linux (#799)
 * Fix: Formatters: The Build Info banner of HTML reports shows UNKNOWN banner when the Build Server cannot be determined (#800)
+* Fix: Formatters: Success flag in `TestRunFinished` Cucumber message is set to true when before/after test run hook fails (Cucumber/Cucumber-compatibility-Kit v21.0.0) (#801)
 
 *Contributors of this release (in alphabetical order):* @gasparnagy, @clrudolphi
 
