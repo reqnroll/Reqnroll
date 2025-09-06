@@ -35,6 +35,16 @@
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
+    <ProjectReference
+      Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
+      Private="false"
+      ReferenceOutputAssembly="false"
+      CopyLocalSatelliteAssemblies="false" />
+    <ProjectReference
+      Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj"
+      Private="false"
+      ReferenceOutputAssembly="false"
+      CopyLocalSatelliteAssemblies="false" />
   </ItemGroup>
 
   <ItemGroup>
@@ -58,26 +68,11 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="PreBuild">
-    <MSBuild Projects="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
-    <MSBuild Projects="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
-  </Target>
-
   <ItemGroup>
     <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
-  <Import Project="..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" /> <!-- has to be before the PropertyGroup change-->
-  <Import Project="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\build\Reqnroll.MsTest.targets" /> <!-- has to be before the PropertyGroup change-->
-  <PropertyGroup>
-    <BuildDependsOn>
-      PreBuild;
-      $(BuildDependsOn)
-    </BuildDependsOn>
-    <RebuildDependsOn>
-      PreBuild;
-      $(RebuildDependsOn)
-    </RebuildDependsOn>
-  </PropertyGroup>
+  <Import Project="..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
+  <Import Project="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\build\Reqnroll.MsTest.targets" />
 
 </Project>
