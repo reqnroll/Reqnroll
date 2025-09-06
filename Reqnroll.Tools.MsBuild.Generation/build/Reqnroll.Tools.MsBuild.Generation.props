@@ -69,18 +69,6 @@
 
   </ItemGroup>
 
-
-  <PropertyGroup>
-    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_Reqnroll_TaskFolder)' == ''">netstandard2.0</_Reqnroll_TaskFolder>
-    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_Reqnroll_TaskFolder)' == ''">net462</_Reqnroll_TaskFolder>
-    <_Reqnroll_TaskAssembly Condition=" '$(_Reqnroll_TaskAssembly)' == '' ">..\tasks\$(_Reqnroll_TaskFolder)\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
-
-    <!-- Using `TaskHostFactory` ensures that the task assembly will not be locked by Visual Studio on Windows. See: https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-configure-targets-and-tasks?view=vs-2022#task-factories -->
-    <!-- Note: `TaskHostFactory` is not compatible with some macOS versions. https://github.com/reqnroll/Reqnroll/issues/152 -->
-    <_Reqnroll_TaskFactory Condition="'$(_Reqnroll_TaskFactory)' == '' And $([MSBuild]::IsOsPlatform('Windows'))">TaskHostFactory</_Reqnroll_TaskFactory>
-    <_Reqnroll_TaskFactory Condition="'$(_Reqnroll_TaskFactory)' == '' And !($([MSBuild]::IsOsPlatform('Windows')))">AssemblyTaskFactory</_Reqnroll_TaskFactory>
-  </PropertyGroup>
-
   <Import Project="Reqnroll.Tools.MsBuild.Generation.tasks" Condition="'$(_ReqnrollTasksImported)' =='' " />
 
 </Project>
