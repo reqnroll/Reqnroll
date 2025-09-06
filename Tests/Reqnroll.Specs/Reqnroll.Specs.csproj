@@ -1,7 +1,17 @@
 ﻿<Project>
 
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
-  <Import Project="build/Reqnroll.Tools.MsBuild.Generation.OwnTests.props" />
+
+  <PropertyGroup>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</ReqnrollTestTFM>
+    <ReqnrollGenerationProjectDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectDir>
+    <ReqnrollGenerationTasksDir>$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksDir>
+  </PropertyGroup>
+
+  <Import
+    Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.props"
+    Condition="'$(ReqnrollGenerationPropsImported)' != 'true'"/>
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -60,8 +70,18 @@
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
-  <Target Name="WriteNuGetVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs" OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs" TextToReplace="NUGET_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
+  <Target
+    Name="WriteNuGetVersion"
+    AfterTargets="GetBuildVersion"
+    BeforeTargets="BeforeCompile"
+    Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
+    
+    <ReplaceTextInFileTask
+      InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs"
+      OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs"
+      TextToReplace="NUGET_VERSION"
+      TextToReplaceWith="$(PackageVersion)"
+      WriteOnlyWhenChanged="true" />
 
     <ItemGroup>
       <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs" />
@@ -72,7 +92,7 @@
     <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
-  <Import Project="..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
+  <Import Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.targets" />
   <Import Project="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\build\Reqnroll.MsTest.targets" />
 
 </Project>
