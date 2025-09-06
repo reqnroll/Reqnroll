@@ -1,10 +1,11 @@
 <Project>
 
-  <Import Project="Reqnroll.Tools.MsBuild.Generation.props" Condition="'$(_ReqnrollPropsImported)'==''"/>
-
   <PropertyGroup>
     <_Reqnroll_Tools_MsBuild_Generation_Imported>true</_Reqnroll_Tools_MsBuild_Generation_Imported>
   </PropertyGroup>
+
+  <UsingTask TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask" AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)" TaskFactory="$(ReqnrollGenerationTaskFactory)" />
+  <UsingTask TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask" AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)" TaskFactory="$(ReqnrollGenerationTaskFactory)" />
 
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
