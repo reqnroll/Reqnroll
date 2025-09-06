@@ -28,6 +28,7 @@
       TextToReplace="PROJECT_ROOT_NAMESPACE"
       TextToReplaceWith="$(_Reqnroll_EffectiveRootNamespace.Replace('.', '_'))"
       WriteOnlyWhenChanged="true" />
+    
     <ItemGroup Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'">
       <Compile Include="$(GeneratedReqnrollAssemblyHooksFile)"/>
     </ItemGroup>
