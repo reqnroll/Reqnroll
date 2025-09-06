@@ -2,22 +2,17 @@
 
   <PropertyGroup>
     <_Reqnroll_Tools_MsBuild_Generation_Imported>true</_Reqnroll_Tools_MsBuild_Generation_Imported>
-
-    <!-- Stops tasks being loaded immediately and defers them to being loaded by a target -->
-    <_ReqnrollDeferTaskLoading>false</_ReqnrollDeferTaskLoading>
   </PropertyGroup>
 
   <UsingTask
     TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask"
     AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
-    TaskFactory="$(ReqnrollGenerationTaskFactory)"
-    Condition="'$(_ReqnrollDeferTaskLoading)' == 'false'" />
+    TaskFactory="$(ReqnrollGenerationTaskFactory)" />
   
   <UsingTask
     TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask"
     AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
-    TaskFactory="$(ReqnrollGenerationTaskFactory)"
-    Condition="'$(_ReqnrollDeferTaskLoading)' == 'false'" />
+    TaskFactory="$(ReqnrollGenerationTaskFactory)" />
 
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
@@ -34,13 +29,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <BuildDependsOn>
-      BeforeUpdateFeatureFilesInProject;
-      UpdateFeatureFilesInProject;
-      IncludeCodeBehindFilesInProject;
-      AfterUpdateFeatureFilesInProject;
-      $(BuildDependsOn)
-    </BuildDependsOn>
     <CleanDependsOn>
       CleanFeatureFilesInProject;
       $(CleanDependsOn)
@@ -77,20 +65,8 @@
     </PropertyGroup>
   </Target>
 
-  <Target Name="LoadReqnrollTasks" Condition="'$(_ReqnrollDeferTaskLoading)' == 'true'">
-    <UsingTask
-      TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask"
-      AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
-      TaskFactory="$(ReqnrollGenerationTaskFactory)" />
-
-    <UsingTask
-      TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask"
-      AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
-      TaskFactory="$(ReqnrollGenerationTaskFactory)" />
-  </Target>
-
   <Target Name="UpdateFeatureFilesInProject"
-          DependsOnTargets="BeforeUpdateFeatureFilesInProject;LoadReqnrollTasks">
+          DependsOnTargets="BeforeUpdateFeatureFilesInProject">
 
     <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
 
@@ -163,11 +139,14 @@
 
   </Target>
 
-  <Target Name="BeforeUpdateFeatureFilesInProject">
+  <Target Name="BeforeUpdateFeatureFilesInProject" BeforeTargets="UpdateFeatureFilesInProject">
 
   </Target>
 
-  <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject">
+  <Target
+    Name="IncludeCodeBehindFilesInProject"
+    DependsOnTargets="UpdateFeatureFilesInProject"
+    BeforeTargets="CoreCompile">
     <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
       <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
@@ -185,7 +164,10 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject">
+  <Target
+    Name="AfterUpdateFeatureFilesInProject"
+    DependsOnTargets="IncludeCodeBehindFilesInProject"
+    AfterTargets="IncludeCodeBehindFilesInProject">
     <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
   </Target>
 
