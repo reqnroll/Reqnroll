@@ -1,18 +1,16 @@
 <Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
 
-  <PropertyGroup>
-    <_ReqnrollTasksImported>true</_ReqnrollTasksImported>
-  </PropertyGroup>
-
   <Import Project="../../../Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.props" />
 
   <PropertyGroup>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
-    <_Reqnroll_Needed_MSBuildGenerator Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</_Reqnroll_Needed_MSBuildGenerator>
+    <ReqnrollTestTFM Condition=" '$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition=" '$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</ReqnrollTestTFM>
   </PropertyGroup>
+  
   <PropertyGroup>
-    <_Reqnroll_TaskAssembly>$(MSBuildThisFileDirectory)../../../Reqnroll.Tools.MsBuild.Generation/bin/$(Configuration)/$(_Reqnroll_Needed_MSBuildGenerator)/tasks/Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
+    <ReqnrollTasksDir>$(MSBuildThisFileDirectory)../../../Reqnroll.Tools.MsBuild.Generation/bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollTasksDir>
   </PropertyGroup>
-  <Import Project="Reqnroll.Tools.MsBuild.Generation.OwnTests.tasks" Condition="'$(_ReqnrollTasksOwnTestImported)' =='' " />
+
+  <Import Project="../../../Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.tasks"/>
 
 </Project>
