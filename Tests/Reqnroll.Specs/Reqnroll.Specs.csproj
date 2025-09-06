@@ -7,6 +7,7 @@
     <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</ReqnrollTestTFM>
     <ReqnrollGenerationProjectDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectDir>
     <ReqnrollGenerationTasksDir>$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksDir>
+    <_ReqnrollDeferTaskLoading>true</_ReqnrollDeferTaskLoading>
   </PropertyGroup>
 
   <Import
@@ -72,6 +73,7 @@
 
   <Target
     Name="WriteNuGetVersion"
+    DependsOnTargets="LoadReqnrollTasks"
     AfterTargets="GetBuildVersion"
     BeforeTargets="BeforeCompile"
     Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
@@ -89,7 +91,7 @@
   </Target>
 
   <ItemGroup>
-    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" />
+    <ReqnrollGeneratorPlugins Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
   <Import Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.targets" />

@@ -2,10 +2,22 @@
 
   <PropertyGroup>
     <_Reqnroll_Tools_MsBuild_Generation_Imported>true</_Reqnroll_Tools_MsBuild_Generation_Imported>
+
+    <!-- Stops tasks being loaded immediately and defers them to being loaded by a target -->
+    <_ReqnrollDeferTaskLoading>false</_ReqnrollDeferTaskLoading>
   </PropertyGroup>
 
-  <UsingTask TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask" AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)" TaskFactory="$(ReqnrollGenerationTaskFactory)" />
-  <UsingTask TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask" AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)" TaskFactory="$(ReqnrollGenerationTaskFactory)" />
+  <UsingTask
+    TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask"
+    AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+    TaskFactory="$(ReqnrollGenerationTaskFactory)"
+    Condition="'$(_ReqnrollDeferTaskLoading)' == 'false'" />
+  
+  <UsingTask
+    TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask"
+    AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+    TaskFactory="$(ReqnrollGenerationTaskFactory)"
+    Condition="'$(_ReqnrollDeferTaskLoading)' == 'false'" />
 
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
@@ -65,9 +77,20 @@
     </PropertyGroup>
   </Target>
 
+  <Target Name="LoadReqnrollTasks" Condition="'$(_ReqnrollDeferTaskLoading)' == 'true'">
+    <UsingTask
+      TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask"
+      AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+      TaskFactory="$(ReqnrollGenerationTaskFactory)" />
+
+    <UsingTask
+      TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask"
+      AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+      TaskFactory="$(ReqnrollGenerationTaskFactory)" />
+  </Target>
 
   <Target Name="UpdateFeatureFilesInProject"
-          DependsOnTargets="BeforeUpdateFeatureFilesInProject">
+          DependsOnTargets="BeforeUpdateFeatureFilesInProject;LoadReqnrollTasks">
 
     <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
 

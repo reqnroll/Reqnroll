@@ -7,11 +7,10 @@
     <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</ReqnrollTestTFM>
     <ReqnrollGenerationProjectDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectDir>
     <ReqnrollGenerationTasksDir>$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksDir>
+    <_ReqnrollDeferTaskLoading>true</_ReqnrollDeferTaskLoading>
   </PropertyGroup>
 
-  <Import
-    Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.props"
-    Condition="'$(ReqnrollGenerationPropsImported)' != 'true'"/>
+  <Import Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.props" Condition="'$(ReqnrollGenerationPropsImported)' != 'true'" />
   
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -31,33 +30,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\Reqnroll.Assist.Dynamic\Reqnroll.Assist.Dynamic.csproj" />
+    <ProjectReference Include="..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
+      <Private>false</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj" />
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
 
-  <Target Name="PreBuild">
-    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" ContinueOnError="false" Properties="TargetFramework=$(_Reqnroll_Needed_MSBuildGenerator)" />
-    <MSBuild Projects="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj" ContinueOnError="false" Properties="TargetFramework=netstandard2.0" />
-  </Target>
-
   <ItemGroup>
-    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.NUnit.Generator.ReqnrollPlugin.dll" />
+    <ReqnrollGeneratorPlugins Include="..\..\Reqnroll.NUnit.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.NUnit.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
-  <Import Project="..\..\..\Reqnroll.Tools.MsBuild.Generation\build\Reqnroll.Tools.MsBuild.Generation.targets" />
-  <!-- has to be before the PropertyGroup change-->
-  <PropertyGroup>
-    <BuildDependsOn>
-      PreBuild;
-      $(BuildDependsOn)
-    </BuildDependsOn>
-    <RebuildDependsOn>
-      PreBuild;
-      $(RebuildDependsOn)
-    </RebuildDependsOn>
-  </PropertyGroup>
+  <Import Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.targets" />
 
   <ItemGroup>
     <None Update="reqnroll.json">

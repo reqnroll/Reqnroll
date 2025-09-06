@@ -30,16 +30,11 @@
     <ProjectReference Include="..\..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj" />
 
-    <ProjectReference
-      Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
-      Private="false"
-      ReferenceOutputAssembly="false"
-      CopyLocalSatelliteAssemblies="false" />
-    <ProjectReference
-      Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj"
-      Private="false"
-      ReferenceOutputAssembly="false"
-      CopyLocalSatelliteAssemblies="false" />
+    <ProjectReference Include="..\..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
+      <Private>false</Private>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+    </ProjectReference>
   </ItemGroup>
 
   <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
