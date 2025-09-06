@@ -30,8 +30,21 @@
     <_Reqnroll_EffectiveRootNamespace Condition="'$(RootNamespace)' == ''">Reqnroll.GeneratedTests</_Reqnroll_EffectiveRootNamespace>
   </PropertyGroup>
 
-  <Target Name="GenerateReqnrollAssemblyHooksFileTask" Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_Reqnroll_Tools_MsBuild_Generation_Imported)' == 'true'">
-    <ReplaceTokenInFileTask Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'" InputFile="$(SourceReqnrollAssemblyHooksFile)" OutputFile="$(GeneratedReqnrollAssemblyHooksFile)" TextToReplace="PROJECT_ROOT_NAMESPACE" TextToReplaceWith="$(_Reqnroll_EffectiveRootNamespace.Replace('.', '_'))" WriteOnlyWhenChanged="true" />
+  <Target
+    Name="GenerateReqnrollAssemblyHooksFileTask"
+    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_Reqnroll_Tools_MsBuild_Generation_Imported)' == 'true'">
+
+    <Message Importance="high" Text="$(ReqnrollGenerationTasksDir)" />
+    <Message Importance="high" Text="$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/" />
+    
+    <ReplaceTokenInFileTask
+      Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'"
+      InputFile="$(SourceReqnrollAssemblyHooksFile)"
+      OutputFile="$(GeneratedReqnrollAssemblyHooksFile)"
+      TextToReplace="PROJECT_ROOT_NAMESPACE"
+      TextToReplaceWith="$(_Reqnroll_EffectiveRootNamespace.Replace('.', '_'))"
+      WriteOnlyWhenChanged="true" />
+    
     <ItemGroup Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'">
       <Compile Include="$(GeneratedReqnrollAssemblyHooksFile)"/>
     </ItemGroup>
