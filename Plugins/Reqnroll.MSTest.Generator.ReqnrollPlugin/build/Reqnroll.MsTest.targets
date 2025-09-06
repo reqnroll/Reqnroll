@@ -33,9 +33,6 @@
   <Target
     Name="GenerateReqnrollAssemblyHooksFileTask"
     Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_Reqnroll_Tools_MsBuild_Generation_Imported)' == 'true'">
-
-    <Message Importance="high" Text="$(ReqnrollGenerationTasksDir)" />
-    <Message Importance="high" Text="$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/" />
     
     <ReplaceTokenInFileTask
       Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'"
