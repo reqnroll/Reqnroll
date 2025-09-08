@@ -13,6 +13,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+    <GenerateDependencyFile>false</GenerateDependencyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <!-- NuGet package metadata -->
@@ -33,25 +34,40 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);MarkTaskAssembliesForPack</TargetsForTfmSpecificBuildOutput>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);ResolveRequiredReferences</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
-  <!-- Includes assemblies referenced in packages -->
-  <Target Name="MarkTaskAssembliesForPack" BeforeTargets="CollectPackFiles" DependsOnTargets="ResolveReferences">
+  <!-- Filters the list of referenced assemblies to exclude ones that should be provided by the MSBuild host process. -->
+  <Target Name="ResolveRequiredReferences">
 
     <ItemGroup>
-      <RuntimeAssembly Include="@(ReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.dll'" />
-
-      <!-- Exclude all assemblies starting "System." -->
-      <RuntimeAssembly
-        Remove="@(RuntimeAssembly)"
-        Condition="$([System.Text.RegularExpressions.Regex]::IsMatch('%(Filename)', '^System\.'))" />
+      <!-- Remove system assemblies. -->
+      <ReferenceCopyLocalPaths
+        Remove="@(ReferenceCopyLocalPaths)"
+        Condition="$([System.String]::Copy(%(Filename)).StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
+      
+      <!-- Remove Visual Studio assemblies. -->
+      <ReferenceCopyLocalPaths
+        Remove="@(ReferenceCopyLocalPaths)"
+        Condition="$([System.String]::Copy(%(Filename)).StartsWith('Microsoft.VisualStudio'))" />
+      
+      <!-- Remove netstandard -->
+      <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'netstandard'" />
+      
     </ItemGroup>
+    
+  </Target>
+
+  <!-- Include runtime assemblies in the package. -->
+  <Target
+    Name="MarkTaskAssembliesForPack"
+    AfterTargets="CoreCompile"
+    DependsOnTargets="ResolveRequiredReferences">
     
     <ItemGroup>
       <BuildOutputInPackage 
-        Include="@(RuntimeAssembly)"
-        TargetPath="%(RuntimeAssembly.DestinationSubPath)"/>
+        Include="@(ReferenceCopyLocalPaths)"
+        TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)"/>
     </ItemGroup>
   </Target>
 
