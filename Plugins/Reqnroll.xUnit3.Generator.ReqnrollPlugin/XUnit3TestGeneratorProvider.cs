@@ -32,6 +32,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     private const string CATEGORY_PROPERTY_NAME = "Category";
     private const string TRAIT_DESCRIPTION_ATTRIBUTE = "Description";
     private const string DISPLAY_NAME_PROPERTY = "DisplayName";
+    private const string IGNORE_TEST_CLASS = "IgnoreTestClass";
 
     public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests;
 
@@ -65,11 +66,18 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestClassIgnore(TestClassGenerationContext generationContext)
     {
-        throw new System.NotImplementedException();
+        // The individual tests have to get Skip argument in their attributes
+        // xUnit does not provide a way to Skip an entire test class
+        // This is handled in FinalizeTestClass
+            
+        // Store in custom data that the test class should be ignored
+        generationContext.CustomData.Add(IGNORE_TEST_CLASS, true);
     }
 
     public void FinalizeTestClass(TestClassGenerationContext generationContext)
     {
+        IgnoreFeature(generationContext);
+        
         // testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<ITestOutputHelper>(_testOutputHelper);
         generationContext.ScenarioInitializeMethod.Statements.Add(
             new CodeMethodInvokeExpression(
@@ -83,10 +91,10 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
                     new CodeTypeReference(OUTPUT_INTERFACE)),
                 new CodeVariableReferenceExpression("_testOutputHelper")));
     }
-
+    
     public void SetTestClassNonParallelizable(TestClassGenerationContext generationContext)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     public void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
@@ -269,7 +277,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void MarkCodeMethodInvokeExpressionAsAwait(CodeMethodInvokeExpression expression)
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
 
     private CodeTypeReference CreateFixtureInterface(TestClassGenerationContext generationContext, CodeTypeReference fixtureDataType)
@@ -351,6 +359,54 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
         method.Statements.Add(
             GetTryCatchStatementWithCombinedErrors(callTestInitializeMethodExpression, callDisposeException));
+    }
+    
+    private void IgnoreFeature(TestClassGenerationContext generationContext)
+    {
+        bool featureHasIgnoreTag = generationContext.CustomData.TryGetValue(IGNORE_TEST_CLASS, out object featureHasIgnoreTagValue) && (bool)featureHasIgnoreTagValue;
+
+        if (!featureHasIgnoreTag)
+        {
+            return;
+        }
+
+        //Ignore all test methods
+        foreach (CodeTypeMember member in generationContext.TestClass.Members)
+        {
+            if (member is CodeMemberMethod method && !IsTestMethodAlreadyIgnored(method))
+            {
+                SetTestMethodIgnore(generationContext, method);
+            }
+        }
+
+        //Clear FixtureData method statements to skip the Before/AfterFeature hooks
+        foreach (CodeTypeMember member in _currentFixtureDataTypeDeclaration.Members)
+        {
+            if (member is CodeMemberMethod method)
+            {
+                method.Statements.Clear();
+            }
+        }
+    }
+
+    private bool IsTestMethodAlreadyIgnored(CodeMemberMethod testMethod)
+    {
+        var factAttr = testMethod.CustomAttributes.OfType<CodeAttributeDeclaration>()
+                                 .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == FACT_ATTRIBUTE);
+
+        bool? hasIgnoredFact = factAttr?.Arguments
+                                       .OfType<CodeAttributeArgument>()
+                                       .Any(x => string.Equals(x.Name, SKIP_PROPERTY_NAME, StringComparison.InvariantCultureIgnoreCase));
+
+        var theoryAttr = testMethod.CustomAttributes
+                                   .OfType<CodeAttributeDeclaration>()
+                                   .FirstOrDefault(codeAttributeDeclaration => codeAttributeDeclaration.Name == THEORY_ATTRIBUTE);
+
+        bool? hasIgnoredTheory = theoryAttr?.Arguments
+                                           .OfType<CodeAttributeArgument>()
+                                           .Any(x => string.Equals(x.Name, SKIP_PROPERTY_NAME, StringComparison.InvariantCultureIgnoreCase));
+
+        return hasIgnoredFact.GetValueOrDefault() || hasIgnoredTheory.GetValueOrDefault();
     }
 
     private void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
