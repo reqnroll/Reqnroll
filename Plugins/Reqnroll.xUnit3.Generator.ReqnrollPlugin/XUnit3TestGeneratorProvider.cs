@@ -62,7 +62,7 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     {
         foreach (string category in featureCategories)
         {
-            SetProperty(_currentFixtureDataTypeDeclaration, CATEGORY_PROPERTY_NAME, category);
+            SetProperty(generationContext.TestClass, CATEGORY_PROPERTY_NAME, category);
         }
     }
 
