@@ -232,6 +232,10 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestMethodCategories(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> scenarioCategories)
     {
+        foreach (string str in scenarioCategories)
+        {
+            SetProperty(testMethod, CATEGORY_PROPERTY_NAME, str);
+        }
     }
 
     public void SetTestMethodIgnore(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
