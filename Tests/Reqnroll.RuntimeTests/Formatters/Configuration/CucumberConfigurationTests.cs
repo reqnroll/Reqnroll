@@ -8,22 +8,23 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration;
 public class CucumberConfigurationTests
 {
     private readonly Mock<IFormattersConfigurationDisableOverrideProvider> _disableOverrideProviderMock;
-    private readonly Mock<IFormattersConfigurationResolver> _fileResolverMock;
-    private readonly Mock<IFormattersEnvironmentOverrideConfigurationResolver> _environmentResolverMock;
+    private readonly Mock<IFileBasedConfigurationResolver> _fileResolverMock;
+    private readonly Mock<IJsonEnvironmentConfigurationResolver> _environmentResolverMock;
     private readonly FormattersConfigurationProvider _sut;
 
     public CucumberConfigurationTests()
     {
         _disableOverrideProviderMock = new Mock<IFormattersConfigurationDisableOverrideProvider>();
-        _fileResolverMock = new Mock<IFormattersConfigurationResolver>();
-        _environmentResolverMock = new Mock<IFormattersEnvironmentOverrideConfigurationResolver>();
+        _fileResolverMock = new Mock<IFileBasedConfigurationResolver>();
+        _environmentResolverMock = new Mock<IJsonEnvironmentConfigurationResolver>();
+        var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
+        keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
 
-        var resolvers = new Dictionary<string, IFormattersConfigurationResolver>
-        {
-            { "fileBasedResolver",  _fileResolverMock.Object }
-        };
-
-        _sut = new FormattersConfigurationProvider(resolvers, _environmentResolverMock.Object, _disableOverrideProviderMock.Object);
+        _sut = new FormattersConfigurationProvider(
+            _fileResolverMock.Object,
+            _environmentResolverMock.Object,
+            keyValueEnvironmentConfigurationResolverMock.Object,
+            _disableOverrideProviderMock.Object);
     }
 
     [Fact]

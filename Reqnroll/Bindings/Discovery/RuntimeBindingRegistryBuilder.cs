@@ -1,11 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using Reqnroll.Bindings.Provider;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 using Reqnroll.PlatformCompatibility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 
 namespace Reqnroll.Bindings.Discovery
 {
@@ -15,13 +16,15 @@ namespace Reqnroll.Bindings.Discovery
         private readonly IReqnrollAttributesFilter _reqnrollAttributesFilter;
         private readonly IBindingAssemblyLoader _bindingAssemblyLoader;
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
+        private readonly IBindingProviderService _bindingProviderService;
 
-        public RuntimeBindingRegistryBuilder(IRuntimeBindingSourceProcessor bindingSourceProcessor, IReqnrollAttributesFilter reqnrollAttributesFilter, IBindingAssemblyLoader bindingAssemblyLoader, ReqnrollConfiguration reqnrollConfiguration)
+        public RuntimeBindingRegistryBuilder(IRuntimeBindingSourceProcessor bindingSourceProcessor, IReqnrollAttributesFilter reqnrollAttributesFilter, IBindingAssemblyLoader bindingAssemblyLoader, ReqnrollConfiguration reqnrollConfiguration, IBindingProviderService bindingProviderService)
         {
             _bindingSourceProcessor = bindingSourceProcessor;
             _reqnrollAttributesFilter = reqnrollAttributesFilter;
             _bindingAssemblyLoader = bindingAssemblyLoader;
             _reqnrollConfiguration = reqnrollConfiguration;
+            _bindingProviderService = bindingProviderService;
         }
 
         public Assembly[] GetBindingAssemblies(Assembly testAssembly)
@@ -63,6 +66,7 @@ namespace Reqnroll.Bindings.Discovery
         public void BuildingCompleted()
         {
             _bindingSourceProcessor.BuildingCompleted();
+            _bindingProviderService.OnBindingRegistryBuildingCompleted();
         }
 
         //internal - for testing

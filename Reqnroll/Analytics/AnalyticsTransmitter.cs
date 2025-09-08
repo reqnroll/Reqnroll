@@ -26,6 +26,11 @@ namespace Reqnroll.Analytics
             return await TransmitEventAsync(projectRunningEvent);
         }
 
+        public async Task<IResult> TransmitReqnrollFeatureUseEventAsync(ReqnrollFeatureUseEvent featureUseEvent)
+        {
+            return await TransmitEventAsync(featureUseEvent);
+        }
+
         public async Task<IResult> TransmitEventAsync(IAnalyticsEvent analyticsEvent)
         {
             if (!IsEnabled)

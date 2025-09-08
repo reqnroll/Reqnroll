@@ -5,6 +5,7 @@ using Moq;
 using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Discovery;
+using Reqnroll.Bindings.Provider;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 
@@ -226,7 +227,7 @@ namespace Reqnroll.RuntimeTests
 
         private RuntimeBindingRegistryBuilder CreateSut()
         {
-            return new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter(), new Mock<IBindingAssemblyLoader>().Object, ConfigurationLoader.GetDefault());
+            return new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter(), new Mock<IBindingAssemblyLoader>().Object, ConfigurationLoader.GetDefault(), new Mock<IBindingProviderService>().Object);
         }
 
         [Fact]

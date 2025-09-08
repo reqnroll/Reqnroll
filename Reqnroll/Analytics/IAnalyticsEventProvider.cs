@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Reqnroll.Analytics
 {
     public interface IAnalyticsEventProvider
@@ -10,5 +12,7 @@ namespace Reqnroll.Analytics
             string projectGuid);
 
         ReqnrollProjectRunningEvent CreateProjectRunningEvent(string testAssemblyName);
+
+        ReqnrollFeatureUseEvent CreateFeatureUseEvent(string testAssemblyName, string featureName, Dictionary<string, string> properties, Dictionary<string, double> metrics);
     }
 }

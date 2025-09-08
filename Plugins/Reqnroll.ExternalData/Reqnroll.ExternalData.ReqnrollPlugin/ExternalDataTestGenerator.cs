@@ -3,6 +3,7 @@ using Reqnroll.ExternalData.ReqnrollPlugin.Transformation;
 using Reqnroll.Configuration;
 using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Parser;
@@ -13,8 +14,8 @@ namespace Reqnroll.ExternalData.ReqnrollPlugin
     {
         private readonly IncludeExternalDataTransformation _includeExternalDataTransformation;
 
-        public ExternalDataTestGenerator(ReqnrollConfiguration reqnrollConfiguration, ProjectSettings projectSettings, ITestHeaderWriter testHeaderWriter, ITestUpToDateChecker testUpToDateChecker, IFeatureGeneratorRegistry featureGeneratorRegistry, CodeDomHelper codeDomHelper, IGherkinParserFactory gherkinParserFactory, IncludeExternalDataTransformation includeExternalDataTransformation) 
-            : base(reqnrollConfiguration, projectSettings, testHeaderWriter, testUpToDateChecker, featureGeneratorRegistry, codeDomHelper, gherkinParserFactory)
+        public ExternalDataTestGenerator(ReqnrollConfiguration reqnrollConfiguration, ProjectSettings projectSettings, ITestHeaderWriter testHeaderWriter, ITestUpToDateChecker testUpToDateChecker, IFeatureGeneratorRegistry featureGeneratorRegistry, CodeDomHelper codeDomHelper, IGherkinParserFactory gherkinParserFactory, GeneratorInfo generatorInfo, IncludeExternalDataTransformation includeExternalDataTransformation) 
+            : base(reqnrollConfiguration, projectSettings, testHeaderWriter, testUpToDateChecker, featureGeneratorRegistry, codeDomHelper, gherkinParserFactory, generatorInfo)
         {
             _includeExternalDataTransformation = includeExternalDataTransformation;
         }

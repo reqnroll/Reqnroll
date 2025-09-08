@@ -44,6 +44,80 @@
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @chekkan, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
 
+# v3.0.1 - 2025-09-05
+
+## Bug fixes:
+
+* Fix: Formatters: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
+* Fix: Formatters: Build URL is invalid in HTML report for Azure DevOps builds (#795)
+* Fix: Build fails with "error CS8103: Combined length of user strings used by the program exceeds allowed limit." when a project contains many long feature files. (#785)
+* Fix: Embedded feature file resource generates different resource names in Windows/Linux (#799)
+* Fix: Formatters: The Build Info banner of HTML reports shows UNKNOWN banner when the Build Server cannot be determined (#800)
+* Fix: Formatters: Success flag in `TestRunFinished` Cucumber message is set to true when before/after test run hook fails (Cucumber/Cucumber-compatibility-Kit v21.0.0) (#801)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy, @clrudolphi
+
+# v3.0.0 - 2025-08-21
+
+## New features:
+
+* Formatters: An infrastructure for implementing integrated reporting formatters has been introduced. The infrastructure allows writing custom formatters, but Reqnroll provides two built-in formatters as well: the HTML and Message formatters. (#233)
+    * HTML Formatter: A formatter that can produce single page HTML reports using the [Cucumber React components](https://github.com/cucumber/react-components). This formatter can be used as a replacement for the "SpecFlow+ LivingDoc Generator"
+    * Message Formatter: A formatter that can produce [Cucumber Messages](https://github.com/cucumber/messages/) `.ndjson` file. Cucumber messages contain all information about the test run, therefore this formatter can be used to integrate Reqnroll with other tools.
+* Support for [TUnit test framework](https://tunit.dev/). Use the package `Reqnroll.TUnit` in a TUnit project to enable Reqnroll TUnit support. Can be used with TUnit v0.55.23 and later. (#442)
+* Allow test execution without invoking binding (step definition, hook, step argument transformation) code by setting the `REQNROLL_DRY_RUN` environment variable to `true`. This is useful for quickly verifying if all steps have been defined. (#614)
+
+## Improvements:
+
+* Added `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
+* Assist: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
+* Renamed `Regex` property and `regex` constructor parameter for all step definition attributes to `Expression` and `expression`, as it represents a cucumber expression or a regular expression (regex) that matches the step text. (#639)
+* Added `ExpressionType` option (`CucumberExpression`/`RegularExpression`) to `[Given]`, `[When]` and `[Then]` attributes (#663)
+* Use scenario names for generated MsTest tests instead of the method name (#588)
+* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
+* Warnings can be logged during test generation (build) to indicate potential issues (#624)
+* Upgrade to Gherkin v34 from v30 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#489)
+* Improved test feature context and feature hook handling for non-parallel or class-parallel scenarios where the scenarios of the feature are not executed in sequence (#638)
+* Introduced a new `BuildMetadata` class to encapsulate CI metadata properties such as `ProductName`, `BuildUrl`, `BuildNumber`, `Remote`, `Revision`, `Branch`, and `Tag`. These will be used to populate data in reports (e.g. html and message formatter). (#658)
+* Updated Reqnroll project template to add TUnit test framework support, to remove EOL .NET versions (6.0, 7.0), and to add .NET 9.0 support (#701)
+* Allow detecting skipped or pending execution status by the unit test providers, treat `NotImplementedException` as "pending" (#732)
+* Allow `ScenarioContext`, `FeatureContext` and `TestThreadContext` to be resolved or injected through their interfaces, e.g. `IScenarioContext` (#761)
+* Updated step definition template that is shown on test output when an undefined step is executed by using `PendingStepException` and `IReqnrollOutputHelper`. (#781)
+* Improved performance of test execution by optimizing telemetry sending (#629)
+
+## Improvements for plugins:
+
+* Refactored `ExecutionEvent` classes and event publishing. Events carry more context information; publication is now async. (#621)
+* Provide `AsyncEventHandler` in `RuntimePluginTestExecutionLifecycleEvents` (#634)
+
+## Bug fixes:
+
+* Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
+* Fix: Disposed `ObjectContainer` can be accessed through `RegisterInstanceAs`/`RegisterFactoryAs`/`RegisterTypeAs` (#594)
+* Fix: Namespace clash in generated files if no `RootNamespace` is defined in the project file (#633)
+* Fix: Missing source link and deterministic compilation for `Reqnroll.CustomPlugin` package (#719)
+* Fix: Rule tags are not generated as test categories (#731)
+
+## Deprecations:
+
+* The synchronous test runner API (`ISyncTestRunner`) has been removed. Please use `ITestRunner` instead.
+* The synchronous code invocation API (`IBindingInvoker`) has been deprecated. Please use `IAsyncBindingInvoker` instead.
+* Removed obsolete property `ScenarioInfo.ScenarioAndFeatureTags`. Please use `ScenarioInfo.CombinedTags` instead.
+* Removed obsolete methods on `Reqnroll.Assist.Service` class: `RegisterValueComparer`, `UnregisterValueComparer`, `RegisterValueRetriever`, `UnregisterValueRetriever` use `ValueComparers.Register`, `ValueComparers.Unregister`, `ValueRetrievers.Register`, `ValueRetrievers.Unregister` instead.
+* The methods `ScenarioContext.Pending` and `ScenarioContext.StepIsPending` have been deprecated and going to be removed in v4. Use `throw new PendingStepException()` instead.
+* Removed unused `Culture` property from step definition attributes (`Given`, `When`, `Then`, `StepDefinition`) (#671)
+* Removed `[Serializable]` from Reqnroll exceptions (#738)
+* Removed support for end-of-life .NET frameworks (.NET 6, .NET 7, .NET Core) (#706)
+* Removed deprecated `<summary>` from NuGet packages (#766)
+
+## Breaking changes:
+
+* Renamed `Regex` property and `regex` constructor parameter for all step definition attributes to `Expression` and `expression`, as it represents a cucumber expression or a regular expression (regex) that matches the step text. (#639)
+* Removed unused `Culture` property from step definition attributes (`Given`, `When`, `Then`, `StepDefinition`) (#671)
+* Use scenario names for generated MsTest tests instead of the method name (#588)
+
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @algirdasN, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
+
 # v2.4.1 - 2025-04-29
 
 ## Bug fixes:

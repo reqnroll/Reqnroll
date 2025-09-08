@@ -1,5 +1,3 @@
-﻿using System.Runtime.CompilerServices;
-
 namespace Reqnroll.EnvironmentAccess
 {
     public record BuildMetadata(
@@ -24,7 +22,7 @@ namespace Reqnroll.EnvironmentAccess
                      Branch: "UNKNOWN",
                      Tag: "UNKNOWN")
                 {
-                    ProductName = "UNKNOWN"
+                    ProductName = ""
                 };
             }
         }

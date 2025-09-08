@@ -1,42 +1,34 @@
 using System;
-using System.Reflection;
+using System.Collections.Generic;
 using System.Text;
 using Reqnroll.Analytics.UserId;
 using Reqnroll.UnitTestProvider;
 using System.Runtime.InteropServices;
-using System.Collections.Generic;
 using Reqnroll.EnvironmentAccess;
-using Reqnroll.CommonModels;
 
 namespace Reqnroll.Analytics
 {
-    public class AnalyticsEventProvider : IAnalyticsEventProvider
+    public class AnalyticsEventProvider(IUserUniqueIdStore userUniqueIdStore, UnitTestProviderConfiguration unitTestProviderConfiguration, IEnvironmentInfoProvider environmentInfoProvider)
+        : IAnalyticsEventProvider
     {
-        private readonly IUserUniqueIdStore _userUniqueIdStore;
-        private readonly IEnvironmentInfoProvider _environmentInfoProvider;
-        private readonly string _unitTestProvider;
-
-        public AnalyticsEventProvider(IUserUniqueIdStore userUniqueIdStore, UnitTestProviderConfiguration unitTestProviderConfiguration, IEnvironmentInfoProvider environmentInfoProvider)
-        {
-            _userUniqueIdStore = userUniqueIdStore;
-            _environmentInfoProvider = environmentInfoProvider;
-            _unitTestProvider = unitTestProviderConfiguration.UnitTestProvider;
-        }
+        private readonly string _unitTestProvider = unitTestProviderConfiguration.UnitTestProvider;
+        private readonly string _sessionId = Guid.NewGuid().ToString("N"); // the session ID helps to correlate events in the same execution, e.g. multiple formatter usages
 
         public ReqnrollProjectCompilingEvent CreateProjectCompilingEvent(string msbuildVersion, string assemblyName, string targetFrameworks, string targetFramework, string projectGuid)
         {
-            string userId = _userUniqueIdStore.GetUserId();
+            string userId = userUniqueIdStore.GetUserId();
             string unitTestProvider = _unitTestProvider;
-            string reqnrollVersion = _environmentInfoProvider.GetReqnrollVersion();
-            string buildServerName = _environmentInfoProvider.GetBuildServerName();
-            bool isDockerContainer = _environmentInfoProvider.IsRunningInDockerContainer();
+            string reqnrollVersion = environmentInfoProvider.GetReqnrollVersion();
+            string buildServerName = environmentInfoProvider.GetBuildServerName();
+            bool isDockerContainer = environmentInfoProvider.IsRunningInDockerContainer();
             string hashedAssemblyName = ToSha256(assemblyName);
-            string platform = _environmentInfoProvider.GetOSPlatform();
+            string platform = environmentInfoProvider.GetOSPlatform();
             string platformDescription = RuntimeInformation.OSDescription;
 
             var compiledEvent = new ReqnrollProjectCompilingEvent(
                 DateTime.UtcNow,
                 userId,
+                _sessionId,
                 platform,
                 platformDescription,
                 reqnrollVersion,
@@ -54,20 +46,21 @@ namespace Reqnroll.Analytics
 
         public ReqnrollProjectRunningEvent CreateProjectRunningEvent(string testAssemblyName)
         {
-            string userId = _userUniqueIdStore.GetUserId();
+            string userId = userUniqueIdStore.GetUserId();
             string unitTestProvider = _unitTestProvider;
-            string reqnrollVersion = _environmentInfoProvider.GetReqnrollVersion();
-            string targetFramework = _environmentInfoProvider.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
-            bool isDockerContainer = _environmentInfoProvider.IsRunningInDockerContainer();
-            string buildServerName = _environmentInfoProvider.GetBuildServerName();
+            string reqnrollVersion = environmentInfoProvider.GetReqnrollVersion();
+            string targetFramework = environmentInfoProvider.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
+            bool isDockerContainer = environmentInfoProvider.IsRunningInDockerContainer();
+            string buildServerName = environmentInfoProvider.GetBuildServerName();
 
             string hashedAssemblyName = ToSha256(testAssemblyName);
-            string platform = _environmentInfoProvider.GetOSPlatform();
+            string platform = environmentInfoProvider.GetOSPlatform();
             string platformDescription = RuntimeInformation.OSDescription;
 
             var runningEvent = new ReqnrollProjectRunningEvent(
                 DateTime.UtcNow,
                 userId,
+                _sessionId,
                 platform,
                 platformDescription,
                 reqnrollVersion,
@@ -77,6 +70,38 @@ namespace Reqnroll.Analytics
                 null,
                 targetFramework,
                 isDockerContainer);
+            return runningEvent;
+        }
+
+        public ReqnrollFeatureUseEvent CreateFeatureUseEvent(string testAssemblyName, string featureName, Dictionary<string, string> properties, Dictionary<string, double> metrics)
+        {
+            string userId = userUniqueIdStore.GetUserId();
+            string unitTestProvider = _unitTestProvider;
+            string reqnrollVersion = environmentInfoProvider.GetReqnrollVersion();
+            string targetFramework = environmentInfoProvider.GetNetCoreVersion() ?? RuntimeInformation.FrameworkDescription;
+            bool isDockerContainer = environmentInfoProvider.IsRunningInDockerContainer();
+            string buildServerName = environmentInfoProvider.GetBuildServerName();
+
+            string hashedAssemblyName = ToSha256(testAssemblyName);
+            string platform = environmentInfoProvider.GetOSPlatform();
+            string platformDescription = RuntimeInformation.OSDescription;
+
+            var runningEvent = new ReqnrollFeatureUseEvent(
+                DateTime.UtcNow,
+                userId,
+                _sessionId,
+                platform,
+                platformDescription,
+                reqnrollVersion,
+                unitTestProvider,
+                buildServerName,
+                hashedAssemblyName,
+                null,
+                targetFramework,
+                isDockerContainer,
+                featureName,
+                properties,
+                metrics);
             return runningEvent;
         }
 

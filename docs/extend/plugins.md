@@ -96,7 +96,7 @@ Reqnroll will attempt to find your plugin's dependencies by
 ## Combined Package with both plugins
 
 You can have a single NuGet package that contains both the runtime and generator plugins. 
-We use this approach for the `Reqnroll.xUnit`, `Reqnroll.NUnit` and `Reqnroll.xUnit` packages
+We use this approach for the `Reqnroll.xUnit`, `Reqnroll.NUnit`, `Reqnroll.TUnit` and `Reqnroll.xUnit` packages
 for example.
 
 The combined package can be built from a single project, or from two projects. The latter 

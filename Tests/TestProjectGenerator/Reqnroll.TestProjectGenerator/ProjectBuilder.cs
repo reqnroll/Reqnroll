@@ -20,7 +20,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit4TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit4TestAdapterPackageVersion = "4.6.0";
         public const string TUnitPackageName = "TUnit";
-        public const string TUnitPackageVersion = "0.25.21";
+        public const string TUnitPackageVersion = "0.55.23";
         private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.10";
         private const string XUnit3PackageVersion = "2.0.0";
@@ -378,14 +378,14 @@ namespace Reqnroll.TestProjectGenerator
                 TUnitPackageName,
                 TUnitPackageVersion,
                 new NuGetPackageAssembly(
-                    "TUnit, Version=0.25.21.0, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
+                    "TUnit, Version=0.55.23, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
                     "netstandard2.0\\TUnit.dll")
                 );
             _project.AddNuGetPackage(
                 "Microsoft.Testing.Extensions.TrxReport",
-                "1.6.3.0",
+                "1.8.2.0",
                 new NuGetPackageAssembly(
-                    "Microsoft.Testing.Extensions.TrxReport, Version=1.6.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+                    "Microsoft.Testing.Extensions.TrxReport, Version=1.8.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
                     "netstandard2.0\\Microsoft.Testing.Extensions.TrxReport.dll")
                 );
 

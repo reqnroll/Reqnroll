@@ -225,6 +225,71 @@ jobs:
         if-no-files-found: error
         path: Tests/Reqnroll.Formatters.Tests/bin/
 
+  validate-packages:
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Download packages
+      uses: actions/download-artifact@v4
+      with:
+        name: packages-v${{ needs.build.outputs.product_full_version }}
+        path: GeneratedNuGetPackages/${{ needs.build.outputs.product_configuration }}/
+    - name: Install NuGet Package Validation Tool
+      run: dotnet tool install --global Meziantou.Framework.NuGetPackageValidation.Tool
+    - name: Validate NuGet packages
+      shell: pwsh
+      run: |
+        Write-Output "Validating NuGet packages..."
+        $packages = Get-ChildItem "GeneratedNuGetPackages/${{ needs.build.outputs.product_configuration }}/*.nupkg" -Exclude "*.snupkg"
+        $errorCount = 0
+        $totalPackages = $packages.Count
+        
+        # Determine excluded rules based on branch
+        $excludedRules = @()
+        if ("${{ github.ref }}" -ne "refs/heads/main") {
+          $excludedRules += "AssembliesMustBeOptimized"
+          Write-Output "::notice::Assembly optimization validation skipped for non-main branch"
+        }
+        
+        foreach ($package in $packages) {
+          Write-Output "Validating package: $($package.Name)"
+          try {
+            # Build validation command with conditional exclusions
+            $validationArgs = @($package.FullName)
+            if ($excludedRules.Count -gt 0) {
+              $validationArgs += "--excluded-rules"
+              $validationArgs += ($excludedRules -join ",")
+            }
+            
+            # Run validation
+            $validationResult = & meziantou.validate-nuget-package @validationArgs
+            $exitCode = $LASTEXITCODE
+            
+            if ($exitCode -eq 0) {
+              Write-Output "✅ $($package.Name) passed validation"
+            } else {
+              Write-Output "::warning title=Package Validation Issues::$($package.Name) has validation issues"
+              Write-Output $validationResult
+              # For now, we'll log warnings but not fail the build to allow gradual improvement
+              # This can be changed to fail the build once all validation issues are resolved
+              Write-Output "::notice::Package validation issues detected but not failing build (gradual improvement mode)"
+            }
+          } catch {
+            Write-Output "::error title=Package Validation Error::Error validating $($package.Name): $_"
+            $errorCount++
+          }
+        }
+        
+        if ($errorCount -gt 0) {
+          Write-Output "::error title=Package Validation Failed::$errorCount package(s) had validation errors"
+          exit 1
+        } else {
+          Write-Output "✅ Validation completed for $totalPackages packages"
+          exit 0
+        }
+
   specs:
     runs-on: ubuntu-latest
     needs: build
@@ -418,7 +483,7 @@ jobs:
     
   release:
     runs-on: ubuntu-latest
-    needs: [build, specs, system-tests-windows, system-tests-linux]
+    needs: [build, validate-packages, specs, system-tests-windows, system-tests-linux]
     environment: production_environment
     if: github.ref == 'refs/heads/main' && needs.build.outputs.deploy_packages == 'true'
     permissions:

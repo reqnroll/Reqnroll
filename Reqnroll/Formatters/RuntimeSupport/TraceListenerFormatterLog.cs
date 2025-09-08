@@ -4,9 +4,7 @@ using System.Collections.Generic;
 
 namespace Reqnroll.Formatters.RuntimeSupport;
 
-#pragma warning disable CS9113 // Parameter is unread.
 public class TraceListenerFormatterLog(ITraceListener tl) : IFormatterLog
-#pragma warning restore CS9113 // Parameter is unread.
 {
     private readonly List<string> _entries = new();
     private bool _hasDumped = false;

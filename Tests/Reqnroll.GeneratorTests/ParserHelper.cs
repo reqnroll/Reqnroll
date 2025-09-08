@@ -9,7 +9,7 @@ class ParserHelper
 {
     public static ReqnrollDocument CreateAnyDocument(string[] tags = null, ReqnrollDocumentLocation documentLocation = null)
     {
-        var reqnrollFeature = new ReqnrollFeature(GetTags(tags), new Location(0), null, null, null, null, []);
+        var reqnrollFeature = new ReqnrollFeature(GetTags(tags), new Location(0), "en", "Feature", null, null, []);
         return new ReqnrollDocument(reqnrollFeature, Array.Empty<Comment>(), documentLocation ?? CreateDummyReqnrollLocation());
     }
 

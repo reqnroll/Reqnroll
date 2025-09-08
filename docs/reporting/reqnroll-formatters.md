@@ -6,7 +6,7 @@ Reqnroll formatters are only available in Reqnroll v3.0 or later.
 
 Reqnroll provides a *formatter* infrastructure, similar to [Cucumber formatters](https://cucumber.io/docs/cucumber/reporting/#built-in-reporter-plugins). The formatters can be used to generate reports of the test execution. Reqnroll provides built-in formatters ([HTML](#html-formatter), [Cucumber Messages](#cucumber-messages-formatter)) and can be extended with custom formatters.
 
-In order to generate a report with a formatter, you need to enable it. You can enable multiple formatters as well. The easiest way to enable a formatter is to add a `formatters` section to the `reqnroll.json` configuration file.
+In order to generate a report with a formatter, you need to enable it. You can enable multiple formatters as well. The easiest way to enable a formatter is to add a `formatters` section to the `reqnroll.json` configuration file or with environment variables.
 
 The following example enables the HTML formatter and configures the output file as `reqnroll_report.html`.
 
@@ -19,6 +19,13 @@ The following example enables the HTML formatter and configures the output file 
         "html" : { "outputFilePath" : "reqnroll_report.html" }
     }
 }
+```
+
+The same configuration can be achieved by setting an environment variable before running the tests.
+
+```{code-block} pwsh
+$env:REQNROLL_FORMATTERS_HTML = 'outputFilePath=reqnroll_report.html'
+dotnet test
 ```
 
 See [](../installation/formatter-configuration.md) for further details about formatter configuration.
@@ -123,3 +130,47 @@ The created formatter can be enabled with a `custom` section in the configuratio
 ```
 
 For a complete example that contains a custom formatter, please check our [Custom Formatter Test Project](https://github.com/reqnroll/Reqnroll.ExploratoryTestProjects/tree/main/ReqnrollFormatters/ReqnrollFormatters.Custom).
+
+## Troubleshooting formatter errors
+
+In order to diagnose formatter errors you can enable formatter logging.
+
+```{warning}
+The formatter logging infrastructure is experimental. In later versions we will provide easier configuration. The method described here might also change even during minor version updates. 
+```
+
+In order to enable formatter log, you need to add the following class to your project. The class is a simple [Reqnroll runtime plugin](../extend/plugins.md#runtime-plugins) that configures a formatter logger.
+
+```{code-block} c#
+:caption: EnableFormatterLogPlugin.cs
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Plugins;
+using Reqnroll.UnitTestProvider;
+
+[assembly: RuntimePlugin(typeof(EnableFormatterLogPlugin))]
+
+namespace Reqnroll.Formatters.RuntimeSupport;
+
+public class EnableFormatterLogPlugin : IRuntimePlugin
+{
+    public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
+    {
+        runtimePluginEvents.CustomizeGlobalDependencies += (_, args) =>
+        {
+            args.ObjectContainer.RegisterTypeAs<TraceListenerFormatterLog, IFormatterLog>();
+        };
+    }
+}
+```
+
+Once the formatter log is enabled, you can run the tests in with verbose console mode and investigate the result if you see any errors.
+
+```
+dotnet test --logger "console;verbosity=detailed"
+```
+
+Because the lengthy log, it is recommended to save the console output to a file.
+
+```
+dotnet test --logger "console;verbosity=detailed" > log.txt
+```

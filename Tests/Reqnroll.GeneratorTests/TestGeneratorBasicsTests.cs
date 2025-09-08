@@ -1,12 +1,13 @@
+using FluentAssertions;
+using Moq;
+using Reqnroll.Generator;
+using Reqnroll.Generator.Configuration;
+using Reqnroll.Generator.Interfaces;
+using Reqnroll.GeneratorTests.Helper;
 using System;
 using System.IO;
 using System.Text.RegularExpressions;
-using FluentAssertions;
-using Moq;
 using Xunit;
-using Reqnroll.Generator;
-using Reqnroll.Generator.Interfaces;
-using Reqnroll.GeneratorTests.Helper;
 
 namespace Reqnroll.GeneratorTests
 {
@@ -55,7 +56,7 @@ namespace Reqnroll.GeneratorTests
         public void Should_include_generator_version_in_the_header()
         {
             string outputFile = GenerateTestFromSimpleFeature(net35CSProjectSettings);
-            outputFile.Should().Contain(string.Format("Reqnroll Generator Version:{0}", TestGeneratorFactory.GeneratorVersion));
+            outputFile.Should().Contain(string.Format("Reqnroll Generator Version:{0}", GeneratorInfoProvider.GeneratorVersion));
         }
 
         [Fact]

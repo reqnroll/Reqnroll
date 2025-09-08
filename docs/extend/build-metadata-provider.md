@@ -128,7 +128,7 @@ namespace MyCompany.CustomScm.ReqnrollPlugin
     {
         public void Initialize(RuntimePluginEvents runtimePluginEvents, 
                               RuntimePluginParameters runtimePluginParameters,
-                              UnitTestFeatureGeneratorProviderParameters unitTestFeatureGeneratorProviderParameters)
+                              UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
             // Register our custom implementation in the global container
             runtimePluginEvents.CustomizeGlobalDependencies += (sender, args) =>
