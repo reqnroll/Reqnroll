@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Unnecessary build output messages are shown during build (#815)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy
 
 # v3.0.1 - 2025-09-05
 

@@ -154,9 +154,6 @@
       </EmbeddedResource>
     </ItemGroup>
     
-    <!-- TODO: Remove this Message after Messages Development -->
-    <Message Text="ReqnrollGeneratedNdjsonFiles: @(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Importance="high" />
-
     <ItemGroup>
       <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Condition="'%(ReqnrollGeneratedFiles.EmbeddedMessagesStoragePath)' != ''">
         <LogicalName>%(ReqnrollGeneratedFiles.EmbeddedMessagesResourceName)</LogicalName>
