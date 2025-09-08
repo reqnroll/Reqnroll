@@ -1,7 +1,5 @@
 # [vNext]
 
-## Improvements:
-
 ## Bug fixes:
 
 * Fix: Unnecessary build output messages are shown during build (#815)
