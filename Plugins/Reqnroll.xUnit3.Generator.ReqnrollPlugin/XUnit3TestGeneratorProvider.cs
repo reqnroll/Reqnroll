@@ -33,6 +33,8 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     private const string TRAIT_DESCRIPTION_ATTRIBUTE = "Description";
     private const string DISPLAY_NAME_PROPERTY = "DisplayName";
     private const string IGNORE_TEST_CLASS = "IgnoreTestClass";
+    private const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
+    private const string COLLECTION_ATTRIBUTE = "Xunit.CollectionAttribute";
 
     public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests;
 
@@ -91,10 +93,13 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
                     new CodeTypeReference(OUTPUT_INTERFACE)),
                 new CodeVariableReferenceExpression("_testOutputHelper")));
     }
-    
+
     public void SetTestClassNonParallelizable(TestClassGenerationContext generationContext)
     {
-        throw new NotImplementedException();
+        _codeDomHelper.AddAttribute(
+            generationContext.TestClass,
+            COLLECTION_ATTRIBUTE,
+            new CodeAttributeArgument(new CodePrimitiveExpression(NONPARALLELIZABLE_COLLECTION_NAME)));
     }
 
     public void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
