@@ -1,5 +1,13 @@
 # [vNext]
 
+## Improvements:
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.0.2 - 2025-09-08
+
 ## Bug fixes:
 
 * Fix: Unnecessary build output messages are shown during build (#815)
