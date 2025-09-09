@@ -489,7 +489,7 @@ namespace Reqnroll.Infrastructure
 
             bool onStepStartHookExecuted = false;
 
-            async Task HandleStepExecutionExceptions(Func<Task> action, bool reThrow = true)
+            async Task HandleStepExecutionExceptions(Func<Task> action)
             {
                 try
                 {
@@ -513,17 +513,14 @@ namespace Reqnroll.Infrastructure
                 {
                     stepStatus = GetStatusFromException(ex);
                     stepException = ex;
-                    // we only throw the exception in this branch to keep the original behavior, but maybe this should be done in the others too
-                    if (reThrow && _reqnrollConfiguration.StopAtFirstError)
-                        throw;
                 }
             }
 
-            Task HandleStepExecutionExceptionsIf(bool condition, Func<Task> action, bool reThrow = true)
+            Task HandleStepExecutionExceptionsIf(bool condition, Func<Task> action)
             {
                 if (!condition)
                     return Task.CompletedTask;
-                return HandleStepExecutionExceptions(action, reThrow);
+                return HandleStepExecutionExceptions(action);
             }
 
             BindingMatch match = null;
@@ -542,10 +539,8 @@ namespace Reqnroll.Infrastructure
                     contextManager.StepContext.StepInfo.BindingMatch = match;
                     contextManager.StepContext.StepInfo.StepInstance = stepInstance;
                     return Task.CompletedTask;
-                }, reThrow: false);
+                });
 
-            try
-            {
                 // 2. Calculate invoke arguments
                 await HandleStepExecutionExceptionsIf(
                     stepStatus == ScenarioExecutionStatus.OK,
@@ -605,17 +600,18 @@ namespace Reqnroll.Infrastructure
                     // 6/B. Invoke skip handlers (if previous error was not undefined)
                     await HandleStepExecutionExceptions(OnSkipStepAsync);
                 }
-            }
-            finally
-            {
                 // 7. Trace result & set scenario execution status
                 TraceStepExecutionResult(stepStatus, stepException, durationHolder.Duration, match, arguments, isStepSkippedBecauseOfPreviousErrors, stepInstance, candidatingMatches);
                 if (stepStatus != ScenarioExecutionStatus.OK)
                     UpdateStatusOnStepFailure(stepStatus, stepException);
 
                 // 8. Publish StepFinishedEvent event
-                var stepFinishedEvent = new StepFinishedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
-                await _testThreadExecutionEventPublisher.PublishEventAsync(stepFinishedEvent);
+                await HandleStepExecutionExceptions(
+                    async () =>
+                    {
+                        var stepFinishedEvent = new StepFinishedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
+                        await _testThreadExecutionEventPublisher.PublishEventAsync(stepFinishedEvent);
+                    });
 
                 // 9. Invoke AfterStep hook
                 if (onStepStartHookExecuted)
@@ -626,7 +622,8 @@ namespace Reqnroll.Infrastructure
                     // but we can let the exception propagate to the caller.
                     await OnStepEndAsync();
                 }
-            }
+            if (stepException != null && stepStatus != ScenarioExecutionStatus.UndefinedStep &&  _reqnrollConfiguration.StopAtFirstError) ExceptionDispatchInfo.Capture(stepException).Throw();
+
         }
 
         private void TraceStepExecutionResult(
