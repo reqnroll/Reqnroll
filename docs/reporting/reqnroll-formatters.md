@@ -174,3 +174,22 @@ Because the lengthy log, it is recommended to save the console output to a file.
 ```
 dotnet test --logger "console;verbosity=detailed" > log.txt
 ```
+
+Note: The built-in `TraceListenerFormatterLog` does not seem to produce visible results for NUnit (works with MsTest). As an alternative, you can implement a simple listener that saves the messages to a file (the file will be generated in the output folder, e.g. `bin\Debug\net8.0`).
+
+```
+public class FileFormatterLog : IFormatterLog
+{
+    private readonly List<string> _entries = new();
+
+    public void WriteMessage(string message)
+    {
+        _entries.Add($"{DateTime.Now:HH:mm:ss.fff}: {message}");
+    }
+
+    public void DumpMessages()
+    {
+        File.WriteAllLines("formatter_log.txt", _entries);
+    }
+}
+```
