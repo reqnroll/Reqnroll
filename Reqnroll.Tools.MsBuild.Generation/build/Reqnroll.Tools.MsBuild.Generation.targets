@@ -143,10 +143,15 @@
 
   </Target>
 
-  <Target
-    Name="IncludeCodeBehindFilesInProject"
-    DependsOnTargets="UpdateFeatureFilesInProject"
-    BeforeTargets="CoreCompile">
+  <PropertyGroup>
+    <CoreCompileDependsOn>
+      IncludeCodeBehindFilesInProject;
+      $(CoreCompileDependsOn)
+    </CoreCompileDependsOn>
+  </PropertyGroup>
+
+  <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject">
+    
     <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
       <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
@@ -156,7 +161,17 @@
         <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
-    
+  </Target>
+
+  <PropertyGroup>
+    <AssignTargetPathsDependsOn>
+      EmbedCucumberMessages;
+      $(AssignTargetPathsDependsOn)
+    </AssignTargetPathsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="EmbedCucumberMessages" DependsOnTargets="UpdateFeatureFilesInProject">
+
     <ItemGroup>
       <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Condition="'%(ReqnrollGeneratedFiles.EmbeddedMessagesStoragePath)' != ''">
         <LogicalName>%(ReqnrollGeneratedFiles.EmbeddedMessagesResourceName)</LogicalName>
