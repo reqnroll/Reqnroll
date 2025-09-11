@@ -1,4 +1,4 @@
-﻿using Cucumber.Messages;
+using Cucumber.Messages;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
@@ -43,7 +43,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return new TestRunHookStarted(hookExecutionTracker.HookStartedId, hookExecutionTracker.TestRunId, hookExecutionTracker.HookId, ToTimestamp(hookExecutionTracker.HookStarted));
+        return new TestRunHookStarted(hookExecutionTracker.HookStartedId, hookExecutionTracker.TestRunId, hookExecutionTracker.HookId, null, ToTimestamp(hookExecutionTracker.HookStarted));
     }
 
     public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookExecutionTracker hookExecutionTracker)
