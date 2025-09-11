@@ -1,4 +1,4 @@
-﻿using FluentAssertions;
+using FluentAssertions;
 using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
 using Io.Cucumber.Messages.Types;
@@ -459,7 +459,7 @@ public class CucumberMessagesValidator
                    expectation = expectation.Replace("\r\n", "\n");
                    subject.Should().Be(expectation);
                })
-               .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data"))
+               .When(info => info.Path.EndsWith("Description") || info.Path.EndsWith("Text") || info.Path.EndsWith("Data") || info.Path.EndsWith("Content"))
 
                // The list of hooks should contain at least as many items as the list of expected hooks
                // Because Reqnroll does not support Tag Expressions, these are represented in RnR as multiple Hooks or multiple Tags on Hooks Binding methods
