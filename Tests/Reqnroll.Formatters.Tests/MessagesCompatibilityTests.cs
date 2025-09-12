@@ -25,8 +25,8 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("rules-backgrounds", "Rules with Backgrounds")]
     [DataRow("skipped", "Skipping scenarios")]
     [DataRow("stack-traces", "Stack traces")]
-    [DataRow("undefined", "Undefined steps")]
     [DataRow("unused-steps", "Unused steps")]
+    [DataRow("undefined", "Undefined steps")] // Snippet provider does not provide all variations possible of method signatures
     // These CCK scenario examples produce Cucumber Messages that are materially compliant with the CCK.
     // The messages produced match the CCK expected messages, with exceptions for things
     // that are not material to the CCK spec (such as IDs don't have to be generated in the same order, timestamps don't have to match, etc.)

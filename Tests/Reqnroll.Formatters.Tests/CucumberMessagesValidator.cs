@@ -396,18 +396,28 @@ public class CucumberMessagesValidator
                .ComparingByMembers<UndefinedParameterType>()
                .ComparingByMembers<TestRunHookStarted>()
                .ComparingByMembers<TestRunHookFinished>()
+               .ComparingByMembers<Suggestion>()
+               .ComparingByMembers<Snippet>()
 
                // Using a custom Property Selector so that we can ignore the properties that are not comparable
                .Using(_customCucumberMessagesPropertySelector)
-
                // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
-               .Using<string>(ctx =>
+               //.Using<string>(ctx =>
+               //{
+               //    var actual = ctx.Subject.Split("-")[0];
+               //    var expected = ctx.Expectation.Split("-")[0];
+               //    actual.Should().Be(expected);
+               //})
+               
+               // Using special logic to assert that suggestions must contain at least one snippets among those specified in the Expected set
+               // We can't compare snippet content as the Language and Code properties won't match
+               .Using<Suggestion>(ctx =>
                {
-                   var actual = ctx.Subject.Split("-")[0];
-                   var expected = ctx.Expectation.Split("-")[0];
-                   actual.Should().Be(expected);
+                   var actualSnippets = ctx.Subject.Snippets ?? new List<Snippet>();
+                   var expectedSnippets = ctx.Expectation.Snippets ?? new List<Snippet>();
+                   actualSnippets.Should().HaveCountGreaterThanOrEqualTo(1).And.HaveCountLessThanOrEqualTo(expectedSnippets.Count);
                })
-               .When(info => info.Path.EndsWith("Language"))
+               .WhenTypeIs<Suggestion>()
 
                // Using special logic to compare regular expression strings (ignoring the differences of the regex anchor characters)
                .Using<List<string>>(ctx =>

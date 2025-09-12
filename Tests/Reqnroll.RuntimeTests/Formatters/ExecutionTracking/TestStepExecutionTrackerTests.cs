@@ -15,6 +15,7 @@ namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
 public class TestStepExecutionTrackerTests
 {
+    private readonly Mock<IIdGenerator> _idGeneratorMock;
     private readonly Mock<ICucumberMessageFactory> _messageFactoryMock;
     private readonly Mock<IPickleExecutionTracker> _pickleExecutionTrackerMock;
     private readonly Mock<IMessagePublisher> _publisherMock;
@@ -26,6 +27,7 @@ public class TestStepExecutionTrackerTests
         
     public TestStepExecutionTrackerTests()
     {
+        _idGeneratorMock = new Mock<IIdGenerator>();
         _messageFactoryMock = new Mock<ICucumberMessageFactory>();
         _pickleExecutionTrackerMock = new Mock<IPickleExecutionTracker>();
         _publisherMock = new Mock<IMessagePublisher>();
@@ -39,7 +41,8 @@ public class TestStepExecutionTrackerTests
         _testStepExecutionTrackerSut = new TestStepExecutionTracker(
             _testCaseExecutionTrackerStub,
             _messageFactoryMock.Object,
-            _publisherMock.Object
+            _publisherMock.Object,
+            _idGeneratorMock.Object
         );
     }
 
@@ -54,7 +57,8 @@ public class TestStepExecutionTrackerTests
         var testStepExecutionTrackerSut = new TestStepExecutionTracker(
             testCaseExecutionTracker,
             _messageFactoryMock.Object,
-            _publisherMock.Object
+            _publisherMock.Object,
+            _idGeneratorMock.Object
         );
         var stepContextMock = CreateStepContextWithPickleId("pickle123");
         var testStepStarted = new TestStepStarted("testCaseStartedId", "testStepId", new Timestamp(0, 1));
@@ -79,7 +83,8 @@ public class TestStepExecutionTrackerTests
         var testStepExecutionTrackerSut = new TestStepExecutionTracker(
             testCaseExecutionTracker,
             _messageFactoryMock.Object,
-            _publisherMock.Object
+            _publisherMock.Object,
+            _idGeneratorMock.Object
         );
         var stepContextMock = CreateStepContextWithPickleId("pickle123");
         var scenarioContextMock = new Mock<IScenarioContext>();
@@ -158,6 +163,41 @@ public class TestStepExecutionTrackerTests
         _testStepExecutionTrackerSut.Exception.Should().Be(testError);
         _testStepExecutionTrackerSut.Status.Should().Be(status);
             
+    }
+
+    [Fact]
+    public async Task TestStepTracker_ProcessEvent_StepFinishedEvent_UndefinedStep_PublishesSuggestionAndTestStepFinished()
+    {
+        // Arrange
+        var stepContextMock = CreateStepContextWithPickleId("undefinedPickleId");
+        stepContextMock.Setup(sc => sc.Status).Returns(ScenarioExecutionStatus.UndefinedStep);
+
+        var scenarioContextMock = new Mock<IScenarioContext>();
+        var stepFinishedEvent = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
+
+        var testStepFinished = new TestStepFinished("testCaseStartedId", "testStepId",
+            new TestStepResult(new Duration(0, 0), "", TestStepResultStatus.UNDEFINED, null), new Timestamp(0, 0));
+        var suggestion = new Suggestion("suggestionId", "undefinedPickleId", [new Snippet("C#", "skeleton")]);
+
+        _messageFactoryMock
+            .Setup(f => f.ToTestStepFinished(_testStepExecutionTrackerSut))
+            .Returns(testStepFinished);
+
+        _messageFactoryMock
+            .Setup(f => f.ToSuggestion(_testStepExecutionTrackerSut, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<IIdGenerator>()))
+            .Returns(suggestion);
+
+        var definitionStub = new TestStepTracker("testStepId", "undefinedPickleId", null);
+        _testStepExecutionTrackerSut.StepTracker = definitionStub;
+
+        _pickleExecutionTrackerMock.SetupGet(t => t.AttemptCount).Returns(0);
+
+        // Act
+        await _testStepExecutionTrackerSut.ProcessEvent(stepFinishedEvent);
+
+        // Assert
+        _publisherMock.Verify(p => p.PublishAsync(It.Is<Envelope>(e => e.Suggestion == suggestion)), Times.Once);
+        _publisherMock.Verify(p => p.PublishAsync(It.Is<Envelope>(e => e.TestStepFinished == testStepFinished)), Times.Once);
     }
 
     private Mock<IScenarioStepContext> CreateStepContextWithPickleId(string pickleId)

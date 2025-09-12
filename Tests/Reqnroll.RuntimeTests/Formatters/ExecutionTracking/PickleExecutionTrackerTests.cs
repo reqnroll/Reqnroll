@@ -46,7 +46,7 @@ public class PickleExecutionTrackerTests
         _mockPublisher = new Mock<IMessagePublisher>();
         _mockMessageFactory = new Mock<ICucumberMessageFactory>();
 
-        IStepTrackerFactory stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object);
+        IStepTrackerFactory stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object, _mockIdGenerator.Object);
         _stubTestCaseExecutionTrackerFactory = new TestCaseExecutionTrackerFactory(_mockIdGenerator.Object, _mockMessageFactory.Object, _mockPublisher.Object, stepTrackerFactory);
 
         SetupMockContexts();

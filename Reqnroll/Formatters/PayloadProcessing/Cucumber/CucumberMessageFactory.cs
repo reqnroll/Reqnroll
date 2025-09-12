@@ -2,8 +2,9 @@ using Cucumber.Messages;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
-using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.EnvironmentAccess;
+using Reqnroll.Events;
+using Reqnroll.Formatters.ExecutionTracking;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -211,6 +212,16 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             ToTimestamp(testStepExecutionTracker.StepFinishedAt));
     }
 
+    public virtual Suggestion ToSuggestion(TestStepExecutionTracker testStepExecution, string programmingLanguage, string skeletonMessage, IIdGenerator idGenerator)
+    {
+        var testStepTracker = testStepExecution.StepTracker as TestStepTracker;
+        if (testStepTracker != null)
+        {
+            var pickleStepId = testStepTracker.PickleStepId;
+            return new Suggestion(idGenerator.GetNewId(), pickleStepId, [new Snippet(programmingLanguage, skeletonMessage)]);
+        }
+        return null;
+    }
     public virtual Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
     {
         SourceReference sourceRef = ToSourceRef(hookBinding);
@@ -293,7 +304,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     private static TestStepResult ToTestStepResult(StepExecutionTrackerBase stepState)
     {
-        TimeSpan d = (stepState.Duration.HasValue ? (TimeSpan) stepState.Duration : new TimeSpan(0));
+        TimeSpan d = (stepState.Duration.HasValue ? (TimeSpan)stepState.Duration : new TimeSpan(0));
         return new TestStepResult(
             Converters.ToDuration(d),
             "",
@@ -388,7 +399,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
                 gitUrl,
                 gitRevision,
                 gitBranch,
-                gitTag  
+                gitTag
             );
         return git;
     }

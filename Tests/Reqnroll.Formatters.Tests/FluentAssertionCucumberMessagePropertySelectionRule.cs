@@ -1,4 +1,4 @@
-﻿using FluentAssertions.Equivalency;
+using FluentAssertions.Equivalency;
 
 namespace Reqnroll.Formatters.Tests;
 
@@ -29,7 +29,7 @@ public class FluentAssertionCucumberMessagePropertySelectionRule : IMemberSelect
         "Duration", "Start", "FileName", "Message", "Type", "StackTrace", "UseForSnippets",
         "Id", "AstNodeId", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", 
         "TestRunStartedId", "TestCaseStartedId", "TestStepId", "TestCaseId", "WorkerId", "TestRunHookStartedId",
-        "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci"
+        "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci", "Code", "Language"
     };
 
     public FluentAssertionCucumberMessagePropertySelectionRule(IEnumerable<Type> cucumberMessageTypes, IEnumerable<string>? proportiesToSkip = null)

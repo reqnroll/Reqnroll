@@ -1,13 +1,15 @@
-﻿using Reqnroll.Formatters.PayloadProcessing.Cucumber;
+using Gherkin.CucumberMessages;
+using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Formatters.PubSub;
+using System.Runtime.CompilerServices;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
-public class StepTrackerFactory(ICucumberMessageFactory messageFactory, IMessagePublisher publisher) : IStepTrackerFactory
+public class StepTrackerFactory(ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IIdGenerator idGenerator) : IStepTrackerFactory
 {
-    public TestStepExecutionTracker CreateTestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
+    public TestStepExecutionTracker CreateTestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null, IIdGenerator testStepIdGenerator = null)
     {
-        return new TestStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher);
+        return new TestStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher, testStepIdGenerator ?? idGenerator);
     }
     public HookStepExecutionTracker CreateHookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
     {

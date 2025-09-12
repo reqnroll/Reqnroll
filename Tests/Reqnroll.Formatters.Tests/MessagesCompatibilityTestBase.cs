@@ -248,12 +248,20 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var result = new List<Envelope>();
 
         // List of Pickle IDs in the order they are seen in the message stream
-        var pickles = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle.Id).ToList();
+        var pickleMsgs = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle);
+        var pickles = pickleMsgs.Select(p => p.Id).ToList();
 
         // Dictionary keyed by the ID of each test case.
         var testCases = new Dictionary<string, TestCaseRecord>();
         var allTestCaseEnvelopes = envelopes.Where(e => e.Content() is TestCase).ToList();
         var testCaseStartedToTestCaseMap = new Dictionary<string, string>();
+
+        string? FindTestCaseStartedFromStepPickleId(string pickleStepId)
+        {
+            var pickleId = pickleMsgs.First(p => p.Steps.Any(ps => ps.Id == pickleStepId)).Id;
+            var testCaseStartedId = testCases.Values.First(tcr => tcr.PickleId == pickleId).Executions.Last().Value.Id;
+            return testCaseStartedId;
+        }
 
         foreach (var tce in allTestCaseEnvelopes)
         {
@@ -311,7 +319,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                 Attachment att => att.TestCaseStartedId,
                 TestRunHookStarted => null,
                 TestRunHookFinished => null,
-                _ => throw new ApplicationException("Unexpected Envelope type")
+                Suggestion suggestion => FindTestCaseStartedFromStepPickleId(suggestion.PickleStepId),
+
+                _ => throw new ApplicationException($"Unexpected Envelope type: {current.Content().ToString()}")
             };
             // attachments created by Before/After TestRun or Feature don't have a value for TestCaseStartedId, so don't attempt to add them to Test execution
             if (!string.IsNullOrEmpty(testCaseStartedId))
