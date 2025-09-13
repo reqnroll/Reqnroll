@@ -78,15 +78,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="17.11.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" PrivateAssets="all" />
-    <!--<PackageReference Include="Microsoft.VisualStudio.Composition" Version="17.11.13" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Only" Version="17.13.61" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.61" PrivateAssets="all" />-->
     <PackageReference Include="System.Collections.Immutable" Version="8.0.0" PrivateAssets="all" />
   </ItemGroup>
-  
-  <!--<ItemGroup Condition="'$(TargetFramework)' == 'net462'">
-    <PackageReference Include="Microsoft.VisualStudio.Shell.15.0" Version="15.8.28010" PrivateAssets="all" />
-  </ItemGroup>-->
 
   <ItemGroup>
     <Reference Include="Microsoft.Build.Framework">
