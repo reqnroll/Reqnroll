@@ -211,15 +211,3 @@ public class CustomTransformations
     }
 }
 ```
-
-### Dependencies
-
-The default `StepArgumentTypeConverter` depends on:
-
-* `ITestTracer` - for logging conversion warnings and errors
-* `IBindingRegistry` - to access step argument transformation bindings
-* `IContextManager` - for accessing scenario context during transformations
-* `IAsyncBindingInvoker` - to invoke step transformation methods
-
-Custom implementations should typically accept the same dependencies to maintain compatibility with Reqnroll's architecture.
-  
