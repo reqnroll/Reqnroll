@@ -1,5 +1,7 @@
 ﻿namespace Reqnroll.Bindings;
 
+#nullable enable
+
 /// <summary>
 /// A text pattern that is used to bind a step definition to a scenario step.
 /// </summary>
@@ -40,7 +42,7 @@ public readonly struct StepTextPattern
     /// <summary>
     /// Gets the text of the pattern.
     /// </summary>
-    public string? Text { get; }
+    public string Text { get; }
 
     /// <summary>
     /// Gets a value indicating whether this instance represents an empty pattern.
