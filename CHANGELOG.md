@@ -1,10 +1,12 @@
 # [vNext]
 
 ## Improvements:
+* Formatters: Upgraded conformance test to Cucumber/Cucumber-compatibility-Kit v21.0.0
+* Added support for asynchronously disposing objects implementing IAsyncDisposable when the Reqnroll object container is disposed.
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @Code-Grump
 
 # v3.0.2 - 2025-09-08
 

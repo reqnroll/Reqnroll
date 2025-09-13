@@ -346,12 +346,15 @@ namespace Reqnroll.Generator.Generation
 
             using (new SourceLineScope(_reqnrollConfiguration, _codeDomHelper, statements, generationContext.Document.SourceFilePath, scenario.Location))
             {
-                statements.Add(new CodeExpressionStatement(
-                    new CodeMethodInvokeExpression(
-                        new CodeThisReferenceExpression(),
-                        generationContext.ScenarioInitializeMethod.Name,
-                        new CodeVariableReferenceExpression("scenarioInfo"),
-                        new CodeVariableReferenceExpression("ruleInfo"))));
+                var callScenarioInitializeExpression = new CodeMethodInvokeExpression(
+                    new CodeThisReferenceExpression(),
+                    generationContext.ScenarioInitializeMethod.Name,
+                    new CodeVariableReferenceExpression("scenarioInfo"),
+                    new CodeVariableReferenceExpression("ruleInfo"));
+
+                _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(callScenarioInitializeExpression);
+
+                statements.Add(new CodeExpressionStatement(callScenarioInitializeExpression));
             }
 
             testMethod.Statements.AddRange(statements.ToArray());

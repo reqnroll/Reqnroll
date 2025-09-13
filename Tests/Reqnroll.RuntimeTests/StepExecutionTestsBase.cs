@@ -123,8 +123,8 @@ namespace Reqnroll.RuntimeTests
 
 
             ContextManagerStub = new ContextManager(new Mock<ITestTracer>().Object, TestThreadContainer, ContainerBuilderStub);
-            ContextManagerStub.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, string.Empty, "test feature", null));
-            ContextManagerStub.InitializeScenarioContext(new ScenarioInfo("test scenario", "test scenario description", null, null), null);
+            await ContextManagerStub.InitializeFeatureContextAsync(new FeatureInfo(FeatureLanguage, string.Empty, "test feature", null));
+            await ContextManagerStub.InitializeScenarioContextAsync(new ScenarioInfo("test scenario", "test scenario description", null, null), null);
 
             StepArgumentTypeConverterStub = new Mock<IStepArgumentTypeConverter>();
         }
