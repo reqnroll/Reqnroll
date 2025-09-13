@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Reqnroll.RuntimeTests.BoDi
 {
@@ -185,13 +186,37 @@ namespace Reqnroll.RuntimeTests.BoDi
         bool WasDisposed { get; }
     }
 
-    public class DisposableClass1 : IDisposableClass, IDisposable
+    public sealed class DisposableClass1 : IDisposableClass, IDisposable
     {
         public bool WasDisposed { get; private set; }
 
         public void Dispose()
         {
             WasDisposed = true;
+        }
+    }
+
+    public interface IAsyncDisposableClass
+    {
+        bool WasDisposed { get; }
+        bool WasDisposedAsync { get; }
+    }
+
+    public sealed class AsyncDisposableClass1 : IAsyncDisposableClass, IDisposable, IAsyncDisposable
+    {
+        public bool WasDisposed { get; private set; }
+
+        public bool WasDisposedAsync { get; private set; }
+
+        public void Dispose()
+        {
+            WasDisposed = true;
+        }
+
+        public ValueTask DisposeAsync()
+        {
+            WasDisposedAsync = true;
+            return ValueTask.CompletedTask;
         }
     }
 
