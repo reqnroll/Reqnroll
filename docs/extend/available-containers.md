@@ -192,7 +192,7 @@ public class CustomStepArgumentTypeConverter : StepArgumentTypeConverter
 
 ### Alternative: Using Step Argument Transformations
 
-In many cases, instead of implementing a custom `IStepArgumentTypeConverter`, you can use [Step Argument Transformations](../automation/step-argument-conversions.html#step-argument-transformation), which are simpler to implement and more focused:
+In many cases, instead of implementing a custom `IStepArgumentTypeConverter`, you can use [Step Argument Transformations](../automation/step-argument-conversions.md#step-argument-transformation), which are simpler to implement and more focused:
 
 ```csharp
 [Binding]
