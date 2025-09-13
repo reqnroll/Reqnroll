@@ -1,12 +1,12 @@
+using System.CodeDom;
 using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.UnitTestProvider;
-using Reqnroll.Parser;
 
 namespace Reqnroll.Generator.UnitTestConverter
 {
-    public class NonParallelizableDecorator : ITestClassDecorator
+    public class NonParallelizableDecorator : ITestClassTagDecorator, ITestMethodTagDecorator
     {
         private readonly string[] nonParallelizableTags;
         private readonly ITagFilterMatcher tagFilterMatcher;
@@ -22,12 +22,32 @@ namespace Reqnroll.Generator.UnitTestConverter
             get { return PriorityValues.Low; }
         }
 
-        public bool CanDecorateFrom(TestClassGenerationContext generationContext)
+        public bool RemoveProcessedTags
         {
-            return ProviderSupportsParallelExecution(generationContext) && ConfiguredTagIsPresent(generationContext.Feature.Tags.Select(x => x.GetNameWithoutAt()));
+            get { return false; }
         }
 
-        public void DecorateFrom(TestClassGenerationContext generationContext)
+        public bool ApplyOtherDecoratorsForProcessedTags
+        {
+            get { return true; }
+        }
+
+        public bool CanDecorateFrom(string tagName, TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+        {
+            return ProviderSupportsParallelExecution(generationContext) && ConfiguredTagIsPresent(new[] { tagName });
+        }
+
+        public void DecorateFrom(string tagName, TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+        {
+            generationContext.UnitTestGeneratorProvider.SetTestMethodNonParallelizable(generationContext, testMethod);
+        }
+
+        public bool CanDecorateFrom(string tagName, TestClassGenerationContext generationContext)
+        {
+            return ProviderSupportsParallelExecution(generationContext) && ConfiguredTagIsPresent(new[] { tagName });
+        }
+
+        public void DecorateFrom(string tagName, TestClassGenerationContext generationContext)
         {
             generationContext.UnitTestGeneratorProvider.SetTestClassNonParallelizable(generationContext);
         }

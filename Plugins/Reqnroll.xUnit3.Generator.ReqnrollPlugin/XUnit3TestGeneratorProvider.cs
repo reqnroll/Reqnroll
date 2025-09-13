@@ -102,6 +102,11 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
             new CodeAttributeArgument(new CodePrimitiveExpression(NONPARALLELIZABLE_COLLECTION_NAME)));
     }
 
+    public void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+    {
+        // xUnit does not support method-level parallelization
+    }
+
     public void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
     {
         // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags

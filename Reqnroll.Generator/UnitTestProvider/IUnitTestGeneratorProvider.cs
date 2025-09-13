@@ -12,6 +12,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         void SetTestClassIgnore(TestClassGenerationContext generationContext);
         void FinalizeTestClass(TestClassGenerationContext generationContext);
         void SetTestClassNonParallelizable(TestClassGenerationContext generationContext);
+        void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod);
 
         void SetTestClassInitializeMethod(TestClassGenerationContext generationContext);
         void SetTestClassCleanupMethod(TestClassGenerationContext generationContext);
