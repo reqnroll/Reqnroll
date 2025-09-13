@@ -509,6 +509,8 @@ namespace Reqnroll.Generator.Generation
             scenarioInitializeMethod.Parameters.Add(
                 new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference), "ruleInfo"));
 
+            _codeDomHelper.MarkCodeMemberMethodAsAsync(scenarioInitializeMethod);
+
             //testRunner.OnScenarioInitialize(scenarioInfo, ruleInfo);
             var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
             var expression = new CodeMethodInvokeExpression(
