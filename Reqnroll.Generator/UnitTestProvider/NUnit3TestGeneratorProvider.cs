@@ -69,6 +69,11 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClass, NONPARALLELIZABLE_ATTR);
         }
 
+        public virtual void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+        {
+            CodeDomHelper.AddAttribute(testMethod, NONPARALLELIZABLE_ATTR);
+        }
+
         public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
         {
             CodeDomHelper.AddAttribute(generationContext.TestClass, TESTFIXTURE_ATTR);

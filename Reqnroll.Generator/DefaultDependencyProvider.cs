@@ -38,7 +38,8 @@ namespace Reqnroll.Generator
             container.RegisterTypeAs<DecoratorRegistry, IDecoratorRegistry>();
             container.RegisterTypeAs<IgnoreDecorator, ITestClassTagDecorator>("ignore");
             container.RegisterTypeAs<IgnoreDecorator, ITestMethodTagDecorator>("ignore");
-            container.RegisterTypeAs<NonParallelizableDecorator, ITestClassDecorator>("nonparallelizable");
+            container.RegisterTypeAs<NonParallelizableDecorator, ITestClassTagDecorator>("nonparallelizable");
+            container.RegisterTypeAs<NonParallelizableDecorator, ITestMethodTagDecorator>("nonparallelizable");
 
             container.RegisterInstanceAs(GenerationTargetLanguage.CreateCodeDomHelper(GenerationTargetLanguage.CSharp), GenerationTargetLanguage.CSharp, dispose: true);
             container.RegisterInstanceAs(GenerationTargetLanguage.CreateCodeDomHelper(GenerationTargetLanguage.VB), GenerationTargetLanguage.VB, dispose: true);
