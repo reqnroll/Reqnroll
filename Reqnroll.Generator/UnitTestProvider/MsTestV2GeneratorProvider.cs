@@ -265,6 +265,11 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClass, DONOTPARALLELIZE_ATTR);
         }
 
+        public override void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+        {
+            CodeDomHelper.AddAttribute(testMethod, DONOTPARALLELIZE_ATTR);
+        }
+
         private IEnumerable<string> GetNonMSTestSpecificTags(IEnumerable<string> tags)
         {
             return tags == null ? new string[0] : tags.Where(t => !t.StartsWith(OWNER_TAG, StringComparison.InvariantCultureIgnoreCase))

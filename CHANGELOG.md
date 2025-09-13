@@ -1,5 +1,9 @@
 # [vNext]
 
+## New features:
+
+* Generator: `addNonParallelizableMarkerForTags` now also applies to scenario-level tags for frameworks supporting method-level isolation (NUnit, MsTest V2, TUnit).
+
 ## Improvements:
 
 * Add xUnit 3 support (#405, #538)

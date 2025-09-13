@@ -450,6 +450,28 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             attributes.Should().NotContain(a => a.Name == XUnitCollectionAttribute);
         }
 
+        [Fact]
+        public void XUnit2TestGeneratorProvider_ScenarioTagOnly_ShouldNotAddNonParallelizableCollectionAttribute()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            @nonparallelizable
+            Scenario: Isolated scenario
+                Given there is something");
+            var provider = new XUnit2TestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new [] { "nonparallelizable" });
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
+
+            // ASSERT
+            code.Class().CustomAttributes().Should().NotContain(a => a.Name == XUnitCollectionAttribute);
+            var method = code.Class().Members().Single(m => m.Name == "IsolatedScenario");
+            method.CustomAttributes().Should().NotContain(a => a.Name == XUnitCollectionAttribute);
+        }
+
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)
         {
             var parser = new ReqnrollGherkinParser(parserCultureInfo ?? new CultureInfo("en-US"));
