@@ -130,3 +130,66 @@ The created formatter can be enabled with a `custom` section in the configuratio
 ```
 
 For a complete example that contains a custom formatter, please check our [Custom Formatter Test Project](https://github.com/reqnroll/Reqnroll.ExploratoryTestProjects/tree/main/ReqnrollFormatters/ReqnrollFormatters.Custom).
+
+## Troubleshooting formatter errors
+
+In order to diagnose formatter errors you can enable formatter logging.
+
+```{warning}
+The formatter logging infrastructure is experimental. In later versions we will provide easier configuration. The method described here might also change even during minor version updates. 
+```
+
+In order to enable formatter log, you need to add the following class to your project. The class is a simple [Reqnroll runtime plugin](../extend/plugins.md#runtime-plugins) that configures a formatter logger.
+
+```{code-block} c#
+:caption: EnableFormatterLogPlugin.cs
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Plugins;
+using Reqnroll.UnitTestProvider;
+
+[assembly: RuntimePlugin(typeof(EnableFormatterLogPlugin))]
+
+namespace Reqnroll.Formatters.RuntimeSupport;
+
+public class EnableFormatterLogPlugin : IRuntimePlugin
+{
+    public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
+    {
+        runtimePluginEvents.CustomizeGlobalDependencies += (_, args) =>
+        {
+            args.ObjectContainer.RegisterTypeAs<TraceListenerFormatterLog, IFormatterLog>();
+        };
+    }
+}
+```
+
+Once the formatter log is enabled, you can run the tests in with verbose console mode and investigate the result if you see any errors.
+
+```
+dotnet test --logger "console;verbosity=detailed"
+```
+
+Because the lengthy log, it is recommended to save the console output to a file.
+
+```
+dotnet test --logger "console;verbosity=detailed" > log.txt
+```
+
+Note: The built-in `TraceListenerFormatterLog` does not seem to produce visible results for NUnit (works with MsTest). As an alternative, you can implement a simple listener that saves the messages to a file (the file will be generated in the output folder, e.g. `bin\Debug\net8.0`).
+
+```
+public class FileFormatterLog : IFormatterLog
+{
+    private readonly List<string> _entries = new();
+
+    public void WriteMessage(string message)
+    {
+        _entries.Add($"{DateTime.Now:HH:mm:ss.fff}: {message}");
+    }
+
+    public void DumpMessages()
+    {
+        File.WriteAllLines("formatter_log.txt", _entries);
+    }
+}
+```

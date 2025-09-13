@@ -1,12 +1,7 @@
 using Microsoft.Build.Framework;
-#if NETFRAMEWORK
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Threading;
-#endif
 using Reqnroll.Analytics;
 using Reqnroll.CommonModels;
 using Reqnroll.Generator;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,38 +9,6 @@ using System.Threading.Tasks;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
-    internal static class AsyncRunner
-    {
-#if NETFRAMEWORK
-        private static readonly Lazy<JoinableTaskFactory> _factory = new(() =>
-        {
-            // If we're running inside VS, ThreadHelper.JoinableTaskFactory will be initialized
-            // Otherwise, create our own context/factory for headless builds
-            return TryGetVsFactory() ?? new JoinableTaskFactory(new JoinableTaskContext());
-        });
-
-        private static JoinableTaskFactory TryGetVsFactory()
-        {
-            try
-            {
-                // ThreadHelper.JoinableTaskFactory throws if not initialized
-                return ThreadHelper.JoinableTaskFactory;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        public static T RunAndJoin<T>(Func<Task<T>> func) => _factory.Value.Run(func);
-
-#else
-
-        public static T RunAndJoin<T>(Func<Task<T>> func) => func().GetAwaiter().GetResult();
-
-#endif
-    }
-
     public class GenerateFeatureFileCodeBehindTask : Microsoft.Build.Utilities.Task
     {
         public IFeatureFileCodeBehindGenerator CodeBehindGenerator { get; set; }

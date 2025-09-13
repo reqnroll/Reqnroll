@@ -1,10 +1,18 @@
 <Project>
 
-  <Import Project="Reqnroll.Tools.MsBuild.Generation.props" Condition="'$(_ReqnrollPropsImported)'==''"/>
-
   <PropertyGroup>
     <_Reqnroll_Tools_MsBuild_Generation_Imported>true</_Reqnroll_Tools_MsBuild_Generation_Imported>
   </PropertyGroup>
+
+  <UsingTask
+    TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask"
+    AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+    TaskFactory="$(ReqnrollGenerationTaskFactory)" />
+  
+  <UsingTask
+    TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask"
+    AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+    TaskFactory="$(ReqnrollGenerationTaskFactory)" />
 
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
@@ -21,13 +29,6 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <BuildDependsOn>
-      BeforeUpdateFeatureFilesInProject;
-      UpdateFeatureFilesInProject;
-      IncludeCodeBehindFilesInProject;
-      AfterUpdateFeatureFilesInProject;
-      $(BuildDependsOn)
-    </BuildDependsOn>
     <CleanDependsOn>
       CleanFeatureFilesInProject;
       $(CleanDependsOn)
@@ -63,7 +64,6 @@
       <ForceGeneration>true</ForceGeneration>
     </PropertyGroup>
   </Target>
-
 
   <Target Name="UpdateFeatureFilesInProject"
           DependsOnTargets="BeforeUpdateFeatureFilesInProject">
@@ -139,11 +139,19 @@
 
   </Target>
 
-  <Target Name="BeforeUpdateFeatureFilesInProject">
+  <Target Name="BeforeUpdateFeatureFilesInProject" BeforeTargets="UpdateFeatureFilesInProject">
 
   </Target>
 
+  <PropertyGroup>
+    <CoreCompileDependsOn>
+      IncludeCodeBehindFilesInProject;
+      $(CoreCompileDependsOn)
+    </CoreCompileDependsOn>
+  </PropertyGroup>
+
   <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject">
+    
     <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
       <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
@@ -153,9 +161,16 @@
         <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
-    
-    <!-- TODO: Remove this Message after Messages Development -->
-    <Message Text="ReqnrollGeneratedNdjsonFiles: @(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Importance="high" />
+  </Target>
+
+  <PropertyGroup>
+    <AssignTargetPathsDependsOn>
+      EmbedCucumberMessages;
+      $(AssignTargetPathsDependsOn)
+    </AssignTargetPathsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="EmbedCucumberMessages" DependsOnTargets="UpdateFeatureFilesInProject">
 
     <ItemGroup>
       <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Condition="'%(ReqnrollGeneratedFiles.EmbeddedMessagesStoragePath)' != ''">
@@ -164,7 +179,10 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject">
+  <Target
+    Name="AfterUpdateFeatureFilesInProject"
+    DependsOnTargets="IncludeCodeBehindFilesInProject"
+    AfterTargets="IncludeCodeBehindFilesInProject">
     <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
   </Target>
 

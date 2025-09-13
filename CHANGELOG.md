@@ -6,13 +6,28 @@
 
 ## Bug fixes:
 
-* Fix: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
-* Fix: Build URL is invalid in HTML report for Azure DevOps builds (#795)
+*Contributors of this release (in alphabetical order):* @Code-Grump
+
+# v3.0.2 - 2025-09-08
+
+## Bug fixes:
+
+* Fix: Unnecessary build output messages are shown during build (#815)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy
+
+# v3.0.1 - 2025-09-05
+
+## Bug fixes:
+
+* Fix: Formatters: Formatters fail under .NET Framework when OutputFilePath is not configured (#797)
+* Fix: Formatters: Build URL is invalid in HTML report for Azure DevOps builds (#795)
 * Fix: Build fails with "error CS8103: Combined length of user strings used by the program exceeds allowed limit." when a project contains many long feature files. (#785)
 * Fix: Embedded feature file resource generates different resource names in Windows/Linux (#799)
 * Fix: Formatters: The Build Info banner of HTML reports shows UNKNOWN banner when the Build Server cannot be determined (#800)
+* Fix: Formatters: Success flag in `TestRunFinished` Cucumber message is set to true when before/after test run hook fails (Cucumber/Cucumber-compatibility-Kit v21.0.0) (#801)
 
-*Contributors of this release (in alphabetical order):* @Code-Grump, @clrudolphi, @gasparnagy
+*Contributors of this release (in alphabetical order):* @gasparnagy, @clrudolphi
 
 # v3.0.0 - 2025-08-21
 
