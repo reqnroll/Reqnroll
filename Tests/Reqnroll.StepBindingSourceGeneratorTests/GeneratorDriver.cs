@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
+using Reqnroll.Bindings;
 using System.Collections.Immutable;
 using System.Reflection;
 using System.Runtime.Loader;
@@ -27,7 +28,7 @@ public class GeneratorDriver
         assemblies.Add(typeof(ImmutableArray).Assembly);
 
         // Reqnroll.dll
-        assemblies.Add(typeof(WhenAttribute).Assembly);
+        assemblies.Add(typeof(StepDefinitionRegistryAttribute).Assembly);
 
         var references = assemblies
             .Select(assembly => MetadataReference.CreateFromFile(assembly.Location))
