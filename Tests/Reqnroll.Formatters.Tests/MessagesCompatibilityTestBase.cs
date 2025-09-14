@@ -268,26 +268,37 @@ public class MessagesCompatibilityTestBase : SystemTestBase
             var tc = tce.Content() as TestCase;
             testCases.Add(tc!.Id, new TestCaseRecord(tc.Id, tc.PickleId, tce, new Dictionary<string, TestExecution>()));
         }
-        int index = 0;
-        bool testCasesBegun = false;
-        // this loop sweeps all of the messages prior to the first testCase into the outgoing results collection.
-        while (index < envelopes.Count && !testCasesBegun)
+        List<Type> staticMessageTypes = new List<Type>
         {
-            var current = envelopes[index];
-            if (current.Content() is TestCase)
-            {
-                testCasesBegun = true;
-            }
-            else
-            {
-                result.Add(current);
-                index++;
-            }
+            typeof(Meta),
+            typeof(Source),
+            typeof(GherkinDocument),
+            typeof(Pickle),
+            typeof(ParameterType),
+            typeof(StepDefinition),
+            typeof(Hook)
+        };
+        bool IsStaticMessage(Envelope envelope)
+        {
+            return staticMessageTypes.Contains(envelope.Content().GetType());
         }
+        int index = 0;
         bool testCasesFinished = false;
         while (index < envelopes.Count && !testCasesFinished)
         {
             var current = envelopes[index];
+            if (IsStaticMessage(current))
+            {
+                result.Add(current);
+                index++;
+                continue;
+            }
+            if (current.Content() is TestRunStarted)
+            {
+                result.Add(current);
+                index++;
+                continue;
+            }
             if (current.Content() is TestRunFinished)
             {
                 testCasesFinished = true;
@@ -353,7 +364,6 @@ public class MessagesCompatibilityTestBase : SystemTestBase
     {
         string resultLocation = ActualResultLocationDirectory();
         fileName = Path.Combine(resultLocation, fileName + ".ndjson");
-        // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
 
         var actualJsonText = File.ReadAllLines(fileName);
         return actualJsonText;
