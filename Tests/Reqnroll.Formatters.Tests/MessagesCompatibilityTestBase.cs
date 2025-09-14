@@ -110,6 +110,21 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         }
     }
 
+    protected void AddFeatureFilesFromResources(string featureFileName, string folder, Assembly assembly)
+    {
+        var assemblyName = assembly.GetName().Name;
+        string prefixToRemove = $"{assemblyName}.{folder}.Resources.{featureFileName}.";
+        // list of features in the scenario directory
+        var featuresToCompile = assembly.GetManifestResourceNames()
+                           .Where(rn => rn.StartsWith(prefixToRemove) && rn.EndsWith(".feature"))
+                           .Select(rn => rn.Substring(prefixToRemove.Length));
+        foreach (var feature in featuresToCompile)
+        {
+            AddFeatureFileFromResource($"{featureFileName}/{feature}", folder, Assembly.GetExecutingAssembly());
+        }
+
+    }
+
     protected void AddBindingClassFromResource(string fileName, string? prefix = null, Assembly? assemblyToLoadFrom = null)
     {
         var bindingCLassFileContent = _testFileManager.GetTestFileContent(fileName, prefix, assemblyToLoadFrom);
@@ -216,7 +231,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
     {
         var fileName = testName + "." + testName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
-        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         //var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
         //var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
         return expectedJsonText;
@@ -368,4 +383,5 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var actualJsonText = File.ReadAllLines(fileName);
         return actualJsonText;
     }
+
 }

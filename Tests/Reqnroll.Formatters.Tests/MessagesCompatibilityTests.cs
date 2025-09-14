@@ -20,6 +20,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("hooks")]
     [DataRow("hooks-attachment")]
     [DataRow("hooks-conditional")]
+    [DataRow("multiple-features")]
     [DataRow("parameter-types")]
     [DataRow("rules")]
     [DataRow("rules-backgrounds")]
@@ -45,8 +46,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
         MimicAzurePipelinesEnvironment();
         AddUtilClassWithFileSystemPath();
 
-
-        AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "Samples", Assembly.GetExecutingAssembly());
+        AddFeatureFilesFromResources(featureFileName, "Samples", Assembly.GetExecutingAssembly());
         AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "Samples", Assembly.GetExecutingAssembly());
 
         ExecuteTests();
@@ -85,6 +85,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("hooks-named")]
     [DataRow("unknown-parameter-type")]
     [DataRow("regular-expression")]
+    [DataRow("multiple-features-reversed")]
     // These scenarios are from the CCK, but Reqnroll cannot provide a compliant implementation. This is usually the result of differences in behavior or support of Gherkin features.
     // When these scenarios are run, expect them to fail.
     public void NonCompliantCCKScenarios(string testName)
