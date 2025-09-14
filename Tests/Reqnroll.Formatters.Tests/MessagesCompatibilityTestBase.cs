@@ -201,9 +201,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                           """);
     }
 
-    protected IEnumerable<Envelope> GetExpectedResults(string testName, string featureFileName)
+    protected IEnumerable<Envelope> GetExpectedResults(string testName)
     {
-        string[] expectedJsonText = GetExpectedJsonText(testName, featureFileName);
+        string[] expectedJsonText = GetExpectedJsonText(testName);
 
         foreach (var json in expectedJsonText)
         {
@@ -212,9 +212,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         }
     }
 
-    protected string[] GetExpectedJsonText(string testName, string featureFileName)
+    protected string[] GetExpectedJsonText(string testName)
     {
-        var fileName = featureFileName + "." + featureFileName + ".ndjson";
+        var fileName = testName + "." + testName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
         var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         //var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
@@ -222,7 +222,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         return expectedJsonText;
     }
 
-    protected static string[] GetActualGeneratedHtml(string testName, string featureFileName)
+    protected static string[] GetActualGeneratedHtml(string featureFileName)
     {
         string resultLocation = ActualResultLocationDirectory();
         var expectedJsonText = File.ReadAllLines(Path.Combine(resultLocation, $"{featureFileName}.html"));
@@ -234,9 +234,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
     record TestCaseRecord(string Id, string PickleId, Envelope TestCaseEnvelope, Dictionary<string, TestExecution> Executions);
     // ReSharper restore NotAccessedPositionalProperty.Local
 
-    protected IEnumerable<Envelope> GetActualResults(string testName, string fileName)
+    protected IEnumerable<Envelope> GetActualResults(string testName)
     {
-        string[] actualJsonText = GetActualJsonText(testName, fileName);
+        string[] actualJsonText = GetActualJsonText(testName);
         actualJsonText.Should().HaveCountGreaterThan(0, "the test results ndjson file was empty.");
 
         var envelopes = actualJsonText.Select(NdjsonSerializer.Deserialize).ToList();
@@ -360,10 +360,10 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         return result;
     }
 
-    protected static string[] GetActualJsonText(string testName, string fileName)
+    protected static string[] GetActualJsonText(string testName)
     {
         string resultLocation = ActualResultLocationDirectory();
-        fileName = Path.Combine(resultLocation, fileName + ".ndjson");
+        var fileName = Path.Combine(resultLocation, testName + ".ndjson");
 
         var actualJsonText = File.ReadAllLines(fileName);
         return actualJsonText;

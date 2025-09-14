@@ -6,51 +6,52 @@ namespace Reqnroll.Formatters.Tests;
 public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 {
     [TestMethod]
-    [DataRow("ambiguous", "ambiguous")]
-    [DataRow("backgrounds", "Backgrounds")]
-    [DataRow("doc-strings", "Doc strings")]
-    [DataRow("minimal", "minimal")]
-    [DataRow("cdata", "cdata")]
-    [DataRow("data-tables", "Data Tables")]
-    [DataRow("pending", "Pending steps")]
-    [DataRow("empty", "Empty Scenarios")]
-    [DataRow("examples-tables", "Examples Tables")]
-    [DataRow("examples-tables-attachment", "Examples Tables - With attachments")]
-    [DataRow("global-hooks", " Global hooks")]
-    [DataRow("hooks", "Hooks")]
-    [DataRow("hooks-attachment", "Hooks - Attachments")]
-    [DataRow("hooks-conditional", "Hooks - Conditional execution")]
-    [DataRow("parameter-types", "Parameter Types")]
-    [DataRow("rules", "Usage of a `Rule`")]
-    [DataRow("rules-backgrounds", "Rules with Backgrounds")]
-    [DataRow("skipped", "Skipping scenarios")]
-    [DataRow("stack-traces", "Stack traces")]
-    [DataRow("unused-steps", "Unused steps")]
-    [DataRow("undefined", "Undefined steps")] // Snippet provider does not provide all variations possible of method signatures
+    [DataRow("ambiguous")]
+    [DataRow("backgrounds")]
+    [DataRow("doc-strings")]
+    [DataRow("minimal")]
+    [DataRow("cdata")]
+    [DataRow("data-tables")]
+    [DataRow("pending")]
+    [DataRow("empty")]
+    [DataRow("examples-tables")]
+    [DataRow("examples-tables-attachment")]
+    [DataRow("global-hooks")]
+    [DataRow("hooks")]
+    [DataRow("hooks-attachment")]
+    [DataRow("hooks-conditional")]
+    [DataRow("parameter-types")]
+    [DataRow("rules")]
+    [DataRow("rules-backgrounds")]
+    [DataRow("skipped")]
+    [DataRow("stack-traces")]
+    [DataRow("unused-steps")]
+    [DataRow("undefined")] // Snippet provider does not provide all variations possible of method signatures
+    
     // These CCK scenario examples produce Cucumber Messages that are materially compliant with the CCK.
     // The messages produced match the CCK expected messages, with exceptions for things
     // that are not material to the CCK spec (such as IDs don't have to be generated in the same order, timestamps don't have to match, etc.)
     // The rules for what must match and what is allowed to not match are built in to a series of custom FluentAssertion validation rules
     // (located in the CucumberMessagesValidator class)
-    public void CCKScenarios(string testName, string featureNameText)
+    public void CCKScenarios(string testName)
     {
-        ResetCucumberMessages(featureNameText);
-        ResetCucumberMessagesHtml(featureNameText);
+        var featureFileName = testName.Replace("-", "_");
+        ResetCucumberMessages(featureFileName);
+        ResetCucumberMessagesHtml(featureFileName);
         EnableCucumberMessages();
-        SetCucumberMessagesOutputFileName(featureNameText);
+        SetCucumberMessagesOutputFileName(featureFileName);
 
         CucumberMessagesAddConfigurationFile("reqnroll_withBothFormatters.json");
         MimicAzurePipelinesEnvironment();
         AddUtilClassWithFileSystemPath();
 
-        var featureFileName = testName.Replace("-", "_");
 
         AddFeatureFileFromResource($"{featureFileName}/{featureFileName}.feature", "Samples", Assembly.GetExecutingAssembly());
         AddBindingClassFromResource($"{featureFileName}/{featureFileName}.cs", "Samples", Assembly.GetExecutingAssembly());
 
         ExecuteTests();
-        var actualResults = GetActualResults(testName, featureNameText).ToArray();
-        var validator = new CucumberMessagesValidator(actualResults, GetExpectedResults(testName, featureFileName).ToArray());
+        var actualResults = GetActualResults(featureFileName).ToArray();
+        var validator = new CucumberMessagesValidator(actualResults, GetExpectedResults(featureFileName).ToArray());
         validator.ShouldPassBasicStructuralChecks();
         validator.ResultShouldPassAllComparisonTests();
         validator.ResultShouldPassSanityChecks();
@@ -58,8 +59,8 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
         // Validate that the generated html, if present, has a line of text that includes all the ACTUAL envelope messages
         // We're not validating that envelope generation succeeded (that was already tested); we're validating that those generated messages
         // made their way into the HTML
-        var generatedHtml = GetActualGeneratedHtml(testName, featureNameText);
-        var actualMessagesJson = GetActualJsonText(testName, featureNameText);
+        var generatedHtml = GetActualGeneratedHtml(featureFileName);
+        var actualMessagesJson = GetActualJsonText(featureFileName);
         var htmlValidator = new CucumberMessagesHtmlGenerationValidator(generatedHtml, actualMessagesJson);
         htmlValidator.GeneratedHtmlProperlyReflectsExpectedMessages();
 
@@ -70,25 +71,25 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [TestMethod]
     // These tests are not (yet) within the CCK but are included here to round out the testing. The expected results were generated by the CucumberMessages plugin.
     // Once the CCK includes these scenarios, the expected results should come from the CCK repo.
-    public void NonCCKScenarios(string testName, string featureNameText)
+    public void NonCCKScenarios(string testName)
     {
-        CCKScenarios(testName, featureNameText);
+        CCKScenarios(testName);
     }
 
     //[Ignore]
     [TestMethod]
-    [DataRow("attachments", "Attachments")]
-    [DataRow("global-hooks-beforeall-error", " Global hooks - BeforeAll error")]
-    [DataRow("global-hooks-afterall-error", " Global hooks - AfterAll error")]
-    [DataRow("global-hooks-attachments", "Global hooks with attachments")]
-    [DataRow("hooks-named", "Hooks - Named")]
-    [DataRow("unknown-parameter-type", "Unknown Parameter Types")]
-    [DataRow("regular-expression", "regular expression")]
+    [DataRow("attachments")]
+    [DataRow("global-hooks-beforeall-error")]
+    [DataRow("global-hooks-afterall-error")]
+    [DataRow("global-hooks-attachments")]
+    [DataRow("hooks-named")]
+    [DataRow("unknown-parameter-type")]
+    [DataRow("regular-expression")]
     // These scenarios are from the CCK, but Reqnroll cannot provide a compliant implementation. This is usually the result of differences in behavior or support of Gherkin features.
     // When these scenarios are run, expect them to fail.
-    public void NonCompliantCCKScenarios(string testName, string featureNameText)
+    public void NonCompliantCCKScenarios(string testName)
     {
-        CCKScenarios(testName, featureNameText);
+        CCKScenarios(testName);
     }
 
     [TestMethod]
@@ -107,7 +108,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
         _projectsDriver.AddNuGetPackage(plugin, version);
-        var testName = $"retry-{pluginName}";
-        CCKScenarios(testName, testName);
+        var testName = $"retry_{pluginName}";
+        CCKScenarios(testName);
     }
 }
