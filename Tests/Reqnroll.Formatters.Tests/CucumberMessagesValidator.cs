@@ -386,7 +386,19 @@ public partial class CucumberMessagesValidator
         }
     }
 
-    EquivalencyAssertionOptions<T> ArrangeFluentAssertionOptions<T>(EquivalencyAssertionOptions<T> options)
+    private bool GroupListIsEmpty(List<Group> groups)
+    {
+        if (groups == null || groups.Count == 0) return true;
+        foreach (var group in groups)
+        {
+            if (!string.IsNullOrEmpty(group.Value) || group.Start.HasValue)
+                return false;
+            if (!GroupListIsEmpty(group.Children)) return false;
+        }
+        return true;
+    }
+
+    private EquivalencyAssertionOptions<T> ArrangeFluentAssertionOptions<T>(EquivalencyAssertionOptions<T> options)
     {
         // invoking these for each Type in CucumberMessages so that FluentAssertions DOES NOT call .Equal when comparing instances
         return options
@@ -552,10 +564,25 @@ public partial class CucumberMessagesValidator
 
                // Groups are nested self-referential objects inside StepMatchArgument(s). Other Cucumber implementations support a more sophisticated
                // version of this structure in which multiple regex capture groups are conveyed inside a single StepMatchArgument
-               // For Reqnroll, we will only compare the outermost Group; the only property we care about is the Value.
+               // For Reqnroll, we will only compare the outermost Group of the actual.
                .Using<Group>((ctx) =>
                {
-                   ctx.Subject.Value.Should().Be(ctx.Expectation.Value);
+                   var actual = ctx.Subject;
+                   var expected = ctx.Expectation;
+                   if (expected != null
+                        && expected.Value.Length > 2
+                        && ((expected.Value.StartsWith("\"") && expected.Value.EndsWith("\""))
+                            || (expected.Value.StartsWith("'") && expected.Value.EndsWith("'")))
+                       && !GroupListIsEmpty(expected.Children))
+                   {
+                       actual.Value.Should().Be(expected.Children[0].Value);
+                       actual.Start.Should().Be(expected.Children[0].Start);
+                   }
+                   else
+                   {
+                       actual.Value.Should().Be(ctx.Expectation.Value);
+                       actual.Start.Should().Be(ctx.Expectation.Start);
+                   }
                })
                .WhenTypeIs<Group>()
 
@@ -563,6 +590,16 @@ public partial class CucumberMessagesValidator
                // We can't simply omit Timestamp from comparison because then TestRunStarted has nothing else to compare (which causes an error)
                .Using<Timestamp>(_ => 1.Should().Be(1))
                .WhenTypeIs<Timestamp>()
+
+               .Using<List<Group>>((ctx) =>
+               {
+                   var actual = ctx.Subject;
+                   var expected = ctx.Expectation;
+                   // The CCK cucumber implementation sometimes renders empty nested groups, which we will ignore
+                   if (GroupListIsEmpty(expected)) { 1.Should().Be(1); }
+                   actual.Should().BeEquivalentTo(expected);
+               })
+               .WhenTypeIs<List<Group>>()
 
                .AllowingInfiniteRecursion()
                //.RespectingRuntimeTypes()

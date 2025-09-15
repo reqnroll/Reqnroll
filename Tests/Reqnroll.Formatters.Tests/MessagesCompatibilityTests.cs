@@ -65,7 +65,15 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
         htmlValidator.GeneratedHtmlProperlyReflectsExpectedMessages();
 
         // This is necessary b/c the System Test framework doesn't understand Rules and can't determine the number of expected tests
-        ConfirmAllTestsRan(testName == "rules" ? 3 : null);
+        // HACK: Hardcoded values; might need to change should the CCK change these scenarios:
+        // The 'Rules' scenario has 3 tests
+        // The 'RulesBackground' scenario has 2 tests
+        int? numOfTests = null;
+        if (testName == "rules")
+            numOfTests = 3;
+        if (testName == "rules-backgrounds")
+            numOfTests = 2;
+        ConfirmAllTestsRan(numOfTests);
     }
 
     [TestMethod]
