@@ -157,19 +157,20 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     public virtual TestStep ToTestStep(TestStepTracker stepDef)
     {
-        var args = stepDef.StepArguments
-                          .Select(ToStepMatchArgument)
-                          .ToList();
 
         var result = new TestStep(
             null,
             stepDef.TestStepId,
             stepDef.PickleStepId,
             stepDef.StepDefinitionIds,
-            stepDef.IsBound ? [new StepMatchArgumentsList(args)] : []
+            stepDef.IsBound ? stepDef.StepArgumentsLists.Select(ToStepMatchArgumentList).ToList() : []
         );
 
         return result;
+    }
+    private StepMatchArgumentsList ToStepMatchArgumentList(List<TestStepArgument> args)
+    {
+        return new StepMatchArgumentsList(args.Select(ToStepMatchArgument).ToList());
     }
 
     public virtual TestStep ToTestStep(HookStepTracker hookStepTracker)

@@ -11,9 +11,9 @@ namespace CucumberMessages.CompatibilityTests.CCK.ambiguous
     internal class Ambiguous
     {
         [Given(@"^a (.*?) with (.*?)$")]
-        public void FirstMatchingStep() { }
+        public void FirstMatchingStep(string p0, string p1) { }
 
         [Given(@"^a step with (.*)$")]
-        public void SecondMatchingStep() { }
+        public void SecondMatchingStep(string p0) { }
     }
 }
