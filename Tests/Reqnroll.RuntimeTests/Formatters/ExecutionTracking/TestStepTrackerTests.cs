@@ -68,7 +68,9 @@ public class TestStepTrackerTests
 
         // Assert
         def.IsBound.Should().BeTrue();
-        def.StepArgumentsLists.Should().HaveCount(2);
+        def.StepArgumentsLists.Should().HaveCount(1);
+        var argumentList = def.StepArgumentsLists[0];
+        argumentList.Should().HaveCount(2);
     }
 
     [Fact]
@@ -202,7 +204,7 @@ public class TestStepTrackerTests
 
         var stepContextMock = new Mock<IScenarioStepContext>();
         stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
-        stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.TestError);
+        stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.BindingError);
 
         //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
         //    .Returns("ambiguousPattern");

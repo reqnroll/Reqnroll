@@ -20,6 +20,7 @@ public class FluentAssertionCucumberMessagePropertySelectionRule : IMemberSelect
     // Start: Start refers to a column position in source code, which may not be comparable across platforms.
     // FileName: CCK does not provide the file name of attachments but Reqnroll does
     // ProtocolVersion, Implementation, Runtime, Cpu, Os, Ci: These properties of the Meta message are not comparable across platforms.
+    // Name is used for named Hooks, which Reqnroll doesn't have.
 
     // Line, Column, Seconds and Nanos are skipped, rather than their container types (Location and TimeStamp & Duration, respectively), 
     // because that way we can assert that those container types exist in the actual CucumberMessage (without requiring that the details match the expected CucumberMessage)
@@ -29,7 +30,7 @@ public class FluentAssertionCucumberMessagePropertySelectionRule : IMemberSelect
         "Duration", "Start", "FileName", "Message", "Type", "StackTrace", "UseForSnippets",
         "Id", "AstNodeId", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", 
         "TestRunStartedId", "TestCaseStartedId", "TestStepId", "TestCaseId", "WorkerId", "TestRunHookStartedId",
-        "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci", "Code", "Language"
+        "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci", "Code", "Language", "Name"
     };
 
     public FluentAssertionCucumberMessagePropertySelectionRule(IEnumerable<Type> cucumberMessageTypes, IEnumerable<string>? proportiesToSkip = null)

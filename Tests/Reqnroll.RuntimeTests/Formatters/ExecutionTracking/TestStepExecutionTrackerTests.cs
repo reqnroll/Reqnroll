@@ -10,6 +10,7 @@ using System;
 using Xunit;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
+using Reqnroll.Infrastructure;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
@@ -170,14 +171,24 @@ public class TestStepExecutionTrackerTests
     {
         // Arrange
         var stepContextMock = CreateStepContextWithPickleId("undefinedPickleId");
-        stepContextMock.Setup(sc => sc.Status).Returns(ScenarioExecutionStatus.UndefinedStep);
+        var stepInfoDummy = new StepInfo(StepDefinitionType.Given, "", null, null);
+        stepInfoDummy.StepInstance = new StepInstance(StepDefinitionType.Given, StepDefinitionKeyword.Given, null, null, null);
 
-        var scenarioContextMock = new Mock<IScenarioContext>();
-        var stepFinishedEvent = new StepFinishedEvent(null, scenarioContextMock.Object, stepContextMock.Object);
+        stepContextMock.Setup(sc => sc.Status).Returns(ScenarioExecutionStatus.UndefinedStep);
+        stepContextMock.SetupGet(sc => sc.StepInfo).Returns(stepInfoDummy);
+
+        var testResolverMock = new Mock<ITestObjectResolver>();
+        var scenarioContextDummy = new ScenarioContext(null, null, null, testResolverMock.Object);
+        scenarioContextDummy.MissingSteps.Add(stepInfoDummy.StepInstance, "skeleton");
+        var featureContextMock = new Mock<IFeatureContext>();
+        var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "title", "");
+        featureContextMock.SetupGet(fc => fc.FeatureInfo).Returns(featureInfo);
+
+        var stepFinishedEvent = new StepFinishedEvent(featureContextMock.Object, scenarioContextDummy, stepContextMock.Object);
 
         var testStepFinished = new TestStepFinished("testCaseStartedId", "testStepId",
             new TestStepResult(new Duration(0, 0), "", TestStepResultStatus.UNDEFINED, null), new Timestamp(0, 0));
-        var suggestion = new Suggestion("suggestionId", "undefinedPickleId", [new Snippet("C#", "skeleton")]);
+        var suggestion = new Suggestion("suggestionId", "undefinedPickleId", [new Snippet("CSharp", "skeleton")]);
 
         _messageFactoryMock
             .Setup(f => f.ToTestStepFinished(_testStepExecutionTrackerSut))

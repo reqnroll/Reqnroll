@@ -43,7 +43,7 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
         {
             var lang = stepFinishedEvent.FeatureContext.FeatureInfo.GenerationTargetLanguage.ToString();
             // retrieve skeleton code from the ScenarioContext (keyed by StepInstance)
-            var sc = stepFinishedEvent.ScenarioContext as ScenarioContext;
+            var sc = (ScenarioContext)stepFinishedEvent.ScenarioContext;
             if (sc != null)
             {
 
