@@ -3,8 +3,6 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 using Reqnroll.Bindings;
 using System.Collections.Immutable;
-using System.Reflection;
-using System.Runtime.Loader;
 
 namespace Reqnroll.StepBindingSourceGenerator;
 
@@ -49,63 +47,5 @@ public class GeneratorDriver
             .GetRunResult();
 
         return new GeneratorResult((CSharpCompilation)outputCompilation, diagnostics, runResult.GeneratedTrees);
-    }
-}
-
-public class GeneratorResult
-{
-    private readonly CSharpCompilation _compilation;
-
-    public GeneratorResult(
-        CSharpCompilation compilation,
-        ImmutableArray<Diagnostic> diagnostics,
-        ImmutableArray<SyntaxTree> generatedTrees)
-    {
-        _compilation = compilation;
-        Diagnostics = diagnostics;
-        GeneratedTrees = generatedTrees;
-    }
-
-    public ImmutableArray<Diagnostic> Diagnostics { get; }
-
-    public ImmutableArray<SyntaxTree> GeneratedTrees { get; }
-
-    public AssemblyTestContext CompileAssembly()
-    {
-        using var buffer = new MemoryStream();
-
-        var result = _compilation.Emit(buffer);
-
-        if (!result.Success)
-        {
-            throw new InvalidOperationException(
-                "Failed to compile generated code.\nDiagnostics:\n  " + 
-                string.Join("\n  ", result.Diagnostics.Select(diag => diag.ToString())));
-        }
-
-        buffer.Seek(0, SeekOrigin.Begin);
-
-        var assemblyLoadContext = new AssemblyLoadContext(nameof(AssemblyTestContext), true);
-        var assembly = assemblyLoadContext.LoadFromStream(buffer);
-
-        return new AssemblyTestContext(assemblyLoadContext, assembly);
-    }
-}
-
-public sealed class AssemblyTestContext : IDisposable
-{
-    private readonly AssemblyLoadContext _context;
-
-    public Assembly Assembly { get; }
-
-    internal AssemblyTestContext(AssemblyLoadContext context, Assembly assembly)
-    {
-        _context = context;
-        Assembly = assembly;
-    }
-
-    public void Dispose()
-    {
-        _context.Unload();
     }
 }
