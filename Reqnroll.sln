@@ -44,10 +44,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Reqnroll.Tools.MsBuild.Gene
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Licenses", "Licenses", "{D7B9D08E-67E6-4294-9E1F-2AB119571BD7}"
 	ProjectSection(SolutionItems) = preProject
-		Licenses\BoDi-LICENSE-Apache2.txt = Licenses\BoDi-LICENSE-Apache2.txt
+		Licenses\Cucumber.CucumberExpressions-LICENSE-MIT.txt = Licenses\Cucumber.CucumberExpressions-LICENSE-MIT.txt
+		Licenses\Cucumber.HtmlFormatter-LICENSE-MIT.txt = Licenses\Cucumber.HtmlFormatter-LICENSE-MIT.txt
+		Licenses\Cucumber.Messages-LICENSE-MIT.txt = Licenses\Cucumber.Messages-LICENSE-MIT.txt
 		Licenses\Gherkin-LICENSE-MIT.txt = Licenses\Gherkin-LICENSE-MIT.txt
-		Licenses\Newtonsoft.Json-LICENSE-MIT.md = Licenses\Newtonsoft.Json-LICENSE-MIT.md
-		Licenses\System.ValueTuple-LICENSE-MIT.txt = Licenses\System.ValueTuple-LICENSE-MIT.txt
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TestProjectGenerator", "TestProjectGenerator", "{974420E8-FEEA-4564-B4CE-BE06F7457E3B}"
