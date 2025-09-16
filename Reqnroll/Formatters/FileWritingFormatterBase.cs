@@ -98,7 +98,9 @@ public abstract class FileWritingFormatterBase : FormatterBase
             catch (System.Exception e)
             {
                 onInitialized(false);
-                Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {Name}. The formatter will be disabled.");
+                Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {Name}. The formatter will be disabled."
+                    + Environment.NewLine
+                    + e.StackTrace);
                 return;
             }
         }
@@ -123,7 +125,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
                     Logger.WriteMessage($"Formatter {Name} has been cancelled.");
                     break;
                 }
-                await WriteToFile(message, cancellationToken);                
+                await WriteToFile(message, cancellationToken);
             }
         }
         catch (OperationCanceledException)
@@ -133,7 +135,9 @@ public abstract class FileWritingFormatterBase : FormatterBase
         }
         catch (System.Exception e)
         {
-            Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be processed.");
+            Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be processed."
+                    + Environment.NewLine
+                    + e.StackTrace);
             throw;
         }
         finally
@@ -145,7 +149,9 @@ public abstract class FileWritingFormatterBase : FormatterBase
             }
             catch (System.Exception e)
             {
-                Logger.WriteMessage($"Formatter {Name} file stream flush threw an exception: {e.Message}.");
+                Logger.WriteMessage($"Formatter {Name} file stream flush threw an exception: {e.Message}."
+                    + Environment.NewLine
+                    + e.StackTrace);
             }
         }
     }
@@ -159,14 +165,17 @@ public abstract class FileWritingFormatterBase : FormatterBase
             onInitialized(true);
             Logger.WriteMessage($"Formatter {Name} opened file stream.");
         }
-        catch
+        catch(System.Exception e)
         {
-            Logger.WriteMessage($"Formatter {Name} closing because of an exception opening the file stream.");
+            Logger.WriteMessage($"Formatter {Name} closing because of an exception opening the file stream."
+                                 + Environment.NewLine
+                                 + e.StackTrace);
+
             onInitialized(false);
         }
     }
 
-    protected virtual Stream CreateTargetFileStream(string outputPath) => 
+    protected virtual Stream CreateTargetFileStream(string outputPath) =>
         File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
 
     protected abstract void OnTargetFileStreamInitialized(Stream targetFileStream);
