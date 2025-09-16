@@ -541,89 +541,91 @@ namespace Reqnroll.Infrastructure
                     return Task.CompletedTask;
                 });
 
-                // 2. Calculate invoke arguments
-                await HandleStepExecutionExceptionsIf(
-                    stepStatus == ScenarioExecutionStatus.OK,
-                    async () =>
-                    {
-                        // GetExecuteArgumentsAsync might throw
-                        // - BindingException when the step definition is invalid (e.g. too many parameters)
-                        // - BindingException when the invoked step argument transformation is invalid
-                        // - Any other exception (e.g. FormatException) when the step arguments cannot be converted
-                        arguments = await GetExecuteArgumentsAsync(match);
-                    });
+            // 2. Calculate invoke arguments
+            await HandleStepExecutionExceptionsIf(
+                stepStatus == ScenarioExecutionStatus.OK,
+                async () =>
+                {
+                    // GetExecuteArgumentsAsync might throw
+                    // - BindingException when the step definition is invalid (e.g. too many parameters)
+                    // - BindingException when the invoked step argument transformation is invalid
+                    // - Any other exception (e.g. FormatException) when the step arguments cannot be converted
+                    arguments = await GetExecuteArgumentsAsync(match);
+                });
 
-                // 3. Handle obsolete step definitions
-                await HandleStepExecutionExceptionsIf(
-                    stepStatus == ScenarioExecutionStatus.OK,
-                    () =>
-                    {
-                        // _obsoleteStepHandler.Handle might throw
-                        // - BindingException when obsoleteBehavior is configured to "error"
-                        // - PendingStepException when obsoleteBehavior is configured to "pending"
-                        _obsoleteStepHandler.Handle(match);
-                        return Task.CompletedTask;
-                    });
+            // 3. Handle obsolete step definitions
+            await HandleStepExecutionExceptionsIf(
+                stepStatus == ScenarioExecutionStatus.OK,
+                () =>
+                {
+                    // _obsoleteStepHandler.Handle might throw
+                    // - BindingException when obsoleteBehavior is configured to "error"
+                    // - PendingStepException when obsoleteBehavior is configured to "pending"
+                    _obsoleteStepHandler.Handle(match);
+                    return Task.CompletedTask;
+                });
 
-                // 4. Invoke BeforeStep hook
-                await HandleStepExecutionExceptionsIf(
-                    stepStatus == ScenarioExecutionStatus.OK,
-                    async () =>
-                    {
-                        // Both 'OnStepStartAsync' and 'ExecuteStepMatchAsync' can throw exceptions
-                        // if the related hook or step definition fails.
-                        onStepStartHookExecuted = true; // setting it before the call, because the call might throw an exception
-                        await OnStepStartAsync();
-                    });
+            // 4. Invoke BeforeStep hook
+            await HandleStepExecutionExceptionsIf(
+                stepStatus == ScenarioExecutionStatus.OK,
+                async () =>
+                {
+                    // Both 'OnStepStartAsync' and 'ExecuteStepMatchAsync' can throw exceptions
+                    // if the related hook or step definition fails.
+                    onStepStartHookExecuted = true; // setting it before the call, because the call might throw an exception
+                    await OnStepStartAsync();
+                });
 
-                // 5. Publish StepStartedEvent event
+            // 5. Publish StepStartedEvent event
+            await HandleStepExecutionExceptions(
+                async () =>
+                {
+                    var stepStartedEvent = new StepStartedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
+                    await _testThreadExecutionEventPublisher.PublishEventAsync(stepStartedEvent);
+                });
+
+            // 6. Invoke step logic (if possible)
+            if (stepStatus == ScenarioExecutionStatus.OK)
+            {
+                // 6/A. Invoke step code
                 await HandleStepExecutionExceptions(
                     async () =>
                     {
-                        var stepStartedEvent = new StepStartedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
-                        await _testThreadExecutionEventPublisher.PublishEventAsync(stepStartedEvent);
+                        await ExecuteStepMatchAsync(match, arguments, durationHolder);
                     });
+            }
+            else if (stepStatus == ScenarioExecutionStatus.Skipped &&
+                     contextManager.StepContext.Status != ScenarioExecutionStatus.UndefinedStep)
+            {
+                // 6/B. Invoke skip handlers (if previous error was not undefined)
+                await HandleStepExecutionExceptions(OnSkipStepAsync);
+            }
 
-                // 6. Invoke step logic (if possible)
-                if (stepStatus == ScenarioExecutionStatus.OK)
+            // 7. Trace result & set scenario execution status
+            TraceStepExecutionResult(stepStatus, stepException, durationHolder.Duration, match, arguments, isStepSkippedBecauseOfPreviousErrors, stepInstance, candidatingMatches);
+            if (stepStatus != ScenarioExecutionStatus.OK)
+                UpdateStatusOnStepFailure(stepStatus, stepException);
+
+            // 8. Publish StepFinishedEvent event
+            await HandleStepExecutionExceptions(
+                async () =>
                 {
-                    // 6/A. Invoke step code
-                    await HandleStepExecutionExceptions(
-                        async () =>
-                        {
-                            await ExecuteStepMatchAsync(match, arguments, durationHolder);
-                        });
-                }
-                else if (stepStatus == ScenarioExecutionStatus.Skipped &&
-                         contextManager.StepContext.Status != ScenarioExecutionStatus.UndefinedStep)
-                {
-                    // 6/B. Invoke skip handlers (if previous error was not undefined)
-                    await HandleStepExecutionExceptions(OnSkipStepAsync);
-                }
-                // 7. Trace result & set scenario execution status
-                TraceStepExecutionResult(stepStatus, stepException, durationHolder.Duration, match, arguments, isStepSkippedBecauseOfPreviousErrors, stepInstance, candidatingMatches);
-                if (stepStatus != ScenarioExecutionStatus.OK)
-                    UpdateStatusOnStepFailure(stepStatus, stepException);
+                    var stepFinishedEvent = new StepFinishedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
+                    await _testThreadExecutionEventPublisher.PublishEventAsync(stepFinishedEvent);
+                });
 
-                // 8. Publish StepFinishedEvent event
-                await HandleStepExecutionExceptions(
-                    async () =>
-                    {
-                        var stepFinishedEvent = new StepFinishedEvent(contextManager.FeatureContext, contextManager.ScenarioContext, contextManager.StepContext);
-                        await _testThreadExecutionEventPublisher.PublishEventAsync(stepFinishedEvent);
-                    });
+            // 9. Invoke AfterStep hook
+            if (onStepStartHookExecuted)
+            {
+                // We need to have this call after the 'UpdateStatusOnStepFailure' above, because otherwise
+                // after step hooks cannot handle step errors.
+                // The 'OnStepEndAsync' call might throw an exception if the related after step hook fails,
+                // but we can let the exception propagate to the caller.
+                await OnStepEndAsync();
+            }
 
-                // 9. Invoke AfterStep hook
-                if (onStepStartHookExecuted)
-                {
-                    // We need to have this call after the 'UpdateStatusOnStepFailure' above, because otherwise
-                    // after step hooks cannot handle step errors.
-                    // The 'OnStepEndAsync' call might throw an exception if the related after step hook fails,
-                    // but we can let the exception propagate to the caller.
-                    await OnStepEndAsync();
-                }
-            if (stepException != null && stepStatus != ScenarioExecutionStatus.UndefinedStep &&  _reqnrollConfiguration.StopAtFirstError) ExceptionDispatchInfo.Capture(stepException).Throw();
-
+            if (stepException != null && stepStatus != ScenarioExecutionStatus.UndefinedStep && _reqnrollConfiguration.StopAtFirstError) 
+                ExceptionDispatchInfo.Capture(stepException).Throw();
         }
 
         private void TraceStepExecutionResult(
