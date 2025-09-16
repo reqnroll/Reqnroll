@@ -13,14 +13,14 @@ permissions:
 jobs:
   check_todos:
     runs-on: ubuntu-latest
-    name: Check for new TODOs
+    name: TODO checker
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: TODO Creeper (Error on PR, Warning on main)
-        uses: Gustrb/todo-creeper@v1.0.0
+      - name: Check for new TODOs
+        uses: Gustrb/todo-creeper@v1.2.0
         continue-on-error: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
         with:
           exclude: |
