@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Dependencies: Updated to Cucumber Gherkin v35.0.0, Cucumber Messages v29.0.0 and Cucumber CompatibilityKit v23.0.0
 
 ## Bug fixes:
 
