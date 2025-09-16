@@ -15,10 +15,28 @@ namespace Reqnroll.Verify.ReqnrollPlugin;
 
 public class VerifyRuntimePlugin : IRuntimePlugin
 {
+    private static FeatureContext featureContext;
+    private static ScenarioContext scenarioContext;
+
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
         runtimePluginEvents.CustomizeGlobalDependencies += RuntimePluginEvents_CustomizeGlobalDependencies;
         runtimePluginEvents.CustomizeScenarioDependencies += RuntimePluginEvents_CustomizeScenarioDependencies;
+        Verifier.DerivePathInfo(
+            (_, projectDirectory, _, _) =>
+            {
+                string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
+
+                foreach (DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
+                {
+                    scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
+                }
+
+                return new PathInfo(
+                    Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
+                    featureContext.FeatureInfo.Title,
+                    scenarioInfoTitle);
+            });
     }
 
     private void RuntimePluginEvents_CustomizeGlobalDependencies(object sender, CustomizeGlobalDependenciesEventArgs e)
@@ -26,24 +44,8 @@ public class VerifyRuntimePlugin : IRuntimePlugin
         var runtimePluginTestExecutionLifecycleEvents = e.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
         runtimePluginTestExecutionLifecycleEvents.BeforeScenario += (_, runtimePluginBeforeScenarioEventArgs) =>
         {
-            var scenarioContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<ScenarioContext>();
-            var featureContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<FeatureContext>();
-
-            Verifier.DerivePathInfo(
-                (_, projectDirectory, _, _) =>
-                {
-                    string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
-
-                    foreach (DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
-                    {
-                        scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
-                    }
-
-                    return new PathInfo(
-                        Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
-                        featureContext.FeatureInfo.Title,
-                        scenarioInfoTitle);
-                });
+            scenarioContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<ScenarioContext>();
+            featureContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<FeatureContext>();
         };
     }
 
