@@ -3,8 +3,9 @@
 ## Improvements:
 
 ## Bug fixes:
+* Fix: Step Execution improperly handles error flows when StopAtFirstError is true resulting in skipped StepStartedEvent.
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolplhi
 
 # v3.0.2 - 2025-09-08
 
