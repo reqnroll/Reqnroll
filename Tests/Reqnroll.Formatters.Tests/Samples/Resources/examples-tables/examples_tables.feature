@@ -25,12 +25,6 @@ Feature: Examples Tables
       |    12 |  20 |    0 |
       |     0 |   1 |    0 |
 
-    @undefined
-    Examples: These are undefined because the value is not an {int}
-      | start | eat    | left  |
-      |    12 | banana |    12 |
-      |     0 |      1 | apple |
-
   Scenario Outline: Eating cucumbers with <friends> friends
     Given there are <friends> friends
     And there are <start> cucumbers

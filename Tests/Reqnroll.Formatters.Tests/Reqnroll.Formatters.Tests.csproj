@@ -13,7 +13,7 @@
     <Compile Remove="Samples\Resources\**\*.cs" />
     <None Remove="Samples\Resources\**\*.feature" />
     <None Remove="Samples\Resources\**\*.feature.ndjson" />
-    <None Remove ="Samples\Resources\**\*.ts" />
+    <None Remove="Samples\Resources\**\*.ts" />
     <None Update="Samples\Resources\**\*.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

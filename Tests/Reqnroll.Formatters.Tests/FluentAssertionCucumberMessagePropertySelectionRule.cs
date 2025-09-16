@@ -27,7 +27,7 @@ public class FluentAssertionCucumberMessagePropertySelectionRule : IMemberSelect
 
     private readonly List<string> _propertiesToSkip = new List<string>() {    
         "Location", "Line", "Column", "Uri", "JavaMethod", "JavaStackTraceElement", "Exception",
-        "Duration", "Start", "FileName", "Message", "Type", "StackTrace", "UseForSnippets",
+        "Duration", "Start", "FileName", "Type", "StackTrace", "UseForSnippets",
         "Id", "AstNodeId", "AstNodeIds", "StepDefinitionIds", "HookId", "PickleStepId", "PickleId", 
         "TestRunStartedId", "TestCaseStartedId", "TestStepId", "TestCaseId", "WorkerId", "TestRunHookStartedId",
         "ProtocolVersion", "Implementation", "Runtime", "Cpu", "Os", "Ci", "Code", "Language", "Name"

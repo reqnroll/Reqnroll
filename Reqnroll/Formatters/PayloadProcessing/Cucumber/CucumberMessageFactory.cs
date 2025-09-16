@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Group = Io.Cucumber.Messages.Types.Group;
 
@@ -303,12 +304,26 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             Converters.ToTimestamp(tracker.Timestamp));
     }
 
+    private static string ToTestStepResultMessage(System.Exception exception, ScenarioExecutionStatus status)
+    {
+        if (exception == null) { return null; }
+        return status switch
+        {
+            ScenarioExecutionStatus.OK => null,
+            ScenarioExecutionStatus.StepDefinitionPending => exception.Message,
+            ScenarioExecutionStatus.UndefinedStep => exception.Message,
+            ScenarioExecutionStatus.BindingError => null,
+            ScenarioExecutionStatus.TestError => exception.Message,
+            ScenarioExecutionStatus.Skipped => null,
+            _ => throw new NotImplementedException(),
+        };
+    }
     private static TestStepResult ToTestStepResult(StepExecutionTrackerBase stepState)
     {
         TimeSpan d = (stepState.Duration.HasValue ? (TimeSpan)stepState.Duration : new TimeSpan(0));
         return new TestStepResult(
             Converters.ToDuration(d),
-            "",
+            ToTestStepResultMessage(stepState.Exception, stepState.Status),
             ToTestStepResultStatus(stepState.Status),
             ToException(stepState.Exception)
         );
@@ -318,7 +333,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     {
         return new TestStepResult(
             Converters.ToDuration(hookExecutionTracker.Duration ?? TimeSpan.Zero),
-            "",
+            ToTestStepResultMessage(hookExecutionTracker.Exception, hookExecutionTracker.Status),
             ToTestStepResultStatus(hookExecutionTracker.Status),
             ToException(hookExecutionTracker.Exception));
     }

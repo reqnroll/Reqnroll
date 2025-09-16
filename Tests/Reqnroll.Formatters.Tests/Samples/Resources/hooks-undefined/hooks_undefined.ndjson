@@ -1,0 +1,18 @@
+{"meta":{"protocolVersion":"29.0.1","implementation":{"name":"fake-cucumber","version":"123.45.6"},"cpu":{"name":"arm64"},"os":{"name":"darwin","version":"24.5.0"},"runtime":{"name":"Node.js","version":"24.4.1"},"ci":{"name":"GitHub Actions","url":"https://github.com/cucumber-ltd/shouty.rb/actions/runs/154666429","buildNumber":"154666429","git":{"revision":"99684bcacf01d95875834d87903dcb072306c9ad","remote":"https://github.com/cucumber-ltd/shouty.rb.git","branch":"main"}}}}
+{"source":{"data":"Feature: Hooks - With Undefined Steps\n  Hooks also run before and after undefined steps\n\n  Scenario: No tags and a undefined step\n    When a step does not exist\n","uri":"samples/hooks-undefined/hooks-undefined.feature","mediaType":"text/x.cucumber.gherkin+plain"}}
+{"gherkinDocument":{"feature":{"tags":[],"location":{"line":1,"column":1},"language":"en","keyword":"Feature","name":"Hooks - With Undefined Steps","description":"  Hooks also run before and after undefined steps","children":[{"scenario":{"id":"1","tags":[],"location":{"line":4,"column":3},"keyword":"Scenario","name":"No tags and a undefined step","description":"","steps":[{"id":"0","location":{"line":5,"column":5},"keyword":"When ","keywordType":"Action","text":"a step does not exist"}],"examples":[]}}]},"comments":[],"uri":"samples/hooks-undefined/hooks-undefined.feature"}}
+{"pickle":{"id":"3","uri":"samples/hooks-undefined/hooks-undefined.feature","astNodeIds":["1"],"tags":[],"name":"No tags and a undefined step","language":"en","steps":[{"id":"2","text":"a step does not exist","type":"Action","astNodeIds":["0"]}]}}
+{"hook":{"id":"4","type":"BEFORE_TEST_CASE","sourceReference":{"uri":"samples/hooks-undefined/hooks-undefined.ts","location":{"line":3}}}}
+{"hook":{"id":"5","type":"AFTER_TEST_CASE","sourceReference":{"uri":"samples/hooks-undefined/hooks-undefined.ts","location":{"line":7}}}}
+{"testRunStarted":{"id":"6","timestamp":{"seconds":0,"nanos":0}}}
+{"testCase":{"id":"7","pickleId":"3","testSteps":[{"id":"8","hookId":"4"},{"id":"9","pickleStepId":"2","stepDefinitionIds":[],"stepMatchArgumentsLists":[]},{"id":"10","hookId":"5"}],"testRunStartedId":"6"}}
+{"testCaseStarted":{"id":"11","testCaseId":"7","timestamp":{"seconds":0,"nanos":1000000},"attempt":0}}
+{"testStepStarted":{"testCaseStartedId":"11","testStepId":"8","timestamp":{"seconds":0,"nanos":2000000}}}
+{"testStepFinished":{"testCaseStartedId":"11","testStepId":"8","testStepResult":{"status":"PASSED","duration":{"seconds":0,"nanos":1000000}},"timestamp":{"seconds":0,"nanos":3000000}}}
+{"testStepStarted":{"testCaseStartedId":"11","testStepId":"9","timestamp":{"seconds":0,"nanos":4000000}}}
+{"suggestion":{"id":"12","pickleStepId":"2","snippets":[{"language":"typescript","code":"When(\"a step does not exist\", () => {\n  return \"pending\"\n})"}]}}
+{"testStepFinished":{"testCaseStartedId":"11","testStepId":"9","testStepResult":{"status":"UNDEFINED","duration":{"seconds":0,"nanos":0}},"timestamp":{"seconds":0,"nanos":5000000}}}
+{"testStepStarted":{"testCaseStartedId":"11","testStepId":"10","timestamp":{"seconds":0,"nanos":6000000}}}
+{"testStepFinished":{"testCaseStartedId":"11","testStepId":"10","testStepResult":{"status":"PASSED","duration":{"seconds":0,"nanos":1000000}},"timestamp":{"seconds":0,"nanos":7000000}}}
+{"testCaseFinished":{"testCaseStartedId":"11","timestamp":{"seconds":0,"nanos":8000000},"willBeRetried":false}}
+{"testRunFinished":{"testRunStartedId":"6","timestamp":{"seconds":0,"nanos":9000000},"success":false}}

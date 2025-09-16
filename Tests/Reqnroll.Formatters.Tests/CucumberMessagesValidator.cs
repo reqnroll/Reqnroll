@@ -601,6 +601,22 @@ public partial class CucumberMessagesValidator
                })
                .WhenTypeIs<List<Group>>()
 
+               // TestStepResult.Message contains Exception message string. If one is expected, then the result should have content
+               .Using<string>((ctx) =>
+               {
+                   var actual = ctx.Subject;
+                   var expected = ctx.Expectation;
+                   if (!string.IsNullOrEmpty(expected))
+                   {
+                       actual.Should().NotBeNullOrEmpty();
+                   }
+                   else
+                   {
+                       actual.Should().BeNullOrEmpty();
+                   }
+               })
+               .When(info => info.Path.EndsWith("Message"))
+
                .AllowingInfiniteRecursion()
                //.RespectingRuntimeTypes()
                .ExcludingFields()

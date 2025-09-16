@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Reqnroll.Formatters.Tests;
@@ -8,27 +9,29 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [TestMethod]
     [DataRow("ambiguous")]
     [DataRow("backgrounds")]
-    [DataRow("doc-strings")]
-    [DataRow("minimal")]
     [DataRow("cdata")]
     [DataRow("data-tables")]
-    [DataRow("pending")]
+    [DataRow("doc-strings")]
     [DataRow("empty")]
     [DataRow("examples-tables")]
     [DataRow("examples-tables-attachment")]
+    [DataRow("examples-tables-undefined")]
     [DataRow("global-hooks")]
     [DataRow("hooks")]
     [DataRow("hooks-attachment")]
-    [DataRow("hooks-named")] // This works b/c we ignore the name property when comparing
     [DataRow("hooks-conditional")]
+    [DataRow("hooks-named")] // This works b/c we ignore the name property when comparing
+    [DataRow("hooks-undefined")]
+    [DataRow("minimal")]
     [DataRow("multiple-features")]
     [DataRow("parameter-types")]
+    [DataRow("pending")]
     [DataRow("rules")]
     [DataRow("rules-backgrounds")]
     [DataRow("skipped")]
     [DataRow("stack-traces")]
-    [DataRow("unused-steps")]
     [DataRow("undefined")] // Snippet provider does not provide all variations possible of method signatures
+    [DataRow("unused-steps")]
     
     // These CCK scenario examples produce Cucumber Messages that are materially compliant with the CCK.
     // The messages produced match the CCK expected messages, with exceptions for things
@@ -36,7 +39,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     // The rules for what must match and what is allowed to not match are built in to a series of custom FluentAssertion validation rules
     // (located in the CucumberMessagesValidator class)
     public void CCKScenarios(string testName)
-    {
+    { 
         var featureFileName = testName.Replace("-", "_");
         ResetCucumberMessages(featureFileName);
         ResetCucumberMessagesHtml(featureFileName);
@@ -88,13 +91,13 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
     [Ignore]
     [TestMethod]
-    [DataRow("attachments")]
-    [DataRow("global-hooks-beforeall-error")]
-    [DataRow("global-hooks-afterall-error")]
-    [DataRow("global-hooks-attachments")]
-    [DataRow("unknown-parameter-type")]
-    [DataRow("regular-expression")]
-    [DataRow("multiple-features-reversed")]
+    [DataRow("attachments")] // Reqnroll does not support user-supplied mime-types for attachments or providing mime-types to WriteLine output
+    [DataRow("global-hooks-beforeall-error")] // Cucumber expects execution to continue after a hook failure
+    [DataRow("global-hooks-afterall-error")] // Cucumber expects execution to continue after a hook failure
+    [DataRow("global-hooks-attachments")] // Fails b/c we cannot obtain Reqnroll OutputHandler in global hooks
+    [DataRow("unknown-parameter-type")] // Reqnroll does not provide skeletons for missing Parameter Types
+    [DataRow("regular-expression")] // Reqnroll does not support optional binding method arguments
+    [DataRow("multiple-features-reversed")] // Reqnroll does not have the concept of specifying execution order via run-time parameter
     // These scenarios are from the CCK, but Reqnroll cannot provide a compliant implementation. This is usually the result of differences in behavior or support of Gherkin features.
     // When these scenarios are run, expect them to fail.
     public void NonCompliantCCKScenarios(string testName)
@@ -104,10 +107,13 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
     [TestMethod]
     //[DataRow("xRetry")] // xRetry currently fails this test because it retries a scenario with an undefined step (which is not expected behavior)
-    [DataRow("NUnitRetry")] // The feature-file and expected result .ndjson file have been modified from the CCK to reflect that NUnitRetry uses a Feature-level tag
+    [DataRow("NUnitRetry", "retry")] // The feature-file and expected result .ndjson file have been modified from the CCK to reflect that NUnitRetry uses a Feature-level tag
+    [DataRow("NUnitRetry", "retry-ambiguous")]
+    [DataRow("NUnitRetry", "retry-pending")]
+    [DataRow("NUnitRetry", "retry-undefined")]
     // When this test suite is refreshed from the CCK, these changes need to be re-applied for this test to properly operate and pass.
     // These tests attempt to execute the Retry scenario from the CCK using the known open-source plugins for Reqnroll that integrate Retry functionality into Reqnroll.
-    public void CCKRetryScenario(string pluginName)
+    public void CCKRetryScenario(string pluginName, string testNameRoot)
     {
         var (plugin, version, unitTestProvider) = pluginName switch
         {
@@ -118,7 +124,7 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 
         _testRunConfiguration.UnitTestProvider = unitTestProvider;
         _projectsDriver.AddNuGetPackage(plugin, version);
-        var testName = $"retry_{pluginName}";
+        var testName = $"{pluginName}-{testNameRoot}";
         CCKScenarios(testName);
     }
 }
