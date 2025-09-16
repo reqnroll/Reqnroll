@@ -100,7 +100,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
                 onInitialized(false);
                 Logger.WriteMessage($"An exception {e.Message} occurred creating the destination directory({baseDirectory} for Formatter {Name}. The formatter will be disabled."
                     + Environment.NewLine
-                    + e.StackTrace);
+                    + e.ToString());
                 return;
             }
         }
@@ -137,7 +137,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
         {
             Logger.WriteMessage($"Formatter {Name} threw an exception: {e.Message}. No further messages will be processed."
                     + Environment.NewLine
-                    + e.StackTrace);
+                    + e.ToString());
             throw;
         }
         finally
@@ -151,7 +151,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
             {
                 Logger.WriteMessage($"Formatter {Name} file stream flush threw an exception: {e.Message}."
                     + Environment.NewLine
-                    + e.StackTrace);
+                    + e.ToString());
             }
         }
     }
@@ -169,7 +169,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
         {
             Logger.WriteMessage($"Formatter {Name} closing because of an exception opening the file stream."
                                  + Environment.NewLine
-                                 + e.StackTrace);
+                                 + e.ToString());
 
             onInitialized(false);
         }
