@@ -11,77 +11,83 @@ permissions:
   contents: read
 
 jobs:
-  check_todos:
+  check_todos_pr:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    name: Check for new TODOs
+    name: Check for new TODOs (PR - Error on new TODOs)
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Check for new TODOs
-        shell: bash
-        run: |
-          # Define ignored files/lines (existing TODOs that should not trigger failures)
-          cat > ignored_todos.txt << 'EOF'
-          docs/integrations/dependency-injection.md:32
-          docs/integrations/windsor.md:39
-          docs/integrations/autofac.md:108
-          docs/integrations/autofac.md:117
-          docs/quickstart/index.md:245
-          docs/guides/how-to-configure-cucumber-expression-behavior.md:54
-          docs/guides/how-to-configure-cucumber-expression-behavior.md:79
-          docs/ide-integrations/rider/index.md:5
-          docs/ide-integrations/vscode/index.md:5
-          docs/help/support.md:5
-          Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:13
-          Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:25
-          Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:33
-          Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:41
-          Plugins/Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin/DependencyInjectionPlugin.cs:151
-          Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin/DataSources/ExternalDataSpecification.cs:36
-          Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:8
-          Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:20
-          Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:35
-          Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator/ProjectBuilder.cs:431
-          Reqnroll.Generator/UnitTestProvider/XUnit2TestGeneratorProvider.cs:78
-          Reqnroll.Generator/Generation/ScenarioPartHelper.cs:148
-          Reqnroll/FeatureInfo.cs:36
-          Reqnroll/Bindings/BindingRegistry.cs:36
-          Reqnroll/Bindings/Reflection/BindingReflectionExtensions.cs:99
-          Reqnroll/PlatformCompatibility/MonoHelper.cs:24
-          EOF
+      - name: TODO Creeper
+        uses: Gustrb/todo-creeper@v1.0.0
+        with:
+          exclude: |
+            docs/integrations/dependency-injection.md:32
+            docs/integrations/windsor.md:39
+            docs/integrations/autofac.md:108
+            docs/integrations/autofac.md:117
+            docs/quickstart/index.md:245
+            docs/guides/how-to-configure-cucumber-expression-behavior.md:54
+            docs/guides/how-to-configure-cucumber-expression-behavior.md:79
+            docs/ide-integrations/rider/index.md:5
+            docs/ide-integrations/vscode/index.md:5
+            docs/help/support.md:5
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:13
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:25
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:33
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:41
+            Plugins/Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin/DependencyInjectionPlugin.cs:151
+            Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin/DataSources/ExternalDataSpecification.cs:36
+            Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:8
+            Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:20
+            Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:35
+            Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator/ProjectBuilder.cs:431
+            Reqnroll.Generator/UnitTestProvider/XUnit2TestGeneratorProvider.cs:78
+            Reqnroll.Generator/Generation/ScenarioPartHelper.cs:148
+            Reqnroll/FeatureInfo.cs:36
+            Reqnroll/Bindings/BindingRegistry.cs:36
+            Reqnroll/Bindings/Reflection/BindingReflectionExtensions.cs:99
+            Reqnroll/PlatformCompatibility/MonoHelper.cs:24
 
-          echo "🔍 Scanning for TODO, FIXME, and HACK comments..."
-          
-          # Find all TODO/FIXME/HACK comments with line numbers
-          grep -rn -E "(TODO|FIXME|HACK)" . \
-            --include="*.cs" --include="*.js" --include="*.ts" --include="*.py" --include="*.java" --include="*.cpp" --include="*.c" --include="*.h" --include="*.md" --include="*.txt" --include="*.yml" --include="*.yaml" \
-            --exclude-dir=".git" --exclude-dir="node_modules" --exclude-dir="bin" --exclude-dir="obj" \
-            | grep -v "Binary file" > all_todos.txt || true
+  check_todos_main:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    name: Check for new TODOs (Main - Warning on new TODOs)
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-          # Filter out ignored TODOs
-          new_todos=""
-          while IFS= read -r line; do
-            if [[ -n "$line" ]]; then
-              # Extract file:line from the grep output
-              file_line=$(echo "$line" | cut -d: -f1,2)
-              # Check if this file:line is in our ignored list
-              if ! grep -Fxq "$file_line" ignored_todos.txt; then
-                new_todos="$new_todos$line"$'\n'
-              fi
-            fi
-          done < all_todos.txt
-
-          if [[ -n "$new_todos" && "$new_todos" != $'\n' ]]; then
-            echo "❌ New TODO/FIXME/HACK comments detected:"
-            echo "$new_todos"
-            echo ""
-            echo "💡 Please either:"
-            echo "   1. Remove the TODO/FIXME/HACK comment and implement the fix"
-            echo "   2. Create a GitHub issue to track this technical debt"
-            echo "   3. If this is acceptable technical debt, add it to the ignored list in .github/workflows/todo-check.yml"
-            exit 1
-          else
-            echo "✅ No new TODO/FIXME/HACK comments detected"
-          fi
+      - name: TODO Creeper (Warning only)
+        uses: Gustrb/todo-creeper@v1.0.0
+        continue-on-error: true
+        with:
+          exclude: |
+            docs/integrations/dependency-injection.md:32
+            docs/integrations/windsor.md:39
+            docs/integrations/autofac.md:108
+            docs/integrations/autofac.md:117
+            docs/quickstart/index.md:245
+            docs/guides/how-to-configure-cucumber-expression-behavior.md:54
+            docs/guides/how-to-configure-cucumber-expression-behavior.md:79
+            docs/ide-integrations/rider/index.md:5
+            docs/ide-integrations/vscode/index.md:5
+            docs/help/support.md:5
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:13
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:25
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:33
+            Templates/Reqnroll.Templates.DotNet/templates/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs:41
+            Plugins/Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin/DependencyInjectionPlugin.cs:151
+            Plugins/Reqnroll.ExternalData/Reqnroll.ExternalData.ReqnrollPlugin/DataSources/ExternalDataSpecification.cs:36
+            Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:8
+            Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:20
+            Tests/Reqnroll.SystemTests/ExternalPlugins/SpecSyncPluginTest.cs:35
+            Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator/ProjectBuilder.cs:431
+            Reqnroll.Generator/UnitTestProvider/XUnit2TestGeneratorProvider.cs:78
+            Reqnroll.Generator/Generation/ScenarioPartHelper.cs:148
+            Reqnroll/FeatureInfo.cs:36
+            Reqnroll/Bindings/BindingRegistry.cs:36
+            Reqnroll/Bindings/Reflection/BindingReflectionExtensions.cs:99
+            Reqnroll/PlatformCompatibility/MonoHelper.cs:24
