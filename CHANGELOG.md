@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Formatters: enchanced logging of exception information when file-based formatters throw exceptions
 
 ## Bug fixes:
 * Fix: Step Execution improperly handles error flows when StopAtFirstError is true resulting in skipped StepStartedEvent.
