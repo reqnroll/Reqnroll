@@ -3,7 +3,7 @@
 Reqnroll supports both xUnit v2 and xUnit v3.
 
 - **xUnit v2**: Supported from xUnit v2 2.8 or later
-- **xUnit v3**: Supported since Reqnroll 3.0
+- **xUnit v3**: Supported since Reqnroll 3.1
 
 Documentation for xUnit can be found [here](https://xunit.net/#documentation).
 
