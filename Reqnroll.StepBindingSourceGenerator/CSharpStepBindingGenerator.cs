@@ -1,6 +1,7 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace Reqnroll.StepBindingSourceGenerator;
 
@@ -32,19 +33,24 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
                 {
                     bindingMethod = BindingMethod.MethodName;
                 }
-                else if (CucumberExpressionDetector.IsCucumberExpression(definitionSyntax.TextPattern))
+                else
                 {
-                    bindingMethod = BindingMethod.CucumberExpression;
+                    bindingMethod = CucumberExpressionDetector.IsCucumberExpression(definitionSyntax.TextPattern) ?
+                        BindingMethod.CucumberExpression : 
+                        BindingMethod.RegularExpression;
 
                     var prefix = definitionSyntax.MatchedKeywords == StepKeywordMatch.Any ?
                         "*" :
                         definitionSyntax.MatchedKeywords.ToString();
 
-                    displayName = $"{prefix} {definitionSyntax.TextPattern}";
-                }
-                else
-                {
-                    bindingMethod = BindingMethod.RegularExpression;
+                    if (bindingMethod == BindingMethod.RegularExpression)
+                    {
+                        displayName = $"{prefix} {Regex.Unescape(definitionSyntax.TextPattern)}";
+                    }
+                    else
+                    {
+                        displayName = $"{prefix} {definitionSyntax.TextPattern}";
+                    }
                 }
 
                 var invocationStyle = definitionSyntax.Method.IsAsync ?
