@@ -1,10 +1,15 @@
 # xUnit
 
-Reqnroll supports xUnit v2 2.8 or later. xUnit v3 is currently not supported.
+Reqnroll supports both xUnit v2 and xUnit v3.
+
+- **xUnit v2**: Supported from xUnit v2 2.8 or later
+- **xUnit v3**: Supported since Reqnroll 3.1
 
 Documentation for xUnit can be found [here](https://xunit.net/#documentation).
 
-## Needed NuGet Packages
+## xUnit v2
+
+### Needed NuGet Packages
 
 For Reqnroll: [Reqnroll.xUnit](https://www.nuget.org/packages/Reqnroll.xUnit/)
 
@@ -13,6 +18,19 @@ For xUnit: [xUnit](https://www.nuget.org/packages/xunit/)
 For Test Discovery & Execution:
 
 - [xunit.runner.visualstudio](https://www.nuget.org/packages/xunit.runner.visualstudio/)
+- [Microsoft.NET.Test.Sdk](https://www.nuget.org/packages/Microsoft.NET.Test.Sdk)
+
+## xUnit v3
+
+### Needed NuGet Packages
+
+For Reqnroll: [Reqnroll.xunit.v3](https://www.nuget.org/packages/Reqnroll.xunit.v3/)
+
+For xUnit: [xunit.v3](https://www.nuget.org/packages/xunit.v3/)
+
+For Test Discovery & Execution:
+
+- [xunit.runner.visualstudio](https://www.nuget.org/packages/xunit.runner.visualstudio/) (version 3.0.2 or later)
 - [Microsoft.NET.Test.Sdk](https://www.nuget.org/packages/Microsoft.NET.Test.Sdk)
 
 ## Access ITestOutputHelper

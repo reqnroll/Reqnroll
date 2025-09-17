@@ -99,6 +99,11 @@ namespace Reqnroll.TestProjectGenerator.Factories
                 project.ProjectName = projectName;
             }
 
+            if (project.Configuration.UnitTestProvider == UnitTestProvider.xUnit3)
+            {
+                project.ProjectType = ProjectType.Exe;
+            }
+
             return project;
         }
 

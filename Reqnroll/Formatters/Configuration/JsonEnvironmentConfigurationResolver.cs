@@ -60,7 +60,7 @@ public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResol
             }
             else if (formatters is Failure<string> failure)
             {
-                _log?.WriteMessage($"Could not retrieve environment variable {_environmentVariableName}: {failure.Description}");
+                _log?.WriteMessage($"Environment variable {_environmentVariableName} not applied: {failure.Description}");
             }
         }
         catch (Exception ex) when (ex is not JsonException)
