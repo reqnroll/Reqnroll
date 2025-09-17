@@ -2,6 +2,14 @@
 
 ## Improvements:
 
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.0.3 - 2025-09-17
+
+## Improvements:
+
 * Formatters: Enchanced logging of exception information when file-based formatters throw exceptions (#842)
 
 ## Bug fixes:
