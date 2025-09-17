@@ -22,7 +22,7 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
         public static IEnumerable<object[]> BuildServers => new[]
         {
             new object[] { "Azure Pipelines", new Dictionary<string, string> {
-                ["BUILD_BUILDURI"] = "url", ["BUILD_BUILDNUMBER"] = "num", ["BUILD_REPOSITORY_URI"] = "repo", ["BUILD_SOURCEVERSION"] = "rev", ["BUILD_SOURCEBRANCHNAME"] = "branch", ["BUILD_SOURCEBRANCH"] = "refs/tags/v1.2.3" } },
+                ["SYSTEM_COLLECTIONURI"] = "https://url/", ["SYSTEM_TEAMPROJECT"] = "myprj", ["BUILD_BUILDID"] = "123", ["BUILD_BUILDNUMBER"] = "num", ["BUILD_REPOSITORY_URI"] = "repo", ["BUILD_SOURCEVERSION"] = "rev", ["BUILD_SOURCEBRANCHNAME"] = "branch", ["BUILD_SOURCEBRANCH"] = "refs/tags/v1.2.3" } },
             new object[] { "TeamCity", new Dictionary<string, string> {
                 ["BUILD_URL"] = "url", ["BUILD_NUMBER"] = "num", ["TEAMCITY_GIT_REPOSITORY_URL"] = "repo", ["BUILD_VCS_NUMBER"] = "rev", ["TEAMCITY_BUILD_BRANCH"] = "branch", ["TEAMCITY_BUILD_TAG"] = "tag" } },
             new object[] { "Jenkins", new Dictionary<string, string> {
@@ -77,7 +77,7 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
             switch (buildServer)
             {
                 case "Azure Pipelines":
-                    metadata.BuildUrl.Should().Be("url");
+                    metadata.BuildUrl.Should().Be("https://url/myprj/_build/results?buildId=123&_a=summary");
                     metadata.BuildNumber.Should().Be("num");
                     metadata.Remote.Should().Be("repo");
                     metadata.Revision.Should().Be("rev");
@@ -133,8 +133,10 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
         public void GetBuildMetadata_AzurePipelines_ExtractsTagFromSourceBranch()
         {
             var env = new EnvironmentWrapperStub();
-            env.SetEnvironmentVariable("BUILD_BUILDURI", "https://build.uri");
-            env.SetEnvironmentVariable("BUILD_BUILDNUMBER", "123");
+            env.SetEnvironmentVariable("SYSTEM_COLLECTIONURI", "https://dev.azure.com/myorg/");
+            env.SetEnvironmentVariable("SYSTEM_TEAMPROJECT", "myproject");
+            env.SetEnvironmentVariable("BUILD_BUILDID", "123");
+            env.SetEnvironmentVariable("BUILD_BUILDNUMBER", "123.456");
             env.SetEnvironmentVariable("BUILD_REPOSITORY_URI", "https://repo.uri");
             env.SetEnvironmentVariable("BUILD_SOURCEVERSION", "abc123");
             env.SetEnvironmentVariable("BUILD_SOURCEBRANCHNAME", "main");
@@ -146,8 +148,8 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
             
             metadata.Should().NotBeNull();
             metadata.ProductName.Should().Be("Azure Pipelines");
-            metadata.BuildUrl.Should().Be("https://build.uri");
-            metadata.BuildNumber.Should().Be("123");
+            metadata.BuildUrl.Should().Be("https://dev.azure.com/myorg/myproject/_build/results?buildId=123&_a=summary");
+            metadata.BuildNumber.Should().Be("123.456");
             metadata.Remote.Should().Be("https://repo.uri");
             metadata.Revision.Should().Be("abc123");
             metadata.Branch.Should().Be("main");

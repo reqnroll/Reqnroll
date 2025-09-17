@@ -18,7 +18,7 @@
     <copyright>$copyright$</copyright>
     <dependencies>
       <group targetFramework="netstandard2.0">
-        <dependency id="Gherkin" version="32.1.2"/>
+        <dependency id="Gherkin" version="34.0.0"/>
         <dependency id="Cucumber.CucumberExpressions" version="17.1.0"/>
         <dependency id="Cucumber.Messages" version="28.0.0"/>
         <dependency id="Cucumber.HtmlFormatter" version="21.14.0" />

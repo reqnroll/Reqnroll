@@ -25,7 +25,7 @@ public sealed class StepDefinitions
 }
 ```
 
-Ignoring is like skipping the scenario. Be careful, as it behaves a little bit different for the different unit test runners (xUnit, NUnit, MSTest).
+Ignoring is like skipping the scenario. Be careful, as it behaves a little bit different for the different unit test runners (xUnit, NUnit, TUnit, MSTest).
 
 ## Limitations
 

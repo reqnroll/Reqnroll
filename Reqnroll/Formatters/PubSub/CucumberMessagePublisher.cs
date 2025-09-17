@@ -1,4 +1,4 @@
-﻿using Gherkin.CucumberMessages;
+using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.Events;
@@ -43,7 +43,10 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
 
     // This field will be updated as each Feature completes. If all complete successfully, this will remain as true.
     // This field ultimately used to set the TestRunFinished message's status.
-    public bool AllFeaturesPassed { get; private set; } = true;
+    public bool TestRunPassed { get; private set; } = true;
+
+    // This field will be set to true if any Before/After Test Run hook fails. This will eventually cause the TestRunPassed field to be set to false as well.
+    internal bool TestRunHookFailed { get; set; } = false;
 
     // StartupCompleted is set to true the first time the Publisher handles the TestRunStartedEvent. It is used as a guard against abnormal behavior from the test runner.
     public bool StartupCompleted { get; internal set; } = false;
@@ -183,10 +186,13 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
             await featureExecutionTracker.FinalizeTracking();
 
             if (!featureExecutionTracker.FeatureExecutionSuccess)
-                AllFeaturesPassed = false;
+                TestRunPassed = false;
         }
 
-        await _broker.PublishAsync(Envelope.Create(MessageFactory.ToTestRunFinished(AllFeaturesPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
+        if (TestRunHookFailed)
+            TestRunPassed = false;
+
+        await _broker.PublishAsync(Envelope.Create(MessageFactory.ToTestRunFinished(TestRunPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
         _logger.WriteMessage("DEBUG: Formatter:Publisher.TestRunComplete: TestRunFinished Message written");
     }
 
@@ -318,18 +324,28 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
         {
             case Bindings.HookType.BeforeTestRun:
             case Bindings.HookType.AfterTestRun:
+                if (hookBindingFinishedEvent.HookException != null)
+                    TestRunHookFailed = true;
+                await HandleHook(hookBindingFinishedEvent);
+                break;
             case Bindings.HookType.BeforeFeature:
             case Bindings.HookType.AfterFeature:
-                if (!TestRunHookTrackers.TryGetValue(hookBindingFinishedEvent.HookBinding, out var hookTracker)) // should not happen
-                    return;
-                await hookTracker.ProcessEvent(hookBindingFinishedEvent);
-                return;
+                await HandleHook(hookBindingFinishedEvent);
+                break;
 
             default:
                 var featureExecutionTracker = await GetFeatureExecutionTracker(hookBindingFinishedEvent);
                 if (featureExecutionTracker != null)
                     await featureExecutionTracker.ProcessEvent(hookBindingFinishedEvent);
                 break;
+        }
+
+        async Task HandleHook(HookBindingFinishedEvent hookBindingFinishedEvent)
+        {
+            if (!TestRunHookTrackers.TryGetValue(hookBindingFinishedEvent.HookBinding, out var hookTracker)) // should not happen
+                return;
+            await hookTracker.ProcessEvent(hookBindingFinishedEvent);
+            return;
         }
     }
 

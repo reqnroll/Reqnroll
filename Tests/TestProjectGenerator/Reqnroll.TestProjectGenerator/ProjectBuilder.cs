@@ -20,9 +20,10 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit4TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit4TestAdapterPackageVersion = "4.6.0";
         public const string TUnitPackageName = "TUnit";
-        public const string TUnitPackageVersion = "0.25.21";
+        public const string TUnitPackageVersion = "0.55.23";
         private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.10";
+        private const string XUnit3PackageVersion = "2.0.0";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
         protected readonly CurrentVersionDriver _currentVersionDriver;
@@ -215,7 +216,7 @@ namespace Reqnroll.TestProjectGenerator
                 Directory.CreateDirectory(_testProjectFolders.PathToNuGetPackages);
             }
 
-            if (ProjectType == ProjectType.Library)
+            if (ProjectType is ProjectType.Library or ProjectType.Exe)
             {
                 _testProjectFolders.ProjectFolder = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _project.Name);
                 _testProjectFolders.ProjectBinOutputPath = Path.Combine(_testProjectFolders.ProjectFolder, GetProjectCompilePath(_project));
@@ -224,7 +225,7 @@ namespace Reqnroll.TestProjectGenerator
                 _testProjectFolders.CompiledAssemblyPath = Path.Combine(_testProjectFolders.ProjectBinOutputPath, _testProjectFolders.TestAssemblyFileName);
 
 
-                _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "16.4.0");
+                _project.AddNuGetPackage("Microsoft.NET.Test.Sdk", "17.12.0");
 
                 if (_project.ProjectFormat == ProjectFormat.Old)
                 {
@@ -254,6 +255,9 @@ namespace Reqnroll.TestProjectGenerator
                         break;
                     case UnitTestProvider.xUnit:
                         ConfigureXUnit();
+                        break;
+                    case UnitTestProvider.xUnit3:
+                        ConfigureXUnit3();
                         break;
                     case UnitTestProvider.NUnit3:
                         ConfigureNUnit3();
@@ -335,6 +339,18 @@ namespace Reqnroll.TestProjectGenerator
             }
         }
 
+        private void ConfigureXUnit3()
+        {
+            _project.AddNuGetPackage("xunit.v3", XUnit3PackageVersion);
+            _project.AddNuGetPackage("xunit.runner.visualstudio", "3.0.2");
+            if (IsReqnrollFeatureProject)
+            {
+                _project.AddNuGetPackage("Reqnroll.xunit.v3", _currentVersionDriver.ReqnrollNuGetVersion,
+                                         new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.xUnit3.ReqnrollPlugin.dll"), "net462\\Reqnroll.xUnit3.ReqnrollPlugin.dll"));
+                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.xunit.v3", ReqnrollPluginType.Runtime));
+            }
+        }
+
         private void ConfigureMSTest()
         {
             _project.AddNuGetPackage("MSTest.TestAdapter", MSTestPackageVersion);
@@ -362,14 +378,14 @@ namespace Reqnroll.TestProjectGenerator
                 TUnitPackageName,
                 TUnitPackageVersion,
                 new NuGetPackageAssembly(
-                    "TUnit, Version=0.25.21.0, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
+                    "TUnit, Version=0.55.23, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
                     "netstandard2.0\\TUnit.dll")
                 );
             _project.AddNuGetPackage(
                 "Microsoft.Testing.Extensions.TrxReport",
-                "1.6.3.0",
+                "1.8.2.0",
                 new NuGetPackageAssembly(
-                    "Microsoft.Testing.Extensions.TrxReport, Version=1.6.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+                    "Microsoft.Testing.Extensions.TrxReport, Version=1.8.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
                     "netstandard2.0\\Microsoft.Testing.Extensions.TrxReport.dll")
                 );
 
@@ -390,9 +406,11 @@ namespace Reqnroll.TestProjectGenerator
             switch (Configuration.UnitTestProvider)
             {
                 case UnitTestProvider.xUnit when !_parallelTestExecution:
+                case UnitTestProvider.xUnit3 when !_parallelTestExecution:
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(MaxParallelThreads = 1, DisableTestParallelization = true)]"));
                     break;
                 case UnitTestProvider.xUnit:
+                case UnitTestProvider.xUnit3:
                     _project.AddFile(new ProjectFile("XUnitConfiguration.cs", "Compile", "using Xunit; [assembly: CollectionBehavior(CollectionBehavior.CollectionPerClass, MaxParallelThreads = 4)]"));
                     break;
                 case UnitTestProvider.NUnit3 when _parallelTestExecution:

@@ -7,7 +7,7 @@ using System.Text.Json;
 
 namespace Reqnroll.Formatters.Configuration;
 
-public class FileBasedConfigurationResolver : FormattersConfigurationResolverBase, IFormattersConfigurationResolver
+public class FileBasedConfigurationResolver : FormattersConfigurationResolverBase, IFileBasedConfigurationResolver
 {
     private readonly IReqnrollJsonLocator _configFileLocator;
     private readonly IFileSystem _fileSystem;

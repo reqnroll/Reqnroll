@@ -7,11 +7,11 @@ namespace {namespace}
     [Binding]
     public class {className}
     {
-        private readonly ScenarioContext _scenarioContext;
+        private readonly IReqnrollOutputHelper _outputHelper;
 
-        public {className}(ScenarioContext scenarioContext)
+        public {className}(IReqnrollOutputHelper outputHelper)
         {
-            _scenarioContext = scenarioContext;
+            _outputHelper = outputHelper;
         }
 {bindings}
     }
@@ -20,13 +20,13 @@ namespace {namespace}
 [{attribute}({expression})]
 public void {methodName}({parameters})
 {
-    _scenarioContext.Pending();
+    throw new PendingStepException();
 }
 >>>CSharp/StepDefinition
 [{attribute}]
 public void {methodName}({parameters})
 {
-    _scenarioContext.Pending();
+    throw new PendingStepException();
 }
 >>>VB/StepDefinitionClass
 Imports System
@@ -45,12 +45,12 @@ End Namespace
 >>>VB/StepDefinitionExpression
 <Reqnroll.{attribute}({expression})> _
 Public Sub {methodName}({parameters})
-    ScenarioContext.Current.Pending()
+    Throw New PendingStepException()
 End Sub
 >>>VB/StepDefinition
 <Reqnroll.{attribute}()> _
 Public Sub {methodName}({parameters})
-    ScenarioContext.Current.Pending()
+    Throw New PendingStepException()
 End Sub
 >>>FSharp/StepDefinitionClass
 [<Reqnroll.Binding>]

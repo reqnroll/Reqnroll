@@ -1,4 +1,5 @@
 ﻿using Io.Cucumber.Messages.Types;
+using Reqnroll.Analytics;
 using Reqnroll.Formatters.RuntimeSupport;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -21,15 +22,17 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // and the Broker can be IsEnabled.
     private int _numberOfFormattersInitialized = 0;
     private readonly IFormatterLog _logger;
+    private readonly IAnalyticsRuntimeTelemetryService _telemetryService;
 
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
     private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeFormatters = new();
 
 
-    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters)
+    public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters, IAnalyticsRuntimeTelemetryService telemetryService)
     {
         _logger = formatterLog;
+        _telemetryService = telemetryService;
         _registeredFormatters.AddRange(containerRegisteredFormatters.Values);
     }
 
@@ -59,7 +62,24 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         // The system is enabled if we have at least one registered formatter that is IsEnabled
         if (HaveAllFormattersRegisteredAndInitialized())
         {
+            SendTelemetryEvents();
             _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
+        }
+    }
+
+    private void SendTelemetryEvents()
+    {
+        if (_telemetryService == null) return;
+
+        foreach (var formatter in _activeFormatters)
+        {
+            _telemetryService.SendFeatureUseEvent(
+                ReqnrollFeatureUseEvent.FeatureNames.Formatter,
+                properties: new Dictionary<string, string>
+                {
+                    { ReqnrollFeatureUseEvent.FormatterNameProperty, formatter.Key }
+                }
+            );
         }
     }
 

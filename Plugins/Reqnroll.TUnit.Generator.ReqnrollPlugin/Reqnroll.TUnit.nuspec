@@ -6,8 +6,7 @@
     <title>Reqnroll.TUnit</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
-    <readme>README.md</readme>
-    <description>Package to use Reqnroll with TUnit 0.25.21 and later. $summary$</description>
+    <description>Package to use Reqnroll with TUnit 0.55.23 and later. $summary$</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
@@ -20,7 +19,7 @@
       <group targetFramework=".NETStandard2.0">
         <dependency id="Reqnroll" version="[$version$]" />
         <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
-        <dependency id="TUnit.Core" version="0.25.21" />
+        <dependency id="TUnit.Core" version="0.55.23" />
       </group>
     </dependencies>
   </metadata>

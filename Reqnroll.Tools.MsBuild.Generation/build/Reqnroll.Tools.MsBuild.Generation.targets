@@ -92,6 +92,7 @@
 
     <GenerateFeatureFileCodeBehindTask
       ProjectPath="$(MSBuildProjectFullPath)"
+      IntermediateOutputPath="$(IntermediateOutputPath)"
       OutputPath="$(ReqnrollCodeBehindOutputPath)"
       FeatureFiles="@(ReqnrollFeatureFiles)"
       RootNamespace="$(RootNamespace)"
@@ -149,10 +150,15 @@
 
     <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
-        <LogicalName>%(ReqnrollFeatureFiles.Identity)</LogicalName>
+        <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
     
+    <ItemGroup>
+      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Condition="'%(ReqnrollGeneratedFiles.EmbeddedMessagesStoragePath)' != ''">
+        <LogicalName>%(ReqnrollGeneratedFiles.EmbeddedMessagesResourceName)</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
   </Target>
 
   <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject">

@@ -1,0 +1,9 @@
+﻿<ProjectConfiguration>
+  <Settings>
+    <CustomBuildProperties>
+      <Value>TargetFrameworks = netstandard2.0</Value>
+    </CustomBuildProperties>
+    <XUnit2Enabled>False</XUnit2Enabled>
+    <XUnit3Enabled>False</XUnit3Enabled>
+  </Settings>
+</ProjectConfiguration>

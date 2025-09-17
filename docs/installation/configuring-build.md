@@ -2,6 +2,7 @@
 The main use case of Reqnroll involves adding one of the Reqnroll unit test NuGet packages to the test project in question, e.g.:
 - `Reqnroll.MSTest`
 - `Reqnroll.NUnit`
+- `Reqnroll.TUnit`
 - `Reqnroll.xUnit`
 
 All of them depend on the package `Reqnroll.Tools.MsBuild.Generation`, including which modifies the project's build process. The obvious effect is generation of the *.cs files from the respective *.feature files and inclusion of the former in the compilation.

@@ -11,7 +11,7 @@ namespace Reqnroll.Formatters.Configuration;
 /// the class will resolve the configuration (only once).
 /// 
 /// One or more profiles may be read from the configuration file (<see cref="FileBasedConfigurationResolver"/>)
-/// then environment variable overrides are applied (<see cref="EnvironmentConfigurationResolver"/>).
+/// then environment variable overrides are applied (first <see cref="JsonEnvironmentConfigurationResolver"/>, then <see cref="KeyValueEnvironmentConfigurationResolver"/>).
 /// </summary>
 public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 {
@@ -20,10 +20,9 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IDictionary<string, IFormattersConfigurationResolver> resolvers, IFormattersEnvironmentOverrideConfigurationResolver environmentOverrideConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
+    public FormattersConfigurationProvider(IFileBasedConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
     {
-        var fileResolver = resolvers["fileBasedResolver"];
-        _resolvers = [fileResolver, environmentOverrideConfigurationResolver];
+        _resolvers = [fileBasedConfigurationResolver, jsonEnvironmentConfigurationResolver, keyValueEnvironmentConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
     }
@@ -38,13 +37,16 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
 
     private FormattersConfiguration ResolveConfiguration()
     {
-        var combinedConfig = new Dictionary<string, IDictionary<string, object>>();
+        var combinedConfig = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var resolver in _resolvers)
         {
             foreach (var entry in resolver.Resolve())
             {
-                combinedConfig[entry.Key] = entry.Value;
+                if (entry.Value == null) 
+                    combinedConfig.Remove(entry.Key);
+                else 
+                    combinedConfig[entry.Key] = entry.Value;
             }
         }
         bool enabled = combinedConfig.Count > 0 && !_envVariableDisableFlagProvider.Disabled();
