@@ -33,6 +33,7 @@ All contributors are welcome! For more information see the [Contribution guideli
 
 * [Spec Solutions](https://www.specsolutions.eu/)
 * [Info Support](https://www.infosupport.com/)
+* [LambdaTest](https://www.lambdatest.com/)
 
 See all sponsors and information about sponsorship on the [Sponsorship page](https://reqnroll.net/sponsorship) of our website.
 

@@ -2,9 +2,23 @@
 
 ## Improvements:
 
+* Add xUnit 3 support (#405, #538)
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @chekkan
+
+# v3.0.3 - 2025-09-17
+
+## Improvements:
+
+* Formatters: Enchanced logging of exception information when file-based formatters throw exceptions (#842)
+
+## Bug fixes:
+
+* Fix: Step execution improperly handles error flows when `runtime/stopAtFirstError` is true, resulting in skipped step events and hence invalid reports (#819)
+
+*Contributors of this release (in alphabetical order):* @clrudolplhi
 
 # v3.0.2 - 2025-09-08
 
