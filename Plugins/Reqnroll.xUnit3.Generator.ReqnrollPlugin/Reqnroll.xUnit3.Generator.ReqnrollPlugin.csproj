@@ -6,6 +6,7 @@
     <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <PackageId>Reqnroll.xunit.v3</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="build\**\*" />

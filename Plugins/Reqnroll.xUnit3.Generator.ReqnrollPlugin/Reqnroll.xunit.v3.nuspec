@@ -27,11 +27,12 @@
 
   <files>
     <file src="build\**\*" exclude="build\*.template.*" target="build" />
-    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.ReqnrollPlugin.*" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.ReqnrollPlugin.dll" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.ReqnrollPlugin.pdb" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.ReqnrollPlugin.xml" target="lib\netstandard2.0" />
 
     <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll" target="build\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.Generator.ReqnrollPlugin.pdb" target="build\netstandard2.0" />
-    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.Generator.ReqnrollPlugin.xml" target="build\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="README.md" target="README.md" />
