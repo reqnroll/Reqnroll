@@ -26,8 +26,7 @@
 
   <files>
     <file src="build\**\*" target="build" />
-    <file src="bin\$config$\netstandard2.0\Reqnroll.Autofac.ReqnrollPlugin.dll" target="lib\netstandard2.0" />
-    <file src="bin\$config$\netstandard2.0\Reqnroll.Autofac.ReqnrollPlugin.pdb" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.Autofac.ReqnrollPlugin.*" target="lib\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="README.md" target="README.md" />
