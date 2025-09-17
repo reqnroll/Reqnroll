@@ -3,13 +3,11 @@ using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.EnvironmentAccess;
-using Reqnroll.Events;
 using Reqnroll.Formatters.ExecutionTracking;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using Group = Io.Cucumber.Messages.Types.Group;
 
@@ -216,8 +214,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     public virtual Suggestion ToSuggestion(TestStepExecutionTracker testStepExecution, string programmingLanguage, string skeletonMessage, IIdGenerator idGenerator)
     {
-        var testStepTracker = testStepExecution.StepTracker as TestStepTracker;
-        if (testStepTracker != null)
+        if (testStepExecution.StepTracker is TestStepTracker testStepTracker)
         {
             var pickleStepId = testStepTracker.PickleStepId;
             return new Suggestion(idGenerator.GetNewId(), pickleStepId, [new Snippet(programmingLanguage, skeletonMessage)]);

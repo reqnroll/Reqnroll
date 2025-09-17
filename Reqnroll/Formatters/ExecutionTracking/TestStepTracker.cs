@@ -3,7 +3,6 @@ using Reqnroll.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -17,7 +16,7 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
     public TestCaseTracker ParentTracker { get; } = parentTracker;
     public string PickleStepId { get; } = pickleStepId;
 
-    // Indicates whether the step was successfully isBound to a Step Definition.
+    // Indicates whether the step was successfully bound to a Step Definition.
     public bool IsBound { get; private set; }
     // The Step Definition(s) that match this step of the Test Case. None for no match, 1 for a successful match, 2 or more for Ambiguous match.
     public List<string> StepDefinitionIds { get; private set; }
@@ -35,10 +34,10 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
     // Once the StepFinishedAt event fires, we can finally capture which step binding was used and the arguments sent as parameters to the binding method
     public void ProcessEvent(StepFinishedEvent stepFinishedEvent)
     {
-        DetectBindingStatus(stepFinishedEvent, out var isBound, out bool isAmbigous, out List<string> stepDefitionIds, out var bindingMatches);
+        DetectBindingStatus(stepFinishedEvent, out var isBound, out bool isAmbiguous, out List<string> stepDefinitionIds, out var bindingMatches);
         IsBound = isBound;
-        IsAmbiguous = isAmbigous;
-        StepDefinitionIds = stepDefitionIds;
+        IsAmbiguous = isAmbiguous;
+        StepDefinitionIds = stepDefinitionIds;
 
         var hasInputDataTable = stepFinishedEvent.StepContext?.StepInfo?.Table != null;
         var hasInputDocString = stepFinishedEvent.StepContext?.StepInfo?.MultilineText != null;
@@ -70,7 +69,6 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
 
     private void DetectBindingStatus(StepFinishedEvent stepFinishedEvent, out bool isBound, out bool isAmbiguous, out List<string> stepDefinitionIds, out List<BindingMatch> bindingMatches)
     {
-
         var stepStatus = stepFinishedEvent.StepContext?.Status ?? ScenarioExecutionStatus.Skipped;
 
         if (stepStatus == ScenarioExecutionStatus.BindingError &&
@@ -88,7 +86,7 @@ public class TestStepTracker(string testStepId, string pickleStepId, TestCaseTra
             var bindingMatch = stepFinishedEvent.StepContext?.StepInfo?.BindingMatch;
             isBound = bindingMatch != null && bindingMatch != BindingMatch.NonMatching;
             isAmbiguous = false;
-            var stepDefinitionId = isBound ? ParentTracker.FindStepDefinitionIdByBindingKey(bindingMatch.StepBinding) : null;
+            var stepDefinitionId = isBound ? ParentTracker.FindStepDefinitionIdByBindingKey(bindingMatch!.StepBinding) : null;
             stepDefinitionIds = stepDefinitionId != null ? [stepDefinitionId] : [];
             bindingMatches = [bindingMatch];
         }

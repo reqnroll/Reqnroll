@@ -41,16 +41,13 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
 
         if (Status == ScenarioExecutionStatus.UndefinedStep)
         {
-            var lang = stepFinishedEvent.FeatureContext.FeatureInfo.GenerationTargetLanguage.ToString();
+            var programmingLanguage = stepFinishedEvent.FeatureContext.FeatureInfo.GenerationTargetLanguage.ToString();
             // retrieve skeleton code from the ScenarioContext (keyed by StepInstance)
-            var sc = (ScenarioContext)stepFinishedEvent.ScenarioContext;
-            if (sc != null)
+            if (stepFinishedEvent.ScenarioContext is ScenarioContext scenarioContext)
             {
-
-                if (sc.MissingSteps.TryGetValue(stepFinishedEvent.StepContext.StepInfo.StepInstance, out var skeletonMessage))
-
+                if (scenarioContext.MissingSteps.TryGetValue(stepFinishedEvent.StepContext.StepInfo.StepInstance, out var skeletonMessage))
                 {
-                    await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToSuggestion(this, lang, skeletonMessage, idGenerator)));
+                    await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToSuggestion(this, programmingLanguage, skeletonMessage, idGenerator)));
                 }
             }
         }

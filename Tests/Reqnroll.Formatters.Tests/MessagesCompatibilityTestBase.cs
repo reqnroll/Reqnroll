@@ -232,8 +232,6 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var fileName = testName + "." + testName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
         var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        //var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
-        //var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
         return expectedJsonText;
     }
 
@@ -263,17 +261,17 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var result = new List<Envelope>();
 
         // List of Pickle IDs in the order they are seen in the message stream
-        var pickleMsgs = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle);
-        var pickles = pickleMsgs.Select(p => p.Id).ToList();
+        var pickleMessages = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle).ToArray();
+        var pickles = pickleMessages.Select(p => p.Id).ToList();
 
         // Dictionary keyed by the ID of each test case.
         var testCases = new Dictionary<string, TestCaseRecord>();
         var allTestCaseEnvelopes = envelopes.Where(e => e.Content() is TestCase).ToList();
         var testCaseStartedToTestCaseMap = new Dictionary<string, string>();
 
-        string? FindTestCaseStartedFromStepPickleId(string pickleStepId)
+        string FindTestCaseStartedFromStepPickleId(string pickleStepId)
         {
-            var pickleId = pickleMsgs.First(p => p.Steps.Any(ps => ps.Id == pickleStepId)).Id;
+            var pickleId = pickleMessages.First(p => p.Steps.Any(ps => ps.Id == pickleStepId)).Id;
             var testCaseStartedId = testCases.Values.First(tcr => tcr.PickleId == pickleId).Executions.Last().Value.Id;
             return testCaseStartedId;
         }
@@ -347,7 +345,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                 TestRunHookFinished => null,
                 Suggestion suggestion => FindTestCaseStartedFromStepPickleId(suggestion.PickleStepId),
 
-                _ => throw new ApplicationException($"Unexpected Envelope type: {current.Content().ToString()}")
+                _ => throw new ApplicationException($"Unexpected Envelope type: {current.Content()}")
             };
             // attachments created by Before/After TestRun or Feature don't have a value for TestCaseStartedId, so don't attempt to add them to Test execution
             if (!string.IsNullOrEmpty(testCaseStartedId))
