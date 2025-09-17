@@ -26,7 +26,9 @@
 
   <files>
     <file src="build\**\*" target="build" />
-    <file src="bin\$config$\netstandard2.0\Reqnroll.Windsor.ReqnrollPlugin.*" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.Windsor.ReqnrollPlugin.dll" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.Windsor.ReqnrollPlugin.pdb" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.Windsor.ReqnrollPlugin.xml" target="lib\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
     <file src="README.md" target="README.md" />
