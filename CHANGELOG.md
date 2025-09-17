@@ -3,10 +3,11 @@
 ## Improvements:
 
 * Add xUnit 3 support (#405, #538)
+* Add READMEs and XML documentation to all NuGet packages (#844)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @chekkan
+*Contributors of this release (in alphabetical order):* @304NotModified, @chekkan
 
 # v3.0.3 - 2025-09-17
 

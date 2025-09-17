@@ -6,6 +6,8 @@
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
 
     <PackageId>Reqnroll.Verify</PackageId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Verify.nuspec</NuspecFile>
 

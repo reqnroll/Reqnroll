@@ -43,7 +43,7 @@
 
     <file src="$SolutionDir$CHANGELOG.md" target="CHANGELOG.md" />
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
-    <file src="PackageReadme.md" target="README.md" />
+    <file src="README.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
 
   </files>
