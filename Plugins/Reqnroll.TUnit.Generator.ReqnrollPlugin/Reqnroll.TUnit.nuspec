@@ -6,6 +6,7 @@
     <title>Reqnroll.TUnit</title>
     <authors>$author$</authors>
     <owners>$owner$</owners>
+    <readme>README.md</readme>
     <description>Package to use Reqnroll with TUnit 0.55.23 and later. $summary$</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>

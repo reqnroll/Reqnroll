@@ -6,6 +6,7 @@
     <title>Reqnroll.Assist.Dynamic</title>
     <authors>Oleg Koshmeliuk,Marcus Hammarberg, $author$</authors>
     <owners>Oleg Koshmeliuk, Marcus Hammarberg, $owner$</owners>
+    <readme>README.md</readme>
     <description>Adds support for dynamic instances and sets from Reqnroll tables. 
     
     See documentation at https://github.com/reqnroll/Reqnroll/tree/main/Plugins/Reqnroll.Assist.Dynamic
