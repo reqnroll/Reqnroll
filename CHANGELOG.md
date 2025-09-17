@@ -44,6 +44,26 @@
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @chekkan, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
 
+# v3.0.3 - 2025-09-17
+
+## Improvements:
+
+* Formatters: Enchanced logging of exception information when file-based formatters throw exceptions (#842)
+
+## Bug fixes:
+
+* Fix: Step execution improperly handles error flows when `runtime/stopAtFirstError` is true, resulting in skipped step events and hence invalid reports (#819)
+
+*Contributors of this release (in alphabetical order):* @clrudolplhi
+
+# v3.0.2 - 2025-09-08
+
+## Bug fixes:
+
+* Fix: Unnecessary build output messages are shown during build (#815)
+
+*Contributors of this release (in alphabetical order):* @gasparnagy
+
 # v3.0.1 - 2025-09-05
 
 ## Bug fixes:
