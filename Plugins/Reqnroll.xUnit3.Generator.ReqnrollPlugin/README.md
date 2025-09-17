@@ -1,6 +1,6 @@
-﻿Reqnroll.xUnit enables using Reqnroll with [xUnit test framework v2](https://xunit.net/docs/getting-started/v2/getting-started).
+﻿Reqnroll.xUnit enables using Reqnroll with [xUnit test framework v3](https://xunit.net/docs/getting-started/v3/getting-started).
 
-For xUnit 2, use the package Reqnroll.xunit.v3
+For xUnit 2, use the package Reqnroll.xUnit
 
 This package provides integration between Reqnroll and xUnit, allowing you to write BDD tests using Gherkin syntax that run with the xUnit test framework.
 
