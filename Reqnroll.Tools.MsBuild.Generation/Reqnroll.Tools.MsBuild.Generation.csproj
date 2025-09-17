@@ -17,7 +17,7 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <!-- NuGet package metadata -->
-    <Description>Package to enable the code-behind file generation during build time http://reqnroll.net/documentation/Generate-Tests-from-MsBuild/</Description>
+    <Description>Package to enable the code-behind file generation during build time https://go.reqnroll.net/doc-config-build</Description>
     <DefaultLanguage>en-US</DefaultLanguage>
     <PackageIcon>assets/icon.png</PackageIcon>
   </PropertyGroup>
