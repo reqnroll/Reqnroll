@@ -6,6 +6,8 @@
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     
     <PackageId>Reqnroll.Assist.Dynamic</PackageId>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Assist.Dynamic.nuspec</NuspecFile>
 
