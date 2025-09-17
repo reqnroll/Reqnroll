@@ -6,7 +6,7 @@ namespace Reqnroll.StepBindingSourceGenerator;
 
 internal static class StepBindingIncrementalGeneratorInitializationContextExtensions
 {
-    public static IncrementalValuesProvider<StepDefinitionSyntaxInfo> GetStepDefinitionSyntaxInfoAndConfig(
+    public static IncrementalValuesProvider<StepDefinitionSyntaxInfo> GetStepDefinitionSyntaxInfo(
         this IncrementalGeneratorInitializationContext context,
         string fullyQualifiedAttributeName,
         StepKeywordMatch keywordMatch)

@@ -1,7 +1,6 @@
 ﻿namespace Reqnroll.StepBindingSourceGenerator;
 
 internal record StepDefinitionInfo(
-    string Name,
     string DisplayName,
     MethodInfo Method,
     StepKeywordMatch MatchesKeywords,
