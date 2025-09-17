@@ -1,10 +1,12 @@
 # [vNext]
 
 ## Improvements:
-* Formatters: enchanced logging of exception information when file-based formatters throw exceptions
+
+* Formatters: Enchanced logging of exception information when file-based formatters throw exceptions (#842)
 
 ## Bug fixes:
-* Fix: Step Execution improperly handles error flows when StopAtFirstError is true resulting in skipped StepStartedEvent.
+
+* Fix: Step execution improperly handles error flows when `runtime/stopAtFirstError` is true, resulting in skipped step events and hence invalid reports (#819)
 
 *Contributors of this release (in alphabetical order):* @clrudolplhi
 
