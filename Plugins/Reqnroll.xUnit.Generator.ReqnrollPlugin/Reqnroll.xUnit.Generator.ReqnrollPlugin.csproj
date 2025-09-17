@@ -7,8 +7,6 @@
     <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <PackageId>Reqnroll.xUnit</PackageId>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="build\**\*" />
