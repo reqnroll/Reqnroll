@@ -127,9 +127,8 @@ internal class RegistryClassEmitter(string @namespace)
             .BeginBlock();
 
         builder
-            .Append('"')
-            .Append(stepDefinition.DisplayName)
-            .AppendLine("\",");
+            .AppendLiteral(stepDefinition.DisplayName)
+            .AppendLine(",");
 
         builder.AppendLine("global::System.Collections.Immutable.ImmutableArray.Create(");
         builder.BeginBlock();
@@ -159,16 +158,16 @@ internal class RegistryClassEmitter(string @namespace)
         else if (stepDefinition.BindingMethod == BindingMethod.RegularExpression)
         {
             builder
-                .Append("global::Reqnroll.Bindings.StepTextPattern.RegularExpression(\"")
-                .Append(stepDefinition.TextPattern)
-                .AppendLine("\"),");
+                .Append("global::Reqnroll.Bindings.StepTextPattern.RegularExpression(")
+                .AppendLiteral(stepDefinition.TextPattern)
+                .AppendLine("),");
         }
         else
         {
             builder
-                .Append("global::Reqnroll.Bindings.StepTextPattern.CucumberExpression(\"")
-                .Append(stepDefinition.TextPattern)
-                .AppendLine("\"),");
+                .Append("global::Reqnroll.Bindings.StepTextPattern.CucumberExpression(")
+                .AppendLiteral(stepDefinition.TextPattern)
+                .AppendLine("),");
         }
 
         builder
