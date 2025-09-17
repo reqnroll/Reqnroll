@@ -1,32 +1,10 @@
-﻿Reqnroll.xUnit enables using Reqnroll with [xUnit test framework](https://xunit.net/?tabs=cs).
+﻿Reqnroll.xUnit enables using Reqnroll with [xUnit test framework v2](https://xunit.net/docs/getting-started/v2/getting-started).
 
 This package provides integration between Reqnroll and xUnit, allowing you to write BDD tests using Gherkin syntax that run with the xUnit test framework.
 
-## Key Features
-
-- **xUnit Integration**: Seamless integration with xUnit test framework
-- **Gherkin Support**: Write tests using Gherkin Given-When-Then syntax
-- **Test Discovery**: Automatic test discovery by xUnit runners
-- **Parameterized Tests**: Support for scenario outlines and examples
-- **Parallel Execution**: Support for parallel test execution
-- **Rich Assertions**: Full access to xUnit's assertion framework
-
-## Installation
-
-Install this package to add Reqnroll support to your xUnit project:
-
-```powershell
-dotnet add package Reqnroll.xUnit
-```
-
-This package automatically includes:
-- Reqnroll core functionality
-- xUnit integration components
-- Build-time code generation tools
-
 ## Documentation
 
-For more information about using Reqnroll with xUnit, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
+For more information about using Reqnroll with xUnit, see [xUnit - Reqnroll documentation](https://docs.reqnroll.net/latest/integrations/xunit.html).
 
 ## Support
 

@@ -14,13 +14,13 @@ This package provides MSBuild tasks and targets that automatically generate test
 This package is automatically included when you install one of the Reqnroll test framework packages:
 - Reqnroll.MSTest
 - Reqnroll.NUnit
+- Reqnroll.TUnit
 - Reqnroll.xUnit
 
 ## Documentation
 
 For more information about build configuration and code generation, see:
-- [Configuring Build](https://docs.reqnroll.net/installation/configuring-build.html)
-- [Code Generation](https://docs.reqnroll.net/automation/code-generation.html)
+- [Configuring Build](https://docs.reqnroll.net/latest/installation/configuring-build.html)
 
 ## Support
 

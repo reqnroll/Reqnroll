@@ -7,8 +7,6 @@ This package contains project templates and item templates that can be used with
 - **Project Templates**: Templates for creating new Reqnroll projects with different test frameworks
 - **Item Templates**: Templates for adding Reqnroll configuration files and feature files
 - **Test Framework Support**: Templates for MSTest, NUnit, and xUnit projects
-- **Quick Setup**: Fast way to get started with Reqnroll
-- **Best Practices**: Templates follow Reqnroll best practices and conventions
 
 ## Installation
 

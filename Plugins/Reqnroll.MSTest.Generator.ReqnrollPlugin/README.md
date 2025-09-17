@@ -1,31 +1,10 @@
 ﻿Reqnroll.MSTest enables using Reqnroll with [MSTest v2 test framework](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-csharp-with-mstest).
 
-This package provides integration between Reqnroll and MSTest, allowing you to write BDD tests using Gherkin syntax that run with the MSTest test framework.
-
-## Key Features
-
-- **MSTest Integration**: Seamless integration with MSTest v2 test framework
-- **Gherkin Support**: Write tests using Gherkin Given-When-Then syntax
-- **Test Discovery**: Automatic test discovery by MSTest runners
-- **Parameterized Tests**: Support for scenario outlines and examples
-- **Parallel Execution**: Support for parallel test execution
-
-## Installation
-
-Install this package to add Reqnroll support to your MSTest project:
-
-```powershell
-dotnet add package Reqnroll.MSTest
-```
-
-This package automatically includes:
-- Reqnroll core functionality
-- MSTest integration components
-- Build-time code generation tools
+This package provides integration between Reqnroll and MSTest v2, allowing you to write BDD tests using Gherkin syntax that run with the MSTest test framework.
 
 ## Documentation
 
-For more information about using Reqnroll with MSTest, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
+For more information about using Reqnroll with MSTest, visit the [MSTest - Reqnroll documentation](https://docs.reqnroll.net/latest/integrations/mstest.html).
 
 ## Support
 

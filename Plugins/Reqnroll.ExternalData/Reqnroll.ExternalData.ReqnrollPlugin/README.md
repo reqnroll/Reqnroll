@@ -1,26 +1,12 @@
 ﻿Reqnroll.ExternalData provides external data loading capabilities for Reqnroll scenarios.
 
-This package enables Reqnroll to load test data from external sources such as CSV files, JSON files, and other data formats, allowing for more flexible and maintainable test scenarios.
+The Reqnroll ExternalData plugin lets teams separate test data from test scenarios, and reuse examples across a large set of scenarios. This is particularly helpful when a common set of examples needs to be consistently verified in different scenarios.
 
-## Key Features
-
-- **External Data Sources**: Load test data from CSV, JSON, and other file formats
-- **Scenario Outlines Enhancement**: Extend scenario outlines with external data
-- **Dynamic Data Loading**: Load data dynamically during test execution
-- **Multiple Formats**: Support for various data file formats
-- **Data Transformation**: Transform and filter external data as needed
-
-## Installation
-
-Install this package to add external data loading support to your Reqnroll project:
-
-```powershell
-dotnet add package Reqnroll.ExternalData
-```
+Supported Data Sources: CSV, JSON, and excel files
 
 ## Documentation
 
-For more information about using external data with Reqnroll, visit the [Reqnroll documentation](https://docs.reqnroll.net/).
+For more information about using external data with Reqnroll, see [External Data Plugin - Reqnroll documentation](https://docs.reqnroll.net/latest/integrations/externaldata.html).
 
 ## Support
 
