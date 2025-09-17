@@ -2,47 +2,11 @@
 
 ## Improvements:
 
-* Removed unused Culture property from step definition attributes (Given, When, Then, StepDefinition) (#671)
-* Add `RuleInfo` to `ScenarioContext` to provide information about the current rule (#454)
-* Ensure that the runtime plugins are loaded in an alphabetic order based on file name on Unix-based platforms. (#519)
-* Reqnroll: Added `VerifyCaseInsensitive` flag to `InstanceCreationOptions` that allows for case-insensitive member verification when object instances are created from tables (#577)
-* Improvement: MsTest simple scenarios (not Scenario Outlines) uses the Scenario Name as the friendly name for the test (#588)
-* Improvement: Introducing the ability to specify env var "REQNROLL_DRY_RUN=true" to skip invocation of step handlers at runtime (#614)
-* Improvement: MsTest Scenario Outlines use the Scenario Name as the friendly name for the test
-* Refactored UnitTestFeatureGenerator to provide an output parameter that contains warnings (#624)
-* Improvement: Added a CreateDirectory() function to the Reqnroll.Utils/IFileSystem (#623)
-* Improvement: Ambiguous binding situations now return the list of Binding Matches that caused the AmbiguousMatchException (#622)
-* Refactored functions that provide Environment Information (eg, current OS Version) into a common service (#620)
-* Upgrade to Gherkin v32 from v30 (see [Gherkin changelog](https://github.com/cucumber/gherkin/blob/main/CHANGELOG.md)) (#489)
-* Refactoring of the ExecutionEvents and Event Publishing. Events carry more context information; publication is now async. (#621)
-* Provide AsyncEventHandler in RuntimePluginTestExecutionLifecycleEvents (#634)
-* Improved test execution time by decoupling the telemetry sending from the execution. (#629)
-* Improved test feature context and feature hook handling for non-parallel or class-parallel scenarios where the scenarios of the feature are not executed in sequence. (#638)
-* Renamed Regex for all step definition attributes to Expression, as it has a cucumber expression or a regular expression (regex) that matches the step text. (Breaking change) (#639)
-* Introduced a new BuildMetadata class to encapsulate CI metadata properties such as ProductName, BuildUrl, BuildNumber, Remote, Revision, Branch, and Tag. These will be used to populate data in Cucumber Messages. (#658)
-* Add xUnit 3 support (#538)
-* Added ExpressionType option (cucumber/regex) to [Given], [When] and [Then] attributes (#663)
-* Remove [Serializable] from exceptions (#738)
-* Updated Reqnroll project template to add TUnit test framework support and remove EOL .NET versions (6.0, 7.0), added .NET 9.0 support (#701)
-* Removed support for end-of-life .NET frameworks (.NET 6, .NET 7, .NET Core) (#706)
-* Allow detecting skipped or pending execution status by the unit test providers (#732)
+* Add xUnit 3 support (#405, #538)
 
 ## Bug fixes:
 
-* Fix: Exception in an `AfterFeature` hook causes the next first test failure in the next feature (#597)
-* Fix: Disposed ObjectContainer can be accessed through RegisterInstanceAs/RegisterFactoryAs/RegisterTypeAs
-* Fix: Namespace clash in generated files if no RootNamespace is defined in the project file (#633)
-* Fixed source link and deterministic compilation for Reqnroll.CustomPlugin package (#719)
-* Fix: Rule Tags are now properly generated as Test Categories (along with Scenario Tags) (#731)(
-
-## Deprecations:
-
-* The synchronous test runner API (`ISyncTestRunner`) has been removed. Please use `ITestRunner` instead.
-* The synchronous code invocation API (`IBindingInvoker`) has been deprecated. Please use `IAsyncBindingInvoker` instead.
-* Removed obsolete property `ScenarioInfo.ScenarioAndFeatureTags`. Please use `ScenarioInfo.CombinedTags` instead.
-* Removed obsolete methods on `Reqnroll.Assist.Service` class: `RegisterValueComparer`, `UnregisterValueComparer`, `RegisterValueRetriever`, `UnregisterValueRetriever` use `ValueComparers.Register`, `ValueComparers.Unregister`, `ValueRetrievers.Register`, `ValueRetrievers.Unregister` instead.
-
-*Contributors of this release (in alphabetical order):* @304NotModified, @algirdasN, @chekkan, @clrudolphi, @DrEsteban, @gasparnagy, @loraderon, @obligaron
+*Contributors of this release (in alphabetical order):* @chekkan
 
 # v3.0.3 - 2025-09-17
 
@@ -82,8 +46,8 @@
 ## New features:
 
 * Formatters: An infrastructure for implementing integrated reporting formatters has been introduced. The infrastructure allows writing custom formatters, but Reqnroll provides two built-in formatters as well: the HTML and Message formatters. (#233)
-    * HTML Formatter: A formatter that can produce single page HTML reports using the [Cucumber React components](https://github.com/cucumber/react-components). This formatter can be used as a replacement for the "SpecFlow+ LivingDoc Generator"
-    * Message Formatter: A formatter that can produce [Cucumber Messages](https://github.com/cucumber/messages/) `.ndjson` file. Cucumber messages contain all information about the test run, therefore this formatter can be used to integrate Reqnroll with other tools.
+	* HTML Formatter: A formatter that can produce single page HTML reports using the [Cucumber React components](https://github.com/cucumber/react-components). This formatter can be used as a replacement for the "SpecFlow+ LivingDoc Generator"
+	* Message Formatter: A formatter that can produce [Cucumber Messages](https://github.com/cucumber/messages/) `.ndjson` file. Cucumber messages contain all information about the test run, therefore this formatter can be used to integrate Reqnroll with other tools.
 * Support for [TUnit test framework](https://tunit.dev/). Use the package `Reqnroll.TUnit` in a TUnit project to enable Reqnroll TUnit support. Can be used with TUnit v0.55.23 and later. (#442)
 * Allow test execution without invoking binding (step definition, hook, step argument transformation) code by setting the `REQNROLL_DRY_RUN` environment variable to `true`. This is useful for quickly verifying if all steps have been defined. (#614)
 
