@@ -1,6 +1,5 @@
 ﻿namespace Reqnroll.StepBindingSourceGenerator;
 
-internal record StepDefinitionCatalogInfo(
-    string HintName,
-    QualifiedTypeName ClassName,
+internal record StepDefinitionGroup(
+    string GroupName,
     ComparableArray<StepDefinitionInfo> StepDefinitions);

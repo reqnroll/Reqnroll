@@ -1,5 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
+using System.Text;
 
 namespace Reqnroll.StepBindingSourceGenerator;
 
@@ -10,29 +11,23 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
     {
         // Obtain step definitions by looking for the various attributes
         var givenStepDefinitions = context
-            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.GivenAttribute", StepKeywordMatch.Given);
+            .GetStepDefinitionSyntaxInfo("Reqnroll.GivenAttribute", StepKeywordMatch.Given);
         var whenStepDefinitions = context
-            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.WhenAttribute", StepKeywordMatch.When);
+            .GetStepDefinitionSyntaxInfo("Reqnroll.WhenAttribute", StepKeywordMatch.When);
         var thenStepDefinitions = context
-            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.ThenAttribute", StepKeywordMatch.Then);
+            .GetStepDefinitionSyntaxInfo("Reqnroll.ThenAttribute", StepKeywordMatch.Then);
         var otherStepDefinitions = context
-            .GetStepDefinitionSyntaxInfoAndConfig("Reqnroll.StepDefinitionAttribute", StepKeywordMatch.Any);
+            .GetStepDefinitionSyntaxInfo("Reqnroll.StepDefinitionAttribute", StepKeywordMatch.Any);
 
         // Combine all step definitions into a single stream and create definitions for emittings
-        var allStepDefinitions = givenStepDefinitions.Collect()
-            .Combine(whenStepDefinitions.Collect())
-            .Combine(thenStepDefinitions.Collect())
-            .Combine(otherStepDefinitions.Collect())
-            .SelectMany(static (definitions, _) =>
-            {
-                var (((givens, whens), thens), others) = definitions;
-
-                return givens.Concat(whens).Concat(thens).Concat(others);
-            })
+        var allStepDefinitions = givenStepDefinitions
+            .Concat(whenStepDefinitions)
+            .Concat(thenStepDefinitions)
+            .Concat(otherStepDefinitions)
             .Select(static (definitionSyntax, cancellationToken) =>
             {
                 var displayName = definitionSyntax.Method.Name;
-                BindingMethod bindingMethod; 
+                BindingMethod bindingMethod;
                 if (definitionSyntax.TextPattern == null)
                 {
                     bindingMethod = BindingMethod.MethodName;
@@ -41,10 +36,10 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
                 {
                     bindingMethod = BindingMethod.CucumberExpression;
 
-                    var prefix = definitionSyntax.MatchedKeywords == StepKeywordMatch.Any ? 
-                        "*" : 
+                    var prefix = definitionSyntax.MatchedKeywords == StepKeywordMatch.Any ?
+                        "*" :
                         definitionSyntax.MatchedKeywords.ToString();
-                    
+
                     displayName = $"{prefix} {definitionSyntax.TextPattern}";
                 }
                 else
@@ -57,90 +52,108 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
                     MethodInvocationStyle.Synchronous;
 
                 return new StepDefinitionInfo(
-                    definitionSyntax.Method.Name,
                     displayName,
                     definitionSyntax.Method,
                     definitionSyntax.MatchedKeywords,
                     bindingMethod,
                     definitionSyntax.TextPattern,
                     invocationStyle);
-            })
-            .Collect();
+            });
 
-        // Group steps definitions into their respective catalogs based on the class which declares them
-        var catalogs = allStepDefinitions
-            .SelectMany(static (definitions, _) => definitions
-                .GroupBy(definition => definition.Method.DeclaringClassName)
-                .Select(group => new StepDefinitionCatalogInfo(
-                    group.Key.Name + "Catalog",
-                    group.Key with { Name = group.Key.Name + "Catalog" },
-                    ComparableArray.CreateRange(group))));
-
-        // Generate unique hint names for each catalog
-        var catalogHintNames = catalogs
-            .Select(static (catalog, _) => (catalog.ClassName))
+        // Group steps definitions into their respective groups based on the class which declares them
+        var stepGroups = allStepDefinitions
             .Collect()
-            .Select(static (catalogIds, _) =>
+            .SelectMany(static (definitions, _) =>
             {
-                var names = new HashSet<string>();
-                var mappedNames = ImmutableDictionary.CreateBuilder<QualifiedTypeName, string>();
+                // Group step definitions by their declaring class
+                var groups = definitions
+                    .GroupBy(static definition => definition.Method.DeclaringClassName)
+                    .ToDictionary(static group => group.Key, group => group.ToImmutableArray()); 
 
-                foreach (var catalogId in catalogIds)
+                var nameMap = new Dictionary<QualifiedTypeName, string>();
+                var result = ImmutableList.CreateBuilder<StepDefinitionGroup>();
+
+                foreach (var group in groups)
                 {
-                    var (classNamespace, className) = catalogId;
-                    var hintName = className;
-                    var i = 1;
-
-                    while (names.Contains(hintName))
+                    // If the name already exists in the map, use it.
+                    if (nameMap.TryGetValue(group.Key, out var name))
                     {
-                        hintName = className + i++;
+                        result.Add(new StepDefinitionGroup(name, group.Value));
+                        continue;
                     }
 
-                    names.Add(hintName);
-                    mappedNames.Add(catalogId, hintName);
+                    // If the class name is unique, use it directly.
+                    if (groups.Keys.Count(key => key.Name == group.Key.Name) == 1)
+                    {
+                        result.Add(new StepDefinitionGroup(group.Key.Name, group.Value));
+                        continue;
+                    }
+
+                    // If there are multiple classes with the same name, prefix with the namespace parts until all are unique.
+                    var collisions = groups.Keys.Where(key => key.Name == group.Key.Name).ToArray();
+                    var candiates = collisions.Select(static qualifiedName => qualifiedName.Name).ToArray();
+                    var namespaces = collisions.Select(static qualifiedName => qualifiedName.Namespace.Split('.')).ToArray();
+                    var prefixCount = 0;
+
+                    do
+                    {
+                        var noMoreParts = true;
+
+                        for (var i = 0; i < collisions.Length; i++)
+                        {
+                            prefixCount++;
+                            var ns = namespaces[i];
+
+                            if (ns.Length < prefixCount)
+                            {
+                                // Prepend the next namespace part to the candidate.
+                                candiates[i] = ns[ns.Length - prefixCount] + "_" + candiates[i];
+                                noMoreParts = false;
+                            }
+                        }
+
+                        if (noMoreParts)
+                        {
+                            // This would mean there are two or more step class symbols with the same name.
+                            break;
+                        }
+                    }
+                    while (candiates.Distinct().Count() != candiates.Length);
+
+                    // Include all generated names in the map to avoid reprocessing.
+                    for (var i = 0; i < collisions.Length; i++)
+                    {
+                        nameMap[collisions[i]] = candiates[i];
+                    }
+
+                    // Add the group for the generated name
+                    result.Add(new StepDefinitionGroup(nameMap[group.Key], group.Value));
                 }
 
-                return mappedNames.ToImmutable();
-            })
-            .WithComparer(
-                ImmutableDictionaryEqualityComparer<QualifiedTypeName, string>.Instance);
-
-        // Combine the catalogs with their hint names
-        var hintedCatalogs = catalogs
-            .Combine(catalogHintNames)
-            .Select(static (catalogAndHintNames, _) =>
-            {
-                var (catalog, hintNames) = catalogAndHintNames;
-
-                if (hintNames.TryGetValue(catalog.ClassName, out var hintName))
-                {
-                    return catalog with { HintName = hintName };
-                }
-
-                return catalog;
+                return result;
             });
 
         // Output the step registry constructor which roots all defined step methods
-        context.RegisterSourceOutput(allStepDefinitions, (context, stepMethods) =>
+        context.RegisterSourceOutput(stepGroups.Collect(), (context, stepGroups) =>
         {
-            if (!stepMethods.Any())
+            if (!stepGroups.Any())
             {
                 return;
             }
 
             var emitter = new RegistryClassEmitter("Sample.Tests");
 
-            context.AddSource("ReqnrollStepRegistry.g.cs", emitter.EmitRegistryClassConstructor(stepMethods));
+            context.AddSource("ReqnrollStepRegistry.g.cs", emitter.EmitRegistryClassConstructor(stepGroups));
         });
 
         // Output the step catalog classes
-        context.RegisterSourceOutput(hintedCatalogs, (context, stepDefinitionClass) =>
+        context.RegisterSourceOutput(stepGroups, (context, stepGroup) =>
         {
-            var emitter = new StepDefinitionEmitter();
+            var emitter = new RegistryClassEmitter("Sample.Tests");
 
             context.AddSource(
-                $"{stepDefinitionClass.HintName}.g.cs",
-                emitter.EmitStepDefinitionCatalogClass(stepDefinitionClass));
+                $"{stepGroup.GroupName}.g.cs",
+                emitter.EmitStepGroupRegisterMethod(stepGroup));
         });
     }
 }
