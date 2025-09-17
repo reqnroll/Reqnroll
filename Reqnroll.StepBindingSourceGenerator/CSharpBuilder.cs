@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using Microsoft.CodeAnalysis.CSharp;
+using System.Text;
 
 namespace Reqnroll.StepBindingSourceGenerator;
 
@@ -99,4 +100,11 @@ internal class CSharpBuilder
     public CSharpBuilder EndBlock(string delimiter) => EndBlock().AppendLine(delimiter);
 
     public override string ToString() => _builder.ToString();
+
+    /// <summary>
+    /// Appends a string value as an encoded C# literal.
+    /// </summary>
+    /// <param name="value">The value to append.</param>
+    /// <returns>The builder.</returns>
+    public CSharpBuilder AppendLiteral(string value) => Append(SymbolDisplay.FormatLiteral(value, quote: true));
 }

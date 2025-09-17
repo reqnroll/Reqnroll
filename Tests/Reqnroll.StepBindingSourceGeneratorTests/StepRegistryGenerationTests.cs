@@ -136,4 +136,43 @@ public class StepRegistryGenerationTests
                 [StepDefinitionType.When],
                 StepTextPattern.CucumberExpression("Maker starts a game")));
     }
+
+    [Fact]
+    public void StepDefinitionWithEscapeInRegularExpressionIsAddedToRegistry()
+    {
+        var source = SourceText.From(
+            """
+            using Reqnroll;
+
+            namespace Sample.Tests;
+
+            [Binding]
+            public class GameSteps
+            {
+                [Given(@"the app\.config is used for configuration")]
+                public void TheAppConfigIsUsedForConfiguration()
+                {
+                    throw new System.NotImplementedException("f1e3f2b2-a99b-4d87-9fff-139128a61d5b");
+                }
+            }
+            """);
+
+        var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+
+        result.Diagnostics.Should().BeEmpty();
+
+        using var assemblyContext = result.CompileAssembly();
+
+        var registry = assemblyContext.Assembly.GetStepRegistry();
+
+        registry.GetStepDefinitions().Should().HaveCount(1);
+
+        var stepDefinition = registry.GetStepDefinitions().Single();
+
+        stepDefinition.Should().BeEquivalentTo(
+            new StepDefinitionDescriptor(
+                "Given the app.config is used for configuration",
+                [StepDefinitionType.Given],
+                StepTextPattern.RegularExpression("the app\\.config is used for configuration")));
+    }
 }
