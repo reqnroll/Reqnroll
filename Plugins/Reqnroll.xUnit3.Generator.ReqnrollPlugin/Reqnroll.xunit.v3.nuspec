@@ -8,7 +8,6 @@
     <owners>$owner$</owners>
     <readme>README.md</readme>
     <description>Package to use Reqnroll with xUnit.v3 2.0 and later. $summary$</description>
-    <summary>Package to use Reqnroll with xUnit.v3 2.0 and later. $summary$</summary>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
     <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
