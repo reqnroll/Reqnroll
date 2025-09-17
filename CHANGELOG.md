@@ -2,9 +2,11 @@
 
 ## Improvements:
 
+* Add xUnit 3 support (#405, #538)
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @chekkan
 
 # v3.0.3 - 2025-09-17
 

@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.xunit.v3</id>
+    <version>$version$</version>
+    <title>Reqnroll.xunit.v3</title>
+    <authors>$author$</authors>
+    <owners>$owner$</owners>
+    <description>Package to use Reqnroll with xUnit.v3 2.0 and later. $summary$</description>
+    <summary>Package to use Reqnroll with xUnit.v3 2.0 and later. $summary$</summary>
+    <language>en-US</language>
+    <projectUrl>https://www.reqnroll.net</projectUrl>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll.git" branch="$branch$" commit="$commit$" />
+    <icon>images\reqnroll-icon.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <license type="expression">BSD-3-Clause</license>
+    <tags>reqnroll xunit xunit.v3</tags>
+    <copyright>$copyright$</copyright>
+    <dependencies>
+      <group targetFramework="netstandard2.0">
+        <dependency id="Reqnroll" version="[$version$]" />
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="[$version$]" />
+        <dependency id="xunit.v3.extensibility.core" version="2.0.0" />
+      </group>
+    </dependencies>
+  </metadata>
+
+  <files>
+    <file src="build\**\*" exclude="build\*.template.*" target="build" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.ReqnrollPlugin.*" target="lib\netstandard2.0" />
+
+    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll" target="build\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.xUnit3.Generator.ReqnrollPlugin.pdb" target="build\netstandard2.0" />
+
+    <file src="$SolutionDir$LICENSE" target="LICENSE" />
+    <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
+  </files>
+</package> 
