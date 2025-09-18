@@ -3,3 +3,30 @@
   border: 1px solid var(--color-background-border);
   padding: 0.325rem 0.675rem; /*0.625rem 0.875rem;*/
 }
+
+.reqnroll-docs-tag {
+  display: inline-block;
+  background-color: var(--color-background-secondary);
+  color: var(--color-brand-primary);
+  border-radius: 0.8em;
+  padding: 0em 0.5em 0.1em 0.5em;
+  margin: 0 0.25em 0.25em 0;
+  font-size: 0.8em;
+  font-weight: 500;
+  border: 1px solid var(--color-background-border);
+  box-shadow: 0 1px 2px rgba(39, 64, 96, 0.04);
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+.reqnroll-docs-tag:hover {
+  background-color: var(--color-background-hover);
+  cursor: pointer;
+}
+.reqnroll-docs-tag.selected {
+  background-color: var(--color-background-hover);
+}
+button.reqnroll-docs-tag {
+  font-size: 1em;
+  padding: 0.2em 0.8em;
+  border-radius: 0.6em;
+}
