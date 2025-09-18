@@ -8,13 +8,7 @@ Plugins marked with the <span class="reqnroll-docs-tag">official</span> tag are 
 Plugins marked with the <span class="reqnroll-docs-tag">3rd‑party</span> tag are maintained by third parties. **The Reqnroll team is not responsible for these plugins**. Please review each plugin's behavior and licensing terms before use, and submit issues to the plugin's own repository.
 ```
 
-```{raw} html
-<div id="tag-filter-buttons">
-  <button onclick="filterPlugins('all')" class="reqnroll-docs-tag">show all</button>
-</div>
-```
-
-{#plugins-table}
+{#plugins-table .tag-filtered-table}
 | Name | Description | Tags | Download |
 |---|---|---|---|
 | [Reqnroll.Autofac](https://github.com/reqnroll/Reqnroll) | Reqnroll plugin for using Autofac as a dependency injection framework for step definitions. [Read more...](autofac.md) | official di-container | <a href="https://www.nuget.org/packages/Reqnroll.Autofac/">![](https://img.shields.io/nuget/v/Reqnroll.Autofac.svg)</a> |
@@ -25,56 +19,6 @@ Plugins marked with the <span class="reqnroll-docs-tag">3rd‑party</span> tag a
 | [Reqnroll.Assist.Dynamic](https://github.com/reqnroll/Reqnroll/tree/main/Plugins/Reqnroll.Assist.Dynamic) | Reqnroll library for using dynamic types in bindings. | official | <a href="https://www.nuget.org/packages/Assist.Dynamic/">![](https://img.shields.io/nuget/v/Reqnroll.Assist.Dynamic.svg)</a> |
 | [DSL.Reqnroll](https://github.com/nowakpi/DSL.Reqnroll) | Reqnroll plugin that enables use of dynamic test data. [Read more...](https://github.com/nowakpi/DSL.Reqnroll/blob/master/README.md) | 3rd-party | <a href="https://www.nuget.org/packages/DSL.Reqnroll/">![](https://img.shields.io/nuget/v/DSL.Reqnroll.svg)</a> |
 
-```{raw} html
-<script>
-function filterPlugins(tag) {
-  var list = document.getElementById('plugins-table').querySelectorAll("tbody > tr");
-  for (var i = 0; i < list.length; i++) {
-    var tagsCell = list[i].querySelectorAll("td")[2]
-    var tags = []
-    for (var tagIndex = 0; tagIndex < tagsCell.children.length; tagIndex++) {
-      tags.push(tagsCell.children[tagIndex].innerText)
-    }
-    if (tag === 'all' || tags.includes(tag)) {
-      list[i].style.display = '';
-    } else {
-      list[i].style.display = 'none';
-    }
-  }
-}
-
-function markTags(){
-  var tagsWithButton = []
-  var buttonListDiv = document.getElementById('tag-filter-buttons');
-  var list = document.getElementById('plugins-table').querySelectorAll("tbody > tr");
-  for (var i = 0; i < list.length; i++) {
-    var tagsCell = list[i].querySelectorAll("td")[2]
-    var tags = tagsCell.innerText.split(/\s+/)
-    var tagsHtml = ""
-    tagsCell.innerHTML = ''
-    tags.forEach(function(tag) {
-      var span = document.createElement("span")
-      span.innerText = tag
-      span.className = "reqnroll-docs-tag"
-      span.setAttribute('onclick',"filterPlugins('" + tag + "')")
-      tagsCell.appendChild(span)
-
-      if (!tagsWithButton.includes(tag))
-      {
-        tagsWithButton.push(tag)
-        var button = document.createElement("button")
-        button.innerText = tag
-        button.className = "reqnroll-docs-tag"
-        button.setAttribute('onclick',"filterPlugins('" + tag + "')")
-        buttonListDiv.appendChild(button)
-      }
-    });
-  }
-}
-
-markTags();
-</script>
-```
 
 ```{note}
 If you would like your Reqnroll plugin to be listed here, please submit a [pull request](https://github.com/reqnroll/Reqnroll/blob/main/CONTRIBUTING.md#pull-requests) to update the documentation source page: [`main/docs/integrations/available-plugins.md`](https://github.com/reqnroll/Reqnroll/edit/main/docs/integrations/available-plugins.md).

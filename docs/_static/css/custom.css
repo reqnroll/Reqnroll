@@ -22,6 +22,9 @@
   background-color: var(--color-background-hover);
   cursor: pointer;
 }
+.reqnroll-docs-tag.selected {
+  background-color: var(--color-background-hover);
+}
 button.reqnroll-docs-tag {
   font-size: 1em;
   padding: 0.2em 0.8em;

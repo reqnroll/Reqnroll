@@ -113,6 +113,10 @@ html_css_files = [
     'css/custom.css',
 ] 
 
+html_js_files = [
+    'tag-filtered-table.js',  # Enable tag-filtered-table functionality
+]
+
 # see https://pygments.org/styles/
 pygments_style = "solarized-light"
 pygments_dark_style = "lightbulb"
