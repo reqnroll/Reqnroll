@@ -3,9 +3,9 @@
 Below is a list of plugins for Reqnroll. Use the tag buttons to filter the list, or click "show all" to display every plugin again.
 
 ```{important}
-Plugins marked with the <span class="reqnroll-docs-tag">official</span> tag are maintained and verified by the [Reqnroll team](https://github.com/reqnroll), and use the same [open‑source license](https://github.com/reqnroll/Reqnroll/blob/main/LICENSE) as Reqnroll.
+Plugins marked with the [official]{.reqnroll-docs-tag} tag are maintained and verified by the [Reqnroll team](https://github.com/reqnroll), and use the same [open‑source license](https://github.com/reqnroll/Reqnroll/blob/main/LICENSE) as Reqnroll.
 
-Plugins marked with the <span class="reqnroll-docs-tag">3rd‑party</span> tag are maintained by third parties. **The Reqnroll team is not responsible for these plugins**. Please review each plugin's behavior and licensing terms before use, and submit issues to the plugin's own repository.
+Plugins marked with the [3rd‑party]{.reqnroll-docs-tag} tag are maintained by third parties. **The Reqnroll team is not responsible for these plugins**. Please review each plugin's behavior and licensing terms before use, and submit issues to the plugin's own repository.
 ```
 
 {#plugins-table .tag-filtered-table}
