@@ -7,9 +7,9 @@ namespace Reqnroll.Formatters.ExecutionTracking;
 
 public class StepTrackerFactory(ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IIdGenerator idGenerator) : IStepTrackerFactory
 {
-    public TestStepExecutionTracker CreateTestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null, IIdGenerator testStepIdGenerator = null)
+    public TestStepExecutionTracker CreateTestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
     {
-        return new TestStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher, testStepIdGenerator ?? idGenerator);
+        return new TestStepExecutionTracker(parentTracker, messageFactory, picklePublisher ?? publisher, idGenerator);
     }
     public HookStepExecutionTracker CreateHookStepExecutionTracker(TestCaseExecutionTracker parentTracker, IMessagePublisher picklePublisher = null)
     {
