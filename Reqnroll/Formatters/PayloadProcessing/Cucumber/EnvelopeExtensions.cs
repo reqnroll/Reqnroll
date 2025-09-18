@@ -1,4 +1,4 @@
-﻿using Io.Cucumber.Messages.Types;
+using Io.Cucumber.Messages.Types;
 using System;
 using System.Collections.Generic;
 
@@ -21,6 +21,7 @@ public static class EnvelopeExtensions
         typeof(Scenario),
         typeof(Step),
         typeof(StepDefinition),
+        typeof(Suggestion),
         typeof(TableRow),
         typeof(Tag),
         typeof(TestCase),
@@ -48,6 +49,7 @@ public static class EnvelopeExtensions
             Scenario sc => sc.Id,
             Step st => st.Id,
             StepDefinition sd => sd.Id,
+            Suggestion sg => sg.Id,
             TableRow tr => tr.Id,
             Tag tag => tag.Id,
             TestCase tc => tc.Id,
@@ -69,6 +71,7 @@ public static class EnvelopeExtensions
         typeof(Pickle),
         typeof(Source),
         typeof(StepDefinition),
+        typeof(Suggestion),
         typeof(TestCase),
         typeof(TestCaseFinished),
         typeof(TestCaseStarted),
@@ -93,6 +96,7 @@ public static class EnvelopeExtensions
         else if (envelope.Pickle != null) { result = envelope.Pickle; }
         else if (envelope.Source != null) { result = envelope.Source; }
         else if (envelope.StepDefinition != null) { result = envelope.StepDefinition; }
+        else if (envelope.Suggestion != null) { result = envelope.Suggestion; }
         else if (envelope.TestCase != null) { result = envelope.TestCase; }
         else if (envelope.TestCaseFinished != null) { result = envelope.TestCaseFinished; }
         else if (envelope.TestCaseStarted != null) { result = envelope.TestCaseStarted; }

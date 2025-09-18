@@ -1,4 +1,4 @@
-﻿using Io.Cucumber.Messages.Types;
+using Io.Cucumber.Messages.Types;
 using System;
 using System.Collections.Generic;
 
@@ -175,6 +175,12 @@ public abstract class CucumberMessageVisitorBase
                 break;
             case StepMatchArgumentsList stepMatchArgumentsList:
                 Visit(stepMatchArgumentsList);
+                break;
+            case Suggestion suggestion:
+                Visit(suggestion);
+                break;
+            case Snippet snippet:
+                Visit(snippet);
                 break;
             case TestRunStarted testRunStarted:
                 Visit(testRunStarted);
@@ -656,6 +662,21 @@ public abstract class CucumberMessageVisitorBase
         OnVisited(stepMatchArgumentsList);
     }
 
+    public virtual void Visit(Suggestion suggestion)
+    {
+        OnVisiting(suggestion);
+        foreach (var snippet in suggestion.Snippets)
+        {
+            Accept(snippet);
+        }
+        OnVisited(suggestion);
+    }
+
+    public virtual void Visit(Snippet snippet)
+    {
+        OnVisiting(snippet);
+        OnVisited(snippet);
+    }
     public virtual void Visit(TestRunStarted testRunStarted)
     {
         OnVisiting(testRunStarted);
@@ -980,6 +1001,10 @@ public abstract class CucumberMessageVisitorBase
     public virtual void OnVisited(StepMatchArgumentsList stepMatchArgumentsList)
     { }
 
+    public virtual void OnVisiting(Suggestion suggestion) { }
+    public virtual void OnVisited(Suggestion suggestion) { }
+    public virtual void OnVisiting(Snippet snippet) { }
+    public virtual void OnVisited(Snippet snippet) { }
     public virtual void OnVisiting(Timestamp timestamp)
     { }
 

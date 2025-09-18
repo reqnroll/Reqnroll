@@ -68,7 +68,9 @@ public class TestStepTrackerTests
 
         // Assert
         def.IsBound.Should().BeTrue();
-        def.StepArguments.Should().HaveCount(2);
+        def.StepArgumentsLists.Should().HaveCount(1);
+        var argumentList = def.StepArgumentsLists[0];
+        argumentList.Should().HaveCount(2);
     }
 
     [Fact]
@@ -114,7 +116,7 @@ public class TestStepTrackerTests
 
         // Assert
         def.IsBound.Should().BeTrue();
-        def.StepArguments.Should().HaveCount(1);
+        def.StepArgumentsLists.Should().HaveCount(1);
     }
 
     private Mock<IBindingMethod> SetupMockMethodWithParameters(IEnumerable<(string, Type)> paramList)
@@ -157,7 +159,7 @@ public class TestStepTrackerTests
 
         // Assert
         def.IsBound.Should().BeFalse();
-        def.StepArguments.Should().BeEmpty();
+        def.StepArgumentsLists.Should().BeEmpty();
         def.StepDefinitionIds.Should().BeNullOrEmpty();
     }
 
@@ -202,7 +204,7 @@ public class TestStepTrackerTests
 
         var stepContextMock = new Mock<IScenarioStepContext>();
         stepContextMock.SetupGet(x => x.StepInfo).Returns(stepInfo);
-        stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.TestError);
+        stepContextMock.SetupGet(x => x.Status).Returns(ScenarioExecutionStatus.BindingError);
 
         //_messageFactoryMock.Setup(f => f.CanonicalizeStepDefinitionPattern(It.IsAny<IStepDefinitionBinding>()))
         //    .Returns("ambiguousPattern");

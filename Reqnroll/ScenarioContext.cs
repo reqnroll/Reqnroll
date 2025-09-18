@@ -49,7 +49,7 @@ public class ScenarioContext : ReqnrollContext, IScenarioContext
 
     public ScenarioExecutionStatus ScenarioExecutionStatus { get; internal set; }
     internal List<string> PendingSteps { get; }
-    internal List<StepInstance> MissingSteps { get; }
+    internal Dictionary<StepInstance, string> MissingSteps { get; }
     internal Stopwatch Stopwatch { get; }
 
     private readonly ITestObjectResolver _testObjectResolver;
@@ -67,7 +67,7 @@ public class ScenarioContext : ReqnrollContext, IScenarioContext
         RuleInfo = ruleInfo;
         ScenarioExecutionStatus = ScenarioExecutionStatus.OK;
         PendingSteps = new List<string>();
-        MissingSteps = new List<StepInstance>();
+        MissingSteps = new();
     }
 
     public ScenarioStepContext StepContext => ScenarioContainer.Resolve<IContextManager>().StepContext;

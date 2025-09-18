@@ -1,9 +1,10 @@
-﻿using Reqnroll;
+using Reqnroll;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
 {
@@ -32,12 +33,9 @@ namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
         }
 
         [Then("I should have {int} cucumbers")]
-        public void ThenIShouldHaveCucumbers(int p0)
-        {
-           if (_count != p0)
-           {
-               throw new Exception($"Cucumber count mismatch: Expected {p0}, got {_count}");
-           }
+        public void ThenIShouldHaveCucumbers(int expectedCount)
+        { 
+           Assert.AreEqual(expectedCount, _count);
         }
 
         [Then("each person can eat {int} cucumbers")]
@@ -45,10 +43,7 @@ namespace CucumberMessages.CompatibilityTests.CCK.examples_tables
         {
             var share = Math.Floor((double)_count / (1 + _friends));
 
-            if (share != p0)
-            {
-                throw new Exception($"Cucumber share mismatch: Expected {p0}, got {share}");
-            }
+            Assert.AreEqual(p0, share);
         }
     }
 }

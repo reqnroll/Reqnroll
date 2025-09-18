@@ -27,6 +27,7 @@ public interface ICucumberMessageFactory
     StepMatchArgument ToStepMatchArgument(TestStepArgument argument);
     TestStepStarted ToTestStepStarted(TestStepExecutionTracker testStepExecutionTracker);
     TestStepFinished ToTestStepFinished(TestStepExecutionTracker testStepExecutionTracker);
+    Suggestion ToSuggestion(TestStepExecutionTracker testStepExecutionTracker, string programmingLanguage, string skeletonMessage, IIdGenerator idGenerator);
 
     // Hook methods
     TestRunHookStarted ToTestRunHookStarted(TestRunHookExecutionTracker hookExecutionTracker);

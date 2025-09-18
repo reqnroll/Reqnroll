@@ -310,7 +310,7 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
         ExecuteTests();
         ShouldAllScenariosPass();
 
-        var actualResults = GetActualResults("", featureNameText).ToList();
+        var actualResults = GetActualResults(featureNameText).ToList();
         var stepDefs = actualResults.Select(e => e.Content()).OfType<StepDefinition>();
         stepDefs.Any(sd => sd.SourceReference.JavaMethod.ClassName.Contains("SampleExternalBindingClass")).Should().BeTrue("StepDefinition for SampleExternalBindingClass should be found in the StepDefinitions");
 
