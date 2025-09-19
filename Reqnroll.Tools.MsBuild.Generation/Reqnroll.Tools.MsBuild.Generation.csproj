@@ -19,13 +19,7 @@
     <!-- NuGet package metadata -->
     <Description>Package to enable the code-behind file generation during build time https://go.reqnroll.net/doc-config-build</Description>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <PackageIcon>assets/icon.png</PackageIcon>
   </PropertyGroup>
-  
-  <!-- Includes the Reqnroll icon. -->
-  <ItemGroup>
-    <None Include="../reqnroll-icon.png" Pack="true" PackagePath="assets/icon.png" />
-  </ItemGroup>
   
   <!-- Includes the build files. -->
   <ItemGroup>

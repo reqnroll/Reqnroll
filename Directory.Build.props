@@ -2,6 +2,7 @@
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Deterministic>true</Deterministic>
     
     <Reqnroll_Copyright>Copyright © Reqnroll</Reqnroll_Copyright>
     <Reqnroll_Authors>Reqnroll</Reqnroll_Authors>
@@ -37,13 +38,18 @@
     <Company>Reqnroll</Company>
     <Product />
     <PackageProjectUrl>https://reqnroll.net</PackageProjectUrl>
-    <PackageIcon>images/reqnroll-icon.png</PackageIcon>
+    <PackageIcon>assets/icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/reqnroll/Reqnroll</RepositoryUrl>
     <PackageTags>reqnroll bdd gherkin cucumber</PackageTags>
     <Description>Reqnroll aims at bridging the communication gap between domain experts and developers by binding business readable behavior specifications to the underlying implementation. Our mission is to provide a pragmatic and frictionless approach to Acceptance Test Driven Development and Behavior Driven Development for .NET projects today."</Description>
     <Copyright>$(Reqnroll_Copyright)</Copyright>
     <PackageLicenseExpression>BSD-3-Clause</PackageLicenseExpression>
   </PropertyGroup>
+
+  <!-- Includes the Reqnroll icon for packable projects. -->
+  <ItemGroup Condition="'$(IsPackable)' == 'true'">
+    <None Include="$(MSBuildThisFileDirectory)reqnroll-icon.png" Pack="true" PackagePath="assets/icon.png" />
+  </ItemGroup>
 
   <PropertyGroup>
     <!-- for Reqnroll.Tools.MsBuild.Generation -->
