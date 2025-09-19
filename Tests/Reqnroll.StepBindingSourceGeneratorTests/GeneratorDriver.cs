@@ -8,11 +8,16 @@ namespace Reqnroll.StepBindingSourceGenerator;
 
 public class GeneratorDriver
 {
-    public static GeneratorResult RunGenerator(SourceText source, string path)
-    {
-        var syntaxTree = CSharpSyntaxTree.ParseText(source, path: path);
+    public static GeneratorResult RunGenerator(SourceText source) => RunGenerator([source]);
 
-        syntaxTree.GetDiagnostics().Should().BeEmpty();
+    public static GeneratorResult RunGenerator(IEnumerable<SourceText> sources)
+    {
+        var syntaxTrees = sources.Select(source => CSharpSyntaxTree.ParseText(source));
+
+        foreach (var syntaxTree in syntaxTrees)
+        {
+            syntaxTree.GetDiagnostics().Should().BeEmpty();
+        }
 
         // Build up the minimal set of references required to compile our simple sample sources.
         var assemblies = AppDomain.CurrentDomain
@@ -34,7 +39,7 @@ public class GeneratorDriver
 
         var compilation = CSharpCompilation.Create(
             "SourceGeneratorTests",
-            [syntaxTree],
+            syntaxTrees,
             references,
             new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary));
 
