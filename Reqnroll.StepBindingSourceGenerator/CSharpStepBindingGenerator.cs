@@ -35,21 +35,19 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
                 }
                 else
                 {
-                    bindingMethod = CucumberExpressionDetector.IsCucumberExpression(definitionSyntax.TextPattern) ?
-                        BindingMethod.CucumberExpression : 
-                        BindingMethod.RegularExpression;
-
                     var prefix = definitionSyntax.MatchedKeywords == StepKeywordMatch.Any ?
                         "*" :
                         definitionSyntax.MatchedKeywords.ToString();
 
-                    if (bindingMethod == BindingMethod.RegularExpression)
+                    displayName = $"{prefix} {definitionSyntax.TextPattern}";
+
+                    if (CucumberExpressionDetector.IsCucumberExpression(definitionSyntax.TextPattern))
                     {
-                        displayName = $"{prefix} {Regex.Unescape(definitionSyntax.TextPattern)}";
+                        bindingMethod = BindingMethod.CucumberExpression;
                     }
                     else
                     {
-                        displayName = $"{prefix} {definitionSyntax.TextPattern}";
+                        bindingMethod = BindingMethod.RegularExpression;
                     }
                 }
 
