@@ -1,4 +1,5 @@
-﻿using Microsoft.CodeAnalysis.Text;
+﻿using Io.Cucumber.Messages.Types;
+using Microsoft.CodeAnalysis.Text;
 using Reqnroll.Bindings;
 
 namespace Reqnroll.StepBindingSourceGenerator;
@@ -24,7 +25,7 @@ public class StepRegistryGenerationTests
             }
             """);
 
-        var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+        var result = GeneratorDriver.RunGenerator(source);
 
         result.Diagnostics.Should().BeEmpty();
 
@@ -53,7 +54,7 @@ public class StepRegistryGenerationTests
             }
             """);
 
-        var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+        var result = GeneratorDriver.RunGenerator(source);
 
         result.Diagnostics.Should().BeEmpty();
 
@@ -83,7 +84,7 @@ public class StepRegistryGenerationTests
             }
             """);
 
-        var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+        var result = GeneratorDriver.RunGenerator(source);
 
         result.Diagnostics.Should().BeEmpty();
 
@@ -118,7 +119,7 @@ public class StepRegistryGenerationTests
             }
             """);
 
-        var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+        var result = GeneratorDriver.RunGenerator(source);
 
         result.Diagnostics.Should().BeEmpty();
 
@@ -157,7 +158,7 @@ public class StepRegistryGenerationTests
             }
             """);
 
-        var result = GeneratorDriver.RunGenerator(source, "/spec/Sample.feature");
+        var result = GeneratorDriver.RunGenerator(source);
 
         result.Diagnostics.Should().BeEmpty();
 
@@ -174,5 +175,70 @@ public class StepRegistryGenerationTests
                 "Given the app.config is used for configuration",
                 [StepDefinitionType.Given],
                 StepTextPattern.RegularExpression("the app\\.config is used for configuration")));
+    }
+
+    [Fact]
+    public void StepDefinitionsFromTwoStepClassesWithTheSameNameAreAddedToRegistry()
+    {
+        var source1 = SourceText.From(
+            """
+            using Reqnroll;
+
+            namespace Sample.Tests;
+
+            [Binding]
+            public class GameSteps
+            {
+                [When("Maker starts a game")]
+                public void WhenMakerStartsAGame()
+                {
+                    throw new System.NotImplementedException("f1e3f2b2-a99b-4d87-9fff-139128a61d5b");
+                }
+            }
+            """);
+
+        var source2 = SourceText.From(
+            """
+            using Reqnroll;
+
+            namespace Sample.Other.Tests;
+
+            [Binding]
+            public class GameSteps
+            {
+                [When("Maker starts a game")]
+                public void WhenMakerStartsAGame()
+                {
+                    throw new System.NotImplementedException("f1e3f2b2-a99b-4d87-9fff-139128a61d5b");
+                }
+            }
+            """);
+
+        var result = GeneratorDriver.RunGenerator([ source1, source2 ]);
+
+        result.Diagnostics.Should().BeEmpty();
+
+        using var assemblyContext = result.CompileAssembly();
+
+        var registry = assemblyContext.Assembly.GetStepRegistry();
+
+        registry.GetStepDefinitions().Should().HaveCount(2);
+
+        var stepDefinition1 = registry.GetStepDefinitions().First();
+
+        stepDefinition1.Should().BeEquivalentTo(
+            new StepDefinitionDescriptor(
+                "When Maker starts a game",
+                [StepDefinitionType.When],
+                StepTextPattern.CucumberExpression("Maker starts a game")));
+
+        var stepDefinition2= registry.GetStepDefinitions().Last();
+
+        stepDefinition2.Should().BeEquivalentTo(
+            new StepDefinitionDescriptor(
+                "When Maker starts a game",
+                [StepDefinitionType.When],
+                StepTextPattern.CucumberExpression("Maker starts a game")));
+
     }
 }
