@@ -98,8 +98,7 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
                     // If there are multiple classes with the same name, prefix with the namespace parts until all are unique.
                     var collisions = groups.Keys.Where(key => key.Name == group.Key.Name).ToArray();
                     var candiates = collisions.Select(static qualifiedName => qualifiedName.Name).ToArray();
-                    var namespaces = collisions.Select(static qualifiedName => qualifiedName.Namespace.Split('.')).ToArray();
-                    var prefixCount = 0;
+                    var namespaces = collisions.Select(static qualifiedName => qualifiedName.Namespace).ToArray<Namespace?>();
 
                     do
                     {
@@ -107,13 +106,13 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
 
                         for (var i = 0; i < collisions.Length; i++)
                         {
-                            prefixCount++;
                             var ns = namespaces[i];
 
-                            if (ns.Length < prefixCount)
-                            {
+                            if (ns != null)
+                            { 
                                 // Prepend the next namespace part to the candidate.
-                                candiates[i] = ns[ns.Length - prefixCount] + "_" + candiates[i];
+                                candiates[i] = ns.Name + "_" + candiates[i];
+                                namespaces[i] = ns.Parent;
                                 noMoreParts = false;
                             }
                         }
