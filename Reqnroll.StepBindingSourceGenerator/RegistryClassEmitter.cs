@@ -198,5 +198,6 @@ internal class RegistryClassEmitter(string @namespace)
 
         builder.EndBlock();
         builder.EndBlock();
+        builder.EndBlock();
     }
 }
