@@ -102,6 +102,11 @@ namespace Reqnroll.Generator.UnitTestProvider
             //Not Supported            
         }
 
+        public virtual void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+        {
+            // Not Supported
+        }
+
         public virtual void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassInitializeMethod.Attributes |= MemberAttributes.Static;

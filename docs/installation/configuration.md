@@ -113,7 +113,7 @@ Use this section to define test generation options.
   - Determines whether "row tests" should be generated for [scenario outlines](../gherkin/gherkin-reference.md#scenario-outline). This setting is ignored if the [test execution framework](setup-project.md#choosing-your-test-execution-framework) does not support row based testing. <br/> *Default:* `true`
 * - addNonParallelizableMarkerForTags
   - List of tags
-  - Defines a set of tags, any of which specify that a feature should be excluded from running in parallel with any other feature. See [](../execution/parallel-execution).<br/> *Default:* empty
+  - Defines a set of tags that mark tests as exclusive (non-parallelizable). If the tag appears on a feature, the whole generated test class is marked non-parallelizable. If the tag appears only on a scenario (and not on the feature), the generated test method is marked non-parallelizable on frameworks that support scenario/method level isolation (currently NUnit, MsTest V2 and TUnit). See [](../execution/parallel-execution).<br/> *Default:* empty
 ```
 
 ### `runtime`
