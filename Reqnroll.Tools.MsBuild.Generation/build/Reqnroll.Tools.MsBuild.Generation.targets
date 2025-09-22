@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup>
-    <_ReqnrollTools_MsBuild_Generation_Imported>true</_ReqnrollTools_MsBuild_Generation_Imported>
+    <_ReqnrollToolsMsBuildGenerationImported>true</_ReqnrollToolsMsBuildGenerationImported>
   </PropertyGroup>
 
   <UsingTask

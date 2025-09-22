@@ -19,7 +19,7 @@
   <Target
     Name="GenerateReqnrollAssemblyHooksFileTask"
     BeforeTargets="CoreCompile"
-    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_ReqnrollTools_MsBuild_Generation_Imported)' == 'true'">
+    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_ReqnrollToolsMsBuildGenerationImported)' == 'true'">
     
     <ReplaceTokenInFileTask
       Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'"
