@@ -2,31 +2,31 @@
 
   <PropertyGroup>
 
-    <_Reqnroll_xUnitGeneratorPlugin>netstandard2.0</_Reqnroll_xUnitGeneratorPlugin>
-    <_Reqnroll_xUnitGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_xUnitGeneratorPlugin)\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll</_Reqnroll_xUnitGeneratorPluginPath>
+    <_ReqnrollxUnitGeneratorPlugin>netstandard2.0</_ReqnrollxUnitGeneratorPlugin>
+    <_ReqnrollxUnitGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_ReqnrollxUnitGeneratorPlugin)\Reqnroll.xUnit.Generator.ReqnrollPlugin.dll</_ReqnrollxUnitGeneratorPluginPath>
 
-    <_Reqnroll_xUnitRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_Reqnroll_xUnitRuntimePlugin>
-    <_Reqnroll_xUnitRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">netstandard2.0</_Reqnroll_xUnitRuntimePlugin>
-    <_Reqnroll_xUnitRuntimePluginPath>$(MSBuildThisFileDirectory)..\lib\$(_Reqnroll_xUnitRuntimePlugin)\Reqnroll.xUnit.ReqnrollPlugin.dll</_Reqnroll_xUnitRuntimePluginPath>
+    <_ReqnrollxUnitRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_ReqnrollxUnitRuntimePlugin>
+    <_ReqnrollxUnitRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">netstandard2.0</_ReqnrollxUnitRuntimePlugin>
+    <_ReqnrollxUnitRuntimePluginPath>$(MSBuildThisFileDirectory)..\lib\$(_ReqnrollxUnitRuntimePlugin)\Reqnroll.xUnit.ReqnrollPlugin.dll</_ReqnrollxUnitRuntimePluginPath>
 
     <SourceReqnrollAssemblyHooksFile Condition="'$(SourceReqnrollAssemblyHooksFile)' == ''">$(MSBuildThisFileDirectory)xUnit.AssemblyHooks$(DefaultLanguageSourceExtension)</SourceReqnrollAssemblyHooksFile>
     <GenerateReqnrollAssemblyHooksFile Condition="'$(GenerateReqnrollAssemblyHooksFile)' == ''">true</GenerateReqnrollAssemblyHooksFile>
     <GeneratedReqnrollAssemblyHooksFile>$([System.IO.Path]::Combine($(ProjectDir),$([MSBuild]::Unescape('$(IntermediateOutputPath)'))))xUnit.AssemblyHooks$(DefaultLanguageSourceExtension)</GeneratedReqnrollAssemblyHooksFile>
-    <_Reqnroll_EffectiveRootNamespace Condition="'$(RootNamespace)' != ''">$(RootNamespace)</_Reqnroll_EffectiveRootNamespace>
-    <_Reqnroll_EffectiveRootNamespace Condition="'$(RootNamespace)' == ''">Reqnroll.GeneratedTests</_Reqnroll_EffectiveRootNamespace>
+    <_ReqnrollEffectiveRootNamespace Condition="'$(RootNamespace)' != ''">$(RootNamespace)</_ReqnrollEffectiveRootNamespace>
+    <_ReqnrollEffectiveRootNamespace Condition="'$(RootNamespace)' == ''">Reqnroll.GeneratedTests</_ReqnrollEffectiveRootNamespace>
   </PropertyGroup>
 
   <Target
     Name="GenerateReqnrollAssemblyHooksFileTask"
     BeforeTargets="CoreCompile"
-    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_Reqnroll_Tools_MsBuild_Generation_Imported)' == 'true'">
+    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_ReqnrollTools_MsBuild_Generation_Imported)' == 'true'">
     
     <ReplaceTokenInFileTask
       Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'"
       InputFile="$(SourceReqnrollAssemblyHooksFile)"
       OutputFile="$(GeneratedReqnrollAssemblyHooksFile)"
       TextToReplace="PROJECT_ROOT_NAMESPACE"
-      TextToReplaceWith="$(_Reqnroll_EffectiveRootNamespace.Replace('.', '_'))"
+      TextToReplaceWith="$(_ReqnrollEffectiveRootNamespace.Replace('.', '_'))"
       WriteOnlyWhenChanged="true" />
     
     <ItemGroup Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'">

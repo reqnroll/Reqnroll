@@ -1,6 +1,6 @@
 ﻿<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework>netstandard2.0</_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework>
-    <_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginFramework)\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll</_Reqnroll_MicrosoftExtensionsDependencyInjectionPluginPath>
+    <_ReqnrollMicrosoftExtensionsDependencyInjectionPluginFramework>netstandard2.0</_ReqnrollMicrosoftExtensionsDependencyInjectionPluginFramework>
+    <_ReqnrollMicrosoftExtensionsDependencyInjectionPluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_ReqnrollMicrosoftExtensionsDependencyInjectionPluginFramework)\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll</_ReqnrollMicrosoftExtensionsDependencyInjectionPluginPath>
   </PropertyGroup>
 </Project>

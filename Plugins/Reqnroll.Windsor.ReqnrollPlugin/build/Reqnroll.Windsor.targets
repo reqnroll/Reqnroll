@@ -1,6 +1,6 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_Reqnroll_WindsorPluginFramework>netstandard2.0</_Reqnroll_WindsorPluginFramework>
-    <_Reqnroll_WindsorPluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_WindsorPluginFramework)\Reqnroll.Windsor.ReqnrollPlugin.dll</_Reqnroll_WindsorPluginPath>
+    <_ReqnrollWindsorPluginFramework>netstandard2.0</_ReqnrollWindsorPluginFramework>
+    <_ReqnrollWindsorPluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_ReqnrollWindsorPluginFramework)\Reqnroll.Windsor.ReqnrollPlugin.dll</_ReqnrollWindsorPluginPath>
   </PropertyGroup>
 </Project>

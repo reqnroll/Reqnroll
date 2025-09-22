@@ -3,8 +3,8 @@
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</ReqnrollTestTFM>
-    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ReqnrollCoreToolsTfm)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ReqnrollFullFrameworkToolsTfm)</ReqnrollTestTFM>
     <ReqnrollGenerationProjectDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectDir>
     <ReqnrollGenerationTasksDir>$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksDir>
     <_ReqnrollDeferTaskLoading>true</_ReqnrollDeferTaskLoading>
@@ -17,13 +17,13 @@
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <AssemblyName>Reqnroll.Specs</AssemblyName>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>false</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
     <PackageId>Reqnroll.Specs</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
-    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>true</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollDeleteCodeBehindFilesOnCleanRebuild>true</ReqnrollDeleteCodeBehindFilesOnCleanRebuild>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
     <NoWarn>$(NoWarn);CS2002</NoWarn>
 

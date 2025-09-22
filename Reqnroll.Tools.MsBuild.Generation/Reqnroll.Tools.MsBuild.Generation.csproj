@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_FullFramework_Tools_TFM);$(Reqnroll_Core_Tools_TFM)</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <TargetFrameworks>$(ReqnrollFullFrameworkToolsTfm);$(ReqnrollCoreToolsTfm)</TargetFrameworks>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
     
     
     <NoPackageAnalysis>true</NoPackageAnalysis>
