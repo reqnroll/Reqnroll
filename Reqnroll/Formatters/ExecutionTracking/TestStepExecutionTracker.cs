@@ -3,13 +3,14 @@ using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 using Reqnroll.Events;
 using System.Threading.Tasks;
 using Reqnroll.Formatters.PubSub;
+using Gherkin.CucumberMessages;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
 /// <summary>
 /// This class is used to track the execution of test steps.
 /// </summary>
-public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher): 
+public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, ICucumberMessageFactory messageFactory, IMessagePublisher publisher, IIdGenerator idGenerator) :
     StepExecutionTrackerBase(parentTracker, messageFactory, publisher)
 {
     public async Task ProcessEvent(StepStartedEvent stepStartedEvent)
@@ -37,6 +38,19 @@ public class TestStepExecutionTracker(TestCaseExecutionTracker parentTracker, IC
         StepFinishedAt = stepFinishedEvent.Timestamp;
         Status = stepFinishedEvent.StepContext.Status;
         Exception = stepFinishedEvent.StepContext.StepError;
+
+        if (Status == ScenarioExecutionStatus.UndefinedStep)
+        {
+            var programmingLanguage = stepFinishedEvent.FeatureContext.FeatureInfo.GenerationTargetLanguage.ToString();
+            // retrieve skeleton code from the ScenarioContext (keyed by StepInstance)
+            if (stepFinishedEvent.ScenarioContext is ScenarioContext scenarioContext)
+            {
+                if (scenarioContext.MissingSteps.TryGetValue(stepFinishedEvent.StepContext.StepInfo.StepInstance, out var skeletonMessage))
+                {
+                    await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToSuggestion(this, programmingLanguage, skeletonMessage, idGenerator)));
+                }
+            }
+        }
 
         await Publisher.PublishAsync(Envelope.Create(MessageFactory.ToTestStepFinished(this)));
     }

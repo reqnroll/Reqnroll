@@ -535,9 +535,9 @@ namespace Reqnroll.Infrastructure
                     // GetStepMatch might throw
                     // - BindingException when the binding registry is invalid, e.g. because of an invalid regex
                     // - MissingStepDefinitionException when step is undefined
+                    contextManager.StepContext.StepInfo.StepInstance = stepInstance;
                     match = GetStepMatch(stepInstance, out candidatingMatches);
                     contextManager.StepContext.StepInfo.BindingMatch = match;
-                    contextManager.StepContext.StepInfo.StepInstance = stepInstance;
                     return Task.CompletedTask;
                 });
 
@@ -649,8 +649,9 @@ namespace Reqnroll.Infrastructure
                     _contextManager.ScenarioContext.PendingSteps.Add(_stepFormatter.GetMatchText(match, arguments));
                     return;
                 case ScenarioExecutionStatus.UndefinedStep:
+                    var msg = _testUndefinedMessageFactory.BuildStepMessageFromContext(stepInstance, FeatureContext);
                     _testTracer.TraceNoMatchingStepDefinition(stepInstance, FeatureContext.FeatureInfo.GenerationTargetLanguage, FeatureContext.BindingCulture, candidatingMatches);
-                    _contextManager.ScenarioContext.MissingSteps.Add(stepInstance);
+                    _contextManager.ScenarioContext.MissingSteps.Add(stepInstance, msg);
                     return;
                 case ScenarioExecutionStatus.BindingError:
                     _testTracer.TraceBindingError(exception);
