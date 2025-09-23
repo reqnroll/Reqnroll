@@ -5,6 +5,8 @@
 
 * Add xUnit 3 support (#405, #538)
 
+* Enhanced documentation to add information on custom Step Attributes
+
 ## Bug fixes:
 
 *Contributors of this release (in alphabetical order):* @chekkan
