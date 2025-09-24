@@ -78,4 +78,28 @@ internal class StepDefinitions
         var actualContents = File.ReadAllText(actualFilePath);
         Assert.Equal(contents, actualContents);
     }
+
+    // Demonstrate the workaround to allow using global VerifySettings instead of the settings provided via DI
+    // This is a workaround for a feature we suppoered before plugin version v3.1
+    [BeforeTestRun]
+    public static void EnableGlobalVerifySettingsForCompatibility()
+    {
+        Verifier.DerivePathInfo(
+            (_, projectDirectory, _, _) =>
+            {
+                var scenarioContext = Reqnroll.ScenarioContext.Current;
+                var featureContext = Reqnroll.FeatureContext.Current;
+                string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
+
+                foreach (System.Collections.DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
+                {
+                    scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
+                }
+
+                return new PathInfo(
+                    Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
+                    featureContext.FeatureInfo.Title,
+                    scenarioInfoTitle);
+            });
+    }
 }
