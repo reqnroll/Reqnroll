@@ -203,6 +203,11 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClass, COLLECTION_ATTRIBUTE, new CodeAttributeArgument(new CodePrimitiveExpression(NONPARALLELIZABLE_COLLECTION_NAME)));
         }
 
+        public virtual void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+        {
+            // xUnit does not support method-level parallelization
+        }
+
         public virtual void FinalizeTestClass(TestClassGenerationContext generationContext)
         {
             IgnoreFeature(generationContext);
