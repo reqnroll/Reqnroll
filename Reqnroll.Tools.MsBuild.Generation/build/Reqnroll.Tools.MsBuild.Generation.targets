@@ -1,10 +1,18 @@
 <Project>
 
-  <Import Project="Reqnroll.Tools.MsBuild.Generation.props" Condition="'$(_ReqnrollPropsImported)'==''"/>
-
   <PropertyGroup>
-    <_Reqnroll_Tools_MsBuild_Generation_Imported>true</_Reqnroll_Tools_MsBuild_Generation_Imported>
+    <_ReqnrollToolsMsBuildGenerationImported>true</_ReqnrollToolsMsBuildGenerationImported>
   </PropertyGroup>
+
+  <UsingTask
+    TaskName="Reqnroll.Tools.MsBuild.Generation.GenerateFeatureFileCodeBehindTask"
+    AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+    TaskFactory="$(ReqnrollGenerationTaskFactory)" />
+  
+  <UsingTask
+    TaskName="Reqnroll.Tools.MsBuild.Generation.ReplaceTokenInFileTask"
+    AssemblyFile="$(ReqnrollGenerationTasksAssemblyPath)"
+    TaskFactory="$(ReqnrollGenerationTaskFactory)" />
 
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
@@ -16,18 +24,11 @@
       - currently we don't want to support globbing with classic project system => ensure globbing only get enabled with 'UsingMicrosoftNETSdk'
       - currently we are supporting $(EnableDefaultCompileItems) for disabling globbing support for codebehind files
     -->
-    <_Reqnroll_EnableDefaultCompileItems Condition="'$(Reqnroll_EnableDefaultCompileItems)' == '' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_Reqnroll_EnableDefaultCompileItems>
-    <_Reqnroll_EnableDefaultCompileItems Condition="'$(Reqnroll_EnableDefaultCompileItems)' == 'true' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_Reqnroll_EnableDefaultCompileItems>
+    <_ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)' == '' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_ReqnrollEnableDefaultCompileItems>
+    <_ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)' == 'true' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_ReqnrollEnableDefaultCompileItems>
   </PropertyGroup>
 
   <PropertyGroup>
-    <BuildDependsOn>
-      BeforeUpdateFeatureFilesInProject;
-      UpdateFeatureFilesInProject;
-      IncludeCodeBehindFilesInProject;
-      AfterUpdateFeatureFilesInProject;
-      $(BuildDependsOn)
-    </BuildDependsOn>
     <CleanDependsOn>
       CleanFeatureFilesInProject;
       $(CleanDependsOn)
@@ -41,7 +42,7 @@
   <!--
     net.sdk support: update default compile items to show generated files as nested items
   -->
-  <ItemGroup Condition="'$(_Reqnroll_EnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' ">
+  <ItemGroup Condition="'$(_ReqnrollEnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' ">
     <Compile Update="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
              DependentUpon="%(Filename)"
              AutoGen="true"
@@ -53,7 +54,7 @@
 
 
   <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
-          Condition="'$(Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
+          Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
     <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
   </Target>
 
@@ -63,7 +64,6 @@
       <ForceGeneration>true</ForceGeneration>
     </PropertyGroup>
   </Target>
-
 
   <Target Name="UpdateFeatureFilesInProject"
           DependsOnTargets="BeforeUpdateFeatureFilesInProject">
@@ -80,14 +80,14 @@
     </PropertyGroup> -->
 
     <PropertyGroup Condition="'$(TargetFrameworkVersion)' != ''">
-      <Reqnroll_TargetFramework>$(TargetFrameworkVersion)</Reqnroll_TargetFramework>
+      <ReqnrollTargetFramework>$(TargetFrameworkVersion)</ReqnrollTargetFramework>
     </PropertyGroup>
     <PropertyGroup Condition="'$(TargetFramework)' != ''">
-      <Reqnroll_TargetFramework>$(TargetFramework)</Reqnroll_TargetFramework>
-      <Reqnroll_TargetFrameworks>$(TargetFramework)</Reqnroll_TargetFrameworks>
+      <ReqnrollTargetFramework>$(TargetFramework)</ReqnrollTargetFramework>
+      <ReqnrollTargetFrameworks>$(TargetFramework)</ReqnrollTargetFrameworks>
     </PropertyGroup>
     <PropertyGroup Condition="'$(TargetFrameworks)' != ''">
-      <Reqnroll_TargetFrameworks>$(TargetFrameworks)</Reqnroll_TargetFrameworks>
+      <ReqnrollTargetFrameworks>$(TargetFrameworks)</ReqnrollTargetFrameworks>
     </PropertyGroup>
 
     <GenerateFeatureFileCodeBehindTask
@@ -100,8 +100,8 @@
       
       MSBuildVersion="$(MSBuildVersion)"
       AssemblyName="$(AssemblyName)"
-      TargetFrameworks="$(Reqnroll_TargetFrameworks)"
-      TargetFramework="$(Reqnroll_TargetFramework)"
+      TargetFrameworks="$(ReqnrollTargetFrameworks)"
+      TargetFramework="$(ReqnrollTargetFramework)"
       ProjectGuid="$(ProjectGuid)"
       >
 
@@ -113,7 +113,7 @@
     <!--
       net.sdk support: globbing does not support including files which are dynamically generated inside targets, we have to manually update compile items
     -->
-    <ItemGroup Condition="'$(_Reqnroll_EnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">
+    <ItemGroup Condition="'$(_ReqnrollEnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">
 
       <!-- if this is the first time generation of codebehind files, we have to manually add them as compile items -->
       <Compile Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
@@ -139,11 +139,19 @@
 
   </Target>
 
-  <Target Name="BeforeUpdateFeatureFilesInProject">
+  <Target Name="BeforeUpdateFeatureFilesInProject" BeforeTargets="UpdateFeatureFilesInProject">
 
   </Target>
 
+  <PropertyGroup>
+    <CoreCompileDependsOn>
+      IncludeCodeBehindFilesInProject;
+      $(CoreCompileDependsOn)
+    </CoreCompileDependsOn>
+  </PropertyGroup>
+
   <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject">
+    
     <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
       <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
     </ItemGroup>
@@ -153,7 +161,17 @@
         <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
-    
+  </Target>
+
+  <PropertyGroup>
+    <AssignTargetPathsDependsOn>
+      EmbedCucumberMessages;
+      $(AssignTargetPathsDependsOn)
+    </AssignTargetPathsDependsOn>
+  </PropertyGroup>
+
+  <Target Name="EmbedCucumberMessages" DependsOnTargets="UpdateFeatureFilesInProject">
+
     <ItemGroup>
       <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Condition="'%(ReqnrollGeneratedFiles.EmbeddedMessagesStoragePath)' != ''">
         <LogicalName>%(ReqnrollGeneratedFiles.EmbeddedMessagesResourceName)</LogicalName>
@@ -161,11 +179,14 @@
     </ItemGroup>
   </Target>
 
-  <Target Name="AfterUpdateFeatureFilesInProject" DependsOnTargets="IncludeCodeBehindFilesInProject">
+  <Target
+    Name="AfterUpdateFeatureFilesInProject"
+    DependsOnTargets="IncludeCodeBehindFilesInProject"
+    AfterTargets="IncludeCodeBehindFilesInProject">
     <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
   </Target>
 
-  <Target Name="CleanFeatureFilesInProject" Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)' == 'true'">
+  <Target Name="CleanFeatureFilesInProject" Condition="'$(ReqnrollDeleteCodeBehindFilesOnCleanRebuild)' == 'true'">
     <!-- remove known codebehind files for existing feature files -->
     <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
 

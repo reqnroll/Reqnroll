@@ -6,6 +6,3 @@ Feature: Hooks
 
   Scenario: No tags and a failed step
     When a step fails
-
-  Scenario: No tags and a undefined step
-    When a step does not exist

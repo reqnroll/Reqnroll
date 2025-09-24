@@ -5,12 +5,14 @@
 * Generator: `addNonParallelizableMarkerForTags` now also applies to scenario-level tags for frameworks supporting method-level isolation (NUnit, MsTest V2, TUnit).
 
 ## Improvements:
+* Dependencies: Updated to Cucumber Gherkin v35.0.0, Cucumber Messages v29.0.0 and Cucumber CompatibilityKit v23.0.0
 
 * Add xUnit 3 support (#405, #538)
+* Improved `Reqnroll.Tools.MsBuild.Generation` NuGet package: reduced size by optimizing included dependencies, consolidated MsBuild assets (#812)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @chekkan, @konarx
+*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @konarx
 
 # v3.0.3 - 2025-09-17
 

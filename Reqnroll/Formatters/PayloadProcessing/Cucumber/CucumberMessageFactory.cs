@@ -1,9 +1,9 @@
-﻿using Cucumber.Messages;
+using Cucumber.Messages;
 using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
-using Reqnroll.Formatters.ExecutionTracking;
 using Reqnroll.EnvironmentAccess;
+using Reqnroll.Formatters.ExecutionTracking;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -43,7 +43,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     public virtual TestRunHookStarted ToTestRunHookStarted(TestRunHookExecutionTracker hookExecutionTracker)
     {
-        return new TestRunHookStarted(hookExecutionTracker.HookStartedId, hookExecutionTracker.TestRunId, hookExecutionTracker.HookId, ToTimestamp(hookExecutionTracker.HookStarted));
+        return new TestRunHookStarted(hookExecutionTracker.HookStartedId, hookExecutionTracker.TestRunId, hookExecutionTracker.HookId, null, ToTimestamp(hookExecutionTracker.HookStarted));
     }
 
     public virtual TestRunHookFinished ToTestRunHookFinished(TestRunHookExecutionTracker hookExecutionTracker)
@@ -156,19 +156,20 @@ public class CucumberMessageFactory : ICucumberMessageFactory
 
     public virtual TestStep ToTestStep(TestStepTracker stepDef)
     {
-        var args = stepDef.StepArguments
-                          .Select(ToStepMatchArgument)
-                          .ToList();
 
         var result = new TestStep(
             null,
             stepDef.TestStepId,
             stepDef.PickleStepId,
             stepDef.StepDefinitionIds,
-            stepDef.IsBound ? [new StepMatchArgumentsList(args)] : []
+            stepDef.IsBound ? stepDef.StepArgumentsLists.Select(ToStepMatchArgumentList).ToList() : []
         );
 
         return result;
+    }
+    private StepMatchArgumentsList ToStepMatchArgumentList(List<TestStepArgument> args)
+    {
+        return new StepMatchArgumentsList(args.Select(ToStepMatchArgument).ToList());
     }
 
     public virtual TestStep ToTestStep(HookStepTracker hookStepTracker)
@@ -211,6 +212,15 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             ToTimestamp(testStepExecutionTracker.StepFinishedAt));
     }
 
+    public virtual Suggestion ToSuggestion(TestStepExecutionTracker testStepExecution, string programmingLanguage, string skeletonMessage, IIdGenerator idGenerator)
+    {
+        if (testStepExecution.StepTracker is TestStepTracker testStepTracker)
+        {
+            var pickleStepId = testStepTracker.PickleStepId;
+            return new Suggestion(idGenerator.GetNewId(), pickleStepId, [new Snippet(programmingLanguage, skeletonMessage)]);
+        }
+        return null;
+    }
     public virtual Hook ToHook(IHookBinding hookBinding, IIdGenerator iDGenerator)
     {
         SourceReference sourceRef = ToSourceRef(hookBinding);
@@ -291,12 +301,26 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             Converters.ToTimestamp(tracker.Timestamp));
     }
 
+    private static string ToTestStepResultMessage(System.Exception exception, ScenarioExecutionStatus status)
+    {
+        if (exception == null) { return null; }
+        return status switch
+        {
+            ScenarioExecutionStatus.OK => null,
+            ScenarioExecutionStatus.StepDefinitionPending => exception.Message,
+            ScenarioExecutionStatus.UndefinedStep => exception.Message,
+            ScenarioExecutionStatus.BindingError => null,
+            ScenarioExecutionStatus.TestError => exception.Message,
+            ScenarioExecutionStatus.Skipped => null,
+            _ => throw new NotImplementedException(),
+        };
+    }
     private static TestStepResult ToTestStepResult(StepExecutionTrackerBase stepState)
     {
-        TimeSpan d = (stepState.Duration.HasValue ? (TimeSpan) stepState.Duration : new TimeSpan(0));
+        TimeSpan d = (stepState.Duration.HasValue ? (TimeSpan)stepState.Duration : new TimeSpan(0));
         return new TestStepResult(
             Converters.ToDuration(d),
-            "",
+            ToTestStepResultMessage(stepState.Exception, stepState.Status),
             ToTestStepResultStatus(stepState.Status),
             ToException(stepState.Exception)
         );
@@ -306,7 +330,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     {
         return new TestStepResult(
             Converters.ToDuration(hookExecutionTracker.Duration ?? TimeSpan.Zero),
-            "",
+            ToTestStepResultMessage(hookExecutionTracker.Exception, hookExecutionTracker.Status),
             ToTestStepResultStatus(hookExecutionTracker.Status),
             ToException(hookExecutionTracker.Exception));
     }
@@ -388,7 +412,7 @@ public class CucumberMessageFactory : ICucumberMessageFactory
                 gitUrl,
                 gitRevision,
                 gitBranch,
-                gitTag  
+                gitTag
             );
         return git;
     }
