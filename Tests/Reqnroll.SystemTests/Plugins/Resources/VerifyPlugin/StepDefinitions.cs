@@ -88,7 +88,7 @@ internal class StepDefinitions
     }
 
     // Demonstrate the workaround to allow using global VerifySettings instead of the settings provided via DI
-    // This is a workaround for a feature we suppoered before plugin version v3.1
+    // This is a workaround for a feature we supported before plugin version v3.1
     [BeforeTestRun]
     public static void EnableGlobalVerifySettingsForCompatibility()
     {
