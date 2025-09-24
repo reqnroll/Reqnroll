@@ -1,6 +1,6 @@
 # Custom Step Definition Attributes
 
-Reqnroll provides the ability to create custom [step definition attributes](/automation/step-definitions), enabling teams to express scenarios in local languages or to define grouped categories for step types beyond `Given`, `When`, and `Then`. This flexibility is commonly leveraged:
+Reqnroll provides the ability to create custom [step definition attributes](../automation/step-definitions), enabling teams to express scenarios in local languages or to define grouped categories for step types beyond `Given`, `When`, and `Then`. This flexibility is commonly leveraged:
 - To use attribute names and conventions in a localized (non-English) language, increasing naturalness for teams that work in other languages.
 - To create broader or grouped step definition types (such as a general-purpose attribute that covers both "Given" and "When" semantics).
 
