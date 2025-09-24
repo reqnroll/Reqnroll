@@ -2,9 +2,9 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Reqnroll.Parser</AssemblyName>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
     <PackageId>Reqnroll.Parser</PackageId>
         
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>

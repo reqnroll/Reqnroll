@@ -4,8 +4,8 @@
     <DebugType>full</DebugType>
     <DebugSymbols>true</DebugSymbols>
 
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PackageIcon>logo.png</PackageIcon>
 
   </PropertyGroup>
