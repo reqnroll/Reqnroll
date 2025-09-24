@@ -2,13 +2,13 @@
 
   <PropertyGroup>
 
-    <_Reqnroll_SpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_Reqnroll_SpecFlowCompatibilityGeneratorPlugin>
-    <_Reqnroll_SpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_Reqnroll_SpecFlowCompatibilityGeneratorPlugin>
-    <_Reqnroll_SpecFlowCompatibilityGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_Reqnroll_SpecFlowCompatibilityGeneratorPlugin)\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.dll</_Reqnroll_SpecFlowCompatibilityGeneratorPluginPath>
+    <_ReqnrollSpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' == 'Core'">netstandard2.0</_ReqnrollSpecFlowCompatibilityGeneratorPlugin>
+    <_ReqnrollSpecFlowCompatibilityGeneratorPlugin Condition=" '$(MSBuildRuntimeType)' != 'Core'">net462</_ReqnrollSpecFlowCompatibilityGeneratorPlugin>
+    <_ReqnrollSpecFlowCompatibilityGeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_ReqnrollSpecFlowCompatibilityGeneratorPlugin)\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.dll</_ReqnrollSpecFlowCompatibilityGeneratorPluginPath>
 
-    <_Reqnroll_SpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_Reqnroll_SpecFlowCompatibilityRuntimePlugin>
-    <_Reqnroll_SpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">netstandard2.0</_Reqnroll_SpecFlowCompatibilityRuntimePlugin>
-    <_Reqnroll_SpecFlowCompatibilityRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_Reqnroll_SpecFlowCompatibilityRuntimePlugin)\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll</_Reqnroll_SpecFlowCompatibilityRuntimePluginPath>
+    <_ReqnrollSpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_ReqnrollSpecFlowCompatibilityRuntimePlugin>
+    <_ReqnrollSpecFlowCompatibilityRuntimePlugin Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">netstandard2.0</_ReqnrollSpecFlowCompatibilityRuntimePlugin>
+    <_ReqnrollSpecFlowCompatibilityRuntimePluginPath>$(MSBuildThisFileDirectory)\..\lib\$(_ReqnrollSpecFlowCompatibilityRuntimePlugin)\Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll</_ReqnrollSpecFlowCompatibilityRuntimePluginPath>
 
   </PropertyGroup>
 

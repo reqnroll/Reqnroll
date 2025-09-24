@@ -4,12 +4,13 @@
 * Dependencies: Updated to Cucumber Gherkin v35.0.0, Cucumber Messages v29.0.0 and Cucumber CompatibilityKit v23.0.0
 
 * Add xUnit 3 support (#405, #538)
+* Improved `Reqnroll.Tools.MsBuild.Generation` NuGet package: reduced size by optimizing included dependencies, consolidated MsBuild assets (#812)
 
 * Enhanced documentation to add information on custom Step Attributes
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @chekkan
+*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump
 
 # v3.0.3 - 2025-09-17
 
