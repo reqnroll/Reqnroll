@@ -172,6 +172,29 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             handledInOnAfterLastStep.Should().Be(!stopAtFirstError); // in case of stopAtFirstError, the error should come from OnScenarioStartAsync
         }
 
+
+        [Fact]
+        public async Task Should_keep_user_hook_error_when_both_user_and_plugin_beforescenario_hook_fails()
+        {
+            var testExecutionEngine = CreateTestExecutionEngine();
+
+            // user hook will fail with SimulatedErrorMessage
+            RegisterFailingHook(_beforeScenarioEvents);
+
+            // plugin hook will also fail
+            _runtimePluginTestExecutionLifecycleEventEmitter.Setup(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeScenario, It.IsAny<IObjectContainer>()))
+                                                            .ThrowsAsync(new Exception("plugin-hook-error"));
+
+            Func<Task> act = async () =>
+            {
+                //NOTE: the exception will be re-thrown in the OnAfterLastStep
+                await testExecutionEngine.OnScenarioStartAsync();
+                await testExecutionEngine.OnAfterLastStepAsync(); 
+            };
+
+            await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
+        }
+
         [Fact]
         public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_afterscenario()
         {

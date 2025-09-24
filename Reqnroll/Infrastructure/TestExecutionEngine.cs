@@ -359,8 +359,12 @@ namespace Reqnroll.Infrastructure
             }
             catch (Exception hookExceptionCaught)
             {
-                hookException = hookExceptionCaught;
-                SetHookError(hookType, hookException);
+                // we do not overwrite an existing exception as that might be the root cause of the failure
+                if (hookException == null)
+                {
+                    hookException = hookExceptionCaught;
+                    SetHookError(hookType, hookException);
+                }
             }
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new HookFinishedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext, hookException));
