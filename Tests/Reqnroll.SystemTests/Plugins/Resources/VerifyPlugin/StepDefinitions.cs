@@ -4,7 +4,7 @@ namespace Reqnroll.Verify.ReqnrollPlugin.IntegrationTest.StepDefinitions;
 internal class StepDefinitions
 {
     private readonly VerifySettings _settings;
-    private VerifyResult _verifyResult;
+    private VerifyResult? _verifyResult;
 
     public StepDefinitions(VerifySettings settings)
     {
@@ -68,15 +68,23 @@ internal class StepDefinitions
         _verifyResult = await Verifier.Verify(contents, _settings);
     }
 
+    private void AssertEqual(string expected, string actual)
+    {
+        if (expected != actual)
+        {
+            throw new Exception($"Expected: {expected}, Actual: {actual}");
+        }
+    }
+
     [Then(@"the verified file is `(.*)` with contents `(.*)`")]
     public void ThenTheVerifiedFileIsWithContents(string fileName, string contents)
     {
-        var actualFilePath = _verifyResult.Files.First();
+        var actualFilePath = _verifyResult!.Files.First();
         var actualFileName = Path.GetFileName(actualFilePath);
-        Assert.Equal(fileName, actualFileName);
+        AssertEqual(fileName, actualFileName);
 
         var actualContents = File.ReadAllText(actualFilePath);
-        Assert.Equal(contents, actualContents);
+        AssertEqual(contents, actualContents);
     }
 
     // Demonstrate the workaround to allow using global VerifySettings instead of the settings provided via DI
