@@ -6,8 +6,6 @@
 * Add xUnit 3 support (#405, #538)
 * Improved `Reqnroll.Tools.MsBuild.Generation` NuGet package: reduced size by optimizing included dependencies, consolidated MsBuild assets (#812)
 
-* Enhanced documentation to add information on custom Step Attributes
-
 ## Bug fixes:
 
 *Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump
