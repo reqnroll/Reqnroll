@@ -121,9 +121,12 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeScenario, It.IsAny<IObjectContainer>()));
         }
         
-        [Fact]
-        public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_beforescenario_after_hook_error_and_throw_error()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_beforescenario_after_hook_error_and_throw_error(bool stopAtFirstError)
         {
+            _reqnrollConfiguration.StopAtFirstError = stopAtFirstError;
             var testExecutionEngine = CreateTestExecutionEngine();
             var handledInOnAfterLastStep = false;
 
@@ -138,15 +141,18 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
             _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeScenario, It.IsAny<IObjectContainer>()));
-            handledInOnAfterLastStep.Should().BeTrue();
+            handledInOnAfterLastStep.Should().Be(!stopAtFirstError); // in case of stopAtFirstError, the error should come from OnScenarioStartAsync
         }
 
-        [Fact]
-        public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_beforescenario_after_plugin_hook_error_and_throw_error()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_beforescenario_after_plugin_hook_error_and_throw_error(bool stopAtFirstError)
         {
             // this test is similar to the previous one, but it simulates an error from the plugin hook infrastructure, not a user hook
             // "normally" the plugin hooks should not throw exceptions, but still, we should ensure that the error is somehow visible
 
+            _reqnrollConfiguration.StopAtFirstError = stopAtFirstError;
             var testExecutionEngine = CreateTestExecutionEngine();
             var handledInOnAfterLastStep = false;
 
@@ -163,7 +169,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
             _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeScenario, It.IsAny<IObjectContainer>()));
-            handledInOnAfterLastStep.Should().BeTrue();
+            handledInOnAfterLastStep.Should().Be(!stopAtFirstError); // in case of stopAtFirstError, the error should come from OnScenarioStartAsync
         }
 
         [Fact]
