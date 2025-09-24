@@ -6,6 +6,7 @@
     <title>Reqnroll Microsoft.Extensions.DependencyInjection integration plugin</title>
     <authors>Mark Hoek, Solid Token, Stef Heyenrath, $author$</authors>
     <owners>Mark Hoek, Solid Token, Stef Heyenrath, $owner$</owners>
+    <readme>README.md</readme>
     <description>Reqnroll plugin that enables to use Microsoft.Extensions.DependencyInjection for resolving test dependencies.</description>
     <language>en-US</language>
     <projectUrl>https://www.reqnroll.net</projectUrl>
@@ -27,8 +28,10 @@
     <file src="build\**\*" target="build" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.pdb" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.xml" target="lib\netstandard2.0" />
 
     <file src="$SolutionDir$LICENSE" target="LICENSE" />
+    <file src="README.md" target="README.md" />
     <file src="$SolutionDir$reqnroll-icon.png" target="images\" />
   </files>
 </package>
