@@ -192,9 +192,9 @@ namespace Reqnroll.Infrastructure
             }
             catch (Exception)
             {
-                // Removed code that sets the ScenarioContext.TestError and ScenarioContext.ScenarioExecutionStatus, because
-                // FireEventsAsync called by FireScenarioEventsAsync sets *Context.TestError and ScenarioContext.ScenarioExecutionStatus.
-                // The fact that the exception is not rethrown here is suspicious, but it is the current behavior. We need to check it eventually.
+                // When StopAtFirstError is false (default), we do not rethrow the exception, because it will be handled in OnAfterLastStepAsync
+                if (_reqnrollConfiguration.StopAtFirstError)
+                    throw;
             }
         }
 
@@ -352,8 +352,20 @@ namespace Reqnroll.Infrastructure
             }
 
             //Note: plugin-hooks are still executed even if a user-hook failed with an exception
-            //A plugin-hook should not throw an exception under normal circumstances, exceptions are not handled/caught here
-            await FireRuntimePluginTestExecutionLifecycleEventsAsync(hookType);
+            //A plugin-hook should not throw an exception under normal circumstances, still, we handle them like user-hooks
+            try
+            {
+                await FireRuntimePluginTestExecutionLifecycleEventsAsync(hookType);
+            }
+            catch (Exception hookExceptionCaught)
+            {
+                // we do not overwrite an existing exception as that might be the root cause of the failure
+                if (hookException == null)
+                {
+                    hookException = hookExceptionCaught;
+                    SetHookError(hookType, hookException);
+                }
+            }
 
             await _testThreadExecutionEventPublisher.PublishEventAsync(new HookFinishedEvent(hookType, FeatureContext, ScenarioContext, _contextManager.StepContext, hookException));
 
