@@ -125,19 +125,46 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_beforescenario_after_hook_error_and_throw_error()
         {
             var testExecutionEngine = CreateTestExecutionEngine();
+            var handledInOnAfterLastStep = false;
 
             RegisterFailingHook(_beforeScenarioEvents);
             Func<Task> act = async () =>
             {
                 //NOTE: the exception will be re-thrown in the OnAfterLastStep
                 await testExecutionEngine.OnScenarioStartAsync();
+                handledInOnAfterLastStep = true;
                 await testExecutionEngine.OnAfterLastStepAsync(); 
             };
 
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
             _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeScenario, It.IsAny<IObjectContainer>()));
+            handledInOnAfterLastStep.Should().BeTrue();
         }
 
+        [Fact]
+        public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_beforescenario_after_plugin_hook_error_and_throw_error()
+        {
+            // this test is similar to the previous one, but it simulates an error from the plugin hook infrastructure, not a user hook
+            // "normally" the plugin hooks should not throw exceptions, but still, we should ensure that the error is somehow visible
+
+            var testExecutionEngine = CreateTestExecutionEngine();
+            var handledInOnAfterLastStep = false;
+
+            _runtimePluginTestExecutionLifecycleEventEmitter.Setup(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeScenario, It.IsAny<IObjectContainer>()))
+                                                            .ThrowsAsync(new Exception(SimulatedErrorMessage));
+
+            Func<Task> act = async () =>
+            {
+                //NOTE: the exception will be re-thrown in the OnAfterLastStep
+                await testExecutionEngine.OnScenarioStartAsync();
+                handledInOnAfterLastStep = true;
+                await testExecutionEngine.OnAfterLastStepAsync(); 
+            };
+
+            await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
+            _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.BeforeScenario, It.IsAny<IObjectContainer>()));
+            handledInOnAfterLastStep.Should().BeTrue();
+        }
 
         [Fact]
         public async Task Should_emit_runtime_plugin_test_execution_lifecycle_event_afterscenario()
