@@ -6,8 +6,6 @@ document.addEventListener('DOMContentLoaded', function () {
   'use strict';
 
   try {
-    let isApplyingFilterFromUrl = false;
-
     function filterList(table, tag, buttonListDiv) {
       const tableRows = table.querySelectorAll("tbody > tr");
       for (let i = 0; i < tableRows.length; i++) {
@@ -31,15 +29,6 @@ document.addEventListener('DOMContentLoaded', function () {
           button.classList.remove('selected');
         }
       });
-
-      if (!isApplyingFilterFromUrl) {
-        if (tag === 'all') {
-          // Use history.pushState to remove the hash without reloading the page
-          history.pushState("", document.title, window.location.pathname + window.location.search);
-        } else {
-          window.location.hash = `filter=${encodeURIComponent(tag)}`;
-        }
-      }
     }
 
     function getTagsCellIndex(table) {
@@ -110,7 +99,6 @@ document.addEventListener('DOMContentLoaded', function () {
       const list = table.querySelectorAll("tbody > tr");
       for (let i = 0; i < list.length; i++) {
         const tagsCell = list[i].querySelectorAll("td")[tagCellIndex]
-        if (!tagsCell) continue;
         const tagText = tagsCell.textContent || tagsCell.innerText || '';
         const tags = tagText.split(/\s+/).filter(function(tag) { return tag.trim().length > 0; });
         tagsCell.replaceChildren()
@@ -133,38 +121,11 @@ document.addEventListener('DOMContentLoaded', function () {
       }
     }
 
-    function applyFilterFromUrl() {
-      if (window.location.hash && window.location.hash.startsWith('#filter=')) {
-        const filterTag = decodeURIComponent(window.location.hash.substring('#filter='.length));
-        if (filterTag) {
-          isApplyingFilterFromUrl = true;
-          try {
-            const tablesToFilter = document.querySelectorAll('table.tag-filtered-table');
-            tablesToFilter.forEach(function(table) {
-              const wrapper = getTableWrapper(table);
-              const buttonListDiv = wrapper.previousElementSibling;
-              if (buttonListDiv && buttonListDiv.classList.contains('reqnroll-docs-tag-button-list')) {
-                const tagExists = Array.from(buttonListDiv.querySelectorAll('button.reqnroll-docs-tag'))
-                                       .some(btn => btn.innerText.trim() === filterTag);
-
-                filterList(table, tagExists ? filterTag : 'all', buttonListDiv);
-              }
-            });
-          } finally {
-            isApplyingFilterFromUrl = false;
-          }
-        }
-      }
-    }
-
     const tagFilteredTables = document.querySelectorAll('table.tag-filtered-table')
     for (let tableIndex = 0; tableIndex < tagFilteredTables.length; tableIndex++) {
       const table = tagFilteredTables[tableIndex]
       initializeTable(table)
     }
-
-    applyFilterFromUrl();
-    window.addEventListener('hashchange', applyFilterFromUrl);
 
   } catch (error) {
     console.error('Error initializing tag-filtered tables:', error);
