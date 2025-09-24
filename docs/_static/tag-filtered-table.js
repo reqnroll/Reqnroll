@@ -131,6 +131,17 @@ document.addEventListener('DOMContentLoaded', function () {
           }
         });
       }
+
+      // support for initial '#table-id-filter-tag' format URL hash
+      if (table.id && window.location.hash) {
+        const hash = window.location.hash.substring(1);
+        const filterPattern = `${table.id}-filter-`;
+        if (hash.startsWith(filterPattern)) {
+          const filterTag = decodeURIComponent(hash.substring(filterPattern.length));
+          // Rewrite the hash, which will trigger the 'hashchange' event listener
+          window.location.hash = `filter=${encodeURIComponent(filterTag)}`;
+        }
+      }
     }
 
     function applyFilterFromUrl() {
