@@ -10,7 +10,7 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @chekkan
+*Contributors of this release (in alphabetical order):* @chekkan, @konarx
 
 # v3.0.3 - 2025-09-17
 
