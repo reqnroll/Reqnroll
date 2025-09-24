@@ -1,12 +1,34 @@
 # [vNext]
 
+## New features:
+
+* Generator: `addNonParallelizableMarkerForTags` now also applies to scenario-level tags for frameworks supporting method-level isolation (NUnit, MsTest V2, TUnit).
+
 ## Improvements:
-* Formatters: Upgraded conformance test to Cucumber/Cucumber-compatibility-Kit v21.0.0
+* Dependencies: Updated to Cucumber Gherkin v35.0.0, Cucumber Messages v29.0.0 and Cucumber CompatibilityKit v23.0.0
 * Added support for asynchronously disposing objects implementing IAsyncDisposable when the Reqnroll object container is disposed.
+
+* Add xUnit 3 support (#405, #538)
+* Improved `Reqnroll.Tools.MsBuild.Generation` NuGet package: reduced size by optimizing included dependencies, consolidated MsBuild assets (#812)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @Code-Grump
+* Fix: Exceptions from before scenario plugin hook events (RuntimePluginTestExecutionLifecycleEvents.BeforeScenario) are not shown (#856)
+* Fix: Before scenario hooks are not raised immediately when `runtime/stopAtFirstError` is true, but handled delayed (#857)
+
+*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @gasparnagy, @konarx
+
+# v3.0.3 - 2025-09-17
+
+## Improvements:
+
+* Formatters: Enchanced logging of exception information when file-based formatters throw exceptions (#842)
+
+## Bug fixes:
+
+* Fix: Step execution improperly handles error flows when `runtime/stopAtFirstError` is true, resulting in skipped step events and hence invalid reports (#819)
+
+*Contributors of this release (in alphabetical order):* @clrudolplhi
 
 # v3.0.2 - 2025-09-08
 

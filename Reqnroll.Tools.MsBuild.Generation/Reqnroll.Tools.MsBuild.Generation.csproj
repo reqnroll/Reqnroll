@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>$(Reqnroll_FullFramework_Tools_TFM);$(Reqnroll_Core_Tools_TFM)</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <TargetFrameworks>$(ReqnrollFullFrameworkToolsTfm);$(ReqnrollCoreToolsTfm)</TargetFrameworks>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
     
     
     <NoPackageAnalysis>true</NoPackageAnalysis>
@@ -17,15 +17,9 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <!-- NuGet package metadata -->
-    <Description>Package to enable the code-behind file generation during build time http://reqnroll.net/documentation/Generate-Tests-from-MsBuild/</Description>
+    <Description>Package to enable the code-behind file generation during build time https://go.reqnroll.net/doc-config-build</Description>
     <DefaultLanguage>en-US</DefaultLanguage>
-    <PackageIcon>assets/icon.png</PackageIcon>
   </PropertyGroup>
-  
-  <!-- Includes the Reqnroll icon. -->
-  <ItemGroup>
-    <None Include="../reqnroll-icon.png" Pack="true" PackagePath="assets/icon.png" />
-  </ItemGroup>
   
   <!-- Includes the build files. -->
   <ItemGroup>
@@ -78,6 +72,9 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="17.11.4" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Composition" Version="17.11.13" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Only" Version="17.13.61" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.61" PrivateAssets="all" />
     <PackageReference Include="System.Collections.Immutable" Version="8.0.0" PrivateAssets="all" />
   </ItemGroup>
 

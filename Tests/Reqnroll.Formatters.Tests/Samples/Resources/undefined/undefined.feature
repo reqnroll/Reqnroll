@@ -15,3 +15,6 @@ Feature: Undefined steps
   Scenario: Steps after undefined steps are skipped
     Given a step that is yet to be defined
     And a step that will be skipped
+
+  Scenario: Snippets reflect parameter types
+    Given a list of 8 things

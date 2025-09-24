@@ -342,28 +342,48 @@ public partial class TestExecutionEngineTests
         StepBlockHookError,
     }
 
-    [Theory]
-    [InlineData(StepExecutionUseCase.PassingStep,                      ScenarioExecutionStatus.OK,                    null,                                null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.FailingStep,                      ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.SkippedBecauseOfPreviousError,    ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.Skipped, false, true,  true,  false)]
-    [InlineData(StepExecutionUseCase.UndefinedStep,                    ScenarioExecutionStatus.UndefinedStep,         null,                                null,                            false, true,  false, false)]
-    [InlineData(StepExecutionUseCase.PendingStepDefinition,            ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.DynamicallyPendingStepDefinition, ScenarioExecutionStatus.StepDefinitionPending, typeof(NotImplementedException),     null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.DynamicallySkippedStepDefinition, ScenarioExecutionStatus.Skipped,               typeof(OperationCanceledException),  null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsError,    ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
-    [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsPending,  ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            false, true,  false, false)]
-    [InlineData(StepExecutionUseCase.AmbiguousStep,                    ScenarioExecutionStatus.BindingError,          typeof(AmbiguousBindingException),   null,                            false, true,  false, false)]
-    [InlineData(StepExecutionUseCase.InvalidStepDefinitionArguments,   ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
-    [InlineData(StepExecutionUseCase.ArgumentConversionError,          ScenarioExecutionStatus.TestError,             typeof(FormatException),             null,                            false, true,  false, false)]
-    [InlineData(StepExecutionUseCase.ArgumentExceptionInStepDefinition,ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.InvalidBindingRegistry,           ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
-    [InlineData(StepExecutionUseCase.BeforeStepHookError,              ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.AfterStepHookError,               ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.OK,      true,  true,  false, true)]
-    [InlineData(StepExecutionUseCase.StepBlockHookError,               ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.OK,      false, false, false, true)]
-    public async Task Should_execute_step(StepExecutionUseCase useCase, ScenarioExecutionStatus expectedStatus, Type expectedErrorType, ScenarioExecutionStatus? customExpectedStepStatus, 
+    [Theory]                        //UseCase                        StopAtFirst                   ExpectedStatus           ExpectedError                        customErrorStatus                 Hooks?  Events? Skipped? Throws?
+    // This first set of Use Cases with StopAtFirstError set to false (the default)
+    [InlineData(StepExecutionUseCase.PassingStep,                       false, ScenarioExecutionStatus.OK,                    null,                                null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.FailingStep,                       false, ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.SkippedBecauseOfPreviousError,     false, ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.Skipped, false, true,  true,  false)]
+    [InlineData(StepExecutionUseCase.UndefinedStep,                     false, ScenarioExecutionStatus.UndefinedStep,         null,                                null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.PendingStepDefinition,             false, ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.DynamicallyPendingStepDefinition,  false, ScenarioExecutionStatus.StepDefinitionPending, typeof(NotImplementedException),     null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.DynamicallySkippedStepDefinition,  false, ScenarioExecutionStatus.Skipped,               typeof(OperationCanceledException),  null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsError,     false, ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsPending,   false, ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.AmbiguousStep,                     false, ScenarioExecutionStatus.BindingError,          typeof(AmbiguousBindingException),   null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.InvalidStepDefinitionArguments,    false, ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.ArgumentConversionError,           false, ScenarioExecutionStatus.TestError,             typeof(FormatException),             null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.ArgumentExceptionInStepDefinition, false, ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.InvalidBindingRegistry,            false, ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.BeforeStepHookError,               false, ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.AfterStepHookError,                false, ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.OK,      true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.StepBlockHookError,                false, ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.OK,      false, false, false, true)]
+    // Repeat the Use Cases with StopAtFirstError set to true
+    [InlineData(StepExecutionUseCase.PassingStep,                       true,  ScenarioExecutionStatus.OK,                    null,                                null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.FailingStep,                       true,  ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.SkippedBecauseOfPreviousError,     true,  ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.Skipped, false, true,  true,  false)]
+    [InlineData(StepExecutionUseCase.UndefinedStep,                     true,  ScenarioExecutionStatus.UndefinedStep,         null,                                null,                            false, true,  false, false)]
+    [InlineData(StepExecutionUseCase.PendingStepDefinition,             true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.DynamicallyPendingStepDefinition,  true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(NotImplementedException),     null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.DynamicallySkippedStepDefinition,  true,  ScenarioExecutionStatus.Skipped,               typeof(OperationCanceledException),  null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsError,     true,  ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, true)]
+    [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsPending,   true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            false, true,  false, true)]
+    [InlineData(StepExecutionUseCase.AmbiguousStep,                     true,  ScenarioExecutionStatus.BindingError,          typeof(AmbiguousBindingException),   null,                            false, true,  false, true)]
+    [InlineData(StepExecutionUseCase.InvalidStepDefinitionArguments,    true,  ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, true)]
+    [InlineData(StepExecutionUseCase.ArgumentConversionError,           true,  ScenarioExecutionStatus.TestError,             typeof(FormatException),             null,                            false, true,  false, true)]
+    [InlineData(StepExecutionUseCase.ArgumentExceptionInStepDefinition, true,  ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.InvalidBindingRegistry,            true,  ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, true)]
+    [InlineData(StepExecutionUseCase.BeforeStepHookError,               true,  ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.AfterStepHookError,                true,  ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.OK,      true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.StepBlockHookError,                true,  ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.OK,      false, false, false, true)]
+    public async Task Should_execute_step(StepExecutionUseCase useCase, bool configuredStopAtFirstError, ScenarioExecutionStatus expectedStatus, Type expectedErrorType, ScenarioExecutionStatus? customExpectedStepStatus, 
         bool shouldRunStepHooks, bool shouldPublishStepStartedFinishedEvent, bool shouldPublishStepSkippedEvent, bool shouldThrow)
     {
         var testExecutionEngine = CreateTestExecutionEngine();
+        _reqnrollConfiguration.StopAtFirstError = configuredStopAtFirstError;
 
         var beforeStepHookMock = CreateHookMock(_beforeStepEvents);
         var afterStepHookMock = CreateHookMock(_afterStepEvents);
@@ -461,7 +481,10 @@ public partial class TestExecutionEngineTests
             _scenarioContext.TestError.Should().BeOfType(expectedErrorType);
 
         if (shouldThrow)
+        {
+            actualExceptionThrown.Should().NotBeNull();
             actualExceptionThrown.Should().BeOfType(expectedErrorType);
+        }
         else
             actualExceptionThrown.Should().BeNull();
 

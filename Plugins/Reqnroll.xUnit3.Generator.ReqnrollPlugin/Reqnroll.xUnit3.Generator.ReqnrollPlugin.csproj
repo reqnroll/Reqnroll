@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.xunit.v3.nuspec</NuspecFile>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+    <PackageId>Reqnroll.xunit.v3</PackageId>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="build\**\*" />
+    <None Include="build\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
+    <ProjectReference Include="..\Reqnroll.xUnit3.ReqnrollPlugin\Reqnroll.xUnit3.ReqnrollPlugin.csproj" />
+  </ItemGroup>
+
+  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
+    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.cs" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
+    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.template.vb" OutputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.vb" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
+  </Target>
+
+</Project>

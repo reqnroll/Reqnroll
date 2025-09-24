@@ -3,8 +3,8 @@
   <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
 
   <PropertyGroup>
-    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(Reqnroll_Core_Tools_TFM)</ReqnrollTestTFM>
-    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(Reqnroll_FullFramework_Tools_TFM)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ReqnrollCoreToolsTfm)</ReqnrollTestTFM>
+    <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ReqnrollFullFrameworkToolsTfm)</ReqnrollTestTFM>
     <ReqnrollGenerationProjectDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectDir>
     <ReqnrollGenerationTasksDir>$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksDir>
   </PropertyGroup>

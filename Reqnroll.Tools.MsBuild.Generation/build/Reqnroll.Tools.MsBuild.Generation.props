@@ -2,10 +2,10 @@
 
   <PropertyGroup>
     <ReqnrollGenerationPropsImported>true</ReqnrollGenerationPropsImported>
-    <Reqnroll_CpsExtensionDesignTimeTargetsPath Condition="'$(Reqnroll_CpsExtensionDesignTimeTargetsPath)' == ''">$(MSBuildThisFileDirectory)CPS\Buildsystem\CpsExtension.DesignTime.targets</Reqnroll_CpsExtensionDesignTimeTargetsPath>
+    <ReqnrollCpsExtensionDesignTimeTargetsPath Condition="'$(ReqnrollCpsExtensionDesignTimeTargetsPath)' == ''">$(MSBuildThisFileDirectory)CPS\Buildsystem\CpsExtension.DesignTime.targets</ReqnrollCpsExtensionDesignTimeTargetsPath>
   </PropertyGroup>
 
-  <Import Project="$(Reqnroll_CpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
+  <Import Project="$(ReqnrollCpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
 
   <PropertyGroup>
     <ReqnrollGenerationTasksDir Condition="'$(ReqnrollGenerationTasksDir)' == '' And '$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)netstandard2.0/</ReqnrollGenerationTasksDir>
@@ -20,8 +20,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <Reqnroll_UseHostCompilerIfAvailable Condition="'$(Reqnroll_UseHostCompilerIfAvailable)'==''">false</Reqnroll_UseHostCompilerIfAvailable>
-    <UseHostCompilerIfAvailable>$(Reqnroll_UseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
+    <ReqnrollUseHostCompilerIfAvailable Condition="'$(ReqnrollUseHostCompilerIfAvailable)'==''">false</ReqnrollUseHostCompilerIfAvailable>
+    <UseHostCompilerIfAvailable>$(ReqnrollUseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
   </PropertyGroup>
 
 
@@ -29,7 +29,7 @@
     <OverwriteReadOnlyFiles Condition="'$(OverwriteReadOnlyFiles)'==''">false</OverwriteReadOnlyFiles>
     <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
 
-    <Reqnroll_DebugMSBuildTask Condition="'$(Reqnroll_DebugMSBuildTask)' == ''">false</Reqnroll_DebugMSBuildTask>
+    <ReqnrollDebugMSBuildTask Condition="'$(ReqnrollDebugMSBuildTask)' == ''">false</ReqnrollDebugMSBuildTask>
   </PropertyGroup>
 
   <!--
@@ -40,13 +40,13 @@
     <!--
       feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
     -->
-    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)'==''">false</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollDeleteCodeBehindFilesOnCleanRebuild Condition="'$(ReqnrollDeleteCodeBehindFilesOnCleanRebuild)'==''">false</ReqnrollDeleteCodeBehindFilesOnCleanRebuild>
 
     <!--
       net.sdk support: feature flag to enable experimental support for net.sdk project system
     -->
-    <Reqnroll_EnableDefaultCompileItems Condition="'$(Reqnroll_EnableDefaultCompileItems)'==''">true</Reqnroll_EnableDefaultCompileItems>
-    <Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(Reqnroll_EnableDefaultCompileItems)</Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
+    <ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)'==''">true</ReqnrollEnableDefaultCompileItems>
+    <ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(ReqnrollEnableDefaultCompileItems)</ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
 
     <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
   </PropertyGroup>

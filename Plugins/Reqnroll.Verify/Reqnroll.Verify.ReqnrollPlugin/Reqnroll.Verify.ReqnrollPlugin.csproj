@@ -1,9 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(Reqnroll_KeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(Reqnroll_EnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(Reqnroll_PublicSign)</PublicSign>
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
 
     <PackageId>Reqnroll.Verify</PackageId>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>

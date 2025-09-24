@@ -88,6 +88,11 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
         CodeDomHelper.AddAttribute(generationContext.TestClass, NOTINPARALLEL_ATTR);
     }
 
+    public void SetTestMethodNonParallelizable(TestClassGenerationContext generationContext, CodeMemberMethod testMethod)
+    {
+        CodeDomHelper.AddAttribute(testMethod, NOTINPARALLEL_ATTR);
+    }
+
     public void SetTestClassInitializeMethod(TestClassGenerationContext generationContext)
     {
         // For class-level initialization, use [Before(Class)].

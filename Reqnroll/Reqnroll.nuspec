@@ -18,10 +18,10 @@
     <copyright>$copyright$</copyright>
     <dependencies>
       <group targetFramework="netstandard2.0">
-        <dependency id="Gherkin" version="34.0.0"/>
+        <dependency id="Gherkin" version="35.0.0"/>
         <dependency id="Cucumber.CucumberExpressions" version="17.1.0"/>
-        <dependency id="Cucumber.Messages" version="28.0.0"/>
-        <dependency id="Cucumber.HtmlFormatter" version="21.14.0" />
+        <dependency id="Cucumber.Messages" version="29.0.1"/>
+        <dependency id="Cucumber.HtmlFormatter" version="21.15.0" />
         <dependency id="Microsoft.Extensions.DependencyModel" version="8.0.2" />
         <dependency id="System.Text.Json" version="8.0.5" />
         <dependency id="System.Threading.Channels" version="9.0.6" />
