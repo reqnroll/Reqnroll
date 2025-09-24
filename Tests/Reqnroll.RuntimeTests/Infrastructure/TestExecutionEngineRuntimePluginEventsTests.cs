@@ -173,9 +173,12 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
 
-        [Fact]
-        public async Task Should_keep_user_hook_error_when_both_user_and_plugin_beforescenario_hook_fails()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task Should_keep_user_hook_error_when_both_user_and_plugin_beforescenario_hook_fails(bool stopAtFirstError)
         {
+            _reqnrollConfiguration.StopAtFirstError = stopAtFirstError;
             var testExecutionEngine = CreateTestExecutionEngine();
 
             // user hook will fail with SimulatedErrorMessage
