@@ -4,7 +4,7 @@
 Reqnroll formatters are only available in Reqnroll v3.0 or later.
 ```
 
-Reqnroll provides a *formatter* infrastructure, similar to [Cucumber formatters](https://cucumber.io/docs/cucumber/reporting/#built-in-reporter-plugins). The formatters can be used to generate reports of the test execution. Reqnroll provides built-in formatters ([HTML](#html-formatter), [Cucumber Messages](#cucumber-messages-formatter)) and can be extended with custom formatters.
+Reqnroll provides a *formatter* infrastructure, similar to [Cucumber formatters](https://cucumber.io/docs/cucumber/reporting/#built-in-reporter-plugins). The formatters can be used to generate reports of the test execution. Reqnroll provides built-in formatters ([HTML](#html-formatter), [Cucumber Messages](#cucumber-messages-formatter)) and can be extended with custom formatters. A list of publicly available custom formatter plugin can be found in the [Available Plugins](../integrations/available-plugins.md#filter=formatter) page.
 
 In order to generate a report with a formatter, you need to enable it. You can enable multiple formatters as well. The easiest way to enable a formatter is to add a `formatters` section to the `reqnroll.json` configuration file or with environment variables.
 
