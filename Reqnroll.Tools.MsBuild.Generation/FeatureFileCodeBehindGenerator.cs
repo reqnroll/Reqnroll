@@ -18,6 +18,11 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
             var featureFileInput = CreateFeatureFileInput(featureFile);
             var codeBehindFileFullPath = reqnrollProjectInfo.GetFullPath(featureFile.CodeBehindFilePath);
             var messagesFileFullPath = reqnrollProjectInfo.GetFullPath(featureFile.MessagesFilePath);
+
+            Log.LogTaskDiagnosticMessage($"Processing {featureFile.FeatureFilePath} ({reqnrollProjectInfo.GetFullPath(featureFile.FeatureFilePath)})");
+            Log.LogTaskDiagnosticMessage($"  Code-behind: {featureFile.CodeBehindFilePath} ({codeBehindFileFullPath})");
+            Log.LogTaskDiagnosticMessage($"  Messages: {featureFile.MessagesFilePath} ({messagesFileFullPath})");
+
             var generatorResult = testGenerator.GenerateTestFile(featureFileInput, new GenerationSettings());
 
             if (!generatorResult.Success)

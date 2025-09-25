@@ -26,7 +26,7 @@ public class GenerateFeatureFileCodeBehindTaskExecutor(
     {
         processInfoDumper.DumpProcessInfo();
         log.LogTaskMessage("Starting GenerateFeatureFileCodeBehind task");
-
+        log.LogTaskDiagnosticMessage($"Project folder: {reqnrollProjectInfo.ProjectFolder}");
         try
         {
             var reqnrollProject = reqnrollProjectProvider.GetReqnrollProject();
@@ -64,17 +64,22 @@ public class GenerateFeatureFileCodeBehindTaskExecutor(
     private IReadOnlyCollection<ITaskItem> GenerateCodeBehindFilesForProject(IFeatureFileCodeBehindGenerator featureFileCodeBehindGenerator)
     {
         var generatedFiles = featureFileCodeBehindGenerator
-            .GenerateFilesForProject();
+            .GenerateFilesForProject()
+            .ToArray();
 
-        return generatedFiles
-               .Select(item =>
-               {
-                   var result = new TaskItem { ItemSpec = FileSystemHelper.GetRelativePath(item.CodeBehindFileFullPath, reqnrollProjectInfo.ProjectFolder) };
-                   result.SetMetadata(GenerateFeatureFileCodeBehindTask.MessagesFileMetadata, item.MessagesFileFullPath == null ? null : FileSystemHelper.GetRelativePath(item.MessagesFileFullPath, reqnrollProjectInfo.ProjectFolder));
-                   result.SetMetadata(GenerateFeatureFileCodeBehindTask.MessagesResourceNameMetadata, item.MessagesResourceName);
-                   return result;
-               })
-               .Cast<ITaskItem>()
-               .ToArray();
+        var result = new List<ITaskItem>();
+        foreach (var generatorResult in generatedFiles)
+        {
+            var taskItem = new TaskItem { ItemSpec = FileSystemHelper.GetRelativePath(generatorResult.CodeBehindFileFullPath, reqnrollProjectInfo.ProjectFolder) };
+            var messagesFileRelativePath = generatorResult.MessagesFileFullPath == null ? null : FileSystemHelper.GetRelativePath(generatorResult.MessagesFileFullPath, reqnrollProjectInfo.ProjectFolder);
+            taskItem.SetMetadata(GenerateFeatureFileCodeBehindTask.MessagesFileMetadata, messagesFileRelativePath);
+            taskItem.SetMetadata(GenerateFeatureFileCodeBehindTask.MessagesResourceNameMetadata, generatorResult.MessagesResourceName);
+            result.Add(taskItem);
+
+            log.LogTaskDiagnosticMessage($"Output {taskItem.ItemSpec} ({generatorResult.CodeBehindFileFullPath})");
+            log.LogTaskDiagnosticMessage($"  Messages: {messagesFileRelativePath} ({generatorResult.MessagesFileFullPath})");
+            log.LogTaskDiagnosticMessage($"  MessagesResourceName: {generatorResult.MessagesResourceName}");
+        }
+        return result;
     }
 }
