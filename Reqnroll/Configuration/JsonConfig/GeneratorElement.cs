@@ -13,5 +13,8 @@ namespace Reqnroll.Configuration.JsonConfig
 
         [JsonPropertyName("addNonParallelizableMarkerForTags")]
         public List<string> AddNonParallelizableMarkerForTags { get; set; }
+
+        [JsonPropertyName("disableFriendlyTestNames")]
+        public bool DisableFriendlyTestNames { get; set; } = ConfigDefaults.DisableFriendlyTestNames;
     }
 }

@@ -114,6 +114,9 @@ Use this section to define test generation options.
 * - addNonParallelizableMarkerForTags
   - List of tags
   - Defines a set of tags that mark tests as exclusive (non-parallelizable). If the tag appears on a feature, the whole generated test class is marked non-parallelizable. If the tag appears only on a scenario (and not on the feature), the generated test method is marked non-parallelizable on frameworks that support scenario/method level isolation (currently NUnit, MsTest V2 and TUnit). See [](../execution/parallel-execution).<br/> *Default:* empty
+* - disableFriendlyTestNames
+  - `true`/`false`
+  - Option available in Reqnroll versions **greater than v3.0.3**. <br/> Determines whether generated tests will contain a `"DisplayName"` in their test attributes with the name of the Scenario. Friendly names are easier to read in test reports, but may cause issues with some test runners or CI systems. Friendly display names are currently only supported by MSTest and xUnit. <br/> *Default:* `false`
 ```
 
 ### `runtime`
