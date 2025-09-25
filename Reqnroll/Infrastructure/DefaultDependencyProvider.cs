@@ -81,6 +81,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<ObsoleteStepHandler, IObsoleteStepHandler>();
 
             container.RegisterTypeAs<EnvironmentWrapper, IEnvironmentWrapper>();
+            container.RegisterTypeAs<EnvironmentOptions, IEnvironmentOptions>();
             container.RegisterTypeAs<EnvironmentInfoProvider, IEnvironmentInfoProvider>();
             container.RegisterTypeAs<BuildMetadataProvider, IBuildMetadataProvider>();
             container.RegisterTypeAs<BinaryFileAccessor, IBinaryFileAccessor>();

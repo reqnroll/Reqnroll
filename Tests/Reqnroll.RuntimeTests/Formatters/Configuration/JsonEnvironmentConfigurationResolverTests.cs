@@ -1,3 +1,4 @@
+#nullable enable
 using FluentAssertions;
 using Moq;
 using Reqnroll.CommonModels;
@@ -9,22 +10,22 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration;
 
 public class JsonEnvironmentConfigurationResolverTests
 {
-    private readonly Mock<IEnvironmentWrapper> _environmentWrapperMock;
+    private readonly Mock<IEnvironmentOptions> _environmentOptionsMock;
     private readonly JsonEnvironmentConfigurationResolver _sut;
 
     public JsonEnvironmentConfigurationResolverTests()
     {
-        _environmentWrapperMock = new Mock<IEnvironmentWrapper>();
-        _sut = new JsonEnvironmentConfigurationResolver(_environmentWrapperMock.Object);
+        _environmentOptionsMock = new Mock<IEnvironmentOptions>();
+        _sut = new JsonEnvironmentConfigurationResolver(_environmentOptionsMock.Object);
     }
 
     [Fact]
     public void Resolve_Should_Return_Empty_When_No_Environment_Variables_Are_Set()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariable(It.IsAny<string>()))
-            .Returns(new Failure<string>("Variable not set"));
+        _environmentOptionsMock
+            .Setup(e => e.FormattersJson)
+            .Returns((string?)null);
 
         // Act
         var result = _sut.Resolve();
@@ -45,9 +46,9 @@ public class JsonEnvironmentConfigurationResolverTests
                        }
                    }
                    """;
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
-            .Returns(new Success<string>(json));
+        _environmentOptionsMock
+            .Setup(e => e.FormattersJson)
+            .Returns(json);
 
         // Act
         var result = _sut.Resolve();
@@ -69,9 +70,9 @@ public class JsonEnvironmentConfigurationResolverTests
                        }
                    }
                    """;
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
-            .Returns(new Success<string>(json));
+        _environmentOptionsMock
+            .Setup(e => e.FormattersJson)
+            .Returns(json);
 
         // Act
         var result = _sut.Resolve();
@@ -91,9 +92,9 @@ public class JsonEnvironmentConfigurationResolverTests
                        }
                    }
                    """;
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
-            .Returns(new Success<string>(json));
+        _environmentOptionsMock
+            .Setup(e => e.FormattersJson)
+            .Returns(json);
 
         // Act
         var result = _sut.Resolve();
@@ -120,9 +121,9 @@ public class JsonEnvironmentConfigurationResolverTests
                           }
                           """;
         
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE))
-            .Returns(new Success<string>(expectedJson));
+        _environmentOptionsMock
+            .Setup(e => e.FormattersJson)
+            .Returns(expectedJson);
 
         // Act
         var result = _sut.Resolve();

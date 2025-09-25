@@ -14,8 +14,9 @@
 
 * Fix: Exceptions from before scenario plugin hook events (RuntimePluginTestExecutionLifecycleEvents.BeforeScenario) are not shown (#856)
 * Fix: Before scenario hooks are not raised immediately when `runtime/stopAtFirstError` is true, but handled delayed (#857)
+* Fix: Fixing "dry run mode" for certain project configurations (#862)
 
-*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @gasparnagy, @konarx
+*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @DrEsteban, @gasparnagy, @konarx
 
 # v3.0.3 - 2025-09-17
 
