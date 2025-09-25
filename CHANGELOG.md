@@ -12,7 +12,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @konarx
+* Fix: Formatters: Test execution fails when formatters were disabled due to a generation error (#861)
+
+*Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @gasparnagy, @konarx
 
 # v3.0.3 - 2025-09-17
 

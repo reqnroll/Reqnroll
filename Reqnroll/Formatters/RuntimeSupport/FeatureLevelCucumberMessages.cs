@@ -23,11 +23,11 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 
     public FeatureLevelCucumberMessages(string featureMessagesResourceName, int envelopeCount)
     {
-        if (string.IsNullOrEmpty(featureMessagesResourceName))
-            throw new ArgumentNullException(nameof(featureMessagesResourceName));
-
         var assembly = Assembly.GetCallingAssembly();
-        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromAssembly(assembly, featureMessagesResourceName));
+
+        var isEnabled = !string.IsNullOrEmpty(featureMessagesResourceName) && envelopeCount > 0;
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => 
+            isEnabled ? ReadEnvelopesFromAssembly(assembly, featureMessagesResourceName) : []);
         ExpectedEnvelopeCount = envelopeCount;
 
         InitializeLazyProperties();
