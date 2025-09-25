@@ -38,7 +38,7 @@ public class GenerateFeatureFileCodeBehindTask : Task
     public string TargetFramework { get; set; }
     public string ProjectGuid { get; set; }
 
-    public bool DebugMSBuildTask { get; set; } = false;
+    public bool DebugMSBuildTask { get; set; }
 
     public override bool Execute()
     {
