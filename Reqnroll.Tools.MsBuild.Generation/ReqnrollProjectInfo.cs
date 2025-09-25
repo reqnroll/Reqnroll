@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.IO;
 using Reqnroll.Generator;
+using Reqnroll.Utils;
+
 namespace Reqnroll.Tools.MsBuild.Generation;
 
 public class ReqnrollProjectInfo(
@@ -27,5 +29,5 @@ public class ReqnrollProjectInfo(
     public string CurrentTargetFramework { get; } = currentTargetFramework;
 
     public string GetFullPath(string projectRelativePath) => 
-        Path.GetFullPath(Path.Combine(ProjectFolder, projectRelativePath));
+        FileSystemHelper.NormalizeDirectorySeparators(Path.GetFullPath(Path.Combine(ProjectFolder, projectRelativePath)));
 }
