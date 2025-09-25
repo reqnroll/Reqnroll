@@ -16,10 +16,10 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
         foreach (var featureFile in reqnrollProjectInfo.FeatureFiles)
         {
             var featureFileInput = CreateFeatureFileInput(featureFile);
-            var codeBehindFileFullPath = reqnrollProjectInfo.GetFullPath(featureFile.CodeBehindFilePath);
-            var messagesFileFullPath = reqnrollProjectInfo.GetFullPath(featureFile.MessagesFilePath);
+            var codeBehindFileFullPath = reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.CodeBehindFilePath);
+            var messagesFileFullPath = reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.MessagesFilePath);
 
-            Log.LogTaskDiagnosticMessage($"Processing {featureFile.FeatureFilePath} ({reqnrollProjectInfo.GetFullPath(featureFile.FeatureFilePath)})");
+            Log.LogTaskDiagnosticMessage($"Processing {featureFile.FeatureFilePath} ({reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.FeatureFilePath)})");
             Log.LogTaskDiagnosticMessage($"  Code-behind: {featureFile.CodeBehindFilePath} ({codeBehindFileFullPath})");
             Log.LogTaskDiagnosticMessage($"  Messages: {featureFile.MessagesFilePath} ({messagesFileFullPath})");
 

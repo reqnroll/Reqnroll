@@ -28,6 +28,6 @@ public class ReqnrollProjectInfo(
     public string TargetFrameworks { get; } = targetFrameworks;
     public string CurrentTargetFramework { get; } = currentTargetFramework;
 
-    public string GetFullPath(string projectRelativePath) => 
+    public string GetFullPathAndNormalize(string projectRelativePath) => 
         FileSystemHelper.NormalizeDirectorySeparators(Path.GetFullPath(Path.Combine(ProjectFolder, projectRelativePath)));
 }
