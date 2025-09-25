@@ -8,37 +8,23 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Tools.MsBuild.Generation
 {
-    public class WrappedGeneratorContainerBuilder
+    public class WrappedGeneratorContainerBuilder(
+        GeneratorContainerBuilder generatorContainerBuilder, 
+        IGenerateFeatureFileCodeBehindTaskDependencyCustomizations dependencyCustomizations)
     {
-        private readonly GeneratorContainerBuilder _generatorContainerBuilder;
-        private readonly GenerateFeatureFileCodeBehindTaskConfiguration _generateFeatureFileCodeBehindTaskConfiguration;
-
-        public WrappedGeneratorContainerBuilder(GeneratorContainerBuilder generatorContainerBuilder, GenerateFeatureFileCodeBehindTaskConfiguration generateFeatureFileCodeBehindTaskConfiguration)
-        {
-            _generatorContainerBuilder = generatorContainerBuilder;
-            _generateFeatureFileCodeBehindTaskConfiguration = generateFeatureFileCodeBehindTaskConfiguration;
-        }
-
         public IObjectContainer BuildGeneratorContainer(
             ReqnrollConfigurationHolder reqnrollConfigurationHolder,
             ProjectSettings projectSettings,
             IReadOnlyCollection<GeneratorPluginInfo> generatorPluginInfos,
             IObjectContainer rootObjectContainer)
         {
-            var objectContainer = _generatorContainerBuilder.CreateContainer(reqnrollConfigurationHolder, projectSettings, generatorPluginInfos, rootObjectContainer);
+            var objectContainer = generatorContainerBuilder.CreateContainer(reqnrollConfigurationHolder, projectSettings, generatorPluginInfos, rootObjectContainer);
 
-            objectContainer.RegisterTypeAs<ProjectCodeBehindGenerator, IProjectCodeBehindGenerator>();
             objectContainer.RegisterTypeAs<AnalyticsEventProvider, IAnalyticsEventProvider>();
             objectContainer.RegisterTypeAs<MSBuildTraceListener, ITraceListener>();
+            objectContainer.RegisterTypeAs<FeatureFileCodeBehindGenerator, IFeatureFileCodeBehindGenerator>();
 
-            if (_generateFeatureFileCodeBehindTaskConfiguration.OverrideFeatureFileCodeBehindGenerator is null)
-            {
-                objectContainer.RegisterTypeAs<FeatureFileCodeBehindGenerator, IFeatureFileCodeBehindGenerator>();
-            }
-            else
-            {
-                objectContainer.RegisterInstanceAs(_generateFeatureFileCodeBehindTaskConfiguration.OverrideFeatureFileCodeBehindGenerator);
-            }
+            dependencyCustomizations.CustomizeGeneratorContainerDependencies(objectContainer);
 
             objectContainer.Resolve<IConfigurationLoader>().TraceConfigSource(objectContainer.Resolve<ITraceListener>(), objectContainer.Resolve<ReqnrollConfiguration>());
 

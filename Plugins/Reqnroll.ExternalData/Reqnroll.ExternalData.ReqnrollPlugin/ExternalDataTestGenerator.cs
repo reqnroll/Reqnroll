@@ -8,24 +8,23 @@ using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Parser;
 
-namespace Reqnroll.ExternalData.ReqnrollPlugin
+namespace Reqnroll.ExternalData.ReqnrollPlugin;
+
+public class ExternalDataTestGenerator(
+    ReqnrollConfiguration reqnrollConfiguration,
+    ProjectSettings projectSettings,
+    IFeatureGeneratorRegistry featureGeneratorRegistry,
+    CodeDomHelper codeDomHelper,
+    IGherkinParserFactory gherkinParserFactory,
+    GeneratorInfo generatorInfo,
+    IncludeExternalDataTransformation includeExternalDataTransformation)
+    : TestGenerator(reqnrollConfiguration, projectSettings, featureGeneratorRegistry, codeDomHelper, gherkinParserFactory, generatorInfo)
 {
-    public class ExternalDataTestGenerator : TestGenerator
+    protected override ReqnrollDocument ParseContent(IGherkinParser parser, TextReader contentReader,
+        ReqnrollDocumentLocation documentLocation)
     {
-        private readonly IncludeExternalDataTransformation _includeExternalDataTransformation;
-
-        public ExternalDataTestGenerator(ReqnrollConfiguration reqnrollConfiguration, ProjectSettings projectSettings, ITestHeaderWriter testHeaderWriter, ITestUpToDateChecker testUpToDateChecker, IFeatureGeneratorRegistry featureGeneratorRegistry, CodeDomHelper codeDomHelper, IGherkinParserFactory gherkinParserFactory, GeneratorInfo generatorInfo, IncludeExternalDataTransformation includeExternalDataTransformation) 
-            : base(reqnrollConfiguration, projectSettings, testHeaderWriter, testUpToDateChecker, featureGeneratorRegistry, codeDomHelper, gherkinParserFactory, generatorInfo)
-        {
-            _includeExternalDataTransformation = includeExternalDataTransformation;
-        }
-
-        protected override ReqnrollDocument ParseContent(IGherkinParser parser, TextReader contentReader,
-            ReqnrollDocumentLocation documentLocation)
-        {
-            var document = base.ParseContent(parser, contentReader, documentLocation);
-            document = _includeExternalDataTransformation.TransformDocument(document);
-            return document; 
-        }
+        var document = base.ParseContent(parser, contentReader, documentLocation);
+        document = includeExternalDataTransformation.TransformDocument(document);
+        return document; 
     }
 }

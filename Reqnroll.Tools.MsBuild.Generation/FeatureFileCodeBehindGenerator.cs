@@ -1,103 +1,55 @@
+#nullable enable
+using Reqnroll.Generator.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using Microsoft.Build.Utilities;
-using Reqnroll.Utils;
 
-namespace Reqnroll.Tools.MsBuild.Generation
+namespace Reqnroll.Tools.MsBuild.Generation;
+
+public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, ReqnrollProjectInfo reqnrollProjectInfo, ITestGenerator testGenerator) : IFeatureFileCodeBehindGenerator
 {
-    public class FeatureFileCodeBehindGenerator : IFeatureFileCodeBehindGenerator
+    public IReqnrollTaskLoggingHelper Log { get; } = log ?? throw new ArgumentNullException(nameof(log));
+
+    public IEnumerable<FeatureFileCodeBehindGeneratorResult> GenerateFilesForProject()
     {
-        private readonly FilePathGenerator _filePathGenerator;
-        private readonly FeatureCodeBehindGenerator _featureCodeBehindGenerator;
+        var codeBehindWriter = new GeneratedFileWriter(Log);
 
-        public FeatureFileCodeBehindGenerator(TaskLoggingHelper log, FeatureCodeBehindGenerator featureCodeBehindGenerator)
+        foreach (var featureFile in reqnrollProjectInfo.FeatureFiles)
         {
-            Log = log ?? throw new ArgumentNullException(nameof(log));
-            _featureCodeBehindGenerator = featureCodeBehindGenerator;
-            _filePathGenerator = new FilePathGenerator();
-        }
+            var featureFileInput = CreateFeatureFileInput(featureFile);
+            var codeBehindFileFullPath = reqnrollProjectInfo.GetFullPath(featureFile.CodeBehindFilePath);
+            var messagesFileFullPath = reqnrollProjectInfo.GetFullPath(featureFile.MessagesFilePath);
+            var generatorResult = testGenerator.GenerateTestFile(featureFileInput, new GenerationSettings());
 
-        public TaskLoggingHelper Log { get; }
-
-        public IEnumerable<FeatureFileCodeBehindGeneratorResult> GenerateFilesForProject(
-            IReadOnlyCollection<string> featureFiles,
-            string projectFolder,
-            string outputPath,
-            string intermediateOutputPath)
-        {
-            var codeBehindWriter = new CodeBehindWriter(null);
-
-            if (featureFiles == null)
+            if (!generatorResult.Success)
             {
-                yield break;
+                foreach (var error in generatorResult.Errors)
+                    Log.LogUserError(error.Message, featureFile.FeatureFilePath, error.Line, error.LinePosition);
+                continue;
             }
 
-            foreach (var featureFile in featureFiles)
+            foreach (var warning in generatorResult.Warnings)
+                Log.LogUserWarning(warning);
+
+            codeBehindWriter.WriteGeneratedFile(
+                codeBehindFileFullPath, generatorResult.GeneratedTestCode);
+
+            bool containsMessages = !String.IsNullOrEmpty(generatorResult.FeatureMessages);
+            if (containsMessages)
             {
-                string featureFileItemSpec = featureFile;
-                var generatorResult = _featureCodeBehindGenerator.GenerateCodeBehindFile(featureFileItemSpec);
-
-                if (!generatorResult.Success)
-                {
-                    foreach (var error in generatorResult.Errors)
-                    {
-                        Log.LogError(
-                            null,
-                            null,
-                            null,
-                            featureFile,
-                            error.Line,
-                            error.LinePosition,
-                            0,
-                            0,
-                            error.Message);
-                    }
-
-                    continue;
-                }
-
-                foreach (var warning in generatorResult.Warnings)
-                {
-                    Log.LogWarning(warning);
-                }
-                string targetFilePath = _filePathGenerator.GenerateFilePath(
-                    projectFolder,
-                    outputPath,
-                    featureFile,
-                    generatorResult.Filename);
-
-                string resultedFile = codeBehindWriter.WriteCodeBehindFile(targetFilePath, featureFile, generatorResult);
-
-                if (!String.IsNullOrEmpty(generatorResult.FeatureMessages))
-                {
-                    // If Feature-level Cucumber Messages were emitted by the code generator
-                    // Save them in the 'obj' directory in a sub-folder structure that mirrors the location of the feature file relative to the project root folder.
-
-                    // The value of 'obj' is passed from the .targets file as the IntermediateOutputPath property of the GenerateFeatureFileCodeBehindTask.
-                    // It's value should be $(IntermediateOutputPath), i.e. 'obj/<Configuration>/<TargetFramework>'
-
-                    string relativeFeaturePath = FileSystemHelper.GetRelativePath(featureFile, projectFolder);
-                    string relativeFeatureDir = Path.GetDirectoryName(relativeFeaturePath) ?? string.Empty;
-
-                    string targetStorageDir = Path.Combine(
-                        projectFolder,
-                        intermediateOutputPath,
-                        relativeFeatureDir
-                    );
-
-                    string ndjsonFilename = Path.GetFileNameWithoutExtension(targetFilePath) + ".ndjson";
-
-                    string ndjsonFilePathAndName = Path.Combine(targetStorageDir, ndjsonFilename);
-                    string messageResourceName = Path.Combine(relativeFeatureDir, ndjsonFilename).Replace("\\", "/");
-                    codeBehindWriter.WriteNdjsonFile(ndjsonFilePathAndName, ndjsonFilename, generatorResult);
-
-                    yield return new FeatureFileCodeBehindGeneratorResult(  FileSystemHelper.GetRelativePath(resultedFile, projectFolder),
-                                                                            FileSystemHelper.GetRelativePath(ndjsonFilePathAndName, projectFolder),
-                                                                            messageResourceName);
-                }
-
+                // If Feature-level Cucumber Messages were emitted by the code generator
+                // Save them in the 'obj' directory in a sub-folder structure that mirrors the location of the feature file relative to the project root folder.
+                codeBehindWriter.WriteGeneratedFile(messagesFileFullPath, generatorResult.FeatureMessages);
             }
+
+            yield return new FeatureFileCodeBehindGeneratorResult(
+                codeBehindFileFullPath,
+                containsMessages ? generatorResult.FeatureMessagesResourceName : null,
+                containsMessages ? messagesFileFullPath : null);
         }
+    }
+
+    private FeatureFileInput CreateFeatureFileInput(ReqnrollFeatureFileInfo featureFile)
+    {
+        return new FeatureFileInput(featureFile.FeatureFilePath);
     }
 }

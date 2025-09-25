@@ -5,7 +5,6 @@ using Reqnroll.Analytics.AppInsights;
 using Reqnroll.Analytics.UserId;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
-using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Project;
 
 namespace Reqnroll.Tools.MsBuild.Generation
@@ -16,7 +15,7 @@ namespace Reqnroll.Tools.MsBuild.Generation
             TaskLoggingHelper taskLoggingHelper,
             ReqnrollProjectInfo reqnrollProjectInfo,
             IMSBuildInformationProvider msbuildInformationProvider,
-            GenerateFeatureFileCodeBehindTaskConfiguration generateFeatureFileCodeBehindTaskConfiguration)
+            IGenerateFeatureFileCodeBehindTaskDependencyCustomizations dependencyCustomizations)
         {
             var objectContainer = new ObjectContainer();
 
@@ -24,10 +23,10 @@ namespace Reqnroll.Tools.MsBuild.Generation
             objectContainer.RegisterInstanceAs(taskLoggingHelper);
             objectContainer.RegisterInstanceAs(reqnrollProjectInfo);
             objectContainer.RegisterInstanceAs(msbuildInformationProvider);
-            objectContainer.RegisterInstanceAs(generateFeatureFileCodeBehindTaskConfiguration);
+            objectContainer.RegisterInstanceAs(dependencyCustomizations);
 
             // types
-            objectContainer.RegisterTypeAs<TaskLoggingHelperWithNameTagWrapper, ITaskLoggingWrapper>();
+            objectContainer.RegisterTypeAs<ReqnrollTaskLoggingHelper, IReqnrollTaskLoggingHelper>();
             objectContainer.RegisterTypeAs<ReqnrollProjectProvider, IReqnrollProjectProvider>();
             objectContainer.RegisterTypeAs<MSBuildProjectReader, IMSBuildProjectReader>();
             objectContainer.RegisterTypeAs<ProcessInfoDumper, IProcessInfoDumper>();
@@ -48,18 +47,10 @@ namespace Reqnroll.Tools.MsBuild.Generation
             objectContainer.RegisterTypeAs<HttpClientWrapper, HttpClientWrapper>();
             objectContainer.RegisterTypeAs<AnalyticsEventProvider, IAnalyticsEventProvider>();
             objectContainer.RegisterTypeAs<ConfigurationLoader, IConfigurationLoader>();
-            objectContainer.RegisterTypeAs<GeneratorConfigurationProvider, IGeneratorConfigurationProvider>();
             objectContainer.RegisterTypeAs<ProjectReader, IReqnrollProjectReader>();
             objectContainer.RegisterTypeAs<ReqnrollJsonLocator, IReqnrollJsonLocator>();
 
-            if (generateFeatureFileCodeBehindTaskConfiguration.OverrideAnalyticsTransmitter is null)
-            {
-                objectContainer.RegisterTypeAs<AnalyticsTransmitter, IAnalyticsTransmitter>();
-            }
-            else
-            {
-                objectContainer.RegisterInstanceAs(generateFeatureFileCodeBehindTaskConfiguration.OverrideAnalyticsTransmitter);
-            }
+            dependencyCustomizations.CustomizeTaskContainerDependencies(objectContainer);
 
             return objectContainer;
         }

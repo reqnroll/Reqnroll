@@ -1,6 +1,5 @@
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
-using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.Plugins;
@@ -20,11 +19,13 @@ namespace Reqnroll.Generator
         {
             container.RegisterTypeAs<FileSystem, IFileSystem>();
 
-            container.RegisterTypeAs<GeneratorConfigurationProvider, IGeneratorConfigurationProvider>();
-            container.RegisterTypeAs<GeneratorInfoProvider, IGeneratorInfoProvider>();
             container.RegisterTypeAs<TestGenerator, ITestGenerator>();
-            container.RegisterTypeAs<TestHeaderWriter, ITestHeaderWriter>();
-            container.RegisterTypeAs<TestUpToDateChecker, ITestUpToDateChecker>();
+
+#pragma warning disable CS0618 // Type or member is obsolete
+            // Interfaces to be removed in v4
+            container.RegisterTypeAs<ObsoleteTestHeaderWriter, ITestHeaderWriter>();
+            container.RegisterTypeAs<ObsoleteTestUpToDateChecker, ITestUpToDateChecker>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
             PlatformHelper.RegisterPluginAssemblyLoader(container);
             container.RegisterTypeAs<GeneratorPluginLoader, IGeneratorPluginLoader>();

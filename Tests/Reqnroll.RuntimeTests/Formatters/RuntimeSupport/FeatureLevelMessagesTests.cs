@@ -117,7 +117,7 @@ public class FeatureLevelMessagesTests
         var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
-        var result = sut.ReadEnvelopesFromStream(stream, "test");
+        var result = sut.ReadEnvelopesFromStream(stream);
 
         // Assert
         result.Should().HaveCount(2);
@@ -134,7 +134,7 @@ public class FeatureLevelMessagesTests
         var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
-        var result = sut.ReadEnvelopesFromStream(stream, "test");
+        var result = sut.ReadEnvelopesFromStream(stream);
 
         // Assert
         result.Should().NotBeNull().And.BeEmpty();
@@ -148,7 +148,7 @@ public class FeatureLevelMessagesTests
         var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
-        var result = sut.ReadEnvelopesFromStream(stream, "test");
+        var result = sut.ReadEnvelopesFromStream(stream);
 
         // Assert
         result.Should().NotBeNull().And.BeEmpty();

@@ -92,7 +92,6 @@
 
     <GenerateFeatureFileCodeBehindTask
       ProjectPath="$(MSBuildProjectFullPath)"
-      IntermediateOutputPath="$(IntermediateOutputPath)"
       OutputPath="$(ReqnrollCodeBehindOutputPath)"
       FeatureFiles="@(ReqnrollFeatureFiles)"
       RootNamespace="$(RootNamespace)"
@@ -103,12 +102,14 @@
       TargetFrameworks="$(ReqnrollTargetFrameworks)"
       TargetFramework="$(ReqnrollTargetFramework)"
       ProjectGuid="$(ProjectGuid)"
+      DebugMSBuildTask="$(ReqnrollDebugMSBuildTask)"
       >
 
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />
     </GenerateFeatureFileCodeBehindTask>
 
-    <Message Text="[Reqnroll] GeneratedFile: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
+    <Message Text="[Reqnroll] Generated code-behind file: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
+    <Message Text="[Reqnroll] Generated messages file: %(ReqnrollGeneratedFiles.MessagesFile)" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''" Importance="normal" />
 
     <!--
       net.sdk support: globbing does not support including files which are dynamically generated inside targets, we have to manually update compile items
@@ -173,8 +174,8 @@
   <Target Name="EmbedCucumberMessages" DependsOnTargets="UpdateFeatureFilesInProject">
 
     <ItemGroup>
-      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(EmbeddedMessagesStoragePath)')" Condition="'%(ReqnrollGeneratedFiles.EmbeddedMessagesStoragePath)' != ''">
-        <LogicalName>%(ReqnrollGeneratedFiles.EmbeddedMessagesResourceName)</LogicalName>
+      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(MessagesFile)')" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''">
+        <LogicalName>%(ReqnrollGeneratedFiles.MessagesResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
   </Target>
