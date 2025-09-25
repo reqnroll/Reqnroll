@@ -13,6 +13,8 @@
 ## Bug fixes:
 
 * Fix: Formatters: Test execution fails when formatters were disabled due to a generation error (#861)
+* Fix: Exceptions from before scenario plugin hook events (RuntimePluginTestExecutionLifecycleEvents.BeforeScenario) are not shown (#856)
+* Fix: Before scenario hooks are not raised immediately when `runtime/stopAtFirstError` is true, but handled delayed (#857)
 
 *Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @gasparnagy, @konarx
 
