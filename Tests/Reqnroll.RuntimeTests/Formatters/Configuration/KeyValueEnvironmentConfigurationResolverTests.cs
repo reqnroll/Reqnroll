@@ -11,17 +11,16 @@ namespace Reqnroll.RuntimeTests.Formatters.Configuration;
 
 public class KeyValueEnvironmentConfigurationResolverTests
 {
-    private readonly Mock<IEnvironmentWrapper> _environmentWrapperMock;
+    private readonly Mock<IEnvironmentOptions> _environmentOptionsMock;
     private readonly Mock<IFormatterLog> _formatterLogMock;
     private readonly KeyValueEnvironmentConfigurationResolver _sut;
     private const string SampleFormatterName = "sample";
-    private const string SampleFormatterEnvironmentName = FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX + SampleFormatterName;
 
     public KeyValueEnvironmentConfigurationResolverTests()
     {
-        _environmentWrapperMock = new Mock<IEnvironmentWrapper>();
+        _environmentOptionsMock = new Mock<IEnvironmentOptions>();
         _formatterLogMock = new Mock<IFormatterLog>();
-        _sut = new KeyValueEnvironmentConfigurationResolver(_environmentWrapperMock.Object, _formatterLogMock.Object);
+        _sut = new KeyValueEnvironmentConfigurationResolver(_environmentOptionsMock.Object, _formatterLogMock.Object);
     }
 
     [Fact]
@@ -30,14 +29,14 @@ public class KeyValueEnvironmentConfigurationResolverTests
         // Act & Assert
         var act = () => new KeyValueEnvironmentConfigurationResolver(null, _formatterLogMock.Object);
         act.Should().Throw<ArgumentNullException>()
-           .WithParameterName("environmentWrapper");
+           .WithParameterName("environmentOptions");
     }
 
     [Fact]
     public void Constructor_Should_Accept_Null_FormatterLog()
     {
         // Act & Assert
-        var act = () => new KeyValueEnvironmentConfigurationResolver(_environmentWrapperMock.Object);
+        var act = () => new KeyValueEnvironmentConfigurationResolver(_environmentOptionsMock.Object);
         act.Should().NotThrow();
     }
 
@@ -45,8 +44,8 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_Should_Return_Empty_When_Environment_Variables_List_Is_Empty()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(new Dictionary<string, string>());
 
         // Act
@@ -60,12 +59,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_ignore_formatter_with_empty_settings()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "" }
+                    { SampleFormatterName, "" }
                 });
 
         // Act
@@ -79,12 +78,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_configure_single_formatter_with_true_setting()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "true" }
+                    { SampleFormatterName, "true" }
                 });
 
         // Act
@@ -100,12 +99,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_disable_formatter_with_false_setting()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "false" }
+                    { SampleFormatterName, "false" }
                 });
 
         // Act
@@ -121,12 +120,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_throw_exception_with_invalid_settings()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "foo" }
+                    { SampleFormatterName, "foo" }
                 });
 
         // Act
@@ -140,12 +139,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_configure_single_formatter_with_output_file_settings()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "outputFilePath=foo.txt" }
+                    { SampleFormatterName, "outputFilePath=foo.txt" }
                 });
 
         // Act
@@ -161,12 +160,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_configure_single_formatter_with_case_insensitive_settings()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "OUTPUTFilePath=foo.txt" }
+                    { SampleFormatterName, "OUTPUTFilePath=foo.txt" }
                 });
 
         // Act
@@ -182,12 +181,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_configure_single_formatter_with_multiple_settings()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "setting1=value1;setting2=value2" }
+                    { SampleFormatterName, "setting1=value1;setting2=value2" }
                 });
 
         // Act
@@ -204,12 +203,12 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_trim_whitespaces_in_settings()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { SampleFormatterEnvironmentName, "  setting1  =  value1  ;   setting2  =  value2  " }
+                    { SampleFormatterName, "  setting1  =  value1  ;   setting2  =  value2  " }
                 });
 
         // Act
@@ -226,13 +225,13 @@ public class KeyValueEnvironmentConfigurationResolverTests
     public void Resolve_should_configure_multiple_formatters()
     {
         // Arrange
-        _environmentWrapperMock
-            .Setup(e => e.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX))
+        _environmentOptionsMock
+            .Setup(e => e.FormatterSettings)
             .Returns(
                 new Dictionary<string, string>
                 {
-                    { FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX + "f1", "outputFilePath=foo.txt" },
-                    { FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX + "f2", "outputFilePath=bar.txt" }
+                    { "f1", "outputFilePath=foo.txt" },
+                    { "f2", "outputFilePath=bar.txt" }
                 });
 
         // Act

@@ -8,6 +8,7 @@ using Reqnroll.SystemTests;
 
 namespace Reqnroll.Formatters.Tests;
 
+[DoNotParallelize]
 [TestClass]
 public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
 {

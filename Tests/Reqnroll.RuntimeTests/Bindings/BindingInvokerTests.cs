@@ -32,9 +32,8 @@ public class BindingInvokerTests
 
     private BindingInvoker CreateSut(EnvironmentWrapperStub environmentWrapperStub = null)
     {
-        var mockContainer = new Mock<IObjectContainer>();
-        mockContainer.Setup(ctx => ctx.Resolve<IEnvironmentWrapper>()).Returns(environmentWrapperStub ?? new EnvironmentWrapperStub());
-        return new BindingInvoker(ConfigurationLoader.GetDefault(), new StubErrorProvider(), new BindingDelegateInvoker(), mockContainer.Object);
+        environmentWrapperStub ??= new EnvironmentWrapperStub();
+        return new BindingInvoker(ConfigurationLoader.GetDefault(), new StubErrorProvider(), new BindingDelegateInvoker(), new EnvironmentOptions(environmentWrapperStub));
     }
 
     class TestableMethodBinding : MethodBinding
@@ -503,7 +502,7 @@ public class BindingInvokerTests
     public async Task ShouldSkipExecutingStepsWhenDryRunEnabled(string value)
     {
         var envStub = new EnvironmentWrapperStub();
-        envStub.EnvironmentVariables.Add(BindingInvoker.DryRunEnvVarName, value);
+        envStub.EnvironmentVariables.Add(EnvironmentOptions.REQNROLL_DRY_RUN_ENVIRONMENT_VARIABLE, value);
         var sut = CreateSut(environmentWrapperStub: envStub);
         var contextManager = CreateContextManagerWith();
         var durationHolder = new DurationHolder();
@@ -529,7 +528,7 @@ public class BindingInvokerTests
     public async Task ShouldExecuteStepsWhenDryRunDisabled(string value)
     {
         var envStub = new EnvironmentWrapperStub();
-        envStub.EnvironmentVariables.Add(BindingInvoker.DryRunEnvVarName, value);
+        envStub.EnvironmentVariables.Add(EnvironmentOptions.REQNROLL_DRY_RUN_ENVIRONMENT_VARIABLE, value);
         var sut = CreateSut(environmentWrapperStub: envStub);
         var contextManager = CreateContextManagerWith();
         var durationHolder = new DurationHolder();

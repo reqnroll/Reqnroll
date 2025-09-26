@@ -58,19 +58,19 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".ndjson";
         DeletePreviousMessagesOutput(fileToDelete);
         ResetCucumberMessagesOutputFileName();
-        Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
+        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
     }
     protected void ResetCucumberMessagesHtml(string? fileToDelete = null)
     {
         fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".html";
         DeletePreviousMessagesOutput(fileToDelete);
         ResetCucumberMessagesOutputFileName();
-        Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
+        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
     }
 
     protected void ResetCucumberMessagesOutputFileName()
     {
-        Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE, null);
+        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE, null);
     }
 
     protected void MimicGitHubActionsEnvironment()
@@ -171,11 +171,12 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var tracerMock = new Mock<ITraceListener>();
         objectContainerMock.Setup(x => x.Resolve<ITraceListener>()).Returns(tracerMock.Object);
         var env = new EnvironmentWrapper();
+        var envOptions = new EnvironmentOptions(env);
         var jsonConfigFileLocator = new ReqnrollJsonLocator();
         var fileSystem = new FileSystem();
         var fileService = new FileService();
         var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
-        var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(env);
+        var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(envOptions);
 
         var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
         keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
@@ -184,7 +185,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
             configFileResolver,
                                                                         jsonEnvConfigResolver,
                                                                         keyValueEnvironmentConfigurationResolverMock.Object,
-                                                                        new FormattersDisabledOverrideProvider(env));
+                                                                        new FormattersDisabledOverrideProvider(envOptions));
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 
         var outputFilePath = outputFilePathElement!.ToString();

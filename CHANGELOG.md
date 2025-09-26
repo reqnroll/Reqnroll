@@ -15,6 +15,7 @@
 
 * Fix: Exceptions from before scenario plugin hook events (RuntimePluginTestExecutionLifecycleEvents.BeforeScenario) are not shown (#856)
 * Fix: Before scenario hooks are not raised immediately when `runtime/stopAtFirstError` is true, but handled delayed (#857)
+* Fix: Fixing "dry run mode" for certain project configurations (#862)
 * Fix: Introduce option to disable inclusion of "friendly names" in generated code (#854)
 
 *Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @DrEsteban, @gasparnagy, @konarx
