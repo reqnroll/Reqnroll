@@ -30,6 +30,7 @@ namespace Reqnroll.Configuration.JsonConfig
             bool allowRowTests = reqnrollConfiguration.AllowRowTests;
             bool allowDebugGeneratedFiles = reqnrollConfiguration.AllowDebugGeneratedFiles;
             var addNonParallelizableMarkerForTags = reqnrollConfiguration.AddNonParallelizableMarkerForTags;
+            bool disableFriendlyTestNames = reqnrollConfiguration.DisableFriendlyTestNames;
             var obsoleteBehavior = reqnrollConfiguration.ObsoleteBehavior;
 
             if (jsonConfig.Language != null)
@@ -73,6 +74,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 allowDebugGeneratedFiles = jsonConfig.Generator.AllowDebugGeneratedFiles;
                 allowRowTests = jsonConfig.Generator.AllowRowTests;
                 addNonParallelizableMarkerForTags = jsonConfig.Generator.AddNonParallelizableMarkerForTags?.ToArray();
+                disableFriendlyTestNames = jsonConfig.Generator.DisableFriendlyTestNames;
             }
 
             if (jsonConfig.Trace != null)
@@ -120,6 +122,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 allowDebugGeneratedFiles,
                 allowRowTests,
                 addNonParallelizableMarkerForTags,
+                disableFriendlyTestNames,
                 obsoleteBehavior,
                 coloredOutput
             )
