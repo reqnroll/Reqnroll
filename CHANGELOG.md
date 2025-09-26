@@ -9,6 +9,7 @@
 
 * Add xUnit 3 support (#405, #538)
 * Improved `Reqnroll.Tools.MsBuild.Generation` NuGet package: reduced size by optimizing included dependencies, consolidated MsBuild assets (#812)
+* Reqnroll.Verify: Support for Verify v29+ (Verify.Xunit v29.0.0 or later). For earlier versions use 3.0.3 version of the plugin that is compatible with Reqnroll v3.*. The support for custom snapshot files with global VerifySettings has been removed, see [plugin documentation](https://docs.reqnroll.net/latest/integrations/verify.html) for details and workarounds. (#151)
 
 ## Bug fixes:
 
