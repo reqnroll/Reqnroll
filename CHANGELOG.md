@@ -1,5 +1,13 @@
 # [vNext]
 
+## Improvements:
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.1.0 - 2025-09-26
+
 ## New features:
 
 * Added xUnit 3 support. In order to use Reqnroll with xUnit v3, you need to use the `Reqnroll.xunit.v3` package. (#405, #538)
