@@ -7,11 +7,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
 {
     public class ProcessInfoDumper : IProcessInfoDumper
     {
-        private readonly ITaskLoggingWrapper _taskLoggingWrapper;
+        private readonly IReqnrollTaskLoggingHelper _log;
 
-        public ProcessInfoDumper(ITaskLoggingWrapper taskLoggingWrapper)
+        public ProcessInfoDumper(IReqnrollTaskLoggingHelper log)
         {
-            _taskLoggingWrapper = taskLoggingWrapper;
+            _log = log;
         }
 
         public void DumpProcessInfo()
@@ -19,11 +19,11 @@ namespace Reqnroll.Tools.MsBuild.Generation
             try
             {
                 var currentProcess = Process.GetCurrentProcess();
-                _taskLoggingWrapper.LogDiagnosticMessage($"process: {currentProcess.ProcessName}, .NET: {RuntimeInformation.FrameworkDescription}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
+                _log.LogTaskDiagnosticMessage($"process: {currentProcess.ProcessName}, .NET: {RuntimeInformation.FrameworkDescription}, pid: {currentProcess.Id}, CD: {Environment.CurrentDirectory}");
             }
             catch (Exception e)
             {
-                _taskLoggingWrapper.LogDiagnosticMessage($"Error when dumping process info: {e}");
+                _log.LogTaskDiagnosticMessage($"Error when dumping process info: {e}");
             }
             DumpLoadedAssemblies();
         }
@@ -32,17 +32,17 @@ namespace Reqnroll.Tools.MsBuild.Generation
         {
             try
             {
-                _taskLoggingWrapper.LogDiagnosticMessage("Loaded assemblies:");
+                _log.LogTaskDiagnosticMessage("Loaded assemblies:");
 
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies().OrderBy(a => a.FullName))
                 {
                     var location = assembly.IsDynamic ? "<dyn>" : assembly.Location;
-                    _taskLoggingWrapper.LogDiagnosticMessage($"  {assembly.FullName};{location}");
+                    _log.LogTaskDiagnosticMessage($"  {assembly.FullName};{location}");
                 }
             }
             catch (Exception e)
             {
-                _taskLoggingWrapper.LogDiagnosticMessage($"Error when dumping loaded assemblies: {e}");
+                _log.LogTaskDiagnosticMessage($"Error when dumping loaded assemblies: {e}");
             }
         }
     }

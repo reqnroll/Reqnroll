@@ -1,13 +1,12 @@
+using Reqnroll.Plugins;
+using Reqnroll.UnitTestProvider;
+using Reqnroll.Verify.ReqnrollPlugin;
 using System;
 using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Reqnroll.Plugins;
-using Reqnroll.UnitTestProvider;
-using Reqnroll.Verify.ReqnrollPlugin;
 using VerifyTests;
-using VerifyXunit;
 
 [assembly: RuntimePlugin(typeof(VerifyRuntimePlugin))]
 
@@ -17,34 +16,7 @@ public class VerifyRuntimePlugin : IRuntimePlugin
 {
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
-        runtimePluginEvents.CustomizeGlobalDependencies += RuntimePluginEvents_CustomizeGlobalDependencies;
         runtimePluginEvents.CustomizeScenarioDependencies += RuntimePluginEvents_CustomizeScenarioDependencies;
-    }
-
-    private void RuntimePluginEvents_CustomizeGlobalDependencies(object sender, CustomizeGlobalDependenciesEventArgs e)
-    {
-        var runtimePluginTestExecutionLifecycleEvents = e.ObjectContainer.Resolve<RuntimePluginTestExecutionLifecycleEvents>();
-        runtimePluginTestExecutionLifecycleEvents.BeforeScenario += (_, runtimePluginBeforeScenarioEventArgs) =>
-        {
-            var scenarioContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<ScenarioContext>();
-            var featureContext = runtimePluginBeforeScenarioEventArgs.ObjectContainer.Resolve<FeatureContext>();
-
-            Verifier.DerivePathInfo(
-                (_, projectDirectory, _, _) =>
-                {
-                    string scenarioInfoTitle = scenarioContext.ScenarioInfo.Title;
-
-                    foreach (DictionaryEntry scenarioInfoArgument in scenarioContext.ScenarioInfo.Arguments)
-                    {
-                        scenarioInfoTitle += "_" + scenarioInfoArgument.Value;
-                    }
-
-                    return new PathInfo(
-                        Path.Combine(projectDirectory, featureContext.FeatureInfo.FolderPath),
-                        featureContext.FeatureInfo.Title,
-                        scenarioInfoTitle);
-                });
-        };
     }
 
     private void RuntimePluginEvents_CustomizeScenarioDependencies(object sender, CustomizeScenarioDependenciesEventArgs e)

@@ -1,37 +1,32 @@
 using System;
 using Reqnroll.Generator.CodeDom;
 
-namespace Reqnroll.Generator
+namespace Reqnroll.Generator;
+
+public static class GenerationTargetLanguage
 {
-    public static class GenerationTargetLanguage
+    public const string CSharp = "C#";
+    public const string VB = "VB";
+
+    public static void AssertSupported(string programmingLanguage)
     {
-        public const string CSharp = "C#";
-        public const string VB = "VB";
-
-        public static string GetExtension(string programmingLanguage)
+        if (programmingLanguage != CSharp && programmingLanguage != VB)
         {
-            switch (programmingLanguage)
-            {
-                case CSharp:
-                    return ".cs";
-                case VB:
-                    return ".vb";
-                default:
-                    throw new NotSupportedException("Programming language not supported: " + programmingLanguage);
-            }
+            throw new NotSupportedException("Programming language not supported: " + programmingLanguage);
         }
+    }
 
-        public static CodeDomHelper CreateCodeDomHelper(string programmingLanguage)
+    public static CodeDomHelper CreateCodeDomHelper(string programmingLanguage)
+    {
+        AssertSupported(programmingLanguage);
+        switch (programmingLanguage)
         {
-            switch (programmingLanguage)
-            {
-                case CSharp:
-                    return new CodeDomHelper(CodeDomProviderLanguage.CSharp);
-                case VB:
-                    return new CodeDomHelper(CodeDomProviderLanguage.VB);
-                default:
-                    throw new NotSupportedException("Programming language not supported: " + programmingLanguage);
-            }
+            case CSharp:
+                return new CodeDomHelper(CodeDomProviderLanguage.CSharp);
+            case VB:
+                return new CodeDomHelper(CodeDomProviderLanguage.VB);
+            default:
+                throw new NotSupportedException(); // never happens
         }
     }
 }

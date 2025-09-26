@@ -277,6 +277,5 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             await act.Should().ThrowAsync<Exception>().WithMessage(SimulatedErrorMessage);
             _runtimePluginTestExecutionLifecycleEventEmitter.Verify(e => e.RaiseExecutionLifecycleEventAsync(HookType.AfterStep, It.IsAny<IObjectContainer>()));
         }
-
     }
 }

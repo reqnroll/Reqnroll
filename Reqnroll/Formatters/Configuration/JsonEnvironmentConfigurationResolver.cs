@@ -8,46 +8,28 @@ namespace Reqnroll.Formatters.Configuration;
 
 public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResolverBase, IJsonEnvironmentConfigurationResolver
 {
-    private readonly IEnvironmentWrapper _environmentWrapper;
+    private readonly IEnvironmentOptions _environmentOptions;
     private readonly IFormatterLog _log;
-    private readonly string _environmentVariableName; 
 
     public JsonEnvironmentConfigurationResolver(
-        IEnvironmentWrapper environmentWrapper,
+        IEnvironmentOptions environmentOptions,
         IFormatterLog log = null)
     {
-        _environmentWrapper = environmentWrapper;
+        _environmentOptions = environmentOptions;
         _log = log;
-        _environmentVariableName = FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE;
-    }
-
-    internal JsonEnvironmentConfigurationResolver(
-        IEnvironmentWrapper environmentWrapper,
-        string environmentVariableName,
-        IFormatterLog log = null)
-    {
-        _environmentWrapper = environmentWrapper ?? throw new ArgumentNullException(nameof(environmentWrapper));
-        _log = log;
-        _environmentVariableName = environmentVariableName ?? throw new ArgumentNullException(nameof(environmentVariableName));
     }
 
     protected override JsonDocument GetJsonDocument()
     {
         try
         {
-            var formatters = _environmentWrapper.GetEnvironmentVariable(_environmentVariableName);
+            var formattersJson = _environmentOptions.FormattersJson;
 
-            if (formatters is Success<string> formattersSuccess)
+            if (!string.IsNullOrWhiteSpace(formattersJson))
             {
-                if (string.IsNullOrWhiteSpace(formattersSuccess.Result))
-                {
-                    _log?.WriteMessage($"Environment variable {_environmentVariableName} is empty");
-                    return null;
-                }
-
                 try
                 {
-                    return JsonDocument.Parse(formattersSuccess.Result, new JsonDocumentOptions
+                    return JsonDocument.Parse(formattersJson, new JsonDocumentOptions
                     {
                         CommentHandling = JsonCommentHandling.Skip,
                         AllowTrailingCommas = true // More lenient parsing
@@ -55,12 +37,12 @@ public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResol
                 }
                 catch (JsonException ex)
                 {
-                    _log?.WriteMessage($"Failed to parse JSON from environment variable {_environmentVariableName}: {ex.Message}");
+                    _log?.WriteMessage($"Failed to parse JSON from environment variable {EnvironmentOptions.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE}: {ex.Message}");
                 }
             }
-            else if (formatters is Failure<string> failure)
+            else
             {
-                _log?.WriteMessage($"Environment variable {_environmentVariableName} not applied: {failure.Description}");
+                _log?.WriteMessage($"Environment variable {EnvironmentOptions.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE} is not set");
             }
         }
         catch (Exception ex) when (ex is not JsonException)

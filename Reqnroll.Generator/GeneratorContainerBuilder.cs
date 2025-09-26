@@ -24,12 +24,12 @@ namespace Reqnroll.Generator
 
             RegisterDefaults(container);
 
-            var configurationProvider = container.Resolve<IGeneratorConfigurationProvider>();
+            var configurationLoader = container.Resolve<IConfigurationLoader>();
             var generatorPluginEvents = container.Resolve<GeneratorPluginEvents>();
             var unitTestProviderConfiguration = container.Resolve<UnitTestProviderConfiguration>();
 
             var reqnrollConfiguration = new ReqnrollProjectConfiguration();
-            reqnrollConfiguration.ReqnrollConfiguration = configurationProvider.LoadConfiguration(reqnrollConfiguration.ReqnrollConfiguration, configurationHolder);
+            reqnrollConfiguration.ReqnrollConfiguration = configurationLoader.Load(reqnrollConfiguration.ReqnrollConfiguration, configurationHolder);
 
             LoadPlugins(container, generatorPluginEvents, unitTestProviderConfiguration, generatorPluginInfos.Select(p => p.PathToGeneratorPluginAssembly));
             
@@ -41,7 +41,7 @@ namespace Reqnroll.Generator
             container.RegisterInstanceAs(reqnrollConfiguration);
             container.RegisterInstanceAs(reqnrollConfiguration.ReqnrollConfiguration);
 
-            var generatorInfo = container.Resolve<IGeneratorInfoProvider>().GetGeneratorInfo();
+            var generatorInfo = GeneratorInfoProvider.GetGeneratorInfo();
             container.RegisterInstanceAs(generatorInfo);
 
             container.RegisterInstanceAs(container.Resolve<CodeDomHelper>(projectSettings.ProjectPlatformSettings.Language));

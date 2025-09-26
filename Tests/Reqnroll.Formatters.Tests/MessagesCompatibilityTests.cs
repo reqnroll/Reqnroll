@@ -3,6 +3,7 @@ using System.Reflection;
 
 namespace Reqnroll.Formatters.Tests;
 
+[DoNotParallelize]
 [TestClass]
 public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 {

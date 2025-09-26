@@ -58,7 +58,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             // Store the fixture data type for later use in constructor
             generationContext.CustomData.Add(FIXTUREDATA_PARAMETER_NAME, fixtureDataType);
 
-            var classFixtureCodeType =  new CodeTypeReference(ICLASSFIXTURE_INTERFACE, fixtureDataType);
+            var classFixtureCodeType = new CodeTypeReference(ICLASSFIXTURE_INTERFACE, fixtureDataType);
             classFixtureCodeType.Options = CodeTypeReferenceOptions.GlobalReference;
             return classFixtureCodeType;
         }
@@ -67,7 +67,14 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
         {
-            CodeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(scenarioTitle)));
+            if (generationContext.DisableFriendlyTestNames)
+            {
+                CodeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE);
+            }
+            else
+            {
+                CodeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(scenarioTitle)));
+            }
 
             SetProperty(testMethod, FEATURE_TITLE_PROPERTY_NAME, generationContext.Feature.Name);
             SetDescription(testMethod, scenarioTitle);
@@ -211,7 +218,7 @@ namespace Reqnroll.Generator.UnitTestProvider
         public virtual void FinalizeTestClass(TestClassGenerationContext generationContext)
         {
             IgnoreFeature(generationContext);
-            
+
             // testRunner.ScenarioContext.ScenarioContainer.RegisterInstanceAs<ITestOutputHelper>(_testOutputHelper);
             generationContext.ScenarioInitializeMethod.Statements.Add(
                 new CodeMethodInvokeExpression(
@@ -312,7 +319,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             disposeMethod.ImplementationTypes.Add(iasyncLifetimeInterface);
 
             CodeDomHelper.MarkCodeMemberMethodAsAsync(disposeMethod);
-            
+
             _currentFixtureDataTypeDeclaration.Members.Add(disposeMethod);
 
             var expression = new CodeMethodInvokeExpression(
@@ -326,7 +333,14 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
         {
-            CodeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
+            if (generationContext.DisableFriendlyTestNames)
+            {
+                CodeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE);
+            }
+            else
+            {
+                CodeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
+            }
 
             SetProperty(testMethod, FEATURE_TITLE_PROPERTY_NAME, generationContext.Feature.Name);
             SetDescription(testMethod, friendlyTestName);
@@ -351,7 +365,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             generationContext.TestClass.Members.Add(ctorMethod);
 
             SetTestConstructor(generationContext, ctorMethod);
-            
+
             // Task IAsyncLifetime.InitializeAsync() { <memberMethod>(); }
 
             var initializeMethod = new CodeMemberMethod();
@@ -381,7 +395,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             disposeMethod.Name = "DisposeAsync";
 
             CodeDomHelper.MarkCodeMemberMethodAsAsync(disposeMethod);
-            
+
             generationContext.TestClass.Members.Add(disposeMethod);
 
             var expression = new CodeMethodInvokeExpression(
@@ -398,7 +412,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             // The individual tests have to get Skip argument in their attributes
             // xUnit does not provide a way to Skip a set of tests - https://xunit.github.io/docs/comparisons.html#attributes
             // This is handled in FinalizeTestClass
-            
+
             // Store in custom data that the test class should be ignored
             generationContext.CustomData.Add(IGNORE_TEST_CLASS, true);
         }

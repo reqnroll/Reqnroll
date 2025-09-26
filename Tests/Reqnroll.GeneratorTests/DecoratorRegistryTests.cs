@@ -7,6 +7,7 @@ using Reqnroll.Generator;
 using Reqnroll.Generator.UnitTestConverter;
 using FluentAssertions;
 using Gherkin.Ast;
+using Reqnroll.Configuration;
 
 namespace Reqnroll.GeneratorTests
 {
@@ -69,7 +70,7 @@ namespace Reqnroll.GeneratorTests
 
         private static TestClassGenerationContext CreateGenerationContext(string tag)
         {
-            return new TestClassGenerationContext(null, ParserHelper.CreateAnyDocument(new []{ tag }), null, null, null, null, null, null, null, null, null, null, null, null, true);
+            return new TestClassGenerationContext(null, ParserHelper.CreateAnyDocument(new []{ tag }), null, null, null, null, null, null, null, null, null, null, null, null, ConfigDefaults.AllowRowTests, ConfigDefaults.DisableFriendlyTestNames);
         }
 
         [Fact]

@@ -2,16 +2,16 @@ namespace Reqnroll.Tools.MsBuild.Generation
 {
     public class AssemblyResolveLoggerFactory : IAssemblyResolveLoggerFactory
     {
-        private readonly ITaskLoggingWrapper _taskLoggingWrapper;
+        private readonly IReqnrollTaskLoggingHelper _log;
 
-        public AssemblyResolveLoggerFactory(ITaskLoggingWrapper taskLoggingWrapper)
+        public AssemblyResolveLoggerFactory(IReqnrollTaskLoggingHelper log)
         {
-            _taskLoggingWrapper = taskLoggingWrapper;
+            _log = log;
         }
 
         public IAssemblyResolveLogger Build()
         {
-            return new AssemblyResolveLogger(_taskLoggingWrapper);
+            return new AssemblyResolveLogger(_log);
         }
     }
 }

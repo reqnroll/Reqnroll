@@ -1,8 +1,8 @@
-using Reqnroll.BindingSkeletons;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Reqnroll.BindingSkeletons;
 
 namespace Reqnroll.Configuration
 {
@@ -30,6 +30,7 @@ namespace Reqnroll.Configuration
             bool allowDebugGeneratedFiles,
             bool allowRowTests,
             string[] addNonParallelizableMarkerForTags,
+            bool disableFriendlyTestNames,
             ObsoleteBehavior obsoleteBehavior,
             bool coloredOutput
         )
@@ -49,6 +50,7 @@ namespace Reqnroll.Configuration
             AllowDebugGeneratedFiles = allowDebugGeneratedFiles;
             AllowRowTests = allowRowTests;
             AddNonParallelizableMarkerForTags = addNonParallelizableMarkerForTags;
+            DisableFriendlyTestNames = disableFriendlyTestNames;
             ObsoleteBehavior = obsoleteBehavior;
             ColoredOutput = coloredOutput;
         }
@@ -72,6 +74,7 @@ namespace Reqnroll.Configuration
         public bool AllowDebugGeneratedFiles { get; set; }
         public bool AllowRowTests { get; set; }
         public string[] AddNonParallelizableMarkerForTags { get; set; }
+        public bool DisableFriendlyTestNames { get; set; }
 
         //tracing settings
         public bool ColoredOutput { get; set; }
@@ -97,7 +100,8 @@ namespace Reqnroll.Configuration
                                                               && MinTracedDuration.Equals(other.MinTracedDuration)
                                                               && StepDefinitionSkeletonStyle == other.StepDefinitionSkeletonStyle
                                                               && AdditionalStepAssemblies.SequenceEqual(other.AdditionalStepAssemblies)
-                                                              && AddNonParallelizableMarkerForTags.SequenceEqual(other.AddNonParallelizableMarkerForTags);
+                                                              && AddNonParallelizableMarkerForTags.SequenceEqual(other.AddNonParallelizableMarkerForTags)
+                                                              && DisableFriendlyTestNames == other.DisableFriendlyTestNames;
 
         public override bool Equals(object obj)
         {
@@ -139,6 +143,7 @@ namespace Reqnroll.Configuration
                 hashCode = (hashCode * 397) ^ (int)StepDefinitionSkeletonStyle;
                 hashCode = (hashCode * 397) ^ (AdditionalStepAssemblies != null ? AdditionalStepAssemblies.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (AddNonParallelizableMarkerForTags != null ? AddNonParallelizableMarkerForTags.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ DisableFriendlyTestNames.GetHashCode();
                 return hashCode;
             }
         }

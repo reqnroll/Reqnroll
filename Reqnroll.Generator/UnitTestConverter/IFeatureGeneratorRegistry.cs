@@ -1,9 +1,8 @@
 using Reqnroll.Parser;
 
-namespace Reqnroll.Generator.UnitTestConverter
+namespace Reqnroll.Generator.UnitTestConverter;
+
+public interface IFeatureGeneratorRegistry
 {
-    public interface IFeatureGeneratorRegistry
-    {
-        IFeatureGenerator CreateGenerator(ReqnrollDocument document);
-    }
+    IFeatureGenerator CreateGenerator(ReqnrollDocument document);
 }

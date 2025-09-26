@@ -269,20 +269,30 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
         }
 
         // Test for GH#588 - Generator Provider adds Friendly Name as an argument to the TestMethodAttribute on a non-paramterized test
-        [Fact]
-        public void MsTestGeneratorProvider_SimpleScenario_ShouldProvideFriendlyNameForTestMethodAttribute()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void MsTestGeneratorProvider_SimpleScenario_ShouldProvideFriendlyNameForTestMethodAttribute(bool disableFriendlyTestNames)
         {
             // ARRANGE
             var document = ParseDocumentFromString(SampleFeatureFile);
             var sampleTestGeneratorProvider = new MsTestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
-            var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
+            var converter = sampleTestGeneratorProvider.CreateUnitTestConverter(disableFriendlyTestNames: disableFriendlyTestNames);
 
             // ACT
             var code = converter.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
 
             // ASSERT
             var testMethodAttributeForFirstScenario = code.Class().Members().Single(m => m.Name == "SimpleScenario").CustomAttributes().Single(a => a.Name == TestMethodAttributeName);
-            testMethodAttributeForFirstScenario.ArgumentValues().First().Should().Be("Simple scenario");
+            if (disableFriendlyTestNames)
+            {
+                testMethodAttributeForFirstScenario.ArgumentValues().Should().BeEmpty();
+            }
+            else
+            {
+                testMethodAttributeForFirstScenario.ArgumentValues().Should().HaveCount(1);
+                testMethodAttributeForFirstScenario.ArgumentValues().First().Should().Be("Simple scenario");
+            }
         }
 
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)

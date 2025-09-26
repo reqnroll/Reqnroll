@@ -1,21 +1,6 @@
 namespace Reqnroll.Generator.Interfaces;
 
-public class GenerationSettings
-{
-    /// <summary>
-    /// Specifies whether the generator should check the existing generation results. 
-    /// Optional, disabled by default.
-    /// </summary>
-    public bool CheckUpToDate { get; set; }
-
-    /// <summary>
-    /// Specifies the way how the up-to-date checking should be performed.
-    /// </summary>
-    public UpToDateCheckingMethod UpToDateCheckingMethod { get; set; } = UpToDateCheckingMethod.ModificationTimeAndGeneratorVersion;
-
-    /// <summary>
-    /// Specifies whether the generation result should be written out to a file. Optional, 
-    /// disabled by default.
-    /// </summary>
-    public bool WriteResultToFile { get; set; } = false;
-}
+/// <summary>
+/// Placeholder class for generation settings. Currently, not in use. We can consider to remove it in v4.
+/// </summary>
+public class GenerationSettings;
