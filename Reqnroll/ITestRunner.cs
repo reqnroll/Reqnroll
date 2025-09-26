@@ -18,7 +18,7 @@ namespace Reqnroll
         Task OnFeatureStartAsync(FeatureInfo featureInfo);
         Task OnFeatureEndAsync();
 
-        void OnScenarioInitialize(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
+        Task OnScenarioInitializeAsync(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
         Task OnScenarioStartAsync();
 
         Task CollectScenarioErrorsAsync();

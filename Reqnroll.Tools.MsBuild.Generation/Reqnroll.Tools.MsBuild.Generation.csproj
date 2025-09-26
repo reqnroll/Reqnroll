@@ -85,7 +85,6 @@
     <Reference Include="Microsoft.Build.Utilities.Core">
       <HintPath>Microsoft.Build.Utilities.Core</HintPath>
     </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
   </ItemGroup>
 
   <ItemGroup>

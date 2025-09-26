@@ -521,14 +521,19 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         scenarioInitializeMethod.Parameters.Add(
             new CodeParameterDeclarationExpression(new CodeTypeReference(typeof(RuleInfo), CodeTypeReferenceOptions.GlobalReference), "ruleInfo"));
 
+        _codeDomHelper.MarkCodeMemberMethodAsAsync(scenarioInitializeMethod);
+
         //testRunner.OnScenarioInitialize(scenarioInfo, ruleInfo);
         var testRunnerField = _scenarioPartHelper.GetTestRunnerExpression();
-        scenarioInitializeMethod.Statements.Add(
-            new CodeMethodInvokeExpression(
-                testRunnerField,
-                nameof(ITestRunner.OnScenarioInitialize),
-                new CodeVariableReferenceExpression("scenarioInfo"),
-                new CodeVariableReferenceExpression("ruleInfo")));
+        var expression = new CodeMethodInvokeExpression(
+            testRunnerField,
+            nameof(ITestRunner.OnScenarioInitializeAsync),
+            new CodeVariableReferenceExpression("scenarioInfo"),
+            new CodeVariableReferenceExpression("ruleInfo"));
+
+        _codeDomHelper.MarkCodeMethodInvokeExpressionAsAwait(expression);
+
+        scenarioInitializeMethod.Statements.Add(expression);
     }
 
     private void SetupScenarioStartMethod(TestClassGenerationContext generationContext)

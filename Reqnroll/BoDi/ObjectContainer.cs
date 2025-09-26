@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Reqnroll.BoDi;
 
@@ -744,15 +745,31 @@ public class ObjectContainer : IObjectContainer
             throw new ObjectContainerException("Object container disposed", null);
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
         if (_isDisposed)
+        {
             return;
+        }
 
         _isDisposed = true;
 
-        foreach (var obj in _objectPool.Values.OfType<IDisposable>().Where(o => !ReferenceEquals(o, this)))
-            obj.Dispose();
+        foreach (var obj in _objectPool.Values)
+        {
+            if (ReferenceEquals(obj, this))
+            {
+                continue;
+            }
+
+            if (obj is IAsyncDisposable asyncDisposable)
+            {
+                await asyncDisposable.DisposeAsync();
+            }
+            else if (obj is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+        }
 
         _objectPool.Clear();
         _registrations.Clear();
