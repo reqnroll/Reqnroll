@@ -1,35 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyName>Reqnroll</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-    <PackageId>Reqnroll</PackageId>
-
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.nuspec</NuspecFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <NoWarn>$(NoWarn);1591;CS2002</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- NuGet configuration -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
   </PropertyGroup>
 
-  <!-- build time dependencies -->
   <ItemGroup>
-    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.15.1" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Gherkin" Version="35.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Cucumber.Messages" Version="29.0.1" />
+    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.15.1" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
+    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" PrivateAssets="all" />
     <!-- System.Runtime.Loader is used for .NET (not .NET Framework) based frameworks only. 
          From .NET, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
          We need 'PrivateAssets="all"' to avoid shipping it with the package and causing conflicts with the runtime. -->
@@ -44,18 +40,68 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+  </ItemGroup>
+
+  <!-- Ensure the instrumentation key template isn't included as source. -->
+  <ItemGroup>
     <Compile Remove="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
     <None Include="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
   </ItemGroup>
 
+  <!-- Include the external annotations in the package. -->
   <ItemGroup>
-    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
+    <None Update="Reqnroll.ExternalAnnotations.xml" Pack="true" PackagePath="lib/$(TargetFramework)/" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Include the readme and changelog files. -->
+    <None Update="PackageReadme.md" Pack="true" PackagePath="README.md" />
+    <None Include="../CHANGELOG.md" Pack="true" PackagePath="" />
+
+    <!-- Include the third-party license files. -->
+    <None Include="../Licenses/*" Pack="true" PackagePath="" />
+
+    <!-- Include build files. -->
+    <None Update="build/**/*" Pack="true" PackagePath="" />
   </ItemGroup>
 
   <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
     <ItemGroup>
       <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Include referenced project assembly as part of this package directly. -->
+  <Target Name="MarkProjectReferenceOutputsForPack" AfterTargets="ResolveReferences">
+
+    <ItemGroup>
+      <ProjectReferenceCopyLocalPaths
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference'" />
+
+      <ProjectReferenceSymbols
+        Include="@(ProjectReferenceCopyLocalPaths)"
+        Condition="'%(Extension)' == '.pdb'" />
+
+      <ProjectReferencePrimaryOutput Include="@(ProjectReferenceCopyLocalPaths)" />
+      <ProjectReferencePrimaryOutput Remove="@(ProjectReferenceSymbols)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- DLLs and other runtime assets go into the main package. -->
+      <None
+        Include="@(ProjectReferencePrimaryOutput)"
+        Pack="true"
+        PackagePath="lib/$(TargetFramework)/" />
+
+      <!-- Debugging symbols go into the symbol package. -->
+      <None
+        Include="@(ProjectReferenceSymbols)"
+        Pack="true"
+        PackFolder="Symbols"
+        PackagePath="lib/$(TargetFramework)/" />
     </ItemGroup>
   </Target>
 
