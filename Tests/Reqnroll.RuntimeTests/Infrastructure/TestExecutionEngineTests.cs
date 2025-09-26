@@ -6,6 +6,7 @@ using Reqnroll.Bindings.Reflection;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.Infrastructure;
@@ -27,6 +28,7 @@ public partial class TestExecutionEngineTests
 {
     private readonly ScenarioContext _scenarioContext;
     private readonly ReqnrollConfiguration _reqnrollConfiguration;
+    private readonly Mock<IEnvironmentOptions> _environmentOptions;
     private readonly Mock<IBindingRegistry> _bindingRegistryStub;
     private readonly Mock<IErrorProvider> _errorProviderStub;
     private readonly Mock<IContextManager> _contextManagerStub;
@@ -83,6 +85,8 @@ public partial class TestExecutionEngineTests
     {
         _reqnrollConfiguration = ConfigurationLoader.GetDefault();
 
+        _environmentOptions = new Mock<IEnvironmentOptions>();
+
         _globalContainer = new ObjectContainer();
         _testThreadContainer = new ObjectContainer(_globalContainer);
         _featureContainer = new ObjectContainer(_testThreadContainer);
@@ -135,7 +139,6 @@ public partial class TestExecutionEngineTests
         _bindingRegistryStub.Setup(br => br.GetStepTransformations()).Returns(_stepTransformations);
         _bindingRegistryStub.Setup(br => br.IsValid).Returns(true);
 
-        _reqnrollConfiguration = ConfigurationLoader.GetDefault();
         _errorProviderStub = new Mock<IErrorProvider>();
         _testTracerStub = new Mock<ITestTracer>();
         _stepDefinitionMatcherStub = new Mock<IStepDefinitionMatchService>();
@@ -166,6 +169,7 @@ public partial class TestExecutionEngineTests
             _errorProviderStub.Object,
             _stepArgumentTypeConverterMock.Object,
             _reqnrollConfiguration,
+            _environmentOptions.Object,
             _bindingRegistryStub.Object,
             _unitTestRuntimeProviderStub.Object,
             _contextManagerStub.Object,

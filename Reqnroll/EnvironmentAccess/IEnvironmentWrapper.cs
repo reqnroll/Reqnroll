@@ -1,20 +1,22 @@
+#nullable enable
 using Reqnroll.CommonModels;
 using System.Collections.Generic;
 
-namespace Reqnroll.EnvironmentAccess
+namespace Reqnroll.EnvironmentAccess;
+
+public interface IEnvironmentWrapper
 {
-    public interface IEnvironmentWrapper
-    {
-        IResult<string> ResolveEnvironmentVariables(string source);
+    bool IsEnvironmentVariableSet(string name);
 
-        bool IsEnvironmentVariableSet(string name);
+    IResult<string> GetEnvironmentVariable(string name);
 
-        IResult<string> GetEnvironmentVariable(string name);
+    /// <summary>
+    /// Retrieves all environment variables that start with the specified prefix,
+    /// optionally removing the prefix from the keys in the returned dictionary.
+    /// </summary>
+    /// <param name="prefix"></param>
+    /// <param name="trimPrefix">If true, the prefix will be removed from the keys in the returned dictionary.</param>
+    IDictionary<string,string> GetEnvironmentVariables(string prefix, bool trimPrefix = true);
 
-        IDictionary<string,string> GetEnvironmentVariables(string prefix);
-
-        void SetEnvironmentVariable(string name, string value);
-
-        string GetCurrentDirectory();
-    }
+    string GetCurrentDirectory();
 }

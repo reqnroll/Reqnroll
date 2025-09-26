@@ -5,21 +5,23 @@ using System.Collections.Generic;
 
 namespace Reqnroll.Formatters.Configuration;
 
-internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentWrapper environmentWrapper, IFormatterLog log = null) : IKeyValueEnvironmentConfigurationResolver
+internal class KeyValueEnvironmentConfigurationResolver(IEnvironmentOptions environmentOptions, IFormatterLog log = null) : IKeyValueEnvironmentConfigurationResolver
 {
-    private readonly IEnvironmentWrapper _environmentWrapper = environmentWrapper ?? throw new ArgumentNullException(nameof(environmentWrapper));
+    private readonly IEnvironmentOptions _environmentWrapper = environmentOptions ?? throw new ArgumentNullException(nameof(environmentOptions));
 
     public IDictionary<string, IDictionary<string, object>> Resolve()
     {
         var result = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
 
-        var environmentVariables = _environmentWrapper.GetEnvironmentVariables(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX);
+        var environmentVariables = _environmentWrapper.FormatterSettings;
         foreach (var formatterEnvironmentVariable in environmentVariables)
         {
-            var formatterName = formatterEnvironmentVariable.Key.Substring(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX.Length);
+            var formatterName = formatterEnvironmentVariable.Key;
             var formatterConfiguration = formatterEnvironmentVariable.Value?.Trim();
             if (string.IsNullOrEmpty(formatterConfiguration))
+            {
                 continue;
+            }
 
             log?.WriteMessage($"Configuring formatter '{formatterName}' via environment variable {formatterEnvironmentVariable.Key}={formatterEnvironmentVariable.Value}");
 

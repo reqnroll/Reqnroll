@@ -138,7 +138,15 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
         {
-            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, friendlyTestName);
+            if (generationContext.DisableFriendlyTestNames)
+            {
+                CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+            }
+            else
+            {
+                CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, friendlyTestName);
+            }
+
             CodeDomHelper.AddAttribute(testMethod, DESCRIPTION_ATTR, friendlyTestName);
 
             //as in mstest, you cannot mark classes with the description attribute, we

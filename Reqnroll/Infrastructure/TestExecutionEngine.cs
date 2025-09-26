@@ -3,6 +3,7 @@ using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
 using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.ErrorHandling;
 using Reqnroll.Events;
 using Reqnroll.PlatformCompatibility;
@@ -26,6 +27,7 @@ namespace Reqnroll.Infrastructure
         private readonly IErrorProvider _errorProvider;
         private readonly IObsoleteStepHandler _obsoleteStepHandler;
         private readonly ReqnrollConfiguration _reqnrollConfiguration;
+        private readonly IEnvironmentOptions _environmentOptions;
         private readonly IStepArgumentTypeConverter _stepArgumentTypeConverter;
         private readonly IStepDefinitionMatchService _stepDefinitionMatchService;
         private readonly IStepFormatter _stepFormatter;
@@ -49,6 +51,7 @@ namespace Reqnroll.Infrastructure
             IErrorProvider errorProvider,
             IStepArgumentTypeConverter stepArgumentTypeConverter,
             ReqnrollConfiguration reqnrollConfiguration,
+            IEnvironmentOptions environmentOptions,
             IBindingRegistry bindingRegistry,
             IUnitTestRuntimeProvider unitTestRuntimeProvider,
             IContextManager contextManager,
@@ -69,6 +72,7 @@ namespace Reqnroll.Infrastructure
             _unitTestRuntimeProvider = unitTestRuntimeProvider;
             _bindingRegistry = bindingRegistry;
             _reqnrollConfiguration = reqnrollConfiguration;
+            _environmentOptions = environmentOptions;
             _testTracer = testTracer;
             _stepFormatter = stepFormatter;
             _stepArgumentTypeConverter = stepArgumentTypeConverter;
@@ -480,6 +484,11 @@ namespace Reqnroll.Infrastructure
 
             if (parameter.Type is RuntimeBindingType runtimeParameterType)
             {
+                if (_environmentOptions.IsDryRun)
+                {
+                    return null;
+                }
+
                 return _testObjectResolver.ResolveBindingInstance(runtimeParameterType.Type, container);
             }
 
