@@ -102,7 +102,7 @@
       TargetFrameworks="$(ReqnrollTargetFrameworks)"
       TargetFramework="$(ReqnrollTargetFramework)"
       ProjectGuid="$(ProjectGuid)"
-      DebugMSBuildTask="$(ReqnrollDebugMSBuildTask)"
+      LaunchDebugger="$(ReqnrollDebugMSBuildTask)"
       >
 
       <Output TaskParameter="GeneratedFiles" ItemName="ReqnrollGeneratedFiles" />

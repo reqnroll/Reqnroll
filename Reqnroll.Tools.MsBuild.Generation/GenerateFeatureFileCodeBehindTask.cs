@@ -38,11 +38,11 @@ public class GenerateFeatureFileCodeBehindTask : Task
     public string TargetFramework { get; set; }
     public string ProjectGuid { get; set; }
 
-    public bool DebugMSBuildTask { get; set; }
+    public bool LaunchDebugger { get; set; }
 
     public override bool Execute()
     {
-        if (DebugMSBuildTask) Debugger.Launch();
+        if (LaunchDebugger) Debugger.Launch();
 
         var generateFeatureFileCodeBehindTaskContainerBuilder = new GenerateFeatureFileCodeBehindTaskContainerBuilder();
         var generatorPlugins = GeneratorPlugins?.Select(gp => gp.ItemSpec).Select(p => new GeneratorPluginInfo(p)).ToArray() ?? [];
