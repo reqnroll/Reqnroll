@@ -67,6 +67,8 @@ internal static class AsyncRunner
         }
 
 #endif
+#pragma warning disable VSTHRD002 // Avoid problematic synchronous waits
         return func().GetAwaiter().GetResult();
+#pragma warning restore VSTHRD002 // Avoid problematic synchronous waits
     }
 }
