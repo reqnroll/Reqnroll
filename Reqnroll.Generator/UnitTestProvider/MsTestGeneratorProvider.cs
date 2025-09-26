@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.BoDi;
 using System.Diagnostics.CodeAnalysis;
-using Reqnroll.Configuration;
 
 namespace Reqnroll.Generator.UnitTestProvider
 {
