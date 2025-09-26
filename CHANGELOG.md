@@ -2,22 +2,22 @@
 
 ## New features:
 
-* Generator: `addNonParallelizableMarkerForTags` now also applies to scenario-level tags for frameworks supporting method-level isolation (NUnit, MsTest V2, TUnit).
+* Added xUnit 3 support. In order to use Reqnroll with xUnit v3, you need to use the `Reqnroll.xunit.v3` package. (#405, #538)
+* Disabling parallel execution with the `addNonParallelizableMarkerForTags` efature now also applies to scenario-level tags for frameworks supporting method-level isolation (NUnit, MsTest V2, TUnit). (#826)
+* Generating "friendly names" for generated test methods by default can be disabled by the `generator/disableFriendlyTestNames` setting in `reqnroll.json`. This can help to avoid compatiblity issues with tools like VsTest retry. For MsTest this setting restores the behavior of Reqnroll v2. (#854)
 
 ## Improvements:
-* Dependencies: Updated to Cucumber Gherkin v35.0.0, Cucumber Messages v29.0.0 and Cucumber CompatibilityKit v23.0.0
 
-* Add xUnit 3 support (#405, #538)
+* Reqnroll.Verify: Support for Verify v29+ (Verify.Xunit v29.0.0 or later). For earlier versions use 3.0.3 version of the plugin that is compatible with Reqnroll v3.*. The support for custom snapshot files with global VerifySettings has been removed, see [plugin documentation](https://docs.reqnroll.net/latest/integrations/verify.html) for details and workarounds. (#572)
+* Dependencies: Updated to Cucumber Gherkin v35, Cucumber Messages v29 and Cucumber CompatibilityKit v23 (#841)
 * Improved `Reqnroll.Tools.MsBuild.Generation` NuGet package: reduced size by optimizing included dependencies, consolidated MsBuild assets (#812)
-* Reqnroll.Verify: Support for Verify v29+ (Verify.Xunit v29.0.0 or later). For earlier versions use 3.0.3 version of the plugin that is compatible with Reqnroll v3.*. The support for custom snapshot files with global VerifySettings has been removed, see [plugin documentation](https://docs.reqnroll.net/latest/integrations/verify.html) for details and workarounds. (#151)
 
 ## Bug fixes:
 
 * Fix: Formatters: Test execution fails when formatters were disabled due to a generation error (#861)
 * Fix: Exceptions from before scenario plugin hook events (RuntimePluginTestExecutionLifecycleEvents.BeforeScenario) are not shown (#856)
 * Fix: Before scenario hooks are not raised immediately when `runtime/stopAtFirstError` is true, but handled delayed (#857)
-* Fix: Fixing "dry run mode" for certain project configurations (#862)
-* Fix: Introduce option to disable inclusion of "friendly names" in generated code (#854)
+* Fix: Dry Run mode doesn't work properly if the project contains hooks that register & inject custom dependencies (#862)
 
 *Contributors of this release (in alphabetical order):* @chekkan, @Code-Grump, @DrEsteban, @gasparnagy, @konarx
 
