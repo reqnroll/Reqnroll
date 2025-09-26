@@ -59,6 +59,7 @@
     
     <ReqnrollFeatureFiles Include="**\*.feature" >
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <MessagesFile>$(IntermediateOutputPath)%(RelativeDir)%(Filename).feature.ndjson</MessagesFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
     </ReqnrollFeatureFiles>

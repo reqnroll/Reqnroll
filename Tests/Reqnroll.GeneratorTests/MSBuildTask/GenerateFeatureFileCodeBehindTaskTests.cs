@@ -1,169 +1,169 @@
 using FluentAssertions;
-using Microsoft.Build.Utilities;
 using Moq;
 using Reqnroll.Tools.MsBuild.Generation;
 using System.Collections.Generic;
 using Reqnroll.Analytics;
+using Reqnroll.BoDi;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Reqnroll.GeneratorTests.MSBuildTask
+namespace Reqnroll.GeneratorTests.MSBuildTask;
+
+public class GenerateFeatureFileCodeBehindTaskTests(ITestOutputHelper output)
 {
-    public class GenerateFeatureFileCodeBehindTaskTests
+    private Mock<IFeatureFileCodeBehindGenerator> GetFeatureFileCodeBehindGeneratorMock()
     {
-        private readonly ITestOutputHelper _output;
+        var generatorMock = new Mock<IFeatureFileCodeBehindGenerator>();
+        generatorMock
+            .Setup(m => m.GenerateFilesForProject())
+            .Returns(new List<FeatureFileCodeBehindGeneratorResult>());
+        return generatorMock;
+    }
 
-        public GenerateFeatureFileCodeBehindTaskTests(ITestOutputHelper output)
+    private Mock<IAnalyticsTransmitter> GetAnalyticsTransmitterMock()
+    {
+        var analyticsTransmitterMock = new Mock<IAnalyticsTransmitter>();
+        analyticsTransmitterMock.Setup(at => at.TransmitReqnrollProjectCompilingEventAsync(It.IsAny<ReqnrollProjectCompilingEvent>()))
+                                .Callback(() => { });
+        return analyticsTransmitterMock;
+    }
+
+    class TestDependencyCustomizations(IAnalyticsTransmitter analyticsTransmitter, IFeatureFileCodeBehindGenerator featureFileCodeBehindGenerator) : IGenerateFeatureFileCodeBehindTaskDependencyCustomizations
+    {
+        public void CustomizeTaskContainerDependencies(IObjectContainer taskContainer)
         {
-            _output = output;
+            taskContainer.RegisterInstanceAs(analyticsTransmitter);
         }
 
-        private Mock<IFeatureFileCodeBehindGenerator> GetFeatureFileCodeBehindGeneratorMock()
+        public void CustomizeGeneratorContainerDependencies(IObjectContainer generatorContainer)
         {
-            var generatorMock = new Mock<IFeatureFileCodeBehindGenerator>();
-            generatorMock
-                .Setup(m => m.GenerateFilesForProject(
-                    It.IsAny<List<string>>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>(),
-                    It.IsAny<string>()))
-                .Returns(new List<FeatureFileCodeBehindGeneratorResult>());
-            return generatorMock;
+            generatorContainer.RegisterInstanceAs(featureFileCodeBehindGenerator);
         }
+    }
 
-        private Mock<IAnalyticsTransmitter> GetAnalyticsTransmitterMock()
+    private IGenerateFeatureFileCodeBehindTaskDependencyCustomizations GetDependencyCustomizations()
+    {
+        return new TestDependencyCustomizations(GetAnalyticsTransmitterMock().Object, GetFeatureFileCodeBehindGeneratorMock().Object);
+    }
+
+    [Fact]
+    public void Execute_OnlyRequiredPropertiesAreSet_ShouldWork()
+    {
+        //ARRANGE
+        var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
         {
-            var analyticsTransmitterMock = new Mock<IAnalyticsTransmitter>();
-            analyticsTransmitterMock.Setup(at => at.TransmitReqnrollProjectCompilingEventAsync(It.IsAny<ReqnrollProjectCompilingEvent>()))
-                .Callback(() => { });
-            return analyticsTransmitterMock;
-        }
+            ProjectPath = "ProjectPath.csproj",
+            BuildEngine = new MockBuildEngine(output),
+            DependencyCustomizations = GetDependencyCustomizations()
+        };
 
-        [Fact]
-        public void Execute_OnlyRequiredPropertiesAreSet_ShouldWork()
+        //ACT
+        bool result = generateFeatureFileCodeBehindTask.Execute();
+
+        //ASSERT
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Execute_AllPropertiesAreSet_ShouldWork()
+    {
+        //ARRANGE
+        var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
         {
-            //ARRANGE
-            var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
-            {
-                ProjectPath = "ProjectPath.csproj",
-                BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
-            };
+            RootNamespace = "RootNamespace",
+            ProjectPath = "ProjectPath.csproj",
+            FeatureFiles = [],
+            GeneratorPlugins = [],
+            BuildEngine = new MockBuildEngine(output),
+            DependencyCustomizations = GetDependencyCustomizations()
+        };
 
-            //ACT
-            bool result = generateFeatureFileCodeBehindTask.Execute();
+        //ACT
+        bool result = generateFeatureFileCodeBehindTask.Execute();
 
-            //ASSERT
-            result.Should().BeTrue();
-        }
+        //ASSERT
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Execute_AllPropertiesAreSet_ShouldWork()
+    [Fact]
+    public void Execute_RootNamespaceEmpty_ShouldWork()
+    {
+        //ARRANGE
+        var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
         {
-            //ARRANGE
-            var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
-            {
-                RootNamespace = "RootNamespace",
-                ProjectPath = "ProjectPath.csproj",
-                FeatureFiles = new TaskItem[0],
-                GeneratorPlugins = new TaskItem[0],
-                BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
-            };
+            RootNamespace = "",
+            ProjectPath = "ProjectPath.csproj",
+            FeatureFiles = [],
+            GeneratorPlugins = [],
+            BuildEngine = new MockBuildEngine(output),
+            DependencyCustomizations = GetDependencyCustomizations()
+        };
 
-            //ACT
-            bool result = generateFeatureFileCodeBehindTask.Execute();
+        //ACT
+        bool result = generateFeatureFileCodeBehindTask.Execute();
 
-            //ASSERT
-            result.Should().BeTrue();
-        }
+        //ASSERT
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Execute_RootNamespaceEmpty_ShouldWork()
+    [Fact]
+    public void Execute_RootNamespaceNull_ShouldWork()
+    {
+        //ARRANGE
+        var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
         {
-            //ARRANGE
-            var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
-            {
-                RootNamespace = "",
-                ProjectPath = "ProjectPath.csproj",
-                FeatureFiles = new TaskItem[0],
-                GeneratorPlugins = new TaskItem[0],
-                BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
-            };
+            RootNamespace = null,
+            ProjectPath = "ProjectPath.csproj",
+            FeatureFiles = [],
+            GeneratorPlugins = [],
+            BuildEngine = new MockBuildEngine(output),
+            DependencyCustomizations = GetDependencyCustomizations()
+        };
 
-            //ACT
-            bool result = generateFeatureFileCodeBehindTask.Execute();
+        //ACT
+        bool result = generateFeatureFileCodeBehindTask.Execute();
 
-            //ASSERT
-            result.Should().BeTrue();
-        }
+        //ASSERT
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Execute_RootNamespaceNull_ShouldWork()
+    [Fact]
+    public void Execute_FeatureFilesNotSet_ShouldWork()
+    {
+        //ARRANGE
+        var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
         {
-            //ARRANGE
-            var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
-            {
-                RootNamespace = null,
-                ProjectPath = "ProjectPath.csproj",
-                FeatureFiles = new TaskItem[0],
-                GeneratorPlugins = new TaskItem[0],
-                BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
-            };
+            RootNamespace = "RootNamespace",
+            ProjectPath = "ProjectPath.csproj",
+            GeneratorPlugins = [],
+            BuildEngine = new MockBuildEngine(output),
+            DependencyCustomizations = GetDependencyCustomizations()
+        };
 
-            //ACT
-            bool result = generateFeatureFileCodeBehindTask.Execute();
+        //ACT
+        bool result = generateFeatureFileCodeBehindTask.Execute();
 
-            //ASSERT
-            result.Should().BeTrue();
-        }
+        //ASSERT
+        result.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Execute_FeatureFilesNotSet_ShouldWork()
+    [Fact]
+    public void Execute_GeneratorPluginsNotSet_ShouldWork()
+    {
+        //ARRANGE
+        var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
         {
-            //ARRANGE
-            var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
-            {
-                RootNamespace = "RootNamespace",
-                ProjectPath = "ProjectPath.csproj",
-                GeneratorPlugins = new TaskItem[0],
-                BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
-            };
+            RootNamespace = "RootNamespace",
+            ProjectPath = "ProjectPath.csproj",
+            FeatureFiles = [],
+            BuildEngine = new MockBuildEngine(output),
+            DependencyCustomizations = GetDependencyCustomizations()
+        };
 
-            //ACT
-            bool result = generateFeatureFileCodeBehindTask.Execute();
+        //ACT
+        bool result = generateFeatureFileCodeBehindTask.Execute();
 
-            //ASSERT
-            result.Should().BeTrue();
-        }
-
-        [Fact]
-        public void Execute_GeneratorPluginsNotSet_ShouldWork()
-        {
-            //ARRANGE
-            var generateFeatureFileCodeBehindTask = new GenerateFeatureFileCodeBehindTask
-            {
-                RootNamespace = "RootNamespace",
-                ProjectPath = "ProjectPath.csproj",
-                FeatureFiles = new TaskItem[0],
-                BuildEngine = new MockBuildEngine(_output),
-                CodeBehindGenerator = GetFeatureFileCodeBehindGeneratorMock().Object,
-                AnalyticsTransmitter = GetAnalyticsTransmitterMock().Object
-            };
-
-            //ACT
-            bool result = generateFeatureFileCodeBehindTask.Execute();
-
-            //ASSERT
-            result.Should().BeTrue();
-        }
+        //ASSERT
+        result.Should().BeTrue();
     }
 }

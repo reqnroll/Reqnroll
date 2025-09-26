@@ -33,6 +33,9 @@ namespace Reqnroll.Generator
 
         public ICollection<string> GenerationWarnings { get; private set; }
 
+        public string FeatureMessagesResourceName { get; set; }
+        internal string FeatureMessages { get; set; }
+
         public TestClassGenerationContext(
             IUnitTestGeneratorProvider unitTestGeneratorProvider,
             ReqnrollDocument document,

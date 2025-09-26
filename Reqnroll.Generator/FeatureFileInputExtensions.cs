@@ -1,68 +1,29 @@
 using System;
-using System.Diagnostics;
 using System.IO;
 using Reqnroll.Generator.Interfaces;
 
-namespace Reqnroll.Generator
+namespace Reqnroll.Generator;
+
+public static class FeatureFileInputExtensions
 {
-    public static class FeatureFileInputExtensions
+    public static TextReader GetFeatureFileContentReader(this FeatureFileInput featureFileInput, ProjectSettings projectSettings)
     {
-        public static TextReader GetFeatureFileContentReader(this FeatureFileInput featureFileInput, ProjectSettings projectSettings)
-        {
-            if (featureFileInput == null) throw new ArgumentNullException("featureFileInput");
+        if (featureFileInput == null) throw new ArgumentNullException(nameof(featureFileInput));
 
-            if (featureFileInput.FeatureFileContent != null)
-                return new StringReader(featureFileInput.FeatureFileContent);
+        if (featureFileInput.FeatureFileContent != null)
+            return new StringReader(featureFileInput.FeatureFileContent);
 
-            Debug.Assert(projectSettings != null);
+        return new StreamReader(featureFileInput.GetFullPath(projectSettings));
+    }
 
-            return new StreamReader(Path.Combine(projectSettings.ProjectFolder, featureFileInput.ProjectRelativePath));
-        }
+    public static string GetFullPath(this FeatureFileInput featureFileInput, ProjectSettings projectSettings) =>
+        projectSettings.GetFullPath(featureFileInput.ProjectRelativePath);
 
-        public static string GetFullPath(this FeatureFileInput featureFileInput, ProjectSettings projectSettings)
-        {
-            if (featureFileInput == null) throw new ArgumentNullException("featureFileInput");
+    public static string GetFullPath(this ProjectSettings projectSettings, string projectRelativePath)
+    {
+        if (projectSettings == null) throw new ArgumentNullException(nameof(projectSettings));
+        if (projectRelativePath == null) throw new ArgumentNullException(nameof(projectRelativePath));
 
-            if (projectSettings == null)
-                return featureFileInput.ProjectRelativePath;
-
-            return Path.GetFullPath(Path.Combine(projectSettings.ProjectFolder, featureFileInput.ProjectRelativePath));
-        }
-
-        public static string GetGeneratedTestFullPath(this FeatureFileInput featureFileInput, ProjectSettings projectSettings)
-        {
-            if (featureFileInput == null) throw new ArgumentNullException("featureFileInput");
-
-            if (featureFileInput.GeneratedTestProjectRelativePath == null)
-                return null;
-
-            if (projectSettings == null)
-                return featureFileInput.GeneratedTestProjectRelativePath;
-
-            return Path.GetFullPath(Path.Combine(projectSettings.ProjectFolder, featureFileInput.GeneratedTestProjectRelativePath));
-        }
-
-        public static string GetGeneratedTestContent(this FeatureFileInput featureFileInput, string generatedTestFullPath)
-        {
-            var generatedTestFileContent = featureFileInput.GeneratedTestFileContent;
-            if (generatedTestFileContent != null)
-                return generatedTestFileContent;
-
-            if (generatedTestFullPath == null)
-                return null;
-
-            try
-            {
-                if (!File.Exists(generatedTestFullPath))
-                    return null;
-
-                return File.ReadAllText(generatedTestFullPath);
-            }
-            catch(Exception exception)
-            {
-                Debug.WriteLine(exception, "FeatureFileInputExtensions.GetGeneratedTestContent");
-                return null;
-            }
-        }
+        return Path.GetFullPath(Path.Combine(projectSettings.ProjectFolder, projectRelativePath));
     }
 }

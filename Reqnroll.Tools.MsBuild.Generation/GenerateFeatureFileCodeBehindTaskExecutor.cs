@@ -1,80 +1,85 @@
+#nullable enable
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using System.Linq;
 using Reqnroll.BoDi;
 using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
 using Reqnroll.CommonModels;
+using Reqnroll.Utils;
+using Task = System.Threading.Tasks.Task;
 
-namespace Reqnroll.Tools.MsBuild.Generation
+namespace Reqnroll.Tools.MsBuild.Generation;
+
+public class GenerateFeatureFileCodeBehindTaskExecutor(
+    IProcessInfoDumper processInfoDumper,
+    IReqnrollTaskLoggingHelper log,
+    IReqnrollProjectProvider reqnrollProjectProvider,
+    ReqnrollProjectInfo reqnrollProjectInfo,
+    WrappedGeneratorContainerBuilder wrappedGeneratorContainerBuilder,
+    IObjectContainer rootObjectContainer,
+    IMSBuildTaskAnalyticsTransmitter msbuildTaskAnalyticsTransmitter,
+    IExceptionTaskLogger exceptionTaskLogger)
+    : IGenerateFeatureFileCodeBehindTaskExecutor
 {
-    public class GenerateFeatureFileCodeBehindTaskExecutor : IGenerateFeatureFileCodeBehindTaskExecutor
+    public IResult<IReadOnlyCollection<ITaskItem>> Execute()
     {
-        private readonly IProcessInfoDumper _processInfoDumper;
-        private readonly ITaskLoggingWrapper _taskLoggingWrapper;
-        private readonly IReqnrollProjectProvider _reqnrollProjectProvider;
-        private readonly ReqnrollProjectInfo _reqnrollProjectInfo;
-        private readonly WrappedGeneratorContainerBuilder _wrappedGeneratorContainerBuilder;
-        private readonly IObjectContainer _rootObjectContainer;
-        private readonly IMSBuildTaskAnalyticsTransmitter _msbuildTaskAnalyticsTransmitter;
-        private readonly IExceptionTaskLogger _exceptionTaskLogger;
-
-        public GenerateFeatureFileCodeBehindTaskExecutor(
-            IProcessInfoDumper processInfoDumper,
-            ITaskLoggingWrapper taskLoggingWrapper,
-            IReqnrollProjectProvider reqnrollProjectProvider,
-            ReqnrollProjectInfo reqnrollProjectInfo,
-            WrappedGeneratorContainerBuilder wrappedGeneratorContainerBuilder,
-            IObjectContainer rootObjectContainer,
-            IMSBuildTaskAnalyticsTransmitter msbuildTaskAnalyticsTransmitter,
-            IExceptionTaskLogger exceptionTaskLogger)
+        processInfoDumper.DumpProcessInfo();
+        log.LogTaskMessage("Starting GenerateFeatureFileCodeBehind task");
+        log.LogTaskDiagnosticMessage($"Project folder: {reqnrollProjectInfo.ProjectFolder}");
+        try
         {
-            _processInfoDumper = processInfoDumper;
-            _taskLoggingWrapper = taskLoggingWrapper;
-            _reqnrollProjectProvider = reqnrollProjectProvider;
-            _reqnrollProjectInfo = reqnrollProjectInfo;
-            _wrappedGeneratorContainerBuilder = wrappedGeneratorContainerBuilder;
-            _rootObjectContainer = rootObjectContainer;
-            _msbuildTaskAnalyticsTransmitter = msbuildTaskAnalyticsTransmitter;
-            _exceptionTaskLogger = exceptionTaskLogger;
-        }
+            var reqnrollProject = reqnrollProjectProvider.GetReqnrollProject();
 
-        public IResult<IReadOnlyCollection<ITaskItem>> Execute()
+            using var generatorContainer = wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
+                reqnrollProject.ProjectSettings.ConfigurationHolder,
+                reqnrollProject.ProjectSettings,
+                reqnrollProjectInfo.GeneratorPlugins,
+                rootObjectContainer);
+            var featureFileCodeBehindGenerator = generatorContainer.Resolve<IFeatureFileCodeBehindGenerator>();
+
+            _ = Task.Run(msbuildTaskAnalyticsTransmitter.TryTransmitProjectCompilingEventAsync);
+
+            var returnValue = GenerateCodeBehindFilesForProject(featureFileCodeBehindGenerator);
+
+            if (log.HasLoggedErrors)
+            {
+                return Result<IReadOnlyCollection<ITaskItem>>.Failure("Feature file code-behind generation has failed with errors.");
+            }
+
+            return Result.Success(returnValue);
+        }
+        catch (Exception e)
         {
-            _processInfoDumper.DumpProcessInfo();
-            _taskLoggingWrapper.LogMessage("Starting GenerateFeatureFileCodeBehind");
-
-            try
-            {
-                var reqnrollProject = _reqnrollProjectProvider.GetReqnrollProject();
-
-                using var generatorContainer = _wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
-                    reqnrollProject.ProjectSettings.ConfigurationHolder,
-                    reqnrollProject.ProjectSettings,
-                    _reqnrollProjectInfo.GeneratorPlugins,
-                    _rootObjectContainer);
-                var projectCodeBehindGenerator = generatorContainer.Resolve<IProjectCodeBehindGenerator>();
-
-                _ = Task.Run(_msbuildTaskAnalyticsTransmitter.TryTransmitProjectCompilingEventAsync);
-
-                var returnValue = projectCodeBehindGenerator.GenerateCodeBehindFilesForProject();
-
-                if (_taskLoggingWrapper.HasLoggedErrors())
-                {
-                    return Result<IReadOnlyCollection<ITaskItem>>.Failure("Feature file code-behind generation has failed with errors.");
-                }
-
-                return Result.Success(returnValue);
-            }
-            catch (Exception e)
-            {
-                _exceptionTaskLogger.LogException(e);
-                _processInfoDumper.DumpLoadedAssemblies();
-                return Result<IReadOnlyCollection<ITaskItem>>.Failure(e);
-            }
-            finally
-            {
-                _processInfoDumper.DumpLoadedAssemblies();
-            }
+            exceptionTaskLogger.LogException(e);
+            processInfoDumper.DumpLoadedAssemblies();
+            return Result<IReadOnlyCollection<ITaskItem>>.Failure(e);
         }
+        finally
+        {
+            processInfoDumper.DumpLoadedAssemblies();
+        }
+    }
+
+    private IReadOnlyCollection<ITaskItem> GenerateCodeBehindFilesForProject(IFeatureFileCodeBehindGenerator featureFileCodeBehindGenerator)
+    {
+        var generatedFiles = featureFileCodeBehindGenerator
+            .GenerateFilesForProject()
+            .ToArray();
+
+        var result = new List<ITaskItem>();
+        foreach (var generatorResult in generatedFiles)
+        {
+            var taskItem = new TaskItem { ItemSpec = FileSystemHelper.GetRelativePath(generatorResult.CodeBehindFileFullPath, reqnrollProjectInfo.ProjectFolder) };
+            var messagesFileRelativePath = generatorResult.MessagesFileFullPath == null ? null : FileSystemHelper.GetRelativePath(generatorResult.MessagesFileFullPath, reqnrollProjectInfo.ProjectFolder);
+            taskItem.SetMetadata(GenerateFeatureFileCodeBehindTask.MessagesFileMetadata, messagesFileRelativePath);
+            taskItem.SetMetadata(GenerateFeatureFileCodeBehindTask.MessagesResourceNameMetadata, generatorResult.MessagesResourceName);
+            result.Add(taskItem);
+
+            log.LogTaskDiagnosticMessage($"Output {taskItem.ItemSpec} ({generatorResult.CodeBehindFileFullPath})");
+            log.LogTaskDiagnosticMessage($"  Messages: {messagesFileRelativePath} ({generatorResult.MessagesFileFullPath})");
+            log.LogTaskDiagnosticMessage($"  MessagesResourceName: {generatorResult.MessagesResourceName}");
+        }
+        return result;
     }
 }

@@ -2,22 +2,15 @@ using Reqnroll.Tracing;
 
 namespace Reqnroll.Tools.MsBuild.Generation;
 
-public class MSBuildTraceListener : ITraceListener
+public class MSBuildTraceListener(IReqnrollTaskLoggingHelper reqnrollTaskLoggingHelper) : ITraceListener
 {
-    private readonly ITaskLoggingWrapper _taskLoggingHelper;
-
-    public MSBuildTraceListener(ITaskLoggingWrapper taskLoggingHelper) 
-    {
-        _taskLoggingHelper = taskLoggingHelper;
-    }
-
     public void WriteTestOutput(string message)
     {
-        _taskLoggingHelper.LogMessage(message);
+        reqnrollTaskLoggingHelper.LogTaskMessage(message);
     }
 
     public void WriteToolOutput(string message)
     {
-        _taskLoggingHelper.LogMessage("-> " + message);
+        reqnrollTaskLoggingHelper.LogTaskMessage("-> " + message);
     }
 }

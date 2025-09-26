@@ -231,6 +231,14 @@ cd ./docs
 
 The documentation will be available at http://localhost:8000
 
+## Debugging MsBuild integration
+
+The MsBuild integration is implemented by the `Reqnroll.Tools.MsBuild.Generation` project that implements a custom MsBuild task. The following hints might help.
+
+* Observing normal log messages in build output: `dotnet build -v:n --tl:of  f` (Look for messages starting with `[Reqnroll]`)
+* Observing detailed log messages in build output: `dotnet build -v:d --tl:off | Select-String -Pattern "\[Reqnroll\]"` (this works with PowerShell)
+* Debugging the MsBuild task: `dotnet build -p:ReqnrollDebugMSBuildTask=True` (will popup to attach a debugger)
+
 ## Where can I go for help?
 
 Please ask in our [Contributor Q&A](https://github.com/orgs/reqnroll/discussions/categories/contributor-q-a) discussion group.

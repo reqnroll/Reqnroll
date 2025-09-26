@@ -200,5 +200,20 @@ namespace Reqnroll.TestProjectGenerator.Helpers
 
             Retry(5, () => Directory.Delete(path, true));
         }
+
+        public static string NormalizeDirectorySeparators(string path)
+        {
+            if (path == null)
+                return null;
+
+            switch (Path.DirectorySeparatorChar)
+            {
+                case '\\':
+                    return path.Replace('/', '\\');
+                case '/':
+                    return path.Replace('\\', '/');
+            }
+            return path;
+        }
     }
 }
