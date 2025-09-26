@@ -97,7 +97,8 @@ namespace Reqnroll.Generator.Generation
                 _codeDomHelper.CreateMethod(testClass),
                 document.ReqnrollFeature.HasFeatureBackground() ? _codeDomHelper.CreateMethod(testClass) : null,
                 _codeDomHelper.CreateMethod(testClass),
-                _testGeneratorProvider.GetTraits().HasFlag(UnitTestGeneratorTraits.RowTests) && _reqnrollConfiguration.AllowRowTests);
+                _testGeneratorProvider.GetTraits().HasFlag(UnitTestGeneratorTraits.RowTests) && _reqnrollConfiguration.AllowRowTests,
+                _reqnrollConfiguration.DisableFriendlyTestNames);
         }
 
         private CodeNamespace CreateNamespace(string targetNamespace)

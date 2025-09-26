@@ -27,6 +27,8 @@ namespace Reqnroll.Generator
 
         public bool GenerateRowTests { get; private set; }
 
+        public bool DisableFriendlyTestNames { get; private set; }
+
         public IDictionary<string, object> CustomData { get; private set; }
 
         public ICollection<string> GenerationWarnings { get; private set; }
@@ -46,7 +48,8 @@ namespace Reqnroll.Generator
             CodeMemberMethod scenarioCleanupMethod,
             CodeMemberMethod featureBackgroundMethod,
             CodeMemberMethod cucumberMessagesInitializationMethod,
-            bool generateRowTests)
+            bool generateRowTests,
+            bool disableFriendlyTestNames)
         {
             UnitTestGeneratorProvider = unitTestGeneratorProvider;
             Document = document;
@@ -63,6 +66,7 @@ namespace Reqnroll.Generator
             FeatureBackgroundMethod = featureBackgroundMethod;
             CucumberMessagesInitializationMethod = cucumberMessagesInitializationMethod;
             GenerateRowTests = generateRowTests;
+            DisableFriendlyTestNames = disableFriendlyTestNames;
 
             CustomData = new Dictionary<string, object>();
             GenerationWarnings = new List<string>();

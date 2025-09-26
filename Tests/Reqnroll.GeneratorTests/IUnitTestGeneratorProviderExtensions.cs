@@ -6,19 +6,19 @@ using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
-using Reqnroll.Tracing;
 
 namespace Reqnroll.GeneratorTests
 {
     public static class IUnitTestGeneratorProviderExtensions
     {
-        public static UnitTestFeatureGenerator CreateUnitTestConverter(this IUnitTestGeneratorProvider testGeneratorProvider)
+        public static UnitTestFeatureGenerator CreateUnitTestConverter(this IUnitTestGeneratorProvider testGeneratorProvider, bool disableFriendlyTestNames = ConfigDefaults.DisableFriendlyTestNames)
         {
             var codeDomHelper = new CodeDomHelper(CodeDomProviderLanguage.CSharp);
 
             var runtimeConfiguration = ConfigurationLoader.GetDefault();
             runtimeConfiguration.AllowRowTests = true;
             runtimeConfiguration.AllowDebugGeneratedFiles = true;
+            runtimeConfiguration.DisableFriendlyTestNames = disableFriendlyTestNames;
 
             return new UnitTestFeatureGenerator(testGeneratorProvider, codeDomHelper, runtimeConfiguration, new DecoratorRegistryStub());
         }
