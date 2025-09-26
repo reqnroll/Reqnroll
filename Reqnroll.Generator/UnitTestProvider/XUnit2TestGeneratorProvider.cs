@@ -6,7 +6,6 @@ using Reqnroll.Generator.CodeDom;
 using Reqnroll.BoDi;
 using System.Text.RegularExpressions;
 using System.Diagnostics.CodeAnalysis;
-using Reqnroll.Configuration;
 
 namespace Reqnroll.Generator.UnitTestProvider
 {
