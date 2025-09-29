@@ -84,24 +84,17 @@
       <ProjectReferenceSymbols
         Include="@(ProjectReferenceCopyLocalPaths)"
         Condition="'%(Extension)' == '.pdb'" />
-
-      <ProjectReferencePrimaryOutput Include="@(ProjectReferenceCopyLocalPaths)" />
-      <ProjectReferencePrimaryOutput Remove="@(ProjectReferenceSymbols)" />
     </ItemGroup>
 
     <ItemGroup>
       <!-- DLLs and other runtime assets go into the main package. -->
       <None
-        Include="@(ProjectReferencePrimaryOutput)"
+        Include="@(ProjectReferenceCopyLocalPaths)"
         Pack="true"
         PackagePath="lib/$(TargetFramework)/" />
 
       <!-- Debugging symbols go into the symbol package. -->
-      <None
-        Include="@(ProjectReferenceSymbols)"
-        Pack="true"
-        PackFolder="Symbols"
-        PackagePath="lib/$(TargetFramework)/" />
+      <None Update="@(ProjectReferenceSymbols)" PackFolder="Symbols" />
     </ItemGroup>
   </Target>
 

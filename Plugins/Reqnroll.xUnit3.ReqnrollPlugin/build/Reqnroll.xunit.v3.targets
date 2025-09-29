@@ -1,0 +1,72 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <GetReqnrollAssemblyHooksTemplateDependsOn></GetReqnrollAssemblyHooksTemplateDependsOn>
+  </PropertyGroup>
+
+  <!-- Gets the hooks templates that should be used to generate assembly hook sources. -->
+  <Target 
+    Name="GetReqnrollAssemblyHooksTemplate"
+    DependsOnTargets="$(GetReqnrollAssemblyHooksTemplateDependsOn)"
+    Returns="ReqnrollAssemblyHooksTemplate">
+
+    <PropertyGroup>
+      <_ReqnrollEffectiveRootNamespace>$(RootNamespace)</_ReqnrollEffectiveRootNamespace>
+      <_ReqnrollEffectiveRootNamespace Condition="'$(_ReqnrollEffectiveRootNamespace)' == ''">Reqnroll.GeneratedTests</_ReqnrollEffectiveRootNamespace>
+      <_ReqnrollAssemblyHooksNamespace>$(_ReqnrollEffectiveRootNamespace.Replace('.', '_'))</_ReqnrollAssemblyHooksNamespace>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <ReqnrollAssemblyHooksTemplate Include="@(ReqnrollAssemblyHooksTemplate)">
+        <TargetPath>$(IntermediateOutputPath)%(Filename)$(_ReqnrollAssemblyHooksNamespace)%(Extension)</TargetPath>
+      </ReqnrollAssemblyHooksTemplate>
+    </ItemGroup>
+  </Target>
+
+
+  <PropertyGroup>
+    <GenerateReqnrollAssemblyHooksDependsOn>GetReqnrollAssemblyHooksTemplate</GenerateReqnrollAssemblyHooksDependsOn>
+  </PropertyGroup>
+
+  <!-- Generates assembly hooks using the templates. -->
+  <Target
+    Name="GenerateReqnrollAssemblyHooks"
+    BeforeTargets="CoreCompile"
+    Inputs="@(ReqnrollAssemblyHooksTemplate)"
+    Outputs="@(ReqnrollAssemblyHooksTemplate -> '%(TargetPath)')"
+    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true'">
+
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(ReqnrollAssemblyHooksTemplate.Identity)">
+      <Output TaskParameter="Lines" ItemName="AssemblyHooksTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Replace the version token. -->
+    <ItemGroup>
+      <AssemblyHooksLine Include="@(AssemblyHooksTemplateLine -> '$([System.String]::Copy(%(Identity)).Replace(`PROJECT_ROOT_NAMESPACE`, `$(_ReqnrollAssemblyHooksNamespace)`))' )" />
+    </ItemGroup>
+
+    <!-- Produce the file. -->
+    <WriteLinesToFile
+      File="%(TargetPath)"
+      Lines="@(AssemblyHooksLine)"
+      Overwrite="true"
+      Encoding="UTF-8" />
+  </Target>
+  
+
+  <PropertyGroup>
+    <AddReqnrollAssemblyHooksDependsOn>GenerateReqnrollAssemblyHooks</AddReqnrollAssemblyHooksDependsOn>
+  </PropertyGroup>
+
+  <!-- Adds the generate assembly hooks to the compilation. -->
+  <Target
+    Name="AddReqnrollAssemblyHooks"
+    BeforeTargets="CoreCompile"
+    DependsOnTargets="$(AddReqnrollAssemblyHooksDependsOn)">
+    <ItemGroup>
+      <Compile Include="@(ReqnrollAssemblyHooksTemplate -> '%(TargetPath)')" />
+    </ItemGroup>
+  </Target>
+
+</Project>
