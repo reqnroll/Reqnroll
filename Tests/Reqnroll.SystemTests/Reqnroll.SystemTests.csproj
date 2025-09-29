@@ -29,6 +29,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
+    
+    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit3.ReqnrollPlugin\Reqnroll.xUnit3.ReqnrollPlugin.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
@@ -39,9 +43,6 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit3.Generator.ReqnrollPlugin\Reqnroll.xUnit3.Generator.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.TUnit.Generator.ReqnrollPlugin\Reqnroll.TUnit.Generator.ReqnrollPlugin.csproj">

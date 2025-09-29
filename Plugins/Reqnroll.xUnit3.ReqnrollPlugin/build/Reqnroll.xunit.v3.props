@@ -1,0 +1,12 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+  <PropertyGroup>
+    <_ReqnrollxUnit3GeneratorPluginPath>$(MSBuildThisFileDirectory)\netstandard2.0\Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll</_ReqnrollxUnit3GeneratorPluginPath>
+    <GenerateReqnrollAssemblyHooksFile Condition="'$(GenerateReqnrollAssemblyHooksFile)' == ''">true</GenerateReqnrollAssemblyHooksFile>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <ReqnrollGeneratorPlugins Include="$(_ReqnrollxUnit3GeneratorPluginPath)" />
+  </ItemGroup>
+
+</Project>
