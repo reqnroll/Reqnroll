@@ -47,6 +47,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Licenses", "Licenses", "{D7
 		Licenses\Cucumber.CucumberExpressions-LICENSE-MIT.txt = Licenses\Cucumber.CucumberExpressions-LICENSE-MIT.txt
 		Licenses\Cucumber.HtmlFormatter-LICENSE-MIT.txt = Licenses\Cucumber.HtmlFormatter-LICENSE-MIT.txt
 		Licenses\Cucumber.Messages-LICENSE-MIT.txt = Licenses\Cucumber.Messages-LICENSE-MIT.txt
+		Licenses\Cucumber.React-Components-LICENSE-MIT.txt = Licenses\Cucumber.React-Components-LICENSE-MIT.txt
 		Licenses\Gherkin-LICENSE-MIT.txt = Licenses\Gherkin-LICENSE-MIT.txt
 	EndProjectSection
 EndProject
