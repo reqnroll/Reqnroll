@@ -27,7 +27,3 @@ public sealed class StepDefinitions
 
 Ignoring is like skipping the scenario. Be careful, as it behaves a little bit different for the different unit test runners (xUnit, NUnit, TUnit, MSTest).
 
-## Limitations
-
-Currently this works only in [step definitions](../automation/step-definitions). It is not possible to use it in [hooks](../automation/hooks).
-

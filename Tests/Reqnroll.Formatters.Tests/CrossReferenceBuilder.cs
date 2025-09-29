@@ -1,4 +1,4 @@
-﻿using Io.Cucumber.Messages.Types;
+using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
 namespace Reqnroll.Formatters.Tests;
@@ -306,5 +306,17 @@ internal class CrossReferenceBuilder : CucumberMessageVisitorBase
     {
         _buildCrossReferences(testRunHookFinished);
         base.OnVisiting(testRunHookFinished);
+    }
+
+    public override void OnVisiting(Suggestion suggestion)
+    {
+        _buildCrossReferences(suggestion);
+        base.OnVisiting(suggestion);
+    }
+
+    public override void OnVisiting(Snippet snippet)
+    {
+        _buildCrossReferences(snippet);
+        base.OnVisiting(snippet);
     }
 }

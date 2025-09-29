@@ -58,19 +58,19 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".ndjson";
         DeletePreviousMessagesOutput(fileToDelete);
         ResetCucumberMessagesOutputFileName();
-        Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
+        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
     }
     protected void ResetCucumberMessagesHtml(string? fileToDelete = null)
     {
         fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".html";
         DeletePreviousMessagesOutput(fileToDelete);
         ResetCucumberMessagesOutputFileName();
-        Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
+        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
     }
 
     protected void ResetCucumberMessagesOutputFileName()
     {
-        Environment.SetEnvironmentVariable(FormattersConfigurationConstants.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE, null);
+        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE, null);
     }
 
     protected void MimicGitHubActionsEnvironment()
@@ -108,6 +108,21 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                 File.Delete(fileToDeletePath);
             }
         }
+    }
+
+    protected void AddFeatureFilesFromResources(string featureFileName, string folder, Assembly assembly)
+    {
+        var assemblyName = assembly.GetName().Name;
+        string prefixToRemove = $"{assemblyName}.{folder}.Resources.{featureFileName}.";
+        // list of features in the scenario directory
+        var featuresToCompile = assembly.GetManifestResourceNames()
+                           .Where(rn => rn.StartsWith(prefixToRemove) && rn.EndsWith(".feature"))
+                           .Select(rn => rn.Substring(prefixToRemove.Length));
+        foreach (var feature in featuresToCompile)
+        {
+            AddFeatureFileFromResource($"{featureFileName}/{feature}", folder, Assembly.GetExecutingAssembly());
+        }
+
     }
 
     protected void AddBindingClassFromResource(string fileName, string? prefix = null, Assembly? assemblyToLoadFrom = null)
@@ -156,11 +171,12 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var tracerMock = new Mock<ITraceListener>();
         objectContainerMock.Setup(x => x.Resolve<ITraceListener>()).Returns(tracerMock.Object);
         var env = new EnvironmentWrapper();
+        var envOptions = new EnvironmentOptions(env);
         var jsonConfigFileLocator = new ReqnrollJsonLocator();
         var fileSystem = new FileSystem();
         var fileService = new FileService();
         var configFileResolver = new FileBasedConfigurationResolver(jsonConfigFileLocator, fileSystem, fileService);
-        var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(env);
+        var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(envOptions);
 
         var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
         keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
@@ -169,7 +185,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
             configFileResolver,
                                                                         jsonEnvConfigResolver,
                                                                         keyValueEnvironmentConfigurationResolverMock.Object,
-                                                                        new FormattersDisabledOverrideProvider(env));
+                                                                        new FormattersDisabledOverrideProvider(envOptions));
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 
         var outputFilePath = outputFilePathElement!.ToString();
@@ -201,9 +217,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                           """);
     }
 
-    protected IEnumerable<Envelope> GetExpectedResults(string testName, string featureFileName)
+    protected IEnumerable<Envelope> GetExpectedResults(string testName)
     {
-        string[] expectedJsonText = GetExpectedJsonText(testName, featureFileName);
+        string[] expectedJsonText = GetExpectedJsonText(testName);
 
         foreach (var json in expectedJsonText)
         {
@@ -212,17 +228,15 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         }
     }
 
-    protected string[] GetExpectedJsonText(string testName, string featureFileName)
+    protected string[] GetExpectedJsonText(string testName)
     {
-        var fileName = featureFileName + "." + featureFileName + ".ndjson";
+        var fileName = testName + "." + testName + ".ndjson";
         var assemblyToLoadFrom = Assembly.GetExecutingAssembly();
-        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
-        //var workingDirectory = Path.Combine(AppContext.BaseDirectory, "..", "..", "..");
-        //var expectedJsonText = File.ReadAllLines(Path.Combine(workingDirectory, "Samples", "Resources", testName, $"{featureFileName}.feature.ndjson"));
+        var expectedJsonText = _testFileManager.GetTestFileContent(fileName, "Samples", assemblyToLoadFrom).Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         return expectedJsonText;
     }
 
-    protected static string[] GetActualGeneratedHtml(string testName, string featureFileName)
+    protected static string[] GetActualGeneratedHtml(string featureFileName)
     {
         string resultLocation = ActualResultLocationDirectory();
         var expectedJsonText = File.ReadAllLines(Path.Combine(resultLocation, $"{featureFileName}.html"));
@@ -234,9 +248,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
     record TestCaseRecord(string Id, string PickleId, Envelope TestCaseEnvelope, Dictionary<string, TestExecution> Executions);
     // ReSharper restore NotAccessedPositionalProperty.Local
 
-    protected IEnumerable<Envelope> GetActualResults(string testName, string fileName)
+    protected IEnumerable<Envelope> GetActualResults(string testName)
     {
-        string[] actualJsonText = GetActualJsonText(testName, fileName);
+        string[] actualJsonText = GetActualJsonText(testName);
         actualJsonText.Should().HaveCountGreaterThan(0, "the test results ndjson file was empty.");
 
         var envelopes = actualJsonText.Select(NdjsonSerializer.Deserialize).ToList();
@@ -248,38 +262,57 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var result = new List<Envelope>();
 
         // List of Pickle IDs in the order they are seen in the message stream
-        var pickles = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle.Id).ToList();
+        var pickleMessages = envelopes.Where(e => e.Content() is Pickle).Select(e => e.Pickle).ToArray();
+        var pickles = pickleMessages.Select(p => p.Id).ToList();
 
         // Dictionary keyed by the ID of each test case.
         var testCases = new Dictionary<string, TestCaseRecord>();
         var allTestCaseEnvelopes = envelopes.Where(e => e.Content() is TestCase).ToList();
         var testCaseStartedToTestCaseMap = new Dictionary<string, string>();
 
+        string FindTestCaseStartedFromStepPickleId(string pickleStepId)
+        {
+            var pickleId = pickleMessages.First(p => p.Steps.Any(ps => ps.Id == pickleStepId)).Id;
+            var testCaseStartedId = testCases.Values.First(tcr => tcr.PickleId == pickleId).Executions.Last().Value.Id;
+            return testCaseStartedId;
+        }
+
         foreach (var tce in allTestCaseEnvelopes)
         {
             var tc = tce.Content() as TestCase;
             testCases.Add(tc!.Id, new TestCaseRecord(tc.Id, tc.PickleId, tce, new Dictionary<string, TestExecution>()));
         }
-        int index = 0;
-        bool testCasesBegun = false;
-        // this loop sweeps all of the messages prior to the first testCase into the outgoing results collection.
-        while (index < envelopes.Count && !testCasesBegun)
+        List<Type> staticMessageTypes = new List<Type>
         {
-            var current = envelopes[index];
-            if (current.Content() is TestCase)
-            {
-                testCasesBegun = true;
-            }
-            else
-            {
-                result.Add(current);
-                index++;
-            }
+            typeof(Meta),
+            typeof(Source),
+            typeof(GherkinDocument),
+            typeof(Pickle),
+            typeof(ParameterType),
+            typeof(StepDefinition),
+            typeof(Hook)
+        };
+        bool IsStaticMessage(Envelope envelope)
+        {
+            return staticMessageTypes.Contains(envelope.Content().GetType());
         }
+        int index = 0;
         bool testCasesFinished = false;
         while (index < envelopes.Count && !testCasesFinished)
         {
             var current = envelopes[index];
+            if (IsStaticMessage(current))
+            {
+                result.Add(current);
+                index++;
+                continue;
+            }
+            if (current.Content() is TestRunStarted)
+            {
+                result.Add(current);
+                index++;
+                continue;
+            }
             if (current.Content() is TestRunFinished)
             {
                 testCasesFinished = true;
@@ -311,7 +344,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                 Attachment att => att.TestCaseStartedId,
                 TestRunHookStarted => null,
                 TestRunHookFinished => null,
-                _ => throw new ApplicationException("Unexpected Envelope type")
+                Suggestion suggestion => FindTestCaseStartedFromStepPickleId(suggestion.PickleStepId),
+
+                _ => throw new ApplicationException($"Unexpected Envelope type: {current.Content()}")
             };
             // attachments created by Before/After TestRun or Feature don't have a value for TestCaseStartedId, so don't attempt to add them to Test execution
             if (!string.IsNullOrEmpty(testCaseStartedId))
@@ -339,13 +374,13 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         return result;
     }
 
-    protected static string[] GetActualJsonText(string testName, string fileName)
+    protected static string[] GetActualJsonText(string testName)
     {
         string resultLocation = ActualResultLocationDirectory();
-        fileName = Path.Combine(resultLocation, fileName + ".ndjson");
-        // Hack: the file name is hard-coded in the test row data to match the name of the feature within the Feature file for the example scenario
+        var fileName = Path.Combine(resultLocation, testName + ".ndjson");
 
         var actualJsonText = File.ReadAllLines(fileName);
         return actualJsonText;
     }
+
 }

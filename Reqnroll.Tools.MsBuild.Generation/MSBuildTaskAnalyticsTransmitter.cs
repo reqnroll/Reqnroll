@@ -11,20 +11,20 @@ namespace Reqnroll.Tools.MsBuild.Generation
         private readonly IMSBuildInformationProvider _msBuildInformationProvider;
         private readonly ReqnrollProjectInfo _reqnrollProjectInfo;
         private readonly IAnalyticsTransmitter _analyticsTransmitter;
-        private readonly ITaskLoggingWrapper _taskLoggingWrapper;
+        private readonly IReqnrollTaskLoggingHelper _log;
 
         public MSBuildTaskAnalyticsTransmitter(
             IAnalyticsEventProvider analyticsEventProvider,
             IMSBuildInformationProvider msBuildInformationProvider,
             ReqnrollProjectInfo reqnrollProjectInfo,
             IAnalyticsTransmitter analyticsTransmitter,
-            ITaskLoggingWrapper taskLoggingWrapper)
+            IReqnrollTaskLoggingHelper log)
         {
             _analyticsEventProvider = analyticsEventProvider;
             _msBuildInformationProvider = msBuildInformationProvider;
             _reqnrollProjectInfo = reqnrollProjectInfo;
             _analyticsTransmitter = analyticsTransmitter;
-            _taskLoggingWrapper = taskLoggingWrapper;
+            _log = log;
         }
 
         public async Task TryTransmitProjectCompilingEventAsync()
@@ -35,14 +35,14 @@ namespace Reqnroll.Tools.MsBuild.Generation
 
                 if (transmissionResult is IFailure failure)
                 {
-                    _taskLoggingWrapper.LogDiagnosticMessage($"Could not transmit analytics: {failure}");
+                    _log.LogTaskDiagnosticMessage($"Could not transmit analytics: {failure}");
                 }
             }
             catch (Exception exc)
             {
                 // catch all exceptions since we do not want to break the build simply because event creation failed
                 // but still return an error containing the exception to at least log it
-                _taskLoggingWrapper.LogDiagnosticMessage($"Could not transmit analytics: {exc}");
+                _log.LogTaskDiagnosticMessage($"Could not transmit analytics: {exc}");
             }
         }
 

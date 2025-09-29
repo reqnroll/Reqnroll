@@ -45,6 +45,8 @@ namespace Reqnroll.Configuration
 
         public static string[] DefaultAddNonParallelizableMarkerForTags => ConfigDefaults.AddNonParallelizableMarkerForTags;
 
+        public static bool DefaultDisableFriendlyTestNames => ConfigDefaults.DisableFriendlyTestNames;
+
         public static ObsoleteBehavior DefaultObsoleteBehavior => ConfigDefaults.ObsoleteBehavior;
 
         public static bool DefaultColoredOutput => ConfigDefaults.ColoredOutput;
@@ -129,6 +131,7 @@ namespace Reqnroll.Configuration
                 DefaultAllowDebugGeneratedFiles,
                 DefaultAllowRowTests,
                 DefaultAddNonParallelizableMarkerForTags,
+                DefaultDisableFriendlyTestNames,
                 DefaultObsoleteBehavior,
                 DefaultColoredOutput
                 );

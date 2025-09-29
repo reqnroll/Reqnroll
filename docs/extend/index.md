@@ -10,4 +10,5 @@ plugins
 decorators
 available-containers
 build-metadata-provider
+custom-attributes
 ```

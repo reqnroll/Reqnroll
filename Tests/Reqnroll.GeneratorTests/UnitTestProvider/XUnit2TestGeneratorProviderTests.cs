@@ -165,8 +165,10 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             inlineDataAttributes.Should().ContainSingle(attribute => attribute.ArgumentValues().First() as string == "and another");
         }
 
-        [Fact]
-        public void XUnit2TestGeneratorProvider_ShouldSetDisplayNameForTheoryAttribute()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void XUnit2TestGeneratorProvider_ShouldSetDisplayNameForTheoryAttribute(bool disableFriendlyTestNames)
         {
             // Arrange
             var provider = new XUnit2TestGeneratorProvider(new CodeDomHelper(new CSharpCodeProvider()));
@@ -196,7 +198,8 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 scenarioCleanupMethod: null,
                 featureBackgroundMethod: null,
                 cucumberMessagesInitializationMethod: null,
-                generateRowTests: false);
+                generateRowTests: false,
+                disableFriendlyTestNames: disableFriendlyTestNames);
             var codeMemberMethod = new CodeMemberMethod();
 
             // Act
@@ -213,13 +216,19 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                                              .OfType<CodeAttributeArgument>()
                                              .FirstOrDefault(a => a.Name == "DisplayName");
 
-            attribute.Should().NotBeNull();
+            if (disableFriendlyTestNames)
+            {
+                attribute.Should().BeNull();
+            }
+            else
+            {
+                attribute.Should().NotBeNull();
 
+                var primitiveExpression = attribute.Value as CodePrimitiveExpression;
 
-            var primitiveExpression = attribute.Value as CodePrimitiveExpression;
-
-            primitiveExpression.Should().NotBeNull();
-            primitiveExpression.Value.Should().Be("Foo");
+                primitiveExpression.Should().NotBeNull();
+                primitiveExpression.Value.Should().Be("Foo");
+            }
         }
 
         [Fact]
@@ -263,8 +272,10 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
          * refactor as appropriate.
          */
 
-        [Fact]
-        public void XUnit2TestGeneratorProvider_ShouldSetDisplayNameForFactAttribute()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public void XUnit2TestGeneratorProvider_ShouldSetDisplayNameForFactAttribute(bool disableFriendlyTestNames)
         {
             // Arrange
             var provider = new XUnit2TestGeneratorProvider(new CodeDomHelper(new CSharpCodeProvider()));
@@ -294,7 +305,8 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 scenarioCleanupMethod: null,
                 featureBackgroundMethod: null,
                 cucumberMessagesInitializationMethod: null,
-                generateRowTests: false);
+                generateRowTests: false,
+                disableFriendlyTestNames: disableFriendlyTestNames);
             var codeMemberMethod = new CodeMemberMethod();
 
             // Act
@@ -310,13 +322,19 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                                              .OfType<CodeAttributeArgument>()
                                              .FirstOrDefault(a => a.Name == "DisplayName");
 
-            attribute.Should().NotBeNull();
+            if (disableFriendlyTestNames)
+            {
+                attribute.Should().BeNull();
+            }
+            else
+            {
+                attribute.Should().NotBeNull();
 
+                var primitiveExpression = attribute.Value as CodePrimitiveExpression;
 
-            var primitiveExpression = attribute.Value as CodePrimitiveExpression;
-
-            primitiveExpression.Should().NotBeNull();
-            primitiveExpression.Value.Should().Be("Foo");
+                primitiveExpression.Should().NotBeNull();
+                primitiveExpression.Value.Should().Be("Foo");
+            }
         }
 
         [Fact]
@@ -448,6 +466,28 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             // ASSERT
             var attributes = code.Class().CustomAttributes().ToArray();
             attributes.Should().NotContain(a => a.Name == XUnitCollectionAttribute);
+        }
+
+        [Fact]
+        public void XUnit2TestGeneratorProvider_ScenarioTagOnly_ShouldNotAddNonParallelizableCollectionAttribute()
+        {
+            // ARRANGE
+            var document = ParseDocumentFromString(@"
+            Feature: Sample feature file
+
+            @nonparallelizable
+            Scenario: Isolated scenario
+                Given there is something");
+            var provider = new XUnit2TestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
+            var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new [] { "nonparallelizable" });
+
+            // ACT
+            var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
+
+            // ASSERT
+            code.Class().CustomAttributes().Should().NotContain(a => a.Name == XUnitCollectionAttribute);
+            var method = code.Class().Members().Single(m => m.Name == "IsolatedScenario");
+            method.CustomAttributes().Should().NotContain(a => a.Name == XUnitCollectionAttribute);
         }
 
         public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo parserCultureInfo = null)

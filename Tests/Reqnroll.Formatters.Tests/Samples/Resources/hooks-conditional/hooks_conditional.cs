@@ -1,4 +1,4 @@
-﻿using Reqnroll;
+using Reqnroll;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,14 +32,13 @@ namespace CucumberMessages.CompatibilityTests.CCK.hooksMulti
             throw new Exception("Exception in conditional hook");
         }
 
-        [AfterScenario("@passing-hook")]
-        public void AfterScenarioHook() { }
-
         [AfterScenario("@fail-after")]
         public void FailingAfterHook()
         {
             throw new Exception("Exception in conditional hook");
         }
 
+        [AfterScenario("@passing-hook")]
+        public void AfterScenarioHook() { }
     }
 }

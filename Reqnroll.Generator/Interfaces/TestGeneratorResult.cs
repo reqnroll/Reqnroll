@@ -11,10 +11,6 @@ public class TestGeneratorResult
     /// </summary>
     public IEnumerable<TestGenerationError> Errors { get; }
     /// <summary>
-    /// The generated file was up-to-date.
-    /// </summary>
-    public bool IsUpToDate { get; private set; }
-    /// <summary>
     /// The generated test code.
     /// </summary>
     public string GeneratedTestCode { get; private set; }
@@ -30,26 +26,26 @@ public class TestGeneratorResult
     /// The collection of feature-level Messages.
     /// </summary>
     public string FeatureMessages { get; private set; }
-    public TestGeneratorResult(params TestGenerationError[] errors)
-        : this((IEnumerable<TestGenerationError>)errors)
-    {
-    }
 
-    public TestGeneratorResult(IEnumerable<TestGenerationError> errors)
+    public string FeatureMessagesResourceName { get; }
+
+    private TestGeneratorResult(IEnumerable<TestGenerationError> errors)
     {
         if (errors == null) throw new ArgumentNullException(nameof(errors));
         var errorsArray = errors.ToArray();
         if (!errorsArray.Any()) throw new ArgumentException("no errors provided", nameof(errors));
 
         Errors = errorsArray;
-        Warnings = Array.Empty<string>();
+        Warnings = [];
     }
 
-    public TestGeneratorResult(string generatedTestCode, bool isUpToDate, IEnumerable<string> warnings, string featureMessages)
+    public TestGeneratorResult(string generatedTestCode, IEnumerable<string> warnings, string featureMessages, string featureMessagesResourceName)
     {
-        IsUpToDate = isUpToDate;
         GeneratedTestCode = generatedTestCode;
         Warnings = warnings is null ? Array.Empty<string>() : warnings.ToList();
         FeatureMessages = featureMessages;
+        FeatureMessagesResourceName = featureMessagesResourceName;
     }
+
+    public static TestGeneratorResult FromErrors(IEnumerable<TestGenerationError> errors) => new(errors);
 }

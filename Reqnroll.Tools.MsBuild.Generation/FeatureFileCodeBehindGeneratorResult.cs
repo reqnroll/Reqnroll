@@ -1,10 +1,13 @@
 namespace Reqnroll.Tools.MsBuild.Generation;
 
-public class FeatureFileCodeBehindGeneratorResult(string codeBehindRelativePath, string embeddedMessagesStoragePath, string embeddedMessagesResourceName)
+public class FeatureFileCodeBehindGeneratorResult(
+    string codeBehindFileFullPath,
+    string messagesResourceName,
+    string messagesFileFullPath)
 {
-    public string CodeBehindRelativePath { get; } = codeBehindRelativePath;
+    public string CodeBehindFileFullPath { get; } = codeBehindFileFullPath;
 
-    public string EmbeddedMessagesStoragePath { get; } = embeddedMessagesStoragePath;
+    public string MessagesResourceName { get; } = messagesResourceName;
 
-    public string EmbeddedMessagesResourceName { get; } = embeddedMessagesResourceName;
+    public string MessagesFileFullPath { get; } = messagesFileFullPath;
 }

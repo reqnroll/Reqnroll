@@ -29,7 +29,11 @@ Reqnroll can also be installed on any .NET frameworks that supports .NET Standar
 - NUnit
 - MsTest
 - TUnit
-- xUnit
+- xUnit, xUnit v3
+
+```{warning}
+MsTest v4 preview is not yet supported.
+```
   
 ## Versioning Policy
 

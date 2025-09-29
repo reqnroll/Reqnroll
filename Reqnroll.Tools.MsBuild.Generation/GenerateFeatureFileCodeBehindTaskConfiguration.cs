@@ -1,17 +1,23 @@
 using Reqnroll.Analytics;
+using Reqnroll.BoDi;
 
-namespace Reqnroll.Tools.MsBuild.Generation
+namespace Reqnroll.Tools.MsBuild.Generation;
+
+public interface IGenerateFeatureFileCodeBehindTaskDependencyCustomizations
 {
-    public class GenerateFeatureFileCodeBehindTaskConfiguration
+    void CustomizeTaskContainerDependencies(IObjectContainer taskContainer);
+    void CustomizeGeneratorContainerDependencies(IObjectContainer generatorContainer);
+}
+
+public class NullGenerateFeatureFileCodeBehindTaskDependencyCustomizations : IGenerateFeatureFileCodeBehindTaskDependencyCustomizations
+{
+    public void CustomizeTaskContainerDependencies(IObjectContainer taskContainer)
     {
-        public GenerateFeatureFileCodeBehindTaskConfiguration(IAnalyticsTransmitter overrideAnalyticsTransmitter, IFeatureFileCodeBehindGenerator overrideFeatureFileCodeBehindGenerator)
-        {
-            OverrideAnalyticsTransmitter = overrideAnalyticsTransmitter;
-            OverrideFeatureFileCodeBehindGenerator = overrideFeatureFileCodeBehindGenerator;
-        }
+        //nop
+    }
 
-        public IAnalyticsTransmitter OverrideAnalyticsTransmitter { get; }
-
-        public IFeatureFileCodeBehindGenerator OverrideFeatureFileCodeBehindGenerator { get; }
+    public void CustomizeGeneratorContainerDependencies(IObjectContainer generatorContainer)
+    {
+        //nop
     }
 }

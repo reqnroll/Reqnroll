@@ -1,15 +1,27 @@
 <Project TreatAsLocalProperty="TaskFolder;TaskAssembly">
 
   <PropertyGroup>
-    <Reqnroll_CpsExtensionDesignTimeTargetsPath Condition="'$(Reqnroll_CpsExtensionDesignTimeTargetsPath)' == ''">$(MSBuildThisFileDirectory)CPS\Buildsystem\CpsExtension.DesignTime.targets</Reqnroll_CpsExtensionDesignTimeTargetsPath>
+    <ReqnrollGenerationPropsImported>true</ReqnrollGenerationPropsImported>
+    <ReqnrollCpsExtensionDesignTimeTargetsPath Condition="'$(ReqnrollCpsExtensionDesignTimeTargetsPath)' == ''">$(MSBuildThisFileDirectory)CPS\Buildsystem\CpsExtension.DesignTime.targets</ReqnrollCpsExtensionDesignTimeTargetsPath>
   </PropertyGroup>
 
-  <Import Project="$(Reqnroll_CpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
-
+  <Import Project="$(ReqnrollCpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
 
   <PropertyGroup>
-    <Reqnroll_UseHostCompilerIfAvailable Condition="'$(Reqnroll_UseHostCompilerIfAvailable)'==''">false</Reqnroll_UseHostCompilerIfAvailable>
-    <UseHostCompilerIfAvailable>$(Reqnroll_UseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
+    <ReqnrollGenerationTasksDir Condition="'$(ReqnrollGenerationTasksDir)' == '' And '$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)netstandard2.0/</ReqnrollGenerationTasksDir>
+    <ReqnrollGenerationTasksDir Condition="'$(ReqnrollGenerationTasksDir)' == ''">$(MSBuildThisFileDirectory)net462/</ReqnrollGenerationTasksDir>
+    <ReqnrollGenerationTasksAssemblyFile Condition=" '$(ReqnrollGenerationTasksAssemblyFile)' == '' ">Reqnroll.Tools.MsBuild.Generation.dll</ReqnrollGenerationTasksAssemblyFile>
+    <ReqnrollGenerationTasksAssemblyPath Condition=" '$(ReqnrollGenerationTasksAssemblyPath)' == '' ">$(ReqnrollGenerationTasksDir)$(ReqnrollGenerationTasksAssemblyFile)</ReqnrollGenerationTasksAssemblyPath>
+
+    <!-- Using `TaskHostFactory` ensures that the task assembly will not be locked by Visual Studio on Windows. See: https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-configure-targets-and-tasks?view=vs-2022#task-factories -->
+    <!-- Note: `TaskHostFactory` is not compatible with some macOS versions. https://github.com/reqnroll/Reqnroll/issues/152 -->
+    <ReqnrollGenerationTaskFactory Condition="'$(ReqnrollGenerationTaskFactory)' == '' And $([MSBuild]::IsOsPlatform('Windows'))">TaskHostFactory</ReqnrollGenerationTaskFactory>
+    <ReqnrollGenerationTaskFactory Condition="'$(ReqnrollGenerationTaskFactory)' == ''">AssemblyTaskFactory</ReqnrollGenerationTaskFactory>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ReqnrollUseHostCompilerIfAvailable Condition="'$(ReqnrollUseHostCompilerIfAvailable)'==''">false</ReqnrollUseHostCompilerIfAvailable>
+    <UseHostCompilerIfAvailable>$(ReqnrollUseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
   </PropertyGroup>
 
 
@@ -17,9 +29,7 @@
     <OverwriteReadOnlyFiles Condition="'$(OverwriteReadOnlyFiles)'==''">false</OverwriteReadOnlyFiles>
     <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
 
-    <Reqnroll_DebugMSBuildTask Condition="'$(Reqnroll_DebugMSBuildTask)' == ''">false</Reqnroll_DebugMSBuildTask>
-
-    <_ReqnrollPropsImported Condition="'$(_ReqnrollPropsImported)'==''">true</_ReqnrollPropsImported>
+    <ReqnrollDebugMSBuildTask Condition="'$(ReqnrollDebugMSBuildTask)' == ''">false</ReqnrollDebugMSBuildTask>
   </PropertyGroup>
 
   <!--
@@ -30,13 +40,13 @@
     <!--
       feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
     -->
-    <Reqnroll_DeleteCodeBehindFilesOnCleanRebuild Condition="'$(Reqnroll_DeleteCodeBehindFilesOnCleanRebuild)'==''">false</Reqnroll_DeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollDeleteCodeBehindFilesOnCleanRebuild Condition="'$(ReqnrollDeleteCodeBehindFilesOnCleanRebuild)'==''">false</ReqnrollDeleteCodeBehindFilesOnCleanRebuild>
 
     <!--
       net.sdk support: feature flag to enable experimental support for net.sdk project system
     -->
-    <Reqnroll_EnableDefaultCompileItems Condition="'$(Reqnroll_EnableDefaultCompileItems)'==''">true</Reqnroll_EnableDefaultCompileItems>
-    <Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(Reqnroll_EnableDefaultCompileItems)</Reqnroll_EnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
+    <ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)'==''">true</ReqnrollEnableDefaultCompileItems>
+    <ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(ReqnrollEnableDefaultCompileItems)</ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
 
     <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
   </PropertyGroup>
@@ -49,6 +59,7 @@
     
     <ReqnrollFeatureFiles Include="**\*.feature" >
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <MessagesFile>$(IntermediateOutputPath)%(RelativeDir)%(Filename).feature.ndjson</MessagesFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
     </ReqnrollFeatureFiles>
@@ -68,19 +79,5 @@
     <CustomAdditionalCompileInputs Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
 
   </ItemGroup>
-
-
-  <PropertyGroup>
-    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' == 'Core' And '$(_Reqnroll_TaskFolder)' == ''">netstandard2.0</_Reqnroll_TaskFolder>
-    <_Reqnroll_TaskFolder Condition=" '$(MSBuildRuntimeType)' != 'Core' And '$(_Reqnroll_TaskFolder)' == ''">net462</_Reqnroll_TaskFolder>
-    <_Reqnroll_TaskAssembly Condition=" '$(_Reqnroll_TaskAssembly)' == '' ">..\tasks\$(_Reqnroll_TaskFolder)\Reqnroll.Tools.MsBuild.Generation.dll</_Reqnroll_TaskAssembly>
-
-    <!-- Using `TaskHostFactory` ensures that the task assembly will not be locked by Visual Studio on Windows. See: https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-configure-targets-and-tasks?view=vs-2022#task-factories -->
-    <!-- Note: `TaskHostFactory` is not compatible with some macOS versions. https://github.com/reqnroll/Reqnroll/issues/152 -->
-    <_Reqnroll_TaskFactory Condition="'$(_Reqnroll_TaskFactory)' == '' And $([MSBuild]::IsOsPlatform('Windows'))">TaskHostFactory</_Reqnroll_TaskFactory>
-    <_Reqnroll_TaskFactory Condition="'$(_Reqnroll_TaskFactory)' == '' And !($([MSBuild]::IsOsPlatform('Windows')))">AssemblyTaskFactory</_Reqnroll_TaskFactory>
-  </PropertyGroup>
-
-  <Import Project="Reqnroll.Tools.MsBuild.Generation.tasks" Condition="'$(_ReqnrollTasksImported)' =='' " />
 
 </Project>

@@ -258,6 +258,22 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
             var attribute = attributes.Should().NotContain(a => a.Name == "NUnit.Framework.NonParallelizableAttribute");
         }
 
+        [Fact]
+        public void NUnit3TestGeneratorProvider_ScenarioTagMatching_ShouldAddNonParallelizableAttributeToMethodOnly()
+        {
+            var feature = @"
+            Feature: Sample feature file
+
+            @nonparallelizable
+            Scenario: Isolated scenario
+                Given there is something";            
+            var code = GenerateCodeNamespaceFromFeature(feature, addNonParallelizableMarkerForTags: new[] { "nonparallelizable" });
+            code.Class().CustomAttributes().Should().NotContain(a => a.Name == "NUnit.Framework.NonParallelizableAttribute");
+            
+            var method = code.Class().Members().Single(m => m.Name == "IsolatedScenario");
+            method.CustomAttributes().Should().Contain(a => a.Name == "NUnit.Framework.NonParallelizableAttribute");
+        }
+
         public CodeNamespace GenerateCodeNamespaceFromFeature(string feature, bool parallelCode = false, string[] addNonParallelizableMarkerForTags = null)
         {
             CodeNamespace code;

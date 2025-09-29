@@ -13,6 +13,7 @@
     <Compile Remove="Samples\Resources\**\*.cs" />
     <None Remove="Samples\Resources\**\*.feature" />
     <None Remove="Samples\Resources\**\*.feature.ndjson" />
+    <None Remove="Samples\Resources\**\*.ts" />
     <None Update="Samples\Resources\**\*.jpeg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -37,7 +38,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="coverlet.collector" Version="6.0.0" />
-    <PackageReference Include="Cucumber.Messages" Version="28.0.0" />
+    <PackageReference Include="Cucumber.Messages" Version="29.0.1" />
     <PackageReference Include="FluentAssertions" Version="7.2.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="MSTest.TestAdapter" Version="3.10.2" />

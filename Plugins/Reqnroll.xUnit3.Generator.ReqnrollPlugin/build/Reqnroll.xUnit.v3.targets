@@ -1,0 +1,37 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+
+    <_ReqnrollxUnit3GeneratorPlugin>netstandard2.0</_ReqnrollxUnit3GeneratorPlugin>
+    <_ReqnrollxUnit3GeneratorPluginPath>$(MSBuildThisFileDirectory)\$(_ReqnrollxUnit3GeneratorPlugin)\Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll</_ReqnrollxUnit3GeneratorPluginPath>
+
+    <_ReqnrollxUnit3RuntimePlugin>netstandard2.0</_ReqnrollxUnit3RuntimePlugin>
+    <_ReqnrollxUnit3RuntimePluginPath>$(MSBuildThisFileDirectory)..\lib\$(_ReqnrollxUnit3RuntimePlugin)\Reqnroll.xUnit3.ReqnrollPlugin.dll</_ReqnrollxUnit3RuntimePluginPath>
+
+    <SourceReqnrollAssemblyHooksFile Condition="'$(SourceReqnrollAssemblyHooksFile)' == ''">$(MSBuildThisFileDirectory)xUnit3.AssemblyHooks$(DefaultLanguageSourceExtension)</SourceReqnrollAssemblyHooksFile>
+    <GenerateReqnrollAssemblyHooksFile Condition="'$(GenerateReqnrollAssemblyHooksFile)' == ''">true</GenerateReqnrollAssemblyHooksFile>
+    <GeneratedReqnrollAssemblyHooksFile>$([System.IO.Path]::Combine($(ProjectDir),$([MSBuild]::Unescape('$(IntermediateOutputPath)'))))xUnit3.AssemblyHooks$(DefaultLanguageSourceExtension)</GeneratedReqnrollAssemblyHooksFile>
+    <_ReqnrollEffectiveRootNamespace Condition="'$(RootNamespace)' != ''">$(RootNamespace)</_ReqnrollEffectiveRootNamespace>
+    <_ReqnrollEffectiveRootNamespace Condition="'$(RootNamespace)' == ''">Reqnroll.GeneratedTests</_ReqnrollEffectiveRootNamespace>
+  </PropertyGroup>
+
+  <Target
+    Name="GenerateReqnrollAssemblyHooksFileTask"
+    BeforeTargets="CoreCompile"
+    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true' AND '$(_ReqnrollToolsMsBuildGenerationImported)' == 'true'">
+    
+    <ReplaceTokenInFileTask
+      Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'"
+      InputFile="$(SourceReqnrollAssemblyHooksFile)"
+      OutputFile="$(GeneratedReqnrollAssemblyHooksFile)"
+      TextToReplace="PROJECT_ROOT_NAMESPACE"
+      TextToReplaceWith="$(_ReqnrollEffectiveRootNamespace.Replace('.', '_'))"
+      WriteOnlyWhenChanged="true" />
+    
+    <ItemGroup Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'">
+      <Compile Include="$(GeneratedReqnrollAssemblyHooksFile)"/>
+    </ItemGroup>
+  </Target>
+
+
+</Project>

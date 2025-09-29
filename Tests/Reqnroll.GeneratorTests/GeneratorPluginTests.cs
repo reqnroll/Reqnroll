@@ -1,168 +1,109 @@
-using System;
-using Reqnroll.BoDi;
 using FluentAssertions;
-using Xunit;
-using Reqnroll.Generator;
+using Reqnroll.BoDi;
 using Reqnroll.Generator.Configuration;
 using Reqnroll.Generator.Plugins;
+using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.UnitTestProvider;
+using System;
+using System.Collections.Generic;
+using Xunit;
 
-namespace Reqnroll.GeneratorTests
+namespace Reqnroll.GeneratorTests;
+
+public class GeneratorPluginTests
 {
-    
-    public class GeneratorPluginTests
+    [Fact]
+    public void Should_be_able_to_register_dependencies_from_a_plugin()
     {
-        [Fact]
-        public void Should_be_able_to_register_dependencies_from_a_plugin()
-        {
-            var pluginWithCustomDependency = new PluginWithCustomDependency();
-            var generatorPluginEvents = new GeneratorPluginEvents();
+        var pluginWithCustomDependency = new PluginWithCustomDependency();
+        var generatorPluginEvents = new GeneratorPluginEvents();
             
-            pluginWithCustomDependency.Initialize(generatorPluginEvents, new GeneratorPluginParameters(), new UnitTestProviderConfiguration());
+        pluginWithCustomDependency.Initialize(generatorPluginEvents, new GeneratorPluginParameters(), new UnitTestProviderConfiguration());
 
 
-            var objectContainer = new ObjectContainer();
-            generatorPluginEvents.RaiseRegisterDependencies(objectContainer);
+        var objectContainer = new ObjectContainer();
+        generatorPluginEvents.RaiseRegisterDependencies(objectContainer);
 
 
-            var customDependency = objectContainer.Resolve<ICustomDependency>();
-            customDependency.Should().BeOfType(typeof(CustomDependency));
-        }
+        var customDependency = objectContainer.Resolve<ICustomDependency>();
+        customDependency.Should().BeOfType(typeof(CustomDependency));
+    }
 
-        [Fact]
-        public void Should_be_able_to_change_default_configuration_from_a_plugin()
-        {
-            var pluginWithCustomConfiguration = new PluginWithCustomConfiguration(conf => conf.ReqnrollConfiguration.StopAtFirstError = true);
-            var generatorPluginEvents = new GeneratorPluginEvents();
+    [Fact]
+    public void Should_be_able_to_change_default_configuration_from_a_plugin()
+    {
+        var pluginWithCustomConfiguration = new PluginWithCustomConfiguration(conf => conf.ReqnrollConfiguration.StopAtFirstError = true);
+        var generatorPluginEvents = new GeneratorPluginEvents();
 
-            pluginWithCustomConfiguration.Initialize(generatorPluginEvents, new GeneratorPluginParameters(), new UnitTestProviderConfiguration());
+        pluginWithCustomConfiguration.Initialize(generatorPluginEvents, new GeneratorPluginParameters(), new UnitTestProviderConfiguration());
             
-            var reqnrollProjectConfiguration = new ReqnrollProjectConfiguration();
-            generatorPluginEvents.RaiseConfigurationDefaults(reqnrollProjectConfiguration);
+        var reqnrollProjectConfiguration = new ReqnrollProjectConfiguration();
+        generatorPluginEvents.RaiseConfigurationDefaults(reqnrollProjectConfiguration);
 
-            reqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError.Should().BeTrue();
-        }
+        reqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError.Should().BeTrue();
+    }
 
-        [Fact]
-        public void Should_be_able_to_register_further_dependencies_based_on_the_configuration() //generatorPluginEvents.RaiseCustomizeDependencies();
-        {
-            var pluginWithCustomization = new PluginWithCustomization();
-            var generatorPluginEvents = new GeneratorPluginEvents();
+    [Fact]
+    public void Should_be_able_to_register_further_dependencies_based_on_the_configuration() //generatorPluginEvents.RaiseCustomizeDependencies();
+    {
+        var pluginWithCustomization = new PluginWithCustomization();
+        var generatorPluginEvents = new GeneratorPluginEvents();
 
-            pluginWithCustomization.Initialize(generatorPluginEvents, new GeneratorPluginParameters(), new UnitTestProviderConfiguration());
+        pluginWithCustomization.Initialize(generatorPluginEvents, new GeneratorPluginParameters(), new UnitTestProviderConfiguration());
 
-            var container = new ObjectContainer();
-            var reqnrollProjectConfiguration = new ReqnrollProjectConfiguration();
-            generatorPluginEvents.RaiseCustomizeDependencies(container, reqnrollProjectConfiguration);
-            container.ResolveAll<ITestHeaderWriter>().Should().BeEmpty();
+        var container = new ObjectContainer();
+        var reqnrollProjectConfiguration = new ReqnrollProjectConfiguration();
+        generatorPluginEvents.RaiseCustomizeDependencies(container, reqnrollProjectConfiguration);
+        container.ResolveAll<ITagFilterMatcher>().Should().BeEmpty();
 
-            reqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError = true;
-            generatorPluginEvents.RaiseCustomizeDependencies(container, reqnrollProjectConfiguration);
+        reqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError = true;
+        generatorPluginEvents.RaiseCustomizeDependencies(container, reqnrollProjectConfiguration);
             
-            var customHeaderWriter = container.Resolve<ITestHeaderWriter>();
-            customHeaderWriter.Should().BeOfType<CustomHeaderWriter>();
-        }
+        var customizedDependency = container.Resolve<ITagFilterMatcher>();
+        customizedDependency.Should().BeOfType<CustomTagFilterMatcher>();
+    }
 
-        //[Fact]
-        //public void Should_be_able_to_specify_a_plugin_with_parameters()
-        //{
-        //    var configurationHolder = new ReqnrollConfigurationHolder(ConfigSource.AppConfig, string.Format(@"<reqnroll>
-        //          <plugins>
-        //            <add name=""MyCompany.MyPlugin"" parameters=""foo, bar"" />
-        //          </plugins>
-        //        </reqnroll>"));
-        //    var pluginMock = new Mock<IGeneratorPlugin>();
-        //    GeneratorContainerBuilder.DefaultDependencyProvider = new TestDefaultDependencyProvider(pluginMock.Object);
-        //    CreateDefaultContainer(configurationHolder);
+    public interface ICustomDependency;
 
-        //    pluginMock.Verify(p => p.Initialize(It.IsAny<GeneratorPluginEvents>(), It.Is<GeneratorPluginParameters>(pp => pp.Parameters == "foo, bar"), It.IsAny<UnitTestProviderConfiguration>()));
-        //}
+    public class CustomDependency : ICustomDependency;
 
-        //private ReqnrollConfigurationHolder GetConfigWithPlugin()
-        //{
-        //    return new ReqnrollConfigurationHolder(ConfigSource.AppConfig, string.Format(@"<reqnroll>
-        //          <plugins>
-        //            <add name=""MyCompany.MyPlugin"" />
-        //          </plugins>
-        //        </reqnroll>"));
-        //}
+    public class CustomTagFilterMatcher : ITagFilterMatcher
+    {
+        public bool Match(string tagFilter, IEnumerable<string> tagNames) => throw new NotImplementedException();
 
-        //private IObjectContainer CreateDefaultContainer(ReqnrollConfigurationHolder configurationHolder)
-        //{
-        //    return new GeneratorContainerBuilder().CreateContainer(configurationHolder, new ProjectSettings(), Enumerable.Empty<GeneratorPluginInfo>());
-        //}
+        public bool MatchPrefix(string tagFilter, IEnumerable<string> tagNames) => throw new NotImplementedException();
 
-        //class TestDefaultDependencyProvider : DefaultDependencyProvider
-        //{
-        //    private readonly IGeneratorPlugin pluginToReturn;
+        public bool GetTagValue(string tagFilter, IEnumerable<string> tagNames, out string value) => throw new NotImplementedException();
 
-        //    public TestDefaultDependencyProvider(IGeneratorPlugin pluginToReturn)
-        //    {
-        //        this.pluginToReturn = pluginToReturn;
-        //    }
+        public string[] GetTagValues(string tagFilter, IEnumerable<string> tagNames) => throw new NotImplementedException();
+    }
 
-        //    public override void RegisterDefaults(ObjectContainer container)
-        //    {
-        //        base.RegisterDefaults(container);
-
-        //        var pluginLoaderStub = new Mock<IGeneratorPluginLoader>();
-        //        pluginLoaderStub.Setup(pl => pl.LoadPlugin(It.IsAny<PluginDescriptor>())).Returns(pluginToReturn);
-        //        container.RegisterInstanceAs<IGeneratorPluginLoader>(pluginLoaderStub.Object);
-        //    }
-        //}
-
-        public interface ICustomDependency
+    public class PluginWithCustomDependency : IGeneratorPlugin
+    {
+        public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
-
+            generatorPluginEvents.RegisterDependencies += (_, args) => args.ObjectContainer.RegisterTypeAs<CustomDependency, ICustomDependency>();
         }
+    }
 
-        public class CustomDependency : ICustomDependency
+    public class PluginWithCustomization : IGeneratorPlugin
+    {
+        public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
-
-        }
-
-        public class CustomHeaderWriter : ITestHeaderWriter
-        {
-            public Version DetectGeneratedTestVersion(string generatedTestContent)
+            generatorPluginEvents.CustomizeDependencies += (_, args) =>
             {
-                throw new NotImplementedException();
-            }
+                if (args.ReqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError)
+                    args.ObjectContainer.RegisterTypeAs<CustomTagFilterMatcher, ITagFilterMatcher>();
+            };
         }
-
-        public class PluginWithCustomDependency : IGeneratorPlugin
-        {
-            public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
-            {
-                generatorPluginEvents.RegisterDependencies += (sender, args) => args.ObjectContainer.RegisterTypeAs<CustomDependency, ICustomDependency>();
-            }
-        }
-
-        public class PluginWithCustomization : IGeneratorPlugin
-        {
-            public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
-            {
-                generatorPluginEvents.CustomizeDependencies += (sender, args) =>
-                {
-                    if (args.ReqnrollProjectConfiguration.ReqnrollConfiguration.StopAtFirstError)
-                        args.ObjectContainer.RegisterTypeAs<CustomHeaderWriter, ITestHeaderWriter>();
-                };
-            }
             
-        }
+    }
 
-        public class PluginWithCustomConfiguration : IGeneratorPlugin
+    public class PluginWithCustomConfiguration(Action<ReqnrollProjectConfiguration> specifyDefaults) : IGeneratorPlugin
+    {
+        public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
         {
-            private readonly Action<ReqnrollProjectConfiguration> specifyDefaults;
-
-            public PluginWithCustomConfiguration(Action<ReqnrollProjectConfiguration> specifyDefaults)
-            {
-                this.specifyDefaults = specifyDefaults;
-            }
-
-            public void Initialize(GeneratorPluginEvents generatorPluginEvents, GeneratorPluginParameters generatorPluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
-            {
-                generatorPluginEvents.ConfigurationDefaults += (sender, args) => { specifyDefaults(args.ReqnrollProjectConfiguration); };
-            }
+            generatorPluginEvents.ConfigurationDefaults += (_, args) => { specifyDefaults(args.ReqnrollProjectConfiguration); };
         }
     }
 }

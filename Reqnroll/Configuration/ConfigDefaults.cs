@@ -26,6 +26,7 @@ namespace Reqnroll.Configuration
         public const bool AllowDebugGeneratedFiles = false;
         public const bool AllowRowTests = true;
         public const string GeneratorPath = null;
+        public const bool DisableFriendlyTestNames = false;
 
         public static readonly string[] AddNonParallelizableMarkerForTags = Array.Empty<string>();
     }

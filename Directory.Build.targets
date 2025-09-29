@@ -4,16 +4,16 @@
       <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);SolutionDir=$(MSBuildThisFileDirectory)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);copyright=$(Reqnroll_Copyright)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);author=$(Reqnroll_Authors)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);owner=$(Reqnroll_Owners)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);summary=$(Reqnroll_Summary)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);copyright=$(ReqnrollCopyright)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);author=$(ReqnrollAuthors)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);owner=$(ReqnrollOwners)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);summary=$(ReqnrollSummary)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);branch=$(GitBranch)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);commit=$(GitCommitSha)</NuspecProperties>
       
-      <NuspecProperties>$(NuspecProperties);Reqnroll_FullFramework_Tools_TFM=$(Reqnroll_FullFramework_Tools_TFM)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);Reqnroll_Core_Tools_TFM=$(Reqnroll_Core_Tools_TFM)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ReqnrollFullFrameworkToolsTfm=$(ReqnrollFullFrameworkToolsTfm)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);ReqnrollCoreToolsTfm=$(ReqnrollCoreToolsTfm)</NuspecProperties>
     </PropertyGroup>
   </Target>
 

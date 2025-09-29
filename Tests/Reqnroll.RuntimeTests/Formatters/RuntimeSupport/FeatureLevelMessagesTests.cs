@@ -27,23 +27,42 @@ public class FeatureLevelMessagesTests
     }
 
     [Fact]
-    public void Constructor_WithNullResourceName_ShouldThrowArgumentException()
+    public void Constructor_WithNullResourceName_ShouldCreateDisabled()
     {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Action act = () => new FeatureLevelCucumberMessages((string)null, 1);
+        // Act
+        var sut = new FeatureLevelCucumberMessages((string)null, 1);
 
-        act.Should().Throw<ArgumentException>();
+        // Assert
+        sut.HasMessages.Should().BeFalse();
+        sut.GherkinDocument.Should().BeNull();
+        sut.Source.Should().BeNull();
+        sut.Pickles.Should().BeEmpty();
     }
 
     [Fact]
-    public void Constructor_WithEmptyResourceName_ShouldThrowArgumentException()
+    public void Constructor_WithEmptyResourceName_ShouldCreateDisabled()
     {
-        // Act & Assert
-        // ReSharper disable once ObjectCreationAsStatement
-        Action act = () => new FeatureLevelCucumberMessages("", 1);
+        // Act
+        var sut = new FeatureLevelCucumberMessages("", 1);
 
-        act.Should().Throw<ArgumentException>();
+        // Assert
+        sut.HasMessages.Should().BeFalse();
+        sut.GherkinDocument.Should().BeNull();
+        sut.Source.Should().BeNull();
+        sut.Pickles.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void Constructor_WithZeroEnvelopeCount_ShouldCreateDisabled()
+    {
+        // Act
+        var sut = new FeatureLevelCucumberMessages("xxx", 0);
+
+        // Assert
+        sut.HasMessages.Should().BeFalse();
+        sut.GherkinDocument.Should().BeNull();
+        sut.Source.Should().BeNull();
+        sut.Pickles.Should().BeEmpty();
     }
 
     [Theory]
@@ -117,7 +136,7 @@ public class FeatureLevelMessagesTests
         var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
-        var result = sut.ReadEnvelopesFromStream(stream, "test");
+        var result = sut.ReadEnvelopesFromStream(stream);
 
         // Assert
         result.Should().HaveCount(2);
@@ -134,7 +153,7 @@ public class FeatureLevelMessagesTests
         var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
-        var result = sut.ReadEnvelopesFromStream(stream, "test");
+        var result = sut.ReadEnvelopesFromStream(stream);
 
         // Assert
         result.Should().NotBeNull().And.BeEmpty();
@@ -148,7 +167,7 @@ public class FeatureLevelMessagesTests
         var sut = new FeatureLevelCucumberMessages(Array.Empty<Envelope>(), 0);
 
         // Act
-        var result = sut.ReadEnvelopesFromStream(stream, "test");
+        var result = sut.ReadEnvelopesFromStream(stream);
 
         // Assert
         result.Should().NotBeNull().And.BeEmpty();
