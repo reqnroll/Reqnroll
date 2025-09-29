@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix: Mismatch in Cucumber.HtmlFormatter version between package and project causing build warnings (#868)
+
+*Contributors of this release (in alphabetical order):* @jdb0123
 
 # v3.1.0 - 2025-09-26
 
