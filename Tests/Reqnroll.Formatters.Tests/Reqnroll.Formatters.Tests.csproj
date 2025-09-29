@@ -46,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
     <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
     <ProjectReference Include="..\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj" />
   </ItemGroup>
