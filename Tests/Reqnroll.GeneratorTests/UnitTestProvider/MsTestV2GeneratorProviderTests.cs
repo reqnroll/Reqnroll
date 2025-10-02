@@ -200,8 +200,10 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                                                            x.ArgumentValues().OfType<string>().ElementAt(1) == "black");
         }
 
-        [Fact]
-        public void MsTestV2GeneratorProvider_WithScenarioOutline_ShouldGenerateDisplayNamePropertyOfEachDataRow()
+        [Theory]
+        [InlineData([true])]
+        [InlineData([false])]
+        public void MsTestV2GeneratorProvider_WithScenarioOutline_ShouldGenerateDisplayNamePropertyOfEachDataRowPerConfiguration(bool disableFriendlyName)
         {
             // ARRANGE
             var document = ParseDocumentFromString(@"
@@ -216,7 +218,7 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                     |     2 | blue  |");
 
             var provider = new MsTestV2GeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
-            var featureGenerator = provider.CreateFeatureGenerator();
+            var featureGenerator = provider.CreateUnitTestConverter(disableFriendlyName);
 
             // ACT
             var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
@@ -236,16 +238,23 @@ namespace Reqnroll.GeneratorTests.UnitTestProvider
                 .Where(arg => !string.IsNullOrEmpty(arg.Name))
                 .ToDictionary(arg => arg.Name, arg => arg.Value);
 
-            row0arguments.Should().ContainKey("DisplayName");
-            row1arguments.Should().ContainKey("DisplayName");
+            if (disableFriendlyName) {
+                row0arguments.Should().NotContainKey("DisplayName");
+                row1arguments.Should().NotContainKey("DisplayName");
+            }
+            else
+            {
+                row0arguments.Should().ContainKey("DisplayName");
+                row1arguments.Should().ContainKey("DisplayName");
 
-            var ArgValue = row0arguments["DisplayName"] as CodePrimitiveExpression;
-            var stringValue = ArgValue?.Value as string;
-            stringValue.Should().Be("Add items(1,red,0)");
+                var ArgValue = row0arguments["DisplayName"] as CodePrimitiveExpression;
+                var stringValue = ArgValue?.Value as string;
+                stringValue.Should().Be("Add items(1,red,0)");
 
-            ArgValue = row1arguments["DisplayName"] as CodePrimitiveExpression;
-            stringValue = ArgValue?.Value as string;
-            stringValue.Should().Be("Add items(2,blue,1)");
+                ArgValue = row1arguments["DisplayName"] as CodePrimitiveExpression;
+                stringValue = ArgValue?.Value as string;
+                stringValue.Should().Be("Add items(2,blue,1)");
+            }
         }
 
         [Fact]

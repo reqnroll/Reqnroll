@@ -3,8 +3,9 @@
 ## Improvements:
 
 ## Bug fixes:
+* FIX: MSTEST Parameterized row test names have formatting inconsistent with that generated in Reqnroll v2 (#867)
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.1.1 - 2025-09-29
 

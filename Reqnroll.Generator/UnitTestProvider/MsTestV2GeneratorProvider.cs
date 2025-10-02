@@ -63,35 +63,39 @@ namespace Reqnroll.Generator.UnitTestProvider
                ? new CodeArrayCreateExpression(typeof(string[]), tagExpressions)
                : new CodePrimitiveExpression(null)));
 
-            // GH193 - Adding a human readable display name for Data Rows
-            // This pulls the display name from the TestMethod attribute on the test method
-            // adds the list of argument values
-            // [TestMethod("friendly name")]
-            // [DataRow(argvalue1, argvalue2, DisplayName="friendly name(argvalue1,argvalue2)"]
-
-            // Find the "TestMethod" attribute and retrieve its "DisplayName" property value
-            var testMethodAttr = testMethod.CustomAttributes
-                .OfType<CodeAttributeDeclaration>()
-                .FirstOrDefault(attr => attr.AttributeType.BaseType == TEST_ATTR);
-
-            string testMethodDisplayName = null;
-            if (testMethodAttr != null && testMethodAttr.Arguments.Count >= 1)
+            // GH867: If config DisableFriendlyNames is true, bypass setting the DisplayName property of the RowTest attribute
+            if (!generationContext.DisableFriendlyTestNames)
             {
-                var displayNameArg = testMethodAttr.Arguments
-                    .OfType<CodeAttributeArgument>()
-                    .FirstOrDefault();
-                if (displayNameArg != null && displayNameArg.Value is CodePrimitiveExpression expr && expr.Value is string str)
+                // GH193 - Adding a human readable display name for Data Rows
+                // This pulls the display name from the TestMethod attribute on the test method
+                // adds the list of argument values
+                // [TestMethod("friendly name")]
+                // [DataRow(argvalue1, argvalue2, DisplayName="friendly name(argvalue1,argvalue2)"]
+
+                // Find the "TestMethod" attribute and retrieve its "DisplayName" property value
+                var testMethodAttr = testMethod.CustomAttributes
+                    .OfType<CodeAttributeDeclaration>()
+                    .FirstOrDefault(attr => attr.AttributeType.BaseType == TEST_ATTR);
+
+                string testMethodDisplayName = null;
+                if (testMethodAttr != null && testMethodAttr.Arguments.Count >= 1)
                 {
-                    testMethodDisplayName = str;
+                    var displayNameArg = testMethodAttr.Arguments
+                        .OfType<CodeAttributeArgument>()
+                        .FirstOrDefault();
+                    if (displayNameArg != null && displayNameArg.Value is CodePrimitiveExpression expr && expr.Value is string str)
+                    {
+                        testMethodDisplayName = str;
+                    }
                 }
+                if (string.IsNullOrEmpty(testMethodDisplayName))
+                {
+                    testMethodDisplayName = testMethod.Name;
+                }
+                var displayName = $"{testMethodDisplayName}({string.Join(",", arguments)})";
+                var displayNameProp = new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(displayName));
+                args.Add(displayNameProp);
             }
-            if (string.IsNullOrEmpty(testMethodDisplayName))
-            {
-                testMethodDisplayName = testMethod.Name;
-            }
-            var displayName = $"{testMethodDisplayName}({string.Join(",", arguments)})";
-            var displayNameProp = new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(displayName));
-            args.Add(displayNameProp);
             CodeDomHelper.AddAttribute(testMethod, ROW_ATTR, args.ToArray());
         }
 
