@@ -147,7 +147,7 @@ namespace Reqnroll.Tracing
                 message.AppendLine("Change the scope or use the following code to create a new step definition:");
             }
             message.Append(
-               stepDefinitionSkeletonProvider.GetStepDefinitionSkeleton(targetLanguage, stepInstance, reqnrollConfiguration.StepDefinitionSkeletonStyle, bindingCulture)
+               stepDefinitionSkeletonProvider.GetStepDefinitionSkeleton(targetLanguage, stepInstance, reqnrollConfiguration.StepDefinitionSkeletonStyle, reqnrollConfiguration.GenerateStepDefinitionSkeletonAsAsync, bindingCulture)
                     .Indent(StepDefinitionSkeletonProvider.METHOD_INDENT));
 
             traceListener.WriteToolOutput("{0}: {1}",

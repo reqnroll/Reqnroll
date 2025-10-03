@@ -21,9 +21,9 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             templateProviderMock = new Mock<ISkeletonTemplateProvider>();
             templateProviderMock.Setup(tp => tp.GetStepDefinitionClassTemplate(It.IsAny<ProgrammingLanguage>()))
                 .Returns("{namespace}/{className}/{bindings}");
-            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), true))
+            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), true, false))
                 .Returns("{attribute}/{expression}/{methodName}/{parameters}");
-            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), false))
+            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), false, false))
                 .Returns("{attribute}/{methodName}/{parameters}");
 
             analizeResult = new AnalyzedStepText();
@@ -78,7 +78,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
                 this.getSkeleton = getSkeleton;
             }
 
-            public override string GetStepDefinitionSkeleton(ProgrammingLanguage language, StepInstance stepInstance, StepDefinitionSkeletonStyle style, CultureInfo bindingCulture)
+            public override string GetStepDefinitionSkeleton(ProgrammingLanguage language, StepInstance stepInstance, StepDefinitionSkeletonStyle style, bool asAsync, CultureInfo bindingCulture)
             {
                 if (getSkeleton != null)
                     return getSkeleton(stepInstance);
@@ -102,7 +102,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new StepInstance[0], "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new StepInstance[0], "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("MyName.Space/MyClass/");
         }
@@ -112,7 +112,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock.Object, stepTextAnalyzerMock.Object, "step-definition-skeleton");
 
-            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("MyName.Space/MyClass/        step-definition-skeleton");
         }
@@ -122,7 +122,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock.Object, stepTextAnalyzerMock.Object, "step-definition-skeleton", "other-step-definition-skeleton", "step-definition-skeleton");
 
-            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen(), CreateSimpleWhen(), CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen(), CreateSimpleWhen(), CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be(StringHelpers.ConsolidateVerbatimStringLineEndings(@"MyName.Space/MyClass/        step-definition-skeleton
         other-step-definition-skeleton"));
@@ -133,7 +133,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = new StepDefinitionSkeletonProviderStepDefinitionSkeletonStub(templateProviderMock.Object, stepTextAnalyzerMock.Object, si => si.StepDefinitionType.ToString() + "-skeleton");
 
-            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen(), CreateSimpleThen(), CreateSimpleGiven() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen(), CreateSimpleThen(), CreateSimpleGiven() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be(StringHelpers.ConsolidateVerbatimStringLineEndings(@"MyName.Space/MyClass/        Given-skeleton
         When-skeleton
@@ -147,7 +147,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
     inner-line
 "));
 
-            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetBindingClassSkeleton(ProgrammingLanguage.CSharp, new[] { CreateSimpleWhen() }, "MyName.Space", "MyClass", StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be(StringHelpers.ConsolidateVerbatimStringLineEndings(@"MyName.Space/MyClass/        step-definition-skeleton
             inner-line"));
@@ -158,7 +158,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I do something$\"/WhenIDoSomething/");
         }
@@ -168,7 +168,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I do something$\"/WhenIDoSomething/string multilineText, DataTable dataTable");
         }
@@ -178,7 +178,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I do something$\"/WhenIDoSomething/multilineText : string, dataTable : DataTable");
         }
@@ -188,7 +188,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.VB, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.VB, CreateWhenWithExtraArgs(), StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/\"^I do something$\"/WhenIDoSomething/ByVal multilineText As String, ByVal dataTable As DataTable");
         }
@@ -200,7 +200,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithSingleParam();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I '(.*)' something$\"/WhenISomething/string p0");
         }
@@ -212,7 +212,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithLanguageKeyword();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I '(.*)' something$\"/WhenISomething/string @do");
         }
@@ -224,7 +224,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithIncorrectlyCasedCSharpKeyword();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I '(.*)' something$\"/WhenISomething/string fLoaT");
         }
@@ -236,7 +236,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithLanguageKeyword();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.VB, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.VB, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/\"^I '(.*)' something$\"/WhenISomething/ByVal [do] As String");
         }
@@ -248,7 +248,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithVBCasedKeyword();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.VB, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.VB, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/\"^I '(.*)' something$\"/WhenISomething/ByVal [Do] As String");
         }
@@ -260,7 +260,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithLanguageKeyword();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I '(.*)' something$\"/WhenISomething/``do`` : string");
         }
@@ -272,7 +272,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithDifferentlyCasedFSharpKeyword();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, stepInstance, StepDefinitionSkeletonStyle.RegexAttribute, false, bindingCulture);
 
             result.Should().Be("When/@\"^I '(.*)' something$\"/WhenISomething/finaLLY : string");
         }
@@ -333,7 +333,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.MethodNameUnderscores, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.MethodNameUnderscores, false, bindingCulture);
 
             result.Should().Be("When/When_I_do_something/");
         }
@@ -343,7 +343,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen("I, do-something."), StepDefinitionSkeletonStyle.MethodNameUnderscores, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen("I, do-something."), StepDefinitionSkeletonStyle.MethodNameUnderscores, false, bindingCulture);
 
             result.Should().Be("When/When_I_do_something/");
         }
@@ -355,7 +355,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithSingleParam();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.MethodNameUnderscores, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.MethodNameUnderscores, false, bindingCulture);
 
             result.Should().Be("When/When_I_P0_something/string p0");
         }
@@ -365,7 +365,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen("Árvíztűrő tükörfúrógép"), StepDefinitionSkeletonStyle.MethodNameUnderscores, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen("Árvíztűrő tükörfúrógép"), StepDefinitionSkeletonStyle.MethodNameUnderscores, false, bindingCulture);
 
             result.Should().Be("When/When_Árvíztűrő_tükörfúrógép/");
         }
@@ -375,7 +375,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.MethodNamePascalCase, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.MethodNamePascalCase, false, bindingCulture);
 
             result.Should().Be("When/WhenIDoSomething/");
         }
@@ -387,7 +387,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithSingleParam();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.MethodNamePascalCase, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.MethodNamePascalCase, false, bindingCulture);
 
             result.Should().Be("When/WhenI_P0_Something/string p0");
         }
@@ -404,7 +404,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             analizeResult.TextParts.Add("");
             analizeResult.Parameters.Add(new AnalyzedStepParameter("Int32", "p0", @"\d+"));
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.MethodNamePascalCase, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.MethodNamePascalCase, false, bindingCulture);
 
             result.Should().Be("When/WhenIDo_P0/int p0");
         }
@@ -415,7 +415,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.MethodNameRegex, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.FSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.MethodNameRegex, false, bindingCulture);
 
             result.Should().Be("When/``^I do something$``/");
         }
@@ -425,7 +425,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
         {
             var sut = CreateSut();
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.CucumberExpressionAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, CreateSimpleWhen(), StepDefinitionSkeletonStyle.CucumberExpressionAttribute, false, bindingCulture);
 
             result.Should().Be("When/\"I do something\"/WhenIDoSomething/");
         }
@@ -437,7 +437,7 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
 
             var stepInstance = CreateWhenWithSingleParam(wrapQuotes: false);
 
-            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.CucumberExpressionAttribute, bindingCulture);
+            var result = sut.GetStepDefinitionSkeleton(ProgrammingLanguage.CSharp, stepInstance, StepDefinitionSkeletonStyle.CucumberExpressionAttribute, false, bindingCulture);
 
             result.Should().Be("When/\"I {string} something\"/WhenISomething/string p0");
         }

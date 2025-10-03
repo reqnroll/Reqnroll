@@ -17,6 +17,9 @@ namespace Reqnroll.Configuration.JsonConfig
         [JsonPropertyName("stepDefinitionSkeletonStyle")]
         public StepDefinitionSkeletonStyle StepDefinitionSkeletonStyle { get; set; } = ConfigDefaults.StepDefinitionSkeletonStyle;
 
+        [JsonPropertyName("generateStepDefinitionSkeletonAsAsync")]
+        public bool GenerateStepDefinitionSkeletonAsAsync { get; set; } = ConfigDefaults.GenerateStepDefinitionSkeletonAsAsync;
+
         [JsonPropertyName("ColoredOutput")]
         public bool ColoredOutput { get; set; } = ConfigDefaults.ColoredOutput;
 

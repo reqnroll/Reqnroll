@@ -22,12 +22,12 @@ namespace Reqnroll.BindingSkeletons
             this.stepTextAnalyzer = stepTextAnalyzer;
         }
 
-        public string GetBindingClassSkeleton(ProgrammingLanguage language, StepInstance[] stepInstances, string namespaceName, string className, StepDefinitionSkeletonStyle style, CultureInfo bindingCulture)
+        public string GetBindingClassSkeleton(ProgrammingLanguage language, StepInstance[] stepInstances, string namespaceName, string className, StepDefinitionSkeletonStyle style, bool asAsync, CultureInfo bindingCulture)
         {
             var template = templateProvider.GetStepDefinitionClassTemplate(language);
 
             var bindings = string.Join(Environment.NewLine, GetOrderedSteps(stepInstances)
-                .Select(si => GetStepDefinitionSkeleton(language, si, style, bindingCulture)).Distinct().ToArray()).TrimEnd();
+                .Select(si => GetStepDefinitionSkeleton(language, si, style, asAsync, bindingCulture)).Distinct().ToArray()).TrimEnd();
             if (bindings.Length > 0)
                 bindings = bindings.Indent(METHOD_INDENT);
 
@@ -44,10 +44,10 @@ namespace Reqnroll.BindingSkeletons
                 .Select(item => item.Step);
         }
 
-        public virtual string GetStepDefinitionSkeleton(ProgrammingLanguage language, StepInstance stepInstance, StepDefinitionSkeletonStyle style, CultureInfo bindingCulture)
+        public virtual string GetStepDefinitionSkeleton(ProgrammingLanguage language, StepInstance stepInstance, StepDefinitionSkeletonStyle style, bool asAsync, CultureInfo bindingCulture)
         {
             var withExpression = style == StepDefinitionSkeletonStyle.RegexAttribute || style == StepDefinitionSkeletonStyle.CucumberExpressionAttribute;
-            var template = templateProvider.GetStepDefinitionTemplate(language, withExpression);
+            var template = templateProvider.GetStepDefinitionTemplate(language, withExpression, asAsync);
             var analyzedStepText = Analyze(stepInstance, bindingCulture);
             //{attribute}/{regex}/{methodName}/{parameters}
             return ApplyTemplate(template, new

@@ -20,8 +20,8 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             var sut = new ResourceSkeletonTemplateProvider();
 
             ShouldNotBeMissing(sut.GetStepDefinitionClassTemplate(ProgrammingLanguage.CSharp));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false, false));
         }
 
         [Fact]
@@ -30,8 +30,8 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             var sut = new ResourceSkeletonTemplateProvider();
 
             ShouldNotBeMissing(sut.GetStepDefinitionClassTemplate(ProgrammingLanguage.VB));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, true));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, true, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, false, false));
         }
 
         [Fact]
@@ -40,8 +40,8 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             var sut = new ResourceSkeletonTemplateProvider();
 
             ShouldNotBeMissing(sut.GetStepDefinitionClassTemplate(ProgrammingLanguage.FSharp));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, true));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, true, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, false, false));
         }
     }
 
@@ -61,8 +61,8 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             var sut = new DefaultSkeletonTemplateProvider(new ResourceSkeletonTemplateProvider());
 
             ShouldNotBeMissing(sut.GetStepDefinitionClassTemplate(ProgrammingLanguage.CSharp));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false, false));
         }
 
         [Fact]
@@ -71,8 +71,8 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             var sut = new DefaultSkeletonTemplateProvider(new ResourceSkeletonTemplateProvider());
 
             ShouldNotBeMissing(sut.GetStepDefinitionClassTemplate(ProgrammingLanguage.VB));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, true));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, true, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.VB, false, false));
         }
 
         [Fact]
@@ -81,8 +81,8 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             var sut = new DefaultSkeletonTemplateProvider(new ResourceSkeletonTemplateProvider());
 
             ShouldNotBeMissing(sut.GetStepDefinitionClassTemplate(ProgrammingLanguage.FSharp));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, true));
-            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, true, false));
+            ShouldNotBeMissing(sut.GetStepDefinitionTemplate(ProgrammingLanguage.FSharp, false, false));
         }
     }
 }

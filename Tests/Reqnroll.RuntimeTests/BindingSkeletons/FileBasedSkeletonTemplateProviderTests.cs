@@ -48,7 +48,7 @@ mytemplate
 mytemplate
 >>>other");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true, false);
             result.Should().Be("mytemplate" + Environment.NewLine);
         }
 
@@ -59,7 +59,7 @@ mytemplate
 mytemplate
 >>>other");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false, false);
             result.Should().Be("mytemplate" + Environment.NewLine);
         }
 
@@ -77,7 +77,7 @@ mytemplate
         {
             var sut = new FileBasedSkeletonTemplateProviderStub(@">>>other", "missing");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true, false);
             result.Should().Be("missing");
         }
 
@@ -86,7 +86,7 @@ mytemplate
         {
             var sut = new FileBasedSkeletonTemplateProviderStub(@">>>other", "missing");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false, false);
             result.Should().Be("missing");
         }
 

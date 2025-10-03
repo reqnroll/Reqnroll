@@ -96,6 +96,11 @@
           "default": "CucumberExpressionAttribute",
           "enum": [ "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
         },
+        "generateStepDefinitionSkeletonAsAsync": {
+          "description": "Specifies that StepDefinition method samples are async.",
+          "type": "boolean",
+          "default": true
+        },
         "coloredOutput": {
           "description": "Determine whether Reqnroll should color the test result output.",
           "type": "boolean",
