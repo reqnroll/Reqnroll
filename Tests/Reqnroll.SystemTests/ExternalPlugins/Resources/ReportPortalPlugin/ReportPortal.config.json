@@ -1,0 +1,13 @@
+{
+  "enabled": true,
+  "server": {
+    "url": "http://localhost",
+    "project": "demo",
+    "apiKey": "00000000-0000-0000-0000-000000000000"
+  },
+  "launch": {
+    "name": "Reqnroll SystemTests",
+    "attributes": [ "tests" ],
+    "description": "Disabled launch for integration test"
+  }
+}
