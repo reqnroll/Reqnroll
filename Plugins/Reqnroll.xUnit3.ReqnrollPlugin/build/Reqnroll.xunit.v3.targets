@@ -1,13 +1,13 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <GetReqnrollAssemblyHooksTemplateDependsOn></GetReqnrollAssemblyHooksTemplateDependsOn>
+    <_GetReqnrollAssemblyHooksTemplateDependsOn></_GetReqnrollAssemblyHooksTemplateDependsOn>
   </PropertyGroup>
 
   <!-- Gets the hooks templates that should be used to generate assembly hook sources. -->
   <Target 
-    Name="GetReqnrollAssemblyHooksTemplate"
-    DependsOnTargets="$(GetReqnrollAssemblyHooksTemplateDependsOn)"
+    Name="_GetReqnrollAssemblyHooksTemplate"
+    DependsOnTargets="$(_GetReqnrollAssemblyHooksTemplateDependsOn)"
     Returns="ReqnrollAssemblyHooksTemplate">
 
     <PropertyGroup>
@@ -17,55 +17,53 @@
     </PropertyGroup>
     
     <ItemGroup>
-      <ReqnrollAssemblyHooksTemplate Include="@(ReqnrollAssemblyHooksTemplate)">
-        <TargetPath>$(IntermediateOutputPath)%(Filename)$(_ReqnrollAssemblyHooksNamespace)%(Extension)</TargetPath>
-      </ReqnrollAssemblyHooksTemplate>
+      <ReqnrollAssemblyHooksTemplate Include="$(MSBuildThisFileDirectory)*.AssemblyHooks$(DefaultLanguageSourceExtension)" />
     </ItemGroup>
   </Target>
 
 
   <PropertyGroup>
-    <GenerateReqnrollAssemblyHooksDependsOn>GetReqnrollAssemblyHooksTemplate</GenerateReqnrollAssemblyHooksDependsOn>
+    <GenerateReqnrollAssemblyHooksDependsOn>_GetReqnrollAssemblyHooksTemplate</GenerateReqnrollAssemblyHooksDependsOn>
   </PropertyGroup>
 
   <!-- Generates assembly hooks using the templates. -->
   <Target
     Name="GenerateReqnrollAssemblyHooks"
+    DependsOnTargets="$(GenerateReqnrollAssemblyHooksDependsOn)"
     BeforeTargets="CoreCompile"
     Inputs="@(ReqnrollAssemblyHooksTemplate)"
-    Outputs="@(ReqnrollAssemblyHooksTemplate -> '%(TargetPath)')"
+    Outputs="@(ReqnrollAssemblyHooksTemplate -> '$(IntermediateOutputPath)%(Filename)$(_ReqnrollAssemblyHooksNamespace)%(Extension)')"
     Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true'">
 
     <!-- Read the lines from the template. -->
     <ReadLinesFromFile File="%(ReqnrollAssemblyHooksTemplate.Identity)">
-      <Output TaskParameter="Lines" ItemName="AssemblyHooksTemplateLine" />
+      <Output TaskParameter="Lines" ItemName="_AssemblyHooksTemplateLine" />
     </ReadLinesFromFile>
+
+    <Message Text="Line: %(_AssemblyHooksTemplateLine.Identity)" Importance="high" />
 
     <!-- Replace the version token. -->
     <ItemGroup>
-      <AssemblyHooksLine Include="@(AssemblyHooksTemplateLine -> '$([System.String]::Copy(%(Identity)).Replace(`PROJECT_ROOT_NAMESPACE`, `$(_ReqnrollAssemblyHooksNamespace)`))' )" />
+      <_AssemblyHooksLine Include="@(_AssemblyHooksTemplateLine -> '$([System.String]::Copy(%(Identity)).Replace(`PROJECT_ROOT_NAMESPACE`, `$(_ReqnrollAssemblyHooksNamespace)`))' )" />
     </ItemGroup>
+
+    <PropertyGroup>
+      <_ReqnrollAssemblyHookPath>$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename)$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)</_ReqnrollAssemblyHookPath>
+    </PropertyGroup>
 
     <!-- Produce the file. -->
     <WriteLinesToFile
-      File="%(TargetPath)"
-      Lines="@(AssemblyHooksLine)"
+      File="$(_ReqnrollAssemblyHookPath)"
+      Lines="@(_AssemblyHooksLine)"
       Overwrite="true"
       Encoding="UTF-8" />
-  </Target>
-  
-
-  <PropertyGroup>
-    <AddReqnrollAssemblyHooksDependsOn>GenerateReqnrollAssemblyHooks</AddReqnrollAssemblyHooksDependsOn>
-  </PropertyGroup>
-
-  <!-- Adds the generate assembly hooks to the compilation. -->
-  <Target
-    Name="AddReqnrollAssemblyHooks"
-    BeforeTargets="CoreCompile"
-    DependsOnTargets="$(AddReqnrollAssemblyHooksDependsOn)">
+    
     <ItemGroup>
-      <Compile Include="@(ReqnrollAssemblyHooksTemplate -> '%(TargetPath)')" />
+      <!-- Include the generated hooks in the compilation -->
+      <Compile Include="$(_ReqnrollAssemblyHookPath)" />
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(_ReqnrollAssemblyHookPath)" />
     </ItemGroup>
   </Target>
 
