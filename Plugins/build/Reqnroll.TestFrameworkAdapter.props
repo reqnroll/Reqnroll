@@ -1,0 +1,19 @@
+<Project>
+  <!-- Assembly hooks templates are not compiled and instead are used to produce source for the package. -->
+  <ItemGroup>
+    <Compile Remove="AssemblyHooksTemplates/**" />
+    <None Include="AssemblyHooksTemplates/**" />
+    <AssemblyHooksTemplate Include="AssemblyHooksTemplates/**" />
+    <UpToDateCheckOutput Include="@(AssemblyHooksTemplate -> '$(IntermediateOutputPath)%(Filename).$(PackageVersion)%(Extension)')" />
+  </ItemGroup>
+
+  <!-- Build assets are included in the package. -->
+  <ItemGroup>
+    <None Include="build/**" Pack="true" PackagePath="build" />
+  </ItemGroup>
+
+  <!-- Writes the assembly hooks version to the template. -->
+  <ItemGroup>
+    <_AssemblyHooksToken Include="REQNROLL_VERSION" Value="$(PackageVersion)" />
+  </ItemGroup>
+</Project>
