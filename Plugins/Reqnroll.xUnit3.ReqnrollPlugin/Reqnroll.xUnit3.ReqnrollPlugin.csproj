@@ -16,17 +16,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
 
-  <!-- Assembly hooks templates are not compiled and instead are used to produce source for the package. -->
-  <ItemGroup>
-    <Compile Remove="AssemblyHooksTemplates/**" />
-    <None Include="AssemblyHooksTemplates/**" />
-    <AssemblyHooksTemplate Include="AssemblyHooksTemplates/**" />
-  </ItemGroup>
-
-  <!-- Build assets are included in the package. -->
-  <ItemGroup>
-    <None Include="build/**" Pack="true" PackagePath="build" />
-  </ItemGroup>
+  <Import Project="../build/Reqnroll.TestFrameworkAdapter.props"/>
   
   <ItemGroup>
     <PackageReference Include="xunit.v3.assert" Version="[2,)" />
@@ -34,73 +24,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj" />
+    <ProjectReference
+      Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
+      PrivateAssets="none" />
     <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
     <ProjectReference
       Include="..\Reqnroll.xUnit3.Generator.ReqnrollPlugin\Reqnroll.xUnit3.Generator.ReqnrollPlugin.csproj"
       PrivateAssets="all"
       IsReqnrollGenerator="true" />
   </ItemGroup>
-  
-  <!-- Writes the assembly hooks version to the template. -->
-  <Target
-    Name="_WriteAssemblyHooksVersion"
-    Inputs="@(AssemblyHooksTemplate)"
-    Outputs="@(AssemblyHooksTemplate -> '$(IntermediateOutputPath)%(Filename).$(PackageVersion)%(Extension)')">
 
-    <!-- Read the lines from the template. -->
-    <ReadLinesFromFile File="%(AssemblyHooksTemplate.Identity)">
-      <Output TaskParameter="Lines" ItemName="AssemblyHooksTemplateLine" />
-    </ReadLinesFromFile>
-
-    <!-- Replace the version token. -->
-    <ItemGroup>
-      <AssemblyHooksLine Include="@(AssemblyHooksTemplateLine -> '$([System.String]::Copy(%(Identity)).Replace(`REQNROLL_VERSION`, `$(PackageVersion)`))' )" />
-    </ItemGroup>
-
-    <!-- Produce the file. -->
-    <WriteLinesToFile
-      File="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(Extension)"
-      Lines="@(AssemblyHooksLine)"
-      Overwrite="true"
-      Encoding="UTF-8" />
-
-  </Target>
-
-  <!-- Collects the generated assembly hook templates to be included in the package. -->
-  <Target Name="_CollectAssemblyHooksTemplates" DependsOnTargets="_WriteAssemblyHooksVersion" BeforeTargets="_GetPackageFiles">
-    
-    <ItemGroup>
-
-      <!-- Include the file in the final build package -->
-      <None
-        Include="@(AssemblyHooksTemplate -> '$(IntermediateOutputPath)%(Filename).$(PackageVersion)%(Extension)')"
-        Pack="true"
-        PackagePath="build/%(AssemblyHooksTemplate.Filename)%(Extension)"/>
-
-      <!-- Track the file was created during the build so it will be cleaned automatically. -->
-      <FileWrites Include="@(AssemblyHooksTemplate -> '$(IntermediateOutputPath)%(Filename).$(PackageVersion)%(Extension)')" />
-    </ItemGroup>
-    
-  </Target>
-
-  <!-- Gets the generator plugin that needs to be included with this package. -->
-  <Target Name="_GetGeneratorPlugin" DependsOnTargets="ResolveReferences" Returns="GeneratorPlugin">
-    <ItemGroup>
-      <GeneratorPlugin
-        Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.IsReqnrollGenerator)' == 'true'" />
-    </ItemGroup>
-  </Target>
-
-  <!-- Collects the generator plugin to be included in the package. -->
-  <Target Name="_CollectGeneratorPlugin" DependsOnTargets="_GetGeneratorPlugin" BeforeTargets="_GetPackageFiles">
-    <ItemGroup>
-      <GeneratorPluginSymbol Include="@(GeneratorPlugin)" Condition="'%(Extension)' == '.pdb'" />
-      
-      <None Include="@(GeneratorPlugin)" Pack="true" PackagePath="build/$(TargetFramework)/" />
-      <None Update="@(GeneratorPluginSymbol)" PackFolder="Symbols" />
-    </ItemGroup>
-  </Target>
+  <Import Project="../build/Reqnroll.TestFrameworkAdapter.targets"/>
 
 </Project>
