@@ -12,7 +12,7 @@ public class ReportPortalPluginTest : ExternalPluginsTestBase
     {
         base.TestInitialize();
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.MSTest;
-        _projectsDriver.AddNuGetPackage("ReportPortal.Reqnroll", "1.4.0");
+        _projectsDriver.AddNuGetPackage("ReportPortal.Reqnroll", "1.5.0");
     }
 
     [TestMethod]
