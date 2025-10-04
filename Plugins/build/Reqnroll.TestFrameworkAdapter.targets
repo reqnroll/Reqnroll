@@ -5,11 +5,22 @@
     Inputs="@(AssemblyHooksTemplate)"
     Outputs="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)')">
 
-    <!-- Generate the assembly hooks file from templates -->
-    <GenerateFileFromTemplate
-      TemplateFile="%(AssemblyHooksTemplate.Identity)"
-      OutputFile="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)"
-      Tokens="@(_AssemblyHooksToken)"/>
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(AssemblyHooksTemplate.Identity)">
+      <Output TaskParameter="Lines" ItemName="_AssemblyHooksTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the version token replaced. -->
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)"
+      Lines="@(_AssemblyHooksTemplateLine -> Replace(`REQNROLL_VERSION`, `$(PackageVersion)`))"
+      Overwrite="true"
+      Encoding="UTF-8" />
+
+    <!-- Clean up the read lines -->
+    <ItemGroup>
+      <_AssemblyHooksTemplateLine Remove="@(_AssemblyHooksTemplateLine)" />
+    </ItemGroup>
 
     <ItemGroup>
       <!-- Include the file in the final build package -->
@@ -42,23 +53,4 @@
       <None Update="@(GeneratorPluginSymbol)" PackFolder="Symbols" />
     </ItemGroup>
   </Target>
-  
-  <UsingTask
-    TaskName="GenerateFileFromTemplate"
-    TaskFactory="RoslynCodeTaskFactory"
-    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
-    <ParameterGroup>
-      <TemplateFile ParameterType="System.String" Required="true" />
-      <OutputFile ParameterType="System.String" Required="true" />
-      <Tokens ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
-    </ParameterGroup>
-    <Task>
-      <Using Namespace="System" />
-      <Using Namespace="System.IO" />
-      <Using Namespace="System.Text" />
-      <Using Namespace="System.Collections.Generic" />
-
-      <Code Source="$(MSBuildThisFileDirectory)Reqnroll.GenerateFileFromTemplateTask.cs" Type="Fragment" Language="cs" />
-    </Task>
-  </UsingTask>
 </Project>
