@@ -38,12 +38,12 @@
       <!-- Remove system assemblies. -->
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Copy(%(Filename)).StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
       
       <!-- Remove Visual Studio assemblies. -->
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Copy(%(Filename)).StartsWith('Microsoft.VisualStudio'))" />
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
       
       <!-- Remove netstandard -->
       <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'netstandard'" />
