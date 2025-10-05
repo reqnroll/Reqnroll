@@ -135,6 +135,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
 	ProjectSection(SolutionItems) = preProject
 		Plugins\build\Reqnroll.TestFrameworkAdapter.props = Plugins\build\Reqnroll.TestFrameworkAdapter.props
+		Plugins\build\Reqnroll.TestFrameworkAdapter.Sdk.props = Plugins\build\Reqnroll.TestFrameworkAdapter.Sdk.props
+		Plugins\build\Reqnroll.TestFrameworkAdapter.Sdk.targets = Plugins\build\Reqnroll.TestFrameworkAdapter.Sdk.targets
 		Plugins\build\Reqnroll.TestFrameworkAdapter.targets = Plugins\build\Reqnroll.TestFrameworkAdapter.targets
 	EndProjectSection
 EndProject

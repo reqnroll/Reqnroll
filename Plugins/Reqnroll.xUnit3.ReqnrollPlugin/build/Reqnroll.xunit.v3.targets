@@ -1,43 +1,5 @@
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup>
-    <GenerateReqnrollAssemblyHooksDependsOn></GenerateReqnrollAssemblyHooksDependsOn>
-  </PropertyGroup>
-
-  <!-- Generates assembly hooks using the templates. -->
-  <Target
-    Name="GenerateReqnrollAssemblyHooks"
-    DependsOnTargets="$(GenerateReqnrollAssemblyHooksDependsOn)"
-    BeforeTargets="CoreCompile"
-    Inputs="@(ReqnrollAssemblyHooksTemplate)"
-    Outputs="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename).$(PackageVersion)%(ReqnrollAssemblyHooksTemplate.Extension)"
-    Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true'">
-
-    <PropertyGroup>
-      <_ReqnrollEffectiveRootNamespace Condition="'$(_ReqnrollEffectiveRootNamespace)' == ''">$(RootNamespace)</_ReqnrollEffectiveRootNamespace>
-      <_ReqnrollEffectiveRootNamespace Condition="'$(_ReqnrollEffectiveRootNamespace)' == ''">Reqnroll.GeneratedTests</_ReqnrollEffectiveRootNamespace>
-      <_ReqnrollAssemblyHooksNamespace>$(_ReqnrollEffectiveRootNamespace.Replace('.', '_'))</_ReqnrollAssemblyHooksNamespace>
-    </PropertyGroup>
-
-    <!-- Read the lines from the template. -->
-    <ReadLinesFromFile File="%(ReqnrollAssemblyHooksTemplate.Identity)">
-      <Output TaskParameter="Lines" ItemName="_AssemblyHooksTemplateLine" />
-    </ReadLinesFromFile>
-    
-    <!-- Produce the output file with the namespace token replaced. -->
-    <WriteLinesToFile
-      File="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename)$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)"
-      Lines="@(_AssemblyHooksTemplateLine -> Replace(`PROJECT_ROOT_NAMESPACE`, `$(_ReqnrollAssemblyHooksNamespace)`))"
-      Overwrite="true"
-      Encoding="UTF-8" />
-    
-    <ItemGroup>
-      <!-- Include the generated hooks in the compilation -->
-      <Compile Include="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename)$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)" />
-
-      <!-- Track the file was created during the build so it will be cleaned automatically. -->
-      <FileWrites Include="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename)$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)" />
-    </ItemGroup>
-  </Target>
+  <Import Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.targets"/>
 
 </Project>

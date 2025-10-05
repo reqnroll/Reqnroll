@@ -1,0 +1,56 @@
+<Project>
+  <Target
+    Name="_WriteAssemblyHooksVersion"
+    BeforeTargets="Build"
+    Inputs="@(AssemblyHooksTemplate)"
+    Outputs="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)')">
+
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(AssemblyHooksTemplate.Identity)">
+      <Output TaskParameter="Lines" ItemName="_AssemblyHooksTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the version token replaced. -->
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)"
+      Lines="@(_AssemblyHooksTemplateLine -> Replace(`REQNROLL_VERSION`, `$(PackageVersion)`))"
+      Overwrite="true"
+      Encoding="UTF-8" />
+
+    <!-- Clean up the read lines -->
+    <ItemGroup>
+      <_AssemblyHooksTemplateLine Remove="@(_AssemblyHooksTemplateLine)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- Include the file in the final build package -->
+      <None
+        Include="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)"
+        Pack="true"
+        PackagePath="build/%(AssemblyHooksTemplate.Filename)%(AssemblyHooksTemplate.Extension)"/>
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)" />
+    </ItemGroup>
+
+  </Target>
+
+  <!-- Gets the generator plugin that needs to be included with this package. -->
+  <Target Name="_GetGeneratorPlugin" DependsOnTargets="ResolveReferences" Returns="GeneratorPlugin">
+    <ItemGroup>
+      <GeneratorPlugin
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.IsReqnrollGenerator)' == 'true'" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Collects the generator plugin to be included in the package. -->
+  <Target Name="_CollectGeneratorPlugin" DependsOnTargets="_GetGeneratorPlugin" BeforeTargets="_GetPackageFiles">
+    <ItemGroup>
+      <GeneratorPluginSymbol Include="@(GeneratorPlugin)" Condition="'%(Extension)' == '.pdb'" />
+
+      <None Include="@(GeneratorPlugin)" Pack="true" PackagePath="build/$(TargetFramework)/" />
+      <None Update="@(GeneratorPluginSymbol)" PackFolder="Symbols" />
+    </ItemGroup>
+  </Target>
+</Project>

@@ -1,28 +1,14 @@
 <Project>
 
-  <!-- The adapter props and targets themselves should be part of the up-to-date check -->
-  <ItemGroup>
-    <UpToDateCheckInput Include="$(MSBuildThisFileFullPath)" />
-    <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).targets"/>
-  </ItemGroup>
-  
-  <!-- Assembly hooks templates are not compiled and instead are used to produce source for the package. -->
-  <ItemGroup>
-    <Compile Remove="AssemblyHooksTemplates/**" />
-    <None Include="AssemblyHooksTemplates/**" />
-    <AssemblyHooksTemplate Include="AssemblyHooksTemplates/**" />
-    <UpToDateCheckInput Include="@(AssemblyHooksTemplate)" />
-    <UpToDateCheckOutput Include="@(AssemblyHooksTemplate -> '$(IntermediateOutputPath)%(Filename).$(PackageVersion)%(Extension)')" />
+  <PropertyGroup>
+    <GenerateReqnrollAssemblyHooksFile Condition="'$(GenerateReqnrollAssemblyHooksFile)' == ''">true</GenerateReqnrollAssemblyHooksFile>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(Language)' == 'C#'">
+    <ReqnrollAssemblyHooksTemplate Include="$(MSBuildThisFileDirectory)*.AssemblyHooks.cs" />
   </ItemGroup>
 
-  <!-- Build assets are included in the package. -->
-  <ItemGroup>
-    <None Include="build/**" Pack="true" PackagePath="build" />
-    <UpToDateCheckInput Include="build/**" />
-  </ItemGroup>
-
-  <!-- Writes the assembly hooks version to the template. -->
-  <ItemGroup>
-    <_AssemblyHooksToken Include="REQNROLL_VERSION" Value="$(PackageVersion)" />
+  <ItemGroup Condition="'$(Language)' == 'VB'">
+    <ReqnrollAssemblyHooksTemplate Include="$(MSBuildThisFileDirectory)*.AssemblyHooks.vb" />
   </ItemGroup>
 </Project>
