@@ -16,7 +16,7 @@
     <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
 
-  <Import Project="../build/Reqnroll.TestFrameworkAdapter.props"/>
+  <Import Project="../build/Reqnroll.TestFrameworkAdapter.Sdk.props"/>
   
   <ItemGroup>
     <PackageReference Include="xunit.v3.assert" Version="[2,)" />
@@ -34,6 +34,6 @@
       IsReqnrollGenerator="true" />
   </ItemGroup>
 
-  <Import Project="../build/Reqnroll.TestFrameworkAdapter.targets"/>
+  <Import Project="../build/Reqnroll.TestFrameworkAdapter.Sdk.targets"/>
 
 </Project>
