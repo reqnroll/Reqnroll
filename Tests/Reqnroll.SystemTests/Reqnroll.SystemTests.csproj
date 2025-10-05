@@ -32,24 +32,31 @@
     
     <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit3.ReqnrollPlugin\Reqnroll.xUnit3.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Targets>Pack</Targets>
     </ProjectReference>
     <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Targets>Pack</Targets>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Targets>Pack</Targets>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Targets>Pack</Targets>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Targets>Pack</Targets>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.TUnit.Generator.ReqnrollPlugin\Reqnroll.TUnit.Generator.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Targets>Pack</Targets>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.Verify\Reqnroll.Verify.ReqnrollPlugin\Reqnroll.Verify.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Targets>Pack</Targets>
     </ProjectReference>
   </ItemGroup>
 
