@@ -8,4 +8,12 @@
     <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)netstandard2.0\Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(Language)' == 'C#'">
+    <ReqnrollAssemblyHooksTemplate Include="$(MSBuildThisFileDirectory)*.AssemblyHooks.cs" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(Language)' == 'VB'">
+    <ReqnrollAssemblyHooksTemplate Include="$(MSBuildThisFileDirectory)*.AssemblyHooks.vb" />
+  </ItemGroup>
+
 </Project>
