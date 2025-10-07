@@ -1,31 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.xUnit.nuspec</NuspecFile>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageId>Reqnroll.xUnit</PackageId>
+    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="build\**\*" />
-    <None Include="build\**\*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-    <ProjectReference Include="..\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj" />
   </ItemGroup>
-
-  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\xUnit.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\xUnit.AssemblyHooks.cs" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\xUnit.AssemblyHooks.template.vb" OutputFile="$(MSBuildThisFileDirectory)\build\xUnit.AssemblyHooks.vb" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-
-  </Target>
 
 </Project>

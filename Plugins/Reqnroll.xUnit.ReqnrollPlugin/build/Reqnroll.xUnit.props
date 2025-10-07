@@ -1,0 +1,11 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+  <ItemGroup>
+    <_TargetFramework Condition=" '$(TargetFrameworkIdentifier)' == '.NETFramework' ">net462</_TargetFramework>
+    <_TargetFramework Condition=" '$(TargetFrameworkIdentifier)' != '.NETFramework' ">netstandard2.0</_TargetFramework>
+    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)$(_TargetFramework)/Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.props"/>
+
+</Project>
