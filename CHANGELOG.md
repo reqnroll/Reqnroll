@@ -1,7 +1,5 @@
 # [vNext]
 
-## Improvements:
-
 ## Bug fixes:
 
 * Fix: MsTest: Friendly names are generated for scenario outline examples, even if `generator/disableFriendlyTestNames` is set to true, causing a Reqnroll v2 compatiblility issue (#867)
@@ -10,8 +8,6 @@
 *Contributors of this release (in alphabetical order):* @clrudolphi, @konarx
 
 # v3.1.1 - 2025-09-29
-
-## Improvements:
 
 ## Bug fixes:
 
