@@ -3,7 +3,9 @@
 ## Improvements:
 
 ## Bug fixes:
-* FIX: MSTEST Parameterized row test names have formatting inconsistent with that generated in Reqnroll v2 (#867)
+
+* Fix: MsTest: Friendly names are generated for scenario outline examples, even if `generator/disableFriendlyTestNames` is set to true, causing a Reqnroll v2 compatiblility issue (#867)
+* Fix: Performance issue caused by the fix #862 in v3.1.0 (#874)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi
 
