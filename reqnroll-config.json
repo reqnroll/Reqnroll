@@ -5,6 +5,9 @@
 
   Changelog:
 
+  3.1
+  - Added generator/disableFriendlyTestNames
+
   3.0
   - Added formatters
  
@@ -58,6 +61,11 @@
           "items": {
             "type": "string"
           }
+        },
+        "disableFriendlyTestNames": {
+          "description": "By default, Reqnroll generates friendly DisplayNames in test case attributes for supported frameworks. Disable this behavior by setting this option to \"true\".",
+          "type": "boolean",
+          "default": false
         }
       }
     },

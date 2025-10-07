@@ -4,13 +4,19 @@
 * Step Definition templates (aka, Skeletons) are now generated as async methods by default. Added a new reqnroll.json configuration setting to control this. 
 
 ## Bug fixes:
-* FIX: MSTEST Parameterized row test names have formatting inconsistent with that generated in Reqnroll v2 (#867)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+*Contributors of this release (in alphabetical order):* 
+
+# v3.1.2 - 2025-10-07
+
+## Bug fixes:
+
+* Fix: MsTest: Friendly names are generated for scenario outline examples, even if `generator/disableFriendlyTestNames` is set to true, causing a Reqnroll v2 compatiblility issue (#867)
+* Fix: Performance issue caused by the fix #862 in v3.1.0 (#874)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi, @konarx
 
 # v3.1.1 - 2025-09-29
-
-## Improvements:
 
 ## Bug fixes:
 

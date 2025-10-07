@@ -13,6 +13,7 @@ namespace Reqnroll.Configuration
         Default
     }
 
+    // IMPORTANT: When updating configuration options, please ensure you update the JSON schema file at `/reqnroll-config.json`
     public class ReqnrollConfiguration
     {
         public ReqnrollConfiguration(ConfigSource configSource,
