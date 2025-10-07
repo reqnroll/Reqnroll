@@ -1,4 +1,5 @@
 <Project>
+  
   <Target
     Name="_WriteAssemblyHooksVersion"
     BeforeTargets="Build"
@@ -36,21 +37,21 @@
   </Target>
 
   <!-- Gets the generator plugin that needs to be included with this package. -->
-  <Target Name="_GetGeneratorPlugin" DependsOnTargets="ResolveReferences" Returns="GeneratorPlugin">
+  <Target Name="_GetReqnrollGeneratorPlugin" DependsOnTargets="ResolveReferences" Returns="ReqnrollGeneratorPlugin">
     <ItemGroup>
-      <GeneratorPlugin
+      <ReqnrollGeneratorPlugin
         Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.IsReqnrollGenerator)' == 'true'" />
+        Condition="'%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true'" />
     </ItemGroup>
   </Target>
 
   <!-- Collects the generator plugin to be included in the package. -->
-  <Target Name="_CollectGeneratorPlugin" DependsOnTargets="_GetGeneratorPlugin" BeforeTargets="_GetPackageFiles">
+  <Target Name="_CollectReqnrollGeneratorPlugin" DependsOnTargets="_GetReqnrollGeneratorPlugin" BeforeTargets="_GetPackageFiles">
     <ItemGroup>
-      <GeneratorPluginSymbol Include="@(GeneratorPlugin)" Condition="'%(Extension)' == '.pdb'" />
+      <ReqnrollGeneratorPluginSymbol Include="@(ReqnrollGeneratorPlugin)" Condition="'%(Extension)' == '.pdb'" />
 
-      <None Include="@(GeneratorPlugin)" Pack="true" PackagePath="build/$(TargetFramework)/" />
-      <None Update="@(GeneratorPluginSymbol)" PackFolder="Symbols" />
+      <None Include="@(ReqnrollGeneratorPlugin)" Pack="true" PackagePath="build/$(TargetFramework)/" />
+      <None Update="@(ReqnrollGeneratorPluginSymbol)" PackFolder="Symbols" />
     </ItemGroup>
   </Target>
 </Project>

@@ -1,0 +1,8 @@
+<Project>
+  <PropertyGroup>
+    <!-- Assembly signing -->
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+  </PropertyGroup>
+</Project>

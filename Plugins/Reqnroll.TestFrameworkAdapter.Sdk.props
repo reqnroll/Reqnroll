@@ -1,5 +1,16 @@
 <Project>
 
+  <PropertyGroup>
+    <!-- Assembly signing -->
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+
+    <!-- NuGet configuration -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <ContentTargetFolders>build</ContentTargetFolders>
+  </PropertyGroup>
+
   <!-- The adapter props and targets and the SDK files themselves should be part of the up-to-date check -->
   <ItemGroup>
     <UpToDateCheckInput Include="$(MSBuildThisFileFullPath)" />
@@ -7,6 +18,14 @@
 
     <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.props"/>
     <UpToDateCheckInput Include="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.targets"/>
+  </ItemGroup>
+
+  <!-- All adapters should reference the Reqnroll generator and runtime -->
+  <ItemGroup>
+    <ProjectReference
+      Include="$(MSBuildThisFileDirectory)..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
+      PrivateAssets="none" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
   
   <!-- Assembly hooks templates are not compiled and instead are used to produce source for the package. -->

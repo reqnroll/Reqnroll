@@ -1,5 +1,4 @@
 <Project>
-
   <PropertyGroup>
     <GenerateReqnrollAssemblyHooksFile Condition="'$(GenerateReqnrollAssemblyHooksFile)' == ''">true</GenerateReqnrollAssemblyHooksFile>
   </PropertyGroup>

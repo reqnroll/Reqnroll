@@ -1,18 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+    <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.xunit.v3</PackageId>
+    <Description>Package to use Reqnroll with xUnit 2.x. Use Reqnroll.xunit.v3 for xUnit 3.x.</Description>
+    <PackageTags>reqnroll xUnit</PackageTags>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="xunit.core" Version="2.8.1" />
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
 
 </Project>
