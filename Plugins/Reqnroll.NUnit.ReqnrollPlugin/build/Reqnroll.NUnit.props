@@ -1,0 +1,9 @@
+<Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" TreatAsLocalProperty="TaskFolder;TaskAssembly">
+
+  <ItemGroup>
+    <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)netstandard2.0\Reqnroll.NUnit.Generator.ReqnrollPlugin.dll" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.props"/>
+  
+</Project>
