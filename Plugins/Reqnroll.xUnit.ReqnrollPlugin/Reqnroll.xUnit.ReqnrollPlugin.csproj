@@ -16,4 +16,11 @@
     <PackageReference Include="Xunit.SkippableFact" Version="1.4.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference
+      Include="..\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj"
+      PrivateAssets="all"
+      PackAsReqnrollGeneratorPlugin="true" />
+  </ItemGroup>
+
 </Project>
