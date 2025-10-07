@@ -5,4 +5,9 @@
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
   </PropertyGroup>
+
+  <!-- All generator plugins must reference the generator. -->
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj" />
+  </ItemGroup>
 </Project>

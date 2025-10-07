@@ -4,9 +4,4 @@
     <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-  </ItemGroup>
-
 </Project>
