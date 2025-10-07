@@ -1,13 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-
-    <!-- NuGet configuration -->
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <ContentTargetFolders>build</ContentTargetFolders>
+    <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
 
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.xunit.v3</PackageId>
@@ -15,8 +9,6 @@
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
-
-  <Import Project="../build/Reqnroll.TestFrameworkAdapter.Sdk.props"/>
   
   <ItemGroup>
     <PackageReference Include="xunit.v3.assert" Version="[2,)" />
@@ -25,15 +17,9 @@
 
   <ItemGroup>
     <ProjectReference
-      Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
-      PrivateAssets="none" />
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
-    <ProjectReference
       Include="..\Reqnroll.xUnit3.Generator.ReqnrollPlugin\Reqnroll.xUnit3.Generator.ReqnrollPlugin.csproj"
       PrivateAssets="all"
-      IsReqnrollGenerator="true" />
+      PackAsReqnrollGeneratorPlugin="true" />
   </ItemGroup>
-
-  <Import Project="../build/Reqnroll.TestFrameworkAdapter.Sdk.targets"/>
 
 </Project>

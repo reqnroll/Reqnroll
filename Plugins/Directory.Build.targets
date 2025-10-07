@@ -1,0 +1,12 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.targets"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.GeneratorPlugin.Sdk.props"
+    Condition="'$(IsReqnrollGeneratorPlugin)' == 'true'"/>
+  <Import 
+    Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.Sdk.props"
+    Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.Sdk.targets"
+    Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
+</Project>
