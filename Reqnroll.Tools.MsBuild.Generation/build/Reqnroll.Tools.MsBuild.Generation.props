@@ -8,10 +8,10 @@
   <Import Project="$(ReqnrollCpsExtensionDesignTimeTargetsPath)" Condition="'$(DesignTimeBuild)' == 'true' " />
 
   <PropertyGroup>
-    <ReqnrollGenerationTasksDir Condition="'$(ReqnrollGenerationTasksDir)' == '' And '$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)netstandard2.0/</ReqnrollGenerationTasksDir>
-    <ReqnrollGenerationTasksDir Condition="'$(ReqnrollGenerationTasksDir)' == ''">$(MSBuildThisFileDirectory)net462/</ReqnrollGenerationTasksDir>
-    <ReqnrollGenerationTasksAssemblyFile Condition=" '$(ReqnrollGenerationTasksAssemblyFile)' == '' ">Reqnroll.Tools.MsBuild.Generation.dll</ReqnrollGenerationTasksAssemblyFile>
-    <ReqnrollGenerationTasksAssemblyPath Condition=" '$(ReqnrollGenerationTasksAssemblyPath)' == '' ">$(ReqnrollGenerationTasksDir)$(ReqnrollGenerationTasksAssemblyFile)</ReqnrollGenerationTasksAssemblyPath>
+    <ReqnrollGenerationTasksPath Condition="'$(ReqnrollGenerationTasksPath)' == '' And '$(MSBuildRuntimeType)' == 'Core'">$(MSBuildThisFileDirectory)netstandard2.0/</ReqnrollGenerationTasksPath>
+    <ReqnrollGenerationTasksPath Condition="'$(ReqnrollGenerationTasksPath)' == ''">$(MSBuildThisFileDirectory)net462/</ReqnrollGenerationTasksPath>
+    <ReqnrollGenerationTasksAssemblyFilename Condition=" '$(ReqnrollGenerationTasksAssemblyFilename)' == '' ">Reqnroll.Tools.MsBuild.Generation.dll</ReqnrollGenerationTasksAssemblyFilename>
+    <ReqnrollGenerationTasksAssemblyPath Condition=" '$(ReqnrollGenerationTasksAssemblyPath)' == '' ">$(ReqnrollGenerationTasksPath)$(ReqnrollGenerationTasksAssemblyFilename)</ReqnrollGenerationTasksAssemblyPath>
 
     <!-- Using `TaskHostFactory` ensures that the task assembly will not be locked by Visual Studio on Windows. See: https://learn.microsoft.com/en-us/visualstudio/msbuild/how-to-configure-targets-and-tasks?view=vs-2022#task-factories -->
     <!-- Note: `TaskHostFactory` is not compatible with some macOS versions. https://github.com/reqnroll/Reqnroll/issues/152 -->

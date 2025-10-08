@@ -17,6 +17,12 @@
     </PropertyGroup>
   </Target>
 
+  <Target Name="SetPackageProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <CompatibilityVersionRange>[$(PackageVersion=""),$(CompatibilityVersionUpperRange=""))</CompatibilityVersionRange>
+    </PropertyGroup>
+  </Target>
+
   <Target Name="CleanupNupkgs" BeforeTargets="Build" >
     <ItemGroup>
       <Nupkgs2Delete Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
