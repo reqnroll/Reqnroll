@@ -581,13 +581,14 @@ namespace Reqnroll.Generator.Generation
             {
                 friendlyTestName = $"{scenarioDefinition.Name}: {variantName}";
             }
-
             if (rowTest)
             {
+                generationContext.CustomData["linenumber"] = scenarioDefinition.Location.Line;
                 _unitTestGeneratorProvider.SetRowTest(generationContext, testMethod, friendlyTestName);
             }
             else
             {
+                generationContext.CustomData["linenumber"] = scenarioDefinition.Location.Line;
                 _unitTestGeneratorProvider.SetTestMethod(generationContext, testMethod, friendlyTestName);
             }
 
