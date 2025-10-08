@@ -1,10 +1,11 @@
 <Project>
   
   <Target
-    Name="_WriteAssemblyHooksVersion"
+    Name="GenerateAssemblyHookTemplates"
     BeforeTargets="Build"
+    Returns="@(GeneratedAssemblyHookTemplates)"
     Inputs="@(AssemblyHooksTemplate)"
-    Outputs="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)')">
+    Outputs="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)">
 
     <!-- Read the lines from the template. -->
     <ReadLinesFromFile File="%(AssemblyHooksTemplate.Identity)">
@@ -24,6 +25,9 @@
     </ItemGroup>
 
     <ItemGroup>
+      <GeneratedAssemblyHookTemplates
+        Include="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)" />
+      
       <!-- Include the file in the final build package -->
       <None
         Include="$(IntermediateOutputPath)%(AssemblyHooksTemplate.Filename).$(PackageVersion)%(AssemblyHooksTemplate.Extension)"

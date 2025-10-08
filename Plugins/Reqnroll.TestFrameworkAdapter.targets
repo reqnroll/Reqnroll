@@ -1,4 +1,11 @@
 <Project>
+
+  <PropertyGroup>
+    <_ReqnrollEffectiveRootNamespace Condition="'$(_ReqnrollEffectiveRootNamespace)' == ''">$(RootNamespace)</_ReqnrollEffectiveRootNamespace>
+    <_ReqnrollEffectiveRootNamespace Condition="'$(_ReqnrollEffectiveRootNamespace)' == ''">Reqnroll.GeneratedTests</_ReqnrollEffectiveRootNamespace>
+    <_ReqnrollAssemblyHooksNamespace>$(_ReqnrollEffectiveRootNamespace.Replace('.', '_'))</_ReqnrollAssemblyHooksNamespace>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <GenerateReqnrollAssemblyHooksDependsOn></GenerateReqnrollAssemblyHooksDependsOn>
   </PropertyGroup>
@@ -9,14 +16,8 @@
     DependsOnTargets="$(GenerateReqnrollAssemblyHooksDependsOn)"
     BeforeTargets="CoreCompile"
     Inputs="@(ReqnrollAssemblyHooksTemplate)"
-    Outputs="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename).$(PackageVersion)%(ReqnrollAssemblyHooksTemplate.Extension)"
+    Outputs="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename).$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)"
     Condition="'$(GenerateReqnrollAssemblyHooksFile)' == 'true'">
-
-    <PropertyGroup>
-      <_ReqnrollEffectiveRootNamespace Condition="'$(_ReqnrollEffectiveRootNamespace)' == ''">$(RootNamespace)</_ReqnrollEffectiveRootNamespace>
-      <_ReqnrollEffectiveRootNamespace Condition="'$(_ReqnrollEffectiveRootNamespace)' == ''">Reqnroll.GeneratedTests</_ReqnrollEffectiveRootNamespace>
-      <_ReqnrollAssemblyHooksNamespace>$(_ReqnrollEffectiveRootNamespace.Replace('.', '_'))</_ReqnrollAssemblyHooksNamespace>
-    </PropertyGroup>
 
     <!-- Read the lines from the template. -->
     <ReadLinesFromFile File="%(ReqnrollAssemblyHooksTemplate.Identity)">

@@ -372,9 +372,6 @@ GitExtensions.settings.backup
 /Tests/Reqnroll.Formatters.Tests/Samples/CucumberMessages/*
 *.feature.cs
 
-# Version for Specs
-Tests/**/NuGetPackageVersion.cs
-
 #Analytics
 AppInsightsInstrumentationKey.cs
 
