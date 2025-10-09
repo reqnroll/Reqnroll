@@ -1,0 +1,14 @@
+[*]
+insert_final_newline = true
+indent_size = 4
+indent_style = space
+max_line_length = 120
+
+[*.cs]
+csharp_style_namespace_declarations = file_scoped
+
+# IDE0290: Use primary constructor
+csharp_style_prefer_primary_constructors = false
+
+[*.{csproj,targets,props}]
+indent_size = 2
