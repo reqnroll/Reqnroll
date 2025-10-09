@@ -23,6 +23,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string TUnitPackageVersion = "0.55.23";
         private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.10";
+        private const string MSTestv4PackageVersion = "4.0.0";
         private const string XUnit3PackageVersion = "2.0.0";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
@@ -253,6 +254,9 @@ namespace Reqnroll.TestProjectGenerator
                     case UnitTestProvider.MSTest:
                         ConfigureMSTest();
                         break;
+                    case UnitTestProvider.MSTestv4:
+                        ConfigureMSTestv4();
+                        break;
                     case UnitTestProvider.xUnit:
                         ConfigureXUnit();
                         break;
@@ -369,6 +373,21 @@ namespace Reqnroll.TestProjectGenerator
                 _project.AddNuGetPackage("Reqnroll.MSTest", _currentVersionDriver.ReqnrollNuGetVersion,
                     new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.MSTest.ReqnrollPlugin.dll"), "net462\\Reqnroll.MSTest.ReqnrollPlugin.dll"));
                 Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.MSTest", ReqnrollPluginType.Runtime));
+            }
+        }
+
+        private void ConfigureMSTestv4()
+        {
+            _project.AddNuGetPackage("MSTest.TestAdapter", MSTestv4PackageVersion);
+            _project.AddNuGetPackage(
+                "MSTest.TestFramework",
+                MSTestv4PackageVersion);
+
+            if (IsReqnrollFeatureProject)
+            {
+                _project.AddNuGetPackage("Reqnroll.MSTestv4", _currentVersionDriver.ReqnrollNuGetVersion,
+                    new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.MSTestv4.ReqnrollPlugin.dll"), "net462\\Reqnroll.MSTestv4.ReqnrollPlugin.dll"));
+                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.MSTestv4", ReqnrollPluginType.Runtime));
             }
         }
 
