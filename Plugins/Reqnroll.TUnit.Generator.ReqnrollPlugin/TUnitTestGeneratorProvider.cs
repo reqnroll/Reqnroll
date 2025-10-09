@@ -148,7 +148,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
     public void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
     {
         // Mark the method as a test and add a friendly name.
-        CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+        CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, generationContext.Document.SourceFilePath, generationContext.CustomData["linenumber"]);
         CodeDomHelper.AddAttribute(testMethod, DISPLAYNAME_ATTR, friendlyTestName);
     }
 
