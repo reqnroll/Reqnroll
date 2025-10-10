@@ -40,7 +40,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper = codeDomHelper;
         }
 
-        private void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
+        internal void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
         {
             CodeDomHelper.AddAttribute(codeTypeMember, PROPERTY_ATTR, name, value);
         }
@@ -117,7 +117,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper.AddAttribute(generationContext.TestClassInitializeMethod, TESTFIXTURESETUP_ATTR);
         }
 
-        public void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
+        public virtual void SetTestClassCleanupMethod(TestClassGenerationContext generationContext)
         {
             generationContext.TestClassCleanupMethod.Attributes |= MemberAttributes.Static;
             // [Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupAttribute(Microsoft.VisualStudio.TestTools.UnitTesting.ClassCleanupBehavior.EndOfClass)]

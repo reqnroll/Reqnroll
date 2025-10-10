@@ -1,10 +1,11 @@
 # [vNext]
 
 ## Improvements:
+* Added Support for MsTestv4. This requires the use of a new Reqnroll package (Reqnroll.MsTestv4) (#889)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):*  @clrudolphi
 
 # v3.1.2 - 2025-10-07
 
