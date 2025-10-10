@@ -26,7 +26,6 @@ namespace Reqnroll.Configuration.JsonConfig
             var minTracedDuration = reqnrollConfiguration.MinTracedDuration;
             bool coloredOutput = reqnrollConfiguration.ColoredOutput;
             var stepDefinitionSkeletonStyle = reqnrollConfiguration.StepDefinitionSkeletonStyle;
-            bool generateStepDefinitionSkeletonAsAsync = reqnrollConfiguration.GenerateStepDefinitionSkeletonAsAsync;
             var additionalStepAssemblies = reqnrollConfiguration.AdditionalStepAssemblies;
             bool allowRowTests = reqnrollConfiguration.AllowRowTests;
             bool allowDebugGeneratedFiles = reqnrollConfiguration.AllowDebugGeneratedFiles;
@@ -87,7 +86,6 @@ namespace Reqnroll.Configuration.JsonConfig
                 // legacy config
                 minTracedDuration = jsonConfig.Trace.MinTracedDuration;
                 stepDefinitionSkeletonStyle = jsonConfig.Trace.StepDefinitionSkeletonStyle;
-                generateStepDefinitionSkeletonAsAsync = jsonConfig.Trace.GenerateStepDefinitionSkeletonAsAsync;
                 coloredOutput = jsonConfig.Trace.ColoredOutput;
             }
 
@@ -120,7 +118,6 @@ namespace Reqnroll.Configuration.JsonConfig
                 traceTimings,
                 minTracedDuration,
                 stepDefinitionSkeletonStyle,
-                generateStepDefinitionSkeletonAsAsync,
                 additionalStepAssemblies,
                 allowDebugGeneratedFiles,
                 allowRowTests,

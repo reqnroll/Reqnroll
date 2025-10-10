@@ -22,41 +22,56 @@ namespace Reqnroll.BindingSkeletons
             this.stepTextAnalyzer = stepTextAnalyzer;
         }
 
-        public string GetBindingClassSkeleton(ProgrammingLanguage language, StepInstance[] stepInstances, string namespaceName, string className, StepDefinitionSkeletonStyle style, bool asAsync, CultureInfo bindingCulture)
+        public string GetBindingClassSkeleton(ProgrammingLanguage language, StepInstance[] stepInstances, string namespaceName, string className, StepDefinitionSkeletonStyle style, CultureInfo bindingCulture)
         {
             var template = templateProvider.GetStepDefinitionClassTemplate(language);
 
             var bindings = string.Join(Environment.NewLine, GetOrderedSteps(stepInstances)
-                .Select(si => GetStepDefinitionSkeleton(language, si, style, asAsync, bindingCulture)).Distinct().ToArray()).TrimEnd();
+                .Select(si => GetStepDefinitionSkeleton(language, si, style, bindingCulture)).Distinct().ToArray()).TrimEnd();
             if (bindings.Length > 0)
                 bindings = bindings.Indent(METHOD_INDENT);
 
             //{namespace}/{className}/{bindings}
-            return ApplyTemplate(template, new { @namespace = namespaceName, className, bindings});
+            return ApplyTemplate(template, new { @namespace = namespaceName, className, bindings });
+        }
+
+        private (bool asAsync, StepDefinitionSkeletonStyle expressionStyle) GetExpressionStyle(StepDefinitionSkeletonStyle style)
+        {
+            return style switch { 
+                StepDefinitionSkeletonStyle.AsyncCucumberExpressionAttribute => (true, StepDefinitionSkeletonStyle.CucumberExpressionAttribute), 
+                StepDefinitionSkeletonStyle.AsyncRegexAttribute => (true, StepDefinitionSkeletonStyle.RegexAttribute), 
+                StepDefinitionSkeletonStyle.AsyncMethodNameUnderscores => (true, StepDefinitionSkeletonStyle.MethodNameUnderscores), 
+                StepDefinitionSkeletonStyle.AsyncMethodNamePascalCase => (true, StepDefinitionSkeletonStyle.MethodNamePascalCase), 
+                StepDefinitionSkeletonStyle.AsyncMethodNameRegex => (true, StepDefinitionSkeletonStyle.MethodNameRegex),
+                _ => (false, style)
+            };
         }
 
         private static IEnumerable<StepInstance> GetOrderedSteps(StepInstance[] stepInstances)
         {
             return stepInstances
-                .Select((si, index) => new { Step = si, Index = index})
+                .Select((si, index) => new { Step = si, Index = index })
                 .OrderBy(item => item.Step.StepDefinitionType)
                 .ThenBy(item => item.Index)
                 .Select(item => item.Step);
         }
 
-        public virtual string GetStepDefinitionSkeleton(ProgrammingLanguage language, StepInstance stepInstance, StepDefinitionSkeletonStyle style, bool asAsync, CultureInfo bindingCulture)
+        public virtual string GetStepDefinitionSkeleton(ProgrammingLanguage language, StepInstance stepInstance, StepDefinitionSkeletonStyle style, CultureInfo bindingCulture)
         {
-            var withExpression = style == StepDefinitionSkeletonStyle.RegexAttribute || style == StepDefinitionSkeletonStyle.CucumberExpressionAttribute;
+            // decompose StepDefinitionSkeletonStyle into a flag for async and a flag for expression
+            (bool asAsync, StepDefinitionSkeletonStyle expressionStyle) = GetExpressionStyle(style);
+
+            var withExpression = expressionStyle == StepDefinitionSkeletonStyle.RegexAttribute || expressionStyle == StepDefinitionSkeletonStyle.CucumberExpressionAttribute;
             var template = templateProvider.GetStepDefinitionTemplate(language, withExpression, asAsync);
             var analyzedStepText = Analyze(stepInstance, bindingCulture);
             //{attribute}/{regex}/{methodName}/{parameters}
             return ApplyTemplate(template, new
-                                               {
-                                                   attribute = stepInstance.StepDefinitionType,
-                                                   expression = withExpression ? GetExpression(analyzedStepText, style, language) : "",
-                                                   methodName = GetMethodName(stepInstance, analyzedStepText, style, language),
-                                                   parameters = string.Join(", ", analyzedStepText.Parameters.Select(p => ToDeclaration(language, p)).ToArray())
-                                               });
+            {
+                attribute = stepInstance.StepDefinitionType,
+                expression = withExpression ? GetExpression(analyzedStepText, expressionStyle, language) : "",
+                methodName = GetMethodName(stepInstance, analyzedStepText, expressionStyle, language),
+                parameters = string.Join(", ", analyzedStepText.Parameters.Select(p => ToDeclaration(language, p)).ToArray())
+            });
         }
 
         private string GetExpression(AnalyzedStepText analyzedStepText, StepDefinitionSkeletonStyle style, ProgrammingLanguage programmingLanguage)
@@ -70,7 +85,7 @@ namespace Reqnroll.BindingSkeletons
                 case StepDefinitionSkeletonStyle.CucumberExpressionAttribute:
                     var cucumberExpression = GetCucumberExpression(analyzedStepText);
                     return $"\"{cucumberExpression}\"";
-                default: 
+                default:
                     return "";
             }
         }

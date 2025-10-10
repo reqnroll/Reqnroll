@@ -29,7 +29,6 @@ namespace Reqnroll.Infrastructure
                 "MyNamespace",
                 "StepDefinitions",
                 _reqnrollConfiguration.StepDefinitionSkeletonStyle,
-                _reqnrollConfiguration.GenerateStepDefinitionSkeletonAsAsync,
                 featureContext.BindingCulture ?? CultureInfo.CurrentCulture);
 
             return $"{_errorProvider.GetMissingStepDefinitionError().Message}{Environment.NewLine}{skeleton}";
@@ -41,7 +40,6 @@ namespace Reqnroll.Infrastructure
                 featureContext.FeatureInfo.GenerationTargetLanguage,
                 step,
                 _reqnrollConfiguration.StepDefinitionSkeletonStyle,
-                true,                 //TODO: replace hard-coded true with config value
                 featureContext.BindingCulture ?? CultureInfo.CurrentCulture);
 
             return skeleton;

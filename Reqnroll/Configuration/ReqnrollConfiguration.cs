@@ -27,7 +27,6 @@ namespace Reqnroll.Configuration
             bool traceTimings,
             TimeSpan minTracedDuration,
             StepDefinitionSkeletonStyle stepDefinitionSkeletonStyle,
-            bool generateStepDefinitionSkeletonAsAsync,
             List<string> additionalStepAssemblies,
             bool allowDebugGeneratedFiles,
             bool allowRowTests,
@@ -48,7 +47,6 @@ namespace Reqnroll.Configuration
             TraceTimings = traceTimings;
             MinTracedDuration = minTracedDuration;
             StepDefinitionSkeletonStyle = stepDefinitionSkeletonStyle;
-            GenerateStepDefinitionSkeletonAsAsync = generateStepDefinitionSkeletonAsAsync;
             AdditionalStepAssemblies = additionalStepAssemblies;
             AllowDebugGeneratedFiles = allowDebugGeneratedFiles;
             AllowRowTests = allowRowTests;
@@ -85,7 +83,6 @@ namespace Reqnroll.Configuration
         public bool TraceTimings { get; set; }
         public TimeSpan MinTracedDuration { get; set; }
         public StepDefinitionSkeletonStyle StepDefinitionSkeletonStyle { get; set; }
-        public bool GenerateStepDefinitionSkeletonAsAsync { get; set; }
 
         public List<string> AdditionalStepAssemblies { get; set; }
 
@@ -103,7 +100,6 @@ namespace Reqnroll.Configuration
                                                               && TraceTimings == other.TraceTimings
                                                               && MinTracedDuration.Equals(other.MinTracedDuration)
                                                               && StepDefinitionSkeletonStyle == other.StepDefinitionSkeletonStyle
-                                                              && GenerateStepDefinitionSkeletonAsAsync == other.GenerateStepDefinitionSkeletonAsAsync
                                                               && AdditionalStepAssemblies.SequenceEqual(other.AdditionalStepAssemblies)
                                                               && AddNonParallelizableMarkerForTags.SequenceEqual(other.AddNonParallelizableMarkerForTags)
                                                               && DisableFriendlyTestNames == other.DisableFriendlyTestNames;
@@ -146,7 +142,6 @@ namespace Reqnroll.Configuration
                 hashCode = (hashCode * 397) ^ TraceTimings.GetHashCode();
                 hashCode = (hashCode * 397) ^ MinTracedDuration.GetHashCode();
                 hashCode = (hashCode * 397) ^ (int)StepDefinitionSkeletonStyle;
-                hashCode = (hashCode * 397) ^ GenerateStepDefinitionSkeletonAsAsync.GetHashCode();
                 hashCode = (hashCode * 397) ^ (AdditionalStepAssemblies != null ? AdditionalStepAssemblies.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (AddNonParallelizableMarkerForTags != null ? AddNonParallelizableMarkerForTags.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ DisableFriendlyTestNames.GetHashCode();
