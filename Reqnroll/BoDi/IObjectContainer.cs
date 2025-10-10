@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Reqnroll.BoDi;
 
-public interface IObjectContainer : IDisposable
+public interface IObjectContainer : IAsyncDisposable
 {
     /// <summary>
     /// Fired when a new object is created directly by the container. It is not invoked for resolving instance and factory registrations.

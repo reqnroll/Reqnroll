@@ -7,6 +7,7 @@ using Xunit;
 using Reqnroll.Bindings;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using System.Threading.Tasks;
 
 namespace Reqnroll.RuntimeTests
 {
@@ -282,11 +283,11 @@ namespace Reqnroll.RuntimeTests
         {
             var mockTracer = new Mock<ITestTracer>();
             var contextManager = ResolveContextManager(mockTracer.Object);
-            contextManager.InitializeFeatureContext(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+            contextManager.InitializeFeatureContextAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             //// Do not call CleanupStepContext, in order to simulate an inconsistent state
-            contextManager.InitializeScenarioContext(new ScenarioInfo("the next scenario", "description of the next scenario", null, null), null);
+            contextManager.InitializeScenarioContextAsync(new ScenarioInfo("the next scenario", "description of the next scenario", null, null), null);
 
             var actualCurrentTopLevelStepDefinitionType = contextManager.CurrentTopLevelStepDefinitionType;
 
@@ -294,21 +295,21 @@ namespace Reqnroll.RuntimeTests
         }
 
         [Fact]
-        public void Dispose_InInconsistentState_ShouldNotThrowException()
+        public async Task DisposeAsync_InInconsistentState_ShouldNotThrowException()
         {
             var mockTracer = new Mock<ITestTracer>();
             var contextManager = ResolveContextManager(mockTracer.Object);
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             //// do not call CleanupStepContext to simulate inconsistent state
+            
+            Func<Task> disposeAction = async () => await ((IAsyncDisposable) contextManager).DisposeAsync();
 
-            Action disposeAction = () => ((IDisposable) contextManager).Dispose();
-
-            disposeAction.Should().NotThrow();
+            await disposeAction.Should().NotThrowAsync();
         }
 
         [Fact]
-        public void Dispose_InConsistentState_ShouldNotThrowException()
+        public async Task DisposeAsync_InConsistentState_ShouldNotThrowException()
         {
             var mockTracer = new Mock<ITestTracer>();
             var contextManager = ResolveContextManager(mockTracer.Object);
@@ -317,9 +318,9 @@ namespace Reqnroll.RuntimeTests
             contextManager.CleanupStepContext();
 
 
-            Action disposeAction = () => ((IDisposable)contextManager).Dispose();
+            Func<Task> disposeAction = async () => await ((IAsyncDisposable)contextManager).DisposeAsync();
 
-            disposeAction.Should().NotThrow();
+            await disposeAction.Should().NotThrowAsync();
         }
 
         [Fact]
