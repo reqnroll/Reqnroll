@@ -28,6 +28,18 @@ public void {methodName}({parameters})
 {
     throw new PendingStepException();
 }
+>>>CSharp/AsyncStepDefinitionExpression
+[{attribute}({expression})]
+public async Task {methodName}Async({parameters})
+{
+    throw new PendingStepException();
+}
+>>>CSharp/AsyncStepDefinition
+[{attribute}]
+public async Task {methodName}Async({parameters})
+{
+    throw new PendingStepException();
+}
 >>>VB/StepDefinitionClass
 Imports System
 Imports Reqnroll
@@ -52,6 +64,16 @@ End Sub
 Public Sub {methodName}({parameters})
     Throw New PendingStepException()
 End Sub
+>>>VB/AsyncStepDefinitionExpression
+<Reqnroll.{attribute}({expression})> _
+Public Async Function {methodName}Async({parameters}) As Task
+    Throw New PendingStepException()
+End Function
+>>>VB/AsyncStepDefinition
+<Reqnroll.{attribute}()> _
+Public Async Function {methodName}Async({parameters}) As Task
+    Throw New PendingStepException()
+End Function
 >>>FSharp/StepDefinitionClass
 [<Reqnroll.Binding>]
 module {className}
@@ -63,3 +85,7 @@ open Reqnroll
 let [<{attribute}({expression}>] {methodName}({parameters}) = ()
 >>>FSharp/StepDefinition
 let [<{attribute}>] {methodName}({parameters}) = ()
+>>>FSharp/AsyncStepDefinitionExpression
+let! [<{attribute}({expression}>] {methodName}Async({parameters}) = async { return () }
+>>>FSharp/AsyncStepDefinition
+let! [<{attribute}>] {methodName}Async({parameters}) = async { return () }

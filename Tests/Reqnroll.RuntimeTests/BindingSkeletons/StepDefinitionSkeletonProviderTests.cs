@@ -21,9 +21,9 @@ namespace Reqnroll.RuntimeTests.BindingSkeletons
             templateProviderMock = new Mock<ISkeletonTemplateProvider>();
             templateProviderMock.Setup(tp => tp.GetStepDefinitionClassTemplate(It.IsAny<ProgrammingLanguage>()))
                 .Returns("{namespace}/{className}/{bindings}");
-            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), true))
+            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), true, false))
                 .Returns("{attribute}/{expression}/{methodName}/{parameters}");
-            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), false))
+            templateProviderMock.Setup(tp => tp.GetStepDefinitionTemplate(It.IsAny<ProgrammingLanguage>(), false, false))
                 .Returns("{attribute}/{methodName}/{parameters}");
 
             analizeResult = new AnalyzedStepText();

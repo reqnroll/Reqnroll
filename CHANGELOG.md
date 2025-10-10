@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Step Definition templates (aka, Skeletons) are now generated as async methods by default. Added a new reqnroll.json configuration setting to control this. 
 
 ## Bug fixes:
 
