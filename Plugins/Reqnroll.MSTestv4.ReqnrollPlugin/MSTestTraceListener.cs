@@ -1,7 +1,7 @@
 using Reqnroll.BoDi;
 using Reqnroll.Tracing;
 
-namespace Reqnroll.MSTestv4.ReqnrollPlugin
+namespace Reqnroll.MSTest.ReqnrollPlugin
 {
     class MSTestTraceListener : AsyncTraceListener
     {

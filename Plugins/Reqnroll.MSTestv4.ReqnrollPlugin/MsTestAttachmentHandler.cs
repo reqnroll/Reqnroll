@@ -2,7 +2,7 @@ using System;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
 
-namespace Reqnroll.MSTestv4.ReqnrollPlugin
+namespace Reqnroll.MSTest.ReqnrollPlugin
 {
     public class MSTestAttachmentHandler : ReqnrollAttachmentHandler
     {

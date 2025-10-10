@@ -3,7 +3,7 @@ using Reqnroll.BoDi;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.Infrastructure;
 
-namespace Reqnroll.MSTestv4.ReqnrollPlugin
+namespace Reqnroll.MSTest.ReqnrollPlugin
 {
     public interface IMSTestTestContextProvider
     {

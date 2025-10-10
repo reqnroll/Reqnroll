@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 
-namespace Reqnroll.MSTestv4.ReqnrollPlugin
+namespace Reqnroll.MSTest.ReqnrollPlugin
 {
     public class MsTestContainerBuilder : IContainerBuilder
     {

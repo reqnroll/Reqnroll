@@ -1,5 +1,5 @@
 using Reqnroll.Infrastructure;
-using Reqnroll.MSTestv4.ReqnrollPlugin;
+using Reqnroll.MSTest.ReqnrollPlugin;
 using Reqnroll.Plugins;
 using Reqnroll.Tracing;
 using Reqnroll.UnitTestProvider;
@@ -7,7 +7,7 @@ using Reqnroll.UnitTestProvider;
 
 [assembly: RuntimePlugin(typeof(RuntimePlugin))]
 
-namespace Reqnroll.MSTestv4.ReqnrollPlugin
+namespace Reqnroll.MSTest.ReqnrollPlugin
 {
     public class RuntimePlugin : IRuntimePlugin
     {
