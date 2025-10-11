@@ -372,9 +372,6 @@ GitExtensions.settings.backup
 /Tests/Reqnroll.Formatters.Tests/Samples/CucumberMessages/*
 *.feature.cs
 
-#Analytics
-AppInsightsInstrumentationKey.cs
-
 docs/_build/*
 !Directory.Build.rsp
 /docs/Lib/
