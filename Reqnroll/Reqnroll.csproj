@@ -40,13 +40,17 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <EmbeddedResource
+      Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate"
+      Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
 
   <!-- Ensure the instrumentation key template isn't included as source. -->
   <ItemGroup>
-    <Compile Remove="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
-    <None Include="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
+    <AppInsightsInstrumentationKeyFile Include="Analytics\AppInsights\AppInsightsInstrumentationKey.cs" />
+    <Compile Remove="@(AppInsightsInstrumentationKeyFile)" />
+    <None Include="@(AppInsightsInstrumentationKeyFile)" />
+    <UpToDateCheckInput Include="@(AppInsightsInstrumentationKeyFile)" />
   </ItemGroup>
 
   <!-- Include the external annotations in the package. -->
@@ -66,10 +70,31 @@
     <None Update="build/**/*" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
+  <!-- Embeds the Application Insights instrumentation key  -->
+  <Target
+    Name="EmbedAppInsightsInstrumentationKey"
+    Inputs="@(AppInsightsInstrumentationKeyFile)"
+    Outputs="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
+    BeforeTargets="CoreCompile">
+
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(AppInsightsInstrumentationKeyFile.Identity)">
+      <Output TaskParameter="Lines" ItemName="_AppInsightsInstrumentationKeyFileTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the key token replaced. -->
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
+      Lines="@(_AppInsightsInstrumentationKeyFileTemplateLine -> Replace('_InstrumentationKey_', '$(AppInsightsInstrumentationKey)'))"
+      Overwrite="true"
+      Encoding="UTF-8" />
+
     <ItemGroup>
-      <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
+      <!-- Include the file in the final build package -->
+      <Compile Include="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" />
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" />
     </ItemGroup>
   </Target>
 
@@ -77,21 +102,14 @@
   <Target Name="MarkProjectReferenceOutputsForPack" AfterTargets="ResolveReferences">
 
     <ItemGroup>
-      <ProjectReferenceCopyLocalPaths
-        Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference'" />
+      <ProjectReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference'" />
 
-      <ProjectReferenceSymbols
-        Include="@(ProjectReferenceCopyLocalPaths)"
-        Condition="'%(Extension)' == '.pdb'" />
+      <ProjectReferenceSymbols Include="@(ProjectReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.pdb'" />
     </ItemGroup>
 
     <ItemGroup>
       <!-- DLLs and other runtime assets go into the main package. -->
-      <None
-        Include="@(ProjectReferenceCopyLocalPaths)"
-        Pack="true"
-        PackagePath="lib/$(TargetFramework)/" />
+      <None Include="@(ProjectReferenceCopyLocalPaths)" Pack="true" PackagePath="lib/$(TargetFramework)/" />
 
       <!-- Debugging symbols go into the symbol package. -->
       <None Update="@(ProjectReferenceSymbols)" PackFolder="Symbols" />
