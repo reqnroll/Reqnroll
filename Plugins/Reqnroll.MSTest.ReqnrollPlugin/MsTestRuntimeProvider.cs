@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.UnitTestProvider;
 
@@ -13,7 +14,8 @@ public class MsTestRuntimeProvider : IUnitTestRuntimeProvider
 
     public void TestInconclusive(string message)
     {
-        Assert.Inconclusive(message);
+        //Assert.Inconclusive(message);
+        throw (Exception)Activator.CreateInstance(MsTestContainerBuilder.GetAssertInconclusiveExceptionType(), message)!;
     }
 
     public void TestIgnore(string message)
@@ -23,7 +25,7 @@ public class MsTestRuntimeProvider : IUnitTestRuntimeProvider
 
     public ScenarioExecutionStatus? DetectExecutionStatus(Exception exception) => exception switch
     {
-        AssertInconclusiveException => ScenarioExecutionStatus.Skipped,
+        var e when e.GetType().Name == "AssertInconclusiveException" => ScenarioExecutionStatus.Skipped,
         _ => null
     };
 }

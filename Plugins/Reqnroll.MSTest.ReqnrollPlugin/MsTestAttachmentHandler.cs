@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
 
@@ -17,7 +18,9 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
         {
             try
             {
-                _testContextProvider.GetTestContext().AddResultFile(filePath);
+                object testContext = _testContextProvider.GetTestContext();
+                //testContext.AddResultFile(filePath);
+                testContext.GetType().GetMethod("AddResultFile")!.Invoke(testContext, [filePath]);
             }
             catch (Exception)
             {

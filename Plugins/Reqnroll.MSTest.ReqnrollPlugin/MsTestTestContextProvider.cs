@@ -1,27 +1,26 @@
 using System;
 using Reqnroll.BoDi;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.Infrastructure;
 
 namespace Reqnroll.MSTest.ReqnrollPlugin
 {
     public interface IMSTestTestContextProvider
     {
-        TestContext GetTestContext();
+        object GetTestContext();
     }
     
     public class MSTestTestContextProvider : IMSTestTestContextProvider
     {
-        private readonly TestContext _testContext;
+        private readonly object _testContext;
         private readonly Lazy<IContextManager> _contextManager;
 
-        public MSTestTestContextProvider(IObjectContainer container, TestContext testContext)
+        public MSTestTestContextProvider(IObjectContainer container)
         {
-            _testContext = testContext;
+            _testContext = container.Resolve(MsTestContainerBuilder.GetTestContextType());
             _contextManager = new Lazy<IContextManager>(container.Resolve<IContextManager>);
         }
         
-        public TestContext GetTestContext()
+        public object GetTestContext()
         {
             var scenarioContext = _contextManager.Value.ScenarioContext;
             
@@ -30,7 +29,7 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
                 return _testContext;
 
             // if we're in the context of a scenario we use the test specific TestContext instance registered in the generated test class in the ScenarioInitialize method
-            return scenarioContext.ScenarioContainer.Resolve<TestContext>();
+            return scenarioContext.ScenarioContainer.Resolve(MsTestContainerBuilder.GetTestContextType());
         }
     }
 }

@@ -19,7 +19,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-    <ProjectReference Include="..\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
+    <ProjectReference Include="..\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" >
+      <!-- Reqnroll.MSTest.ReqnrollPlugin is referenced only to be included in the NuGet package. -->
+      <!-- Do not add it as a normal reference to avoid version conflicts. -->
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <OutputItemType>Content</OutputItemType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </ProjectReference>
   </ItemGroup>
 
 
