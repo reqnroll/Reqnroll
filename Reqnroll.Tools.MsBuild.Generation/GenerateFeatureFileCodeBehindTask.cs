@@ -45,7 +45,7 @@ public class GenerateFeatureFileCodeBehindTask : Task
         if (LaunchDebugger) Debugger.Launch();
 
         var generateFeatureFileCodeBehindTaskContainerBuilder = new GenerateFeatureFileCodeBehindTaskContainerBuilder();
-        var generatorPlugins = GeneratorPlugins?.Select(gp => gp.ItemSpec).Select(p => new GeneratorPluginInfo(p)).ToArray() ?? [];
+        var generatorPlugins = GeneratorPlugins?.Select(gp => new GeneratorPluginInfo(gp.ItemSpec, GetPluginParameters(gp))).ToArray() ?? [];
         var featureFiles = FeatureFiles?
                            .Where(i => FileFilter.IsValidFile(i.ItemSpec))
                            .Select(i => new ReqnrollFeatureFileInfo(i.ItemSpec, i.GetMetadata(CodeBehindFileMetadata), i.GetMetadata(MessagesFileMetadata)))
@@ -72,5 +72,20 @@ public class GenerateFeatureFileCodeBehindTask : Task
 
             return true;
         }
+    }
+
+    private Dictionary<string, string> GetPluginParameters(ITaskItem pluginItem)
+    {
+        var pluginParameters = new Dictionary<string, string>();
+        foreach (var parameterName in pluginItem.MetadataNames.OfType<string>())
+        {
+            const string pluginParameterPrefix = "Parameter_";
+            if (parameterName.StartsWith(pluginParameterPrefix))
+            {
+                var parameterValue = pluginItem.GetMetadata(parameterName);
+                pluginParameters[parameterName.Substring(pluginParameterPrefix.Length)] = parameterValue;
+            }
+        }
+        return pluginParameters;
     }
 }
