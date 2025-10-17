@@ -131,6 +131,7 @@ If you want consume local changes on your project, run `dotnet build` and go to 
     </packageSource>
     <packageSource key="Reqnroll">
       <package pattern="Reqnroll.*" />
+			<package pattern="Reqnroll" />
     </packageSource>
   </packageSourceMapping>
 </configuration>
