@@ -27,6 +27,8 @@ public class GenerateFeatureFileCodeBehindTaskExecutor(
         processInfoDumper.DumpProcessInfo();
         log.LogTaskMessage("Starting GenerateFeatureFileCodeBehind task");
         log.LogTaskDiagnosticMessage($"Project folder: {reqnrollProjectInfo.ProjectFolder}");
+        foreach (var generatorPluginInfo in reqnrollProjectInfo.GeneratorPlugins)
+            log.LogTaskDiagnosticMessage($"Generator plugin: {generatorPluginInfo.PathToGeneratorPluginAssembly}, parameters: {generatorPluginInfo.GetLegacyPluginParameters()}");
         try
         {
             var reqnrollProject = reqnrollProjectProvider.GetReqnrollProject();
