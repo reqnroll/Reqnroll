@@ -379,15 +379,13 @@ namespace Reqnroll.TestProjectGenerator
         private void ConfigureMSTestv4()
         {
             _project.AddNuGetPackage("MSTest.TestAdapter", MSTestv4PackageVersion);
-            _project.AddNuGetPackage(
-                "MSTest.TestFramework",
-                MSTestv4PackageVersion);
+            _project.AddNuGetPackage("MSTest.TestFramework", MSTestv4PackageVersion);
 
             if (IsReqnrollFeatureProject)
             {
-                _project.AddNuGetPackage("Reqnroll.MSTestv4", _currentVersionDriver.ReqnrollNuGetVersion,
-                    new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.MSTestv4.ReqnrollPlugin.dll"), "net462\\Reqnroll.MSTestv4.ReqnrollPlugin.dll"));
-                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.MSTestv4", ReqnrollPluginType.Runtime));
+                _project.AddNuGetPackage("Reqnroll.MSTest", _currentVersionDriver.ReqnrollNuGetVersion,
+                                         new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.MSTest.ReqnrollPlugin.dll"), "net462\\Reqnroll.MSTest.ReqnrollPlugin.dll"));
+                Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.MSTest", ReqnrollPluginType.Runtime));
             }
         }
 

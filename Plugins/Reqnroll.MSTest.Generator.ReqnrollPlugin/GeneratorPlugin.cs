@@ -14,9 +14,12 @@ namespace Reqnroll.MSTest.Generator.ReqnrollPlugin
             var parameters = generatorPluginParameters.GetParametersAsDictionary();
             if (parameters.TryGetValue("TargetMsTestVersion", out string version) && IsMsTestV4OrHigher(version))
             {
-                throw new NotImplementedException("TODO");
+                unitTestProviderConfiguration.UseUnitTestProvider("mstestv4");
             }
-            unitTestProviderConfiguration.UseUnitTestProvider("mstest");
+            else
+            {
+                unitTestProviderConfiguration.UseUnitTestProvider("mstest");
+            }
         }
 
         private bool IsMsTestV4OrHigher(string version)
