@@ -114,6 +114,28 @@ CLI:
 
 - Execute `dotnet build` in a shell
 
+## Consuming local build
+
+If you want consume local changes on your project, run `dotnet build` and go to `GeneratedNuGetPackages\Debug` folder. There would be stored locally build packages. You should modify your nuget.config to use that folder as source for `Reqnroll.*` packages. For example:
+```
+<?xml version="1.0" encoding="utf-8"?>
+<configuration>
+  <packageSources>
+    <clear />
+    <add key="https://api.nuget.org/v3/index.json" value="https://api.nuget.org/v3/index.json" />
+    <add key="Reqnroll" value="<path-to-reqnroll>\GeneratedNuGetPackages\Debug" />
+  </packageSources>
+  <packageSourceMapping>
+    <packageSource key="https://api.nuget.org/v3/index.json">
+      <package pattern="*" />
+    </packageSource>
+    <packageSource key="Reqnroll">
+      <package pattern="Reqnroll.*" />
+    </packageSource>
+  </packageSourceMapping>
+</configuration>
+```
+
 ## Running tests
 
 Running tests should be possible by running them from Visual Studio or by executing `dotnet test` in a shell. Some tests in the `Reqnroll.SystemTests` might be ignored if you do not have all the recommended SDKs installed (see above).
