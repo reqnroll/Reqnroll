@@ -4,6 +4,8 @@
 
 ## Bug fixes:
 
+* Address [Microsoft Security Advisory CVE-2025-55247 | .NET Denial of Service Vulnerability](https://github.com/advisories/GHSA-w3q9-fxm7-j8fq) (#893)
+
 *Contributors of this release (in alphabetical order):* 
 
 # v3.1.2 - 2025-10-07
