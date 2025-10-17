@@ -19,7 +19,6 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
         {
             try
             {
-                //_testContextProvider.GetTestContext().AddResultFile(filePath);
                 _runtimeAdapter.TestContextAddResultFile(_testContextProvider.GetTestContext(), filePath);
             }
             catch (Exception)

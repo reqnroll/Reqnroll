@@ -15,8 +15,7 @@ public class MsTestRuntimeProvider(IObjectContainer container) : IUnitTestRuntim
 
     public void TestInconclusive(string message)
     {
-        //Assert.Inconclusive(message);
-        throw _runtimeAdapter.Value.CreateAssertInconclusiveException(message);
+        _runtimeAdapter.Value.ThrowAssertInconclusiveException(message);
     }
 
     public void TestIgnore(string message)
