@@ -1,6 +1,6 @@
-using System;
 using Reqnroll.BoDi;
 using Reqnroll.Infrastructure;
+using System;
 
 namespace Reqnroll.MSTest.ReqnrollPlugin
 {
@@ -11,12 +11,14 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
     
     public class MSTestTestContextProvider : IMSTestTestContextProvider
     {
+        private readonly IMsTestRuntimeAdapter _runtimeAdapter;
         private readonly object _testContext;
         private readonly Lazy<IContextManager> _contextManager;
 
-        public MSTestTestContextProvider(IObjectContainer container)
+        public MSTestTestContextProvider(IObjectContainer container, IMsTestRuntimeAdapter runtimeAdapter)
         {
-            _testContext = container.Resolve(MsTestContainerBuilder.GetTestContextType());
+            _runtimeAdapter = runtimeAdapter;
+            _testContext = _runtimeAdapter.ResolveTestContext(container);
             _contextManager = new Lazy<IContextManager>(container.Resolve<IContextManager>);
         }
         
@@ -29,7 +31,7 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
                 return _testContext;
 
             // if we're in the context of a scenario we use the test specific TestContext instance registered in the generated test class in the ScenarioInitialize method
-            return scenarioContext.ScenarioContainer.Resolve(MsTestContainerBuilder.GetTestContextType());
+            return _runtimeAdapter.ResolveTestContext(scenarioContext.ScenarioContainer);
         }
     }
 }

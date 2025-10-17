@@ -1,12 +1,13 @@
 using System;
-using System.Reflection;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Reqnroll.BoDi;
 using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.MSTest.ReqnrollPlugin;
 
-public class MsTestRuntimeProvider : IUnitTestRuntimeProvider
+public class MsTestRuntimeProvider(IObjectContainer container) : IUnitTestRuntimeProvider
 {
+    private readonly Lazy<IMsTestRuntimeAdapter> _runtimeAdapter = new(container.Resolve<IMsTestRuntimeAdapter>);
+
     public void TestPending(string message)
     {
         TestInconclusive(message);
@@ -15,7 +16,7 @@ public class MsTestRuntimeProvider : IUnitTestRuntimeProvider
     public void TestInconclusive(string message)
     {
         //Assert.Inconclusive(message);
-        throw (Exception)Activator.CreateInstance(MsTestContainerBuilder.GetAssertInconclusiveExceptionType(), message)!;
+        throw _runtimeAdapter.Value.CreateAssertInconclusiveException(message);
     }
 
     public void TestIgnore(string message)
@@ -25,7 +26,7 @@ public class MsTestRuntimeProvider : IUnitTestRuntimeProvider
 
     public ScenarioExecutionStatus? DetectExecutionStatus(Exception exception) => exception switch
     {
-        var e when e.GetType().Name == "AssertInconclusiveException" => ScenarioExecutionStatus.Skipped,
+        var e when _runtimeAdapter.Value.IsInconclusiveException(e) => ScenarioExecutionStatus.Skipped,
         _ => null
     };
 }

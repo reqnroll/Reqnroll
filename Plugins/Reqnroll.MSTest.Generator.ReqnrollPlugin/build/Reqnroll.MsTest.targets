@@ -41,8 +41,6 @@
       <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(PackageReference->WithMetadataValue('Identity', 'MSTest')->'%(Version)')</_MsTestFrameworkVersion>
     </PropertyGroup>
 
-    <Warning Text="MsTest Version: $(_MsTestFrameworkVersion)" />
-
     <ItemGroup>
       <ReqnrollGeneratorPlugins Update="$(_ReqnrollMsTestGeneratorPluginPath)">
         <Parameter_TargetMsTestVersion>$(_MsTestFrameworkVersion)</Parameter_TargetMsTestVersion>

@@ -10,34 +10,22 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
     public class MsTestContainerBuilder : IContainerBuilder
     {
         private readonly IContainerBuilder _innerContainerBuilder;
-        private readonly object _testContext; 
+        private readonly IMsTestRuntimeAdapter _runtimeAdapter;
 
         public MsTestContainerBuilder(object testContext, IContainerBuilder innerContainerBuilder = null)
         {
-            _testContext = testContext;
             _innerContainerBuilder = innerContainerBuilder ?? new ContainerBuilder();
+            _runtimeAdapter = MsTestRuntimeAdapterSelector.GetAdapter(testContext); //TODO: provide adapter via ctor
         }
 
         public IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider = null)
         {
             var container = _innerContainerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
-            var testContextClass = GetTestContextType();
-            container.RegisterInstanceAs(_testContext, testContextClass);
-
+            container.RegisterInstanceAs(_runtimeAdapter);
+            _runtimeAdapter.RegisterGlobalTestContext(container);
             return container;
         }
 
-        //TODO: temporary until we have a proper MSTest plugin abstraction
-        internal static Type GetTestContextType()
-        {
-            var a1 = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a =>
-                                                                                a.GetName().Name == "Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions" ||
-                                                                                a.GetName().Name == "MSTest.TestFramework.Extensions");
-            if (a1 == null)
-                throw new InvalidOperationException("Could not find MSTest TestContext type in loaded assemblies.");
-
-            return a1.GetType("Microsoft.VisualStudio.TestTools.UnitTesting.TestContext");
-        }
 
         //TODO: temporary until we have a proper MSTest plugin abstraction
         internal static Type GetAssertInconclusiveExceptionType()

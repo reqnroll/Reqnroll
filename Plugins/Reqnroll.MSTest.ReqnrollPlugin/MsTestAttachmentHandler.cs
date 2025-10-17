@@ -1,5 +1,4 @@
 using System;
-using System.Reflection;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
 
@@ -8,19 +7,20 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
     public class MSTestAttachmentHandler : ReqnrollAttachmentHandler
     {
         private readonly IMSTestTestContextProvider _testContextProvider;
+        private readonly IMsTestRuntimeAdapter _runtimeAdapter;
 
-        public MSTestAttachmentHandler(ITraceListener traceListener, IMSTestTestContextProvider testContextProvider) : base(traceListener)
+        public MSTestAttachmentHandler(ITraceListener traceListener, IMSTestTestContextProvider testContextProvider, IMsTestRuntimeAdapter runtimeAdapter) : base(traceListener)
         {
             _testContextProvider = testContextProvider;
+            _runtimeAdapter = runtimeAdapter;
         }
 
         public override void AddAttachment(string filePath)
         {
             try
             {
-                object testContext = _testContextProvider.GetTestContext();
-                //testContext.AddResultFile(filePath);
-                testContext.GetType().GetMethod("AddResultFile")!.Invoke(testContext, [filePath]);
+                //_testContextProvider.GetTestContext().AddResultFile(filePath);
+                _runtimeAdapter.TestContextAddResultFile(_testContextProvider.GetTestContext(), filePath);
             }
             catch (Exception)
             {
