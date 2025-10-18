@@ -37,8 +37,8 @@
     <PropertyGroup>
       <!-- Detect the version of MSTest.TestFramework or MSTest package and pass it to the plugin. -->
       <!-- MSTest.TestFramework has priority if both are defined -->
-      <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(PackageReference->WithMetadataValue('Identity', 'MSTest.TestFramework')->'%(Version)')</_MsTestFrameworkVersion>
-      <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(PackageReference->WithMetadataValue('Identity', 'MSTest')->'%(Version)')</_MsTestFrameworkVersion>
+      <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(ReferencePath->WithMetadataValue('NuGetPackageId', 'MSTest.TestFramework')->'%(NuGetPackageVersion)')</_MsTestFrameworkVersion>
+      <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(ReferencePath->WithMetadataValue('NuGetPackageId', 'MSTest')->'%(NuGetPackageVersion)')</_MsTestFrameworkVersion>
     </PropertyGroup>
 
     <Warning Text="MsTest Version: $(_MsTestFrameworkVersion)" />

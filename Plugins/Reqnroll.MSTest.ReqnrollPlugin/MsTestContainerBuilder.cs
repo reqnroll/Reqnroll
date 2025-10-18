@@ -9,9 +9,9 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
     public class MsTestContainerBuilder : IContainerBuilder
     {
         private readonly IContainerBuilder _innerContainerBuilder;
-        private readonly TestContext _testContext; 
+        private readonly object _testContext;
 
-        public MsTestContainerBuilder(TestContext testContext, IContainerBuilder innerContainerBuilder = null)
+        public MsTestContainerBuilder(object testContext, IContainerBuilder innerContainerBuilder = null)
         {
             _testContext = testContext;
             _innerContainerBuilder = innerContainerBuilder ?? new ContainerBuilder();
@@ -20,7 +20,7 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
         public IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider = null)
         {
             var container = _innerContainerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
-            container.RegisterInstanceAs(_testContext);
+            container.RegisterInstanceAs(new TestContextWrapper(_testContext));
 
             return container;
         }
@@ -32,5 +32,10 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
 
         public IObjectContainer CreateFeatureContainer(IObjectContainer testThreadContainer, FeatureInfo featureInfo)
             => _innerContainerBuilder.CreateFeatureContainer(testThreadContainer, featureInfo);
+    }
+
+    public class TestContextWrapper(object testContext)
+    {
+        public object TestContext { get; } = testContext;
     }
 }
