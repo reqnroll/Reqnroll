@@ -33,5 +33,22 @@
     </ItemGroup>
   </Target>
 
+  <Target Name="SetPluginParameters" BeforeTargets="UpdateFeatureFilesInProject">
+    <PropertyGroup>
+      <!-- Detect the version of MSTest.TestFramework or MSTest package and pass it to the plugin. -->
+      <!-- MSTest.TestFramework has priority if both are defined -->
+      <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(ReferencePath->WithMetadataValue('NuGetPackageId', 'MSTest.TestFramework')->'%(NuGetPackageVersion)')</_MsTestFrameworkVersion>
+      <_MsTestFrameworkVersion Condition="'$(_MsTestFrameworkVersion)' == ''">@(ReferencePath->WithMetadataValue('NuGetPackageId', 'MSTest')->'%(NuGetPackageVersion)')</_MsTestFrameworkVersion>
+    </PropertyGroup>
+
+    <Warning Text="MsTest Version: $(_MsTestFrameworkVersion)" />
+
+    <ItemGroup>
+      <ReqnrollGeneratorPlugins Update="$(_ReqnrollMsTestGeneratorPluginPath)">
+        <Parameter_TargetMsTestVersion>$(_MsTestFrameworkVersion)</Parameter_TargetMsTestVersion>
+      </ReqnrollGeneratorPlugins>
+    </ItemGroup>
+  </Target>
+
 
 </Project>
