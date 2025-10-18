@@ -1,6 +1,10 @@
 # MSTest
 
-Reqnroll supports MsTest V2 (NuGet Version 2.2.8 or higher).
+Reqnroll supports MsTest V2 or later (NuGet Version 2.2.8 or higher).
+
+```{note}
+MsTest V4 is supported from Reqnroll v3.2 onwards.
+```
 
 Documentation for MSTest can be found [here](https://docs.microsoft.com/en-us/visualstudio/test/unit-test-your-code?view=vs-2019).
 
