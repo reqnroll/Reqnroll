@@ -40,7 +40,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             CodeDomHelper = codeDomHelper;
         }
 
-        internal void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
+        protected void SetProperty(CodeTypeMember codeTypeMember, string name, string value)
         {
             CodeDomHelper.AddAttribute(codeTypeMember, PROPERTY_ATTR, name, value);
         }

@@ -9,7 +9,7 @@ namespace Reqnroll.TestProjectGenerator.Extensions
             switch (unitTestProvider)
             {
                 case UnitTestProvider.MSTest: return "MSTest";
-                case UnitTestProvider.MSTestv4: return "MSTestv4";
+                case UnitTestProvider.MSTest4: return "MSTest4";
                 case UnitTestProvider.NUnit2: return "NUnit2";
                 case UnitTestProvider.NUnit3: 
                 case UnitTestProvider.NUnit4: 

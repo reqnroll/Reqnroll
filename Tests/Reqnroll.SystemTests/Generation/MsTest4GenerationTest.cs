@@ -8,13 +8,13 @@ namespace Reqnroll.SystemTests.Generation;
 /// MsTest generator compile and can execute with MsTest.
 /// </summary>
 [TestClass]
-[TestCategory("MsTestv4")]
-public class MsTestv4GenerationTest : GenerationTestBase
+[TestCategory("MsTest4")]
+public class MsTest4GenerationTest : GenerationTestBase
 {
     protected override void TestInitialize()
     {
         base.TestInitialize();
-        _testRunConfiguration.UnitTestProvider = UnitTestProvider.MSTestv4;
+        _testRunConfiguration.UnitTestProvider = UnitTestProvider.MSTest4;
     }
 
     /// <summary>

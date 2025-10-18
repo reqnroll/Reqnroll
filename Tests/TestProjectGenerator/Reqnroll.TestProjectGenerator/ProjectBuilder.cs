@@ -23,7 +23,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string TUnitPackageVersion = "0.55.23";
         private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.10";
-        private const string MSTestv4PackageVersion = "4.0.0";
+        private const string MSTest4PackageVersion = "4.0.0";
         private const string XUnit3PackageVersion = "2.0.0";
         private readonly BindingsGeneratorFactory _bindingsGeneratorFactory;
         private readonly ConfigurationGeneratorFactory _configurationGeneratorFactory;
@@ -254,8 +254,8 @@ namespace Reqnroll.TestProjectGenerator
                     case UnitTestProvider.MSTest:
                         ConfigureMSTest();
                         break;
-                    case UnitTestProvider.MSTestv4:
-                        ConfigureMSTestv4();
+                    case UnitTestProvider.MSTest4:
+                        ConfigureMSTest4();
                         break;
                     case UnitTestProvider.xUnit:
                         ConfigureXUnit();
@@ -376,10 +376,10 @@ namespace Reqnroll.TestProjectGenerator
             }
         }
 
-        private void ConfigureMSTestv4()
+        private void ConfigureMSTest4()
         {
-            _project.AddNuGetPackage("MSTest.TestAdapter", MSTestv4PackageVersion);
-            _project.AddNuGetPackage("MSTest.TestFramework", MSTestv4PackageVersion);
+            _project.AddNuGetPackage("MSTest.TestAdapter", MSTest4PackageVersion);
+            _project.AddNuGetPackage("MSTest.TestFramework", MSTest4PackageVersion);
 
             if (IsReqnrollFeatureProject)
             {
@@ -435,12 +435,12 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddFile(new ProjectFile("NUnitConfiguration.cs", "Compile", "[assembly: NUnit.Framework.Parallelizable(NUnit.Framework.ParallelScope.All)]"));
                     break;
                 case UnitTestProvider.MSTest when _parallelTestExecution:
-                case UnitTestProvider.MSTestv4 when _parallelTestExecution:
+                case UnitTestProvider.MSTest4 when _parallelTestExecution:
                     _project.AddFile(
                         new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: Parallelize(Workers = 4, Scope = ExecutionScope.MethodLevel)]"));
                     break;
                 case UnitTestProvider.MSTest when !_parallelTestExecution:
-                case UnitTestProvider.MSTestv4 when !_parallelTestExecution:
+                case UnitTestProvider.MSTest4 when !_parallelTestExecution:
                     _project.AddFile(new ProjectFile("MsTestConfiguration.cs", "Compile", "using Microsoft.VisualStudio.TestTools.UnitTesting; [assembly: DoNotParallelize]"));
                     break;
                 case UnitTestProvider.TUnit when !_parallelTestExecution:
