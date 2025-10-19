@@ -4,7 +4,7 @@
     <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
 
     <!-- NuGet package metadata -->
-    <PackageId>Reqnroll.xunit.v3</PackageId>
+    <PackageId>Reqnroll.xUnit</PackageId>
     <Description>Package to use Reqnroll with xUnit 2.x. Use Reqnroll.xunit.v3 for xUnit 3.x.</Description>
     <PackageTags>reqnroll xUnit</PackageTags>
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>

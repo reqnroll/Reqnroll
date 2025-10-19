@@ -9,6 +9,10 @@
     <!-- NuGet configuration -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <ContentTargetFolders>build</ContentTargetFolders>
+    <IsPackable>true</IsPackable>
+
+    <!-- We don't use compatibility ranges for test framework adapters -->
+    <UseCompatibilityRangeForReqnrollDependency>false</UseCompatibilityRangeForReqnrollDependency>
   </PropertyGroup>
 
   <!-- The adapter props and targets and the SDK files themselves should be part of the up-to-date check -->
@@ -25,7 +29,7 @@
     <ProjectReference
       Include="$(MSBuildThisFileDirectory)..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
       PrivateAssets="none" />
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)..\Reqnroll\Reqnroll.csproj"  />
   </ItemGroup>
   
   <!-- Assembly hooks templates are not compiled and instead are used to produce source for the package. -->

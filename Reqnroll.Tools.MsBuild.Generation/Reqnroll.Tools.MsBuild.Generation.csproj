@@ -86,4 +86,6 @@
     </None>
   </ItemGroup>
 
+  <Import Project="SingleTfm.targets" Condition="'$(TargetFramework)' == ''" />
+
 </Project>

@@ -50,7 +50,11 @@
   </Target>
 
   <!-- Collects the generator plugin to be included in the package. -->
-  <Target Name="_CollectReqnrollGeneratorPlugin" DependsOnTargets="_GetReqnrollGeneratorPlugin" BeforeTargets="_GetPackageFiles">
+  <Target
+    Name="_CollectReqnrollGeneratorPlugin"
+    DependsOnTargets="_GetReqnrollGeneratorPlugin"
+    BeforeTargets="_GetPackageFiles"
+    Condition="'$(TargetFramework)' != ''">
     <ItemGroup>
       <ReqnrollGeneratorPluginSymbol Include="@(ReqnrollGeneratorPlugin)" Condition="'%(Extension)' == '.pdb'" />
 
