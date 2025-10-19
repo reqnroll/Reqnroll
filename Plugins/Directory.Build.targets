@@ -9,4 +9,20 @@
   <Import
     Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.Sdk.targets"
     Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
+  
+  <PropertyGroup>
+    <UseCompatibilityRangeForReqnrollDependency Condition="'$(UseCompatibilityRangeForReqnrollDependency)' == ''">true</UseCompatibilityRangeForReqnrollDependency>
+  </PropertyGroup>
+
+  <!-- Updates project reference versions to use the explicit override for packing -->
+  <Target
+    Name="_SetReqnrollProjectReferenceVersionForPack"
+    AfterTargets="_GetProjectReferenceVersions"
+    Condition="'$(UseCompatibilityRangeForReqnrollDependency)' == 'true'">
+    <ItemGroup>
+      <_ProjectReferencesWithVersions
+        Update="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj"
+        ProjectVersion="@(_ProjectReferencesWithVersions->'[%(ProjectVersion),$(CompatibilityVersionUpperRange))')"/>
+    </ItemGroup>
+  </Target>
 </Project>

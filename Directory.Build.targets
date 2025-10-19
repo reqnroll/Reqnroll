@@ -1,4 +1,9 @@
 <Project>
+
+  <PropertyGroup>
+    <ReqnrollCompatibilityVersionRange>[$(PackageVersion),$(CompatibilityVersionUpperRange))</ReqnrollCompatibilityVersionRange>
+  </PropertyGroup>
+  
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
       <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
@@ -8,18 +13,12 @@
       <NuspecProperties>$(NuspecProperties);author=$(ReqnrollAuthors)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);owner=$(ReqnrollOwners)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);summary=$(ReqnrollSummary)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=$(ReqnrollCompatibilityVersionRange)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);branch=$(GitBranch)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);commit=$(GitCommitSha)</NuspecProperties>
       
       <NuspecProperties>$(NuspecProperties);ReqnrollFullFrameworkToolsTfm=$(ReqnrollFullFrameworkToolsTfm)</NuspecProperties>
       <NuspecProperties>$(NuspecProperties);ReqnrollCoreToolsTfm=$(ReqnrollCoreToolsTfm)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
-
-  <Target Name="SetPackageProperties" BeforeTargets="GenerateNuspec">
-    <PropertyGroup>
-      <CompatibilityVersionRange>[$(PackageVersion=""),$(CompatibilityVersionUpperRange=""))</CompatibilityVersionRange>
     </PropertyGroup>
   </Target>
 

@@ -25,7 +25,6 @@
     <PackageReference Include="Cucumber.HtmlFormatter" Version="21.15.1" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" PrivateAssets="all" />
     <!-- System.Runtime.Loader is used for .NET (not .NET Framework) based frameworks only. 
          From .NET, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
          We need 'PrivateAssets="all"' to avoid shipping it with the package and causing conflicts with the runtime. -->
@@ -115,5 +114,4 @@
       <None Update="@(ProjectReferenceSymbols)" PackFolder="Symbols" />
     </ItemGroup>
   </Target>
-
 </Project>

@@ -6,7 +6,6 @@
     <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../'))</_RepoRoot>
     <ReqnrollGenerationProjectPath>$(_RepoRoot)Reqnroll.Tools.MsBuild.Generation/</ReqnrollGenerationProjectPath>
     <ReqnrollGenerationTasksPath>$(ReqnrollGenerationProjectPath)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksPath>
-    <_ReqnrollDeferTaskLoading>true</_ReqnrollDeferTaskLoading>
     <GenerateReqnrollAssemblyHooksFile>true</GenerateReqnrollAssemblyHooksFile>
   </PropertyGroup>
 
@@ -45,9 +44,7 @@
     <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj">
-      <Private>false</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
     </ProjectReference>
   </ItemGroup>
 
