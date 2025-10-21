@@ -2,7 +2,7 @@
 
 ## Improvements:
 
-* Step definition snippets (aka, skeletons) can be generated as async methods by setting `treace/stepDefinitionSkeletonStyle` to `AsyncCucumberExpressionAttribute` or `AsyncRegexAttribute`. The default has been changed to `AsyncCucumberExpressionAttribute`. (#876)
+* Step definition snippets (aka, skeletons) can be generated as async methods by setting `treace/stepDefinitionSkeletonStyle` to `AsyncCucumberExpressionAttribute` or `AsyncRegexAttribute`. (#876)
 * Added Support for MsTest v4 (#703, #889, #894, #896)
 
 ## Bug fixes:

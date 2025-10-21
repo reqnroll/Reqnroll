@@ -19,7 +19,7 @@ namespace Reqnroll.Configuration
         public const bool TraceTimings = false;
         public const string MinTracedDuration = "0:0:0.1";
         public static TimeSpan MinTracedDurationAsTimeSpan { get; } = TimeSpan.Parse(MinTracedDuration);
-        public const StepDefinitionSkeletonStyle StepDefinitionSkeletonStyle = Reqnroll.BindingSkeletons.StepDefinitionSkeletonStyle.AsyncCucumberExpressionAttribute;
+        public const StepDefinitionSkeletonStyle StepDefinitionSkeletonStyle = Reqnroll.BindingSkeletons.StepDefinitionSkeletonStyle.CucumberExpressionAttribute;
 
         public const ObsoleteBehavior ObsoleteBehavior = Configuration.ObsoleteBehavior.Warn;
         public const bool ColoredOutput = false;

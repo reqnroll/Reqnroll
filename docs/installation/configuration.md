@@ -152,7 +152,7 @@ Use this section to determine the Reqnroll trace output.
   - Description
 * - stepDefinitionSkeletonStyle
   - `CucumberExpressionAttribute` / `RegexAttribute` / `AsyncCucumberExpressionAttribute` / `AsyncRegexAttribute`
-  - Specifies the default [step definition style](step-matching-styles-rules).<br/> *Default:* `AsyncCucumberExpressionAttribute`
+  - Specifies the default [step definition style](step-matching-styles-rules).<br/> *Default:* `CucumberExpressionAttribute`
 * - coloredOutput
   - `true`/`false`
   - Determine whether Reqnroll should color the test result output. See [](../execution/color-output) for more details. You can override this setting to disable color (e.g. on build servers), with the environment variable `NO_COLOR=1`<br/> *Default:* `false`
