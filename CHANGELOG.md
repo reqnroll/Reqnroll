@@ -1,8 +1,8 @@
 # [vNext]
 
 ## Improvements:
-* Step Definition templates (aka, Skeletons) are now generated as async methods by default. Added a new reqnroll.json configuration setting to control this. 
 
+* Step definition snippets (aka, skeletons) can be generated as async methods by setting `treace/stepDefinitionSkeletonStyle` to `AsyncCucumberExpressionAttribute` or `AsyncRegexAttribute`. The default has been changed to `AsyncCucumberExpressionAttribute`. (#876)
 * Added Support for MsTest v4 (#703, #889, #894, #896)
 
 ## Bug fixes:
