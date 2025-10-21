@@ -7,17 +7,19 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
     public class MSTestAttachmentHandler : ReqnrollAttachmentHandler
     {
         private readonly IMSTestTestContextProvider _testContextProvider;
+        private readonly IMsTestRuntimeAdapter _runtimeAdapter;
 
-        public MSTestAttachmentHandler(ITraceListener traceListener, IMSTestTestContextProvider testContextProvider) : base(traceListener)
+        public MSTestAttachmentHandler(ITraceListener traceListener, IMSTestTestContextProvider testContextProvider, IMsTestRuntimeAdapter runtimeAdapter) : base(traceListener)
         {
             _testContextProvider = testContextProvider;
+            _runtimeAdapter = runtimeAdapter;
         }
 
         public override void AddAttachment(string filePath)
         {
             try
             {
-                _testContextProvider.GetTestContext().AddResultFile(filePath);
+                _runtimeAdapter.TestContextAddResultFile(_testContextProvider.GetTestContext(), filePath);
             }
             catch (Exception)
             {

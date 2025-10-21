@@ -70,8 +70,8 @@
   </ItemGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.11.4" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.11.48" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.48" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Composition" Version="17.11.13" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Only" Version="17.13.61" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.61" PrivateAssets="all" />

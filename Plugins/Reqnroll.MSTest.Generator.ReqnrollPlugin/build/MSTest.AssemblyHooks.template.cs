@@ -5,6 +5,7 @@ using System.CodeDom.Compiler;
 using System.Diagnostics;
 using global::Microsoft.VisualStudio.TestTools.UnitTesting;
 using global::Reqnroll;
+using global::Reqnroll.BoDi;
 using global::Reqnroll.MSTest.ReqnrollPlugin;
 using global::System.Runtime.CompilerServices;
 using System.Threading.Tasks;
@@ -13,12 +14,47 @@ using System.Threading.Tasks;
 [TestClass]
 public class PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks
 {
+    public class MsTestRuntimeAdapter : IMsTestRuntimeAdapter
+    {
+        private readonly TestContext _globalTestContext;
+
+        public MsTestRuntimeAdapter(TestContext globalTestContext)
+        {
+            _globalTestContext = globalTestContext;
+        }
+
+        public void RegisterGlobalTestContext(IObjectContainer container)
+        {
+            container.RegisterInstanceAs(_globalTestContext);
+        }
+
+        public object ResolveTestContext(IObjectContainer container) => container.Resolve<TestContext>();
+
+        public void TestContextWriteLine(object testContext, string message)
+        {
+            ((TestContext)testContext).WriteLine(message);
+        }
+
+        public void TestContextAddResultFile(object testContext, string filePath)
+        {
+            ((TestContext)testContext).AddResultFile(filePath);
+        }
+
+        public void ThrowAssertInconclusiveException(string message)
+        {
+            Assert.Inconclusive(message);
+        }
+
+        public bool IsInconclusiveException(global::System.Exception exception) => exception is AssertInconclusiveException;
+    }
+
+
     [AssemblyInitialize]
     [MethodImpl(MethodImplOptions.NoInlining)]
     public static async Task AssemblyInitializeAsync(TestContext testContext)
     {
         var currentAssembly = typeof(PROJECT_ROOT_NAMESPACE_MSTestAssemblyHooks).Assembly;
-        var containerBuilder = new MsTestContainerBuilder(testContext);
+        var containerBuilder = new MsTestContainerBuilder(new MsTestRuntimeAdapter(testContext));
 
         try
         {

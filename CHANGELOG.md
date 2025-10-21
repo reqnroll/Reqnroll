@@ -3,9 +3,13 @@
 ## Improvements:
 * Step Definition templates (aka, Skeletons) are now generated as async methods by default. Added a new reqnroll.json configuration setting to control this. 
 
+* Added Support for MsTest v4 (#703, #889, #894, #896)
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Address [Microsoft Security Advisory CVE-2025-55247 | .NET Denial of Service Vulnerability](https://github.com/advisories/GHSA-w3q9-fxm7-j8fq) (#893)
+
+*Contributors of this release (in alphabetical order):*  @clrudolphi, @Code-Grump, @gasparnagy, @kant2002
 
 # v3.1.2 - 2025-10-07
 
