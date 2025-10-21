@@ -1,6 +1,5 @@
 using System.Reflection;
 using Reqnroll.BoDi;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Reqnroll.Configuration;
 using Reqnroll.Infrastructure;
 
@@ -9,19 +8,19 @@ namespace Reqnroll.MSTest.ReqnrollPlugin
     public class MsTestContainerBuilder : IContainerBuilder
     {
         private readonly IContainerBuilder _innerContainerBuilder;
-        private readonly TestContext _testContext; 
+        private readonly IMsTestRuntimeAdapter _runtimeAdapter;
 
-        public MsTestContainerBuilder(TestContext testContext, IContainerBuilder innerContainerBuilder = null)
+        public MsTestContainerBuilder(IMsTestRuntimeAdapter runtimeAdapter, IContainerBuilder innerContainerBuilder = null)
         {
-            _testContext = testContext;
             _innerContainerBuilder = innerContainerBuilder ?? new ContainerBuilder();
+            _runtimeAdapter = runtimeAdapter;
         }
 
         public IObjectContainer CreateGlobalContainer(Assembly testAssembly, IRuntimeConfigurationProvider configurationProvider = null)
         {
             var container = _innerContainerBuilder.CreateGlobalContainer(testAssembly, configurationProvider);
-            container.RegisterInstanceAs(_testContext);
-
+            container.RegisterInstanceAs(_runtimeAdapter);
+            _runtimeAdapter.RegisterGlobalTestContext(container);
             return container;
         }
 
