@@ -97,7 +97,6 @@ There are multiple options for step definition matching:
 
 * Use attributes with [cucumber expressions](cucumber-expressions); [async](asynchronous-bindings) or normal
 * Use attributes with regular expressions; [async](asynchronous-bindings) or normal
-* Use the method name as cucumber or regular expressions (for F#)
 
 ## Parameter Matching Rules
 
