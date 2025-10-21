@@ -91,12 +91,12 @@ public void GivenStuffIsDone()
 * Should return `void` or `Task`. Note `async` methods must return `Task`
 
 (step-matching-styles-rules)=
-## Step Matching Styles & Rules
+## Step Definition Styles
 
 There are multiple options for step definition matching:
 
-* Use attributes with [cucumber expressions](cucumber-expressions)
-* Use attributes with regular expressions
+* Use attributes with [cucumber expressions](cucumber-expressions); [async](asynchronous-bindings) or normal
+* Use attributes with regular expressions; [async](asynchronous-bindings) or normal
 * Use the method name as cucumber or regular expressions (for F#)
 
 ## Parameter Matching Rules
