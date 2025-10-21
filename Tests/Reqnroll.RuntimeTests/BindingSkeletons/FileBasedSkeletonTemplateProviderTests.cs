@@ -42,26 +42,48 @@ mytemplate
         }
 
         [Fact]
-        public void Should_parse_step_definition_expression_template()
+        public void Should_parse_sync_step_definition_expression_template()
         {
             var sut = new FileBasedSkeletonTemplateProviderStub(@">>>CSharp/StepDefinitionExpression
 mytemplate
 >>>other");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true, false);
             result.Should().Be("mytemplate" + Environment.NewLine);
         }
 
         [Fact]
-        public void Should_parse_step_definition_template()
+        public void Should_parse_sync_step_definition_template()
         {
             var sut = new FileBasedSkeletonTemplateProviderStub(@">>>CSharp/StepDefinition
 mytemplate
 >>>other");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false, false);
             result.Should().Be("mytemplate" + Environment.NewLine);
         }
+        [Fact]
+        public void Should_parse_async_step_definition_expression_template()
+        {
+            var sut = new FileBasedSkeletonTemplateProviderStub(@">>>CSharp/AsyncStepDefinitionExpression
+mytemplate
+>>>other");
+
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true, true);
+            result.Should().Be("mytemplate" + Environment.NewLine);
+        }
+
+        [Fact]
+        public void Should_parse_async_step_definition_template()
+        {
+            var sut = new FileBasedSkeletonTemplateProviderStub(@">>>CSharp/AsyncStepDefinition
+mytemplate
+>>>other");
+
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false, true);
+            result.Should().Be("mytemplate" + Environment.NewLine);
+        }
+
 
         [Fact]
         public void Should_handle_missing_step_definition_class_template()
@@ -77,7 +99,7 @@ mytemplate
         {
             var sut = new FileBasedSkeletonTemplateProviderStub(@">>>other", "missing");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, true, false);
             result.Should().Be("missing");
         }
 
@@ -86,7 +108,7 @@ mytemplate
         {
             var sut = new FileBasedSkeletonTemplateProviderStub(@">>>other", "missing");
 
-            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false);
+            var result = sut.GetStepDefinitionTemplate(ProgrammingLanguage.CSharp, false, false);
             result.Should().Be("missing");
         }
 

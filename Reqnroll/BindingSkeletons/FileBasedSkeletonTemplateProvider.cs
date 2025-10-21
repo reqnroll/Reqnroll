@@ -45,9 +45,9 @@ namespace Reqnroll.BindingSkeletons
             return template;
         }
 
-        public string GetStepDefinitionTemplate(ProgrammingLanguage language, bool withExpression)
+        public string GetStepDefinitionTemplate(ProgrammingLanguage language, bool withExpression, bool asAsync)
         {
-            string key = $"{language}/StepDefinition{(withExpression ? "Expression" : "")}";
+            string key = $"{language}/{(asAsync ? "Async" : "")}StepDefinition{(withExpression ? "Expression" : "")}";
             string template = GetTemplate(key);
             if (template == null)
                 return MissingTemplate(key);

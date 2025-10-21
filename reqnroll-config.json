@@ -101,8 +101,8 @@
         "stepDefinitionSkeletonStyle": {
           "description": "Specifies the default step definition style.",
           "type": "string",
-          "default": "CucumberExpressionAttribute",
-          "enum": [ "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
+          "default": "AsyncCucumberExpressionAttribute",
+          "enum": [ "AsyncCucumberExpressionAttribute", "AsyncRegexAttribute", "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
         },
         "coloredOutput": {
           "description": "Determine whether Reqnroll should color the test result output.",

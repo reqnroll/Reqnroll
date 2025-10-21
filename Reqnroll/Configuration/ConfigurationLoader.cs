@@ -37,7 +37,6 @@ namespace Reqnroll.Configuration
         private static TimeSpan DefaultMinTracedDuration => ConfigDefaults.MinTracedDurationAsTimeSpan;
 
         private static StepDefinitionSkeletonStyle DefaultStepDefinitionSkeletonStyle => ConfigDefaults.StepDefinitionSkeletonStyle;
-
         private static List<string> DefaultAdditionalStepAssemblies => new List<string>();
         private static bool DefaultAllowDebugGeneratedFiles => ConfigDefaults.AllowDebugGeneratedFiles;
         private static bool DefaultAllowRowTests => ConfigDefaults.AllowRowTests;
