@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <VersionPrefix>3.2.1</VersionPrefix>
-    <VersionSuffix>local</VersionSuffix>
+    <VersionSuffix>local-$([System.DateTime]::Now.ToString("yyyyMMdd-HHmm"))</VersionSuffix>
     <AssemblyVersion>3.0.0</AssemblyVersion>
     <CompatibilityVersionUpperRange>4</CompatibilityVersionUpperRange>
   </PropertyGroup>
