@@ -253,10 +253,7 @@ namespace Reqnroll.Infrastructure
 
             try
             {
-                if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
-                {
-                    await FireScenarioEventsAsync(HookType.AfterScenario);
-                }
+                await FireScenarioEventsAsync(HookType.AfterScenario);
             }
             finally
             {
