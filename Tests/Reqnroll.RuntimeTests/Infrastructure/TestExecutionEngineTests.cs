@@ -698,11 +698,11 @@ public partial class TestExecutionEngineTests
         var testExecutionEngine = CreateTestExecutionEngine();
         RegisterStepDefinition();
 
-        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
         await testExecutionEngine.OnScenarioStartAsync();
         await testExecutionEngine.OnScenarioEndAsync();
 
-        _contextManagerStub.Verify(cm => cm.CleanupScenarioContext(), Times.Once);
+        _contextManagerStub.Verify(cm => cm.CleanupScenarioContextAsync(), Times.Once);
     }
 
     [Fact]
@@ -717,12 +717,12 @@ public partial class TestExecutionEngineTests
                                 .Throws(new Exception("simulated error"));
 
 
-        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
         await testExecutionEngine.OnScenarioStartAsync();
         Func<Task> act = async () => await testExecutionEngine.OnScenarioEndAsync();
 
         await act.Should().ThrowAsync<Exception>().WithMessage("simulated error");
-        _contextManagerStub.Verify(cm => cm.CleanupScenarioContext(), Times.Once);
+        _contextManagerStub.Verify(cm => cm.CleanupScenarioContextAsync(), Times.Once);
     }
 
     [Fact]
@@ -802,7 +802,7 @@ public partial class TestExecutionEngineTests
         var beforeHook = CreateParametrizedHookMock(_beforeScenarioEvents, typeof(DummyClass));
         var afterHook = CreateParametrizedHookMock(_afterScenarioEvents, typeof(DummyClass));
 
-        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
         await testExecutionEngine.OnScenarioStartAsync();
         await testExecutionEngine.OnScenarioEndAsync();
 
@@ -826,7 +826,7 @@ public partial class TestExecutionEngineTests
                                                                  It.IsAny<object[]>(),It.IsAny<ITestTracer>(), It.IsAny<DurationHolder>()))
                                 .Callback(() => actualInstance = testExecutionEngine.ScenarioContext.ScenarioContainer.Resolve<AnotherDummyClass>());
 
-        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioInitializeAsync(_scenarioInfo, _ruleInfo);
         testExecutionEngine.ScenarioContext.ScenarioContainer.RegisterInstanceAs(instanceToAddBeforeScenarioEventFiring);
         await testExecutionEngine.OnScenarioStartAsync();
         actualInstance.Should().BeSameAs(instanceToAddBeforeScenarioEventFiring);
@@ -884,7 +884,7 @@ public partial class TestExecutionEngineTests
                            .Should().ThrowAsync<Exception>("execution of the step should have failed because of the exception thrown by the before scenario block hook");
 
         _methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
-        _contextManagerStub.Verify(cm => cm.CleanupFeatureContext());
+        _contextManagerStub.Verify(cm => cm.CleanupFeatureContextAsync());
     }
 
     [Fact]

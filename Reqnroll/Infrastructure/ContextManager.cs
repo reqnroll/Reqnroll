@@ -5,52 +5,60 @@ using Reqnroll.BoDi;
 using Reqnroll.Bindings;
 using Reqnroll.Configuration;
 using Reqnroll.Tracing;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Infrastructure;
 
-public class ContextManager : IContextManager, IDisposable
+public class ContextManager : IContextManager, IAsyncDisposable
 {
-    private class InternalContextManager<TContext>(ITestTracer testTracer) : IDisposable
+    private class InternalContextManager<TContext>(ITestTracer testTracer) : IAsyncDisposable
         where TContext : ReqnrollContext
     {
         private IObjectContainer _objectContainer;
 
         public TContext Instance { get; private set; }
 
-        public void Init(TContext newInstance, IObjectContainer newObjectContainer)
+        public async Task InitAsync(TContext newInstance, IObjectContainer newObjectContainer)
         {
             if (Instance != null)
             {
                 testTracer.TraceWarning($"The previous {typeof(TContext).Name} was not disposed.");
-                DisposeInstance();
+                await DisposeInstanceAsync();
             }
             Instance = newInstance;
             _objectContainer = newObjectContainer;
         }
 
-        public void Cleanup()
+        public ValueTask CleanupAsync()
         {
             if (Instance == null)
             {
                 testTracer.TraceWarning($"The previous {typeof(TContext).Name} was already disposed.");
-                return;
+                return default;
             }
-            DisposeInstance();
+
+            return DisposeInstanceAsync();
         }
 
-        private void DisposeInstance()
+        private async ValueTask DisposeInstanceAsync()
         {
-            _objectContainer?.Dispose();
+            if (_objectContainer != null)
+            {
+                await _objectContainer.DisposeAsync();
+            }
+
             Instance = null;
             _objectContainer = null;
         }
 
-        public void Dispose()
+        public ValueTask DisposeAsync()
         {
             if (Instance != null)
             {
-                DisposeInstance();
+                return DisposeInstanceAsync();
             }
+
+            return default;
         }
     }
 
@@ -151,32 +159,32 @@ public class ContextManager : IContextManager, IDisposable
         TestThreadContext = testThreadContext;
     }
 
-    public void InitializeFeatureContext(FeatureInfo featureInfo)
+    public async Task InitializeFeatureContextAsync(FeatureInfo featureInfo)
     {
         var featureContainer = _containerBuilder.CreateFeatureContainer(_testThreadContainer, featureInfo);
         var reqnrollConfiguration = _testThreadContainer.Resolve<ReqnrollConfiguration>();
         var newContext = new FeatureContext(featureContainer, featureInfo, reqnrollConfiguration);
         // make sure that the FeatureContext can also be resolved through the interface as well
         RegisterInstanceAsInterfaceAndObjectType<IFeatureContext, FeatureContext>(featureContainer, newContext, dispose: true);
-        _featureContextManager.Init(newContext, featureContainer);
+        await _featureContextManager.InitAsync(newContext, featureContainer);
 #pragma warning disable 618
         FeatureContext.Current = newContext;
 #pragma warning restore 618
     }
 
-    public void CleanupFeatureContext()
+    public ValueTask CleanupFeatureContextAsync()
     {
-        _featureContextManager.Cleanup();
+        return _featureContextManager.CleanupAsync();
     }
 
-    public void InitializeScenarioContext(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
+    public async Task InitializeScenarioContextAsync(ScenarioInfo scenarioInfo, RuleInfo ruleInfo)
     {
         var scenarioContainer = _containerBuilder.CreateScenarioContainer(FeatureContext.FeatureContainer, scenarioInfo);
         var testObjectResolver = scenarioContainer.Resolve<ITestObjectResolver>();
         var newContext = new ScenarioContext(scenarioContainer, scenarioInfo, ruleInfo, testObjectResolver);
         // make sure that the ScenarioContext can also be resolved through the interface as well
         RegisterInstanceAsInterfaceAndObjectType<IScenarioContext, ScenarioContext>(scenarioContainer, newContext, dispose: true);
-        _scenarioContextManager.Init(newContext, scenarioContainer);
+        await _scenarioContextManager.InitAsync(newContext, scenarioContainer);
 #pragma warning disable 618
         ScenarioContext.Current = newContext;
 #pragma warning restore 618
@@ -191,9 +199,9 @@ public class ContextManager : IContextManager, IDisposable
         ScenarioStepContext.Current = null;
     }
 
-    public void CleanupScenarioContext()
+    public ValueTask CleanupScenarioContextAsync()
     {
-        _scenarioContextManager.Cleanup();
+        return _scenarioContextManager.CleanupAsync();
     }
 
     public void InitializeStepContext(StepInfo stepInfo)
@@ -212,10 +220,18 @@ public class ContextManager : IContextManager, IDisposable
         // we do not reset CurrentTopLevelStepDefinitionType in order to "remember" last top level type for "And" and "But" steps
     }
         
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
-        _featureContextManager?.Dispose();
-        _scenarioContextManager?.Dispose();
+        if (_featureContextManager != null)
+        {
+            await _featureContextManager.DisposeAsync();
+        }
+
+        if (_scenarioContextManager != null)
+        {
+            await _scenarioContextManager.DisposeAsync();
+        }
+
         _stepContextManager?.Dispose();
     }
 }
