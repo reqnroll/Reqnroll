@@ -103,6 +103,6 @@ Scenario Outline: AfterScenario Hooks are executed after all step results
 	| stepOutcome  | afterScenarioHookExecuted |
 	| Pass         | 1                         |
 	| Fail         | 1                         |
-	| Inconclusive | 0                         |
-	| Pending      | 0                         |
-	| Ignore       | 0                         |
+	| Inconclusive | 1                         |
+	| Pending      | 1                         |
+	| Ignore       | 1                         |
