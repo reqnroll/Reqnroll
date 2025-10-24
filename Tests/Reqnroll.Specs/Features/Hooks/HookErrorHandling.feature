@@ -1,4 +1,4 @@
-﻿Feature: Hook Error Handling
+Feature: Hook Error Handling
 
 
 Scenario: Subsequent BeforeScenario hooks are not executed after an error
@@ -84,3 +84,25 @@ Scenario: Subsequent AfterScenario hooks are not executed after an error
 	Then the hook 'Hook1' is executed once
 	Then the hook 'Hook2' is executed 0 times
 	Then the hook 'Hook3' is executed 0 times
+
+Scenario Outline: AfterScenario Hooks are executed after all step results
+	Given there is a feature file in the project as
+         """
+		Feature: Simple Feature
+
+		@mytag
+		Scenario: Simple Scenario
+		When I do something
+         """
+	And a hook 'Hook1' for 'AfterScenario'
+	And a step that results in '<stepOutcome>'
+	When I execute the tests
+	Then the hook 'Hook1' is executed <afterScenarioHookExecuted> times
+
+	Examples: 
+	| stepOutcome  | afterScenarioHookExecuted |
+	| Pass         | 1                         |
+	| Fail         | 1                         |
+	| Inconclusive | 1                         |
+	| Pending      | 1                         |
+	| Ignore       | 1                         |

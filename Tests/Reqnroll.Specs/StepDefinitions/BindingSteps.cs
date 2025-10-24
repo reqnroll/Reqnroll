@@ -144,5 +144,34 @@ namespace Reqnroll.Specs.StepDefinitions
         {
             _projectsDriver.AddBindingClass(rawBindingClass);
         }
+
+        [Given("a step that results in {string}")]
+        public void GivenAStepThatResultsInPass(string outcome)
+        {
+            switch (outcome)
+            {
+                case "Pass":
+                    GivenAllStepsAreBoundAndPass();
+                    break;
+                case "Fail":
+                    GivenAllStepsAreBoundAndFail();
+                    break;
+                case "Inconclusive":
+                case "Pending":
+                case "Ignore":
+                    var rtpMethod = outcome switch
+                    {
+                        "Inconclusinve" => $"TestInconclusive(\"{outcome}\")",
+                        "Pending" => $"TestPending(\"{outcome}\")",
+                        _ => $"TestIgnore(\"{outcome}\")",
+                    };
+                    _projectsDriver.AddBindingClass(
+                        $"using Reqnroll;\r\nusing Reqnroll.UnitTestProvider;\r\n[Binding] public class TestSteps(IUnitTestRuntimeProvider rtp) {{ [When(\"I do something\")] public void WhenIFinishScenarioWithStatus() {{ rtp.{rtpMethod}; }} }}");
+                    break;
+                default:
+                    break;
+            }
+        }
+
     }
 }

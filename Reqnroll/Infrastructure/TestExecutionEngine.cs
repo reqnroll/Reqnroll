@@ -253,7 +253,11 @@ namespace Reqnroll.Infrastructure
 
             try
             {
-                if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped)
+                // IF the ScenarioExecutionStatus is something other than Skipped, then we should fire the AfterScenario Hooks
+                // IF the ScenarioExecutionStatus IS Skipped AND the TestError IS NULL, then this situation came about because the OnScenarioSkippedAsync() got called, therefore the Scenario wasn't started and we should NOT fire the AfterScenario hooks
+                // IF the ScenarioExecutionStatus IS Skipped AND the TestError has a value, then the result of executing the Scenario was the TestError; and we SHOULD fire the AfterScenario hooks
+                if (_contextManager.ScenarioContext.ScenarioExecutionStatus != ScenarioExecutionStatus.Skipped || 
+                    (_contextManager.ScenarioContext.ScenarioExecutionStatus == ScenarioExecutionStatus.Skipped && _contextManager.ScenarioContext.TestError != null))
                 {
                     await FireScenarioEventsAsync(HookType.AfterScenario);
                 }
