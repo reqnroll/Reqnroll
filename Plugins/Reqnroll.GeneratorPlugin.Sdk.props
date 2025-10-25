@@ -1,13 +1,48 @@
 <Project>
+  <!--
+  REQNROLL GENERATOR PLUGIN SDK
+  
+  This file defines properties and extensions to MSBuild which ensure a generator plugin is built and packed correctly.
+  
+  The generator is loaded into the MSBuild runtime during project builds. Extensions to the generator are delivered as
+  MSBUild-extension packages, independant from the runtime assemblies. The plugin assembly is packaged into the /build
+  path, including all any dependencies that are not provided by the generator or the MSBuild runtime.
+  
+  NuGet package layout:
+  /assets
+    /icon.png <- The package icon
+  /build      <- Contains a copy of all files from the project's /build folder
+    /<tfm>    <- Contains the plugin assembly compiled for that Target Framework plus redestributable dependencies
+  -->
+  
   <PropertyGroup>
+    <!-- Suppress the normal dependency file - they're not used by MSBuild -->
+    <GenerateDependencyFile>false</GenerateDependencyFile>
+
+    <!-- Assemble output in the build path -->
+    <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+
     <!-- Assembly signing -->
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
   </PropertyGroup>
 
-  <!-- All generator plugins must reference the generator. -->
+  <!-- All generator plugins must reference the generator. This also doubles as a version-compatibility declaration in the package. -->
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj" />
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj"/>
   </ItemGroup>
+  
+  <!-- Build assets are included in the package. -->
+  <ItemGroup>
+    <None Include="build/**" Pack="true" PackagePath="build" />
+    <UpToDateCheckInput Include="build/**" />
+  </ItemGroup>
+
+  <!-- Package references are not exposed to projects consuming the generator plugin. -->
+  <ItemDefinitionGroup>
+    <PackageReference>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemDefinitionGroup>
 </Project>

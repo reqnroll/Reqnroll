@@ -1,11 +1,20 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.targets"/>
   <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.RuntimePlugin.Sdk.props"
+    Condition="'$(IsReqnrollRuntimePlugin)' == 'true'"/>
+  <Import
     Project="$(MSBuildThisFileDirectory)Reqnroll.GeneratorPlugin.Sdk.props"
     Condition="'$(IsReqnrollGeneratorPlugin)' == 'true'"/>
   <Import 
     Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.Sdk.props"
     Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.RuntimePlugin.Sdk.targets"
+    Condition="'$(IsReqnrollRuntimePlugin)' == 'true'"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.GeneratorPlugin.Sdk.targets"
+    Condition="'$(IsReqnrollGeneratorPlugin)' == 'true'"/>
   <Import
     Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.Sdk.targets"
     Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
@@ -17,12 +26,22 @@
   <!-- Updates project reference versions to use the explicit override for packing -->
   <Target
     Name="_SetReqnrollProjectReferenceVersionForPack"
-    AfterTargets="_GetProjectReferenceVersions"
+    BeforeTargets="GenerateNuspec"
     Condition="'$(UseCompatibilityRangeForReqnrollDependency)' == 'true'">
+
+    <ItemGroup>
+      <_ProjectReferencesWithVersions
+        Update="@(_ProjectReferencesWithVersions)"
+        BaseVersion="%(ProjectVersion)"/>
+    </ItemGroup>
+    
     <ItemGroup>
       <_ProjectReferencesWithVersions
         Update="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj"
-        ProjectVersion="@(_ProjectReferencesWithVersions->'[%(ProjectVersion),$(CompatibilityVersionUpperRange))')"/>
+        ProjectVersion="[%(_ProjectReferencesWithVersions.BaseVersion),$(CompatibilityVersionUpperRange))"/>
+      <_ProjectReferencesWithVersions
+        Update="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj"
+        ProjectVersion="[%(_ProjectReferencesWithVersions.BaseVersion),$(CompatibilityVersionUpperRange))"/>
     </ItemGroup>
   </Target>
 </Project>

@@ -1,8 +1,3 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.props"/>
-
-  <!-- All plugins take a reference to the Reqnroll core project. -->
-  <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj" Condition="'$(IsPackable)' == 'true'" />
-  </ItemGroup>
 </Project>

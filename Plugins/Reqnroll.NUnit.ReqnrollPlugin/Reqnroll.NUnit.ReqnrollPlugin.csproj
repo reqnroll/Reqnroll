@@ -7,8 +7,6 @@
     <PackageId>Reqnroll.NUnit</PackageId>
     <Description>Package to use Reqnroll with NUnit 3.13 and later.</Description>
     <PackageTags>reqnroll nunit</PackageTags>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
 
   <ItemGroup>

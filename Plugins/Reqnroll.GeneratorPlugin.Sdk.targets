@@ -1,0 +1,60 @@
+<Project>
+
+  <PropertyGroup>
+    <!-- Suppress NU5128 - We deliberately don't include lib or refs in a Generator plugin. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);ResolveRedistributableAssemblies</TargetsForTfmSpecificBuildOutput>
+    <ResolveRedistributableAssembliesDependsOn>ResolveAssemblyReferences</ResolveRedistributableAssembliesDependsOn>
+  </PropertyGroup>
+
+  <!-- Resolves the additional assemblies that will be provided to the runtime through this package. -->
+  <Target
+    Name="ResolveRedistributableAssemblies"
+    Outputs="RedistributableAssembly"
+    DependsOnTargets="$(ResolveRedistributableAssembliesDependsOn)">
+
+    <ItemGroup>
+      <RedistributableAssembly Include="@(ReferenceCopyLocalPaths)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      
+      <!-- Remove system assemblies. -->
+      <RedistributableAssembly
+        Remove="@(RedistributableAssembly)"
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(RedistributableAssembly.NuGetPackageId)' == ''" />
+
+      <!-- Remove Visual Studio assemblies. -->
+      <RedistributableAssembly
+        Remove="@(RedistributableAssembly)"
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
+
+      <!-- Remove netstandard -->
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'netstandard'" />
+
+      <!-- TODO: Remove libraries provided via the Reqnroll MSBuild Generator. -->
+
+    </ItemGroup>
+
+  </Target>
+
+  <PropertyGroup>
+    <MarkRedistributableAssembliesForPackDependsOn>ResolveRedistributableAssemblies</MarkRedistributableAssembliesForPackDependsOn>
+  </PropertyGroup>
+
+  <!-- Include redistributable assemblies in the package. -->
+  <Target
+    Name="MarkRedistributableAssembliesForPack"
+    AfterTargets="CoreCompile"
+    DependsOnTargets="$(MarkRedistributableAssembliesForPackDependsOn)">
+
+    <ItemGroup>
+      <BuildOutputInPackage
+        Include="@(RedistributableAssembly)"
+        TargetPath="%(RedistributableAssembly.DestinationSubPath)"/>
+    </ItemGroup>
+  </Target>
+</Project>

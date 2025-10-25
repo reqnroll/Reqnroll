@@ -2,10 +2,11 @@
 	<PropertyGroup>
 		<TargetFrameworks>netstandard2.0</TargetFrameworks>
 
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
     <ImplicitUsings>enable</ImplicitUsings>
     <LangVersion>10</LangVersion>
+
+    <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <!-- Assembly signing -->
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
@@ -21,8 +22,6 @@
     <Authors>Oleg Koshmeliuk,Marcus Hammarberg, $(ReqnrollAuthors)</Authors>
     <Copyright>Copyright © Oleg Koshmeliuk, Marcus Hammarberg, $(ReqnrollAuthors)</Copyright>
     <PackageTags>reqnroll dynamic</PackageTags>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <DefaultLanguage>en-US</DefaultLanguage>
 	</PropertyGroup>
 
 	<ItemGroup>

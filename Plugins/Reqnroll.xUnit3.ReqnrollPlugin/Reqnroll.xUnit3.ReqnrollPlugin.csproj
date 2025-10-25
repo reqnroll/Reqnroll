@@ -6,8 +6,6 @@
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.xunit.v3</PackageId>
     <Description>Package to use Reqnroll with xUnit.v3 2.0 and later.</Description>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
   
   <ItemGroup>

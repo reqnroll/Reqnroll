@@ -8,8 +8,6 @@
     <PackageId>Reqnroll.MSTest</PackageId>
     <Description>Package to use Reqnroll for use with MsTest v2.</Description>
     <PackageTags>reqnroll mstest</PackageTags>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
 
   <ItemGroup>

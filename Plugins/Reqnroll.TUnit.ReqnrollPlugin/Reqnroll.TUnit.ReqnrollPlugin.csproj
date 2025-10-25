@@ -7,8 +7,6 @@
     <PackageId>Reqnroll.TUnit</PackageId>
     <Description>Package to use Reqnroll with TUnit 0.55.23 and later.</Description>
     <PackageTags>reqnroll TUnit</PackageTags>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
 
   <ItemGroup>
