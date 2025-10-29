@@ -138,6 +138,18 @@
       <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
     </ItemGroup>
 
+    <!--
+      Generate the timestamp files
+    -->
+    <ItemGroup>
+      <ReqnrollTimestampFolders Include="@(ReqnrollTimestampFiles->'%(RelativeDir)')" />
+    </ItemGroup>
+    <MakeDir Directories="@(ReqnrollTimestampFolders->Distinct())" />
+    <Touch Files="@(ReqnrollTimestampFiles)" AlwaysCreate="true" />
+    <ItemGroup>
+      <StaleReqnrollTimestampFiles Include="'$(BaseIntermediateOutputPath)**/*.timestamp'" Exclude="@(ReqnrollTimestampFiles)" />
+    </ItemGroup>
+    <Delete Files="@(StaleReqnrollTimestampFiles)" TreatErrorsAsWarnings="true" />
   </Target>
 
   <Target Name="BeforeUpdateFeatureFilesInProject" BeforeTargets="UpdateFeatureFilesInProject">
