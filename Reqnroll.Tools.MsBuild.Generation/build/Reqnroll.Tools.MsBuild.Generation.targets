@@ -66,6 +66,8 @@
   </Target>
 
   <Target Name="UpdateFeatureFilesInProject"
+          Inputs="@(ReqnrollFeatureFiles);$(MSBuildProjectFullPath)"
+          Outputs="@(ReqnrollTimestampFiles)"
           DependsOnTargets="BeforeUpdateFeatureFilesInProject">
 
     <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
