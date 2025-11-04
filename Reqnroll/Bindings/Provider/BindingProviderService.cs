@@ -1,4 +1,5 @@
-﻿using Reqnroll.Bindings.Discovery;
+using Cucumber.TagExpressions;
+using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
@@ -188,6 +189,7 @@ public class BindingProviderService(
             base.RegisterGlobalContainerDefaults(container);
             container.RegisterTypeAs<DryRunBindingInvoker, IAsyncBindingInvoker>();
             container.RegisterTypeAs<Formatters.Configuration.FormattersForcedDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
+            container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser(new TagExpressionParser()));
         }
     }
 

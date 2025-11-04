@@ -547,17 +547,15 @@ public partial class CucumberMessagesValidator
                        actualList.Should().HaveCountGreaterThanOrEqualTo(expectedList.Count,
                                                                          "actual collection should have at least as many items as expected");
 
-                       // Impossible to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
-                       // and the Scope tags won't line up because the CCK uses tag expressions and RnR does not support them)
+                       // Difficult to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
                        // and After Hook execution ordering is different between Reqnroll and CCK.
-                       /*
-                           foreach (var expectedItem in expectedList)
-                           {
-                               actualList.Should().Contain(actualItem =>
-                                   AssertionExtensions.Should(actualItem).BeEquivalentTo(expectedItem, "").And.Subject == actualItem,
-                                   "actual collection should contain an item equivalent to {0}", expectedItem);
-                           }
-                       */
+                       foreach (var expectedItem in expectedList)
+                       {
+                           actualList.Should().Contain(actualItem =>
+                               actualItem.TagExpression == expectedItem.TagExpression
+                               && actualItem.Type == expectedItem.Type,
+                               "actual collection should contain an item equivalent to {0}", expectedItem);
+                       }
                    }
                })
                .WhenTypeIs<List<Hook>>()
