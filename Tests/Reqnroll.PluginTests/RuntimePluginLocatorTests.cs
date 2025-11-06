@@ -48,23 +48,20 @@ namespace Reqnroll.PluginTests
             var allProjectReferenceFoundByPluginLocator = projectReferences.All(pr => plugins.Any(plugin => plugin.Contains(pr)));
             allProjectReferenceFoundByPluginLocator.Should().BeTrue();
 
-            var numberOfGeneratorPlugins = NumberOfGeneratorPluginsReferenced(projectReferences);
-            var generatorPluginsFound = plugins.Where(p => p.Contains("Generator")).ToList();
-            generatorPluginsFound.Count.Should().Be(numberOfGeneratorPlugins);
-
-            var numberOfRuntimePlugins = NumberOfRuntimePluginsReferenced(projectReferences);
-            var runtimePluginsFound = plugins.Where(p => !p.Equals(testAssembly.Location)).Except(generatorPluginsFound).ToList();
-            runtimePluginsFound.Should().HaveCount(numberOfRuntimePlugins, $"{string.Join(",", runtimePluginsFound)} were found");
-        }
-
-        private int NumberOfGeneratorPluginsReferenced(List<string> projectReferences)
-        {
-            return projectReferences.Count(p => p.Contains("Generator"));
-        }
-
-        private int NumberOfRuntimePluginsReferenced(List<string> projectReferences)
-        {
-            return projectReferences.Count(p => !p.Contains("Generator"));
+            var foundPlugins = plugins.Select(Path.GetFileName);
+            foundPlugins.Should().BeEquivalentTo([
+                "Reqnroll.PluginTests.dll", // This test assembly
+                "Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll",
+                "Reqnroll.Autofac.ReqnrollPlugin.dll", 
+                "Reqnroll.ExternalData.ReqnrollPlugin.dll",
+                "Reqnroll.Windsor.ReqnrollPlugin.dll",
+                "Reqnroll.MSTest.ReqnrollPlugin.dll",
+                "Reqnroll.MSTest.Generator.ReqnrollPlugin.dll",
+                "Reqnroll.NUnit.ReqnrollPlugin.dll",
+                "Reqnroll.NUnit.Generator.ReqnrollPlugin.dll",
+                "Reqnroll.xUnit.ReqnrollPlugin.dll",
+                "Reqnroll.xUnit.Generator.ReqnrollPlugin.dll",
+            ]);
         }
 
         private List<string> GetProjectReferencesDlls()

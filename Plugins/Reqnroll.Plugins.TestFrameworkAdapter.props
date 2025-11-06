@@ -1,5 +1,27 @@
 <Project>
-
+  <!--
+  REQNROLL TEST FRAMEWORK ADAPTER SDK
+  
+  This file defines properties and extensions to MSBuild which ensure a runtime and generator plugin can be built and
+  and packed correctly.
+  
+  Runtime plugins are loaded into Reqnroll at runtime, where generator plugins are loaded into the MSBuild process and picked
+  up by the Reqnroll generator. To deliver a test framework adapter, both kinds of plugin are packed as separate assemblies.
+  The SDK expects the runtime plugin to be a project that also references a generator plugin project. The runtime plugin 
+  project imports this SDK to create the publishable NuGet package and the generator plugin project is packed into the /build 
+  folder of the NuGet package.
+  
+  NuGet package layout:
+  /assets
+    /icon.png <- The package icon
+  /build      <- Contains a copy of all files from the project's /build folder plus SDK-defined files
+    /<tfm>    <- Contains the generator plugin assembly compiled for that Target Framework
+    /Reqnroll.TestFrameworkAdapter.props   <- Prop file added by the SDK
+    /Reqnroll.TestFrameworkAdapter.targets <- Targets file added by the SDK
+  /lib
+    /<tfm>    <- Contains the runtime plugin assembly compiled for that Target Framework
+      
+  -->
   <PropertyGroup>
     <!-- Assembly signing -->
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>

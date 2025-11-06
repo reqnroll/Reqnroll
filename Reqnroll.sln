@@ -136,13 +136,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{02EA681E
 	ProjectSection(SolutionItems) = preProject
 		Plugins\Directory.Build.props = Plugins\Directory.Build.props
 		Plugins\Directory.Build.targets = Plugins\Directory.Build.targets
-		Plugins\Reqnroll.GeneratorPlugin.Sdk.props = Plugins\Reqnroll.GeneratorPlugin.Sdk.props
-		Plugins\Reqnroll.GeneratorPlugin.Sdk.targets = Plugins\Reqnroll.GeneratorPlugin.Sdk.targets
-		Plugins\Reqnroll.RuntimePlugin.Sdk.props = Plugins\Reqnroll.RuntimePlugin.Sdk.props
-		Plugins\Reqnroll.RuntimePlugin.Sdk.targets = Plugins\Reqnroll.RuntimePlugin.Sdk.targets
+		Plugins\Reqnroll.Plugins.GeneratorPlugin.props = Plugins\Reqnroll.Plugins.GeneratorPlugin.props
 		Plugins\Reqnroll.TestFrameworkAdapter.props = Plugins\Reqnroll.TestFrameworkAdapter.props
-		Plugins\Reqnroll.TestFrameworkAdapter.Sdk.props = Plugins\Reqnroll.TestFrameworkAdapter.Sdk.props
-		Plugins\Reqnroll.TestFrameworkAdapter.Sdk.targets = Plugins\Reqnroll.TestFrameworkAdapter.Sdk.targets
+		Plugins\Reqnroll.Plugins.TestFrameworkAdapter.targets = Plugins\Reqnroll.Plugins.TestFrameworkAdapter.targets
+		Plugins\Reqnroll.Plugins.TestFrameworkAdapter.props = Plugins\Reqnroll.Plugins.TestFrameworkAdapter.props
+		Plugins\Reqnroll.Plugins.GeneratorPlugin.targets = Plugins\Reqnroll.Plugins.GeneratorPlugin.targets
+		Plugins\Reqnroll.Plugins.RuntimePlugin.targets = Plugins\Reqnroll.Plugins.RuntimePlugin.targets
+		Plugins\Reqnroll.Plugins.RuntimePlugin.props = Plugins\Reqnroll.Plugins.RuntimePlugin.props
 		Plugins\Reqnroll.TestFrameworkAdapter.targets = Plugins\Reqnroll.TestFrameworkAdapter.targets
 	EndProjectSection
 EndProject

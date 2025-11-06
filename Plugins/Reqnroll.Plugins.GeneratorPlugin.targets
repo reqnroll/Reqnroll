@@ -13,7 +13,7 @@
   <!-- Resolves the additional assemblies that will be provided to the runtime through this package. -->
   <Target
     Name="ResolveRedistributableAssemblies"
-    Outputs="RedistributableAssembly"
+    Returns="RedistributableAssembly"
     DependsOnTargets="$(ResolveRedistributableAssembliesDependsOn)">
 
     <ItemGroup>

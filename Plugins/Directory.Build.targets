@@ -1,22 +1,22 @@
 <Project>
   <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.targets"/>
   <Import
-    Project="$(MSBuildThisFileDirectory)Reqnroll.RuntimePlugin.Sdk.props"
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.RuntimePlugin.props"
     Condition="'$(IsReqnrollRuntimePlugin)' == 'true'"/>
   <Import
-    Project="$(MSBuildThisFileDirectory)Reqnroll.GeneratorPlugin.Sdk.props"
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.GeneratorPlugin.props"
     Condition="'$(IsReqnrollGeneratorPlugin)' == 'true'"/>
   <Import 
-    Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.Sdk.props"
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.TestFrameworkAdapter.props"
     Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
   <Import
-    Project="$(MSBuildThisFileDirectory)Reqnroll.RuntimePlugin.Sdk.targets"
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.RuntimePlugin.targets"
     Condition="'$(IsReqnrollRuntimePlugin)' == 'true'"/>
   <Import
-    Project="$(MSBuildThisFileDirectory)Reqnroll.GeneratorPlugin.Sdk.targets"
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.GeneratorPlugin.targets"
     Condition="'$(IsReqnrollGeneratorPlugin)' == 'true'"/>
   <Import
-    Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.Sdk.targets"
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.TestFrameworkAdapter.targets"
     Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
   
   <PropertyGroup>

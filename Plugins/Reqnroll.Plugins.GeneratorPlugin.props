@@ -16,11 +16,11 @@
   -->
   
   <PropertyGroup>
-    <!-- Suppress the normal dependency file - they're not used by MSBuild -->
-    <GenerateDependencyFile>false</GenerateDependencyFile>
-
     <!-- Assemble output in the build path -->
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
+
+    <!-- This is required to ensure dependencies are made available for packing -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <!-- Assembly signing -->
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
@@ -39,10 +39,10 @@
     <UpToDateCheckInput Include="build/**" />
   </ItemGroup>
 
-  <!-- Package references are not exposed to projects consuming the generator plugin. -->
-  <ItemDefinitionGroup>
-    <PackageReference>
+  <!-- Mark all package as private so they don't get declared in the NuGet depdendencies. -->
+  <ItemGroup>
+    <PackageReference Update="@(PackageReference)">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-  </ItemDefinitionGroup>
+  </ItemGroup>
 </Project>
