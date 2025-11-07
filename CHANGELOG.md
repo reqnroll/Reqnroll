@@ -1,5 +1,13 @@
 # [vNext]
 
+## Improvements:
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.2.1 - 2025-11-07
+
 ## Bug fixes:
 
 * Fix: AfterScenario hook is not called when a scenario end in inconclusive or skipped status (#883, #900)
