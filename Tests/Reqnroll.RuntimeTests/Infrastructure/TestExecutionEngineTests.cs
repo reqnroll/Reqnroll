@@ -533,6 +533,41 @@ public partial class TestExecutionEngineTests
     }
 
     [Fact]
+    public async Task Should_execute_after_scenario()
+    {
+        var testExecutionEngine = CreateTestExecutionEngine();
+        RegisterStepDefinition();
+
+        var hookMock = CreateHookMock(_afterScenarioEvents);
+
+        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioStartAsync();
+        await testExecutionEngine.OnScenarioEndAsync();
+
+        _methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+    }
+
+    [Fact]
+    public async Task Should_execute_after_scenario_even_when_test_is_dynamically_ignored()
+    {
+        var testExecutionEngine = CreateTestExecutionEngine();
+        RegisterStepDefinition();
+
+        var hookMock = CreateHookMock(_afterScenarioEvents);
+
+        _unitTestRuntimeProviderStub.Setup(utp => utp.DetectExecutionStatus(It.Is<Exception>(e => e is OperationCanceledException)))
+                                    .Returns(ScenarioExecutionStatus.Skipped);
+        RegisterFailingStepDefinition(exceptionToThrow: new OperationCanceledException("simulated"));
+
+        testExecutionEngine.OnScenarioInitialize(_scenarioInfo, _ruleInfo);
+        await testExecutionEngine.OnScenarioStartAsync();
+        await testExecutionEngine.StepAsync(StepDefinitionKeyword.Given, null, "foo", null, null);
+        await testExecutionEngine.OnScenarioEndAsync();
+
+        _methodBindingInvokerMock.Verify(i => i.InvokeBindingAsync(hookMock.Object, _contextManagerStub.Object, null, _testTracerStub.Object, It.IsAny<DurationHolder>()), Times.Once());
+    }
+
+    [Fact]
     public async Task Should_not_execute_step_when_there_was_an_error_earlier()
     {
         var testExecutionEngine = CreateTestExecutionEngine();
@@ -724,6 +759,8 @@ public partial class TestExecutionEngineTests
         await act.Should().ThrowAsync<Exception>().WithMessage("simulated error");
         _contextManagerStub.Verify(cm => cm.CleanupScenarioContext(), Times.Once);
     }
+
+    
 
     [Fact]
     public async Task Should_resolve_FeatureContext_hook_parameter()
