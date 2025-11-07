@@ -138,6 +138,16 @@ namespace Reqnroll.Generator.UnitTestProvider
 
         public virtual void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
         {
+            AddTestMethodAttribute(generationContext, testMethod, friendlyTestName);
+            CodeDomHelper.AddAttribute(testMethod, DESCRIPTION_ATTR, friendlyTestName);
+
+            //as in mstest, you cannot mark classes with the description attribute, we
+            //just apply it for each test method as a property
+            SetProperty(testMethod, FEATURE_TITILE_PROPERTY_NAME, generationContext.Feature.Name);
+        }
+
+        public virtual void AddTestMethodAttribute(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
+        {
             if (generationContext.DisableFriendlyTestNames)
             {
                 CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
@@ -146,12 +156,6 @@ namespace Reqnroll.Generator.UnitTestProvider
             {
                 CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, friendlyTestName);
             }
-
-            CodeDomHelper.AddAttribute(testMethod, DESCRIPTION_ATTR, friendlyTestName);
-
-            //as in mstest, you cannot mark classes with the description attribute, we
-            //just apply it for each test method as a property
-            SetProperty(testMethod, FEATURE_TITILE_PROPERTY_NAME, generationContext.Feature.Name);
         }
 
         public virtual void SetTestMethodCategories(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, IEnumerable<string> scenarioCategories)

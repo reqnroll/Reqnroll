@@ -3,8 +3,9 @@
 ## Improvements:
 
 ## Bug fixes:
+* Fix: Feature-level tags are not generating MSTest TestCategory attributes for scenarios (#910)
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.2.0 - 2025-10-21
 
