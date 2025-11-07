@@ -3,7 +3,8 @@
 ## Improvements:
 
 ## Bug fixes:
-* Fix:  #883 AfterScenario hook is not called when a scenario end in inconclusive or skipped status (#900)
+* Fix: AfterScenario hook is not called when a scenario end in inconclusive or skipped status (#883, #900)
+* Fix: Feature-level tags are not generating MSTest TestCategory attributes for scenarios (#910)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi
 
