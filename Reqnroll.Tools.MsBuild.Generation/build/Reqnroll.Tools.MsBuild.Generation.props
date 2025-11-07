@@ -62,6 +62,7 @@
       <MessagesFile>$(IntermediateOutputPath)%(RelativeDir)%(Filename).feature.ndjson</MessagesFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
       <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
+      <Folder>%(RelativeDir)</Folder>
     </ReqnrollFeatureFiles>
 
     <!-- obsolete codebehind files, scenarios:
@@ -74,8 +75,12 @@
     <!-- Support for Visual Studio Incremental Build
         https://github.com/reqnroll/Reqnroll/issues/1319
      -->
+    <ReqnrollTimestampFiles Include="@(ReqnrollFeatureFiles->'$(BaseIntermediateOutputPath)%(Folder)%(Filename).timestamp')">
+      <Original>%(Folder)%(Filename).feature</Original>
+    </ReqnrollTimestampFiles>
     <UpToDateCheckInput Include="@(ReqnrollFeatureFiles)" />
-    <UpToDateCheckBuild Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" Original="@(ReqnrollFeatureFiles)" />
+    <UpToDateCheckBuilt Include="@(ReqnrollTimestampFiles)" />
+    <Clean Include="@(ReqnrollTimestampFiles)" />
     <CustomAdditionalCompileInputs Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
 
   </ItemGroup>
