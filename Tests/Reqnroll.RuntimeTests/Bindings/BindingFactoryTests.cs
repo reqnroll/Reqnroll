@@ -7,6 +7,7 @@ using Reqnroll.Bindings.CucumberExpressions;
 using Reqnroll.Bindings.Reflection;
 using System.Linq;
 using Xunit;
+using Reqnroll.Bindings.Discovery;
 
 namespace Reqnroll.RuntimeTests.Bindings;
 
@@ -23,10 +24,10 @@ public class BindingFactoryTests
         var cucumberExpressionStepDefinitionBindingBuilderFactory = new CucumberExpressionStepDefinitionBindingBuilderFactory(new CucumberExpressionParameterTypeRegistry(Mock.Of<IBindingRegistry>()));
         var cucumberExpressionDetector = new CucumberExpressionDetector();
         var sut = new BindingFactory(stepDefinitionRegexCalculator.Object, cucumberExpressionStepDefinitionBindingBuilderFactory, cucumberExpressionDetector);
-
+        var tagExpressionParser = new ReqnrollTagExpressionParser(new Cucumber.TagExpressions.TagExpressionParser());
         var stepDefinitionType = StepDefinitionType.Given;
         var bindingMethod = new Mock<IBindingMethod>().Object;
-        var bindingScope = new BindingScope("tag1", "feature1", "scenario1");
+        var bindingScope = new BindingScope(tagExpressionParser.Parse("tag1"), "feature1", "scenario1");
         var expressionString = "The product {string} has the price {int}$";
 
         // Act

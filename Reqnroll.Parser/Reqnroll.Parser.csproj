@@ -18,4 +18,8 @@
     <ProjectReference Include="..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Cucumber\TagExpression\" />
+  </ItemGroup>
+
 </Project>

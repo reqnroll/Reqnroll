@@ -3,20 +3,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.PlatformCompatibility;
+using Cucumber.TagExpressions;
 
 namespace Reqnroll.Bindings.Discovery
 {
     public abstract class BindingSourceProcessor : IBindingSourceProcessor
     {
         private readonly IBindingFactory _bindingFactory;
+        private readonly ITagExpressionParser _tagExpressionParser;
 
         private BindingSourceType _currentBindingSourceType = null;
         private BindingScope[] _typeScopes = null;
         private readonly List<IStepDefinitionBindingBuilder> _stepDefinitionBindingBuilders = new();
 
-        protected BindingSourceProcessor(IBindingFactory bindingFactory)
+        protected BindingSourceProcessor(IBindingFactory bindingFactory, ITagExpressionParser tagExpressionParser)
         {
             _bindingFactory = bindingFactory;
+            _tagExpressionParser = tagExpressionParser;
         }
 
         public bool CanProcessTypeAttribute(string attributeTypeName)
@@ -75,7 +78,7 @@ namespace Reqnroll.Bindings.Discovery
         private IEnumerable<BindingScope> GetScopes(IEnumerable<BindingSourceAttribute> attributes)
         {
             return attributes.Where(attr => attr.AttributeType.TypeEquals(typeof(ScopeAttribute)))
-                .Select(attr => new BindingScope(attr.TryGetAttributeValue<string>("Tag"), attr.TryGetAttributeValue<string>("Feature"), attr.TryGetAttributeValue<string>("Scenario")));
+                .Select(attr => new BindingScope(_tagExpressionParser.Parse(attr.TryGetAttributeValue<string>("Tag")), attr.TryGetAttributeValue<string>("Feature"), attr.TryGetAttributeValue<string>("Scenario")));
         }
 
         private bool IsBindingType(BindingSourceType bindingSourceType)
@@ -156,7 +159,7 @@ namespace Reqnroll.Bindings.Discovery
 
             string[] tags = GetTagsDefinedOnBindingAttribute(hookAttribute);
             if (tags != null)
-                scopes = scopes.Concat(tags.Select(t => new BindingScope(t, null, null)));
+                scopes = scopes.Concat(tags.Select(t => new BindingScope(_tagExpressionParser.Parse(t), null, null)));
 
 
             ApplyForScope(scopes.ToArray(), scope => ProcessHookAttribute(bindingSourceMethod, hookAttribute, scope));

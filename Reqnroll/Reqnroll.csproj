@@ -52,6 +52,12 @@
     <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="Cucumber.TagExpressions">
+      <HintPath>..\..\cucumber\tag-expressions\dotnet\TagExpressions\bin\Debug\netstandard2.0\Cucumber.TagExpressions.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
   <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
     <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
     <ItemGroup>

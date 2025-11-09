@@ -1,4 +1,5 @@
-﻿using Reqnroll.Bindings.Discovery;
+using Cucumber.TagExpressions;
+using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
@@ -138,9 +139,7 @@ public class BindingProviderService(
 
             return new BindingScopeData
             {
-                Tag = scopedBinding.BindingScope.Tag == null
-                    ? null
-                    : "@" + scopedBinding.BindingScope.Tag,
+                Tag = scopedBinding.BindingScope.Tag,
                 FeatureTitle = scopedBinding.BindingScope.FeatureTitle,
                 ScenarioTitle = scopedBinding.BindingScope.ScenarioTitle
             };
@@ -188,6 +187,7 @@ public class BindingProviderService(
             base.RegisterGlobalContainerDefaults(container);
             container.RegisterTypeAs<DryRunBindingInvoker, IAsyncBindingInvoker>();
             container.RegisterTypeAs<Formatters.Configuration.FormattersForcedDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
+            var _ = container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser(new TagExpressionParser())).InstancePerDependency;
         }
     }
 
