@@ -355,7 +355,7 @@ public class TestRunnerManager : ITestRunnerManager
             {
                 foreach (var item in testWorkerContainers)
                 {
-                    item.Key.Dispose();
+                    await item.Key.DisposeAsync();
                     _availableTestWorkerContainers.TryRemove(item.Key, out _);
                 }
                 testWorkerContainers = _availableTestWorkerContainers.ToArray();
@@ -369,7 +369,7 @@ public class TestRunnerManager : ITestRunnerManager
             }
 
             // this call dispose on this object, but _wasDisposed will avoid double execution
-            _globalContainer.Dispose();
+            await _globalContainer.DisposeAsync();
 
             OnTestRunnerManagerDisposed(this);
 

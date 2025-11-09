@@ -1,12 +1,13 @@
 #nullable enable
+using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+using Reqnroll.BoDi;
+using Reqnroll.CommonModels;
+using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Reqnroll.BoDi;
-using Microsoft.Build.Framework;
-using Microsoft.Build.Utilities;
-using Reqnroll.CommonModels;
-using Reqnroll.Utils;
+using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
 namespace Reqnroll.Tools.MsBuild.Generation;
@@ -22,7 +23,7 @@ public class GenerateFeatureFileCodeBehindTaskExecutor(
     IExceptionTaskLogger exceptionTaskLogger)
     : IGenerateFeatureFileCodeBehindTaskExecutor
 {
-    public IResult<IReadOnlyCollection<ITaskItem>> Execute()
+    public async Task<IResult<IReadOnlyCollection<ITaskItem>>> ExecuteAsync()
     {
         processInfoDumper.DumpProcessInfo();
         log.LogTaskMessage("Starting GenerateFeatureFileCodeBehind task");
@@ -33,7 +34,7 @@ public class GenerateFeatureFileCodeBehindTaskExecutor(
         {
             var reqnrollProject = reqnrollProjectProvider.GetReqnrollProject();
 
-            using var generatorContainer = wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
+            await using var generatorContainer = wrappedGeneratorContainerBuilder.BuildGeneratorContainer(
                 reqnrollProject.ProjectSettings.ConfigurationHolder,
                 reqnrollProject.ProjectSettings,
                 reqnrollProjectInfo.GeneratorPlugins,

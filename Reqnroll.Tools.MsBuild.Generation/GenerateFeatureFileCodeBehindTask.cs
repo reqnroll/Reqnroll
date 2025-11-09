@@ -7,10 +7,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Tools.MsBuild.Generation;
 
-public class GenerateFeatureFileCodeBehindTask : Task
+public class GenerateFeatureFileCodeBehindTask : Microsoft.Build.Utilities.Task
 {
     public const string CodeBehindFileMetadata = "CodeBehindFile"; //in
     public const string MessagesFileMetadata = "MessagesFile"; //in,out
@@ -40,7 +41,9 @@ public class GenerateFeatureFileCodeBehindTask : Task
 
     public bool LaunchDebugger { get; set; }
 
-    public override bool Execute()
+    public override bool Execute() => AsyncRunner.RunAndJoin(ExecuteAsync);
+
+    public async Task<bool> ExecuteAsync()
     {
         if (LaunchDebugger) Debugger.Launch();
 
@@ -55,20 +58,25 @@ public class GenerateFeatureFileCodeBehindTask : Task
         var reqnrollProjectInfo = new ReqnrollProjectInfo(generatorPlugins, featureFiles, ProjectPath, ProjectFolder, ProjectGuid, AssemblyName, OutputPath, RootNamespace, TargetFrameworks, TargetFramework);
         var dependencyCustomizations = DependencyCustomizations ?? new NullGenerateFeatureFileCodeBehindTaskDependencyCustomizations();
 
-        using var taskRootContainer = generateFeatureFileCodeBehindTaskContainerBuilder.BuildRootContainer(Log, reqnrollProjectInfo, msbuildInformationProvider, dependencyCustomizations);
+        await using var taskRootContainer = generateFeatureFileCodeBehindTaskContainerBuilder.BuildRootContainer(
+            Log,
+            reqnrollProjectInfo,
+            msbuildInformationProvider,
+            dependencyCustomizations);
+
         var assemblyResolveLoggerFactory = taskRootContainer.Resolve<IAssemblyResolveLoggerFactory>();
 
         using (assemblyResolveLoggerFactory.Build())
         {
             var taskExecutor = taskRootContainer.Resolve<IGenerateFeatureFileCodeBehindTaskExecutor>();
-            var executeResult = taskExecutor.Execute();
+            var executeResult = await taskExecutor.ExecuteAsync();
 
             if (executeResult is not ISuccess<IReadOnlyCollection<ITaskItem>> success)
             {
                 return false;
             }
 
-            GeneratedFiles = success.Result.ToArray();
+            GeneratedFiles = [.. success.Result];
 
             return true;
         }

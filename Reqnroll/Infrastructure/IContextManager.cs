@@ -1,4 +1,5 @@
 using Reqnroll.Bindings;
+using System.Threading.Tasks;
 
 namespace Reqnroll.Infrastructure
 {
@@ -10,11 +11,11 @@ namespace Reqnroll.Infrastructure
         ScenarioStepContext StepContext { get; }
         StepDefinitionType? CurrentTopLevelStepDefinitionType { get; }
 
-        void InitializeFeatureContext(FeatureInfo featureInfo);
-        void CleanupFeatureContext();
+        Task InitializeFeatureContextAsync(FeatureInfo featureInfo);
+        ValueTask CleanupFeatureContextAsync();
 
-        void InitializeScenarioContext(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
-        void CleanupScenarioContext();
+        Task InitializeScenarioContextAsync(ScenarioInfo scenarioInfo, RuleInfo ruleInfo);
+        ValueTask CleanupScenarioContextAsync();
 
         void InitializeStepContext(StepInfo stepInfo);
         void CleanupStepContext();
