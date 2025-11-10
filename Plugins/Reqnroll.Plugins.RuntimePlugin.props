@@ -16,6 +16,9 @@
       
   -->
   <PropertyGroup>
+    <!-- Plugins become packages by default -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    
     <!-- Assembly signing -->
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>

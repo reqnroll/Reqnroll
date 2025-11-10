@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>net472;net8.0</TargetFrameworks>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
     
     <!-- NuGet package metadata -->

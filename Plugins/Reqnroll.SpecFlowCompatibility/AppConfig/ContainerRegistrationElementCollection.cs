@@ -2,7 +2,8 @@
 using System.Linq;
 using Reqnroll.Configuration;
 
-namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig;
+namespace Reqnroll.SpecFlowCompatibility.AppConfig;
+
 public class ContainerRegistrationElementCollection : ConfigurationElementCollection
 {
     protected override ConfigurationElement CreateNewElement()

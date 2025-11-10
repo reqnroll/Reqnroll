@@ -2,11 +2,6 @@
 
   <ItemGroup>
     <ReqnrollGeneratorPlugins Include="$(_ReqnrollSpecFlowCompatibilityGeneratorPluginPath)" />
-    <None Include="$(_ReqnrollSpecFlowCompatibilityRuntimePluginPath)" >
-      <Link>%(Filename)%(Extension)</Link>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Visible>False</Visible>
-    </None>
   </ItemGroup>
 
 </Project>

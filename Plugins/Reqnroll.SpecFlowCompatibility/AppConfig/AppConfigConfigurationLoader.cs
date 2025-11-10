@@ -5,7 +5,7 @@ using System.Linq;
 using Reqnroll.Configuration;
 using Reqnroll.Tracing;
 
-namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.AppConfig;
+namespace Reqnroll.SpecFlowCompatibility.AppConfig;
 
 public class AppConfigConfigurationLoader
 {

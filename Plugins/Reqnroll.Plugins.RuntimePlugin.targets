@@ -1,3 +1,38 @@
 <Project>
+  <!--
+  REQNROLL RUNTIME PLUGIN SDK
+  
+  This file defines properties and extensions to MSBuild which ensure a runtime plugin is built and packed correctly.
+  
+  Runtime plugins are loaded into Reqnroll at runtime. They are delivered as standard NuGet packages to be included
+  in the runtime of the test project which wants to use them.
+  
+  NuGet package layout:
+  /assets
+    /icon.png <- The package icon
+  /build      <- Contains a copy of all files from the project's /build folder
+  /lib
+    /<tfm>    <- Contains the plugin assembly compiled for that Target Framework
+      
+  -->
+  <PropertyGroup>
+    <!-- Plugins become packages by default -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
+    <!-- Assembly signing -->
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+  </PropertyGroup>
+
+  <!-- All runtime plugins must reference Reqnroll. This also doubles as a version-compatibility declaration in the package. -->
+  <ItemGroup>
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj"/>
+  </ItemGroup>
+
+  <!-- Build assets are included in the package. -->
+  <ItemGroup>
+    <None Include="build/**" Pack="true" PackagePath="build" />
+    <UpToDateCheckInput Include="build/**" />
+  </ItemGroup>
 </Project>
