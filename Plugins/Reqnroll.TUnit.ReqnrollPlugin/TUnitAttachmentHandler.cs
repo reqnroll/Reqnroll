@@ -21,7 +21,7 @@ public class TUnitAttachmentHandler : ReqnrollAttachmentHandler
                 DisplayName = filePath,
             };
 
-            TestContext.Current?.AddArtifact(artifact);
+            TestContext.Current?.Output.AttachArtifact(artifact);
         }
         catch (Exception)
         {
