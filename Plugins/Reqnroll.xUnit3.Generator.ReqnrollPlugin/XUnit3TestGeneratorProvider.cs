@@ -36,7 +36,7 @@ public class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     protected internal const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
     protected internal const string COLLECTION_ATTRIBUTE = "Xunit.CollectionAttribute";
 
-    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests;
+    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
 
     public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
     {
