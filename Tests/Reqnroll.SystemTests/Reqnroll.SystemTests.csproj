@@ -13,6 +13,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="NuGetPackageVersion.template.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="NuGetPackageVersion.template.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -52,15 +60,27 @@
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <NuGetPackageVersionTemplate Include="NuGetPackageVersion.template.cs" />
+    <Compile Remove="@(NuGetPackageVersionTemplate)" />
+  </ItemGroup>
 
-  <Target Name="WriteNuGetVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs.txt" OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs" TextToReplace="NUGET_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-
+  <Target
+    Name="WriteNuGetVersion"
+    AfterTargets="GetBuildVersion"
+    BeforeTargets="BeforeCompile"
+    Inputs="@(NuGetPackageVersionTemplate)"
+    Outputs="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)">
+    
+    <ReplaceTextInFileTask
+      InputFile="%(NuGetPackageVersionTemplate.FullPath)"
+      OutputFile="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)"
+      TextToReplace="NUGET_VERSION"
+      TextToReplaceWith="$(PackageVersion)" />
+    
     <ItemGroup>
-      <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs" />
+      <Compile Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
     </ItemGroup>
   </Target>
-
-
-
 </Project>
