@@ -317,6 +317,10 @@ namespace Reqnroll.Bindings.Discovery
         {
             bool BindingClassInheritsFromBindingClass(BindingSourceType bindingSourceType)
             {
+                if (bindingSourceType.BindingType == null)
+                    return false;
+                if (string.IsNullOrEmpty(bindingSourceType.BindingType.FullName) || string.IsNullOrEmpty(bindingSourceType.BindingType.AssemblyName))
+                    return false;
                 var type = GetTypeFromFullNameAndAssembly(bindingSourceType.BindingType?.FullName, bindingSourceType.BindingType?.AssemblyName);
                 int count = 0;
                 while (type != null && type != typeof(object))
