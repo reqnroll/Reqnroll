@@ -217,7 +217,7 @@ public class XUnit3TestGeneratorProviderTests
 
         // Assert
         var modifiedAttribute = codeMemberMethod.CustomAttributes.OfType<CodeAttributeDeclaration>()
-            .FirstOrDefault(a => a.Name == "Xunit.SkippableTheoryAttribute");
+            .FirstOrDefault(a => a.Name == "Xunit.TheoryAttribute");
 
         modifiedAttribute.Should().NotBeNull();
 
@@ -324,7 +324,7 @@ public class XUnit3TestGeneratorProviderTests
 
         // Assert
         var modifiedAttribute = codeMemberMethod.CustomAttributes.OfType<CodeAttributeDeclaration>()
-            .FirstOrDefault(a => a.Name == "Xunit.SkippableFactAttribute");
+            .FirstOrDefault(a => a.Name == "Xunit.FactAttribute");
 
         modifiedAttribute.Should().NotBeNull();
 

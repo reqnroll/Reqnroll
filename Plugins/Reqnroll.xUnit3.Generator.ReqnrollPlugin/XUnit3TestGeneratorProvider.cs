@@ -230,7 +230,15 @@ public class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
     {
-        _codeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(friendlyTestName)));
+        if (generationContext.DisableFriendlyTestNames)
+        {
+            _codeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE);
+        }
+        else
+        {
+            _codeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(friendlyTestName)));
+        }
+
         SetProperty(testMethod, FEATURE_TITLE, generationContext.Feature.Name);
         SetDescription(testMethod, friendlyTestName);
     }
@@ -262,7 +270,15 @@ public class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
     {
-        _codeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(scenarioTitle)));
+        if (generationContext.DisableFriendlyTestNames)
+        {
+            _codeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE);
+        }
+        else
+        {
+            _codeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(scenarioTitle)));
+        }
+
         SetProperty(testMethod, FEATURE_TITLE, generationContext.Feature.Name);
         SetDescription(testMethod, scenarioTitle);
     }
