@@ -13,11 +13,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="NuGetPackageVersion.template.cs" />
+    <Compile Remove="NuGetPackageVersion.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <None Include="NuGetPackageVersion.template.cs" />
+    <None Include="NuGetPackageVersion.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,6 @@
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Scrutor" Version="5.0.2" />
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="*" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,25 +61,26 @@
   </ItemGroup>
   
   <ItemGroup>
-    <NuGetPackageVersionTemplate Include="NuGetPackageVersion.template.cs" />
+    <NuGetPackageVersionTemplate Include="NuGetPackageVersion.cs" />
     <Compile Remove="@(NuGetPackageVersionTemplate)" />
   </ItemGroup>
+  
+  <Target Name="WriteNuGetVersion" Inputs="@(NuGetPackageVersionTemplate)" Outputs="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile">
 
-  <Target
-    Name="WriteNuGetVersion"
-    AfterTargets="GetBuildVersion"
-    BeforeTargets="BeforeCompile"
-    Inputs="@(NuGetPackageVersionTemplate)"
-    Outputs="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)">
-    
-    <ReplaceTextInFileTask
-      InputFile="%(NuGetPackageVersionTemplate.FullPath)"
-      OutputFile="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)"
-      TextToReplace="NUGET_VERSION"
-      TextToReplaceWith="$(PackageVersion)" />
-    
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(NuGetPackageVersionTemplate.Identity)">
+      <Output TaskParameter="Lines" ItemName="_NuGetPackageVersionTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the namespace token replaced. -->
+    <WriteLinesToFile File="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" Lines="@(_NuGetPackageVersionTemplateLine -&gt; Replace(`NUGET_VERSION`, `$(PackageVersion)`))" Overwrite="true" Encoding="UTF-8" />
+
     <ItemGroup>
-      <Compile Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
+      <!-- Include the generated hooks in the compilation -->
+      <Compile Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
     </ItemGroup>
   </Target>
 </Project>

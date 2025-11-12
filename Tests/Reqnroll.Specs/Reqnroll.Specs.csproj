@@ -72,8 +72,7 @@
     Inputs="@(NuGetPackageVersionTemplate)"
     Outputs="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)"
     AfterTargets="GetBuildVersion"
-    BeforeTargets="BeforeCompile"
-    Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
+    BeforeTargets="BeforeCompile">
 
     <!-- Read the lines from the template. -->
     <ReadLinesFromFile File="%(NuGetPackageVersionTemplate.Identity)">

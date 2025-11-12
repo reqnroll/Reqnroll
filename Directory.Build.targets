@@ -2,20 +2,17 @@
 
   <PropertyGroup>
     <ReqnrollCompatibilityVersionRange>[$(PackageVersion),$(CompatibilityVersionUpperRange))</ReqnrollCompatibilityVersionRange>
+    <PackagesOutputPath>$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)</PackagesOutputPath>
   </PropertyGroup>
 
-  <Target Name="CleanupNupkgs" BeforeTargets="Build" >
+  <!-- Copies generated NuGet packages and symbol packages to the output packages path -->
+  <Target
+    Name="CopyPackageToPackagesOutputPath"
+    AfterTargets="Pack">
     <ItemGroup>
-      <Nupkgs2Delete Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
+      <GeneratedPackages Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
     </ItemGroup>
-    <Delete Files="@(Nupkgs2Delete)" />
-  </Target>
-
-  <Target Name="CopyNupkgToFolder" AfterTargets="Pack">
-    <ItemGroup>
-      <GeneratedNupkgs Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
-    </ItemGroup>
-    <Copy SourceFiles="@(GeneratedNupkgs)" DestinationFolder="$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)" />
+    <Copy SourceFiles="@(GeneratedPackages)" DestinationFolder="$(PackagesOutputPath)" />
   </Target>
 
   <UsingTask

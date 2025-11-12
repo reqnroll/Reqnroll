@@ -32,6 +32,7 @@
     <GeneratePackageOnBuild Condition="'$(GeneratePackageOnBuild)' == ''">true</GeneratePackageOnBuild>
     <ContentTargetFolders>build</ContentTargetFolders>
     <IsPackable>true</IsPackable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <!-- We don't use compatibility ranges for test framework adapters -->
     <UseCompatibilityRangeForReqnrollDependency>false</UseCompatibilityRangeForReqnrollDependency>
