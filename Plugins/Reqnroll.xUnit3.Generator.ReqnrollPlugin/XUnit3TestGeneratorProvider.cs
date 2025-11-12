@@ -9,34 +9,34 @@ using System.Linq;
 
 namespace Reqnroll.xUnit3.Generator.ReqnrollPlugin;
 
-public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
+public class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
     : IUnitTestGeneratorProvider
 {
     private CodeTypeDeclaration _currentFixtureDataTypeDeclaration;
     private readonly CodeTypeReference _objectCodeTypeReference = new(typeof(object));
     private readonly CodeDomHelper _codeDomHelper = codeDomHelper;
 
-    private const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
-    private const string IASYNC_DISPOSABLE_INTERFACE = "System.IAsyncDisposable";
-    private const string OUTPUT_INTERFACE = "Xunit.ITestOutputHelper";
-    private const string FACT_ATTRIBUTE = "Xunit.FactAttribute";
-    private const string THEORY_ATTRIBUTE = "Xunit.TheoryAttribute";
-    private const string INLINEDATA_ATTRIBUTE = "Xunit.InlineDataAttribute";
-    private const string ICLASSFIXTURE_INTERFACE = "Xunit.IClassFixture";
-    private const string TRAIT_ATTRIBUTE = "Xunit.TraitAttribute";
-    private const string FEATURE_TITLE = "FeatureTitle";
-    private const string SKIP_PROPERTY_NAME = "Skip";
-    private const string IGNORED_REASON = "Ignored";
-    private const string DISPOSE_ASYNC_METHOD = "DisposeAsync";
-    private const string INITIALIZE_ASYNC_METHOD = "InitializeAsync";
-    private const string CATEGORY_PROPERTY_NAME = "Category";
-    private const string TRAIT_DESCRIPTION_ATTRIBUTE = "Description";
-    private const string DISPLAY_NAME_PROPERTY = "DisplayName";
-    private const string IGNORE_TEST_CLASS = "IgnoreTestClass";
-    private const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
-    private const string COLLECTION_ATTRIBUTE = "Xunit.CollectionAttribute";
+    protected internal const string IASYNCLIFETIME_INTERFACE = "Xunit.IAsyncLifetime";
+    protected internal const string IASYNC_DISPOSABLE_INTERFACE = "System.IAsyncDisposable";
+    protected internal const string OUTPUT_INTERFACE = "Xunit.ITestOutputHelper";
+    protected internal const string FACT_ATTRIBUTE = "Xunit.FactAttribute";
+    protected internal const string THEORY_ATTRIBUTE = "Xunit.TheoryAttribute";
+    protected internal const string INLINEDATA_ATTRIBUTE = "Xunit.InlineDataAttribute";
+    protected internal const string ICLASSFIXTURE_INTERFACE = "Xunit.IClassFixture";
+    protected internal const string TRAIT_ATTRIBUTE = "Xunit.TraitAttribute";
+    protected internal const string FEATURE_TITLE = "FeatureTitle";
+    protected internal const string SKIP_PROPERTY_NAME = "Skip";
+    protected internal const string IGNORED_REASON = "Ignored";
+    protected internal const string DISPOSE_ASYNC_METHOD = "DisposeAsync";
+    protected internal const string INITIALIZE_ASYNC_METHOD = "InitializeAsync";
+    protected internal const string CATEGORY_PROPERTY_NAME = "Category";
+    protected internal const string TRAIT_DESCRIPTION_ATTRIBUTE = "Description";
+    protected internal const string DISPLAY_NAME_PROPERTY = "DisplayName";
+    protected internal const string IGNORE_TEST_CLASS = "IgnoreTestClass";
+    protected internal const string NONPARALLELIZABLE_COLLECTION_NAME = "ReqnrollNonParallelizableFeatures";
+    protected internal const string COLLECTION_ATTRIBUTE = "Xunit.CollectionAttribute";
 
-    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests;
+    public UnitTestGeneratorTraits GetTraits() => UnitTestGeneratorTraits.RowTests | UnitTestGeneratorTraits.ParallelExecution;
 
     public void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
     {
@@ -230,7 +230,15 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
     {
-        _codeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(friendlyTestName)));
+        if (generationContext.DisableFriendlyTestNames)
+        {
+            _codeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE);
+        }
+        else
+        {
+            _codeDomHelper.AddAttribute(testMethod, FACT_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(friendlyTestName)));
+        }
+
         SetProperty(testMethod, FEATURE_TITLE, generationContext.Feature.Name);
         SetDescription(testMethod, friendlyTestName);
     }
@@ -262,7 +270,15 @@ public sealed class XUnit3TestGeneratorProvider(CodeDomHelper codeDomHelper)
 
     public void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
     {
-        _codeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(scenarioTitle)));
+        if (generationContext.DisableFriendlyTestNames)
+        {
+            _codeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE);
+        }
+        else
+        {
+            _codeDomHelper.AddAttribute(testMethod, THEORY_ATTRIBUTE, new CodeAttributeArgument(DISPLAY_NAME_PROPERTY, new CodePrimitiveExpression(scenarioTitle)));
+        }
+
         SetProperty(testMethod, FEATURE_TITLE, generationContext.Feature.Name);
         SetDescription(testMethod, scenarioTitle);
     }
