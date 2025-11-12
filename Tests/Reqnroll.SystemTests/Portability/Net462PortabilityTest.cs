@@ -14,6 +14,5 @@ public class Net462PortabilityTest : PortabilityTestBase
         base.TestInitialize();
         _testRunConfiguration.TargetFramework = TargetFramework.Net462;
         _testRunConfiguration.ProgrammingLanguage = ProgrammingLanguage.CSharp73;
-        SkipTUnit = true; // TUnit is not supported on .NET Framework 4.6.2
     }
 }

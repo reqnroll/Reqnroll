@@ -20,7 +20,7 @@ namespace Reqnroll.TestProjectGenerator
         public const string NUnit4TestAdapterPackageName = "NUnit3TestAdapter";
         public const string NUnit4TestAdapterPackageVersion = "4.6.0";
         public const string TUnitPackageName = "TUnit";
-        public const string TUnitPackageVersion = "0.55.23";
+        public const string TUnitPackageVersion = "0.90.6";
         private const string XUnitPackageVersion = "2.8.1";
         private const string MSTestPackageVersion = "2.2.10";
         private const string MSTest4PackageVersion = "4.0.0";
@@ -395,16 +395,26 @@ namespace Reqnroll.TestProjectGenerator
                 TUnitPackageName,
                 TUnitPackageVersion,
                 new NuGetPackageAssembly(
-                    "TUnit, Version=0.55.23, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
+                    "TUnit, Version=0.90.6, Culture=neutral, PublicKeyToken=b8d4030011dbd70c",
                     "netstandard2.0\\TUnit.dll")
                 );
             _project.AddNuGetPackage(
                 "Microsoft.Testing.Extensions.TrxReport",
-                "1.8.2.0",
+                "2.0.1",
                 new NuGetPackageAssembly(
-                    "Microsoft.Testing.Extensions.TrxReport, Version=1.8.2.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
+                    "Microsoft.Testing.Extensions.TrxReport, Version=2.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
                     "netstandard2.0\\Microsoft.Testing.Extensions.TrxReport.dll")
                 );
+            
+            if (TargetFramework is TargetFramework.Net481 or TargetFramework.Net472 or TargetFramework.Net462)
+            {
+                // Polyfill from TUnit doesn't work correctly for .NET Framework projects (see https://github.com/thomhurst/TUnit/issues/2734)
+                _project.AddNuGetPackage("Polyfill", "8.9.0");
+                _project.AddAdditionalPropertyGroupEntry("EnableTUnitPolyfills", "false");
+                _project.AddAdditionalPropertyGroupEntry("LangVersion", "latest"); // LangVersion=latest is needed for Polyfill
+                // Exe is needed explicitly to ensure we don't get errors when running the tests from cli (see https://tunit.dev/docs/faq/#my-test-project-wont-execute--i-get-errors-about-runtime-identifiers)
+                _project.AddAdditionalPropertyGroupEntry("OutputType", "Exe");
+            }
 
             if (IsReqnrollFeatureProject)
             {
