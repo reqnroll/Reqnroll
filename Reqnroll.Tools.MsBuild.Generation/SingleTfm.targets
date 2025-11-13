@@ -1,0 +1,6 @@
+<Project>
+  <Target
+    Name="GetTargetPath"
+    DependsOnTargets="$(GetTargetPathDependsOn)"
+    Returns="@(TargetPathWithTargetPlatformMoniker)" />
+</Project>

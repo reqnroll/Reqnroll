@@ -2,16 +2,13 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.CustomPlugin.nuspec</NuspecFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-    <NoPackageAnalysis>true</NoPackageAnalysis>
-
+    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
+    
+    <!-- NuGet configuration -->
+    <PackageId>Reqnroll.CustomPlugin</PackageId>
+    <Description>Package for writing custom generator extensions for Reqnroll.</Description>
+    <PackageTags>reqnroll bdd gherkin cucumber generator</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-  </ItemGroup>
 
 </Project>

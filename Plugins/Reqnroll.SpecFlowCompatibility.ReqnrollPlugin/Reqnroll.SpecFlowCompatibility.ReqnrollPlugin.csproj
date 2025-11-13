@@ -1,17 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+    <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.SpecFlowCompatibility</PackageId>
+    <Description>Enables SpecFlow compatibility mode for Reqnroll</Description>
+    <PackageTags>reqnroll specflow</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference
+      Include="..\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin\Reqnroll.SpecFlowCompatibility.Generator.ReqnrollPlugin.csproj"
+      PrivateAssets="all"
+      PackAsReqnrollGeneratorPlugin="true" />
+    <ProjectReference
+      Include="..\Reqnroll.SpecFlowCompatibility\Reqnroll.SpecFlowCompatibility.csproj"
+      PrivateAssets="all" />
   </ItemGroup>
 
 </Project>

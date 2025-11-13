@@ -5,7 +5,6 @@
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
     
-    
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeSymbols>false</IncludeSymbols>
 
@@ -38,12 +37,12 @@
       <!-- Remove system assemblies. -->
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Copy(%(Filename)).StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
       
       <!-- Remove Visual Studio assemblies. -->
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Copy(%(Filename)).StartsWith('Microsoft.VisualStudio'))" />
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
       
       <!-- Remove netstandard -->
       <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'netstandard'" />
@@ -79,16 +78,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework">
-      <HintPath>Microsoft.Build.Framework</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Build.Utilities.Core">
-      <HintPath>Microsoft.Build.Utilities.Core</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="build/CPS/Buildsystem/Rules/FeatureFileType.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
@@ -96,5 +85,7 @@
       <Generator>MSBuild:Compile</Generator>
     </None>
   </ItemGroup>
+
+  <Import Project="SingleTfm.targets" Condition="'$(TargetFramework)' == ''" />
 
 </Project>
