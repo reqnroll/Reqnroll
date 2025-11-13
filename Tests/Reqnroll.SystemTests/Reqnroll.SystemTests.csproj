@@ -43,16 +43,16 @@
     <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.TUnit.Generator.ReqnrollPlugin\Reqnroll.TUnit.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.TUnit.ReqnrollPlugin\Reqnroll.TUnit.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.Verify\Reqnroll.Verify.ReqnrollPlugin\Reqnroll.Verify.ReqnrollPlugin.csproj">
