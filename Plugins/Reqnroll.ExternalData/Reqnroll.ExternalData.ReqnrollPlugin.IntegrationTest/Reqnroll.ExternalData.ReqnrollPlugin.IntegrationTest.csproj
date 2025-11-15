@@ -14,7 +14,7 @@
     Condition="'$(ReqnrollGenerationPropsImported)' != 'true'"/>
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- we have to set the root namespace to avoid generation error -->
     <RootNamespace>XReqnroll.ExternalData.ReqnrollPlugin.IntegrationTest</RootNamespace>
   </PropertyGroup>
