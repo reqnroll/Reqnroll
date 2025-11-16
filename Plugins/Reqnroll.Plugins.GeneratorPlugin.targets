@@ -88,14 +88,14 @@
   </Target>
 
   <PropertyGroup>
-    <MarkRedistributableAssembliesForPackDependsOn>ResolveRedistributableAssemblies</MarkRedistributableAssembliesForPackDependsOn>
+    <CollectRedistributableAssembliesDependsOn>ResolveRedistributableAssemblies</CollectRedistributableAssembliesDependsOn>
   </PropertyGroup>
 
   <!-- Include redistributable assemblies in the package. -->
   <Target
-    Name="MarkRedistributableAssembliesForPack"
+    Name="CollectRedistributableAssemblies"
     AfterTargets="CoreCompile"
-    DependsOnTargets="$(MarkRedistributableAssembliesForPackDependsOn)">
+    DependsOnTargets="$(CollectRedistributableAssembliesDependsOn)">
 
     <ItemGroup>
       <BuildOutputInPackage

@@ -124,26 +124,26 @@
 
   </Target>
 
-  <!-- Gets the generator plugin that needs to be included with this package. -->
-  <Target Name="_GetReqnrollGeneratorPlugin" DependsOnTargets="ResolveReferences" Returns="ReqnrollGeneratorPlugin">
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);ResolveReqnrollGeneratorPluginFiles</TargetsForTfmSpecificContentInPackage>
+    <ResolveReqnrollGeneratorPluginFilesDependsOn>ResolveAssemblyReferences</ResolveReqnrollGeneratorPluginFilesDependsOn>
+  </PropertyGroup>
+
+  <!-- Resolves the generator plugin assemblies that needs to be included with this package. -->
+  <Target
+    Name="ResolveReqnrollGeneratorPluginFiles"
+    DependsOnTargets="$(ResolveReqnrollGeneratorPluginFilesDependsOn)">
+
     <ItemGroup>
-      <ReqnrollGeneratorPlugin
+      <ReqnrollGeneratorPluginFile
         Include="@(ReferenceCopyLocalPaths)"
         Condition="'%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true'" />
     </ItemGroup>
-  </Target>
 
-  <!-- Collects the generator plugin to be included in the package. -->
-  <Target
-    Name="_CollectReqnrollGeneratorPlugin"
-    DependsOnTargets="_GetReqnrollGeneratorPlugin"
-    BeforeTargets="_GetPackageFiles"
-    Condition="'$(TargetFramework)' != ''">
     <ItemGroup>
-      <ReqnrollGeneratorPluginSymbol Include="@(ReqnrollGeneratorPlugin)" Condition="'%(Extension)' == '.pdb'" />
-
-      <None Include="@(ReqnrollGeneratorPlugin)" Pack="true" PackagePath="build/$(TargetFramework)/" />
-      <None Update="@(ReqnrollGeneratorPluginSymbol)" PackFolder="Symbols" />
+      <TfmSpecificPackageFile Include="@(ReqnrollGeneratorPluginFile)" PackagePath="build/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Update="@(ReqnrollGeneratorPluginFile)" PackFolder="Symbols" Condition="'%(Extension)' == '.pdb'" />
     </ItemGroup>
   </Target>
+  
 </Project>
