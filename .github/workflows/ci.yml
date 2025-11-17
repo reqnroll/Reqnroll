@@ -195,7 +195,7 @@ jobs:
     - name: Plugin Tests
       run: dotnet test ./Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/plugintests-results.trx" ${{ steps.build_params.outputs.test_params }}
     - name: Plugin Generator Tests
-      run: dotnet test ./Tests/TestFrameworkPlugins/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/Reqnroll.xUnit3.Generator.PluginTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/xunit3-generator-plugintests-results.trx" ${{ steps.build_params.outputs.test_params }}
+      run: dotnet test ./Tests/TestFrameworkPlugins/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/Reqnroll.xUnit3.Generator.ReqnrollPluginTests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/xunit3-generator-plugintests-results.trx" ${{ steps.build_params.outputs.test_params }}
     - name: TestProjectGenerator Tests
       run: dotnet test ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/Reqnroll.TestProjectGenerator.Tests.csproj --logger "trx;LogFileName=${{ github.workspace }}/TestResults/testprjgentests-results.trx" ${{ steps.build_params.outputs.test_params }}
     - name: Upload TRX files
