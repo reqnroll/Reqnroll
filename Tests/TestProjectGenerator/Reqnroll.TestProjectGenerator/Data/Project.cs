@@ -16,6 +16,7 @@ namespace Reqnroll.TestProjectGenerator.Data
 
         private readonly List<MSBuildTarget> _msBuildTargets = new List<MSBuildTarget>();
         private readonly List<MSBuildImport> _msbuildImports = new List<MSBuildImport>();
+        private readonly List<KeyValuePair<string, string>> _additionalPropertyGroupEntries = new List<KeyValuePair<string, string>>();
 
         public Project(string name, Guid projectGuid, ProgrammingLanguage programmingLanguage, TargetFramework targetFrameworks, ProjectFormat projectFormat, ProjectType projectType = ProjectType.Library, bool? isTreatWarningsAsErrors = null)
         {
@@ -55,6 +56,7 @@ namespace Reqnroll.TestProjectGenerator.Data
 
         public IReadOnlyList<MSBuildTarget> MSBuildTargets => _msBuildTargets;
         public IReadOnlyList<MSBuildImport> MSBuildImports => _msbuildImports;
+        public IReadOnlyList<KeyValuePair<string, string>> AdditionalPropertyGroupEntries => _additionalPropertyGroupEntries;
 
         public void AddNuGetPackage(string name, string version = null)
         {
@@ -116,6 +118,11 @@ namespace Reqnroll.TestProjectGenerator.Data
         public void AddMSBuildImport(string msbuildTargetFile)
         {
             _msbuildImports.Add(new MSBuildImport(msbuildTargetFile));
+        }
+
+        internal void AddAdditionalPropertyGroupEntry(string key, string value)
+        {
+            _additionalPropertyGroupEntries.Add(new KeyValuePair<string, string>(key, value));
         }
     }
 }
