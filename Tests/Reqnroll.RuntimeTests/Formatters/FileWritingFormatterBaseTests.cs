@@ -1,7 +1,10 @@
 #nullable enable
 using FluentAssertions;
+using FluentAssertions.Common;
 using Io.Cucumber.Messages.Types;
 using Moq;
+using Reqnroll.CommonModels;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PubSub;
@@ -40,8 +43,8 @@ public class FileWritingFormatterBaseTests
         public bool FinalizeInitializationCalled = false;
         public Stream? LastStream;
 
-        public TestFileWritingFormatter(IFormattersConfigurationProvider config, IFormatterLog logger, IFileSystem fileSystem)
-            : base(config, logger, fileSystem, "testPlugin", ".txt", "default.txt") { }
+        public TestFileWritingFormatter(IFormattersConfigurationProvider config, IFormatterLog logger, IFileSystem fileSystem, IEnvironmentWrapper wrapper, Reqnroll.Time.IClock clock)
+            : base(config, logger, fileSystem, wrapper, clock, "testPlugin", ".txt", "default.txt") { }
 
         protected override void OnTargetFileStreamInitialized(Stream targetFileStream)
         {
@@ -100,11 +103,13 @@ public class FileWritingFormatterBaseTests
     private readonly Mock<IFormattersConfigurationProvider> _configMock = new();
     private readonly Mock<IFormatterLog> _loggerMock = new();
     private readonly Mock<IFileSystem> _fileSystemMock = new();
+    private readonly Mock<IEnvironmentWrapper> _environmentWrapperMock = new();
+    private readonly Mock<Reqnroll.Time.IClock> _clockMock = new();
     private readonly TestFileWritingFormatter _sut;
 
     public FileWritingFormatterBaseTests()
     {
-        _sut = new TestFileWritingFormatter(_configMock.Object, _loggerMock.Object, _fileSystemMock.Object);
+        _sut = new TestFileWritingFormatter(_configMock.Object, _loggerMock.Object, _fileSystemMock.Object, _environmentWrapperMock.Object, _clockMock.Object);
     }
 
     [Fact]
@@ -342,5 +347,87 @@ public class FileWritingFormatterBaseTests
         var config = new Dictionary<string, object> { { "outputFilePath", null! } };
         var result = _sut.TestConfiguredOutputFilePath(config);
         result.Should().BeEmpty();
+    }
+
+    // Tests for variable substitution in output file path
+    [Fact]
+    public void ResolveOutputFilePathVariables_NoVariables_ReturnsSamePath()
+    {
+        // Arrange
+        var config = new Dictionary<string, object> { { "outputFilePath", "results.txt" } };
+        // Act
+        var result = _sut.ResolveOutputFilePathVariables("results.txt");
+        // Assert
+        result.Should().Be("results.txt");
+    }
+    [Fact]
+    public void ResolveOutputFilePathVariables_WithNullEmptyInput_ReturnsEmptyString()
+    {
+        // Act
+        var resultNull = _sut.ResolveOutputFilePathVariables(null);
+        var resultEmpty = _sut.ResolveOutputFilePathVariables("");
+        // Assert
+        resultNull.Should().BeNull();
+        resultEmpty.Should().BeEmpty();
+    }
+    [Fact]
+    public void ResolveOutputFilePathVariables_ReplacesTimestampVariable()
+    {
+        // Arrange
+        var config = new Dictionary<string, object> { { "outputFilePath", "results_{timestamp}.txt" } };
+        _clockMock.Setup(c => c.GetNowDateAndTime()).Returns(new DateTime(2023, 1, 2, 3, 4, 5, DateTimeKind.Utc));
+        // Act
+        _sut.LaunchInner(config, _ => { });
+        // Assert
+        _sut.LastOutputPath.Should().EndWith("results_2023-01-02_03-04-05.txt");
+    }
+
+    [Fact]
+    public void ResolveOutputFilePathVariables_ReplacesEnvironmentVariable()
+    {
+        // Arrange
+        _environmentWrapperMock.Setup(e => e.GetEnvironmentVariable("MY_ENV_VAR"))
+            .Returns(Result<string>.Success("envValue"));
+        var config = new Dictionary<string, object> { { "outputFilePath", "results_{MY_ENV_VAR}.txt" } };
+        // Act
+        _sut.LaunchInner(config, _ => { });
+        // Assert
+        _sut.LastOutputPath.Should().EndWith("results_envValue.txt");
+    }
+
+    [Fact]
+    public void ResolveOutputFilePathVariables_UnknownVariableLeftUnchanged()
+    {
+        // Arrange
+        var config = new Dictionary<string, object> { { "outputFilePath", "results_{unknownvar}.txt" } };
+        // Act
+        _sut.LaunchInner(config, _ => { });
+        // Assert
+        _sut.LastOutputPath.Should().EndWith("results_{unknownvar}.txt");
+    }
+
+    [Fact]
+    public void ResolveOutputFilePathVariables_MultipleVariables_AllSubstituted()
+    {
+        // Arrange
+        _clockMock.Setup(c => c.GetNowDateAndTime()).Returns(new DateTime(2023, 1, 2, 3, 4, 5, DateTimeKind.Utc));
+        _environmentWrapperMock.Setup(e => e.GetEnvironmentVariable("MY_ENV_VAR"))
+            .Returns(Result<string>.Success("envValue"));
+        var config = new Dictionary<string, object> { { "outputFilePath", "results_{timestamp}_{MY_ENV_VAR}.txt" } };
+        // Act
+        _sut.LaunchInner(config, _ => { });
+        // Assert
+        _sut.LastOutputPath.Should().EndWith("results_2023-01-02_03-04-05_envValue.txt");
+    }
+
+    [Fact]
+    public void ResolveOutputFilePathVariables_MalformedPattern_NotSubstituted()
+    {
+        // Arrange
+        var config = new Dictionary<string, object> { { "outputFilePath", "results_{timestamp.txt" } };
+        // Act
+        _sut.LaunchInner(config, _ => { });
+        // Assert
+        _sut.LastOutputPath.Should().EndWith("results_{timestamp.txt");
     }
 }

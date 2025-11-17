@@ -1,15 +1,17 @@
 ﻿#nullable enable
 
+using Io.Cucumber.Messages.Types;
+using Reqnroll.EnvironmentAccess;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.PayloadProcessing;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Time;
+using Reqnroll.Utils;
 using System;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Io.Cucumber.Messages.Types;
-using Reqnroll.Formatters.Configuration;
-using Reqnroll.Formatters.PayloadProcessing;
-using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Utils;
 
 namespace Reqnroll.Formatters.Message;
 
@@ -20,7 +22,7 @@ public class MessageFormatter : FileWritingFormatterBase
 {
     private readonly byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-    public MessageFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, fileSystem, "message", ".ndjson", "reqnroll_report.ndjson")
+    public MessageFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem, IEnvironmentWrapper environmentWrapper, IClock clock) : base(configurationProvider, logger, fileSystem, environmentWrapper, clock, "message", ".ndjson", "reqnroll_report.ndjson")
     {
     }
 

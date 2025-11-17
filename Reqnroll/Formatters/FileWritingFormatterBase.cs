@@ -1,12 +1,16 @@
 #nullable enable
 
 using Io.Cucumber.Messages.Types;
+using Reqnroll.CommonModels;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Time;
 using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,12 +24,16 @@ public abstract class FileWritingFormatterBase : FormatterBase
     private readonly string _defaultFileExtension;
     private readonly string _defaultFileName;
     private readonly IFileSystem _fileSystem;
+    private IEnvironmentWrapper _environmentWrapper;
+    private IClock _clock;
     protected Stream? TargetFileStream { get; private set; } = null;
 
     protected FileWritingFormatterBase(
         IFormattersConfigurationProvider configurationProvider,
         IFormatterLog logger,
         IFileSystem fileSystem,
+        IEnvironmentWrapper environmentWrapper,
+        IClock clock,
         string pluginName,
         string defaultFileExtension,
         string defaultFileName) : base(configurationProvider, logger, pluginName)
@@ -34,6 +42,8 @@ public abstract class FileWritingFormatterBase : FormatterBase
             throw new ArgumentNullException(nameof(defaultFileExtension));
         if (string.IsNullOrEmpty(defaultFileName))
             throw new ArgumentNullException(nameof(defaultFileName));
+        _environmentWrapper = environmentWrapper;
+        _clock = clock;
         _defaultFileExtension = defaultFileExtension;
         _defaultFileName = defaultFileName;
         _fileSystem = fileSystem;
@@ -45,6 +55,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
     {
         var defaultBaseDirectory = ".";
         var configuredPath = ConfiguredOutputFilePath(formatterConfiguration)?.Trim();
+        configuredPath = ResolveOutputFilePathVariables(configuredPath);
         string outputPath;
         string baseDirectory;
 
@@ -109,6 +120,48 @@ public abstract class FileWritingFormatterBase : FormatterBase
         Logger.WriteMessage($"Formatter {Name} initialized to write to: {outputPath}.");
     }
 
+    public virtual string? ResolveOutputFilePathVariables(string? configuredPath)
+    {
+
+        var substitutionMatcher = new Regex(@"\{([a-zA-Z0-9_]+)\}", RegexOptions.Compiled);
+        if (string.IsNullOrWhiteSpace(configuredPath))
+            return configuredPath;
+
+        // Beyond checking for an empty configured path, no other validation required. 
+        // Mismatched braces will simply result in the brace being included in the result, which might be the desired file path.
+
+        var resolvedOutputFilePath = substitutionMatcher.Replace(configuredPath, match =>
+        {
+            var variableName = match.Groups[1].Value; // the variable name with the opening and closing braces stripped out
+            var resolved = ReplaceBuiltInVariable(variableName);
+            return resolved ?? match.Value;
+        });
+
+        return resolvedOutputFilePath;
+
+        string? ReplaceBuiltInVariable(string variableName)
+        {
+            if (string.IsNullOrEmpty(variableName))
+                return null;
+
+            var builtinVariableResolvers = new Dictionary<string, Func<string>>()
+            {
+                { "timestamp", () => _clock.GetNowDateAndTime().ToString("yyyy-MM-dd_HH-mm-ss") },
+            };
+
+            if (builtinVariableResolvers.TryGetValue(variableName, out var resolver))
+            {
+                return resolver();
+            }
+
+            var environmentVariable = _environmentWrapper.GetEnvironmentVariable(variableName);
+            if (environmentVariable is ISuccess<string> ev)
+                return ev.Result;
+
+            return null;
+        }
+    }
+
     protected override async Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken)
     {
         if (TargetFileStream == null)
@@ -165,7 +218,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
             onInitialized(true);
             Logger.WriteMessage($"Formatter {Name} opened file stream.");
         }
-        catch(System.Exception e)
+        catch (System.Exception e)
         {
             Logger.WriteMessage($"Formatter {Name} closing because of an exception opening the file stream."
                                  + Environment.NewLine

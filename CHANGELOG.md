@@ -1,6 +1,7 @@
 # [vNext]
 
 ## Improvements:
+* Formatters: configured OutputFilePath may now contain variable substitution parameters (e.g.: "outputFilePath": "test_results_{timestamp}.ndjson" )
 
 ## Bug fixes:
 
