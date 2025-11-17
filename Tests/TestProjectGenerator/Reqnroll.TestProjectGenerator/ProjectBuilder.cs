@@ -408,7 +408,7 @@ namespace Reqnroll.TestProjectGenerator
             
             if (TargetFramework is TargetFramework.Net481 or TargetFramework.Net472 or TargetFramework.Net462)
             {
-                // Polyfill from TUnit doesn't work correctly for .NET Framework projects (see https://github.com/thomhurst/TUnit/issues/2734)
+                // Polyfill from TUnit doesn't work correctly for .NET Framework projects (see https://github.com/thomhurst/TUnit/issues/2734) 
                 _project.AddNuGetPackage("Polyfill", "8.9.0");
                 _project.AddAdditionalPropertyGroupEntry("EnableTUnitPolyfills", "false");
                 _project.AddAdditionalPropertyGroupEntry("LangVersion", "latest"); // LangVersion=latest is needed for Polyfill
