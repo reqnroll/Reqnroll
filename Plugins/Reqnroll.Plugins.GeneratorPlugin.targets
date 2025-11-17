@@ -28,9 +28,12 @@
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
   </PropertyGroup>
 
-  <!-- All generator plugins must reference the generator. This also doubles as a version-compatibility declaration in the package. -->
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj"/>
+    <!-- All generator plugins must reference the generator. -->
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj" PrivateAssets="all" />
+
+    <!-- All generator projects must declare a reference to the Reqnroll runtime to ensure version compatibility. -->
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj" />
   </ItemGroup>
 
   <!-- Build assets are included in the package. -->

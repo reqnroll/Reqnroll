@@ -46,6 +46,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference
+      Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
+      <PrivateAssets>all</PrivateAssets>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
     <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
     <ProjectReference Include="..\Reqnroll.SystemTests\Reqnroll.SystemTests.csproj" />
