@@ -15,8 +15,10 @@ public class MsTestV4GeneratorProvider(CodeDomHelper codeDomHelper) : MsTestV2Ge
         CodeDomHelper.AddAttribute(generationContext.TestClassCleanupMethod, TESTFIXTURETEARDOWN_ATTR);
     }
 
-    public override void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
+    public override void AddTestMethodAttribute(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
     {
+        // V4 - the DisplayName property must be explicitly set
+
         if (generationContext.DisableFriendlyTestNames)
         {
             CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
@@ -25,11 +27,5 @@ public class MsTestV4GeneratorProvider(CodeDomHelper codeDomHelper) : MsTestV2Ge
         {
             CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
         }
-
-        CodeDomHelper.AddAttribute(testMethod, DESCRIPTION_ATTR, friendlyTestName);
-
-        //as in mstest, you cannot mark classes with the description attribute, we
-        //just apply it for each test method as a property
-        SetProperty(testMethod, FEATURE_TITILE_PROPERTY_NAME, generationContext.Feature.Name);
     }
 }
