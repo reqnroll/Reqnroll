@@ -104,6 +104,11 @@
       <BuildOutputInPackage
         Include="@(RedistributableAssembly)"
         TargetPath="%(RedistributableAssembly.DestinationSubPath)"/>
+
+      <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
+      <BuildOutputInPackage
+        Include="$(ProjectDepsFilePath)"
+        TargetPath="$(ProjectDepsFileName)"/>
     </ItemGroup>
   </Target>
 </Project>
