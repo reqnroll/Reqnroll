@@ -43,6 +43,9 @@ permissions:
 env:
   SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
   REQNROLL_TEST_PIPELINEMODE: true
+  DOTNET_VERSIONS: |
+    8.0.x
+    9.0.306
 
 jobs:
   build:
@@ -378,9 +381,7 @@ jobs:
       # It is faster to install all required .NET versions to D: drive than installing only the missing one to C: drive and use it from there.
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: | 
-          8.0.x
-          9.0.x
+        dotnet-version: ${{ env.DOTNET_VERSIONS }}
     - name: .NET Information
       run: |
         dotnet --list-sdks
@@ -442,9 +443,7 @@ jobs:
       # The default image contains .NET 8 only, but reusing it would not provide much performance benefit
       uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: | 
-          8.0.x
-          9.0.x
+        dotnet-version: ${{ env.DOTNET_VERSIONS }}
     - name: .NET Information
       run: |
         dotnet --list-sdks
