@@ -1,4 +1,5 @@
 using Reqnroll.Tracing;
+using Cucumber.TagExpressions;
 
 namespace Reqnroll.Bindings.Discovery
 {
@@ -12,7 +13,7 @@ namespace Reqnroll.Bindings.Discovery
         private readonly IBindingRegistry _bindingRegistry;
         private readonly ITestTracer _testTracer;
 
-        public RuntimeBindingSourceProcessor(IBindingFactory bindingFactory, IBindingRegistry bindingRegistry, ITestTracer testTracer) : base(bindingFactory)
+        public RuntimeBindingSourceProcessor(IBindingFactory bindingFactory, IBindingRegistry bindingRegistry, ITestTracer testTracer, ITagExpressionParser tagExpressionParser) : base(bindingFactory, tagExpressionParser)
         {
             _bindingRegistry = bindingRegistry;
             _testTracer = testTracer;

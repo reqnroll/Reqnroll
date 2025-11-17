@@ -37,6 +37,7 @@
     <file src="bin\$config$\netstandard2.0\Reqnroll.pdb" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.xml" target="lib\netstandard2.0" />
     <file src="bin\$config$\netstandard2.0\Reqnroll.Utils.*" target="lib\netstandard2.0" />
+    <file src="bin\$config$\netstandard2.0\Cucumber.TagExpressions.dll" target="lib/netstandard2.0" />
     <file src="Reqnroll.ExternalAnnotations.xml" target="lib\netstandard2.0" />
 
     <file src="$SolutionDir$\Licenses\*" target="Licenses" />
