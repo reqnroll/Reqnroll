@@ -22,6 +22,9 @@
     <!-- This is required to ensure dependencies are made available for packing -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
+    <!-- Generates a dependency file to help MSBuild load dependencies -->
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+
     <!-- Assembly signing -->
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
@@ -108,7 +111,8 @@
       <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
       <BuildOutputInPackage
         Include="$(ProjectDepsFilePath)"
-        TargetPath="$(ProjectDepsFileName)"/>
+        TargetPath="$(ProjectDepsFileName)"
+        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'"/>
     </ItemGroup>
   </Target>
 </Project>

@@ -12,7 +12,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
-    <GenerateDependencyFile>false</GenerateDependencyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <!-- NuGet package metadata -->
@@ -53,7 +52,7 @@
 
   <!-- Include runtime assemblies in the package. -->
   <Target
-    Name="MarkTaskAssembliesForPack"
+    Name="CollectRedistributableAssemblies"
     AfterTargets="CoreCompile"
     DependsOnTargets="ResolveRequiredReferences">
     
@@ -61,6 +60,12 @@
       <BuildOutputInPackage 
         Include="@(ReferenceCopyLocalPaths)"
         TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)"/>
+
+      <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
+      <BuildOutputInPackage
+        Include="$(ProjectDepsFilePath)"
+        TargetPath="$(ProjectDepsFileName)"
+        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'"/>
     </ItemGroup>
   </Target>
 
