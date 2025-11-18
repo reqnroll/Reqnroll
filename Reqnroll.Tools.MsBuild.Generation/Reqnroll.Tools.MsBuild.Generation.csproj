@@ -4,10 +4,10 @@
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-    
-    
+
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeSymbols>false</IncludeSymbols>
+    <GenerateDependencyFile>true</GenerateDependencyFile>
 
     <!-- NuGet configuration -->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -20,7 +20,7 @@
     <Description>Package to enable the code-behind file generation during build time https://go.reqnroll.net/doc-config-build</Description>
     <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
-  
+
   <!-- Includes the build files. -->
   <ItemGroup>
     <None Include="build/**/*" Pack="true" PackagePath="build/" />
@@ -39,17 +39,17 @@
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
         Condition="$([System.String]::Copy(%(Filename)).StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
-      
+
       <!-- Remove Visual Studio assemblies. -->
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
         Condition="$([System.String]::Copy(%(Filename)).StartsWith('Microsoft.VisualStudio'))" />
-      
+
       <!-- Remove netstandard -->
       <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'netstandard'" />
-      
+
     </ItemGroup>
-    
+
   </Target>
 
   <!-- Include runtime assemblies in the package. -->
@@ -57,18 +57,23 @@
     Name="MarkTaskAssembliesForPack"
     AfterTargets="CoreCompile"
     DependsOnTargets="ResolveRequiredReferences">
-    
+
     <ItemGroup>
-      <BuildOutputInPackage 
+      <BuildOutputInPackage
         Include="@(ReferenceCopyLocalPaths)"
         TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)"/>
+
+      <BuildOutputInPackage
+        Include="$(OutputPath)tasks/$(AssemblyName).deps.json"
+        TargetPath="$(AssemblyName).deps.json"
+        Condition="Exists('$(OutputPath)tasks/$(AssemblyName).deps.json')" />
     </ItemGroup>
   </Target>
 
   <ItemGroup>
     <ProjectReference Include="../Reqnroll.Generator/Reqnroll.Generator.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.Build.Framework" Version="17.11.48" PrivateAssets="all" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.11.48" PrivateAssets="all" />
