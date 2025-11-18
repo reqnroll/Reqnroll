@@ -22,13 +22,13 @@ public class HtmlFormatter : FileWritingFormatterBase
 {
     private MessagesToHtmlWriter? _htmlWriter;
 
-    protected HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem, IEnvironmentWrapper environmentWrapper, IClock clock, string pluginName) : 
-        base(configurationProvider, logger, fileSystem, environmentWrapper, clock, pluginName, ".html", "reqnroll_report.html")
+    protected HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem, string pluginName) : 
+        base(configurationProvider, logger, fileSystem, pluginName, ".html", "reqnroll_report.html")
     {
     }
 
-    public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem, IEnvironmentWrapper environmentWrapper, IClock clock) : 
-        this(configurationProvider, logger, fileSystem, environmentWrapper, clock, "html")
+    public HtmlFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : 
+        this(configurationProvider, logger, fileSystem, "html")
     {
     }
 

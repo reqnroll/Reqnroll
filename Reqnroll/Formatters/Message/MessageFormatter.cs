@@ -22,7 +22,7 @@ public class MessageFormatter : FileWritingFormatterBase
 {
     private readonly byte[] _newLineBytes = Encoding.UTF8.GetBytes(Environment.NewLine);
 
-    public MessageFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem, IEnvironmentWrapper environmentWrapper, IClock clock) : base(configurationProvider, logger, fileSystem, environmentWrapper, clock, "message", ".ndjson", "reqnroll_report.ndjson")
+    public MessageFormatter(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, IFileSystem fileSystem) : base(configurationProvider, logger, fileSystem, "message", ".ndjson", "reqnroll_report.ndjson")
     {
     }
 

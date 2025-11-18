@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Reqnroll.CommonModels;
+using Reqnroll.EnvironmentAccess;
+using Reqnroll.Time;
+using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 
 namespace Reqnroll.Formatters.Configuration;
 
@@ -18,13 +22,16 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
     private readonly IList<IFormattersConfigurationResolverBase> _resolvers;
     private readonly Lazy<FormattersConfiguration> _resolvedConfiguration;
     private readonly IFormattersConfigurationDisableOverrideProvider _envVariableDisableFlagProvider;
+    private readonly IVariableSubstitutionService _variableSubstitutionService;
+
     public bool Enabled => _resolvedConfiguration.Value.Enabled;
 
-    public FormattersConfigurationProvider(IFileBasedConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider)
+    public FormattersConfigurationProvider(IFileBasedConfigurationResolver fileBasedConfigurationResolver, IJsonEnvironmentConfigurationResolver jsonEnvironmentConfigurationResolver, IKeyValueEnvironmentConfigurationResolver keyValueEnvironmentConfigurationResolver, IFormattersConfigurationDisableOverrideProvider envVariableDisableFlagProvider, IVariableSubstitutionService variableSubstitutionService)
     {
         _resolvers = [fileBasedConfigurationResolver, jsonEnvironmentConfigurationResolver, keyValueEnvironmentConfigurationResolver];
         _resolvedConfiguration = new Lazy<FormattersConfiguration>(ResolveConfiguration);
         _envVariableDisableFlagProvider = envVariableDisableFlagProvider;
+        _variableSubstitutionService = variableSubstitutionService;
     }
 
     public IDictionary<string, object> GetFormatterConfigurationByName(string formatterName)
@@ -57,4 +64,17 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
             Enabled = enabled
         };
     }
+
+    /// <summary>
+    /// Replaces all recognized placeholders in the specified template string with their corresponding values.
+    /// </summary>
+    /// <param name="template">The template string containing placeholders to be resolved. Placeholders should be in the expected format for
+    /// variable substitution.</param>
+    /// <returns>A string with all recognized placeholders in the template replaced by their resolved values. If no placeholders
+    /// are found, returns the original template string.</returns>
+    public string ResolveTemplatePlaceholders(string template)
+    {
+        return _variableSubstitutionService.ResolveTemplatePlaceholders(template);
+    }
+
 }
