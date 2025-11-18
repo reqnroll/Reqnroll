@@ -1,10 +1,7 @@
 #nullable enable
 using FluentAssertions;
-using FluentAssertions.Common;
 using Io.Cucumber.Messages.Types;
 using Moq;
-using Reqnroll.CommonModels;
-using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PubSub;
@@ -13,7 +10,6 @@ using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;

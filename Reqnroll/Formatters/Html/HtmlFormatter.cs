@@ -2,11 +2,9 @@
 
 using Cucumber.HtmlFormatter;
 using Io.Cucumber.Messages.Types;
-using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Time;
 using Reqnroll.Utils;
 using System;
 using System.IO;

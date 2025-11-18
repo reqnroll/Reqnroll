@@ -1,16 +1,12 @@
 #nullable enable
 
 using Io.Cucumber.Messages.Types;
-using Reqnroll.CommonModels;
-using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Time;
 using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 

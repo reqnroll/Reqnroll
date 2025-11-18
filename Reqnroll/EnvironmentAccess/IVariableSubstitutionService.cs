@@ -1,6 +1,4 @@
-﻿using System.Text;
-
-namespace Reqnroll.EnvironmentAccess;
+﻿namespace Reqnroll.EnvironmentAccess;
 
 public interface IVariableSubstitutionService
 {
