@@ -1,4 +1,5 @@
 using Moq;
+using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using System.Collections.Generic;
 using Xunit;
@@ -10,6 +11,7 @@ public class CucumberConfigurationTests
     private readonly Mock<IFormattersConfigurationDisableOverrideProvider> _disableOverrideProviderMock;
     private readonly Mock<IFileBasedConfigurationResolver> _fileResolverMock;
     private readonly Mock<IJsonEnvironmentConfigurationResolver> _environmentResolverMock;
+    private readonly Mock<IVariableSubstitutionService> _variableSubstitutionServiceMock;   
     private readonly FormattersConfigurationProvider _sut;
 
     public CucumberConfigurationTests()
@@ -17,6 +19,7 @@ public class CucumberConfigurationTests
         _disableOverrideProviderMock = new Mock<IFormattersConfigurationDisableOverrideProvider>();
         _fileResolverMock = new Mock<IFileBasedConfigurationResolver>();
         _environmentResolverMock = new Mock<IJsonEnvironmentConfigurationResolver>();
+        _variableSubstitutionServiceMock = new Mock<IVariableSubstitutionService>();
         var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
         keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
 
@@ -24,7 +27,8 @@ public class CucumberConfigurationTests
             _fileResolverMock.Object,
             _environmentResolverMock.Object,
             keyValueEnvironmentConfigurationResolverMock.Object,
-            _disableOverrideProviderMock.Object);
+            _disableOverrideProviderMock.Object,
+            _variableSubstitutionServiceMock.Object);
     }
 
     [Fact]

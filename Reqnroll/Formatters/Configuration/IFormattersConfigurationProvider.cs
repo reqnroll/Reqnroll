@@ -6,4 +6,6 @@ public interface IFormattersConfigurationProvider
 {
     bool Enabled { get; }
     IDictionary<string, object> GetFormatterConfigurationByName(string formatterName);
+
+    string ResolveTemplatePlaceholders(string template);
 }
