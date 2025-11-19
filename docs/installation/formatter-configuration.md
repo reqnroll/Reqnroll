@@ -126,6 +126,37 @@ You can override different parts of the output file path:
 }
 ```
 
+**Overriding path components with substitution variables:**
+
+You can use substitution variables in the `outputFilePath` to dynamically generate file or directory names based on runtime information. This is useful for organizing reports by build, branch, or other environment-specific data.
+
+#### Available Substitution Variables
+
+- `{timestamp}`: Replaced with the current date and time in `yyyy-MM-dd_hh_mm_ss` format.
+- `{buildNumber}`: Replaced with the build number, if available.
+- `{revision}`: Replaced with the current revision or commit hash, if available.
+- `{branch}`: Replaced with the current branch name, if available.
+- `{tag}`: Replaced with the current tag, if available.
+- `{env:environmentVariableName}`: Replaced with the value of the specified environment variable.
+
+#### Example Usage
+
+```{code-block} json
+:caption: reqnroll.json
+{
+  "formatters": {
+    "html": { "outputFilePath": "reports/{branch}/report_{timestamp}.html" },
+    "message": { "outputFilePath": "reports/{env:TEST_ENV}/messages_{buildNumber}.ndjson" }
+  }
+}
+```
+
+In this example:
+- The HTML report will be saved in a subdirectory named after the current branch, with a timestamped filename.
+- The Message formatter report will be saved in a directory named after the value of the `TEST_ENV` environment variable, and the filename will include the build number.
+
+> **Note:** If a variable cannot be resolved at runtime, it will be replaced with an empty string.
+
 ## Environment Variables
 
 The settings discussed above can be overridden by setting an environment variable. When an environment variable is set, it takes precedence over the same configuration setting in the configuration file. If a setting is not overridden by an environment variable, the value will be taken from the configuration file (if set), otherwise a default (as shown above) will be used. The formatter specific environment variables override the general `REQNROLL_FORMATTERS` environment variable settings. 
@@ -220,4 +251,8 @@ $env:REQNROLL_FORMATTERS='{"formatters": {"html": {"outputFilePath": "output/rep
 
 # Linux/macOS Bash
 export REQNROLL_FORMATTERS='{"formatters": {"html": {"outputFilePath": "output/report.html"}, "message": {"outputFilePath": "output/messages.ndjson"}}}'
+```
+
+```{note}
+When using an environment variable to override a `formatters` section, the `outputFilePath` may also use substitution variables.
 ```
