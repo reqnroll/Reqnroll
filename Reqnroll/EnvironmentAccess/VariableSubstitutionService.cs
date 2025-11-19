@@ -30,7 +30,7 @@ public class VariableSubstitutionService : IVariableSubstitutionService
     }
     public string ResolveTemplatePlaceholders(string template)
     {
-        var substitutionMatcher = new Regex(@"\{((?:env:\s*)?[a-zA-Z0-9_]+)\}", RegexOptions.Compiled);
+        var substitutionMatcher = new Regex(@"\{((?:env:)?[a-zA-Z0-9_]+)\}", RegexOptions.Compiled);
         if (string.IsNullOrWhiteSpace(template))
             return template;
 

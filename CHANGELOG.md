@@ -1,11 +1,11 @@
 # [vNext]
 
 ## Improvements:
-* Formatters: configured OutputFilePath may now contain variable substitution parameters (e.g.: "outputFilePath": "test_results_{timestamp}.ndjson" )
+* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.2.1 - 2025-11-07
 

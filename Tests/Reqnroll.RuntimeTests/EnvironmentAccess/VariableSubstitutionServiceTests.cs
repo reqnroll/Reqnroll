@@ -76,7 +76,7 @@ public class VariableSubstitutionServiceTests
         // Arrange
         _environmentWrapperMock.Setup(e => e.GetEnvironmentVariable("MY_ENV_VAR"))
             .Returns(Result<string>.Success("envValue"));
-        var input = "results_{env: MY_ENV_VAR}.txt";
+        var input = "results_{env:MY_ENV_VAR}.txt";
         // Act
         var result = _sut.ResolveTemplatePlaceholders(input);
         // Assert
@@ -101,7 +101,7 @@ public class VariableSubstitutionServiceTests
         _clockMock.Setup(c => c.GetNowDateAndTime()).Returns(new DateTime(2023, 1, 2, 3, 4, 5, DateTimeKind.Utc));
         _environmentWrapperMock.Setup(e => e.GetEnvironmentVariable("MY_ENV_VAR"))
             .Returns(Result<string>.Success("envValue"));
-        var input = "results_{timestamp}_{env: MY_ENV_VAR}.txt";
+        var input = "results_{timestamp}_{env:MY_ENV_VAR}.txt";
         // Act
         var result = _sut.ResolveTemplatePlaceholders(input);
         // Assert

@@ -1,15 +1,15 @@
 ﻿#nullable enable
 
-using Io.Cucumber.Messages.Types;
-using Reqnroll.Formatters.Configuration;
-using Reqnroll.Formatters.PayloadProcessing;
-using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Utils;
 using System;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Io.Cucumber.Messages.Types;
+using Reqnroll.Formatters.Configuration;
+using Reqnroll.Formatters.PayloadProcessing;
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Utils;
 
 namespace Reqnroll.Formatters.Message;
 
