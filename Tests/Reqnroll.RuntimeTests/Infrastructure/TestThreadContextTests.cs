@@ -4,6 +4,7 @@ using Moq;
 using Xunit;
 using Reqnroll.Infrastructure;
 using Reqnroll.Tracing;
+using System.Threading.Tasks;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
 {
@@ -36,7 +37,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         }
 
         [Fact]
-        public void Should_disposing_event_fired_when_test_thread_container_disposes()
+        public async Task Should_disposing_event_fired_when_test_thread_container_disposes()
         {
             bool wasDisposingFired = false;
             ContextManagerStub.TestThreadContext.Should().NotBeNull();
@@ -46,21 +47,21 @@ namespace Reqnroll.RuntimeTests.Infrastructure
                 wasDisposingFired = true;
             };
 
-            TestThreadContainer.Dispose();
+            await TestThreadContainer.DisposeAsync();
 
             wasDisposingFired.Should().BeTrue();
         }
 
         [Fact]
-        public void Should_be_able_to_resolve_from_scenario_container()
+        public async Task Should_be_able_to_resolve_from_scenario_container()
         {
             // this basically tests the special registration in DefaultDependencyProvider
 
             var containerBuilder = new RuntimeTestsContainerBuilder();
             var testThreadContainer = containerBuilder.CreateTestThreadContainer(containerBuilder.CreateGlobalContainer(typeof(TestThreadContextTests).Assembly));
             var contextManager = CreateContextManager(testThreadContainer);
-            contextManager.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, "", "test feature", null));
-            contextManager.InitializeScenarioContext(new ScenarioInfo("test scenario", "test_description", null, null), null);
+            await contextManager.InitializeFeatureContextAsync(new FeatureInfo(FeatureLanguage, "", "test feature", null));
+            await contextManager.InitializeScenarioContextAsync(new ScenarioInfo("test scenario", "test_description", null, null), null);
 
             contextManager.TestThreadContext.Should().NotBeNull();
 

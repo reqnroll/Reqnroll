@@ -4,7 +4,7 @@ namespace Reqnroll.Generator.Generation
     {
         public const string DEFAULT_NAMESPACE = "ReqnrollTests";
         public const string TEST_NAME_FORMAT = "{0}";
-        public const string SCENARIO_INITIALIZE_NAME = "ScenarioInitialize";
+        public const string SCENARIO_INITIALIZE_NAME = "ScenarioInitializeAsync";
         public const string SCENARIO_START_NAME = "ScenarioStartAsync";
         public const string SCENARIO_CLEANUP_NAME = "ScenarioCleanupAsync";
         public const string TEST_INITIALIZE_NAME = "TestInitializeAsync";
