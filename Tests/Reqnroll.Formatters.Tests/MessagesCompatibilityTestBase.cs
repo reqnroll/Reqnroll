@@ -57,43 +57,34 @@ public class MessagesCompatibilityTestBase : SystemTestBase
     {
         fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".ndjson";
         DeletePreviousMessagesOutput(fileToDelete);
-        ResetCucumberMessagesOutputFileName();
-        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
     }
     protected void ResetCucumberMessagesHtml(string? fileToDelete = null)
     {
         fileToDelete = string.IsNullOrEmpty(fileToDelete) ? fileToDelete : fileToDelete + ".html";
         DeletePreviousMessagesOutput(fileToDelete);
-        ResetCucumberMessagesOutputFileName();
-        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_DISABLED_ENVIRONMENT_VARIABLE, null);
-    }
-
-    protected void ResetCucumberMessagesOutputFileName()
-    {
-        Environment.SetEnvironmentVariable(EnvironmentOptions.REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE, null);
     }
 
     protected void MimicGitHubActionsEnvironment()
     {
-        Environment.SetEnvironmentVariable("GITHUB_ACTIONS", "true");
-        Environment.SetEnvironmentVariable("GITHUB_SERVER_URL", "https://github.com");
-        Environment.SetEnvironmentVariable("GITHUB_REPOSITORY", "reqnroll/reqnroll");
-        Environment.SetEnvironmentVariable("GITHUB_RUN_ID", "1234567890");
-        Environment.SetEnvironmentVariable("GITHUB_RUN_NUMBER", "1");
-        Environment.SetEnvironmentVariable("GITHUB_REF_TYPE", "branch");
-        Environment.SetEnvironmentVariable("GITHUB_REF_NAME", "main");
-        Environment.SetEnvironmentVariable("GITHUB_SHA", "abcdef1234567890abcdef1234567890abcdef12");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_ACTIONS", "true");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_SERVER_URL", "https://github.com");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_REPOSITORY", "reqnroll/reqnroll");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_RUN_ID", "1234567890");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_RUN_NUMBER", "1");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_REF_TYPE", "branch");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_REF_NAME", "main");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("GITHUB_SHA", "abcdef1234567890abcdef1234567890abcdef12");
     }
 
     protected void MimicAzurePipelinesEnvironment()
     {
-        Environment.SetEnvironmentVariable("TF_BUILD", "true");
-        Environment.SetEnvironmentVariable("BUILD_BUILDURI", "https://dev.azure.com/reqnroll/reqnroll/_build");
-        Environment.SetEnvironmentVariable("BUILD_BUILDNUMBER", "20231001.1");
-        Environment.SetEnvironmentVariable("BUILD_REPOSITORY_URI", "https://dev.azure.com/reqnroll/reqnroll/_git/reqnroll");
-        Environment.SetEnvironmentVariable("BUILD_SOURCEBRANCHNAME", "1b1c2588e46d5c995d54da1082b618fa13553eb3");
-        Environment.SetEnvironmentVariable("BUILD_SOURCEVERSION", "main");
-        Environment.SetEnvironmentVariable("Build_SOURCEBRANCH", "refs/tags/v1.0.0");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("TF_BUILD", "true");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("BUILD_BUILDURI", "https://dev.azure.com/reqnroll/reqnroll/_build");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("BUILD_BUILDNUMBER", "20231001.1");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("BUILD_REPOSITORY_URI", "https://dev.azure.com/reqnroll/reqnroll/_git/reqnroll");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("BUILD_SOURCEBRANCHNAME", "1b1c2588e46d5c995d54da1082b618fa13553eb3");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("BUILD_SOURCEVERSION", "main");
+        _testSuiteInitializationDriver.AddEnvironmentVariableOverride("Build_SOURCEBRANCH", "refs/tags/v1.0.0");
     }
     protected void DeletePreviousMessagesOutput(string? fileToDelete = null)
     {
