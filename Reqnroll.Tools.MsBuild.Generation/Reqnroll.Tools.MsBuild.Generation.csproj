@@ -65,7 +65,7 @@
       <BuildOutputInPackage
         Include="$(ProjectDepsFilePath)"
         TargetPath="$(ProjectDepsFileName)"
-        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'"/>
+        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'"/>
     </ItemGroup>
   </Target>
 
