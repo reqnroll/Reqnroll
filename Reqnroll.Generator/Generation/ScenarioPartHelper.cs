@@ -233,18 +233,5 @@ namespace Reqnroll.Generator.Generation
                 "Format",
                 formatArguments.ToArray());
         }
-        public void AddVariableForPickleIndex(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, int? pickleIndex)
-        {
-            if (!pickleIdIncludedInParameters && pickleIndex == null)
-                throw new ArgumentNullException(nameof(pickleIndex));
-
-            // string pickleId = "<pickleJar.CurrentPickleId>"; or
-            // string pickleId = __pickleId;
-            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), GeneratorConstants.PICKLEINDEX_VARIABLE_NAME,
-                pickleIdIncludedInParameters ?
-                    new CodeVariableReferenceExpression(GeneratorConstants.PICKLEINDEX_PARAMETER_NAME) :
-                    new CodePrimitiveExpression(pickleIndex.Value.ToString()));
-            testMethod.Statements.Add(pickleIdVariable);
-        }
     }
 }

@@ -70,6 +70,7 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
         _unitTestMethodGenerator.CreateUnitTests(feature, generationContext);
 
+        SerializeFeatureEnvelopes(generationContext);
         //before returning the generated code, call the provider's method in case the generated code needs to be customized            
         _testGeneratorProvider.FinalizeTestClass(generationContext);
 
@@ -236,10 +237,8 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
                 Envelope.Create(featureGherkinDocumentMessage)
             };
             envelopes.AddRange(featurePickleMessages.Select(Envelope.Create));
+            generationContext.FeatureEnvelopes = envelopes;
             envelopeCount = envelopes.Count;
-
-            // Serialize each envelope and append into a ndjson format
-            generationContext.FeatureMessages = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
 
         }
         catch (System.Exception e)
@@ -261,6 +260,13 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         cucumberMessagesInitializationMethod.Statements.Add(
             new CodeMethodReturnStatement(
                 featureLevelCucumberMessagesExpression));
+    }
+
+    private void SerializeFeatureEnvelopes(TestClassGenerationContext generationContext)
+    {
+
+        // Serialize each envelope and append into a ndjson format
+        generationContext.FeatureMessages = string.Join(Environment.NewLine, generationContext.FeatureEnvelopes.Select(NdjsonSerializer.Serialize));
     }
 
     private void SetupTestClassInitializeMethod(TestClassGenerationContext generationContext)
