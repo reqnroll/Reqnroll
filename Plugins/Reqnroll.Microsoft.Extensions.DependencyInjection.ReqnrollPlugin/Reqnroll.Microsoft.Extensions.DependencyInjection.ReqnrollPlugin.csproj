@@ -1,25 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-
-    <PackageId>Reqnroll.Microsoft.Extensions.DependencyInjection</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.Microsoft.Extensions.DependencyInjection.nuspec</NuspecFile>
-    
     <RootNamespace>Reqnroll.Microsoft.Extensions.DependencyInjection</RootNamespace>
     <Nullable>enable</Nullable>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.Microsoft.Extensions.DependencyInjection</PackageId>
+    <PackageTags>reqnroll verify xunit</PackageTags>
+    <Title>Reqnroll Microsoft.Extensions.DependencyInjection integration plugin</Title>
+    <Description>Reqnroll plugin that enables to use Microsoft.Extensions.DependencyInjection for resolving test dependencies.</Description>
+    <Authors>Mark Hoek, Solid Token, Stef Heyenrath, $(ReqnrollAuthors)</Authors>
+    <Copyright>Copyright © Mark Hoek, Solid Token, Stef Heyenrath, $(ReqnrollAuthors)</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
   </ItemGroup>
 
 </Project>

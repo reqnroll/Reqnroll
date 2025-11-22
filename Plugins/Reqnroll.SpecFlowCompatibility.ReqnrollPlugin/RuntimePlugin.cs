@@ -1,5 +1,6 @@
 ﻿using Reqnroll.Configuration;
 using Reqnroll.Plugins;
+using Reqnroll.SpecFlowCompatibility.AppConfig;
 using Reqnroll.SpecFlowCompatibility.ReqnrollPlugin;
 using Reqnroll.UnitTestProvider;
 using System.Configuration;
@@ -7,6 +8,7 @@ using System.Configuration;
 [assembly: RuntimePlugin(typeof(RuntimePlugin))]
 
 namespace Reqnroll.SpecFlowCompatibility.ReqnrollPlugin;
+
 public class RuntimePlugin : IRuntimePlugin
 {
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)

@@ -1,18 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-  </PropertyGroup>
+    <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
 
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.xunit.v3</PackageId>
+    <Description>Package to use Reqnroll with xUnit.v3 2.0 and later.</Description>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="xunit.v3.assert" Version="2.0.0" />
-    <PackageReference Include="xunit.v3.extensibility.core" Version="2.0.0" />
+    <PackageReference Include="xunit.v3.assert" Version="[2,)" />
+    <PackageReference Include="xunit.v3.extensibility.core" Version="[2,)" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <ProjectReference
+      Include="..\Reqnroll.xUnit3.Generator.ReqnrollPlugin\Reqnroll.xUnit3.Generator.ReqnrollPlugin.csproj"
+      PrivateAssets="all"
+      PackAsReqnrollGeneratorPlugin="true" />
   </ItemGroup>
 
 </Project>

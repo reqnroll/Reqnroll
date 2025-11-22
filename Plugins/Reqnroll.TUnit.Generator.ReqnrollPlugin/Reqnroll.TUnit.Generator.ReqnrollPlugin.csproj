@@ -1,59 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.TUnit.nuspec</NuspecFile>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-    <PackageId>Reqnroll.TUnit</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <!-- build incorrectly detects a missing content in the 'lib' folder, we need to skip this warning -->
-    <NoWarn>$(NoWarn);NU5128</NoWarn>
+    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-
-  <PropertyGroup>
-     <!--adjust path/version as needed--> 
-    <MSBuildAdditionalTasksPath>$(NuGetPackageRoot)\msbuild.additionaltasks\0.1.36</MSBuildAdditionalTasksPath>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
-      <!-- Do not add it as a normal reference, we just need this as a package dependency. -->
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
-
-  <!--<Import Project="$(MSBuildAdditionalTasksPath)\build\MSBuild.AdditionalTasks.targets" />-->
-
-  <ItemGroup>
-    <Compile Remove="build\**\*" />
-    <None Include="build\**\*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36">
-      <!-- only bring in its build-time targets/tasks -->
-      <IncludeAssets>build</IncludeAssets>
-      <!-- don’t flow these build-only bits to any projects that consume this project as a NuGet -->
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-    <ProjectReference Include="..\Reqnroll.TUnit.ReqnrollPlugin\Reqnroll.TUnit.ReqnrollPlugin.csproj">
-      <!-- Reqnroll.TUnit.ReqnrollPlugin is referenced only to be included in the NuGet package. -->
-      <!-- Do not add it as a normal reference, as the TUnit SourceGenerator adds generated code that depends on TUnit.Core. -->
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <OutputItemType>Content</OutputItemType>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </ProjectReference>
-  </ItemGroup>
-
-  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\TUnit.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\TUnit.AssemblyHooks.cs" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\TUnit.AssemblyHooks.template.vb" OutputFile="$(MSBuildThisFileDirectory)\build\TUnit.AssemblyHooks.vb" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-  </Target>
-
 </Project>
