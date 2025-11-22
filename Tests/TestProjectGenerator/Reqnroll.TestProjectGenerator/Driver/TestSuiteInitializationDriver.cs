@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Reqnroll.TestProjectGenerator.Driver
 {
@@ -17,5 +18,11 @@ namespace Reqnroll.TestProjectGenerator.Driver
         public bool? OverrideCucumberEnable { get; set; }
 
         public string OverrideCucumberMessagesFormatters { get; set; }
+
+        internal Dictionary<string, string> EnvironmentVariableOverrides { get; } = [];
+        public void AddEnvironmentVariableOverride(string envKey, string envVar)
+        {
+            EnvironmentVariableOverrides.Add(envKey, envVar);
+        }
     }
 }
