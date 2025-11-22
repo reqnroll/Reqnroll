@@ -128,8 +128,6 @@
       <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Tasks.Extensions'" />
     </ItemGroup>
 
-    <Message Text="Redistributable assemblies: @(RedistributableAssembly->'%(Filename)')" Importance="High" />
-
   </Target>
 
   <PropertyGroup>
