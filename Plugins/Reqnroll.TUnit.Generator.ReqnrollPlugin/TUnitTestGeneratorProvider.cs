@@ -169,7 +169,7 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
     public void SetRowTest(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string scenarioTitle)
     {
         // For a row test, mark it as a test with a display name.
-        var paramNames = string.Join(", ", testMethod.Parameters.Cast<CodeParameterDeclarationExpression>().Take(testMethod.Parameters.Count - 2).Select(x => $"${x.Name}"));
+        var paramNames = string.Join(", ", testMethod.Parameters.Cast<CodeParameterDeclarationExpression>().Take(testMethod.Parameters.Count - 1).Select(x => $"${x.Name}"));
         SetTestMethod(generationContext, testMethod, scenarioTitle + " (" + paramNames + ")");
     }
 
