@@ -80,11 +80,11 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
                 var pickle = featurePickles[i];
                 PickleIds.Add(i.ToString(), pickle.Id);
 
-                // If the pickle has a tag that begins with "@RowHash:", we need to replace the pickle with a new one without that tag
+                // If the pickle has a tag that begins with "@RowHash", we need to replace the pickle with a new one without that tag
                 var tagsToRemovePrefix = "@RowHash";
                 if (pickle.Tags != null && pickle.Tags.Any(t => t.Name.StartsWith(tagsToRemovePrefix, StringComparison.Ordinal)))
                 {
-                    // Create a new Pickle without the "@RowHash:" tag(s)
+                    // Create a new Pickle without the "@RowHash" tag(s)
                     var filteredTags = pickle.Tags.Where(t => !t.Name.StartsWith(tagsToRemovePrefix, StringComparison.Ordinal)).ToList();
                     var newPickle = new Pickle(
                         id: pickle.Id,

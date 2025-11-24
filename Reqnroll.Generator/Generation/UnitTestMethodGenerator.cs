@@ -1,3 +1,8 @@
+using System;
+using System.CodeDom;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Linq;
 using Gherkin.Ast;
 using Reqnroll.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
@@ -6,15 +11,11 @@ using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 using Reqnroll.Tracing;
-using System;
-using System.CodeDom;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
+
 
 namespace Reqnroll.Generator.Generation
 {
-    public partial class UnitTestMethodGenerator
+    public class UnitTestMethodGenerator
     {
         private const string IGNORE_TAG = "@Ignore";
         private const string TESTRUNNER_FIELD = "testRunner";
@@ -249,7 +250,7 @@ namespace Reqnroll.Generator.Generation
                 throw new ArgumentNullException(nameof(pickleIndex));
 
             // if simple scenario, just assign the pickle index value directly
-            // string pickleIndex = "<pickleIndex";
+            // string pickleIndex = "<pickleIndex>";
 
             // if scenario outline with row tests, we generate code that invokes the TestRowPickleMapper to get the pickle index from the row hash.
 
