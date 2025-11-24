@@ -469,10 +469,12 @@ namespace Reqnroll.Generator.Generation
                     // Look up the pickle in the generation context Feature Envelopes using the pickleIndex, and add the hash to the Pickle's list of tags.
                     var featureName = generationContext.Feature.Name;
                     var scenarioOutlineName = scenarioOutline.Name;
-                    var rowValues = string.Join("|", arguments);
-                    var rowHash = TestRowPickleMapper.ComputeHash(featureName, scenarioOutlineName, examples.Tags.Select(t => t.Name), arguments);
+                    var pickle = generationContext.FeatureEnvelopes
+                                .Where(e => e.Pickle != null)
+                                .Select(e => e.Pickle)
+                                .ElementAt(pickleIndex);
 
-                    TestRowPickleMapper.MarkPickleWithRowHash(generationContext.FeatureEnvelopes, pickleIndex, rowHash);
+                    TestRowPickleMapper.MarkPickleWithRowHash(pickle, featureName, scenarioOutlineName, examples.Tags.Select(t => t.Name), arguments);
 
                     pickleIndex++;
                 }
@@ -556,7 +558,6 @@ namespace Reqnroll.Generator.Generation
 
             //call test implementation with the params
             var argumentExpressions = row.Cells.Select(paramCell => new CodePrimitiveExpression(paramCell.Value)).Cast<CodeExpression>().ToList();
-            argumentExpressions.Add(new CodePrimitiveExpression(pickleIndex.ToString()));
             argumentExpressions.Add(_scenarioPartHelper.GetStringArrayExpression(exampleSetTags));
 
             var statements = new List<CodeStatement>();

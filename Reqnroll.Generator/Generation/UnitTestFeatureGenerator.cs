@@ -264,7 +264,10 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
     private void SerializeFeatureEnvelopes(TestClassGenerationContext generationContext)
     {
-
+        if (generationContext.FeatureEnvelopes == null || !generationContext.FeatureEnvelopes.Any() || string.IsNullOrEmpty(generationContext.FeatureMessagesResourceName))
+        {
+            return;
+        }
         // Serialize each envelope and append into a ndjson format
         generationContext.FeatureMessages = string.Join(Environment.NewLine, generationContext.FeatureEnvelopes.Select(NdjsonSerializer.Serialize));
     }
