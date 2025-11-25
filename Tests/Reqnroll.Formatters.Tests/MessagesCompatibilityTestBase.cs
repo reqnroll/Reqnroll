@@ -12,6 +12,7 @@ using Reqnroll.SystemTests;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
 using System.Reflection;
+using Reqnroll.Time;
 
 namespace Reqnroll.Formatters.Tests;
 
@@ -161,6 +162,7 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var objectContainerMock = new Mock<IObjectContainer>();
         var tracerMock = new Mock<ITraceListener>();
         objectContainerMock.Setup(x => x.Resolve<ITraceListener>()).Returns(tracerMock.Object);
+        var substitutionServiceMock = new Mock<IVariableSubstitutionService>();
         var env = new EnvironmentWrapper();
         var envOptions = new EnvironmentOptions(env);
         var jsonConfigFileLocator = new ReqnrollJsonLocator();
@@ -176,7 +178,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
             configFileResolver,
                                                                         jsonEnvConfigResolver,
                                                                         keyValueEnvironmentConfigurationResolverMock.Object,
-                                                                        new FormattersDisabledOverrideProvider(envOptions));
+                                                                        new FormattersDisabledOverrideProvider(envOptions),
+                                                                        substitutionServiceMock.Object);
+
         configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
 
         var outputFilePath = outputFilePathElement!.ToString();
