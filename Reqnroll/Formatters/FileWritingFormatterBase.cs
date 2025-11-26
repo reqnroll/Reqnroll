@@ -45,6 +45,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
     {
         var defaultBaseDirectory = ".";
         var configuredPath = ConfiguredOutputFilePath(formatterConfiguration)?.Trim();
+        configuredPath = ResolveOutputFilePathVariables(configuredPath);
         string outputPath;
         string baseDirectory;
 
@@ -109,6 +110,11 @@ public abstract class FileWritingFormatterBase : FormatterBase
         Logger.WriteMessage($"Formatter {Name} initialized to write to: {outputPath}.");
     }
 
+    public virtual string? ResolveOutputFilePathVariables(string? configuredFilePath)
+    {
+        return ConfigurationProvider.ResolveTemplatePlaceholders(configuredFilePath);
+    }
+
     protected override async Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken)
     {
         if (TargetFileStream == null)
@@ -165,7 +171,7 @@ public abstract class FileWritingFormatterBase : FormatterBase
             onInitialized(true);
             Logger.WriteMessage($"Formatter {Name} opened file stream.");
         }
-        catch(System.Exception e)
+        catch (System.Exception e)
         {
             Logger.WriteMessage($"Formatter {Name} closing because of an exception opening the file stream."
                                  + Environment.NewLine
