@@ -37,11 +37,6 @@
   <PropertyGroup>
 
     <!--
-      feature flag to enable/disable removing code-behind files during clean
-    -->
-    <ReqnrollDeleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)'==''">true</ReqnrollDeleteCodeBehindFilesOnClean>
-
-    <!--
       feature flag to enable embedding of feature files as resources in the assembly
     -->
     <!--<ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>-->
