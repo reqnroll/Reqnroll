@@ -66,10 +66,6 @@
       File="@(None)"
       Condition="%(None.Extension) == '.feature' AND %(None.Generator) == 'ReqnrollSingleFileGenerator'"/>
 
-    <!-- <PropertyGroup>
-      <ReqnrollCodeBehindOutputPath Condition=" '$(ReqnrollCodeBehindOutputPath)' == '' ">Features.Generated</ReqnrollCodeBehindOutputPath>
-    </PropertyGroup> -->
-
     <PropertyGroup Condition="'$(TargetFrameworkVersion)' != ''">
       <ReqnrollTargetFramework>$(TargetFrameworkVersion)</ReqnrollTargetFramework>
     </PropertyGroup>
