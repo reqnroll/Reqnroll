@@ -261,6 +261,7 @@ namespace Reqnroll.Generator.Generation
             }
             else
             {
+                // string pickleIndex = TestRowPickleMapper.GetPickleIndexFromTestRow(featureName, scenarioName, exampleTags, arguments.Values, featureInfo);
                 var testRowPickleMapperTypeRef = new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRowPickleMapper), CodeTypeReferenceOptions.GlobalReference));
                 valueExpression = new CodeMethodInvokeExpression(
                     testRowPickleMapperTypeRef,
@@ -269,7 +270,7 @@ namespace Reqnroll.Generator.Generation
                     new CodePrimitiveExpression(scenarioName),
                     exampleTags,
                     new CodePropertyReferenceExpression(arguments, "Values"),
-                    new CodePropertyReferenceExpression(new CodePropertyReferenceExpression(new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD), "FeatureCucumberMessages"), "Pickles"));
+                    new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD));
             }
 
             var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), GeneratorConstants.PICKLEINDEX_VARIABLE_NAME,

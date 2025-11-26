@@ -31,12 +31,14 @@ public static class TestRowPickleMapper
         pickle.Tags.Add(new Io.Cucumber.Messages.Types.PickleTag($"{RowHashTagPrefix}{ComputeHash(featureName, scenarioOutlineName, tags, rowValues)}", ""));
     }
 
-    public static string GetPickleIndexFromTestRow(string featureName, string scenarioOutlineName, IEnumerable<string> tags, ICollection rowValues, IEnumerable<Pickle> pickles)
+    public static string GetPickleIndexFromTestRow(string featureName, string scenarioOutlineName, IEnumerable<string> tags, ICollection rowValues, FeatureInfo featureInfo)
     {
         var rowValuesStrings = rowValues.Cast<object>().Select(v => v?.ToString() ?? string.Empty);
 
         var rowHash = ComputeHash(featureName, scenarioOutlineName, tags, rowValuesStrings);
         var tagName = $"{RowHashTagPrefix}{rowHash}";
+        var pickles = featureInfo.FeatureCucumberMessages.Pickles;
+
         for (int i = 0; i < pickles.Count(); i++)
         {
             var pickle = pickles.ElementAt(i);
