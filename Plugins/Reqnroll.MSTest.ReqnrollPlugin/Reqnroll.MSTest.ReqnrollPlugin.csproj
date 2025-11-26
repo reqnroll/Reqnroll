@@ -1,13 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <IsReqnrollTestFrameworkAdapter>true</IsReqnrollTestFrameworkAdapter>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.MSTest</PackageId>
+    <Description>Package to use Reqnroll for use with MsTest v2.</Description>
+    <PackageTags>reqnroll mstest</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll\Reqnroll.csproj" />
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference
+      Include="..\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj"
+      PrivateAssets="all"
+      PackAsReqnrollGeneratorPlugin="true" />
   </ItemGroup>
 
 </Project>

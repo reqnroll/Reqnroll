@@ -1,6 +1,7 @@
 ﻿using Reqnroll.Configuration;
 using Reqnroll.Generator.Plugins;
 using Reqnroll.Infrastructure;
+using Reqnroll.SpecFlowCompatibility.AppConfig;
 using Reqnroll.SpecFlowCompatibility.ReqnrollPlugin;
 using Reqnroll.UnitTestProvider;
 

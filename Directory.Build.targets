@@ -1,34 +1,18 @@
 <Project>
-  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
-    <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);version=$(PackageVersion)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);SolutionDir=$(MSBuildThisFileDirectory)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);copyright=$(ReqnrollCopyright)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);author=$(ReqnrollAuthors)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);owner=$(ReqnrollOwners)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);summary=$(ReqnrollSummary)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);CompatibilityVersionRange=[$(PackageVersion),$(CompatibilityVersionUpperRange))</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);branch=$(GitBranch)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);commit=$(GitCommitSha)</NuspecProperties>
-      
-      <NuspecProperties>$(NuspecProperties);ReqnrollFullFrameworkToolsTfm=$(ReqnrollFullFrameworkToolsTfm)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);ReqnrollCoreToolsTfm=$(ReqnrollCoreToolsTfm)</NuspecProperties>
-    </PropertyGroup>
-  </Target>
 
-  <Target Name="CleanupNupkgs" BeforeTargets="Build" >
-    <ItemGroup>
-      <Nupkgs2Delete Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
-    </ItemGroup>
-    <Delete Files="@(Nupkgs2Delete)" />
-  </Target>
+  <PropertyGroup>
+    <ReqnrollCompatibilityVersionRange>[$(PackageVersion),$(CompatibilityVersionUpperRange))</ReqnrollCompatibilityVersionRange>
+    <PackagesOutputPath>$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)</PackagesOutputPath>
+  </PropertyGroup>
 
-  <Target Name="CopyNupkgToFolder" AfterTargets="Pack">
+  <!-- Copies generated NuGet packages and symbol packages to the output packages path -->
+  <Target
+    Name="CopyPackageToPackagesOutputPath"
+    AfterTargets="Pack">
     <ItemGroup>
-      <GeneratedNupkgs Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
+      <GeneratedPackages Include="$(PackageOutputAbsolutePath)\*.*nupkg"/>
     </ItemGroup>
-    <Copy SourceFiles="@(GeneratedNupkgs)" DestinationFolder="$(MSBuildThisFileDirectory)GeneratedNuGetPackages\$(Configuration)" />
+    <Copy SourceFiles="@(GeneratedPackages)" DestinationFolder="$(PackagesOutputPath)" />
   </Target>
 
   <UsingTask

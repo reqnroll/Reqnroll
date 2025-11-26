@@ -1,34 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <AssemblyName>Reqnroll</AssemblyName>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-    <PackageId>Reqnroll</PackageId>
-
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.nuspec</NuspecFile>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 
     <NoWarn>$(NoWarn);1591;CS2002</NoWarn>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- NuGet configuration -->
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
-  <!-- build time dependencies -->
   <ItemGroup>
-    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.15.1" />
-    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Gherkin" Version="35.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Cucumber.Messages" Version="29.0.1" />
+    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.15.1" />
+    <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
     <!-- System.Runtime.Loader is used for .NET (not .NET Framework) based frameworks only. 
          From .NET, it's part of the runtime, but we need to reference it to be able to compile to .NET Standard. 
@@ -44,25 +38,79 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
-    <None Include="Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" />
+    <EmbeddedResource
+      Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate"
+      Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+  </ItemGroup>
+
+  <!-- Ensure the instrumentation key template isn't included as source. -->
+  <ItemGroup>
+    <AppInsightsInstrumentationKeyFile Include="Analytics\AppInsights\AppInsightsInstrumentationKey.cs" />
+    <Compile Remove="@(AppInsightsInstrumentationKeyFile)" />
+    <None Include="@(AppInsightsInstrumentationKeyFile)" />
+    <UpToDateCheckInput Include="@(AppInsightsInstrumentationKeyFile)" />
+  </ItemGroup>
+
+  <!-- Include the external annotations in the package. -->
+  <ItemGroup>
+    <None Update="Reqnroll.ExternalAnnotations.xml" Pack="true" PackagePath="lib/$(TargetFramework)/" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
+    <!-- Include the readme and changelog files. -->
+    <None Update="PackageReadme.md" Pack="true" PackagePath="README.md" />
+    <None Include="../CHANGELOG.md" Pack="true" PackagePath="" />
+
+    <!-- Include the third-party license files. -->
+    <None Include="../Licenses/*" Pack="true" PackagePath="" />
+
+    <!-- Include build files. -->
+    <None Update="build/**/*" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Cucumber.TagExpressions">
-      <HintPath>..\..\cucumber\tag-expressions\dotnet\TagExpressions\bin\Debug\netstandard2.0\Cucumber.TagExpressions.dll</HintPath>
-    </Reference>
-  </ItemGroup>
+  <!-- Embeds the Application Insights instrumentation key  -->
+  <Target
+    Name="EmbedAppInsightsInstrumentationKey"
+    Inputs="@(AppInsightsInstrumentationKeyFile)"
+    Outputs="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
+    BeforeTargets="CoreCompile">
 
-  <Target Name="RunTokenReplace" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.template.cs" OutputFile="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" TextToReplace="&lt;InstrumentationKeyGoesHere&gt;" TextToReplaceWith="$(AppInsightsInstrumentationKey)" WriteOnlyWhenChanged="true" />
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(AppInsightsInstrumentationKeyFile.Identity)">
+      <Output TaskParameter="Lines" ItemName="_AppInsightsInstrumentationKeyFileTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the key token replaced. -->
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
+      Lines="@(_AppInsightsInstrumentationKeyFileTemplateLine -> Replace('_InstrumentationKey_', '$(AppInsightsInstrumentationKey)'))"
+      Overwrite="true"
+      Encoding="UTF-8" />
+
     <ItemGroup>
-      <Compile Include="$(ProjectDir)Analytics/AppInsights/AppInsightsInstrumentationKey.cs" />
+      <!-- Include the file in the final build package -->
+      <Compile Include="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" />
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" />
     </ItemGroup>
   </Target>
 
+  <!-- Include referenced project assembly as part of this package directly. -->
+  <Target Name="MarkProjectReferenceOutputsForPack" AfterTargets="ResolveReferences">
+
+    <ItemGroup>
+      <ProjectReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference'" />
+
+      <ProjectReferenceSymbols Include="@(ProjectReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.pdb'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <!-- DLLs and other runtime assets go into the main package. -->
+      <None Include="@(ProjectReferenceCopyLocalPaths)" Pack="true" PackagePath="lib/$(TargetFramework)/" />
+
+      <!-- Debugging symbols go into the symbol package. -->
+      <None Update="@(ProjectReferenceSymbols)" PackFolder="Symbols" />
+    </ItemGroup>
+  </Target>
 </Project>

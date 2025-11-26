@@ -29,6 +29,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
     protected bool Closed = false;
 
     public IFormatterLog Logger => _logger;
+    internal IFormattersConfigurationProvider ConfigurationProvider => _configurationProvider;
 
     private readonly string _pluginName;
 
