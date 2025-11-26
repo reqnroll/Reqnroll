@@ -8,6 +8,7 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 
 public static class TestRowPickleMapper
 {
+    public const string RowHashTagPrefix = "@__RowHash_";
     public static object ComputeHash(string featureName, string scenarioOutlineName, IEnumerable<string> tags, IEnumerable<string> rowValues)
     {
         var tagsList = tags ?? Enumerable.Empty<string>();
@@ -27,7 +28,7 @@ public static class TestRowPickleMapper
 
     public static void MarkPickleWithRowHash(Pickle pickle, string featureName, string scenarioOutlineName, IEnumerable<string> tags, IEnumerable<string> rowValues)
     {
-        pickle.Tags.Add(new Io.Cucumber.Messages.Types.PickleTag($"@RowHash_{ComputeHash(featureName, scenarioOutlineName, tags, rowValues)}", ""));
+        pickle.Tags.Add(new Io.Cucumber.Messages.Types.PickleTag($"{RowHashTagPrefix}{ComputeHash(featureName, scenarioOutlineName, tags, rowValues)}", ""));
     }
 
     public static string GetPickleIndexFromTestRow(string featureName, string scenarioOutlineName, IEnumerable<string> tags, ICollection rowValues, IEnumerable<Pickle> pickles)
@@ -35,7 +36,7 @@ public static class TestRowPickleMapper
         var rowValuesStrings = rowValues.Cast<object>().Select(v => v?.ToString() ?? string.Empty);
 
         var rowHash = ComputeHash(featureName, scenarioOutlineName, tags, rowValuesStrings);
-        var tagName = $"@RowHash_{rowHash}";
+        var tagName = $"{RowHashTagPrefix}{rowHash}";
         for (int i = 0; i < pickles.Count(); i++)
         {
             var pickle = pickles.ElementAt(i);
