@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Cucumber.TagExpressions" Version="8.1.0" />
     <PackageReference Include="Gherkin" Version="35.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Cucumber.Messages" Version="29.0.1" />
@@ -38,9 +39,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource
-      Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate"
-      Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <EmbeddedResource Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
 
   <!-- Ensure the instrumentation key template isn't included as source. -->
@@ -69,11 +68,7 @@
   </ItemGroup>
 
   <!-- Embeds the Application Insights instrumentation key  -->
-  <Target
-    Name="EmbedAppInsightsInstrumentationKey"
-    Inputs="@(AppInsightsInstrumentationKeyFile)"
-    Outputs="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
-    BeforeTargets="CoreCompile">
+  <Target Name="EmbedAppInsightsInstrumentationKey" Inputs="@(AppInsightsInstrumentationKeyFile)" Outputs="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" BeforeTargets="CoreCompile">
 
     <!-- Read the lines from the template. -->
     <ReadLinesFromFile File="%(AppInsightsInstrumentationKeyFile.Identity)">
@@ -81,11 +76,7 @@
     </ReadLinesFromFile>
 
     <!-- Produce the output file with the key token replaced. -->
-    <WriteLinesToFile
-      File="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
-      Lines="@(_AppInsightsInstrumentationKeyFileTemplateLine -> Replace('_InstrumentationKey_', '$(AppInsightsInstrumentationKey)'))"
-      Overwrite="true"
-      Encoding="UTF-8" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" Lines="@(_AppInsightsInstrumentationKeyFileTemplateLine -&gt; Replace('_InstrumentationKey_', '$(AppInsightsInstrumentationKey)'))" Overwrite="true" Encoding="UTF-8" />
 
     <ItemGroup>
       <!-- Include the file in the final build package -->
