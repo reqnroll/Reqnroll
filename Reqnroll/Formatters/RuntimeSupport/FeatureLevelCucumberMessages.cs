@@ -1,6 +1,8 @@
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing;
 using System;
+using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -17,6 +19,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     private readonly Lazy<IReadOnlyCollection<Envelope>> _embeddedEnvelopes;
     private Lazy<Source> _source;
     private Lazy<GherkinDocument> _gherkinDocument;
+    private ConcurrentDictionary<string, (List<int>, int)> _rowHashToPickleIndexMaps;
     private Lazy<IEnumerable<Pickle>> _pickles;
 
     internal int ExpectedEnvelopeCount { get; }
@@ -26,7 +29,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         var assembly = Assembly.GetCallingAssembly();
 
         var isEnabled = !string.IsNullOrEmpty(featureMessagesResourceName) && envelopeCount > 0;
-        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => 
+        _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() =>
             isEnabled ? ReadEnvelopesFromAssembly(assembly, featureMessagesResourceName) : []);
         ExpectedEnvelopeCount = envelopeCount;
 
@@ -54,7 +57,23 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     {
         _source = new Lazy<Source>(() => _embeddedEnvelopes.Value.Select(e => e.Source).DefaultIfEmpty(null).FirstOrDefault(s => s != null));
         _gherkinDocument = new Lazy<GherkinDocument>(() => _embeddedEnvelopes.Value.Select(e => e.GherkinDocument).DefaultIfEmpty(null).FirstOrDefault(g => g != null));
-        _pickles = new Lazy<IEnumerable<Pickle>>(() => _embeddedEnvelopes.Value.Select(e => e.Pickle).Where(p => p != null));
+
+        _rowHashToPickleIndexMaps = new ConcurrentDictionary<string, (List<int>, int)>();
+
+        var pickles = _embeddedEnvelopes.Value.Select(e => e.Pickle).Where(p => p != null).ToArray();
+        for (int i = 0; i < pickles.Count(); i++)
+        {
+            var p = pickles[i];
+            if (TestRowPickleMapper.PickleHasRowHashMarkerTag(p, out var rowHash))
+            {
+                var hashUseTracker = _rowHashToPickleIndexMaps.GetOrAdd(rowHash, (new List<int>(), 0));
+                hashUseTracker.Item1.Add(i);
+                _rowHashToPickleIndexMaps[rowHash] = hashUseTracker;
+                TestRowPickleMapper.RemoveHashRowMarkerTag(p);
+            }
+        }
+
+        _pickles = new Lazy<IEnumerable<Pickle>>(() => pickles);
     }
 
     internal IReadOnlyCollection<Envelope> ReadEnvelopesFromAssembly(Assembly assembly, string featureMessagesResourceName)
@@ -108,4 +127,38 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     public Source Source => _source.Value;
     public GherkinDocument GherkinDocument => _gherkinDocument.Value;
     public IEnumerable<Pickle> Pickles => _pickles.Value;
+
+    public string GetPickleIndexFromTestRow(string featureName, string scenarioOutlineName, IEnumerable<string> tags, ICollection rowValues)
+    {
+        var rowValuesStrings = rowValues.Cast<object>().Select(v => v?.ToString() ?? string.Empty);
+
+        var rowHash = TestRowPickleMapper.ComputeHash(featureName, scenarioOutlineName, tags, rowValuesStrings);
+
+        // The _rowHashToPickleIndexMaps dictionary maps row hashes to a tuple of (List of pickle indices, current use index).
+        // We will round-robin through the list of pickle indices for each row hash as they are requested.
+
+        // Thread-safe update of useIndex using a loop and TryUpdate
+        if (_rowHashToPickleIndexMaps.TryGetValue(rowHash, out var hashUseTracker))
+        {
+            var (pickleIndices, useIndex) = hashUseTracker;
+            var pickleIndex = pickleIndices[useIndex];
+            var newUseCount = (useIndex + 1) % pickleIndices.Count;
+
+            // Try to update the useIndex atomically
+            while (!_rowHashToPickleIndexMaps.TryUpdate(rowHash, (pickleIndices, newUseCount), hashUseTracker))
+            {
+                // If update failed, reload and retry
+                if (!_rowHashToPickleIndexMaps.TryGetValue(rowHash, out hashUseTracker))
+                    break;
+                (pickleIndices, useIndex) = hashUseTracker;
+                pickleIndex = pickleIndices[useIndex];
+                newUseCount = (useIndex + 1) % pickleIndices.Count;
+            }
+
+            return pickleIndex.ToString();
+        }
+
+        return null;
+    }
+
 }

@@ -8,8 +8,8 @@ namespace Reqnroll.Formatters.RuntimeSupport;
 
 public static class TestRowPickleMapper
 {
-    public const string RowHashTagPrefix = "@__RowHash_";
-    public static object ComputeHash(string featureName, string scenarioOutlineName, IEnumerable<string> tags, IEnumerable<string> rowValues)
+    internal const string RowHashTagPrefix = "@__RowHash_";
+    internal static string ComputeHash(string featureName, string scenarioOutlineName, IEnumerable<string> tags, IEnumerable<string> rowValues)
     {
         var tagsList = tags ?? Enumerable.Empty<string>();
         tagsList = tagsList.Select(t => t.StartsWith("@") ? t : $"@{t}");
@@ -31,30 +31,26 @@ public static class TestRowPickleMapper
         pickle.Tags.Add(new Io.Cucumber.Messages.Types.PickleTag($"{RowHashTagPrefix}{ComputeHash(featureName, scenarioOutlineName, tags, rowValues)}", ""));
     }
 
-    public static string GetPickleIndexFromTestRow(string featureName, string scenarioOutlineName, IEnumerable<string> tags, ICollection rowValues, FeatureInfo featureInfo)
+
+    internal static bool PickleHasRowHashMarkerTag(Pickle p, out string rowHash)
     {
-        var rowValuesStrings = rowValues.Cast<object>().Select(v => v?.ToString() ?? string.Empty);
-
-        var rowHash = ComputeHash(featureName, scenarioOutlineName, tags, rowValuesStrings);
-        var tagName = $"{RowHashTagPrefix}{rowHash}";
-        var pickles = featureInfo.FeatureCucumberMessages.Pickles;
-
-        for (int i = 0; i < pickles.Count(); i++)
+        var tag = p.Tags.FirstOrDefault(t => t.Name.StartsWith(RowHashTagPrefix, StringComparison.OrdinalIgnoreCase));
+        if (tag != null)
         {
-            var pickle = pickles.ElementAt(i);
-            // at this point, if the pickle has a tag with the row hash, we found it; 
-            // in a thread safe way, remove the tag so that subsequent calls do not find the same pickle again
-            lock (pickle.Tags)
-            {
-                var tag = pickle.Tags.FirstOrDefault(t => t.Name == tagName);
-                if (tag != null)
-                {
-                    pickle.Tags.Remove(tag);
-                    return i.ToString();
-                }
-            }
+            rowHash = tag.Name.Substring(RowHashTagPrefix.Length);
+            return true;
         }
-        return null;
+        rowHash = null;
+        return false;
+    }
+
+    internal static void RemoveHashRowMarkerTag(Pickle p)
+    {
+        var tag = p.Tags.FirstOrDefault(t => t.Name.StartsWith(RowHashTagPrefix, StringComparison.OrdinalIgnoreCase));
+        if (tag != null)
+        {
+            p.Tags.Remove(tag);
+        }
     }
 }
 
