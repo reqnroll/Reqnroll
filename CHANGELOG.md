@@ -1,11 +1,15 @@
 # [vNext]
 
 ## Improvements:
+
 * Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
+* Improved packaging of Reqnroll NuGet packages (#914)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+* Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi, @Code-Grump
 
 # v3.2.1 - 2025-11-07
 

@@ -1,0 +1,38 @@
+<Project>
+  <Import Project="$(MSBuildThisFileDirectory)../Directory.Build.targets"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.RuntimePlugin.targets"
+    Condition="'$(IsReqnrollRuntimePlugin)' == 'true'"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.GeneratorPlugin.targets"
+    Condition="'$(IsReqnrollGeneratorPlugin)' == 'true'"/>
+  <Import
+    Project="$(MSBuildThisFileDirectory)Reqnroll.Plugins.TestFrameworkAdapter.targets"
+    Condition="'$(IsReqnrollTestFrameworkAdapter)' == 'true'"/>
+  
+  <PropertyGroup>
+    <UseCompatibilityRangeForReqnrollDependency Condition="'$(UseCompatibilityRangeForReqnrollDependency)' == ''">true</UseCompatibilityRangeForReqnrollDependency>
+  </PropertyGroup>
+
+  <!-- Updates project reference versions to use the explicit override for packing -->
+  <Target
+    Name="_SetReqnrollProjectReferenceVersionForPack"
+    BeforeTargets="GenerateNuspec"
+    Condition="'$(UseCompatibilityRangeForReqnrollDependency)' == 'true'">
+
+    <ItemGroup>
+      <_ProjectReferencesWithVersions
+        Update="@(_ProjectReferencesWithVersions)"
+        BaseVersion="%(ProjectVersion)"/>
+    </ItemGroup>
+    
+    <ItemGroup>
+      <_ProjectReferencesWithVersions
+        Update="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj"
+        ProjectVersion="[%(_ProjectReferencesWithVersions.BaseVersion),$(CompatibilityVersionUpperRange))"/>
+      <_ProjectReferencesWithVersions
+        Update="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj"
+        ProjectVersion="[%(_ProjectReferencesWithVersions.BaseVersion),$(CompatibilityVersionUpperRange))"/>
+    </ItemGroup>
+  </Target>
+</Project>
