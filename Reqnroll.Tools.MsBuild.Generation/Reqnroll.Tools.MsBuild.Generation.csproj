@@ -5,7 +5,6 @@
     <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
     <PublicSign>$(ReqnrollPublicSign)</PublicSign>
     
-    
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeSymbols>false</IncludeSymbols>
 
@@ -13,7 +12,6 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
     <BuildOutputTargetFolder>build</BuildOutputTargetFolder>
-    <GenerateDependencyFile>false</GenerateDependencyFile>
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
 
     <!-- NuGet package metadata -->
@@ -38,12 +36,12 @@
       <!-- Remove system assemblies. -->
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Copy(%(Filename)).StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(ReferenceCopyLocalPaths.NuGetPackageId)' == ''" />
       
       <!-- Remove Visual Studio assemblies. -->
       <ReferenceCopyLocalPaths
         Remove="@(ReferenceCopyLocalPaths)"
-        Condition="$([System.String]::Copy(%(Filename)).StartsWith('Microsoft.VisualStudio'))" />
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
       
       <!-- Remove netstandard -->
       <ReferenceCopyLocalPaths Remove="@(ReferenceCopyLocalPaths)" Condition="'%(Filename)' == 'netstandard'" />
@@ -54,7 +52,7 @@
 
   <!-- Include runtime assemblies in the package. -->
   <Target
-    Name="MarkTaskAssembliesForPack"
+    Name="CollectRedistributableAssemblies"
     AfterTargets="CoreCompile"
     DependsOnTargets="ResolveRequiredReferences">
     
@@ -62,6 +60,12 @@
       <BuildOutputInPackage 
         Include="@(ReferenceCopyLocalPaths)"
         TargetPath="%(ReferenceCopyLocalPaths.DestinationSubPath)"/>
+
+      <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
+      <BuildOutputInPackage
+        Include="$(ProjectDepsFilePath)"
+        TargetPath="$(ProjectDepsFileName)"
+        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'"/>
     </ItemGroup>
   </Target>
 
@@ -79,16 +83,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Build.Framework">
-      <HintPath>Microsoft.Build.Framework</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.Build.Utilities.Core">
-      <HintPath>Microsoft.Build.Utilities.Core</HintPath>
-    </Reference>
-    <Reference Include="System.ComponentModel.Composition" />
-  </ItemGroup>
-
-  <ItemGroup>
     <None Update="build/CPS/Buildsystem/Rules/FeatureFileType.xaml">
       <Generator>MSBuild:Compile</Generator>
     </None>
@@ -96,5 +90,7 @@
       <Generator>MSBuild:Compile</Generator>
     </None>
   </ItemGroup>
+
+  <Import Project="SingleTfm.targets" Condition="'$(TargetFramework)' == ''" />
 
 </Project>
