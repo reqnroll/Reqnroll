@@ -79,6 +79,25 @@ public class FeatureExecutionTracker : IFeatureExecutionTracker
             {
                 var pickle = featurePickles[i];
                 PickleIds.Add(i.ToString(), pickle.Id);
+
+                // If the pickle has a tag that begins with "@__RowHash_", we need to replace the pickle with a new one without that tag
+                var tagsToRemovePrefix = TestRowPickleMapper.RowHashTagPrefix;
+                if (pickle.Tags != null && pickle.Tags.Any(t => t.Name.StartsWith(tagsToRemovePrefix, StringComparison.Ordinal)))
+                {
+                    // Create a new Pickle without the "@RowHash" tag(s)
+                    var filteredTags = pickle.Tags.Where(t => !t.Name.StartsWith(tagsToRemovePrefix, StringComparison.Ordinal)).ToList();
+                    var newPickle = new Pickle(
+                        id: pickle.Id,
+                        uri: pickle.Uri,
+                        name: pickle.Name,
+                        language: pickle.Language,
+                        steps: pickle.Steps,
+                        tags: filteredTags,
+                        astNodeIds: pickle.AstNodeIds
+                    );
+                    pickle = newPickle;
+                }
+
                 await _publisher.PublishAsync(Envelope.Create(pickle));
             }
             PickleJar = new PickleJar(featurePickles);
