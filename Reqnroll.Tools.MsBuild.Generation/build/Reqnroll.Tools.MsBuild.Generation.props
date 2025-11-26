@@ -84,4 +84,8 @@
 
   </ItemGroup>
 
+  <PropertyGroup>
+    <ReqnrollConfigFile Condition="Exists('reqnroll.json')">reqnroll.json</ReqnrollConfigFile>
+  </PropertyGroup>
+
 </Project>
