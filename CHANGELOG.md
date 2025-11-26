@@ -4,6 +4,7 @@
 
 * Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
+* Tag Expressions: Step Definition Scopes and Hook Bindings may now use tag expressions (such as [Scope("@db and not @slow)]) (#911)
 
 ## Bug fixes:
 
