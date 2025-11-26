@@ -1,3 +1,4 @@
+using Cucumber.TagExpressions;
 using Gherkin.CucumberMessages;
 using Reqnroll.Analytics;
 using Reqnroll.Analytics.AppInsights;
@@ -28,6 +29,7 @@ using Reqnroll.Time;
 using Reqnroll.Tracing;
 using Reqnroll.Utils;
 using System;
+using System.ComponentModel;
 
 namespace Reqnroll.Infrastructure
 {
@@ -135,6 +137,8 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestCaseExecutionTrackerFactory, ITestCaseExecutionTrackerFactory>();
             container.RegisterFactoryAs<IMessagePublisher>(() => container.Resolve<ICucumberMessageBroker>());
             container.RegisterTypeAs<StepTrackerFactory, IStepTrackerFactory>();
+
+            var _ = container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser(new TagExpressionParser())).InstancePerDependency;
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)
