@@ -33,10 +33,6 @@
       CleanFeatureFilesInProject;
       $(CleanDependsOn)
     </CleanDependsOn>
-    <RebuildDependsOn>
-      SwitchToForceGenerate;
-      $(RebuildDependsOn)
-    </RebuildDependsOn>
   </PropertyGroup>
 
   <!--
@@ -56,13 +52,6 @@
   <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
           Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
     <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
-  </Target>
-
-
-  <Target Name="SwitchToForceGenerate">
-    <PropertyGroup>
-      <ForceGeneration>true</ForceGeneration>
-    </PropertyGroup>
   </Target>
 
   <Target Name="UpdateFeatureFilesInProject"

@@ -28,9 +28,6 @@
     property group for internal or debug settings
   -->
   <PropertyGroup>
-    <!--TODO: check-->
-    <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
-
     <ReqnrollDebugMSBuildTask Condition="'$(ReqnrollDebugMSBuildTask)' == ''">false</ReqnrollDebugMSBuildTask>
   </PropertyGroup>
 
@@ -42,7 +39,7 @@
     <!--
       feature flag to enable/disable removing code-behind files during clean
     -->
-    <ReqnrollDeleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteCodeBehindFilesOnClean>
+    <ReqnrollDeleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)'==''">true</ReqnrollDeleteCodeBehindFilesOnClean>
 
     <!--
       feature flag to enable embedding of feature files as resources in the assembly
