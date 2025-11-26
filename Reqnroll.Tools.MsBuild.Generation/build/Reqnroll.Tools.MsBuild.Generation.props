@@ -24,9 +24,11 @@
     <UseHostCompilerIfAvailable>$(ReqnrollUseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
   </PropertyGroup>
 
-
+  <!--
+    property group for internal or debug settings
+  -->
   <PropertyGroup>
-    <OverwriteReadOnlyFiles Condition="'$(OverwriteReadOnlyFiles)'==''">false</OverwriteReadOnlyFiles>
+    <!--TODO: check-->
     <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
 
     <ReqnrollDebugMSBuildTask Condition="'$(ReqnrollDebugMSBuildTask)' == ''">false</ReqnrollDebugMSBuildTask>
@@ -38,9 +40,14 @@
   <PropertyGroup>
 
     <!--
-      feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
+      feature flag to enable/disable removing code-behind files during clean
     -->
-    <ReqnrollDeleteCodeBehindFilesOnCleanRebuild Condition="'$(ReqnrollDeleteCodeBehindFilesOnCleanRebuild)'==''">false</ReqnrollDeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollDeleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteCodeBehindFilesOnClean>
+
+    <!--
+      feature flag to enable embedding of feature files as resources in the assembly
+    -->
+    <!--<ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>-->
 
     <!--
       net.sdk support: feature flag to enable experimental support for net.sdk project system
