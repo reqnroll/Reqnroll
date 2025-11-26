@@ -12,28 +12,18 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
     public void WriteGeneratedFile(string outputPath, string generatedFileContent)
     {
         log.LogTaskDiagnosticMessage($"Writing data to {outputPath}");
-        WriteFileIfChanged(outputPath, generatedFileContent);
+        WriteFile(outputPath, generatedFileContent);
     }
 
-    private void WriteFileIfChanged(string filePath, string content)
+    private void WriteFile(string filePath, string content)
     {
-        if (File.Exists(filePath))
+        string directoryPath = Path.GetDirectoryName(filePath);
+        if (directoryPath != null && !Directory.Exists(directoryPath))
         {
-            if (!FileSystemHelper.FileCompareContent(filePath, content))
-            {
-                WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
-            }
+            Directory.CreateDirectory(directoryPath);
         }
-        else
-        {
-            string directoryPath = Path.GetDirectoryName(filePath);
-            if (directoryPath != null && !Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
 
-            WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
-        }
+        WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
     }
 
     /// <summary>
