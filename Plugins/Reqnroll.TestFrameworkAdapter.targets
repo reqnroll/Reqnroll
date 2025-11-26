@@ -26,17 +26,17 @@
 
     <!-- Produce the output file with the namespace token replaced. -->
     <WriteLinesToFile
-      File="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename)$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)"
+      File="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename).$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)"
       Lines="@(_AssemblyHooksTemplateLine -> Replace(`PROJECT_ROOT_NAMESPACE`, `$(_ReqnrollAssemblyHooksNamespace)`))"
       Overwrite="true"
       Encoding="UTF-8" />
 
     <ItemGroup>
       <!-- Include the generated hooks in the compilation -->
-      <Compile Include="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename)$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)" />
+      <Compile Include="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename).$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)" />
 
       <!-- Track the file was created during the build so it will be cleaned automatically. -->
-      <FileWrites Include="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename)$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)" />
+      <FileWrites Include="$(IntermediateOutputPath)%(ReqnrollAssemblyHooksTemplate.Filename).$(_ReqnrollAssemblyHooksNamespace)%(ReqnrollAssemblyHooksTemplate.Extension)" />
     </ItemGroup>
   </Target>
 </Project>
