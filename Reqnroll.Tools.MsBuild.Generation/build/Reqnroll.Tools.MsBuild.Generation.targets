@@ -39,7 +39,7 @@
 
   <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
           Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
-    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
+    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Perform a 'Clean' or 'Rebuild' operation to get these obsolete files deleted." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
   </Target>
 
   <Target Name="UpdateFeatureFilesInProject"
@@ -158,5 +158,9 @@
          - after pulling latest changes from version control with above changes
      -->
     <Delete Files="@(ReqnrollObsoleteCodeBehindFiles)" ContinueOnError="true" />
+    <ItemGroup>
+      <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
+      <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
+    </ItemGroup>
   </Target>
 </Project>
