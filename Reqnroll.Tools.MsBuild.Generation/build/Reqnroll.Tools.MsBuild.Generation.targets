@@ -21,6 +21,7 @@
     <!-- .NET SDK support: tracks whether the code-behind files are included to the project implicitly (without mentioning them in the project file) -->
     <!-- This is the default behavior for SDK-style projects, unless EnableDefaultItems/EnableDefaultCompileItems is disabled by the user  -->
     <_ReqnrollImplicitlyIncludedCodeBehindFiles Condition="'$(UsingMicrosoftNETSdk)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">true</_ReqnrollImplicitlyIncludedCodeBehindFiles>
+    <_ReqnrollImplicitlyIncludedCodeBehindFiles Condition="'$(_ReqnrollImplicitlyIncludedCodeBehindFiles)' == ''">false</_ReqnrollImplicitlyIncludedCodeBehindFiles>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -90,7 +91,7 @@
     <Message Text="[Reqnroll] Generated messages file: %(ReqnrollGeneratedFiles.MessagesFile)" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''" Importance="normal" />
 
     <!-- Include newly generated codebehind files in the compile item group -->
-    <ItemGroup Condition="'$(_ReqnrollImplicitlyIncludedCodeBehindFiles)' == 'true'">
+    <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">
 
       <!-- if this is the first time generation of codebehind files, we have to manually add them as compile items -->
       <Compile Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
