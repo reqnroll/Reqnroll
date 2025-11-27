@@ -43,12 +43,12 @@
   </Target>
 
   <Target Name="ProcessFeatureFilesInProject"
-          BeforeTargets="BeforeCompile;CoreCompile"
+          BeforeTargets="BeforeCompile;CoreCompile;AssignTargetPaths"
           DependsOnTargets="PrepareForBuild;CoreProcessFeatureFilesInProject" />
 
   <Target Name="CoreProcessFeatureFilesInProject"
           Inputs="@(ReqnrollFeatureFiles);$(MSBuildProjectFullPath);$(ReqnrollConfigFile)"
-          Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)')">
+          Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)');@(ReqnrollFeatureFiles -> '%(MessagesFile)')">
 
     <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
 
@@ -100,6 +100,15 @@
       <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
     </ItemGroup>
 
+    <!-- Embed messages files as resource (required for Reqnroll) -->
+    <ItemGroup>
+      <!-- We need the condition because it can happen that the messages file is not generated, but we still want to be able to run the tests. 
+           In this case the task shows a warning anyway. -->
+      <EmbeddedResource Include="@(ReqnrollFeatureFiles->'%(MessagesFile)')" Condition="Exists(@(ReqnrollFeatureFiles->'%(MessagesFile)'))">
+        <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName).ndjson</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+
     <!-- Embed feature files as resource, if requested -->
     <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
@@ -107,22 +116,6 @@
       </EmbeddedResource>
     </ItemGroup>
 
-  </Target>
-
-  <PropertyGroup>
-    <AssignTargetPathsDependsOn>
-      EmbedCucumberMessages;
-      $(AssignTargetPathsDependsOn)
-    </AssignTargetPathsDependsOn>
-  </PropertyGroup>
-
-  <Target Name="EmbedCucumberMessages" DependsOnTargets="CoreProcessFeatureFilesInProject">
-
-    <ItemGroup>
-      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(MessagesFile)')" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''">
-        <LogicalName>%(ReqnrollGeneratedFiles.MessagesResourceName)</LogicalName>
-      </EmbeddedResource>
-    </ItemGroup>
   </Target>
 
   <Target Name="CleanFeatureFilesInProject">

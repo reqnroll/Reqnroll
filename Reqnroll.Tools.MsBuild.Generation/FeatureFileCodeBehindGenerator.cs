@@ -45,6 +45,10 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
                 // Save them in the 'obj' directory in a sub-folder structure that mirrors the location of the feature file relative to the project root folder.
                 codeBehindWriter.WriteGeneratedFile(messagesFileFullPath, generatorResult.FeatureMessages);
             }
+            else
+            {
+                codeBehindWriter.DeleteGeneratedFile(messagesFileFullPath);
+            }
 
             yield return new FeatureFileCodeBehindGeneratorResult(
                 codeBehindFileFullPath,

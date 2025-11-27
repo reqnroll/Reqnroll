@@ -15,6 +15,22 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
         WriteFile(outputPath, generatedFileContent);
     }
 
+    public void DeleteGeneratedFile(string outputPath)
+    {
+        if (!File.Exists(outputPath))
+            return;
+
+        log.LogTaskDiagnosticMessage($"Deleting {outputPath}");
+        try
+        {
+            File.Delete(outputPath);
+        }
+        catch (IOException ex)
+        {
+            log.LogTaskDiagnosticMessage($"Failed to delete {outputPath}: {ex.Message}.");
+        }
+    }
+
     private void WriteFile(string filePath, string content)
     {
         string directoryPath = Path.GetDirectoryName(filePath);
