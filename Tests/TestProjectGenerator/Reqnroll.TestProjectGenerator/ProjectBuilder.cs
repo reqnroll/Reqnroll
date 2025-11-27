@@ -405,6 +405,10 @@ namespace Reqnroll.TestProjectGenerator
                     "Microsoft.Testing.Extensions.TrxReport, Version=2.0.1, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a",
                     "netstandard2.0\\Microsoft.Testing.Extensions.TrxReport.dll")
                 );
+
+            // Enable the new dotnet test experience required for Microsoft.Testing.Platform on .NET 10 SDK and later
+            // See: https://aka.ms/dotnet-test-mtp-error
+            _project.AddAdditionalPropertyGroupEntry("TestingPlatformDotnetTestSupport", "true");
             
             if (TargetFramework is TargetFramework.Net481 or TargetFramework.Net472 or TargetFramework.Net462)
             {
