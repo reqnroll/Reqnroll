@@ -89,9 +89,7 @@
     <Message Text="[Reqnroll] Generated code-behind file: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
     <Message Text="[Reqnroll] Generated messages file: %(ReqnrollGeneratedFiles.MessagesFile)" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''" Importance="normal" />
 
-    <!--
-      Include newly generated codebehind files in the compile item group
-    -->
+    <!-- Include newly generated codebehind files in the compile item group -->
     <ItemGroup Condition="'$(_ReqnrollImplicitlyIncludedCodeBehindFiles)' == 'true'">
 
       <!-- if this is the first time generation of codebehind files, we have to manually add them as compile items -->
@@ -102,6 +100,7 @@
       <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
     </ItemGroup>
 
+    <!-- Embed feature files as resource, if requested -->
     <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
         <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
