@@ -99,11 +99,26 @@ namespace Reqnroll.TestProjectGenerator
             var envVariables = _testSuiteEnvironmentVariableGenerator.GenerateEnvironmentVariables();
 
             var processHelper = new ProcessHelper();
-            string arguments = $"test {GenerateDotnetTestsArguments()}";
+            string arguments;
+            string workingDirectory;
+            
+            // TUnit uses Microsoft.Testing.Platform which requires using 'dotnet run' instead of 'dotnet test'
+            // on .NET 10 SDK and later due to VSTest target deprecation
+            if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
+            {
+                arguments = $"run --project \"{_testProjectFolders.ProjectFolder}\" --no-build -- --report-trx";
+                workingDirectory = _testProjectFolders.ProjectFolder;
+            }
+            else
+            {
+                arguments = $"test {GenerateDotnetTestsArguments()}";
+                workingDirectory = _testProjectFolders.PathToSolutionDirectory;
+            }
+            
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, arguments, envVariables);
+                processResult = processHelper.RunProcess(_outputWriter, workingDirectory, DotnetTestPath, arguments, envVariables);
             }
             catch (Exception)
             {
