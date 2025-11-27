@@ -42,9 +42,11 @@
     <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Perform a 'Clean' or 'Rebuild' operation to get these obsolete files deleted." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
   </Target>
 
-  <Target Name="UpdateFeatureFilesInProject"
+  <Target Name="ProcessFeatureFilesInProject"
           BeforeTargets="BeforeCompile;CoreCompile"
-          DependsOnTargets="PrepareForBuild;CoreProcessFeatureFilesInProject"
+          DependsOnTargets="PrepareForBuild;CoreProcessFeatureFilesInProject" />
+
+  <Target Name="CoreProcessFeatureFilesInProject"
           Inputs="@(ReqnrollFeatureFiles);$(MSBuildProjectFullPath);$(ReqnrollConfigFile)"
           Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)')">
 
@@ -105,6 +107,7 @@
         <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
+
   </Target>
 
   <PropertyGroup>
@@ -114,7 +117,7 @@
     </AssignTargetPathsDependsOn>
   </PropertyGroup>
 
-  <Target Name="EmbedCucumberMessages" DependsOnTargets="UpdateFeatureFilesInProject">
+  <Target Name="EmbedCucumberMessages" DependsOnTargets="CoreProcessFeatureFilesInProject">
 
     <ItemGroup>
       <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(MessagesFile)')" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''">
