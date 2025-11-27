@@ -37,9 +37,9 @@
   <PropertyGroup>
 
     <!--
-      feature flag to enable embedding of feature files as resources in the assembly
+      feature flag to enable embedding of feature files as resources in the assembly; this is optional, Reqnroll does not need it
     -->
-    <!--<ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>-->
+    <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
 
     <!--
       net.sdk support: feature flag to enable experimental support for net.sdk project system
@@ -52,8 +52,9 @@
 
   <ItemGroup>
 
-    <!-- Registration of custom item type for ReSharper Build -->
-    <!-- https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
+    <!-- The items group 'ReqnrollFeatureFiles' has to be made visible with the 'AvailableItemName' group for multiple reasons: -->
+    <!-- * Visual Studio Fast-Up-To-Date-Check (FUTDC) requires it, otherwise if only a feature file is changed, the build will be skipped.  -->
+    <!-- * ReSharper Build requires it to be treated as compile item https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
     <AvailableItemName Include="ReqnrollFeatureFiles"/>
     
     <ReqnrollFeatureFiles Include="**\*.feature" >
@@ -69,18 +70,6 @@
          - after pulling latest changes from version control with above changes
      -->
     <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
-
-    <!-- Support for Visual Studio Incremental Build
-        https://web.archive.org/web/20200926191113/https://github.com/SpecFlowOSS/SpecFlow/issues/1319
-        
-        TODO: Temporarily disabled, because it seems to work correctly without it in the new SDK-based projects. We need to
-              re-evaluate this for different projects.
-              
-        NOTE: The property 'UpToDateCheckBuild' was anyway wrong because it should have been called 'UpToDateCheckBuilt'. See https://github.com/reqnroll/Reqnroll/issues/906
-     -->
-    <!--<UpToDateCheckInput Include="@(ReqnrollFeatureFiles)" />-->
-    <!--<UpToDateCheckBuild Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" Original="@(ReqnrollFeatureFiles)" />-->
-    <!--<CustomAdditionalCompileInputs Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />-->
 
   </ItemGroup>
 
