@@ -43,10 +43,12 @@ permissions:
 env:
   SPECS_FILTER: "" # use for testing CI: "&Category=basicExecution"
   REQNROLL_TEST_PIPELINEMODE: true
+  # Note: .NET 10 is currently excluded because Microsoft.Testing.Platform no longer supports
+  # VSTest target on .NET 10 SDK. The test infrastructure needs to be updated to use the new
+  # dotnet test experience before .NET 10 can be added. See: https://aka.ms/dotnet-test-mtp-error
   DOTNET_VERSIONS: |
     8.0.x
     9.0.x
-    10.0.x
 
 jobs:
   build:
