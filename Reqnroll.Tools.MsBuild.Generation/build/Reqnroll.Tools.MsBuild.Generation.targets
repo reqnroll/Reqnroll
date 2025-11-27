@@ -18,14 +18,9 @@
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'!='true'">true</BuildServerMode>
 
-    <!--
-      net.sdk experimental support:
-      - currently we only want to support either classic project system or netsdk project system.
-      - currently we don't want to support globbing with classic project system => ensure globbing only get enabled with 'UsingMicrosoftNETSdk'
-      - currently we are supporting $(EnableDefaultCompileItems) for disabling globbing support for codebehind files
-    -->
-    <_ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)' == '' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_ReqnrollEnableDefaultCompileItems>
-    <_ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)' == 'true' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_ReqnrollEnableDefaultCompileItems>
+    <!-- .NET SDK support: tracks whether the code-behind files are included to the project implicitly (without mentioning them in the project file) -->
+    <!-- This is the default behavior for SDK-style projects, unless EnableDefaultItems/EnableDefaultCompileItems is disabled by the user  -->
+    <_ReqnrollImplicitlyIncludedCodeBehindFiles Condition="'$(UsingMicrosoftNETSdk)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">true</_ReqnrollImplicitlyIncludedCodeBehindFiles>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -36,18 +31,11 @@
   </PropertyGroup>
 
   <!--
-    net.sdk support: update default compile items to show generated files as nested items
+    Show code-behind files as nested items under feature files in Visual Studio Solution Explorer
   -->
-  <ItemGroup Condition="'$(_ReqnrollEnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' ">
-    <Compile Update="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
-             DependentUpon="%(Filename)"
-             AutoGen="true"
-             DesignTime="true"
-             Visible="true"
-             Condition="'$(EnableDefaultCompileItems)' == 'true'" />
-
+  <ItemGroup Condition="'$(_ReqnrollImplicitlyIncludedCodeBehindFiles)' == 'true'">
+    <Compile Update="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" DependentUpon="%(Filename)" />
   </ItemGroup>
-
 
   <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
           Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
@@ -99,27 +87,13 @@
     <Message Text="[Reqnroll] Generated messages file: %(ReqnrollGeneratedFiles.MessagesFile)" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''" Importance="normal" />
 
     <!--
-      net.sdk support: globbing does not support including files which are dynamically generated inside targets, we have to manually update compile items
+      Include newly generated codebehind files in the compile item group
     -->
-    <ItemGroup Condition="'$(_ReqnrollEnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">
+    <ItemGroup Condition="'$(_ReqnrollImplicitlyIncludedCodeBehindFiles)' == 'true'">
 
       <!-- if this is the first time generation of codebehind files, we have to manually add them as compile items -->
       <Compile Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
                Exclude="@(Compile)"/>
-
-      <!--
-        eather if codebehind files are added manually to compile item group or are added by net.sdk globbing support,
-        ensure they are nested under feature files like in previous reqnroll versions
-        currently, we cannot use itemgroup update attribute inside a target because of some bugs in MSBuild (all items will be updated)
-        - https://github.com/Microsoft/msbuild/issues/1618
-        - https://github.com/Microsoft/msbuild/issues/2835
-        - https://github.com/Microsoft/msbuild/issues/1124
-      -->
-      <Compile DependentUpon="@(ReqnrollFeatureFiles)"
-               AutoGen="true"
-               DesignTime="true"
-               Visible="true"
-               Condition="'%(Compile.Identity)' == '@(ReqnrollFeatureFiles->'%(CodeBehindFile)')'" />
 
       <!-- remove files which got obsolete, typically after rename operation, or getting changes from source control -->
       <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
