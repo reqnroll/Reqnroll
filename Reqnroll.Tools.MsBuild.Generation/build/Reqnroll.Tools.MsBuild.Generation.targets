@@ -43,7 +43,8 @@
   </Target>
 
   <Target Name="UpdateFeatureFilesInProject"
-          DependsOnTargets="BeforeUpdateFeatureFilesInProject"
+          BeforeTargets="BeforeCompile;CoreCompile"
+          DependsOnTargets="PrepareForBuild;CoreProcessFeatureFilesInProject"
           Inputs="@(ReqnrollFeatureFiles);$(MSBuildProjectFullPath);$(ReqnrollConfigFile)"
           Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)')">
 
@@ -99,25 +100,6 @@
       <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
     </ItemGroup>
 
-  </Target>
-
-  <Target Name="BeforeUpdateFeatureFilesInProject" BeforeTargets="UpdateFeatureFilesInProject">
-
-  </Target>
-
-  <PropertyGroup>
-    <CoreCompileDependsOn>
-      IncludeCodeBehindFilesInProject;
-      $(CoreCompileDependsOn)
-    </CoreCompileDependsOn>
-  </PropertyGroup>
-
-  <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject">
-    
-    <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
-      <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
-    </ItemGroup>
-
     <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
         <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
@@ -139,13 +121,6 @@
         <LogicalName>%(ReqnrollGeneratedFiles.MessagesResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
-  </Target>
-
-  <Target
-    Name="AfterUpdateFeatureFilesInProject"
-    DependsOnTargets="IncludeCodeBehindFilesInProject"
-    AfterTargets="IncludeCodeBehindFilesInProject">
-    <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
   </Target>
 
   <Target Name="CleanFeatureFilesInProject">
