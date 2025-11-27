@@ -20,4 +20,9 @@ public class FeatureFileInput(string projectRelativePath)
     /// A custom namespace for the generated test class. Optional.
     /// </summary>
     public string CustomNamespace { get; set; }
+
+    /// <summary>
+    /// The resource name to use for the embedded messages resource.
+    /// </summary>
+    public string MessagesResourceName { get; set; }
 }

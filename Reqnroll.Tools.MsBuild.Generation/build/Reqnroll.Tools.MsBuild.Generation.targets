@@ -105,14 +105,14 @@
       <!-- We need the condition because it can happen that the messages file is not generated, but we still want to be able to run the tests. 
            In this case the task shows a warning anyway. -->
       <EmbeddedResource Include="@(ReqnrollFeatureFiles->'%(MessagesFile)')" Condition="Exists(@(ReqnrollFeatureFiles->'%(MessagesFile)'))">
-        <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName).ndjson</LogicalName>
+        <LogicalName>%(ReqnrollFeatureFiles.MessagesResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
 
     <!-- Embed feature files as resource, if requested -->
     <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
       <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
-        <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
+        <LogicalName>%(ReqnrollFeatureFiles.FeatureFileResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
 

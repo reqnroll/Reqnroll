@@ -64,6 +64,11 @@
       <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
     </ReqnrollFeatureFiles>
 
+    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" >
+      <MessagesResourceName>%(NormalizedLogicalName).ndjson</MessagesResourceName>
+      <FeatureFileResourceName>%(NormalizedLogicalName)</FeatureFileResourceName>
+    </ReqnrollFeatureFiles>
+
     <!-- obsolete codebehind files, scenarios:
          - after rename operation
          - after deletion of a feature file
