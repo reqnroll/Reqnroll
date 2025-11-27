@@ -82,19 +82,16 @@ namespace Reqnroll.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
-            var task = ExecuteTestsInternalAsync(async (processHelper, parameters) =>
-                                                     processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
-
+            var task = ExecuteTestsInternalAsync();
             return task.Result;
         }
 
         public async Task<TestExecutionResult> ExecuteTestsAsync()
         {
-            return await ExecuteTestsInternalAsync(async (processHelper, parameters) =>
-                                                       await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
+            return await ExecuteTestsInternalAsync();
         }
 
-        private async Task<TestExecutionResult> ExecuteTestsInternalAsync(Func<ProcessHelper, (string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables), Task<ProcessResult>> runProcessAction)
+        private async Task<TestExecutionResult> ExecuteTestsInternalAsync()
         {
             var envVariables = _testSuiteEnvironmentVariableGenerator.GenerateEnvironmentVariables();
 
