@@ -1,7 +1,8 @@
-using System.CodeDom;
-using System.IO;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Utils;
+using System.CodeDom;
+using System.IO;
 
 namespace Reqnroll.Generator.Generation
 {
@@ -17,12 +18,23 @@ namespace Reqnroll.Generator.Generation
         }
 
 
-        public void AddLinePragmaInitial(CodeTypeDeclaration testType, string sourceFile)
+        public void AddLinePragmaInitial(CodeTypeDeclaration testType, string sourceFile, string codeBehindFilePath)
         {
             if (_reqnrollConfiguration.AllowDebugGeneratedFiles)
                 return;
 
-            _codeDomHelper.BindTypeToSourceFile(testType, Path.GetFileName(sourceFile));
+            string sourceFileRelativePath = Path.GetFileName(sourceFile);
+
+            if (codeBehindFilePath != null && Path.IsPathRooted(sourceFile))
+            {
+                var codeBehindFolder = Path.GetDirectoryName(codeBehindFilePath);
+                if (codeBehindFolder != null)
+                {
+                    sourceFileRelativePath = FileSystemHelper.GetRelativePath(sourceFile, codeBehindFolder);
+                }
+            }
+
+            _codeDomHelper.BindTypeToSourceFile(testType, sourceFileRelativePath);
         }
     }
 }
