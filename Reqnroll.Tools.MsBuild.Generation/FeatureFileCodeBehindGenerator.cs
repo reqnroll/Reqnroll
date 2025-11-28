@@ -61,6 +61,7 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
     {
         var featureFileInput = new FeatureFileInput(featureFile.FeatureFilePath);
         featureFileInput.MessagesResourceName = featureFile.MessagesResourceName; // Move this to the constructor of FeatureFileInput in v4
+        featureFileInput.CodeBehindFilePath = featureFile.CodeBehindFilePath; // Move this to the constructor of FeatureFileInput in v4
         return featureFileInput;
     }
 }

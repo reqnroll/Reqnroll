@@ -3,6 +3,7 @@ using Reqnroll.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
@@ -48,19 +49,21 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
     public string TestClassNameFormat { get; set; } = "{0}Feature";
 
-    [Obsolete("Pass this via passing the FeatureFileInput to the GenerateUnitTestFixture method in v4")]
-    internal string MessagesResourceName { get; set; }
+    [Obsolete("Pass this via GenerateUnitTestFixture method in v4")]
+    internal FeatureFileInput FeatureFileInput { get; set; }
 
     public UnitTestFeatureGenerationResult GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
     {
 #pragma warning disable CS0618 // Type or member is obsolete
-        var messagesResourceName = MessagesResourceName;
+        var messagesResourceName = FeatureFileInput.MessagesResourceName;
+        var featureFileInput = FeatureFileInput;
 #pragma warning restore CS0618 // Type or member is obsolete
         var codeNamespace = CreateNamespace(targetNamespace);
         var feature = document.ReqnrollFeature;
 
         testClassName ??= string.Format(TestClassNameFormat, feature.Name.ToIdentifier());
         var generationContext = CreateTestClassStructure(codeNamespace, testClassName, document);
+        generationContext.FeatureFileInput = featureFileInput;
         generationContext.FeatureMessagesResourceName = messagesResourceName;
 
         SetupTestClass(generationContext);
@@ -151,7 +154,7 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         generationContext.TestClass.IsPartial = true;
         generationContext.TestClass.TypeAttributes |= TypeAttributes.Public;
 
-        _linePragmaHandler.AddLinePragmaInitial(generationContext.TestClass, generationContext.Document.SourceFilePath);
+        _linePragmaHandler.AddLinePragmaInitial(generationContext.TestClass, generationContext.Document.SourceFilePath, generationContext.FeatureFileInput?.CodeBehindFilePath);
 
         _testGeneratorProvider.SetTestClass(generationContext, generationContext.Feature.Name, generationContext.Feature.Description);
 
