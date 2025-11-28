@@ -42,7 +42,7 @@ public class MsBuildIntegrationTest : SystemTestBase
                                        }
                                        """);
 
-        _compilationDriver.CompileSolution(logLevel: "n");
+        _compilationDriver.CompileSolution(logLevel: "bl");
         foreach (string featureFile in featureFiles)
         {
             _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {featureFile}.cs");
@@ -64,6 +64,14 @@ public class MsBuildIntegrationTest : SystemTestBase
                       .Distinct()
                       .Should()
                       .BeEquivalentTo(featureFiles.Select(ff => $"-> resource: {ff}.ndjson:StepBinding"));
+    }
+
+    [TestMethod]
+    public void Should_produce_all_outputs_on_first_build()
+    {
+        var featureFiles = PrepareProject();
+
+        CheckProjectConsistency(featureFiles);
     }
 
     [TestMethod]
