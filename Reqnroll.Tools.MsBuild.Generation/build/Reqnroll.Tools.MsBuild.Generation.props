@@ -83,5 +83,9 @@
   <PropertyGroup>
     <ReqnrollConfigFile Condition="Exists('reqnroll.json')">reqnroll.json</ReqnrollConfigFile>
   </PropertyGroup>
+  <ItemGroup>
+    <!-- Build should be triggered in Visual Studio even if only the config file was changed -->
+    <UpToDateCheckInput Include="$(ReqnrollConfigFile)" Condition ="'$(ReqnrollConfigFile)' != ''" />
+  </ItemGroup>
 
 </Project>
