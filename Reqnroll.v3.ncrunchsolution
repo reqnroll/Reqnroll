@@ -5,6 +5,7 @@
       <Value>GeneratedNuGetPackages\Debug\**.*</Value>
     </AdditionalFilesToIncludeForSolution>
     <AllowParallelTestExecution>True</AllowParallelTestExecution>
+    <DefaultTestTimeout>120000</DefaultTestTimeout>
     <EnableRDI>False</EnableRDI>
     <NCrunchCacheStoragePath>.ncrunch\cache</NCrunchCacheStoragePath>
     <ProjectConfigStoragePathRelativeToSolutionDir>.ncrunch</ProjectConfigStoragePathRelativeToSolutionDir>
