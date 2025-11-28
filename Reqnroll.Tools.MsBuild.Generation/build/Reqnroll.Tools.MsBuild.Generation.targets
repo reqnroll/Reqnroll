@@ -17,11 +17,12 @@
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'!='true'">true</BuildServerMode>
+  </PropertyGroup>
 
+  <PropertyGroup>
     <!-- .NET SDK support: tracks whether the code-behind files are included to the project implicitly (without mentioning them in the project file) -->
     <!-- This is the default behavior for SDK-style projects, unless EnableDefaultItems/EnableDefaultCompileItems is disabled by the user  -->
     <_ReqnrollImplicitlyIncludedCodeBehindFiles Condition="'$(UsingMicrosoftNETSdk)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">true</_ReqnrollImplicitlyIncludedCodeBehindFiles>
-    <_ReqnrollImplicitlyIncludedCodeBehindFiles Condition="'$(_ReqnrollImplicitlyIncludedCodeBehindFiles)' == ''">false</_ReqnrollImplicitlyIncludedCodeBehindFiles>
   </PropertyGroup>
 
   <PropertyGroup>
