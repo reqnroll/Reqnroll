@@ -19,7 +19,7 @@ public class MsBuildIntegrationTest : SystemTestBase
             """
             Feature: Feature A
 
-            Scenario: Scenario 1
+            Scenario: Test Scenario
                 When embedded messages resources are reported
             """);
         featureFiles.Add(_projectsDriver.LastFeatureFile.Path);
@@ -28,7 +28,7 @@ public class MsBuildIntegrationTest : SystemTestBase
             """
             Feature: Feature B
 
-            Scenario: Scenario 2
+            Scenario: Test Scenario
                 When embedded messages resources are reported
             """);
         featureFiles.Add(_projectsDriver.LastFeatureFile.Path);
@@ -80,7 +80,7 @@ public class MsBuildIntegrationTest : SystemTestBase
         var featureFiles = PrepareProject();
 
         _compilationDriver.CompileSolution(logLevel: "bl");
-        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
+        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
         _compilationResultDriver.CompileResult.Output.Should().NotContain("[Reqnroll] Generated code-behind file:");
         _compilationResultDriver.CompileResult.Output.Should().NotContain("[Reqnroll] Generated messages file:");
 
@@ -106,12 +106,15 @@ public class MsBuildIntegrationTest : SystemTestBase
     {
         var featureFiles = PrepareProject();
 
+        // we change the first feature file in alphabetical order, because in case of issues,
+        // that is moved to the end of the lists so there is more likely to catch problems
+        featureFiles.Sort();
         var changedFeatureFile = featureFiles[0];
         var notChangedFeatureFile = featureFiles[1];
         string changedFileFullPath = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _solutionDriver.DefaultProject.ProjectName, changedFeatureFile);
         var fileContent = File.ReadAllText(changedFileFullPath);
         // make a relevant change
-        var changedContent = fileContent.Replace("Feature A", "Feature A - changed at " + DateTime.Now.Ticks);
+        var changedContent = fileContent.Replace("Test Scenario", "Test Scenario - changed at " + DateTime.Now.Ticks);
         changedContent.Should().NotBe(fileContent);
         File.WriteAllText(changedFileFullPath, changedContent);
 
@@ -128,7 +131,7 @@ public class MsBuildIntegrationTest : SystemTestBase
 
         // Any subsequent compilation makes everything up-to-date again
         _compilationDriver.CompileSolution(logLevel: "n");
-        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
+        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
         _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreCompile\" because all output files are up-to-date with respect to the input files.");
     }
 
@@ -159,7 +162,7 @@ public class MsBuildIntegrationTest : SystemTestBase
 
         // Any subsequent compilation makes everything up-to-date again
         _compilationDriver.CompileSolution(logLevel: "n");
-        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
+        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
         _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreCompile\" because all output files are up-to-date with respect to the input files.");
     }
 }
