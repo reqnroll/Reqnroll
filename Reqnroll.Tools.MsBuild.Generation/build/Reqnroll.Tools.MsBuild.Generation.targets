@@ -36,8 +36,8 @@
 
   <Target Name="WarnForObsoleteReqnrollCodeBehindFiles" AfterTargets="CoreCompile"
           Condition="'$(ReqnrollWarnForObsoleteCodeBehindFiles)' == 'true' and '@(ReqnrollObsoleteCodeBehindFiles)' != ''">
-    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Set project property 'ReqnrollDeleteObsoleteCodeBehindFilesOnClean' to delete these files automatically on 'Clean' or 'Rebuild'." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' != 'true'" />
-    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Perform a 'Clean' or 'Rebuild' operation to get these obsolete files deleted." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'" />
+    <Warning Text="For code-behind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Set project property 'ReqnrollDeleteObsoleteCodeBehindFilesOnClean' to delete these files automatically on 'Clean' or 'Rebuild'." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' != 'true'" />
+    <Warning Text="For code-behind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Perform a 'Clean' or 'Rebuild' operation to get these obsolete files deleted." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'" />
   </Target>
 
   <Target Name="ProcessFeatureFilesInProject"
@@ -51,7 +51,7 @@
     <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
 
     <Error
-      Text="Reqnroll designer codebehind generation is not compatible with MSBuild codebehind generation. The custom tool must be removed from the file. See https://www.reqnroll.net/documentation/Generate-Tests-from-MsBuild"
+      Text="Reqnroll designer code-behind generation is not compatible with MSBuild code-behind generation. The custom tool must be removed from the file. See https://www.reqnroll.net/documentation/Generate-Tests-from-MsBuild"
       File="@(None)"
       Condition="%(None.Extension) == '.feature' AND %(None.Generator) == 'ReqnrollSingleFileGenerator'"/>
 
@@ -87,12 +87,12 @@
     <Message Text="[Reqnroll] Generated code-behind file: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
     <Message Text="[Reqnroll] Generated messages file: %(ReqnrollGeneratedFiles.MessagesFile)" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''" Importance="normal" />
 
-    <!-- Include newly generated codebehind files in the compile item group -->
+    <!-- Include newly generated code-behind files in the compile item group -->
     <!-- We only do this when the code-behind files are included to the project implicitly (without mentioning them in the project file) -->
     <!-- This is the default behavior for SDK-style projects, unless EnableDefaultItems/EnableDefaultCompileItems is disabled by the user  -->
     <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">
 
-      <!-- if this is the first time generation of codebehind files, we have to manually add them as compile items -->
+      <!-- if this is the first time generation of code-behind files, we have to manually add them as compile items -->
       <Compile Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
                Exclude="@(Compile)"/>
 
@@ -119,13 +119,13 @@
   </Target>
 
   <Target Name="CleanFeatureFilesInProject">
-    <!-- remove known codebehind files for existing feature files -->
+    <!-- remove known code-behind files for existing feature files -->
     <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
     <Delete Files="%(ReqnrollFeatureFiles.MessagesFile)" ContinueOnError="true" />
   </Target>
 
   <Target Name="CleanObsoleteCodeBehindFilesInProject" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'">
-    <!-- remove obsolete codebehind files, scenarios:
+    <!-- remove obsolete code-behind files, scenarios:
          - after rename operation
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes

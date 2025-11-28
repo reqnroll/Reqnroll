@@ -42,12 +42,12 @@
     <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
 
     <!--
-      feature flag to enable warning for obsolete feature codebehind files without corresponding feature file
+      feature flag to enable warning for obsolete feature code-behind files without corresponding feature file
     -->
     <ReqnrollWarnForObsoleteCodeBehindFiles Condition="'$(ReqnrollWarnForObsoleteCodeBehindFiles)'==''">true</ReqnrollWarnForObsoleteCodeBehindFiles>
 
     <!--
-      feature flag to enable deletion of obsolete feature codebehind files on 'Clean' and 'Rebuild' operation
+      feature flag to enable deletion of obsolete feature code-behind files on 'Clean' and 'Rebuild' operation
     -->
     <ReqnrollDeleteObsoleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteObsoleteCodeBehindFilesOnClean>
   </PropertyGroup>
@@ -71,7 +71,7 @@
       <FeatureFileResourceName>%(NormalizedLogicalName)</FeatureFileResourceName>
     </ReqnrollFeatureFiles>
 
-    <!-- obsolete codebehind files, scenarios:
+    <!-- obsolete code-behind files, scenarios:
          - after rename operation
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
