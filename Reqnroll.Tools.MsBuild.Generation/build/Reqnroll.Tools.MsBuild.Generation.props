@@ -50,8 +50,6 @@
       feature flag to enable deletion of obsolete feature codebehind files on 'Clean' and 'Rebuild' operation
     -->
     <ReqnrollDeleteObsoleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteObsoleteCodeBehindFilesOnClean>
-
-    <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
