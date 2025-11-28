@@ -87,10 +87,6 @@
     <Message Text="[Reqnroll] Generated code-behind file: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
     <Message Text="[Reqnroll] Generated messages file: %(ReqnrollGeneratedFiles.MessagesFile)" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''" Importance="normal" />
 
-    <PropertyGroup>
-      <_ReqnrollImplicitlyIncludedCodeBehindFilesDiag2>UsingMicrosoftNETSdk: '$(UsingMicrosoftNETSdk)', EnableDefaultItems: '$(EnableDefaultItems)', EnableDefaultCompileItems: '$(EnableDefaultCompileItems)'</_ReqnrollImplicitlyIncludedCodeBehindFilesDiag2>
-    </PropertyGroup>
-
     <!-- Include newly generated codebehind files in the compile item group -->
     <!-- We only do this when the code-behind files are included to the project implicitly (without mentioning them in the project file) -->
     <!-- This is the default behavior for SDK-style projects, unless EnableDefaultItems/EnableDefaultCompileItems is disabled by the user  -->
