@@ -37,6 +37,12 @@
   <PropertyGroup>
 
     <!--
+      feature flag to enable use of intermediate output path for generated codebehind files; this is optional, Reqnroll does not need it
+      this is false by default for backward compatibility, but will be changed to true in v4 hopefully
+    -->
+    <ReqnrollUseIntermediateOutputPathForCodeBehind Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'==''">false</ReqnrollUseIntermediateOutputPathForCodeBehind>
+
+    <!--
       feature flag to enable embedding of feature files as resources in the assembly; this is optional, Reqnroll does not need it
     -->
     <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
