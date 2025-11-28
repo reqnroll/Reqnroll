@@ -125,6 +125,7 @@
   <Target Name="CleanFeatureFilesInProject">
     <!-- remove known codebehind files for existing feature files -->
     <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
+    <Delete Files="%(ReqnrollFeatureFiles.MessagesFile)" ContinueOnError="true" />
   </Target>
 
   <Target Name="CleanObsoleteCodeBehindFilesInProject" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'">
