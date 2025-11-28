@@ -48,13 +48,20 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
     public string TestClassNameFormat { get; set; } = "{0}Feature";
 
+    [Obsolete("Pass this via passing the FeatureFileInput to the GenerateUnitTestFixture method in v4")]
+    internal string MessagesResourceName { get; set; }
+
     public UnitTestFeatureGenerationResult GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
+        var messagesResourceName = MessagesResourceName;
+#pragma warning restore CS0618 // Type or member is obsolete
         var codeNamespace = CreateNamespace(targetNamespace);
         var feature = document.ReqnrollFeature;
 
         testClassName ??= string.Format(TestClassNameFormat, feature.Name.ToIdentifier());
         var generationContext = CreateTestClassStructure(codeNamespace, testClassName, document);
+        generationContext.FeatureMessagesResourceName = messagesResourceName;
 
         SetupTestClass(generationContext);
         SetupTestClassInitializeMethod(generationContext);
@@ -197,6 +204,7 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
     private void DeclareFeatureMessagesFactoryMembers(TestClassGenerationContext generationContext)
     {
+        [Obsolete("Backwards compatibility fallback, we can remove this in v4 once the MessagesResourceName is passed in to the GenerateUnitTestFixture method")]
         string GetFeatureMessagesResourceName()
         {
             try
@@ -224,7 +232,13 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         try
         {
             var featureSource = CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document);
-            generationContext.FeatureMessagesResourceName = GetFeatureMessagesResourceName();
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (generationContext.FeatureMessagesResourceName == null)
+            {
+                // backwards compatibility fallback, we can remove this in v4 once the MessagesResourceName is passed in to the GenerateUnitTestFixture method
+                generationContext.FeatureMessagesResourceName = GetFeatureMessagesResourceName();
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
             var idGeneratorSeed = featureSource.Uri + featureSource.Data;
             var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(idGeneratorSeed));
             var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
@@ -240,7 +254,6 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
             // Serialize each envelope and append into a ndjson format
             generationContext.FeatureMessages = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
-
         }
         catch (System.Exception e)
         {

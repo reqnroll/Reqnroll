@@ -3,6 +3,7 @@ using Gherkin;
 using Reqnroll.Configuration;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.Configuration;
+using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Parser;
@@ -142,6 +143,10 @@ public class TestGenerator(
         if (reqnrollDocument.ReqnrollFeature == null) return null;
 
         var featureGenerator = _featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (featureGenerator is UnitTestFeatureGenerator unitTestFeatureGenerator)
+            unitTestFeatureGenerator.MessagesResourceName = featureFileInput.MessagesResourceName; // pass this to GenerateUnitTestFixture via passing featureFileInput in v4
+#pragma warning restore CS0618 // Type or member is obsolete
         string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
         var generationResult = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace);
         if (generationResult.CodeNamespace == null)

@@ -2,7 +2,7 @@
 
   <Import Project="$(MSBuildThisFileDirectory)Reqnroll.TestFrameworkAdapter.targets"/>
 
-  <Target Name="SetPluginParameters" BeforeTargets="UpdateFeatureFilesInProject">
+  <Target Name="SetPluginParameters" BeforeTargets="CoreProcessFeatureFilesInProject">
     <PropertyGroup>
       <!-- Detect the version of MSTest.TestFramework package and pass it to the plugin. -->
       <!-- The property can be overridden for special cases in the project file. -->
