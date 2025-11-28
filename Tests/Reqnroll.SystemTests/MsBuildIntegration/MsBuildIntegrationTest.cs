@@ -1,6 +1,6 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,8 +11,16 @@ namespace Reqnroll.SystemTests.MsBuildIntegration;
 [TestCategory("MsBuildIntegration")]
 public class MsBuildIntegrationTest : SystemTestBase
 {
-    private List<string> PrepareProject()
+    public enum CodeBehindLocation
     {
+        ProjectFolder,
+        IntermediateOutputPath
+    }
+
+    private List<string> PrepareProject(CodeBehindLocation codeBehindLocation = CodeBehindLocation.ProjectFolder)
+    {
+        _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = codeBehindLocation == CodeBehindLocation.IntermediateOutputPath;
+
         var featureFiles = new List<string>();
 
         AddFeatureFile(
@@ -67,17 +75,23 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
-    public void Should_produce_all_outputs_on_first_build()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_produce_all_outputs_on_first_build(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
         CheckProjectConsistency(featureFiles);
+
+        KeepPassingResults = true;
     }
 
     [TestMethod]
-    public void Should_detect_when_all_files_are_up_to_date()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_detect_when_all_files_are_up_to_date(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
         _compilationDriver.CompileSolution(logLevel: "bl");
         _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
@@ -102,9 +116,11 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
-    public void Should_detect_when_only_feature_files_changed()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_detect_when_only_feature_files_changed(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
         // we change the first feature file in alphabetical order, because in case of issues,
         // that is moved to the end of the lists so there is more likely to catch problems
@@ -136,9 +152,11 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
-    public void Should_detect_when_only_feature_files_changed_in_a_way_that_code_behind_not_changed()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_detect_when_only_feature_files_changed_in_a_way_that_code_behind_not_changed(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
         var changedFeatureFile = featureFiles[0];
         var notChangedFeatureFile = featureFiles[1];
