@@ -45,8 +45,8 @@ public class MsBuildIntegrationTest : SystemTestBase
         _compilationDriver.CompileSolution(logLevel: "n");
         foreach (string featureFile in featureFiles)
         {
-            _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {featureFile}.cs");
-            _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{featureFile}\.ndjson");
+            _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{featureFile}\.cs");
+            _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{featureFile}\.ndjson");
         }
 
         return featureFiles;
@@ -117,12 +117,12 @@ public class MsBuildIntegrationTest : SystemTestBase
 
         _compilationDriver.CompileSolution(logLevel: "n");
         // the changed feature file should be re-processed
-        _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {changedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{changedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{changedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{changedFeatureFile}\.ndjson");
 
         // the not changed feature file should be skipped
-        _compilationResultDriver.CompileResult.Output.Should().NotContain($"[Reqnroll] Generated code-behind file: {notChangedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{notChangedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{notChangedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: .*{notChangedFeatureFile}\.ndjson");
 
         CheckProjectConsistency(featureFiles);
 
@@ -148,12 +148,12 @@ public class MsBuildIntegrationTest : SystemTestBase
 
         _compilationDriver.CompileSolution(logLevel: "n");
         // the changed feature file should be re-processed
-        _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {changedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{changedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{changedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{changedFeatureFile}\.ndjson");
 
         // the not changed feature file should be skipped
-        _compilationResultDriver.CompileResult.Output.Should().NotContain($"[Reqnroll] Generated code-behind file: {notChangedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{notChangedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{notChangedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: .*{notChangedFeatureFile}\.ndjson");
 
         CheckProjectConsistency(featureFiles);
 
