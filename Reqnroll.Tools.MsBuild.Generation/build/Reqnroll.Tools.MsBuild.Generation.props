@@ -42,10 +42,14 @@
     <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
 
     <!--
-      net.sdk support: feature flag to enable experimental support for net.sdk project system
+      feature flag to enable warning for obsolete feature codebehind files without corresponding feature file
     -->
-    <ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)'==''">true</ReqnrollEnableDefaultCompileItems>
-    <ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(ReqnrollEnableDefaultCompileItems)</ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
+    <ReqnrollWarnForObsoleteCodeBehindFiles Condition="'$(ReqnrollWarnForObsoleteCodeBehindFiles)'==''">true</ReqnrollWarnForObsoleteCodeBehindFiles>
+
+    <!--
+      feature flag to enable deletion of obsolete feature codebehind files on 'Clean' and 'Rebuild' operation
+    -->
+    <ReqnrollDeleteObsoleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteObsoleteCodeBehindFilesOnClean>
 
     <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
   </PropertyGroup>

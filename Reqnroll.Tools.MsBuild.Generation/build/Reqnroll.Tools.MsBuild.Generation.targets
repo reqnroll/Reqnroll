@@ -22,6 +22,7 @@
   <PropertyGroup>
     <CleanDependsOn>
       CleanFeatureFilesInProject;
+      CleanObsoleteCodeBehindFilesInProject;
       $(CleanDependsOn)
     </CleanDependsOn>
   </PropertyGroup>
@@ -33,9 +34,10 @@
     <Compile Update="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" DependentUpon="%(Filename)" />
   </ItemGroup>
 
-  <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
-          Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
-    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Perform a 'Clean' or 'Rebuild' operation to get these obsolete files deleted." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
+  <Target Name="WarnForObsoleteReqnrollCodeBehindFiles" AfterTargets="CoreCompile"
+          Condition="'$(ReqnrollWarnForObsoleteCodeBehindFiles)' == 'true' and '@(ReqnrollObsoleteCodeBehindFiles)' != ''">
+    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Set project property 'ReqnrollDeleteObsoleteCodeBehindFilesOnClean' to delete these files automatically on 'Clean' or 'Rebuild'." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' != 'true'" />
+    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Perform a 'Clean' or 'Rebuild' operation to get these obsolete files deleted." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'" />
   </Target>
 
   <Target Name="ProcessFeatureFilesInProject"
@@ -123,7 +125,9 @@
   <Target Name="CleanFeatureFilesInProject">
     <!-- remove known codebehind files for existing feature files -->
     <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
+  </Target>
 
+  <Target Name="CleanObsoleteCodeBehindFilesInProject" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'">
     <!-- remove obsolete codebehind files, scenarios:
          - after rename operation
          - after deletion of a feature file
