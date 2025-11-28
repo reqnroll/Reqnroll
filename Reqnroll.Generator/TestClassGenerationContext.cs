@@ -1,5 +1,6 @@
 using System.CodeDom;
 using System.Collections.Generic;
+using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 
@@ -35,6 +36,8 @@ namespace Reqnroll.Generator
 
         public string FeatureMessagesResourceName { get; set; }
         internal string FeatureMessages { get; set; }
+
+        public FeatureFileInput FeatureFileInput { get; set; }
 
         public TestClassGenerationContext(
             IUnitTestGeneratorProvider unitTestGeneratorProvider,

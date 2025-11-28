@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Copyright, Microsoft Corporation, All rights reserved.-->
-    
 <Rule
     Name="Feature"
     DisplayName="Feature"
@@ -25,10 +23,8 @@
         </StringProperty.DataSource>
     </StringProperty>
 
-    <!--<BoolProperty Name="Visible" Visible="true" />-->
     <StringProperty Name="DependentUpon" Visible="false" />
     <StringProperty Name="Link" Visible="false" />
-    <StringProperty Name="Generator" Visible="true" DisplayName="Custom Tool"/>
-
+    <StringProperty Name="Generator" Visible="false" DisplayName="Custom Tool"/>
 
 </Rule>

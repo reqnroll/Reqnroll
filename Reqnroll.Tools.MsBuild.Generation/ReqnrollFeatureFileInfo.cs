@@ -1,6 +1,6 @@
 namespace Reqnroll.Tools.MsBuild.Generation;
 
-public class ReqnrollFeatureFileInfo(string featureFilePath, string codeBehindFilePath, string messagesFilePath)
+public class ReqnrollFeatureFileInfo(string featureFilePath, string codeBehindFilePath, string messagesFilePath, string messagesResourceName)
 {
     /// <summary>
     /// Path of the existing feature file. Absolute or relative to the project folder.
@@ -16,4 +16,9 @@ public class ReqnrollFeatureFileInfo(string featureFilePath, string codeBehindFi
     /// Path of the messages file to be generated (will be embedded as resource). Absolute or relative to the project folder.
     /// </summary>
     public string MessagesFilePath { get; } = messagesFilePath;
+
+    /// <summary>
+    /// The resource name to use for the embedded messages resource.
+    /// </summary>
+    public string MessagesResourceName { get; } = messagesResourceName;
 }

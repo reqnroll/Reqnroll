@@ -15,13 +15,14 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
 
         foreach (var featureFile in reqnrollProjectInfo.FeatureFiles)
         {
-            var featureFileInput = CreateFeatureFileInput(featureFile);
             var codeBehindFileFullPath = reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.CodeBehindFilePath);
             var messagesFileFullPath = reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.MessagesFilePath);
 
+            var featureFileInput = CreateFeatureFileInput(featureFile, codeBehindFileFullPath);
+
             Log.LogTaskDiagnosticMessage($"Processing {featureFile.FeatureFilePath} ({reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.FeatureFilePath)})");
             Log.LogTaskDiagnosticMessage($"  Code-behind: {featureFile.CodeBehindFilePath} ({codeBehindFileFullPath})");
-            Log.LogTaskDiagnosticMessage($"  Messages: {featureFile.MessagesFilePath} ({messagesFileFullPath})");
+            Log.LogTaskDiagnosticMessage($"  Messages: {featureFile.MessagesFilePath} ({messagesFileFullPath}), Resource name: {featureFile.MessagesResourceName}");
 
             var generatorResult = testGenerator.GenerateTestFile(featureFileInput, new GenerationSettings());
 
@@ -45,6 +46,10 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
                 // Save them in the 'obj' directory in a sub-folder structure that mirrors the location of the feature file relative to the project root folder.
                 codeBehindWriter.WriteGeneratedFile(messagesFileFullPath, generatorResult.FeatureMessages);
             }
+            else
+            {
+                codeBehindWriter.DeleteGeneratedFile(messagesFileFullPath);
+            }
 
             yield return new FeatureFileCodeBehindGeneratorResult(
                 codeBehindFileFullPath,
@@ -53,8 +58,11 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
         }
     }
 
-    private FeatureFileInput CreateFeatureFileInput(ReqnrollFeatureFileInfo featureFile)
+    private FeatureFileInput CreateFeatureFileInput(ReqnrollFeatureFileInfo featureFile, string codeBehindFileFullPath)
     {
-        return new FeatureFileInput(featureFile.FeatureFilePath);
+        var featureFileInput = new FeatureFileInput(featureFile.FeatureFilePath);
+        featureFileInput.MessagesResourceName = featureFile.MessagesResourceName; // Move this to the constructor of FeatureFileInput in v4
+        featureFileInput.CodeBehindFilePath = codeBehindFileFullPath; // Move this to the constructor of FeatureFileInput in v4
+        return featureFileInput;
     }
 }
