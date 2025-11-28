@@ -55,7 +55,7 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
     public UnitTestFeatureGenerationResult GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
     {
 #pragma warning disable CS0618 // Type or member is obsolete
-        var messagesResourceName = FeatureFileInput.MessagesResourceName;
+        var messagesResourceName = FeatureFileInput?.MessagesResourceName;
         var featureFileInput = FeatureFileInput;
 #pragma warning restore CS0618 // Type or member is obsolete
         var codeNamespace = CreateNamespace(targetNamespace);
