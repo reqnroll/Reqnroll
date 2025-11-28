@@ -15,9 +15,10 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
 
         foreach (var featureFile in reqnrollProjectInfo.FeatureFiles)
         {
-            var featureFileInput = CreateFeatureFileInput(featureFile);
             var codeBehindFileFullPath = reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.CodeBehindFilePath);
             var messagesFileFullPath = reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.MessagesFilePath);
+
+            var featureFileInput = CreateFeatureFileInput(featureFile, codeBehindFileFullPath);
 
             Log.LogTaskDiagnosticMessage($"Processing {featureFile.FeatureFilePath} ({reqnrollProjectInfo.GetFullPathAndNormalize(featureFile.FeatureFilePath)})");
             Log.LogTaskDiagnosticMessage($"  Code-behind: {featureFile.CodeBehindFilePath} ({codeBehindFileFullPath})");
@@ -57,11 +58,11 @@ public class FeatureFileCodeBehindGenerator(IReqnrollTaskLoggingHelper log, Reqn
         }
     }
 
-    private FeatureFileInput CreateFeatureFileInput(ReqnrollFeatureFileInfo featureFile)
+    private FeatureFileInput CreateFeatureFileInput(ReqnrollFeatureFileInfo featureFile, string codeBehindFileFullPath)
     {
         var featureFileInput = new FeatureFileInput(featureFile.FeatureFilePath);
         featureFileInput.MessagesResourceName = featureFile.MessagesResourceName; // Move this to the constructor of FeatureFileInput in v4
-        featureFileInput.CodeBehindFilePath = featureFile.CodeBehindFilePath; // Move this to the constructor of FeatureFileInput in v4
+        featureFileInput.CodeBehindFilePath = codeBehindFileFullPath; // Move this to the constructor of FeatureFileInput in v4
         return featureFileInput;
     }
 }
