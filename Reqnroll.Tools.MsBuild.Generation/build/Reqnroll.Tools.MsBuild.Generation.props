@@ -66,36 +66,8 @@
     <AvailableItemName Include="ReqnrollFeatureFiles"/>
     
     <ReqnrollFeatureFiles Include="**\*.feature" >
-      <MessagesFile>$(IntermediateOutputPath)%(RelativeDir)%(Filename).feature.ndjson</MessagesFile>
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
-      <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
     </ReqnrollFeatureFiles>
-
-    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
-      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </ReqnrollFeatureFiles>
-
-    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'">
-      <CodeBehindFile>$(IntermediateOutputPath)%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-      <LegacyCodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</LegacyCodeBehindFile>
-    </ReqnrollFeatureFiles>
-
-    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" >
-      <MessagesResourceName>%(NormalizedLogicalName).ndjson</MessagesResourceName>
-      <FeatureFileResourceName>%(NormalizedLogicalName)</FeatureFileResourceName>
-    </ReqnrollFeatureFiles>
-
-    <!-- obsolete code-behind files, scenarios:
-         - after rename operation
-         - after deletion of a feature file
-         - after pulling latest changes from version control with above changes
-     -->
-    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
-    <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollFeatureFiles->'%(LegacyCodeBehindFile)')" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />
-
-    <!-- legacy code-behind files: files in project folder when they should be in obj -->
-    <ReqnrollLegacyCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollObsoleteCodeBehindFiles)" />
-
   </ItemGroup>
 
   <PropertyGroup>

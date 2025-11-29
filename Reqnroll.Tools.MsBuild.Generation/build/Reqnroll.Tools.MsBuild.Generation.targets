@@ -27,6 +27,40 @@
     </CleanDependsOn>
   </PropertyGroup>
 
+  <ItemGroup>
+    
+    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" >
+      <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
+      <NormalizedRelativeDir>$([System.String]::Copy('%(RelativeDir)').Replace('..','_'))</NormalizedRelativeDir>
+    </ReqnrollFeatureFiles>
+
+    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </ReqnrollFeatureFiles>
+
+    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'">
+      <CodeBehindFile>$(IntermediateOutputPath)%(NormalizedRelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <LegacyCodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</LegacyCodeBehindFile>
+    </ReqnrollFeatureFiles>
+
+    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" >
+      <MessagesFile>$(IntermediateOutputPath)%(NormalizedRelativeDir)%(Filename).feature.ndjson</MessagesFile>
+      <MessagesResourceName>%(NormalizedLogicalName).ndjson</MessagesResourceName>
+      <FeatureFileResourceName>%(NormalizedLogicalName)</FeatureFileResourceName>
+    </ReqnrollFeatureFiles>
+
+    <!-- obsolete code-behind files, scenarios:
+         - after rename operation
+         - after deletion of a feature file
+         - after pulling latest changes from version control with above changes
+     -->
+    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
+    <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollFeatureFiles->'%(LegacyCodeBehindFile)')" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />
+
+    <!-- legacy code-behind files: files in project folder when they should be in obj -->
+    <ReqnrollLegacyCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollObsoleteCodeBehindFiles)" />
+  </ItemGroup>
+
   <!--
     Show code-behind files as nested items under feature files in Visual Studio Solution Explorer
   -->
