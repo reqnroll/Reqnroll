@@ -107,7 +107,7 @@ Some important notes to keep in mind:
 
 Visual Studio:
 
-- Open <Reqnroll.sln> with Visual Studio
+- Open <Reqnroll.slnx> with Visual Studio
 - Build\Build Solution
 
 CLI:
