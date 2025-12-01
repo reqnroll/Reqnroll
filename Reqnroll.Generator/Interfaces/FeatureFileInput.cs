@@ -30,4 +30,10 @@ public class FeatureFileInput(string projectRelativePath)
     /// Absolute path of the code behind file to be generated.
     /// </summary>
     public string CodeBehindFilePath { get; set; }
+
+    /// <summary>
+    /// Optional link information for feature files imported from outside the project folder. Relative "virtual" path in the project.
+    /// If the link is provided (not null), the feature file should be handled (e.g. for generated namespace) as a linked file in the project.
+    /// </summary>
+    public string FeatureFileLink { get; set; }
 }
