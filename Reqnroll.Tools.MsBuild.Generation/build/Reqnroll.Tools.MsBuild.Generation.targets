@@ -132,6 +132,8 @@
      -->
     <Delete Files="@(ReqnrollObsoleteCodeBehindFiles)" ContinueOnError="true" />
     <ItemGroup>
+      <!-- We need to remove the deleted files from the lists, because otherwise a Visual Studio "rebuild" 
+           produces a missing file error as it does not clean the item groups between clean and build. -->
       <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
       <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
     </ItemGroup>
