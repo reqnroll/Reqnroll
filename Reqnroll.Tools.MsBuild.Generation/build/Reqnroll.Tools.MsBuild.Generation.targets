@@ -41,6 +41,11 @@
       <NormalizedRelativeDir>$([System.String]::Copy('%(RelativeDir)').Replace('..','_'))</NormalizedRelativeDir>
     </ReqnrollFeatureFile>
 
+    <!-- use the 'Link' as logical name for embedded resources, instead of the '../xxx' path  -->
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)">
+      <NormalizedLogicalName Condition="'%(ReqnrollFeatureFile.Link)' != ''">$([System.String]::Copy('%(Link)').Replace('\','/'))</NormalizedLogicalName>
+    </ReqnrollFeatureFile>
+
     <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
     </ReqnrollFeatureFile>

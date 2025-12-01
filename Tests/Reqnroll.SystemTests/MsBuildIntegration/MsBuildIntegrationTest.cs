@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Reqnroll.TestProjectGenerator.Data;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,21 @@ public class MsBuildIntegrationTest : SystemTestBase
     {
         ProjectFolder,
         IntermediateOutputPath
+    }
+
+    private void AddStepBindings()
+    {
+        _projectsDriver.AddStepBinding("When", regex: "embedded messages resources are reported",
+                                       """
+                                       foreach (var resourceName in System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames())
+                                       {
+                                           global::Log.LogCustom("resource", resourceName);
+                                       }
+                                       """);
+        _projectsDriver.AddStepBinding("When", regex: "the namespace is reported",
+                                       """
+                                       global::Log.LogCustom("namespace", new System.Diagnostics.StackTrace(true).GetFrames().FirstOrDefault(f => f.GetFileName()?.Contains(".feature") ?? false)?.GetMethod()?.DeclaringType?.Namespace);
+                                       """);
     }
 
     private List<string> PrepareProject(CodeBehindLocation codeBehindLocation = CodeBehindLocation.ProjectFolder)
@@ -42,13 +58,7 @@ public class MsBuildIntegrationTest : SystemTestBase
         featureFiles.Add(_projectsDriver.LastFeatureFile.Path);
 
 
-        _projectsDriver.AddStepBinding("When", regex: "embedded messages resources are reported",
-                                       """
-                                       foreach (var resourceName in System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames())
-                                       {
-                                           global::Log.LogCustom("resource", resourceName);
-                                       }
-                                       """);
+        AddStepBindings();
 
         _compilationDriver.CompileSolution(logLevel: "n");
         foreach (string featureFile in featureFiles)
@@ -182,5 +192,50 @@ public class MsBuildIntegrationTest : SystemTestBase
         _compilationDriver.CompileSolution(logLevel: "n");
         _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
         _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreCompile\" because all output files are up-to-date with respect to the input files.");
+    }
+
+    [TestMethod]
+    public void Should_support_linked_files()
+    {
+        _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = true;
+
+        var featureFile = "LinkedFeature.feature";
+        var linkTargetFolder = "TargetFolder";
+        var featureFileContent = """
+                                 Feature: Feature A
+
+                                 Scenario: Test Scenario
+                                     When the namespace is reported
+                                     And embedded messages resources are reported
+                                 """;
+
+        _solutionDriver.DefaultProject.AddFile(new ProjectFile($@"..\SomeFolder\{featureFile}", "ReqnrollFeatureFile", featureFileContent,
+            CopyToOutputDirectory.DoNotCopy, 
+            new Dictionary<string, string> { { "Link", $@"{linkTargetFolder}\{featureFile}" }}));
+
+        AddStepBindings();
+
+        _compilationDriver.CompileSolution(logLevel: "n");
+
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{featureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{featureFile}\.ndjson");
+
+        ExecuteTests();
+
+        // make sure that both tests were generated and included to the test assembly
+        ShouldAllScenariosPass(1);
+
+        // make sure namespace of the generated test is what we specified as 'Link'
+        _bindingDriver.GetActualLogLines("namespace")
+                      .Distinct()
+                      .Should()
+                      .BeEquivalentTo($"-> namespace: {_solutionDriver.DefaultProject.ProjectName}.{linkTargetFolder}:StepBinding");
+
+        // make sure the ndjson resource has been embedded for all feature files
+        _bindingDriver.GetActualLogLines("resource")
+                      .Distinct()
+                      .Should()
+                      .BeEquivalentTo($"-> resource: {linkTargetFolder}/{featureFile}.ndjson:StepBinding");
+
     }
 }
