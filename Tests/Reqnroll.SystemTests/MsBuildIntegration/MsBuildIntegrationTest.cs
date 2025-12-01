@@ -20,7 +20,7 @@ public class MsBuildIntegrationTest : SystemTestBase
             Feature: Feature A
 
             Scenario: Scenario 1
-                Then embedded messages resource should be available
+                When embedded messages resources are reported
             """);
         featureFiles.Add(_projectsDriver.LastFeatureFile.Path);
 
@@ -29,12 +29,12 @@ public class MsBuildIntegrationTest : SystemTestBase
             Feature: Feature B
 
             Scenario: Scenario 2
-                Then embedded messages resource should be available
+                When embedded messages resources are reported
             """);
         featureFiles.Add(_projectsDriver.LastFeatureFile.Path);
 
 
-        _projectsDriver.AddStepBinding("Then", regex: "embedded messages resource should be available",
+        _projectsDriver.AddStepBinding("When", regex: "embedded messages resources are reported",
                                        """
                                        foreach (var resourceName in System.Reflection.Assembly.GetExecutingAssembly().GetManifestResourceNames())
                                        {
@@ -42,7 +42,7 @@ public class MsBuildIntegrationTest : SystemTestBase
                                        }
                                        """);
 
-        _compilationDriver.CompileSolution(logLevel: "bl");
+        _compilationDriver.CompileSolution(logLevel: "n");
         foreach (string featureFile in featureFiles)
         {
             _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {featureFile}.cs");
