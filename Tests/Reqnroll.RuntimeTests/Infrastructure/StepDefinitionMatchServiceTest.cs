@@ -7,6 +7,8 @@ using Reqnroll.Bindings.Reflection;
 using Reqnroll.Infrastructure;
 using FluentAssertions;
 using Reqnroll.RuntimeTests.ErrorHandling;
+using Reqnroll.Bindings.Discovery;
+using System;
 
 namespace Reqnroll.RuntimeTests.Infrastructure
 {
@@ -53,11 +55,18 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             return new BindingMethod(new BindingType("dummy", "dummy", "dummy"), name, new IBindingParameter[] { new BindingParameter(new RuntimeBindingType(typeof(object)), "param1") }, null);
         }
 
-        private StepInstance CreateSimpleWhen(string text = "I do something")
+        private StepInstance CreateSimpleWhen(string text = "I do something", IEnumerable<string> tags = null)
         {
+            tags = tags ?? new string[0];
             var result = new StepInstance(StepDefinitionType.When, StepDefinitionKeyword.When, "When ", text, null, null, 
-                new StepContext("MyFeature", "MyScenario", new string[0], new CultureInfo("en-US", false)));
+                new StepContext("MyFeature", "MyScenario", tags, new CultureInfo("en-US", false)));
             return result;
+        }
+
+        private BindingScope CreateBindingScope(string tag, string featureTitle, string scenarioTitle)
+        {
+            var tagExpressionParser = new ReqnrollTagExpressionParser(new Cucumber.TagExpressions.TagExpressionParser());
+            return new BindingScope(tagExpressionParser.Parse(tag), featureTitle, scenarioTitle);
         }
 
         [Fact]
@@ -76,7 +85,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         public void Should_GetBestMatch_succeed_when_proper_match_and_non_matching_scopes()
         {
             whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("m1")));
-            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("m2"), new BindingScope("non-matching-tag", null, null)));
+            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("m2"), CreateBindingScope("non-matching-tag", null, null)));
 
             var sut = CreateSUT();
 
@@ -84,6 +93,22 @@ namespace Reqnroll.RuntimeTests.Infrastructure
 
             result.Success.Should().BeTrue();
         }
+
+        [Fact]
+        public void Should_GetBestMatch_succeed_when_proper_match_and_matching_tag_expression()
+        {
+            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("m1")));
+            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("m2"), CreateBindingScope("@alpha and @beta", null, null)));
+
+            var sut = CreateSUT();
+
+            var result = sut.GetBestMatch(CreateSimpleWhen("I do something", new string[] { "alpha", "beta" }), bindingCulture, out _, out _);
+
+            result.Success.Should().BeTrue();
+            result.StepBinding.Method.Name.Should().Be("m2");
+        }
+
+
 
         [Fact]
         public void Should_GetBestMatch_succeed_when_proper_match_with_parameters()
@@ -139,7 +164,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public void Should_GetBestMatch_fail_when_scope_errors_with_single_match()
         {
-            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod(), new BindingScope("non-matching-tag", null, null)));
+            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod(), CreateBindingScope("non-matching-tag", null, null)));
 
             var sut = CreateSUT();
 
@@ -152,8 +177,8 @@ namespace Reqnroll.RuntimeTests.Infrastructure
         [Fact]
         public void Should_GetBestMatch_fail_when_scope_errors_with_multiple_matches()
         {
-            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("dummy1"), new BindingScope("non-matching-tag", null, null)));
-            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("dummy2"), new BindingScope("other-non-matching-tag", null, null)));
+            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("dummy1"), CreateBindingScope("non-matching-tag", null, null)));
+            whenStepDefinitions.Add(StepDefinitionHelper.CreateRegex(StepDefinitionType.When, ".*", CreateBindingMethod("dummy2"), CreateBindingScope("other-non-matching-tag", null, null)));
 
             var sut = CreateSUT();
 
