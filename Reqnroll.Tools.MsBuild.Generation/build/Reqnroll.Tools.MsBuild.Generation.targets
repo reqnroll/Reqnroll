@@ -27,35 +27,42 @@
     </CleanDependsOn>
   </PropertyGroup>
 
+  <!--backwards compatibility: use the items declared with the old name 'ReqnrollFeatureFiles' as new name 'ReqnrollFeatureFile'  -->
   <ItemGroup>
-    
-    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" >
+    <ReqnrollFeatureFile Include="@(ReqnrollFeatureFiles)">
+      <Visible>true</Visible>
+    </ReqnrollFeatureFile>
+  </ItemGroup>
+
+  <ItemGroup>
+
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" >
       <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
       <NormalizedRelativeDir>$([System.String]::Copy('%(RelativeDir)').Replace('..','_'))</NormalizedRelativeDir>
-    </ReqnrollFeatureFiles>
+    </ReqnrollFeatureFile>
 
-    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
       <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
-    </ReqnrollFeatureFiles>
+    </ReqnrollFeatureFile>
 
-    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'">
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'">
       <CodeBehindFile>$(IntermediateOutputPath)%(NormalizedRelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
       <LegacyCodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</LegacyCodeBehindFile>
-    </ReqnrollFeatureFiles>
+    </ReqnrollFeatureFile>
 
-    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" >
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" >
       <MessagesFile>$(IntermediateOutputPath)%(NormalizedRelativeDir)%(Filename).feature.ndjson</MessagesFile>
       <MessagesResourceName>%(NormalizedLogicalName).ndjson</MessagesResourceName>
       <FeatureFileResourceName>%(NormalizedLogicalName)</FeatureFileResourceName>
-    </ReqnrollFeatureFiles>
+    </ReqnrollFeatureFile>
 
     <!-- obsolete code-behind files, scenarios:
          - after rename operation
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
      -->
-    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
-    <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollFeatureFiles->'%(LegacyCodeBehindFile)')" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />
+    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollFeatureFile->'%(CodeBehindFile)')" />
+    <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollFeatureFile->'%(LegacyCodeBehindFile)')" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />
 
     <!-- legacy code-behind files: files in project folder when they should be in obj -->
     <ReqnrollLegacyCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollObsoleteCodeBehindFiles)" />
@@ -65,7 +72,7 @@
     Show code-behind files as nested items under feature files in Visual Studio Solution Explorer
   -->
   <ItemGroup Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
-    <Compile Update="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" DependentUpon="%(Filename)" />
+    <Compile Update="@(ReqnrollFeatureFile->'%(CodeBehindFile)')" DependentUpon="%(Filename)" />
   </ItemGroup>
 
   <Target Name="WarnForObsoleteReqnrollCodeBehindFiles" AfterTargets="CoreCompile"
@@ -126,10 +133,10 @@
 
   <Target Name="CoreProcessReqnrollFeatureFilesInProject"
           DependsOnTargets="ReqnrollCreateProcessFeatureFileInputsCacheFile"
-          Inputs="@(ReqnrollFeatureFiles);$(ReqnrollProcessFeatureFileInputsCacheFile);$(ReqnrollConfigFile)"
-          Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)');@(ReqnrollFeatureFiles -> '%(MessagesFile)')">
+          Inputs="@(ReqnrollFeatureFile);$(ReqnrollProcessFeatureFileInputsCacheFile);$(ReqnrollConfigFile)"
+          Outputs="@(ReqnrollFeatureFile -> '%(CodeBehindFile)');@(ReqnrollFeatureFile -> '%(MessagesFile)')">
 
-    <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
+    <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFile)" Importance="normal" />
 
     <Error
       Text="Reqnroll designer code-behind generation is not compatible with MSBuild code-behind generation. The custom tool must be removed from the file. See https://www.reqnroll.net/documentation/Generate-Tests-from-MsBuild"
@@ -150,7 +157,7 @@
     <GenerateFeatureFileCodeBehindTask
       ProjectPath="$(MSBuildProjectFullPath)"
       OutputPath="$(ReqnrollCodeBehindOutputPath)"
-      FeatureFiles="@(ReqnrollFeatureFiles)"
+      FeatureFiles="@(ReqnrollFeatureFile)"
       RootNamespace="$(RootNamespace)"
       GeneratorPlugins="@(ReqnrollGeneratorPlugins)" 
       
@@ -187,7 +194,7 @@
       <!-- In case of storing the code-behind files in the project folder, only the first-time generated ones
            need to be included, because the others were included automatically. We need the exclude statement 
            to avoid re-adding the existing ones (would cause an error). -->
-      <Compile Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
+      <Compile Include="@(ReqnrollFeatureFile->'%(CodeBehindFile)')"
                Exclude="@(Compile)"/>
 
       <!-- remove files which got obsolete, typically after rename operation, or getting changes from source control -->
@@ -196,7 +203,7 @@
       <!-- in case the code-behind files are saved to the obj folder, we remove the legacy code-behind files 
            of the feature files from the project folder to avoid duplication. 
            These files will be deleted on clean. -->
-      <Compile Remove="@(ReqnrollFeatureFiles->'%(LegacyCodeBehindFile)')"
+      <Compile Remove="@(ReqnrollFeatureFile->'%(LegacyCodeBehindFile)')"
                Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'"/>
     </ItemGroup>
 
@@ -204,15 +211,15 @@
     <ItemGroup>
       <!-- We need the condition because it can happen that the messages file is not generated, but we still want to be able to run the tests. 
            In this case the task shows a warning anyway. -->
-      <EmbeddedResource Include="@(ReqnrollFeatureFiles->'%(MessagesFile)')" Condition="Exists('%(ReqnrollFeatureFiles.MessagesFile)')">
-        <LogicalName>%(ReqnrollFeatureFiles.MessagesResourceName)</LogicalName>
+      <EmbeddedResource Include="@(ReqnrollFeatureFile->'%(MessagesFile)')" Condition="Exists('%(ReqnrollFeatureFile.MessagesFile)')">
+        <LogicalName>%(ReqnrollFeatureFile.MessagesResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
 
     <!-- Embed feature files as resource, if requested -->
     <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
-      <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
-        <LogicalName>%(ReqnrollFeatureFiles.FeatureFileResourceName)</LogicalName>
+      <EmbeddedResource Include="@(ReqnrollFeatureFile)">
+        <LogicalName>%(ReqnrollFeatureFile.FeatureFileResourceName)</LogicalName>
       </EmbeddedResource>
     </ItemGroup>
 
@@ -220,8 +227,8 @@
 
   <Target Name="CleanFeatureFilesInProject">
     <!-- remove known code-behind files for existing feature files -->
-    <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
-    <Delete Files="%(ReqnrollFeatureFiles.MessagesFile)" ContinueOnError="true" />
+    <Delete Files="%(ReqnrollFeatureFile.CodeBehindFile)" ContinueOnError="true" />
+    <Delete Files="%(ReqnrollFeatureFile.MessagesFile)" ContinueOnError="true" />
 
     <!-- delete legacy code-behind files -->
     <Delete Files="@(ReqnrollLegacyCodeBehindFiles)" ContinueOnError="true" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />

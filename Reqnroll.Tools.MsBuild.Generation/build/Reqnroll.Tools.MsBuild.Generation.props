@@ -60,14 +60,14 @@
 
   <ItemGroup>
 
-    <!-- The items group 'ReqnrollFeatureFiles' has to be made visible with the 'AvailableItemName' group for multiple reasons: -->
+    <!-- The items group 'ReqnrollFeatureFile' has to be made visible with the 'AvailableItemName' group for multiple reasons: -->
     <!-- * Visual Studio Fast-Up-To-Date-Check (FUTDC) requires it, otherwise if only a feature file is changed, the build will be skipped.  -->
     <!-- * ReSharper Build requires it to be treated as compile item https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
-    <AvailableItemName Include="ReqnrollFeatureFiles"/>
+    <AvailableItemName Include="ReqnrollFeatureFile"/>
     
-    <ReqnrollFeatureFiles Include="**\*.feature" >
+    <ReqnrollFeatureFile Include="**\*.feature" >
       <Visible>$(UsingMicrosoftNETSdk)</Visible>
-    </ReqnrollFeatureFiles>
+    </ReqnrollFeatureFile>
   </ItemGroup>
 
   <PropertyGroup>
