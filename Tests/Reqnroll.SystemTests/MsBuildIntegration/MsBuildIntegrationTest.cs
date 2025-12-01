@@ -209,9 +209,9 @@ public class MsBuildIntegrationTest : SystemTestBase
                                      And embedded messages resources are reported
                                  """;
 
-        _solutionDriver.DefaultProject.AddFile(new ProjectFile($@"..\SomeFolder\{featureFile}", "ReqnrollFeatureFile", featureFileContent,
+        _solutionDriver.DefaultProject.AddFile(new ProjectFile( Path.Combine("..", "SomeFolder",featureFile), "ReqnrollFeatureFile", featureFileContent,
             CopyToOutputDirectory.DoNotCopy, 
-            new Dictionary<string, string> { { "Link", $@"{linkTargetFolder}\{featureFile}" }}));
+            new Dictionary<string, string> { { "Link", Path.Combine(linkTargetFolder, featureFile) }}));
 
         AddStepBindings();
 
