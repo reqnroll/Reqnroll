@@ -6,6 +6,7 @@
 * Improved packaging of Reqnroll NuGet packages (#914)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
 * Support for storing the code-behind files in the intermediate output folder (obj folder) by setting the `ReqnrollUseIntermediateOutputPathForCodeBehind` MSBuild property to `true`. (#947)
+* Support for linked feature files (files used from outside of the project folder). To use this feature, the `ReqnrollUseIntermediateOutputPathForCodeBehind` flag must be enabled (see above). (#948)
 * Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
 
 ## Bug fixes:
