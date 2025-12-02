@@ -44,8 +44,49 @@
           BeforeTargets="BeforeCompile;CoreCompile;AssignTargetPaths"
           DependsOnTargets="PrepareForBuild;CoreProcessFeatureFilesInProject" />
 
+  <!--
+    To regenerate code-behind files when core project settings or Reqnroll dependencies change, we create a cache file with a hash of relevant inputs.
+    We only change the file if the hash changes, so that MSBuild incremental build can work properly.
+  -->
+  <Target Name="ReqnrollCreateProcessFeatureFileInputsCacheFile">
+    <PropertyGroup>
+      <ReqnrollProcessFeatureFileInputsCacheFile>$(IntermediateOutputPath)$(MSBuildProjectName).ProcessFeatureFileInputs.cache</ReqnrollProcessFeatureFileInputsCacheFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ReqnrollProcessFeatureFileInputs Include="ProjectName">
+        <_ParameterValue>$(MSBuildProjectName)</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="RootNamespace">
+        <_ParameterValue>$(RootNamespace)</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="ReqnrollVersion">
+        <_ParameterValue>@(ReferencePath->WithMetadataValue('NuGetPackageId', 'Reqnroll')->'%(NuGetPackageVersion)')</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="ReqnrollAssemlyTimestamp">
+        <_ParameterValue>@(ReferencePath->WithMetadataValue('NuGetPackageId', 'Reqnroll')->'%(ModifiedTime)')</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="ReqnrollGeneratorAssemlyTimestamp" Condition="Exists('$(ReqnrollGenerationTasksAssemblyPath)')">
+        <_ParameterValue>$([System.IO.File]::GetLastWriteTime('$(ReqnrollGenerationTasksAssemblyPath)').ToString("o"))</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+    </ItemGroup>
+
+    <Hash ItemsToHash="@(ReqnrollProcessFeatureFileInputs->'%(Identity)%(_ParameterValue)')">
+      <Output TaskParameter="HashResult" PropertyName="_ReqnrollProcessFeatureFileInputsHash" />
+    </Hash>
+
+    <WriteLinesToFile Lines="$(_ReqnrollProcessFeatureFileInputsHash)" File="$(ReqnrollProcessFeatureFileInputsCacheFile)" Overwrite="True" WriteOnlyWhenDifferent="True" />
+
+    <!-- Ensure that the file is deleted on clean -->
+    <ItemGroup>
+      <FileWrites Include="$(ReqnrollProcessFeatureFileInputsCacheFile)" />
+    </ItemGroup>
+  </Target>
+
+
   <Target Name="CoreProcessFeatureFilesInProject"
-          Inputs="@(ReqnrollFeatureFiles);$(MSBuildProjectFullPath);$(ReqnrollConfigFile)"
+          DependsOnTargets="ReqnrollCreateProcessFeatureFileInputsCacheFile"
+          Inputs="@(ReqnrollFeatureFiles);$(ReqnrollProcessFeatureFileInputsCacheFile);$(ReqnrollConfigFile)"
           Outputs="@(ReqnrollFeatureFiles -> '%(CodeBehindFile)');@(ReqnrollFeatureFiles -> '%(MessagesFile)')">
 
     <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
