@@ -90,7 +90,7 @@
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
      -->
-    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);$(DefaultItemExcludes);@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
+    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
     <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollFeatureFiles->'%(LegacyCodeBehindFile)')" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />
 
     <!-- legacy code-behind files: files in project folder when they should be in obj -->
