@@ -136,7 +136,7 @@
   </Target>
 
   <Target Name="IncludeProcessedReqnrollItemsToBuildInputs" DependsOnTargets="CoreProcessReqnrollFeatureFilesInProject">
-    <!-- We need to process the item inclusions in a separate taget, because if we process it in the
+    <!-- We need to process the item inclusions in a separate target, because if we process it in the
          target that has inputs/outputs defined the order of the items will be dependent on what has changed 
          (changed items will be processed last).
          This is a problem, because the C# compiler only detects up-to-date state when the order of 
