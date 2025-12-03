@@ -28,6 +28,7 @@
   </PropertyGroup>
 
   <!--backwards compatibility: use the items declared with the old name 'ReqnrollFeatureFiles' as new name 'ReqnrollFeatureFile'  -->
+  <!-- We should consider replacing this with an error in v4 (breaking change) and in v5 remove it entirely. -->
   <ItemGroup>
     <ReqnrollFeatureFile Include="@(ReqnrollFeatureFiles)">
       <Visible>true</Visible>
