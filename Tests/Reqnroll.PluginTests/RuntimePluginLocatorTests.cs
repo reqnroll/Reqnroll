@@ -56,9 +56,7 @@ namespace Reqnroll.PluginTests
                 "Reqnroll.ExternalData.ReqnrollPlugin.dll",
                 "Reqnroll.Windsor.ReqnrollPlugin.dll",
                 "Reqnroll.MSTest.ReqnrollPlugin.dll",
-                "Reqnroll.MSTest.Generator.ReqnrollPlugin.dll",
                 "Reqnroll.NUnit.ReqnrollPlugin.dll",
-                "Reqnroll.NUnit.Generator.ReqnrollPlugin.dll",
                 "Reqnroll.xUnit.ReqnrollPlugin.dll",
                 "Reqnroll.xUnit.Generator.ReqnrollPlugin.dll",
             ]);
