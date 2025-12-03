@@ -149,7 +149,10 @@
     <!-- or for SDK-style projects, unless EnableDefaultItems/EnableDefaultCompileItems is disabled by the user  -->
     <ItemGroup Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true' or ('$(UsingMicrosoftNETSdk)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true')">
 
-      <!-- if this is the first time generation of code-behind files, we have to manually add them as compile items -->
+      <!-- In case of using the 'obj' folder, we include the code-behind files to the 'Compile' group. -->
+      <!-- In case of storing the code-behind files in the project folder, only the first-time generated ones
+           need to be included, because the others were included automatically. We need the exclude statement 
+           to avoid re-adding the existing ones (would cause an error). -->
       <Compile Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
                Exclude="@(Compile)"/>
 
