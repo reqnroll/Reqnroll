@@ -35,4 +35,4 @@ TUnit uses Microsoft.Testing.Platform which dropped VSTest support in .NET 10 SD
 </PropertyGroup>
 ```
 
-For more information, see [Microsoft's documentation on the new testing platform](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-mstest-intro).
+For more information, see [Microsoft's documentation on the Microsoft.Testing.Platform](https://learn.microsoft.com/en-us/dotnet/core/testing/microsoft-testing-platform).
