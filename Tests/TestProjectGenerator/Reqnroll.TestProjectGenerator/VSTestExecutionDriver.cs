@@ -82,40 +82,28 @@ namespace Reqnroll.TestProjectGenerator
 
         public TestExecutionResult ExecuteTests()
         {
-            var task = ExecuteTestsInternalAsync();
+            var task = ExecuteTestsInternalAsync(async (processHelper, parameters) =>
+                                                     processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
+
             return task.Result;
         }
 
         public async Task<TestExecutionResult> ExecuteTestsAsync()
         {
-            return await ExecuteTestsInternalAsync();
+            return await ExecuteTestsInternalAsync(async (processHelper, parameters) =>
+                                                       await processHelper.RunProcessAsync(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, parameters.argumentsFormat, parameters.environmentVariables));
         }
 
-        private async Task<TestExecutionResult> ExecuteTestsInternalAsync()
+        private async Task<TestExecutionResult> ExecuteTestsInternalAsync(Func<ProcessHelper, (string argumentsFormat, IReadOnlyDictionary<string, string> environmentVariables), Task<ProcessResult>> runProcessAction)
         {
             var envVariables = _testSuiteEnvironmentVariableGenerator.GenerateEnvironmentVariables();
 
             var processHelper = new ProcessHelper();
-            string arguments;
-            string workingDirectory;
-            
-            // TUnit uses Microsoft.Testing.Platform which requires using 'dotnet run' instead of 'dotnet test'
-            // on .NET 10 SDK and later due to VSTest target deprecation
-            if (_testRunConfiguration.UnitTestProvider == UnitTestProvider.TUnit)
-            {
-                arguments = $"run --project \"{_testProjectFolders.ProjectFolder}\" --no-build -- --report-trx";
-                workingDirectory = _testProjectFolders.ProjectFolder;
-            }
-            else
-            {
-                arguments = $"test {GenerateDotnetTestsArguments()}";
-                workingDirectory = _testProjectFolders.PathToSolutionDirectory;
-            }
-            
+            string arguments = $"test {GenerateDotnetTestsArguments()}";
             ProcessResult processResult;
             try
             {
-                processResult = processHelper.RunProcess(_outputWriter, workingDirectory, DotnetTestPath, arguments, envVariables);
+                processResult = processHelper.RunProcess(_outputWriter, _testProjectFolders.PathToSolutionDirectory, DotnetTestPath, arguments, envVariables);
             }
             catch (Exception)
             {
