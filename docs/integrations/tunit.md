@@ -1,14 +1,21 @@
 # TUnit
 
-Reqnroll supports TUnit 0.55.23 or later.
+Reqnroll supports TUnit 1.3.25 or later.
 
 Documentation for TUnit can be found [here](https://tunit.dev/).
+
+## Supported .NET Versions
+
+TUnit with Reqnroll supports the following .NET versions:
+
+- .NET 8.0 or later
+- .NET Framework 4.6.2 or later
 
 ## Needed NuGet Packages
 
 For Reqnroll: [Reqnroll.TUnit](https://www.nuget.org/packages/Reqnroll.TUnit/)
 
-For TUnit: [TUnit](https://www.nuget.org/packages/TUnit/)  
+For TUnit: [TUnit](https://www.nuget.org/packages/TUnit/)
 
 ## Access TestContext
 
@@ -17,3 +24,15 @@ The TUnit test context (`TUnit.Core.TestContext`) is registered in the scenario 
 ## Parallel Execution
 
 TUnit supports test-level (scenario-level) parallel test execution by default. The parallel execution can be disabled for the entire test project using the `[assembly: TUnit.Core.NotInParallel]` attribute or use [](../execution/parallel-execution.md#excluding-reqnroll-features-from-parallel-execution).
+
+## .NET 10 SDK Compatibility
+
+TUnit uses Microsoft.Testing.Platform which dropped VSTest support in .NET 10 SDK. If you encounter the error "Testing with VSTest target is no longer supported by Microsoft.Testing.Platform on .NET 10 SDK and later", you need to enable the new dotnet test experience by adding the following property to your project file:
+
+```xml
+<PropertyGroup>
+  <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
+</PropertyGroup>
+```
+
+For more information, see [Microsoft's documentation on the new testing platform](https://learn.microsoft.com/en-us/dotnet/core/testing/unit-testing-mstest-intro).
