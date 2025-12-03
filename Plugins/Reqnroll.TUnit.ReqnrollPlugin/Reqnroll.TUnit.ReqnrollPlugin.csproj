@@ -7,6 +7,8 @@
     <PackageId>Reqnroll.TUnit</PackageId>
     <Description>Package to use Reqnroll with TUnit 1.3.25 and later.</Description>
     <PackageTags>reqnroll TUnit</PackageTags>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,11 +16,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Update="Polyfill" Version="9.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Reqnroll.TUnit.Generator.ReqnrollPlugin\Reqnroll.TUnit.Generator.ReqnrollPlugin.csproj" PrivateAssets="all" PackAsReqnrollGeneratorPlugin="true" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Update="Polyfill" Version="9.3.1" />
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
