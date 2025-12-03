@@ -5,12 +5,13 @@
 * Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
 * Added .NET version 10 to CI (GitHub actions) (#943)
+* Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
 
 ## Bug fixes:
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @clrudolphi, @Code-Grump
+*Contributors of this release (in alphabetical order):* @304NotModified, @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
 
 # v3.2.1 - 2025-11-07
 

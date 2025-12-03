@@ -24,11 +24,10 @@
     <UseHostCompilerIfAvailable>$(ReqnrollUseHostCompilerIfAvailable)</UseHostCompilerIfAvailable>
   </PropertyGroup>
 
-
+  <!--
+    property group for internal or debug settings
+  -->
   <PropertyGroup>
-    <OverwriteReadOnlyFiles Condition="'$(OverwriteReadOnlyFiles)'==''">false</OverwriteReadOnlyFiles>
-    <ForceGeneration Condition="'$(ForceGeneration)'==''">false</ForceGeneration>
-
     <ReqnrollDebugMSBuildTask Condition="'$(ReqnrollDebugMSBuildTask)' == ''">false</ReqnrollDebugMSBuildTask>
   </PropertyGroup>
 
@@ -38,23 +37,26 @@
   <PropertyGroup>
 
     <!--
-      feature flag to enable experimental support for cleaning up generated code-behind files during rebuild and clean scenarios
+      feature flag to enable embedding of feature files as resources in the assembly; this is optional, Reqnroll does not need it
     -->
-    <ReqnrollDeleteCodeBehindFilesOnCleanRebuild Condition="'$(ReqnrollDeleteCodeBehindFilesOnCleanRebuild)'==''">false</ReqnrollDeleteCodeBehindFilesOnCleanRebuild>
+    <ReqnrollEmbedFeatureFiles Condition="'$(ReqnrollEmbedFeatureFiles)'==''">false</ReqnrollEmbedFeatureFiles>
 
     <!--
-      net.sdk support: feature flag to enable experimental support for net.sdk project system
+      feature flag to enable warning for obsolete feature code-behind files without corresponding feature file
     -->
-    <ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)'==''">true</ReqnrollEnableDefaultCompileItems>
-    <ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)'==''">$(ReqnrollEnableDefaultCompileItems)</ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile>
+    <ReqnrollWarnForObsoleteCodeBehindFiles Condition="'$(ReqnrollWarnForObsoleteCodeBehindFiles)'==''">true</ReqnrollWarnForObsoleteCodeBehindFiles>
 
-    <DefaultItemExcludes>$(DefaultItemExcludes);**/*.feature</DefaultItemExcludes>
+    <!--
+      feature flag to enable deletion of obsolete feature code-behind files on 'Clean' and 'Rebuild' operation
+    -->
+    <ReqnrollDeleteObsoleteCodeBehindFilesOnClean Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)'==''">false</ReqnrollDeleteObsoleteCodeBehindFilesOnClean>
   </PropertyGroup>
 
   <ItemGroup>
 
-    <!-- Registration of custom item type for ReSharper Build -->
-    <!-- https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
+    <!-- The items group 'ReqnrollFeatureFiles' has to be made visible with the 'AvailableItemName' group for multiple reasons: -->
+    <!-- * Visual Studio Fast-Up-To-Date-Check (FUTDC) requires it, otherwise if only a feature file is changed, the build will be skipped.  -->
+    <!-- * ReSharper Build requires it to be treated as compile item https://www.jetbrains.com/help/resharper/Building_Solution.html#supported-build-items -->
     <AvailableItemName Include="ReqnrollFeatureFiles"/>
     
     <ReqnrollFeatureFiles Include="**\*.feature" >
@@ -64,20 +66,26 @@
       <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
     </ReqnrollFeatureFiles>
 
-    <!-- obsolete codebehind files, scenarios:
+    <ReqnrollFeatureFiles Update="@(ReqnrollFeatureFiles)" >
+      <MessagesResourceName>%(NormalizedLogicalName).ndjson</MessagesResourceName>
+      <FeatureFileResourceName>%(NormalizedLogicalName)</FeatureFileResourceName>
+    </ReqnrollFeatureFiles>
+
+    <!-- obsolete code-behind files, scenarios:
          - after rename operation
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
      -->
-    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
+    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
 
-    <!-- Support for Visual Studio Incremental Build
-        https://github.com/reqnroll/Reqnroll/issues/1319
-     -->
-    <UpToDateCheckInput Include="@(ReqnrollFeatureFiles)" />
-    <UpToDateCheckBuild Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" Original="@(ReqnrollFeatureFiles)" />
-    <CustomAdditionalCompileInputs Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')" />
+  </ItemGroup>
 
+  <PropertyGroup>
+    <ReqnrollConfigFile Condition="Exists('reqnroll.json')">reqnroll.json</ReqnrollConfigFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Build should be triggered in Visual Studio even if only the config file was changed -->
+    <UpToDateCheckInput Include="$(ReqnrollConfigFile)" Condition ="'$(ReqnrollConfigFile)' != ''" />
   </ItemGroup>
 
 </Project>
