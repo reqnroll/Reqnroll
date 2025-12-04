@@ -5,12 +5,12 @@
     <ContentType
         Name="FeatureFile" 
         DisplayName="FeatureFileType source file" 
-        ItemType="ReqnrollFeatureFiles">
+        ItemType="ReqnrollFeatureFile">
         <NameValuePair Name="DependentExtensions" Value=".feature.cs" />
 
     </ContentType>
 
-    <ItemType Name="ReqnrollFeatureFiles" DisplayName="Feature file"/>
+    <ItemType Name="ReqnrollFeatureFile" DisplayName="Feature file"/>
 
     <FileExtension Name=".feature" ContentType="FeatureFile" />
 

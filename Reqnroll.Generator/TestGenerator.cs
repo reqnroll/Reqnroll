@@ -191,7 +191,9 @@ public class TestGenerator(
             ? null
             : ProjectSettings.DefaultNamespace;
 
-        var directoryName = Path.GetDirectoryName(featureFileInput.ProjectRelativePath);
+        // we calculate the namespace based on the link information (if available) otherwise from the project relative path
+        var relativePathToCalculateNamespaceFrom = !string.IsNullOrEmpty(featureFileInput.FeatureFileLink) ? featureFileInput.FeatureFileLink : featureFileInput.ProjectRelativePath;
+        var directoryName = Path.GetDirectoryName(relativePathToCalculateNamespaceFrom);
         var namespaceExtension = string.IsNullOrEmpty(directoryName) ? null :
             string.Join(".", directoryName.TrimStart('\\', '/', '.').Split('\\', '/').Select(f => f.ToIdentifier()).ToArray());
         if (!string.IsNullOrEmpty(namespaceExtension))
