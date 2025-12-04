@@ -70,6 +70,8 @@ namespace Reqnroll.TestProjectGenerator
 
         public bool? IsTreatWarningsAsErrors { get; set; }
 
+        public bool? UseIntermediateOutputPathForCodeBehind { get; set; }
+
         public ProjectType ProjectType { get; set; } = ProjectType.Library;
 
         public void AddProjectReference(string projectPath, ProjectBuilder projectToReference)
@@ -277,6 +279,9 @@ namespace Reqnroll.TestProjectGenerator
                 }
             }
 
+            if (UseIntermediateOutputPathForCodeBehind != null)
+                ConfigureUseIntermediateOutputPathForCodeBehind(UseIntermediateOutputPathForCodeBehind.Value);
+
             AddAdditionalStuff();
         }
 
@@ -429,6 +434,11 @@ namespace Reqnroll.TestProjectGenerator
                                          new NuGetPackageAssembly(GetReqnrollPublicAssemblyName("Reqnroll.TUnit.ReqnrollPlugin.dll"), "netstandard2.0\\Reqnroll.TUnit.ReqnrollPlugin.dll"));
                 Configuration.Plugins.Add(new ReqnrollPlugin("Reqnroll.TUnit", ReqnrollPluginType.Runtime));
             }
+        }
+
+        private void ConfigureUseIntermediateOutputPathForCodeBehind(bool useIntermediateOutputPathForCodeBehind)
+        {
+            _project.AddAdditionalPropertyGroupEntry("ReqnrollUseIntermediateOutputPathForCodeBehind", useIntermediateOutputPathForCodeBehind.ToString().ToLowerInvariant());
         }
 
         protected virtual void AddAdditionalStuff()

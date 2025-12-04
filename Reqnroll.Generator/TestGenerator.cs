@@ -145,7 +145,7 @@ public class TestGenerator(
         var featureGenerator = _featureGeneratorRegistry.CreateGenerator(reqnrollDocument);
 #pragma warning disable CS0618 // Type or member is obsolete
         if (featureGenerator is UnitTestFeatureGenerator unitTestFeatureGenerator)
-            unitTestFeatureGenerator.MessagesResourceName = featureFileInput.MessagesResourceName; // pass this to GenerateUnitTestFixture via passing featureFileInput in v4
+            unitTestFeatureGenerator.FeatureFileInput = featureFileInput; // pass this to GenerateUnitTestFixture in v4
 #pragma warning restore CS0618 // Type or member is obsolete
         string targetNamespace = GetTargetNamespace(featureFileInput) ?? "Reqnroll.GeneratedTests";
         var generationResult = featureGenerator.GenerateUnitTestFixture(reqnrollDocument, null, targetNamespace);

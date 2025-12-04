@@ -1,6 +1,6 @@
-﻿using System;
-using FluentAssertions;
+﻿using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,15 +11,23 @@ namespace Reqnroll.SystemTests.MsBuildIntegration;
 [TestCategory("MsBuildIntegration")]
 public class MsBuildIntegrationTest : SystemTestBase
 {
-    private List<string> PrepareProject()
+    public enum CodeBehindLocation
     {
+        ProjectFolder,
+        IntermediateOutputPath
+    }
+
+    private List<string> PrepareProject(CodeBehindLocation codeBehindLocation = CodeBehindLocation.ProjectFolder)
+    {
+        _solutionDriver.DefaultProject.UseIntermediateOutputPathForCodeBehind = codeBehindLocation == CodeBehindLocation.IntermediateOutputPath;
+
         var featureFiles = new List<string>();
 
         AddFeatureFile(
             """
             Feature: Feature A
 
-            Scenario: Scenario 1
+            Scenario: Test Scenario
                 When embedded messages resources are reported
             """);
         featureFiles.Add(_projectsDriver.LastFeatureFile.Path);
@@ -28,7 +36,7 @@ public class MsBuildIntegrationTest : SystemTestBase
             """
             Feature: Feature B
 
-            Scenario: Scenario 2
+            Scenario: Test Scenario
                 When embedded messages resources are reported
             """);
         featureFiles.Add(_projectsDriver.LastFeatureFile.Path);
@@ -45,8 +53,8 @@ public class MsBuildIntegrationTest : SystemTestBase
         _compilationDriver.CompileSolution(logLevel: "n");
         foreach (string featureFile in featureFiles)
         {
-            _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {featureFile}.cs");
-            _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{featureFile}\.ndjson");
+            _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{featureFile}\.cs");
+            _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{featureFile}\.ndjson");
         }
 
         return featureFiles;
@@ -67,20 +75,26 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
-    public void Should_produce_all_outputs_on_first_build()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_produce_all_outputs_on_first_build(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
         CheckProjectConsistency(featureFiles);
+
+        KeepPassingResults = true;
     }
 
     [TestMethod]
-    public void Should_detect_when_all_files_are_up_to_date()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_detect_when_all_files_are_up_to_date(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
         _compilationDriver.CompileSolution(logLevel: "bl");
-        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
+        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
         _compilationResultDriver.CompileResult.Output.Should().NotContain("[Reqnroll] Generated code-behind file:");
         _compilationResultDriver.CompileResult.Output.Should().NotContain("[Reqnroll] Generated messages file:");
 
@@ -102,40 +116,47 @@ public class MsBuildIntegrationTest : SystemTestBase
     }
 
     [TestMethod]
-    public void Should_detect_when_only_feature_files_changed()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_detect_when_only_feature_files_changed(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
+        // we change the first feature file in alphabetical order, because in case of issues,
+        // that is moved to the end of the lists so there is more likely to catch problems
+        featureFiles.Sort();
         var changedFeatureFile = featureFiles[0];
         var notChangedFeatureFile = featureFiles[1];
         string changedFileFullPath = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _solutionDriver.DefaultProject.ProjectName, changedFeatureFile);
         var fileContent = File.ReadAllText(changedFileFullPath);
         // make a relevant change
-        var changedContent = fileContent.Replace("Feature A", "Feature A - changed at " + DateTime.Now.Ticks);
+        var changedContent = fileContent.Replace("Test Scenario", "Test Scenario - changed at " + DateTime.Now.Ticks);
         changedContent.Should().NotBe(fileContent);
         File.WriteAllText(changedFileFullPath, changedContent);
 
         _compilationDriver.CompileSolution(logLevel: "n");
         // the changed feature file should be re-processed
-        _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {changedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{changedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{changedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{changedFeatureFile}\.ndjson");
 
         // the not changed feature file should be skipped
-        _compilationResultDriver.CompileResult.Output.Should().NotContain($"[Reqnroll] Generated code-behind file: {notChangedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{notChangedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{notChangedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: .*{notChangedFeatureFile}\.ndjson");
 
         CheckProjectConsistency(featureFiles);
 
         // Any subsequent compilation makes everything up-to-date again
         _compilationDriver.CompileSolution(logLevel: "n");
-        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
+        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
         _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreCompile\" because all output files are up-to-date with respect to the input files.");
     }
 
     [TestMethod]
-    public void Should_detect_when_only_feature_files_changed_in_a_way_that_code_behind_not_changed()
+    [DataRow(CodeBehindLocation.ProjectFolder)]
+    [DataRow(CodeBehindLocation.IntermediateOutputPath)]
+    public void Should_detect_when_only_feature_files_changed_in_a_way_that_code_behind_not_changed(CodeBehindLocation codeBehindLocation)
     {
-        var featureFiles = PrepareProject();
+        var featureFiles = PrepareProject(codeBehindLocation);
 
         var changedFeatureFile = featureFiles[0];
         var notChangedFeatureFile = featureFiles[1];
@@ -148,18 +169,18 @@ public class MsBuildIntegrationTest : SystemTestBase
 
         _compilationDriver.CompileSolution(logLevel: "n");
         // the changed feature file should be re-processed
-        _compilationResultDriver.CompileResult.Output.Should().Contain($"[Reqnroll] Generated code-behind file: {changedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{changedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{changedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().MatchRegex($@"\[Reqnroll\] Generated messages file: .*{changedFeatureFile}\.ndjson");
 
         // the not changed feature file should be skipped
-        _compilationResultDriver.CompileResult.Output.Should().NotContain($"[Reqnroll] Generated code-behind file: {notChangedFeatureFile}.cs");
-        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: obj[\/\\].*[\/\\]{notChangedFeatureFile}\.ndjson");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated code-behind file: .*{notChangedFeatureFile}\.cs");
+        _compilationResultDriver.CompileResult.Output.Should().NotMatchRegex($@"\[Reqnroll\] Generated messages file: .*{notChangedFeatureFile}\.ndjson");
 
         CheckProjectConsistency(featureFiles);
 
         // Any subsequent compilation makes everything up-to-date again
         _compilationDriver.CompileSolution(logLevel: "n");
-        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
+        _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreProcessReqnrollFeatureFilesInProject\" because all output files are up-to-date with respect to the input files.");
         _compilationResultDriver.CompileResult.Output.Should().Contain("Skipping target \"CoreCompile\" because all output files are up-to-date with respect to the input files.");
     }
 }

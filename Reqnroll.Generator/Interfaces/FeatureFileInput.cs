@@ -25,4 +25,9 @@ public class FeatureFileInput(string projectRelativePath)
     /// The resource name to use for the embedded messages resource.
     /// </summary>
     public string MessagesResourceName { get; set; }
+
+    /// <summary>
+    /// Absolute path of the code behind file to be generated.
+    /// </summary>
+    public string CodeBehindFilePath { get; set; }
 }
