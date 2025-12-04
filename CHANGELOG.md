@@ -11,7 +11,7 @@
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
 
-*Contributors of this release (in alphabetical order):* @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
 
 # v3.2.1 - 2025-11-07
 
