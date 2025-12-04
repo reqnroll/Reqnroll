@@ -183,7 +183,10 @@ namespace Reqnroll.TestProjectGenerator
 
             TestExecutionResultFiles = trxFiles.ToDictionary(trxFile => trxFile.trxFilePath, trxFile => trxFile.trx);
 
-            LastTestExecutionResult = TestExecutionResultFiles.First(f => f.Key.Contains(_testProjectFolders.ProjectFolder)).Value;
+            // For TUnit direct execution, TRX files are generated in the bin output path,
+            // so the path might not contain the project folder name. Use first match or single result.
+            var matchingResult = TestExecutionResultFiles.FirstOrDefault(f => f.Key.Contains(_testProjectFolders.ProjectFolder));
+            LastTestExecutionResult = matchingResult.Value ?? TestExecutionResultFiles.First().Value;
 
             return LastTestExecutionResult;
         }
