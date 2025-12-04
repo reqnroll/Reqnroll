@@ -12,7 +12,7 @@
   <Import Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.props" />
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Reqnroll.Specs</AssemblyName>
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>false</SignAssembly>

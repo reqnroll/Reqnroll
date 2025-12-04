@@ -6,12 +6,13 @@
 * Improved packaging of Reqnroll NuGet packages (#914)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
 * Support for storing the code-behind files in the intermediate output folder (obj folder) by setting the `ReqnrollUseIntermediateOutputPathForCodeBehind` MSBuild property to `true`. (#947)
+* Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
 
 ## Bug fixes:
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
 
 # v3.2.1 - 2025-11-07
 
