@@ -118,16 +118,16 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AsyncStepMethodMustReturnTaskMessage" xml:space="preserve">
-    <value>Asynchronous step methods must return a Task</value>
+    <value>Asynchronous step methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt;</value>
   </data>
   <data name="AsyncStepMethodMustReturnTaskTitle" xml:space="preserve">
     <value>'{0}': step method is marked as {1} and must return a Task. Remove the {1} keyword or change the return type to Task.</value>
   </data>
-  <data name="StepMethodMustReturnVoidOrTaskMessage" xml:space="preserve">
-    <value>Step methods must return either void or a Task</value>
+  <data name="StepMethodShouldReturnVoidOrTaskOrValueTaskMessage" xml:space="preserve">
+    <value>Step methods should not return values.</value>
   </data>
-  <data name="StepMethodMustReturnVoidOrTaskTitle" xml:space="preserve">
-    <value>'{0}': method is marked as a step and must return either {1} or a Task. Change the return type of the method or remove the binding attributes.</value>
+  <data name="StepMethodShouldReturnVoidOrTaskOrValueTaskTitle" xml:space="preserve">
+    <value>'{0}': method is marked as a step and any values returned by the method will be ignored. Step methods should either have {0} return type, or return a Task or ValueTask.</value>
   </data>
   <data name="StepTextCannotBeNullOrEmptyTitle" xml:space="preserve">
     <value>Step text cannot be empty</value>

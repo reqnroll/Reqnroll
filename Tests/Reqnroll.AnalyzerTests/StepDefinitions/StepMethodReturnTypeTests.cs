@@ -2,12 +2,12 @@
 
 namespace Reqnroll.Analyzers.StepDefinitions;
 
-public class StepMethodMustReturnVoidOrTaskTests
+public class StepMethodReturnTypeTests
 {
     [Fact]
     public async Task StepMethodReturningVoidDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepMethodMustReturnVoidOrTaskAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -32,7 +32,7 @@ public class StepMethodMustReturnVoidOrTaskTests
     [Fact]
     public async Task StepMethodReturningTaskDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepMethodMustReturnVoidOrTaskAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -57,9 +57,36 @@ public class StepMethodMustReturnVoidOrTaskTests
     }
 
     [Fact]
+    public async Task StepMethodReturningValueTaskDoesNotRaiseDiagnostic()
+    {
+        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
+        {
+            TestCode =
+                """"
+                using System.Threading.Tasks;
+                using Reqnroll;
+
+                namespace Sample.Tests;
+
+                [Binding]
+                public class GameSteps
+                {
+                    [When]
+                    public ValueTask WhenMakerStartsAGame()
+                    {
+                        return ValueTask.CompletedTask;
+                    }
+                }
+                """"
+        };
+
+        await test.RunAsync();
+    }
+
+    [Fact]
     public async Task StepMethodReturningValueRaisesDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepMethodMustReturnVoidOrTaskAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -80,7 +107,7 @@ public class StepMethodMustReturnVoidOrTaskTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepMethodMustReturnVoidOrTaskAnalyzer.Rule)
+            new DiagnosticResult(StepMethodReturnTypeAnalyzer.Rule)
                 .WithLocation(0)
                 .WithArguments("GameSteps.WhenMakerStartsAGame", "void"));
 
