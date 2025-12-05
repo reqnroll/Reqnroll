@@ -1,21 +1,18 @@
-﻿<Project>
-
-  <Import Project="Sdk.props" Sdk="Microsoft.NET.Sdk" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ReqnrollCoreToolsTfm)</ReqnrollTestTFM>
     <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ReqnrollFullFrameworkToolsTfm)</ReqnrollTestTFM>
-    <ReqnrollGenerationProjectDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectDir>
-    <ReqnrollGenerationTasksDir>$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksDir>
-    <_ReqnrollDeferTaskLoading>true</_ReqnrollDeferTaskLoading>
+    <_RepoRoot>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../'))</_RepoRoot>
+    <ReqnrollGenerationProjectPath>$(_RepoRoot)Reqnroll.Tools.MsBuild.Generation/</ReqnrollGenerationProjectPath>
+    <ReqnrollGenerationTasksPath>$(ReqnrollGenerationProjectPath)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksPath>
+    <GenerateReqnrollAssemblyHooksFile>true</GenerateReqnrollAssemblyHooksFile>
   </PropertyGroup>
 
-  <Import
-    Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.props"
-    Condition="'$(ReqnrollGenerationPropsImported)' != 'true'"/>
+  <Import Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.props" />
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <AssemblyName>Reqnroll.Specs</AssemblyName>
     <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
     <SignAssembly>false</SignAssembly>
@@ -23,7 +20,6 @@
     <PackageId>Reqnroll.Specs</PackageId>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
     <AddSyntheticProjectReferencesForSolutionDependencies>false</AddSyntheticProjectReferencesForSolutionDependencies>
-    <ReqnrollDeleteCodeBehindFilesOnCleanRebuild>true</ReqnrollDeleteCodeBehindFilesOnCleanRebuild>
     <RunPostBuildEvent>Always</RunPostBuildEvent>
     <NoWarn>$(NoWarn);CS2002</NoWarn>
 
@@ -36,25 +32,18 @@
     
     <None Include="App.config" />
 
-    <Compile Remove="NuGetPackageVersion.template.cs" />
-    <None Include="NuGetPackageVersion.template.cs" />
-    <ReqnrollFeatureFiles Remove="TestFiles/**/*.feature" />
+    <ReqnrollFeatureFile Remove="TestFiles/**/*.feature" />
   </ItemGroup>
    
   <ItemGroup>
+    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj">
+      <AdditionalTargets>GenerateAssemblyHookTemplates</AdditionalTargets>
+    </ProjectReference>
     <ProjectReference Include="..\TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
-    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" />
     <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" />
-    <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
-      <Private>false</Private>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
-    </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj">
-      <Private>false</Private>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
     </ProjectReference>
   </ItemGroup>
 
@@ -69,31 +58,48 @@
     <PackageReference Include="MSTest" Version="3.8.2" />
   </ItemGroup>
 
-  <Import Project="Sdk.targets" Sdk="Microsoft.NET.Sdk" />
+  <ItemGroup>
+    <NuGetPackageVersionTemplate Include="NuGetPackageVersion.cs" />
+    <UpToDateCheckInput Include="@(NuGetPackageVersionTemplate)" />
+    <UpToDateCheckOutput Include="@(NuGetPackageVersionTemplate -> '$(IntermediateOutputPath)%(Filename).$(PackageVersion)%(Extension)')" />
+    <Compile Remove="@(NuGetPackageVersionTemplate)" />
+    <None Include="@(NuGetPackageVersionTemplate)" />
+  </ItemGroup>
 
   <Target
     Name="WriteNuGetVersion"
+    Inputs="@(NuGetPackageVersionTemplate)"
+    Outputs="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)"
     AfterTargets="GetBuildVersion"
-    BeforeTargets="BeforeCompile"
-    Condition="$(DesignTimeBuild) != 'true' OR '$(BuildingProject)' == 'true'">
-    
-    <ReplaceTextInFileTask
-      InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs"
-      OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs"
-      TextToReplace="NUGET_VERSION"
-      TextToReplaceWith="$(PackageVersion)"
-      WriteOnlyWhenChanged="true" />
+    BeforeTargets="BeforeCompile">
+
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(NuGetPackageVersionTemplate.Identity)">
+      <Output TaskParameter="Lines" ItemName="_NuGetPackageVersionTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the namespace token replaced. -->
+    <WriteLinesToFile
+      File="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)"
+      Lines="@(_NuGetPackageVersionTemplateLine -> Replace(`NUGET_VERSION`, `$(PackageVersion)`))"
+      Overwrite="true"
+      Encoding="UTF-8" />
 
     <ItemGroup>
-      <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs" />
+      <!-- Include the generated hooks in the compilation -->
+      <Compile Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
     </ItemGroup>
   </Target>
 
   <ItemGroup>
-    <ReqnrollGeneratorPlugins Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" />
+    <ReqnrollGeneratorPlugins Include="$(_RepoRoot)Plugins/Reqnroll.MSTest.Generator.ReqnrollPlugin/bin/$(Configuration)/netstandard2.0/Reqnroll.MSTest.Generator.ReqnrollPlugin.dll" />
+    <ReqnrollAssemblyHooksTemplate Include="$(_RepoRoot)Plugins/Reqnroll.MSTest.ReqnrollPlugin/obj/$(Configuration)/netstandard2.0/MSTest.AssemblyHooks.$(PackageVersion).cs" />
   </ItemGroup>
 
-  <Import Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.targets" />
-  <Import Project="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\build\Reqnroll.MsTest.targets" />
+  <Import Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.targets" />
+  <Import Project="$(_RepoRoot)Plugins/Reqnroll.TestFrameworkAdapter.targets" />
 
 </Project>

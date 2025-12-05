@@ -371,14 +371,6 @@ GitExtensions.settings.backup
 /Tests/Reqnroll.CucumberMessages.Tests/Samples/CucumberMessages/*
 /Tests/Reqnroll.Formatters.Tests/Samples/CucumberMessages/*
 *.feature.cs
-*.AssemblyHooks.cs
-*.AssemblyHooks.vb
-
-# Version for Specs
-Tests/**/NuGetPackageVersion.cs
-
-#Analytics
-AppInsightsInstrumentationKey.cs
 
 docs/_build/*
 !Directory.Build.rsp

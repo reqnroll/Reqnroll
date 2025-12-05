@@ -1,32 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <NuspecFile>$(MSBuildThisFileDirectory)Reqnroll.xunit.v3.nuspec</NuspecFile>
-    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
-    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
-    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
-    <PackageId>Reqnroll.xunit.v3</PackageId>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
+    <IsPackable>false</IsPackable>
   </PropertyGroup>
-  <ItemGroup>
-    <Compile Remove="build\**\*" />
-    <None Include="build\**\*" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="0.1.36" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" />
-    <ProjectReference Include="..\Reqnroll.xUnit3.ReqnrollPlugin\Reqnroll.xUnit3.ReqnrollPlugin.csproj" />
-  </ItemGroup>
-
-  <Target Name="WriteAssemblyHooksVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.template.cs" OutputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.cs" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-    <ReplaceTextInFileTask InputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.template.vb" OutputFile="$(MSBuildThisFileDirectory)\build\xUnit3.AssemblyHooks.vb" TextToReplace="REQNROLL_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
-  </Target>
-  <ItemGroup>
+    <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Reqnroll.xUnit3.Generator.ReqnrollPluginTests, PublicKey=002400000480000094000000060200000024000052534131000400000100010059bb085601a8b65a8a7b00f34e6d85df230f1e4913d3c0eaadcd13c1fd9cd15c3f01567c49d5f41f617dbda6f544ea3e2d5b5a042f307a7c8d21a079254509ba543efaefce96fac977abd0a76206b721abc33f84ee45ae5383cf50eeb8e234595656fd4af916e1dcde644ce20bb9a68bd72bc7957b759560524c63ca294585ca</_Parameter1>
     </AssemblyAttribute>

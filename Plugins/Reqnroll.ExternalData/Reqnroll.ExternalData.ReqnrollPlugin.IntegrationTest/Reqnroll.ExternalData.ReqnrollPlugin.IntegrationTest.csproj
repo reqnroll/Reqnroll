@@ -5,16 +5,16 @@
   <PropertyGroup>
     <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' == 'Core'">$(ReqnrollCoreToolsTfm)</ReqnrollTestTFM>
     <ReqnrollTestTFM Condition="'$(MSBuildRuntimeType)' != 'Core'">$(ReqnrollFullFrameworkToolsTfm)</ReqnrollTestTFM>
-    <ReqnrollGenerationProjectDir>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectDir>
-    <ReqnrollGenerationTasksDir>$(ReqnrollGenerationProjectDir)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksDir>
+    <ReqnrollGenerationProjectPath>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)../../../Reqnroll.Tools.MsBuild.Generation/'))</ReqnrollGenerationProjectPath>
+    <ReqnrollGenerationTasksPath>$(ReqnrollGenerationProjectPath)bin/$(Configuration)/$(ReqnrollTestTFM)/</ReqnrollGenerationTasksPath>
   </PropertyGroup>
 
   <Import
-    Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.props"
+    Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.props"
     Condition="'$(ReqnrollGenerationPropsImported)' != 'true'"/>
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- we have to set the root namespace to avoid generation error -->
     <RootNamespace>XReqnroll.ExternalData.ReqnrollPlugin.IntegrationTest</RootNamespace>
   </PropertyGroup>
@@ -43,5 +43,5 @@
     <ReqnrollGeneratorPlugins Include="$(MSBuildThisFileDirectory)..\Reqnroll.ExternalData.ReqnrollPlugin\bin\$(Configuration)\netstandard2.0\Reqnroll.ExternalData.ReqnrollPlugin.dll" />
   </ItemGroup>
 
-  <Import Project="$(ReqnrollGenerationProjectDir)build/Reqnroll.Tools.MsBuild.Generation.targets" />
+  <Import Project="$(ReqnrollGenerationProjectPath)build/Reqnroll.Tools.MsBuild.Generation.targets" />
 </Project>

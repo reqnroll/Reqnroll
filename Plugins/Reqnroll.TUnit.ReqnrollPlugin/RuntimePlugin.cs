@@ -8,8 +8,12 @@ using Reqnroll.UnitTestProvider;
 
 namespace Reqnroll.TUnit.ReqnrollPlugin;
 
+/// <summary>
+/// Runtime plugin for TUnit test framework integration with Reqnroll.
+/// </summary>
 public class RuntimePlugin : IRuntimePlugin
 {
+    /// <inheritdoc />
     public void Initialize(RuntimePluginEvents runtimePluginEvents, RuntimePluginParameters runtimePluginParameters, UnitTestProviderConfiguration unitTestProviderConfiguration)
     {
         runtimePluginEvents.RegisterGlobalDependencies += RuntimePluginEvents_RegisterGlobalDependencies;

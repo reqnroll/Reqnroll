@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <NoWarn>$(NoWarn);CS2002</NoWarn>
@@ -10,6 +10,14 @@
   <ItemGroup>
     <Compile Remove="**\Resources\**\*.cs" />
     <EmbeddedResource Include="**\Resources\**\*" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="NuGetPackageVersion.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="NuGetPackageVersion.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,42 +32,55 @@
     <PackageReference Include="Moq" Version="4.20.70" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.0" />
     <PackageReference Include="Scrutor" Version="5.0.2" />
-    <PackageReference Include="MSBuild.AdditionalTasks" Version="*" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\TestProjectGenerator\Reqnroll.TestProjectGenerator\Reqnroll.TestProjectGenerator.csproj" />
+    
+    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit3.ReqnrollPlugin\Reqnroll.xUnit3.ReqnrollPlugin.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
     <ProjectReference Include="..\..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.Generator.ReqnrollPlugin\Reqnroll.MSTest.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.MSTest.ReqnrollPlugin\Reqnroll.MSTest.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.NUnit.Generator.ReqnrollPlugin\Reqnroll.NUnit.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.NUnit.ReqnrollPlugin\Reqnroll.NUnit.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.Generator.ReqnrollPlugin\Reqnroll.xUnit.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit.ReqnrollPlugin\Reqnroll.xUnit.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.xUnit3.Generator.ReqnrollPlugin\Reqnroll.xUnit3.Generator.ReqnrollPlugin.csproj">
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Plugins\Reqnroll.TUnit.Generator.ReqnrollPlugin\Reqnroll.TUnit.Generator.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.TUnit.ReqnrollPlugin\Reqnroll.TUnit.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
     <ProjectReference Include="..\..\Plugins\Reqnroll.Verify\Reqnroll.Verify.ReqnrollPlugin\Reqnroll.Verify.ReqnrollPlugin.csproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
+  
+  <ItemGroup>
+    <NuGetPackageVersionTemplate Include="NuGetPackageVersion.cs" />
+    <Compile Remove="@(NuGetPackageVersionTemplate)" />
+  </ItemGroup>
+  
+  <Target Name="WriteNuGetVersion" Inputs="@(NuGetPackageVersionTemplate)" Outputs="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename).$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile">
 
-  <Target Name="WriteNuGetVersion" AfterTargets="GetBuildVersion" BeforeTargets="BeforeCompile" Condition="'$(DesignTimeBuild)' != 'true' AND '$(BuildingProject)' == 'true'">
-    <ReplaceTextInFileTask InputFile="$(ProjectDir)\\NuGetPackageVersion.template.cs.txt" OutputFile="$(ProjectDir)\\NuGetPackageVersion.cs" TextToReplace="NUGET_VERSION" TextToReplaceWith="$(PackageVersion)" WriteOnlyWhenChanged="true" />
+    <!-- Read the lines from the template. -->
+    <ReadLinesFromFile File="%(NuGetPackageVersionTemplate.Identity)">
+      <Output TaskParameter="Lines" ItemName="_NuGetPackageVersionTemplateLine" />
+    </ReadLinesFromFile>
+
+    <!-- Produce the output file with the namespace token replaced. -->
+    <WriteLinesToFile File="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" Lines="@(_NuGetPackageVersionTemplateLine -&gt; Replace(`NUGET_VERSION`, `$(PackageVersion)`))" Overwrite="true" Encoding="UTF-8" />
 
     <ItemGroup>
-      <Compile Include="$(ProjectDir)\\NuGetPackageVersion.cs" />
+      <!-- Include the generated hooks in the compilation -->
+      <Compile Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
+
+      <!-- Track the file was created during the build so it will be cleaned automatically. -->
+      <FileWrites Include="$(IntermediateOutputPath)%(NuGetPackageVersionTemplate.Filename)$(PackageVersion)%(NuGetPackageVersionTemplate.Extension)" />
     </ItemGroup>
   </Target>
-
-
-
 </Project>

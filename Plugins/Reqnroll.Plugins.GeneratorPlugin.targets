@@ -1,0 +1,155 @@
+<Project>
+  <!--
+  REQNROLL GENERATOR PLUGIN SDK
+  
+  This file defines properties and extensions to MSBuild which ensure a generator plugin is built and packed correctly.
+  
+  The generator is loaded into the MSBuild runtime during project builds. Extensions to the generator are delivered as
+  MSBUild-extension packages, independant from the runtime assemblies. The plugin assembly is packaged into the /build
+  path, including all any dependencies that are not provided by the generator or the MSBuild runtime.
+  
+  NuGet package layout:
+  /assets
+    /icon.png <- The package icon
+  /build      <- Contains a copy of all files from the project's /build folder
+    /<tfm>    <- Contains the plugin assembly compiled for that Target Framework plus redestributable dependencies
+  -->
+
+  <PropertyGroup>
+    <!-- Assemble output in the build path -->
+    <BuildOutputTargetFolder Condition="'$(BuildOutputTargetFolder)' == ''">build</BuildOutputTargetFolder>
+
+    <!-- This is required to ensure dependencies are made available for packing -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- Generates a dependency file to help MSBuild load dependencies -->
+    <GenerateDependencyFile>true</GenerateDependencyFile>
+
+    <!-- Assembly signing -->
+    <AssemblyOriginatorKeyFile>$(ReqnrollKeyFile)</AssemblyOriginatorKeyFile>
+    <SignAssembly>$(ReqnrollEnableStrongNameSigning)</SignAssembly>
+    <PublicSign>$(ReqnrollPublicSign)</PublicSign>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- All generator plugins must reference the generator. -->
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll.Generator/Reqnroll.Generator.csproj" PrivateAssets="all" />
+
+    <!-- All generator projects must declare a reference to the Reqnroll runtime to ensure version compatibility. -->
+    <ProjectReference Include="$(MSBuildThisFileDirectory)../Reqnroll/Reqnroll.csproj" />
+  </ItemGroup>
+
+  <!-- Build assets are included in the package. -->
+  <ItemGroup>
+    <None Include="build/**" Pack="true" PackagePath="build" />
+    <UpToDateCheckInput Include="build/**" />
+  </ItemGroup>
+
+  <!-- Mark all package as private so they don't get declared in the NuGet depdendencies. -->
+  <ItemGroup>
+    <PackageReference Update="@(PackageReference)">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!-- Suppress NU5128 - We deliberately don't include lib or refs in a Generator plugin. -->
+    <NoWarn>$(NoWarn);NU5128</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);ResolveRedistributableAssemblies</TargetsForTfmSpecificBuildOutput>
+    <ResolveRedistributableAssembliesDependsOn>ResolveAssemblyReferences</ResolveRedistributableAssembliesDependsOn>
+  </PropertyGroup>
+
+  <!-- Resolves the additional assemblies that will be provided to the runtime through this package. -->
+  <Target
+    Name="ResolveRedistributableAssemblies"
+    Returns="RedistributableAssembly"
+    DependsOnTargets="$(ResolveRedistributableAssembliesDependsOn)">
+
+    <ItemGroup>
+      <RedistributableAssembly Include="@(ReferenceCopyLocalPaths)" />
+      
+      <!-- Remove system assemblies. -->
+      <RedistributableAssembly
+        Remove="@(RedistributableAssembly)"
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(RedistributableAssembly.NuGetPackageId)' == ''" />
+
+      <!-- Remove Visual Studio assemblies. -->
+      <RedistributableAssembly
+        Remove="@(RedistributableAssembly)"
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
+
+      <!-- Remove netstandard -->
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'netstandard'" />
+
+      <!-- Remove libraries provided via the Reqnroll MSBuild Generator. -->
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Cucumber.HtmlFormatter'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Cucumber.Messages'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'CucumberExpressions'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Gherkin'" />
+                                       
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Bcl.AsyncInterfaces'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Extensions.DependencyModel'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.NET.StringTools'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Win32.Primitives'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Win32.Registry'" />
+      
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Generator'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Parser'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Tools.MsBuild.Generation'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Utils'" />
+      
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Buffers'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.CodeDom'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Collections.Immutable'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.AttributedModel'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Convention'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Hosting'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Runtime'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.TypedParts'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Configuration.ConfigurationManager'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Memory'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Numerics.Vectors'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Emit'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Emit.ILGeneration'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Metadata'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Runtime.CompilerServices.Unsafe'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.AccessControl'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.Cryptography.ProtectedData'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.Principal.Windows'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Encoding.CodePages'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Encodings.Web'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Json'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Channels'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Tasks.Dataflow'" />
+      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Tasks.Extensions'" />
+    </ItemGroup>
+
+  </Target>
+
+  <PropertyGroup>
+    <CollectRedistributableAssembliesDependsOn>ResolveRedistributableAssemblies</CollectRedistributableAssembliesDependsOn>
+  </PropertyGroup>
+
+  <!-- Include redistributable assemblies in the package. -->
+  <Target
+    Name="CollectRedistributableAssemblies"
+    AfterTargets="CoreCompile"
+    DependsOnTargets="$(CollectRedistributableAssembliesDependsOn)">
+
+    <ItemGroup>
+      <BuildOutputInPackage
+        Include="@(RedistributableAssembly)"
+        TargetPath="%(RedistributableAssembly.DestinationSubPath)"/>
+
+      <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
+      <BuildOutputInPackage
+        Include="$(ProjectDepsFilePath)"
+        TargetPath="$(ProjectDepsFileName)"
+        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'"/>
+    </ItemGroup>
+  </Target>
+</Project>
