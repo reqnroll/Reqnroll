@@ -7,32 +7,29 @@ namespace Reqnroll.Analyzers.StepDefinitions;
 using static DiagnosticResources;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class StepMethodMustReturnVoidOrTaskAnalyzer : StepMethodAnalyzer
+public class AsyncStepMethodReturnTypeAnalyzer : StepMethodAnalyzer
 {
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
     internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-        "RR1002",
-        CreateResourceString(nameof(StepMethodMustReturnVoidOrTaskTitle)),
-        CreateResourceString(nameof(StepMethodMustReturnVoidOrTaskMessage)),
+        "RR1003",
+        CreateResourceString(nameof(AsyncStepMethodMustReturnTaskTitle)),
+        CreateResourceString(nameof(AsyncStepMethodMustReturnTaskMessage)),
         DiagnosticCategory.Usage,
         DiagnosticSeverity.Error,
         true);
 
-    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
-        ImmutableArray.Create(Rule);
+    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 
     protected override void AnalyzeStepMethod(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol)
     {
         var methodSyntax = (MethodDeclarationSyntax)context.Node;
 
-        if (methodSymbol.ReturnsVoid || methodSymbol.ReturnType.ToDisplayString() == "System.Threading.Tasks.Task")
+        if (methodSymbol.IsAsync && methodSymbol.ReturnsVoid)
         {
-            return;
+            var methodName = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
+
+            context.ReportDiagnostic(
+                Diagnostic.Create(Rule, methodSyntax.Identifier.GetLocation(), methodName, "async"));
         }
-
-        var methodName = $"{methodSymbol.ContainingType.Name}.{methodSymbol.Name}";
-
-        context.ReportDiagnostic(
-            Diagnostic.Create(Rule, methodSyntax.Identifier.GetLocation(), methodName, "void"));
     }
 }
