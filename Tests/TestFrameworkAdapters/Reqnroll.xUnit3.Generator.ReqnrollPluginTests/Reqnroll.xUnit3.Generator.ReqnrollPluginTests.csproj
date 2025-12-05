@@ -32,6 +32,6 @@
     <Using Include="Xunit" />
   </ItemGroup>
 
-  <Import Project="..\TestFrameworkPlugin.Tests.Shared\TestFrameworkPlugin.Tests.Shared.projitems" Label="Shared" />
+  <Import Project="..\TestFrameworkAdapter.Tests.Shared\TestFrameworkPlugin.Tests.Shared.projitems" Label="Shared" />
 
 </Project>
