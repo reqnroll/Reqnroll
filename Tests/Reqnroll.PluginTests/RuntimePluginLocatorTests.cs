@@ -53,8 +53,10 @@ namespace Reqnroll.PluginTests
                 "Reqnroll.Autofac.ReqnrollPlugin.dll", 
                 "Reqnroll.ExternalData.ReqnrollPlugin.dll",
                 "Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll",
-                "Reqnroll.MSTest.ReqnrollPlugin.dll",
-                "Reqnroll.NUnit.ReqnrollPlugin.dll",
+                "Reqnroll.MSTest.Generator.ReqnrollPlugin.dll", 
+                "Reqnroll.MSTest.ReqnrollPlugin.dll", 
+                "Reqnroll.NUnit.Generator.ReqnrollPlugin.dll", 
+                "Reqnroll.NUnit.ReqnrollPlugin.dll",                 
                 "Reqnroll.PluginTests.dll", // This test assembly
                 "Reqnroll.Windsor.ReqnrollPlugin.dll",
                 "Reqnroll.xUnit.ReqnrollPlugin.dll",
