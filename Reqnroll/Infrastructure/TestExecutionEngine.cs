@@ -451,10 +451,7 @@ namespace Reqnroll.Infrastructure
         }
 
         private ScenarioExecutionStatus GetStatusFromException(Exception exception)
-        {
-            // handle generic exception types
-            if (exception is NotImplementedException)
-                return ScenarioExecutionStatus.StepDefinitionPending;
+        {            
             if (exception is PendingScenarioException) // this exception should not be thrown by steps (for that we have PendingStepException), but in case it does, we detect it
                 return ScenarioExecutionStatus.StepDefinitionPending;
 
