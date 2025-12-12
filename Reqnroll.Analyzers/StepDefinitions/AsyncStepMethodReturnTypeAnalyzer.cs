@@ -11,7 +11,7 @@ public class AsyncStepMethodReturnTypeAnalyzer : StepMethodAnalyzer
 {
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
     internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-        "RR1003",
+        "RR1004",
         CreateResourceString(nameof(AsyncStepMethodMustReturnTaskTitle)),
         CreateResourceString(nameof(AsyncStepMethodMustReturnTaskMessage)),
         DiagnosticCategory.Usage,
