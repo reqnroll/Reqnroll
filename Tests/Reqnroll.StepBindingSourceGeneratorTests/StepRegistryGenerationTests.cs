@@ -30,8 +30,11 @@ public class StepRegistryGenerationTests
 
         using var assemblyContext = result.CompileAssembly();
 
-        assemblyContext.Assembly.ExportedTypes.Should()
-            .Contain(type => type.Name == "ReqnrollStepRegistry" && type.Namespace == "Sample.Tests");
+        var registryAttribute = (StepDefinitionRegistryAttribute)assemblyContext.Assembly
+            .GetCustomAttributes(typeof(StepDefinitionRegistryAttribute), false)
+            .Should().ContainSingle().Subject;
+
+        registryAttribute.RegistryType.Assembly.Should().BeSameAs(assemblyContext.Assembly);
     }
 
     [Fact]
@@ -59,7 +62,11 @@ public class StepRegistryGenerationTests
 
         using var assemblyContext = result.CompileAssembly();
 
-        var registryType = assemblyContext.Assembly.ExportedTypes.Single(type => type.Name == "ReqnrollStepRegistry");
+        var registryAttribute = (StepDefinitionRegistryAttribute)assemblyContext.Assembly
+            .GetCustomAttributes(typeof(StepDefinitionRegistryAttribute), false)
+            .Single();
+
+        var registryType = registryAttribute.RegistryType;
 
         registryType.Should().Implement<IStepDefinitionDescriptorsProvider>();
     }
@@ -88,8 +95,12 @@ public class StepRegistryGenerationTests
         result.Diagnostics.Should().BeEmpty();
 
         using var assemblyContext = result.CompileAssembly();
+        
+        var registryAttribute = (StepDefinitionRegistryAttribute)assemblyContext.Assembly
+            .GetCustomAttributes(typeof(StepDefinitionRegistryAttribute), false)
+            .Single();
 
-        var registryType = assemblyContext.Assembly.ExportedTypes.Single(type => type.Name == "ReqnrollStepRegistry");
+        var registryType = registryAttribute.RegistryType;
 
         registryType.Should().HaveProperty(registryType, "Instance").Which.Should().BeReadable();
 

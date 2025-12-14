@@ -1,13 +1,11 @@
 ﻿
-
-
 namespace Reqnroll.StepBindingSourceGenerator;
 
-internal class RegistryClassEmitter(string @namespace)
+internal class RegistryClassEmitter(string @namespace, string className)
 {
     public string Namespace { get; } = @namespace;
 
-    public string ClassName { get; } = "ReqnrollStepRegistry";
+    public string ClassName { get; } = className;
 
     /// <summary>
     /// Emits a partial class definition that contains the constructor of the registry class. The constructor has the
@@ -61,10 +59,8 @@ internal class RegistryClassEmitter(string @namespace)
                 {
                     foreach (var stepDefinitionGroup in stepDefinitionGroups)
                     {
-                        builder
-                            .Append("Register")
-                            .Append(stepDefinitionGroup.GroupName)
-                            .AppendLine("();");
+                        AppendStepGroupRegisterMethodNameTo(builder, stepDefinitionGroup);
+                        builder.AppendLine("();");
                     }
                 });
             });
@@ -91,12 +87,42 @@ internal class RegistryClassEmitter(string @namespace)
 
             builder.AppendBodyBlock(builder =>
             {
-                builder.Append("private void Register").Append(stepGroup.GroupName).AppendLine("()");
+                builder.Append("private void ");
+                AppendStepGroupRegisterMethodNameTo(builder, stepGroup);
+                builder.AppendLine("()");
                 builder.AppendBodyBlock(builder => AppendStepGroupRegisterMethodBodyTo(builder, stepGroup));
             });
         });
 
         return builder.ToString();
+    }
+
+    private void AppendStepGroupRegisterMethodNameTo(CSharpBuilder builder, StepDefinitionGroup stepGroup)
+    {
+        builder.Append("Register_");
+
+        var className = stepGroup.DeclaringClassName;
+        var ns = className.Namespace;
+
+        AppendNamespaceAsIdentifierTo(builder, ns);
+
+        builder.Append('_');
+
+        foreach (var c in className.Name)
+        {
+            builder.Append(CSharpSyntaxHelper.IsValidInIdentifier(c) ? c : '_');
+        }
+    }
+
+    private void AppendNamespaceAsIdentifierTo(CSharpBuilder builder, Namespace ns)
+    {
+        if (ns.Parent != null)
+        {
+            AppendNamespaceAsIdentifierTo(builder, ns.Parent);
+            builder.Append('_');
+        }
+
+        builder.Append(ns.Name);
     }
 
     private void AppendStepGroupRegisterMethodBodyTo(CSharpBuilder builder, StepDefinitionGroup stepGroup)

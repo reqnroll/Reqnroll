@@ -1,15 +1,37 @@
 ﻿using Microsoft.CodeAnalysis;
 using System.Collections.Immutable;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Xml.Linq;
 
 namespace Reqnroll.StepBindingSourceGenerator;
 
 [Generator(LanguageNames.CSharp)]
 public class CSharpStepBindingGenerator : IIncrementalGenerator
 {
+    private const string GeneratedStepBindingsNamespace = "Reqnroll.Generated.StepBindings";
+
+    private static readonly char[] InvalidHintPathChars = [.. Path.GetInvalidFileNameChars(), '.'];
+
     public void Initialize(IncrementalGeneratorInitializationContext context)
     {
+        // Get the assembly name and project it into the registry type name.
+        var registryName = context.CompilationProvider
+            .Select(static (compilation, _) =>
+            {
+                var assemblyName = compilation.AssemblyName ?? "Anonymous";
+
+                const string prefix = "StepRegistry_";
+
+                // Replace invalid chars with underscores
+                var sb = new StringBuilder(prefix, assemblyName.Length + prefix.Length);
+                foreach (var ch in assemblyName)
+                {
+                    sb.Append(char.IsLetterOrDigit(ch) ? ch : '_');
+                }
+
+                return sb.ToString();
+            });
+
         // Obtain step definitions by looking for the various attributes
         var givenStepDefinitions = context
             .GetStepDefinitionSyntaxInfo("Reqnroll.GivenAttribute", StepKeywordMatch.Given);
@@ -70,92 +92,50 @@ public class CSharpStepBindingGenerator : IIncrementalGenerator
             .SelectMany(static (definitions, _) =>
             {
                 // Group step definitions by their declaring class
-                var groups = definitions
+                return definitions
                     .GroupBy(static definition => definition.Method.DeclaringClassName)
-                    .ToDictionary(static group => group.Key, group => group.ToImmutableArray()); 
-
-                var nameMap = new Dictionary<QualifiedTypeName, string>();
-                var result = ImmutableList.CreateBuilder<StepDefinitionGroup>();
-
-                foreach (var group in groups)
-                {
-                    // If the name already exists in the map, use it.
-                    if (nameMap.TryGetValue(group.Key, out var name))
-                    {
-                        result.Add(new StepDefinitionGroup(name, group.Value));
-                        continue;
-                    }
-
-                    // If the class name is unique, use it directly.
-                    if (groups.Keys.Count(key => key.Name == group.Key.Name) == 1)
-                    {
-                        result.Add(new StepDefinitionGroup(group.Key.Name, group.Value));
-                        continue;
-                    }
-
-                    // If there are multiple classes with the same name, prefix with the namespace parts until all are unique.
-                    var collisions = groups.Keys.Where(key => key.Name == group.Key.Name).ToArray();
-                    var candiates = collisions.Select(static qualifiedName => qualifiedName.Name).ToArray();
-                    var namespaces = collisions.Select(static qualifiedName => qualifiedName.Namespace).ToArray<Namespace?>();
-
-                    do
-                    {
-                        var noMoreParts = true;
-
-                        for (var i = 0; i < collisions.Length; i++)
-                        {
-                            var ns = namespaces[i];
-
-                            if (ns != null)
-                            { 
-                                // Prepend the next namespace part to the candidate.
-                                candiates[i] = ns.Name + "_" + candiates[i];
-                                namespaces[i] = ns.Parent;
-                                noMoreParts = false;
-                            }
-                        }
-
-                        if (noMoreParts)
-                        {
-                            // This would mean there are two or more step class symbols with the same name.
-                            break;
-                        }
-                    }
-                    while (candiates.Distinct().Count() != candiates.Length);
-
-                    // Include all generated names in the map to avoid reprocessing.
-                    for (var i = 0; i < collisions.Length; i++)
-                    {
-                        nameMap[collisions[i]] = candiates[i];
-                    }
-
-                    // Add the group for the generated name
-                    result.Add(new StepDefinitionGroup(nameMap[group.Key], group.Value));
-                }
-
-                return result;
+                    .ToDictionary(static group => group.Key, group => group.ToImmutableArray())
+                    .Select(static group => new StepDefinitionGroup(group.Key, group.Value));
             });
 
         // Output the step registry constructor which roots all defined step methods
-        context.RegisterSourceOutput(stepGroups.Collect(), (context, stepGroups) =>
+        var registryClassInputs = registryName.Combine(stepGroups.Collect());
+
+        context.RegisterSourceOutput(registryClassInputs, (context, inputs) =>
         {
+            var (registryName, stepGroups) = inputs;
+
             if (!stepGroups.Any())
             {
                 return;
             }
 
-            var emitter = new RegistryClassEmitter("Sample.Tests");
+            var emitter = new RegistryClassEmitter(GeneratedStepBindingsNamespace, registryName);
 
             context.AddSource("ReqnrollStepRegistry.g.cs", emitter.EmitRegistryClassConstructor(stepGroups));
         });
 
         // Output the step catalog classes
-        context.RegisterSourceOutput(stepGroups, (context, stepGroup) =>
+        var stepGroupInputs = stepGroups.Combine(registryName);
+
+        context.RegisterSourceOutput(stepGroupInputs, (context, inputs) =>
         {
-            var emitter = new RegistryClassEmitter("Sample.Tests");
+            var (stepGroup, registryName) = inputs;
+
+            var emitter = new RegistryClassEmitter(GeneratedStepBindingsNamespace, registryName);
+
+            // Produce a unique hint name from the qualified class name.
+            var hintName = new StringBuilder();
+
+            foreach (var c in stepGroup.DeclaringClassName.ToString())
+            {
+                hintName.Append(InvalidHintPathChars.Contains(c) ? '_' : c);
+            }
+
+            hintName.Append(".g.cs");
 
             context.AddSource(
-                $"{stepGroup.GroupName}.g.cs",
+                hintName.ToString(),
                 emitter.EmitStepGroupRegisterMethod(stepGroup));
         });
     }
