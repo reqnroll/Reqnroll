@@ -58,6 +58,10 @@
       Include="..\..\Reqnroll.Analyzers\Reqnroll.Analyzers.csproj"
       ReferenceOutputAssembly="false"
       OutputItemType="Analyzer" />
+    <ProjectReference
+      Include="..\..\Reqnroll.StepBindingSourceGenerator\Reqnroll.StepBindingSourceGenerator.csproj"
+      ReferenceOutputAssembly="false"
+      OutputItemType="Analyzer" />
   </ItemGroup>
 
   <ItemGroup>
