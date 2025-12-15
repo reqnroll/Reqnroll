@@ -12,28 +12,34 @@ public class GeneratedFileWriter(IReqnrollTaskLoggingHelper log)
     public void WriteGeneratedFile(string outputPath, string generatedFileContent)
     {
         log.LogTaskDiagnosticMessage($"Writing data to {outputPath}");
-        WriteFileIfChanged(outputPath, generatedFileContent);
+        WriteFile(outputPath, generatedFileContent);
     }
 
-    private void WriteFileIfChanged(string filePath, string content)
+    public void DeleteGeneratedFile(string outputPath)
     {
-        if (File.Exists(filePath))
-        {
-            if (!FileSystemHelper.FileCompareContent(filePath, content))
-            {
-                WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
-            }
-        }
-        else
-        {
-            string directoryPath = Path.GetDirectoryName(filePath);
-            if (directoryPath != null && !Directory.Exists(directoryPath))
-            {
-                Directory.CreateDirectory(directoryPath);
-            }
+        if (!File.Exists(outputPath))
+            return;
 
-            WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
+        log.LogTaskDiagnosticMessage($"Deleting {outputPath}");
+        try
+        {
+            File.Delete(outputPath);
         }
+        catch (IOException ex)
+        {
+            log.LogTaskDiagnosticMessage($"Failed to delete {outputPath}: {ex.Message}.");
+        }
+    }
+
+    private void WriteFile(string filePath, string content)
+    {
+        string directoryPath = Path.GetDirectoryName(filePath);
+        if (directoryPath != null && !Directory.Exists(directoryPath))
+        {
+            Directory.CreateDirectory(directoryPath);
+        }
+
+        WriteAllTextWithRetry(filePath, content, Encoding.UTF8);
     }
 
     /// <summary>

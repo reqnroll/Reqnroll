@@ -1,6 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Copyright, Microsoft Corporation, All rights reserved.-->
-    
 <Rule
     Name="Feature"
     DisplayName="Feature"
@@ -9,26 +7,24 @@
     xmlns="http://schemas.microsoft.com/build/2009/properties">
 
     <Rule.DataSource>
-        <DataSource Persistence="ProjectFile" HasConfigurationCondition="True" ItemType="ReqnrollFeatureFiles" />
+        <DataSource Persistence="ProjectFile" HasConfigurationCondition="True" ItemType="ReqnrollFeatureFile" />
     </Rule.DataSource>
 
 
     <StringProperty Name="Identity" DisplayName="File Name" ReadOnly="true" Category="Misc">
         <StringProperty.DataSource>
-            <DataSource Persistence="Intrinsic" ItemType="ReqnrollFeatureFiles" PersistedName="Identity" />
+            <DataSource Persistence="Intrinsic" ItemType="ReqnrollFeatureFile" PersistedName="Identity" />
         </StringProperty.DataSource>
     </StringProperty>
 
     <StringProperty Name="FullPath" DisplayName="Full Path" ReadOnly="true" Category="Misc">
         <StringProperty.DataSource>
-            <DataSource Persistence="Intrinsic" ItemType="ReqnrollFeatureFiles" PersistedName="FullPath" />
+            <DataSource Persistence="Intrinsic" ItemType="ReqnrollFeatureFile" PersistedName="FullPath" />
         </StringProperty.DataSource>
     </StringProperty>
 
-    <!--<BoolProperty Name="Visible" Visible="true" />-->
     <StringProperty Name="DependentUpon" Visible="false" />
     <StringProperty Name="Link" Visible="false" />
-    <StringProperty Name="Generator" Visible="true" DisplayName="Custom Tool"/>
-
+    <StringProperty Name="Generator" Visible="false" DisplayName="Custom Tool"/>
 
 </Rule>

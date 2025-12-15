@@ -1,6 +1,6 @@
 # How to configure Cucumber Expression behavior for large legacy projects
 
-Reqnroll uses Cucumber Expressions as the default method to connect step definitions to steps, while regular expressions are still supported. Cucumber expressions are provide a nice and convenient way to define which step should match to a step definition, but if you migrated a large project that uses regular expressions extensively, you might run into some issues.
+Reqnroll uses Cucumber Expressions as the default method to connect step definitions to steps, while regular expressions are still supported. Cucumber expressions provide a nice and convenient way to define which step should match to a step definition, but if you migrated a large project that uses regular expressions extensively, you might run into some issues.
 
 The main problem is that Reqnroll needs to decide based on an expression whether it is a regular expression or a cucumber expression. As SpecFlow introduced regular expression support without forcing the users to use the regex start (`^`) and end (`$`) markers, this is not an easy task to do. Reqnroll uses some heuristics to make the decision:
 

@@ -14,5 +14,6 @@ namespace Reqnroll.TestProjectGenerator.Data
         Net481,
         Net80,
         Net90,
+        Net100,
     }
 }

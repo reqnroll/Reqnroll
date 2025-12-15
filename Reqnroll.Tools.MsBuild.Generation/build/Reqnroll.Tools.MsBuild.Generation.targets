@@ -17,67 +17,137 @@
   <PropertyGroup Condition="'$(BuildServerMode)' == ''">
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'=='true'">false</BuildServerMode>
     <BuildServerMode Condition="'$(BuildingInsideVisualStudio)'!='true'">true</BuildServerMode>
-
-    <!--
-      net.sdk experimental support:
-      - currently we only want to support either classic project system or netsdk project system.
-      - currently we don't want to support globbing with classic project system => ensure globbing only get enabled with 'UsingMicrosoftNETSdk'
-      - currently we are supporting $(EnableDefaultCompileItems) for disabling globbing support for codebehind files
-    -->
-    <_ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)' == '' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_ReqnrollEnableDefaultCompileItems>
-    <_ReqnrollEnableDefaultCompileItems Condition="'$(ReqnrollEnableDefaultCompileItems)' == 'true' And '$(UsingMicrosoftNETSdk)' == 'true'">true</_ReqnrollEnableDefaultCompileItems>
   </PropertyGroup>
 
   <PropertyGroup>
     <CleanDependsOn>
       CleanFeatureFilesInProject;
+      CleanObsoleteCodeBehindFilesInProject;
       $(CleanDependsOn)
     </CleanDependsOn>
-    <RebuildDependsOn>
-      SwitchToForceGenerate;
-      $(RebuildDependsOn)
-    </RebuildDependsOn>
   </PropertyGroup>
 
-  <!--
-    net.sdk support: update default compile items to show generated files as nested items
-  -->
-  <ItemGroup Condition="'$(_ReqnrollEnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' ">
-    <Compile Update="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
-             DependentUpon="%(Filename)"
-             AutoGen="true"
-             DesignTime="true"
-             Visible="true"
-             Condition="'$(EnableDefaultCompileItems)' == 'true'" />
-
+  <!--backwards compatibility: use the items declared with the old name 'ReqnrollFeatureFiles' as new name 'ReqnrollFeatureFile'  -->
+  <!-- We should consider replacing this with an error in v4 (breaking change) and in v5 remove it entirely. -->
+  <ItemGroup>
+    <ReqnrollFeatureFile Include="@(ReqnrollFeatureFiles)">
+      <Visible>true</Visible>
+    </ReqnrollFeatureFile>
   </ItemGroup>
 
+  <ItemGroup>
 
-  <Target Name="WarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile" AfterTargets="CoreCompile"
-          Condition="'$(ReqnrollEnableWarnForFeatureCodeBehindFilesWithoutCorrespondingFeatureFile)' == 'true'">
-    <Warning Text="For codebehind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'@(ReqnrollObsoleteCodeBehindFiles)' != ''" />
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" >
+      <NormalizedLogicalName>$([System.String]::Copy('%(Identity)').Replace('\','/'))</NormalizedLogicalName>
+      <NormalizedRelativeDir>$([System.String]::Copy('%(RelativeDir)').Replace('..','_'))</NormalizedRelativeDir>
+    </ReqnrollFeatureFile>
+
+    <!-- use the 'Link' as logical name for embedded resources, instead of the '../xxx' path  -->
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)">
+      <NormalizedLogicalName Condition="'%(ReqnrollFeatureFile.Link)' != ''">$([System.String]::Copy('%(Link)').Replace('\','/'))</NormalizedLogicalName>
+    </ReqnrollFeatureFile>
+
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
+      <CodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+    </ReqnrollFeatureFile>
+
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'">
+      <CodeBehindFile>$(IntermediateOutputPath)%(NormalizedRelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</CodeBehindFile>
+      <LegacyCodeBehindFile>%(RelativeDir)%(Filename).feature$(DefaultLanguageSourceExtension)</LegacyCodeBehindFile>
+    </ReqnrollFeatureFile>
+
+    <ReqnrollFeatureFile Update="@(ReqnrollFeatureFile)" >
+      <MessagesFile>$(IntermediateOutputPath)%(NormalizedRelativeDir)%(Filename).feature.ndjson</MessagesFile>
+      <MessagesResourceName>%(NormalizedLogicalName).ndjson</MessagesResourceName>
+      <FeatureFileResourceName>%(NormalizedLogicalName)</FeatureFileResourceName>
+    </ReqnrollFeatureFile>
+
+    <!-- obsolete code-behind files, scenarios:
+         - after rename operation
+         - after deletion of a feature file
+         - after pulling latest changes from version control with above changes
+     -->
+    <ReqnrollObsoleteCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollFeatureFile->'%(CodeBehindFile)')" />
+    <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollFeatureFile->'%(LegacyCodeBehindFile)')" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />
+
+    <!-- legacy code-behind files: files in project folder when they should be in obj -->
+    <ReqnrollLegacyCodeBehindFiles Include="**\*.feature$(DefaultLanguageSourceExtension)" Exclude="$(DefaultItemExcludes);@(ReqnrollObsoleteCodeBehindFiles)" />
+  </ItemGroup>
+
+  <!--
+    Show code-behind files as nested items under feature files in Visual Studio Solution Explorer
+  -->
+  <ItemGroup Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'!='true'">
+    <Compile Update="@(ReqnrollFeatureFile->'%(CodeBehindFile)')" DependentUpon="%(Filename)" />
+  </ItemGroup>
+
+  <Target Name="WarnForObsoleteReqnrollCodeBehindFiles" AfterTargets="CoreCompile"
+          Condition="'$(ReqnrollWarnForObsoleteCodeBehindFiles)' == 'true' and '@(ReqnrollObsoleteCodeBehindFiles)' != ''">
+    <Warning Text="For code-behind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Set project property 'ReqnrollDeleteObsoleteCodeBehindFilesOnClean' to delete these files automatically on 'Clean' or 'Rebuild'." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' != 'true'" />
+    <Warning Text="For code-behind file '@(ReqnrollObsoleteCodeBehindFiles)', no feature file was found. Perform a 'Clean' or 'Rebuild' operation to get these obsolete files deleted." File="@(ReqnrollObsoleteCodeBehindFiles)" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'" />
   </Target>
 
+  <Target Name="WarnForLegacyReqnrollCodeBehindFiles" AfterTargets="CoreCompile"
+          Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true' and '@(ReqnrollLegacyCodeBehindFiles)' != ''">
 
-  <Target Name="SwitchToForceGenerate">
+    <Warning Text="Old code-behind files found in project folder, although Reqnroll is configured to store them in the 'obj' folder. Perform a 'Clean' or 'Rebuild' operation to get these old files deleted or set 'ReqnrollUseIntermediateOutputPathForCodeBehind' to 'false' to keep the code-behind files in the project folder. ('@(ReqnrollLegacyCodeBehindFiles)')" />
+  </Target>
+
+  <Target Name="ProcessReqnrollFeatureFilesInProject"
+          BeforeTargets="BeforeCompile;CoreCompile;AssignTargetPaths"
+          DependsOnTargets="PrepareForBuild;CoreProcessReqnrollFeatureFilesInProject;IncludeProcessedReqnrollItemsToBuildInputs" />
+
+  <!--
+    To regenerate code-behind files when core project settings or Reqnroll dependencies change, we create a cache file with a hash of relevant inputs.
+    We only change the file if the hash changes, so that MSBuild incremental build can work properly.
+  -->
+  <Target Name="ReqnrollCreateProcessFeatureFileInputsCacheFile">
     <PropertyGroup>
-      <ForceGeneration>true</ForceGeneration>
+      <ReqnrollProcessFeatureFileInputsCacheFile>$(IntermediateOutputPath)$(MSBuildProjectName).ProcessFeatureFileInputs.cache</ReqnrollProcessFeatureFileInputsCacheFile>
     </PropertyGroup>
+
+    <ItemGroup>
+      <ReqnrollProcessFeatureFileInputs Include="ProjectName">
+        <_ParameterValue>$(MSBuildProjectName)</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="RootNamespace">
+        <_ParameterValue>$(RootNamespace)</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="ReqnrollVersion">
+        <_ParameterValue>@(ReferencePath->WithMetadataValue('NuGetPackageId', 'Reqnroll')->'%(NuGetPackageVersion)')</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="ReqnrollAssemlyTimestamp">
+        <_ParameterValue>@(ReferencePath->WithMetadataValue('NuGetPackageId', 'Reqnroll')->'%(ModifiedTime)')</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+      <ReqnrollProcessFeatureFileInputs Include="ReqnrollGeneratorAssemlyTimestamp" Condition="Exists('$(ReqnrollGenerationTasksAssemblyPath)')">
+        <_ParameterValue>$([System.IO.File]::GetLastWriteTime('$(ReqnrollGenerationTasksAssemblyPath)').ToString("o"))</_ParameterValue>
+      </ReqnrollProcessFeatureFileInputs>
+    </ItemGroup>
+
+    <Hash ItemsToHash="@(ReqnrollProcessFeatureFileInputs->'%(Identity)%(_ParameterValue)')">
+      <Output TaskParameter="HashResult" PropertyName="_ReqnrollProcessFeatureFileInputsHash" />
+    </Hash>
+
+    <WriteLinesToFile Lines="$(_ReqnrollProcessFeatureFileInputsHash)" File="$(ReqnrollProcessFeatureFileInputsCacheFile)" Overwrite="True" WriteOnlyWhenDifferent="True" />
+
+    <!-- Ensure that the file is deleted on clean -->
+    <ItemGroup>
+      <FileWrites Include="$(ReqnrollProcessFeatureFileInputsCacheFile)" />
+    </ItemGroup>
   </Target>
 
-  <Target Name="UpdateFeatureFilesInProject"
-          DependsOnTargets="BeforeUpdateFeatureFilesInProject">
 
-    <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFiles)" Importance="normal" />
+  <Target Name="CoreProcessReqnrollFeatureFilesInProject"
+          DependsOnTargets="ReqnrollCreateProcessFeatureFileInputsCacheFile"
+          Inputs="@(ReqnrollFeatureFile);$(ReqnrollProcessFeatureFileInputsCacheFile);$(ReqnrollConfigFile)"
+          Outputs="@(ReqnrollFeatureFile -> '%(CodeBehindFile)');@(ReqnrollFeatureFile -> '%(MessagesFile)')">
+
+    <Message Text="[Reqnroll] FeatureFiles: @(ReqnrollFeatureFile)" Importance="normal" />
 
     <Error
-      Text="Reqnroll designer codebehind generation is not compatible with MSBuild codebehind generation. The custom tool must be removed from the file. See https://www.reqnroll.net/documentation/Generate-Tests-from-MsBuild"
+      Text="Reqnroll designer code-behind generation is not compatible with MSBuild code-behind generation. The custom tool must be removed from the file. See https://www.reqnroll.net/documentation/Generate-Tests-from-MsBuild"
       File="@(None)"
       Condition="%(None.Extension) == '.feature' AND %(None.Generator) == 'ReqnrollSingleFileGenerator'"/>
-
-    <!-- <PropertyGroup>
-      <ReqnrollCodeBehindOutputPath Condition=" '$(ReqnrollCodeBehindOutputPath)' == '' ">Features.Generated</ReqnrollCodeBehindOutputPath>
-    </PropertyGroup> -->
 
     <PropertyGroup Condition="'$(TargetFrameworkVersion)' != ''">
       <ReqnrollTargetFramework>$(TargetFrameworkVersion)</ReqnrollTargetFramework>
@@ -93,7 +163,7 @@
     <GenerateFeatureFileCodeBehindTask
       ProjectPath="$(MSBuildProjectFullPath)"
       OutputPath="$(ReqnrollCodeBehindOutputPath)"
-      FeatureFiles="@(ReqnrollFeatureFiles)"
+      FeatureFiles="@(ReqnrollFeatureFile)"
       RootNamespace="$(RootNamespace)"
       GeneratorPlugins="@(ReqnrollGeneratorPlugins)" 
       
@@ -110,92 +180,82 @@
 
     <Message Text="[Reqnroll] Generated code-behind file: %(ReqnrollGeneratedFiles.Identity)" Importance="normal" />
     <Message Text="[Reqnroll] Generated messages file: %(ReqnrollGeneratedFiles.MessagesFile)" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''" Importance="normal" />
+  </Target>
 
-    <!--
-      net.sdk support: globbing does not support including files which are dynamically generated inside targets, we have to manually update compile items
+  <Target Name="IncludeProcessedReqnrollItemsToBuildInputs" DependsOnTargets="CoreProcessReqnrollFeatureFilesInProject">
+    <!-- We need to process the item inclusions in a separate target, because if we process it in the
+         target that has inputs/outputs defined the order of the items will be dependent on what has changed 
+         (changed items will be processed last).
+         This is a problem, because the C# compiler only detects up-to-date state when the order of 
+         the Compile items is the same as in the previous build.
     -->
-    <ItemGroup Condition="'$(_ReqnrollEnableDefaultCompileItems)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true'">
 
-      <!-- if this is the first time generation of codebehind files, we have to manually add them as compile items -->
-      <Compile Include="@(ReqnrollFeatureFiles->'%(CodeBehindFile)')"
+    <!-- Include newly generated code-behind files in the compile item group -->
+    <!-- We only do this when the code-behind files are included to the project implicitly (without mentioning them in the project file) -->
+    <!-- This is required if the code-behind files are generated to the intermediate output path (obj folder), -->
+    <!-- or for SDK-style projects, unless EnableDefaultItems/EnableDefaultCompileItems is disabled by the user  -->
+    <ItemGroup Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true' or ('$(UsingMicrosoftNETSdk)' == 'true' and '$(EnableDefaultItems)' == 'true' and '$(EnableDefaultCompileItems)' == 'true')">
+
+      <!-- In case of using the 'obj' folder, we include the code-behind files to the 'Compile' group. -->
+      <!-- In case of storing the code-behind files in the project folder, only the first-time generated ones
+           need to be included, because the others were included automatically. We need the exclude statement 
+           to avoid re-adding the existing ones (would cause an error). -->
+      <Compile Include="@(ReqnrollFeatureFile->'%(CodeBehindFile)')"
                Exclude="@(Compile)"/>
-
-      <!--
-        eather if codebehind files are added manually to compile item group or are added by net.sdk globbing support,
-        ensure they are nested under feature files like in previous reqnroll versions
-        currently, we cannot use itemgroup update attribute inside a target because of some bugs in MSBuild (all items will be updated)
-        - https://github.com/Microsoft/msbuild/issues/1618
-        - https://github.com/Microsoft/msbuild/issues/2835
-        - https://github.com/Microsoft/msbuild/issues/1124
-      -->
-      <Compile DependentUpon="@(ReqnrollFeatureFiles)"
-               AutoGen="true"
-               DesignTime="true"
-               Visible="true"
-               Condition="'%(Compile.Identity)' == '@(ReqnrollFeatureFiles->'%(CodeBehindFile)')'" />
 
       <!-- remove files which got obsolete, typically after rename operation, or getting changes from source control -->
       <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
+
+      <!-- in case the code-behind files are saved to the obj folder, we remove the legacy code-behind files 
+           of the feature files from the project folder to avoid duplication. 
+           These files will be deleted on clean. -->
+      <Compile Remove="@(ReqnrollFeatureFile->'%(LegacyCodeBehindFile)')"
+               Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'"/>
     </ItemGroup>
 
-  </Target>
-
-  <Target Name="BeforeUpdateFeatureFilesInProject" BeforeTargets="UpdateFeatureFilesInProject">
-
-  </Target>
-
-  <PropertyGroup>
-    <CoreCompileDependsOn>
-      IncludeCodeBehindFilesInProject;
-      $(CoreCompileDependsOn)
-    </CoreCompileDependsOn>
-  </PropertyGroup>
-
-  <Target Name="IncludeCodeBehindFilesInProject" DependsOnTargets="UpdateFeatureFilesInProject">
-    
-    <ItemGroup Condition="'$(UsingMicrosoftNETSdk)' != 'true'">
-      <Compile Include="@(ReqnrollGeneratedFiles)" Exclude="@(Compile)" />
-    </ItemGroup>
-
-    <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
-      <EmbeddedResource Include="@(ReqnrollFeatureFiles)">
-        <LogicalName>%(ReqnrollFeatureFiles.NormalizedLogicalName)</LogicalName>
-      </EmbeddedResource>
-    </ItemGroup>
-  </Target>
-
-  <PropertyGroup>
-    <AssignTargetPathsDependsOn>
-      EmbedCucumberMessages;
-      $(AssignTargetPathsDependsOn)
-    </AssignTargetPathsDependsOn>
-  </PropertyGroup>
-
-  <Target Name="EmbedCucumberMessages" DependsOnTargets="UpdateFeatureFilesInProject">
-
+    <!-- Embed messages files as resource (required for Reqnroll) -->
     <ItemGroup>
-      <EmbeddedResource Include="@(ReqnrollGeneratedFiles->'%(MessagesFile)')" Condition="'%(ReqnrollGeneratedFiles.MessagesFile)' != ''">
-        <LogicalName>%(ReqnrollGeneratedFiles.MessagesResourceName)</LogicalName>
+      <!-- We need the condition because it can happen that the messages file is not generated, but we still want to be able to run the tests. 
+           In this case the task shows a warning anyway. -->
+      <EmbeddedResource Include="@(ReqnrollFeatureFile->'%(MessagesFile)')" Condition="Exists('%(ReqnrollFeatureFile.MessagesFile)')">
+        <LogicalName>%(ReqnrollFeatureFile.MessagesResourceName)</LogicalName>
       </EmbeddedResource>
+    </ItemGroup>
+
+    <!-- Embed feature files as resource, if requested -->
+    <ItemGroup Condition="'$(ReqnrollEmbedFeatureFiles)' == 'true'">
+      <EmbeddedResource Include="@(ReqnrollFeatureFile)">
+        <LogicalName>%(ReqnrollFeatureFile.FeatureFileResourceName)</LogicalName>
+      </EmbeddedResource>
+    </ItemGroup>
+
+  </Target>
+
+  <Target Name="CleanFeatureFilesInProject">
+    <!-- remove known code-behind files for existing feature files -->
+    <Delete Files="%(ReqnrollFeatureFile.CodeBehindFile)" ContinueOnError="true" />
+    <Delete Files="%(ReqnrollFeatureFile.MessagesFile)" ContinueOnError="true" />
+
+    <!-- delete legacy code-behind files -->
+    <Delete Files="@(ReqnrollLegacyCodeBehindFiles)" ContinueOnError="true" Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'" />
+    <ItemGroup Condition="'$(ReqnrollUseIntermediateOutputPathForCodeBehind)'=='true'">
+      <Compile Remove="@(ReqnrollLegacyCodeBehindFiles)" />
+      <ReqnrollLegacyCodeBehindFiles Remove="@(ReqnrollLegacyCodeBehindFiles)" />
     </ItemGroup>
   </Target>
 
-  <Target
-    Name="AfterUpdateFeatureFilesInProject"
-    DependsOnTargets="IncludeCodeBehindFilesInProject"
-    AfterTargets="IncludeCodeBehindFilesInProject">
-    <!-- include any generated Reqnroll files in the compilation of the project if not included yet -->
-  </Target>
-
-  <Target Name="CleanFeatureFilesInProject" Condition="'$(ReqnrollDeleteCodeBehindFilesOnCleanRebuild)' == 'true'">
-    <!-- remove known codebehind files for existing feature files -->
-    <Delete Files="%(ReqnrollFeatureFiles.CodeBehindFile)" ContinueOnError="true" />
-
-    <!-- remove obsolete codebehind files, scenarios:
+  <Target Name="CleanObsoleteCodeBehindFilesInProject" Condition="'$(ReqnrollDeleteObsoleteCodeBehindFilesOnClean)' == 'true'">
+    <!-- remove obsolete code-behind files, scenarios:
          - after rename operation
          - after deletion of a feature file
          - after pulling latest changes from version control with above changes
      -->
     <Delete Files="@(ReqnrollObsoleteCodeBehindFiles)" ContinueOnError="true" />
+    <ItemGroup>
+      <!-- We need to remove the deleted files from the lists, because otherwise a Visual Studio "rebuild" 
+           produces a missing file error as it does not clean the item groups between clean and build. -->
+      <Compile Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
+      <ReqnrollObsoleteCodeBehindFiles Remove="@(ReqnrollObsoleteCodeBehindFiles)" />
+    </ItemGroup>
   </Target>
 </Project>
