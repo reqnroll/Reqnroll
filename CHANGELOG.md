@@ -10,7 +10,6 @@
 * Support for linked feature files (files used from outside of the project folder). To use this feature, the `ReqnrollUseIntermediateOutputPathForCodeBehind` flag must be enabled (see above). (#948)
 * Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
 
-
 ## Bug fixes:
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
