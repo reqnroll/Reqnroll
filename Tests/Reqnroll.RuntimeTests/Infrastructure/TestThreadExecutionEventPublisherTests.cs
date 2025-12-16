@@ -252,7 +252,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var data = new TheoryData<Type, ScenarioExecutionStatus, bool>();
             (Type, ScenarioExecutionStatus)[] options = 
                 [
-                    (typeof(NotImplementedException), ScenarioExecutionStatus.StepDefinitionPending),
+                    (typeof(NotImplementedException), ScenarioExecutionStatus.TestError),
                     (typeof(PendingScenarioException), ScenarioExecutionStatus.StepDefinitionPending),
                     (typeof(InvalidOperationException), ScenarioExecutionStatus.TestError),
                     (typeof(ArgumentException), ScenarioExecutionStatus.TestError)
