@@ -9,6 +9,7 @@
 * Support for linked feature files (files used from outside of the project folder). To use this feature, the `ReqnrollUseIntermediateOutputPathForCodeBehind` flag must be enabled (see above). (#948)
 * Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
 * Updated Cucumber.HtmlFormatter to version 22 to support HTML reports on non-https URLs (#962)
+* NotImplementedException no longer maps to ScenarioExecutionStatus.StepDefinitionPending (#954)
 
 ## Bug fixes:
 
