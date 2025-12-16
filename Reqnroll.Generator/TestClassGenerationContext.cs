@@ -1,6 +1,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using Io.Cucumber.Messages.Types;
+using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 
@@ -37,6 +38,8 @@ namespace Reqnroll.Generator
         public string FeatureMessagesResourceName { get; set; }
         internal string FeatureMessages { get; set; }
         internal IEnumerable<Envelope> FeatureEnvelopes { get; set; }
+
+        public FeatureFileInput FeatureFileInput { get; set; }
 
         public TestClassGenerationContext(
             IUnitTestGeneratorProvider unitTestGeneratorProvider,

@@ -3,6 +3,7 @@ using Reqnroll.Configuration;
 using Reqnroll.Formatters.PayloadProcessing;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Generator.CodeDom;
+using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
@@ -48,13 +49,22 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
     public string TestClassNameFormat { get; set; } = "{0}Feature";
 
+    [Obsolete("Pass this via GenerateUnitTestFixture method in v4")]
+    internal FeatureFileInput FeatureFileInput { get; set; }
+
     public UnitTestFeatureGenerationResult GenerateUnitTestFixture(ReqnrollDocument document, string testClassName, string targetNamespace)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
+        var messagesResourceName = FeatureFileInput?.MessagesResourceName;
+        var featureFileInput = FeatureFileInput;
+#pragma warning restore CS0618 // Type or member is obsolete
         var codeNamespace = CreateNamespace(targetNamespace);
         var feature = document.ReqnrollFeature;
 
         testClassName ??= string.Format(TestClassNameFormat, feature.Name.ToIdentifier());
         var generationContext = CreateTestClassStructure(codeNamespace, testClassName, document);
+        generationContext.FeatureFileInput = featureFileInput;
+        generationContext.FeatureMessagesResourceName = messagesResourceName;
 
         SetupTestClass(generationContext);
         SetupTestClassInitializeMethod(generationContext);
@@ -145,7 +155,7 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         generationContext.TestClass.IsPartial = true;
         generationContext.TestClass.TypeAttributes |= TypeAttributes.Public;
 
-        _linePragmaHandler.AddLinePragmaInitial(generationContext.TestClass, generationContext.Document.SourceFilePath);
+        _linePragmaHandler.AddLinePragmaInitial(generationContext.TestClass, generationContext.Document.SourceFilePath, generationContext.FeatureFileInput?.CodeBehindFilePath);
 
         _testGeneratorProvider.SetTestClass(generationContext, generationContext.Feature.Name, generationContext.Feature.Description);
 
@@ -198,6 +208,7 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
 
     private void DeclareFeatureMessagesFactoryMembers(TestClassGenerationContext generationContext)
     {
+        [Obsolete("Backwards compatibility fallback, we can remove this in v4 once the MessagesResourceName is passed in to the GenerateUnitTestFixture method")]
         string GetFeatureMessagesResourceName()
         {
             try
@@ -225,7 +236,13 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
         try
         {
             var featureSource = CucumberMessagesConverter.ConvertToCucumberMessagesSource(generationContext.Document);
-            generationContext.FeatureMessagesResourceName = GetFeatureMessagesResourceName();
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (generationContext.FeatureMessagesResourceName == null)
+            {
+                // backwards compatibility fallback, we can remove this in v4 once the MessagesResourceName is passed in to the GenerateUnitTestFixture method
+                generationContext.FeatureMessagesResourceName = GetFeatureMessagesResourceName();
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
             var idGeneratorSeed = featureSource.Uri + featureSource.Data;
             var messageConverter = new CucumberMessagesConverter(new DeterministicIdGenerator(idGeneratorSeed));
             var featureGherkinDocumentMessage = messageConverter.ConvertToCucumberMessagesGherkinDocument(generationContext.Document);
@@ -240,6 +257,8 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
             generationContext.FeatureEnvelopes = envelopes;
             envelopeCount = envelopes.Count;
 
+            // Serialize each envelope and append into a ndjson format
+            generationContext.FeatureMessages = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
         }
         catch (System.Exception e)
         {

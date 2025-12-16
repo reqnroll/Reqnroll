@@ -12,6 +12,7 @@ namespace Reqnroll.Tools.MsBuild.Generation;
 
 public class GenerateFeatureFileCodeBehindTask : Task
 {
+    public const string LinkMetadata = "Link"; //in
     public const string CodeBehindFileMetadata = "CodeBehindFile"; //in
     public const string MessagesFileMetadata = "MessagesFile"; //in,out
     public const string MessagesResourceNameMetadata = "MessagesResourceName"; //out
@@ -48,7 +49,12 @@ public class GenerateFeatureFileCodeBehindTask : Task
         var generatorPlugins = GeneratorPlugins?.Select(gp => new GeneratorPluginInfo(gp.ItemSpec, GetPluginParameters(gp))).ToArray() ?? [];
         var featureFiles = FeatureFiles?
                            .Where(i => FileFilter.IsValidFile(i.ItemSpec))
-                           .Select(i => new ReqnrollFeatureFileInfo(i.ItemSpec, i.GetMetadata(CodeBehindFileMetadata), i.GetMetadata(MessagesFileMetadata)))
+                           .Select(i => new ReqnrollFeatureFileInfo(
+                                       i.ItemSpec, 
+                                       i.GetMetadata(LinkMetadata),
+                                       i.GetMetadata(CodeBehindFileMetadata), 
+                                       i.GetMetadata(MessagesFileMetadata), 
+                                       i.GetMetadata(MessagesResourceNameMetadata)))
                            .ToArray() ?? [];
 
         var msbuildInformationProvider = new MSBuildInformationProvider(MSBuildVersion);

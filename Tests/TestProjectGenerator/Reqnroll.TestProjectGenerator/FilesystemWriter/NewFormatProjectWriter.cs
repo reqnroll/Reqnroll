@@ -110,7 +110,7 @@ namespace Reqnroll.TestProjectGenerator.FilesystemWriter
                     }
                 }
 
-                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || f.BuildAction.ToUpper() == "NONE" && (f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy || f.AdditionalMsBuildProperties.Any())))
+                foreach (var file in project.Files.Where(f => f.BuildAction.ToUpper() == "CONTENT" || (f.CopyToOutputDirectory != CopyToOutputDirectory.DoNotCopy || f.AdditionalMsBuildProperties.Any())))
                 {
                     WriteFileReference(xw, file);
                     created = true;

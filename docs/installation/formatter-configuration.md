@@ -128,6 +128,10 @@ You can override different parts of the output file path:
 
 **Overriding path components with substitution variables:**
 
+```{note}
+Introduced in Reqnroll v3.3
+```
+
 You can use substitution variables in the `outputFilePath` to dynamically generate file or directory names based on runtime information. This is useful for organizing reports by build, branch, or other environment-specific data.
 
 #### Available Substitution Variables
