@@ -113,7 +113,7 @@ public class FeatureLevelMessagesTests
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(ndjsonContent));
 
         // Act
-        var sut = new FeatureLevelCucumberMessages(stream, "test", 2);
+        var sut = new FeatureLevelCucumberMessages(stream, 2);
 
         // Assert
         sut.Should().NotBeNull();
@@ -362,7 +362,7 @@ public class FeatureLevelMessagesTests
     [Fact]
     public void GetPickleIndexFromTestRow_ReturnsCorrectIndex()
     {
-        // Arrange: create pickles with row hash tags
+        // Arrange: create pickles with row-hash tags
         var pickle1 = new Pickle(
             id: "id1",
             name: "name1",
@@ -381,7 +381,7 @@ public class FeatureLevelMessagesTests
             uri: "",
             language: ""
         );
-        TestRowPickleMapper.MarkPickleWithRowHash(pickle2, "Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle2, "Feature", "Scenario", ["tag1"], ["val1"]);
 
         var envelopes = new List<Envelope>
             {
@@ -392,7 +392,7 @@ public class FeatureLevelMessagesTests
         var featureMessages = new FeatureLevelCucumberMessages(envelopes, 2);
 
         // Act
-        var index = featureMessages.GetPickleIndexFromTestRow("Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        var index = featureMessages.GetPickleIndexFromTestRow("Feature", "Scenario", ["tag1"], new[] { "val1" });
 
         // Assert
         Assert.Equal("1", index);
@@ -427,7 +427,7 @@ public class FeatureLevelMessagesTests
 
         var featureMessages = new FeatureLevelCucumberMessages(envelopes, 2);
 
-        var index = featureMessages.GetPickleIndexFromTestRow("Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        var index = featureMessages.GetPickleIndexFromTestRow("Feature", "Scenario", ["tag1"], new[] { "val1" });
 
         Assert.Null(index);
     }
@@ -463,7 +463,7 @@ public class FeatureLevelMessagesTests
             language: ""
         );
 
-        // All pickles get the same row hash tag
+        // All pickles get the same row-hash tag
         var feature = "Feature";
         var scenario = "Scenario";
         var tags = new[] { "tag1" };

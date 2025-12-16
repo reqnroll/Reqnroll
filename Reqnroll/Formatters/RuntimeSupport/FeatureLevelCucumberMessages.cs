@@ -19,7 +19,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     private readonly Lazy<IReadOnlyCollection<Envelope>> _embeddedEnvelopes;
     private Lazy<Source> _source;
     private Lazy<GherkinDocument> _gherkinDocument;
-    private ConcurrentDictionary<string, (List<int>, int)> _rowHashToPickleIndexMaps;
+    private ConcurrentDictionary<string, (List<int> PickleIndices, int NextToBeUsed)> _rowHashToPickleIndexMaps;
     private Lazy<IEnumerable<Pickle>> _pickles;
 
     internal int ExpectedEnvelopeCount { get; }
@@ -37,7 +37,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
     }
 
     // Internal constructor for testing with direct stream access
-    internal FeatureLevelCucumberMessages(Stream stream, string resourceNameOfEmbeddedMessages, int envelopeCount)
+    internal FeatureLevelCucumberMessages(Stream stream, int envelopeCount)
     {
         _embeddedEnvelopes = new Lazy<IReadOnlyCollection<Envelope>>(() => ReadEnvelopesFromStream(stream));
         ExpectedEnvelopeCount = envelopeCount;
@@ -53,6 +53,7 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 
         InitializeLazyProperties();
     }
+
     private void InitializeLazyProperties()
     {
         _source = new Lazy<Source>(() => _embeddedEnvelopes.Value.Select(e => e.Source).DefaultIfEmpty(null).FirstOrDefault(s => s != null));
@@ -61,13 +62,13 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         _rowHashToPickleIndexMaps = new ConcurrentDictionary<string, (List<int>, int)>();
 
         var pickles = _embeddedEnvelopes.Value.Select(e => e.Pickle).Where(p => p != null).ToArray();
-        for (int i = 0; i < pickles.Count(); i++)
+        for (int i = 0; i < pickles.Length; i++)
         {
             var p = pickles[i];
             if (TestRowPickleMapper.PickleHasRowHashMarkerTag(p, out var rowHash))
             {
                 var hashUseTracker = _rowHashToPickleIndexMaps.GetOrAdd(rowHash, (new List<int>(), 0));
-                hashUseTracker.Item1.Add(i);
+                hashUseTracker.PickleIndices.Add(i);
                 _rowHashToPickleIndexMaps[rowHash] = hashUseTracker;
                 TestRowPickleMapper.RemoveHashRowMarkerTag(p);
             }
@@ -135,24 +136,29 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
         var rowHash = TestRowPickleMapper.ComputeHash(featureName, scenarioOutlineName, tags, rowValuesStrings);
 
         // The _rowHashToPickleIndexMaps dictionary maps row hashes to a tuple of (List of pickle indices, current use index).
-        // We will round-robin through the list of pickle indices for each row hash as they are requested.
+        // We will apply a round-robin through the list of pickle indices for each row hash as they are requested.
 
         // Thread-safe update of useIndex using a loop and TryUpdate
         if (_rowHashToPickleIndexMaps.TryGetValue(rowHash, out var hashUseTracker))
         {
-            var (pickleIndices, useIndex) = hashUseTracker;
-            var pickleIndex = pickleIndices[useIndex];
-            var newUseCount = (useIndex + 1) % pickleIndices.Count;
+            // returns the pickle index to use and calculates an updated hashUseTracker for the next use
+            int AcquirePickleIndex(out (List<int> PickleIndices, int NextToBeUsed) nextHashUseTracker)
+            {
+                var result = hashUseTracker.PickleIndices[hashUseTracker.NextToBeUsed];
+                nextHashUseTracker = (hashUseTracker.PickleIndices, (hashUseTracker.NextToBeUsed + 1) % hashUseTracker.PickleIndices.Count);
+                return result;
+            }
+
+            var pickleIndex = AcquirePickleIndex(out var newHashUseTracker);
 
             // Try to update the useIndex atomically
-            while (!_rowHashToPickleIndexMaps.TryUpdate(rowHash, (pickleIndices, newUseCount), hashUseTracker))
+            while (!_rowHashToPickleIndexMaps.TryUpdate(rowHash, newHashUseTracker, hashUseTracker))
             {
                 // If update failed, reload and retry
                 if (!_rowHashToPickleIndexMaps.TryGetValue(rowHash, out hashUseTracker))
                     break;
-                (pickleIndices, useIndex) = hashUseTracker;
-                pickleIndex = pickleIndices[useIndex];
-                newUseCount = (useIndex + 1) % pickleIndices.Count;
+
+                pickleIndex = AcquirePickleIndex(out newHashUseTracker);
             }
 
             return pickleIndex.ToString();
@@ -160,5 +166,4 @@ public class FeatureLevelCucumberMessages : IFeatureLevelCucumberMessages
 
         return null;
     }
-
 }

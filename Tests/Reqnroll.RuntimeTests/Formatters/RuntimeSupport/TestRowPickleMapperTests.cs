@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Io.Cucumber.Messages.Types;
@@ -9,11 +8,6 @@ namespace Reqnroll.RuntimeTests.Formatters.RuntimeSupport;
 
 public class TestRowPickleMapperTests
 {
-    private PickleTag CreateTag(string name)
-    {
-        return new PickleTag(name, "");
-    }
-
     private Pickle CreatePickleWithTags(IEnumerable<PickleTag> tags)
     {
         return new Pickle(
@@ -30,16 +24,16 @@ public class TestRowPickleMapperTests
     [Fact]
     public void ComputeHash_ReturnsConsistentHash_ForSameInputs()
     {
-        var hash1 = TestRowPickleMapper.ComputeHash("Feature", "Scenario", new[] { "tag1", "tag2" }, new[] { "val1", "val2" });
-        var hash2 = TestRowPickleMapper.ComputeHash("Feature", "Scenario", new[] { "tag1", "tag2" }, new[] { "val1", "val2" });
+        var hash1 = TestRowPickleMapper.ComputeHash("Feature", "Scenario", ["tag1", "tag2"], ["val1", "val2"]);
+        var hash2 = TestRowPickleMapper.ComputeHash("Feature", "Scenario", ["tag1", "tag2"], ["val1", "val2"]);
         Assert.Equal(hash1, hash2);
     }
 
     [Fact]
     public void ComputeHash_DiffersForDifferentInputs()
     {
-        var hash1 = TestRowPickleMapper.ComputeHash("FeatureA", "Scenario", new[] { "tag1" }, new[] { "val1" });
-        var hash2 = TestRowPickleMapper.ComputeHash("FeatureB", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        var hash1 = TestRowPickleMapper.ComputeHash("FeatureA", "Scenario", ["tag1"], ["val1"]);
+        var hash2 = TestRowPickleMapper.ComputeHash("FeatureB", "Scenario", ["tag1"], ["val1"]);
         Assert.NotEqual(hash1, hash2);
     }
 
@@ -47,8 +41,8 @@ public class TestRowPickleMapperTests
     public void MarkPickleWithRowHash_AddsRowHashTag()
     {
         var pickle = CreatePickleWithTags(new List<PickleTag>());
-        TestRowPickleMapper.MarkPickleWithRowHash(pickle,  "Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
-        var expectedHash = TestRowPickleMapper.ComputeHash("Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle,  "Feature", "Scenario", ["tag1"], ["val1"]);
+        var expectedHash = TestRowPickleMapper.ComputeHash("Feature", "Scenario", ["tag1"], ["val1"]);
         Assert.Contains(pickle.Tags, t => t.Name == $"{TestRowPickleMapper.RowHashTagPrefix}{expectedHash}");
     }
 
@@ -56,9 +50,9 @@ public class TestRowPickleMapperTests
     public void PickleHasRowHashMarkerTag_ReturnsTrueAndHash_WhenTagPresent()
     {
         var pickle = CreatePickleWithTags(new List<PickleTag>());
-        TestRowPickleMapper.MarkPickleWithRowHash(pickle, "Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle, "Feature", "Scenario", ["tag1"], ["val1"]);
         var result = TestRowPickleMapper.PickleHasRowHashMarkerTag(pickle, out var hash);
-        var expectedHash = TestRowPickleMapper.ComputeHash("Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        var expectedHash = TestRowPickleMapper.ComputeHash("Feature", "Scenario", ["tag1"], ["val1"]);
         Assert.True(result);
         Assert.Equal(expectedHash, hash);
     }
@@ -76,7 +70,7 @@ public class TestRowPickleMapperTests
     public void RemoveHashRowMarkerTag_RemovesTag()
     {
         var pickle = CreatePickleWithTags(new List<PickleTag>());
-        TestRowPickleMapper.MarkPickleWithRowHash(pickle, "Feature", "Scenario", new[] { "tag1" }, new[] { "val1" });
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle, "Feature", "Scenario", ["tag1"], ["val1"]);
         TestRowPickleMapper.RemoveHashRowMarkerTag(pickle);
         Assert.DoesNotContain(pickle.Tags, t => t.Name.StartsWith(TestRowPickleMapper.RowHashTagPrefix));
     }

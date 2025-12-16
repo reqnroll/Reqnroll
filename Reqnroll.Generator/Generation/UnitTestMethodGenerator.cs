@@ -12,7 +12,6 @@ using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 using Reqnroll.Tracing;
 
-
 namespace Reqnroll.Generator.Generation
 {
     public class UnitTestMethodGenerator
@@ -462,10 +461,10 @@ namespace Reqnroll.Generator.Generation
             {
                 foreach (var row in examples.TableBody)
                 {
-                    var arguments = row.Cells.Select(c => c.Value);
+                    var arguments = row.Cells.Select(c => c.Value).ToArray();
                     _unitTestGeneratorProvider.SetRow(generationContext, scenarioOutlineTestMethod, arguments, GetNonIgnoreTags(examples.Tags), HasIgnoreTag(examples.Tags));
 
-                    // hash the featurename, scenariooutline name, example set tags and row values to create a unique id for the row.
+                    // hash the feature name, scenario outline name, example set tags and row values to create a unique id for the row.
                     // Look up the pickle in the generation context Feature Envelopes using the pickleIndex, and add the hash to the Pickle's list of tags.
                     var featureName = generationContext.Feature.Name;
                     var scenarioOutlineName = scenarioOutline.Name;
