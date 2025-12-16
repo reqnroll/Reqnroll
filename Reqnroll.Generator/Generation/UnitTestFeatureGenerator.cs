@@ -256,9 +256,6 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
             envelopes.AddRange(featurePickleMessages.Select(Envelope.Create));
             generationContext.FeatureEnvelopes = envelopes;
             envelopeCount = envelopes.Count;
-
-            // Serialize each envelope and append into a ndjson format
-            generationContext.FeatureMessages = string.Join(Environment.NewLine, envelopes.Select(NdjsonSerializer.Serialize));
         }
         catch (System.Exception e)
         {
