@@ -1,5 +1,6 @@
 using Io.Cucumber.Messages.Types;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -47,6 +48,11 @@ public static class TestRowPickleMapper
         {
             p.Tags.Remove(tag);
         }
+    }
+
+    public static string GetPickleIndexFromTestRow(FeatureInfo featureInfo, string featureName, string scenarioOutlineName, IEnumerable<string> tags, ICollection rowValues)
+    {
+        return featureInfo.FeatureCucumberMessages.GetPickleIndexFromTestRow(featureName, scenarioOutlineName, tags, rowValues);
     }
 }
 

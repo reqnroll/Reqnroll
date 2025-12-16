@@ -1,8 +1,6 @@
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Tracing;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 
@@ -52,11 +50,6 @@ namespace Reqnroll
             : this(language, folderPath, title, description, programmingLanguage, tags)
         {
             FeatureCucumberMessages = featureLevelCucumberMessages;
-        }
-
-        public string GetPickleIndexFromTestRow(string featureName, string scenarioOutlineName, IEnumerable<string> tags, ICollection rowValues)
-        {
-            return FeatureCucumberMessages.GetPickleIndexFromTestRow(featureName, scenarioOutlineName, tags, rowValues);
         }
     }
 }
