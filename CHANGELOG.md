@@ -2,6 +2,14 @@
 
 ## Improvements:
 
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.3.0 - 2025-12-17
+
+## Improvements:
+
 * NUnit dependencies are updated to v4.4.0 in templates. This does not impact Reqnroll compatibility. (#846)
 * Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. See https://docs.reqnroll.net/latest/installation/formatter-configuration.html#available-substitution-variables for details. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
