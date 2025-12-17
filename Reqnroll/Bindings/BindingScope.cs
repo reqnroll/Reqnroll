@@ -1,38 +1,26 @@
 using System;
 using System.Linq;
+using Cucumber.TagExpressions;
 
 namespace Reqnroll.Bindings
 {
-    public class BindingScope
+    public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle)
     {
-        public string Tag { get; private set; }
-        public string FeatureTitle { get; private set; }
-        public string ScenarioTitle { get; private set; }
+        public string Tag => tagExpression.ToString();
 
-        public BindingScope(string tag, string featureTitle, string scenarioTitle)
-        {
-            Tag = RemoveLeadingAt(tag);
-            FeatureTitle = featureTitle;
-            ScenarioTitle = scenarioTitle;
-        }
+        public string FeatureTitle { get; } = featureTitle;
 
-        private string RemoveLeadingAt(string tag)
-        {
-            if (tag == null || !tag.StartsWith("@"))
-                return tag;
-
-            return tag.Substring(1); // remove leading "@"
-        }
+        public string ScenarioTitle { get; } = scenarioTitle;
 
         public bool Match(StepContext stepContext, out int scopeMatches)
         {
             scopeMatches = 0;
 
-            var tags = stepContext.Tags;
-
             if (Tag != null)
             {
-                if (!tags.Contains(Tag))
+                var tags = stepContext.Tags.Select(t => "@" + t).ToList();
+
+                if (!tagExpression.Evaluate(tags))    
                     return false;
 
                 scopeMatches++;
@@ -64,7 +52,7 @@ namespace Reqnroll.Bindings
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((BindingScope) obj);
         }
 

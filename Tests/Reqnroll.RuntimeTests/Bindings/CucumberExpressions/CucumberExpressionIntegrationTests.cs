@@ -11,6 +11,7 @@ using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.Infrastructure;
 using Reqnroll.UnitTestProvider;
+using Cucumber.TagExpressions;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Bindings.CucumberExpressions;
@@ -152,6 +153,7 @@ public class CucumberExpressionIntegrationTests
             base.RegisterGlobalContainerDefaults(container);
             var stubUintTestProvider = new Mock<IUnitTestRuntimeProvider>();
             container.RegisterInstanceAs(stubUintTestProvider.Object, "nunit");
+            container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser(new TagExpressionParser()));
         }
     }
 
