@@ -13,6 +13,7 @@
 ## Bug fixes:
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
+* Fix: The configuration setting `generator/addNonParallelizableMarkerForTags` does not work for xUnit 3 (#917)
 
 *Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
 
