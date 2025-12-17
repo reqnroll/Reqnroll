@@ -3,7 +3,6 @@ using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
-using Reqnroll.CommonModels;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;

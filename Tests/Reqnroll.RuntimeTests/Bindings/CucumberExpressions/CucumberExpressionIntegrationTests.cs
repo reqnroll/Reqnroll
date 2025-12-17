@@ -1,17 +1,17 @@
-using Cucumber.TagExpressions;
-using FluentAssertions;
-using Moq;
-using Reqnroll.Bindings;
-using Reqnroll.Bindings.Discovery;
-using Reqnroll.Bindings.Reflection;
-using Reqnroll.BoDi;
-using Reqnroll.Infrastructure;
-using Reqnroll.UnitTestProvider;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Reqnroll.BoDi;
+using FluentAssertions;
+using Moq;
+using Reqnroll.Bindings;
+using Reqnroll.Bindings.Discovery;
+using Reqnroll.Bindings.Reflection;
+using Reqnroll.Infrastructure;
+using Reqnroll.UnitTestProvider;
+using Cucumber.TagExpressions;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Bindings.CucumberExpressions;

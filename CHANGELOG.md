@@ -4,7 +4,7 @@
 
 * Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
-* Tag Expressions: Step Definition Scopes and Hook Bindings may now use tag expressions (such as [Scope("@db and not @slow)]) (#911)
+* Tag Expressions: step definition scopes and hooks may now use tag expressions (such as `@db and not @slow`) (#911)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
 * Support for storing the code-behind files in the intermediate output folder (obj folder) by setting the `ReqnrollUseIntermediateOutputPathForCodeBehind` MSBuild property to `true`. (#947)
 * Support for linked feature files (files used from outside of the project folder). To use this feature, the `ReqnrollUseIntermediateOutputPathForCodeBehind` flag must be enabled (see above). (#948)

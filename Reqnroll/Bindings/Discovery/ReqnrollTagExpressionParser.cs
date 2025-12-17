@@ -1,7 +1,5 @@
 using Cucumber.TagExpressions;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Reqnroll.Bindings.Discovery;
 

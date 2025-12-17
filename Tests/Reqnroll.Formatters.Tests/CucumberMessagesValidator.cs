@@ -3,9 +3,7 @@ using FluentAssertions.Equivalency;
 using FluentAssertions.Execution;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.PayloadProcessing.Cucumber;
-using System.Collections.Concurrent;
 using System.Reflection;
-using System.Runtime.Versioning;
 
 namespace Reqnroll.Formatters.Tests;
 
@@ -139,10 +137,10 @@ public partial class CucumberMessagesValidator
         if (!_expectedElementsByType.ContainsKey(typeof(T)))
             return;
 
-        int actualsPartitionNumber = MapPartitionNumber(partitionNumber);
+        int actualPartitionNumber = MapPartitionNumber(partitionNumber);
 
         var actual = _actualElementsByType.TryGetValue(typeof(T), out HashSet<object>? actualElements) && actualElements.Count > 0 ?
-            actualElements.OfType<T>().Where(e => _actualPartitions[e!] == actualsPartitionNumber).ToList() : new List<T>();
+            actualElements.OfType<T>().Where(e => _actualPartitions[e!] == actualPartitionNumber).ToList() : new List<T>();
 
         var expected = _expectedElementsByType[typeof(T)].AsEnumerable().OfType<T>().Where(e => _expectedPartitions[e!] == partitionNumber).ToList();
 
@@ -191,11 +189,11 @@ public partial class CucumberMessagesValidator
         for (int i = 0; i < _numPartitions; i++)
         {
             var partitionNumber = i + 1;
-            int actualsPartitionNumber = MapPartitionNumber(partitionNumber);
+            int actualPartitionNumber = MapPartitionNumber(partitionNumber);
 
             // For each TestStepStarted message, ensure that the pickle step referred to is the same in Actual and Expected for the corresponding testStepStarted message
-            var actualTestStepStartedTestStepIds = _actualElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Where(e => _actualPartitions[e!] == actualsPartitionNumber).Select(tss => tss.TestStepId).ToList();
-            var expectedTestStepStartedTestStepIds = _expectedElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Where(e => _expectedPartitions[e!] == partitionNumber).Select(tss => tss.TestStepId).ToList();
+            var actualTestStepStartedTestStepIds = _actualElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Where(e => _actualPartitions[e] == actualPartitionNumber).Select(tss => tss.TestStepId).ToList();
+            var expectedTestStepStartedTestStepIds = _expectedElementsByType[typeof(TestStepStarted)].OfType<TestStepStarted>().Where(e => _expectedPartitions[e] == partitionNumber).Select(tss => tss.TestStepId).ToList();
 
             // Making the assumption here that the order of TestStepStarted messages is the same in both Actual and Expected within a Partition
             // pair these up, and walk back to the pickle step text and compare
@@ -330,7 +328,7 @@ public partial class CucumberMessagesValidator
                 if (step.PickleStepId != null)
                     _actualElementsById.Should().ContainKey(step.PickleStepId, "a step references a pickle step that doesn't exist");
 
-                if (step.StepDefinitionIds != null && step.StepDefinitionIds.Count > 0)
+                if (step.StepDefinitionIds is { Count: > 0 })
                 {
                     foreach (var stepDefinitionId in step.StepDefinitionIds)
                         _actualElementsById.Should().ContainKey(stepDefinitionId, "a step references a step definition that doesn't exist");
@@ -374,19 +372,19 @@ public partial class CucumberMessagesValidator
                 {
                     throw new System.Exception($"{messageType} present in the expected but not in the actual.");
                 }
-                if (messageType != typeof(Hook) && _actualElementsByType.ContainsKey(messageType))
+                if (messageType != typeof(Hook) && _actualElementsByType.TryGetValue(messageType, out var nonHookElement))
                 {
-                    _actualElementsByType[messageType].Should().HaveCount(_expectedElementsByType[messageType].Count());
+                    nonHookElement.Should().HaveCount(_expectedElementsByType[messageType].Count);
                 }
-                if (messageType == typeof(Hook) && _actualElementsByType.ContainsKey(messageType))
-                    _actualElementsByType[messageType].Should().HaveCountGreaterThanOrEqualTo(_expectedElementsByType[messageType].Count());
+                if (messageType == typeof(Hook) && _actualElementsByType.TryGetValue(messageType, out var hookElement))
+                    hookElement.Should().HaveCountGreaterThanOrEqualTo(_expectedElementsByType[messageType].Count);
             }
 
             actual.Should().HaveCountGreaterThanOrEqualTo(expected.Count(), "the total number of envelopes in the actual should be at least as many as in the expected");
         }
     }
 
-    private bool GroupListIsEmpty(List<Group> groups)
+    private bool GroupListIsEmpty(List<Group>? groups)
     {
         if (groups == null || groups.Count == 0) return true;
         foreach (var group in groups)
@@ -407,7 +405,7 @@ public partial class CucumberMessagesValidator
                .ComparingByMembers<Ci>()
                .ComparingByMembers<Comment>()
                .ComparingByMembers<Io.Cucumber.Messages.Types.DataTable>()
-               .ComparingByMembers<Io.Cucumber.Messages.Types.DocString>()
+               .ComparingByMembers<DocString>()
                .ComparingByMembers<Envelope>()
                .ComparingByMembers<Examples>()
                .ComparingByMembers<Feature>()
@@ -458,7 +456,7 @@ public partial class CucumberMessagesValidator
 
                // Using a custom Property Selector so that we can ignore the properties that are not comparable
                .Using(_customCucumberMessagesPropertySelector)
-               // Using a custom string comparison that deals with ISO langauge codes when the property name ends with "Language"
+               // Using a custom string comparison that deals with ISO language codes when the property name ends with "Language"
                //.Using<string>(ctx =>
                //{
                //    var actual = ctx.Subject.Split("-")[0];
@@ -466,7 +464,7 @@ public partial class CucumberMessagesValidator
                //    actual.Should().Be(expected);
                //})
 
-               // Using special logic to assert that suggestions must contain at least one snippets among those specified in the Expected set
+               // Using special logic to assert that suggestions must contain at least one snippet among those specified in the Expected set
                // We can't compare snippet content as the Language and Code properties won't match
                .Using<Suggestion>(ctx =>
                {
@@ -547,7 +545,7 @@ public partial class CucumberMessagesValidator
                        actualList.Should().HaveCountGreaterThanOrEqualTo(expectedList.Count,
                                                                          "actual collection should have at least as many items as expected");
 
-                       // Difficult to compare individual Hook messages (Ids aren't comparable, the Source references aren't compatible, 
+                       // Difficult to compare individual Hook messages: Ids aren't comparable, the Source references aren't compatible, 
                        // and After Hook execution ordering is different between Reqnroll and CCK.
                        foreach (var expectedItem in expectedList)
                        {

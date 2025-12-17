@@ -60,11 +60,12 @@ The following example combines the feature name and the tag scope with "AND":
 
 If multiple `[Scope]` attributes are defined for the same method or class, the attributes are combined with OR, i.e. at least one of the `[Scope]` attributes needs to match.
 
-The following example combines the tag scopes with "OR":
+The following example combines the scopes with "OR":
 
 ```{code-block} csharp
 :caption: Step Definition File
-[Scope(Tag = "thisTag or thatTag", Feature = "thisFeature")] [Scope(Tag = "OrThisTag", Feature="thatFeature")]
+[Scope(Tag = "@thisTag or @thatTag", Feature = "thisFeature")]
+[Scope(Tag = "@anotherTag", Feature="thatFeature")]
 ```
 
 ````{note}
