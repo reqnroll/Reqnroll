@@ -332,7 +332,7 @@ public partial class TestExecutionEngineTests
         SkippedBecauseOfPreviousError,
         UndefinedStep,
         PendingStepDefinition,
-        DynamicallyPendingStepDefinition, // e.g. throws a not implemented exception
+        DynamicallyNotImplementedError, // e.g. throws a not implemented exception
         DynamicallySkippedStepDefinition, // e.g. Assert.Ignore called
         ObsoleteStepDefinitionAsError,
         ObsoleteStepDefinitionAsPending,
@@ -353,7 +353,7 @@ public partial class TestExecutionEngineTests
     [InlineData(StepExecutionUseCase.SkippedBecauseOfPreviousError,     false, ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.Skipped, false, true,  true,  false)]
     [InlineData(StepExecutionUseCase.UndefinedStep,                     false, ScenarioExecutionStatus.UndefinedStep,         null,                                null,                            false, true,  false, false)]
     [InlineData(StepExecutionUseCase.PendingStepDefinition,             false, ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            true,  true,  false, false)]
-    [InlineData(StepExecutionUseCase.DynamicallyPendingStepDefinition,  false, ScenarioExecutionStatus.StepDefinitionPending, typeof(NotImplementedException),     null,                            true,  true,  false, false)]
+    [InlineData(StepExecutionUseCase.DynamicallyNotImplementedError,    false, ScenarioExecutionStatus.TestError,             typeof(NotImplementedException),     null,                            true,  true,  false, false)]
     [InlineData(StepExecutionUseCase.DynamicallySkippedStepDefinition,  false, ScenarioExecutionStatus.Skipped,               typeof(OperationCanceledException),  null,                            true,  true,  false, false)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsError,     false, ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, false)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsPending,   false, ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            false, true,  false, false)]
@@ -371,7 +371,7 @@ public partial class TestExecutionEngineTests
     [InlineData(StepExecutionUseCase.SkippedBecauseOfPreviousError,     true,  ScenarioExecutionStatus.TestError,             typeof(InvalidOperationException),   ScenarioExecutionStatus.Skipped, false, true,  true,  false)]
     [InlineData(StepExecutionUseCase.UndefinedStep,                     true,  ScenarioExecutionStatus.UndefinedStep,         null,                                null,                            false, true,  false, false)]
     [InlineData(StepExecutionUseCase.PendingStepDefinition,             true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            true,  true,  false, true)]
-    [InlineData(StepExecutionUseCase.DynamicallyPendingStepDefinition,  true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(NotImplementedException),     null,                            true,  true,  false, true)]
+    [InlineData(StepExecutionUseCase.DynamicallyNotImplementedError,    true,  ScenarioExecutionStatus.TestError,             typeof(NotImplementedException),     null,                            true,  true,  false, true)]
     [InlineData(StepExecutionUseCase.DynamicallySkippedStepDefinition,  true,  ScenarioExecutionStatus.Skipped,               typeof(OperationCanceledException),  null,                            true,  true,  false, true)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsError,     true,  ScenarioExecutionStatus.BindingError,          typeof(BindingException),            null,                            false, true,  false, true)]
     [InlineData(StepExecutionUseCase.ObsoleteStepDefinitionAsPending,   true,  ScenarioExecutionStatus.StepDefinitionPending, typeof(PendingStepException),        null,                            false, true,  false, true)]
@@ -400,7 +400,7 @@ public partial class TestExecutionEngineTests
             case StepExecutionUseCase.PendingStepDefinition:
                 RegisterPendingStepDefinition();
                 break;
-            case StepExecutionUseCase.DynamicallyPendingStepDefinition:
+            case StepExecutionUseCase.DynamicallyNotImplementedError:
                 RegisterFailingStepDefinition(exceptionToThrow: new NotImplementedException("simulated"));
                 break;
             case StepExecutionUseCase.DynamicallySkippedStepDefinition:
