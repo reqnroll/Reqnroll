@@ -2,19 +2,32 @@
 
 ## Improvements:
 
-* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.3.0 - 2025-12-17
+
+## Improvements:
+
+* NUnit dependencies are updated to v4.4.0 in templates. This does not impact Reqnroll compatibility. (#846)
+* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. See https://docs.reqnroll.net/latest/installation/formatter-configuration.html#available-substitution-variables for details. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
 * Support for storing the code-behind files in the intermediate output folder (obj folder) by setting the `ReqnrollUseIntermediateOutputPathForCodeBehind` MSBuild property to `true`. (#947)
 * Support for linked feature files (files used from outside of the project folder). To use this feature, the `ReqnrollUseIntermediateOutputPathForCodeBehind` flag must be enabled (see above). (#948)
 * Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
-* NotImplementedException no longer maps to ScenarioExecutionStatus.StepDefinitionPending (#954)
+* Updated Cucumber.HtmlFormatter to version 22 to support HTML reports on non-https URLs (#962)
+* Updated Cucumber.Messages to version 30 (#962)
+* NotImplementedException thrown by the tests is no longer treated as a "pending" outcome (reverting to v2 behavior). (#954)
 
 ## Bug fixes:
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
+* Fix: The configuration setting `generator/addNonParallelizableMarkerForTags` does not work for xUnit 3 (#917)
+* Fix: Improve error handling in OnTestRunEnd when test runners are still executing (#957)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @copilot, @gasparnagy, @markk-df, @obligaron
 
 # v3.2.1 - 2025-11-07
 
