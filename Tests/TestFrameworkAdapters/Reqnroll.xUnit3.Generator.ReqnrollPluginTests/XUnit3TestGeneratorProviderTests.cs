@@ -1,17 +1,10 @@
 ﻿using FluentAssertions;
-using Microsoft.CSharp;
-using Reqnroll.Generator;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 using Reqnroll.xUnit3.Generator.ReqnrollPlugin;
-using System;
 using System.CodeDom;
 using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Reflection.Emit;
-using Xunit;
 
 namespace Reqnroll.xUnit3.Generator.ReqnrollPluginTests;
 
@@ -27,7 +20,7 @@ public class XUnit3TestGeneratorProviderTests
                 When I do something
                 Then something should happen";
 
-    [Xunit.Fact]
+    [Fact]
     public void XUnit3TestGeneratorProvider_OnlyVariantName_ShouldSetInlineDataAttributesCorrectly()
     {
         // ARRANGE
@@ -51,7 +44,7 @@ public class XUnit3TestGeneratorProviderTests
 ";
 
         var document = ParseDocumentFromString(sampleFeatureFile);
-        var sampleTestGeneratorProvider = CreateSUTxunit3GeneratorProvider();
+        var sampleTestGeneratorProvider = CreateSutXUnit3GeneratorProvider();
         var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
         // ACT
@@ -69,7 +62,7 @@ public class XUnit3TestGeneratorProviderTests
         inlineDataAttributes.Should().ContainSingle(attribute => attribute.ArgumentValues().First() as string == "something else");
     }
 
-    private static IUnitTestGeneratorProvider CreateSUTxunit3GeneratorProvider()
+    private static IUnitTestGeneratorProvider CreateSutXUnit3GeneratorProvider()
     {
         var instance = new XUnit3TestGeneratorProvider(new CodeDomHelper(CodeDomProviderLanguage.CSharp));
         return instance;
@@ -104,7 +97,7 @@ public class XUnit3TestGeneratorProviderTests
 ";
 
         var document = ParseDocumentFromString(sampleFeatureFileMultipleColumns);
-        var sampleTestGeneratorProvider = CreateSUTxunit3GeneratorProvider();
+        var sampleTestGeneratorProvider = CreateSutXUnit3GeneratorProvider();
         var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
         // ACT
@@ -155,7 +148,7 @@ public class XUnit3TestGeneratorProviderTests
 ";
 
         var document = ParseDocumentFromString(sampleFeatureFileWithMultipleExampleSets);
-        var sampleTestGeneratorProvider = CreateSUTxunit3GeneratorProvider();
+        var sampleTestGeneratorProvider = CreateSutXUnit3GeneratorProvider();
         var converter = sampleTestGeneratorProvider.CreateUnitTestConverter();
 
         // ACT
@@ -181,7 +174,7 @@ public class XUnit3TestGeneratorProviderTests
     public void XUnit3TestGeneratorProvider_ShouldSetDisplayNameForTheoryAttribute(bool disableFriendlyTestNames)
     {
         // Arrange
-        var provider = CreateSUTxunit3GeneratorProvider();
+        var provider = CreateSutXUnit3GeneratorProvider();
         var context = new Reqnroll.Generator.TestClassGenerationContext(
             unitTestGeneratorProvider: null,
             document: new ReqnrollDocument(
@@ -245,14 +238,14 @@ public class XUnit3TestGeneratorProviderTests
     public void XUnit3TestGeneratorProvider_ShouldSetSkipAttributeForTheory()
     {
         // Arrange
-        var provider = CreateSUTxunit3GeneratorProvider();
+        var provider = CreateSutXUnit3GeneratorProvider();
 
         // Act
         var codeMemberMethod = new CodeMemberMethod
         {
             CustomAttributes =
                 new CodeAttributeDeclarationCollection(
-                    new[] { new CodeAttributeDeclaration(XUnit3TestGeneratorProvider.THEORY_ATTRIBUTE) })
+                    [new CodeAttributeDeclaration(XUnit3TestGeneratorProvider.THEORY_ATTRIBUTE)])
         };
         provider.SetTestMethodIgnore(null, codeMemberMethod);
 
@@ -278,7 +271,7 @@ public class XUnit3TestGeneratorProviderTests
 
 
     /*
-     * Based on w1ld's `Should_set_skip_attribute_for_theory`,
+     * Based on @w1ld's `Should_set_skip_attribute_for_theory`,
      * refactor as appropriate.
      */
 
@@ -288,10 +281,10 @@ public class XUnit3TestGeneratorProviderTests
     public void XUnit3TestGeneratorProvider_ShouldSetDisplayNameForFactAttribute(bool disableFriendlyTestNames)
     {
         // Arrange
-        var provider = CreateSUTxunit3GeneratorProvider();
+        var provider = CreateSutXUnit3GeneratorProvider();
         var context = new Reqnroll.Generator.TestClassGenerationContext(
             unitTestGeneratorProvider: null,
-            document: new Parser.ReqnrollDocument(
+            document: new ReqnrollDocument(
                 feature: new ReqnrollFeature(
                     tags: null,
                     location: default,
@@ -352,7 +345,7 @@ public class XUnit3TestGeneratorProviderTests
     {
         // ARRANGE
         var document = ParseDocumentFromString(SampleFeatureFile);
-        var provider = CreateSUTxunit3GeneratorProvider();
+        var provider = CreateSutXUnit3GeneratorProvider();
         var converter = provider.CreateUnitTestConverter();
 
         // ACT
@@ -378,7 +371,7 @@ public class XUnit3TestGeneratorProviderTests
     {
         // ARRANGE
         var document = ParseDocumentFromString(SampleFeatureFile);
-        var provider = CreateSUTxunit3GeneratorProvider();
+        var provider = CreateSutXUnit3GeneratorProvider();
         var converter = provider.CreateUnitTestConverter();
 
         // ACT
@@ -386,8 +379,9 @@ public class XUnit3TestGeneratorProviderTests
 
         // ASSERT
         code.Should().NotBeNull();
-        var loggerInstance = code.Class().Members.OfType<CodeMemberField>().First(m => m.Name == @"_testOutputHelper");
+        var loggerInstance = code.Class().Members.OfType<CodeMemberField>().First(m => m.Name == "_testOutputHelper");
         loggerInstance.Type.BaseType.Should().Be(XUnit3TestGeneratorProvider.OUTPUT_INTERFACE);
+        // ReSharper disable once BitwiseOperatorOnEnumWithoutFlags
         loggerInstance.Attributes.Should().Be(MemberAttributes.Private | MemberAttributes.Final);
     }
 
@@ -396,7 +390,7 @@ public class XUnit3TestGeneratorProviderTests
     {
         // ARRANGE
         var document = ParseDocumentFromString(SampleFeatureFile);
-        var provider = CreateSUTxunit3GeneratorProvider();
+        var provider = CreateSutXUnit3GeneratorProvider();
         var converter = provider.CreateUnitTestConverter();
 
         // ACT
@@ -404,7 +398,7 @@ public class XUnit3TestGeneratorProviderTests
 
         // ASSERT
         code.Should().NotBeNull();
-        var scenarioStartMethod = code.Class().Members().Single(m => m.Name == @"ScenarioInitialize");
+        var scenarioStartMethod = code.Class().Members().Single(m => m.Name == "ScenarioInitialize");
         scenarioStartMethod.Statements.Count.Should().Be(2);
 
         var expression = scenarioStartMethod.Statements[1].Should().BeOfType<CodeExpressionStatement>()
@@ -424,7 +418,7 @@ public class XUnit3TestGeneratorProviderTests
     [Fact]
     public void XUnit3TestGeneratorProvider_ShouldHaveParallelExecutionTrait()
     {
-        var provider = CreateSUTxunit3GeneratorProvider();
+        var provider = CreateSutXUnit3GeneratorProvider();
 
         provider.GetTraits()
                 .HasFlag(UnitTestGeneratorTraits.ParallelExecution)
@@ -443,8 +437,8 @@ public class XUnit3TestGeneratorProviderTests
             Scenario: Simple scenario
                 Given there is something");
 
-        var provider = CreateSUTxunit3GeneratorProvider();
-        var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
+        var provider = CreateSutXUnit3GeneratorProvider();
+        var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: ["nonparallelizable"]);
 
         // ACT
         var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
@@ -467,8 +461,8 @@ public class XUnit3TestGeneratorProviderTests
             Scenario: Simple scenario
                 Given there is something");
 
-        var provider = CreateSUTxunit3GeneratorProvider();
-        var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new string[] { "nonparallelizable" });
+        var provider = CreateSutXUnit3GeneratorProvider();
+        var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: ["nonparallelizable"]);
 
         // ACT
         var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
@@ -488,8 +482,8 @@ public class XUnit3TestGeneratorProviderTests
             @nonparallelizable
             Scenario: Isolated scenario
                 Given there is something");
-        var provider = CreateSUTxunit3GeneratorProvider();
-        var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: new[] { "nonparallelizable" });
+        var provider = CreateSutXUnit3GeneratorProvider();
+        var featureGenerator = provider.CreateFeatureGenerator(addNonParallelizableMarkerForTags: ["nonparallelizable"]);
 
         // ACT
         var code = featureGenerator.GenerateUnitTestFixture(document, "TestClassName", "Target.Namespace").CodeNamespace;
@@ -503,11 +497,9 @@ public class XUnit3TestGeneratorProviderTests
     public ReqnrollDocument ParseDocumentFromString(string documentSource, CultureInfo? parserCultureInfo = null)
     {
         var parser = new ReqnrollGherkinParser(parserCultureInfo ?? new CultureInfo("en-US"));
-        using (var reader = new StringReader(documentSource))
-        {
-            var document = parser.Parse(reader, new ReqnrollDocumentLocation($"dummy_ReqnrollLocation_for_{nameof(XUnit3TestGeneratorProviderTests)}"));
-            document.Should().NotBeNull();
-            return document;
-        }
+        using var reader = new StringReader(documentSource);
+        var document = parser.Parse(reader, new ReqnrollDocumentLocation($"dummy_ReqnrollLocation_for_{nameof(XUnit3TestGeneratorProviderTests)}"));
+        document.Should().NotBeNull();
+        return document;
     }
 }

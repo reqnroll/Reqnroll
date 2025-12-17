@@ -1,7 +1,5 @@
 #nullable disable
 
-using System;
-using System.Linq;
 using Gherkin.Ast;
 using Reqnroll.Parser;
 
@@ -35,7 +33,7 @@ class ParserHelper
         tags ??= [];
 
         var scenario1 = new Scenario(GetTags(scenarioTags), new Location(0), "Scenario", "scenario1 title", "", Array.Empty<Step>(), Array.Empty<Examples>());
-        var rule1 = new Rule(GetTags(ruleTags), new Location(0), "Rule", "rule1 title", "", new IHasLocation[] { scenario1 });
+        var rule1 = new Rule(GetTags(ruleTags), new Location(0), "Rule", "rule1 title", "", [scenario1]);
 
         var reqnrollFeature = new ReqnrollFeature(GetTags(tags), new Location(0), "en", "feature", "title", "desc", new IHasLocation[] { rule1 });
         return new ReqnrollDocument(reqnrollFeature, Array.Empty<Comment>(), CreateDummyReqnrollLocation());
@@ -47,7 +45,8 @@ class ParserHelper
 
         var scenario1 = new ScenarioOutline(GetTags(scenarioOutlineTags), new Location(0), "Scenario Outline", "scenario outline1 title", "", Array.Empty<Step>(),
         [
-            new Examples(GetTags(examplesTags), default, "Examples", "examples name", "", new TableRow(default, [new TableCell(default, "col1")]), new TableRow[]{new TableRow(default, [new TableCell(default, "col1")])})
+            new Examples(GetTags(examplesTags), default, "Examples", "examples name", "", new TableRow(default, [new TableCell(default, "col1")]), [new TableRow(default, [new TableCell(default, "col1")])
+                         ])
         ]);
 
         var reqnrollFeature = new ReqnrollFeature(GetTags(tags), new Location(0), "en", "feature", "title", "desc", new StepsContainer[] {scenario1});
@@ -60,12 +59,13 @@ class ParserHelper
 
         var scenarioOutline = new ScenarioOutline(GetTags(scenarioOutlineTags), new Location(0), "Scenario Outline", "scenario outline1 title", "", Array.Empty<Step>(),
         [
-            new Examples(GetTags(examplesTags), default, "Examples", "examples name", "", new TableRow(default, [new TableCell(default, "col1")]), new TableRow[]{new TableRow(default, [new TableCell(default, "col1")])})
+            new Examples(GetTags(examplesTags), default, "Examples", "examples name", "", new TableRow(default, [new TableCell(default, "col1")]), [new TableRow(default, [new TableCell(default, "col1")])
+                         ])
         ]);
 
-        var rule1 = new Rule(GetTags(ruleTags), new Location(0), "Rule", "rule1 title", "", new IHasLocation[] { scenarioOutline });
+        var rule1 = new Rule(GetTags(ruleTags), new Location(0), "Rule", "rule1 title", "", [scenarioOutline]);
 
-        var reqnrollFeature = new ReqnrollFeature(GetTags(tags), new Location(0), "en", "feature", "title", "desc", new IHasLocation[] { rule1 });
+        var reqnrollFeature = new ReqnrollFeature(GetTags(tags), new Location(0), "en", "feature", "title", "desc", [rule1]);
         return new ReqnrollDocument(reqnrollFeature, Array.Empty<Comment>(), CreateDummyReqnrollLocation());
     }
 

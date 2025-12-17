@@ -1,12 +1,7 @@
 ﻿using Gherkin.Ast;
 using Reqnroll.Generator;
 using Reqnroll.Generator.UnitTestConverter;
-using System;
 using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Reqnroll.xUnit3.Generator.ReqnrollPluginTests;
 
