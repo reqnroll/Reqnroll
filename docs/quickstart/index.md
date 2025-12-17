@@ -3,14 +3,14 @@
 This guide gives a quick introduction to Reqnroll.
 
 ```{note}
-The guide uses Visual Studio 2022 as an IDE, but you can also follow it with other tools.
+The guide uses Visual Studio as an IDE, but you can also follow it with other tools.
 ```
 
 In this tutorial we demonstrate the usage of Reqnroll by implementing the *price calculation* module of an *online instrument & accessories shop*.
 
 ## Setup environment & get starting point
 
-When you use Visual Studio 2022 for Reqnroll, please make sure you install the Reqnroll for Visual Studio extension. See [](../installation/setup-ide.md#setup-visual-studio) for details. Please make sure that the SpecFlow extension is disabled or removed for this Quickstart.
+When you use Visual Studio for Reqnroll, please make sure you install the Reqnroll for Visual Studio extension. See [](../installation/setup-ide.md#setup-visual-studio) for details. Please make sure that the SpecFlow extension is disabled or removed for this Quickstart.
 
 We prepared a simple starting point for this tutorial that you can find on GitHub: [https://github.com/reqnroll/Quickstart](https://github.com/reqnroll/Quickstart). Clone this project to your machine or [download it as zip](https://github.com/reqnroll/Quickstart/archive/refs/heads/main.zip) and extract it to a local folder.
 
