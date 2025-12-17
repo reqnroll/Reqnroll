@@ -260,7 +260,7 @@ namespace Reqnroll.Generator.Generation
             }
             else
             {
-                // string pickleIndex = featureInfo.GetPickleIndexFromTestRow(featureName, scenarioName, exampleTags, arguments.Values, featureInfo);
+                // string pickleIndex = global::TestRowPickleMapper.GetPickleIndexFromTestRow(featureInfo, featureName, scenarioName, exampleTags, arguments.Values);
                 var testRowPickleMapperTypeRef = new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRowPickleMapper), CodeTypeReferenceOptions.GlobalReference));
                 valueExpression = new CodeMethodInvokeExpression(
                     testRowPickleMapperTypeRef,
