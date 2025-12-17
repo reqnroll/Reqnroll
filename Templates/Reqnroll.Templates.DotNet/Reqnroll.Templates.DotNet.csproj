@@ -15,6 +15,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <NoPackageAnalysis>true</NoPackageAnalysis>
     <IncludeSymbols>false</IncludeSymbols>
+    <IncludeSource>false</IncludeSource>
     <!-- Because templates trigger NU5128, because they need a targetframework, but don't have files in the lib folder for it-->
     <NoDefaultExcludes>true</NoDefaultExcludes>
   </PropertyGroup>
