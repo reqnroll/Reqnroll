@@ -2,7 +2,7 @@
 
 Reqnroll can be [setup](setup-project) simply by adding a NuGet package to your project and in the most of the cases there is no additional configuration required.
 
-The default configuration can be altered by adding a `reqnroll.json` configuration file to your project. An empty configuration file can be added using the *Add / New Item...* command of Visual Studio 2022 or using the Reqnroll .NET item template. The following example downloads the Reqnroll templates and adds a configuration file to the project.
+The default configuration can be altered by adding a `reqnroll.json` configuration file to your project. An empty configuration file can be added using the *Add / New Item...* command of Visual Studio or using the Reqnroll .NET item template. The following example downloads the Reqnroll templates and adds a configuration file to the project.
 
 ```{code-block} pwsh
 :caption: .NET CLI
