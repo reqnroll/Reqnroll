@@ -2,6 +2,7 @@
 
 ## Improvements:
 
+* Updated NUnit3TestAdapter to v5.2.0 and NUnit to v4.4.0 in templates and tests to fix spurious warnings during test runs (#846)
 * Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
@@ -14,7 +15,7 @@
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @gasparnagy, @markk-df
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @copilot, @gasparnagy, @markk-df
 
 # v3.2.1 - 2025-11-07
 
