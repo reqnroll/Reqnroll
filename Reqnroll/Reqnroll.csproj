@@ -21,8 +21,8 @@
     <PackageReference Include="Cucumber.TagExpressions" Version="8.1.0" />
     <PackageReference Include="Gherkin" Version="35.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
-    <PackageReference Include="Cucumber.Messages" Version="29.0.1" />
-    <PackageReference Include="Cucumber.HtmlFormatter" Version="21.15.1" />
+    <PackageReference Include="Cucumber.Messages" Version="30.1.0" />
+    <PackageReference Include="Cucumber.HtmlFormatter" Version="22.2.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
     <!-- System.Runtime.Loader is used for .NET (not .NET Framework) based frameworks only. 
