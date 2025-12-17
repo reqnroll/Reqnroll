@@ -7,7 +7,7 @@ hide-toc: true
 This documentation covers the Visual Studio extension for Reqnroll. The extension supports Visual Studio 2022 and Visual Studio 2026.
 
 * [Feature Overview](feature-overview.md) - Overview of the Visual Studio extension features
-* [Installation](../../installation/setup-ide.md#setup-visual-studio-2022) - How to install the Reqnroll Visual Studio extension
+* [Installation](../../installation/setup-ide.md#setup-visual-studio) - How to install the Reqnroll Visual Studio extension
 * [Editing Features](editing-features.md) - Syntax highlighting, IntelliSense, and editing features
 * [Navigation Features](navigation-features.md) - Navigate between steps and step definitions
 * [Defining Steps](defining-steps.md) - Generate step definition code snippets

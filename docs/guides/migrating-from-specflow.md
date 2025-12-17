@@ -9,7 +9,7 @@ The key differences between SpecFlow and Reqnroll are the following:
 * There is a new `DataTable` alias for the `Table` class to better match Gherkin terminology. The `Table` class can still be used.
 * The main extension methods of the *Assist helpers* have been moved to the `Reqnroll` namespace, so that they can be used without an additional namespace using statement. The helpers are now referred to as [](../automation/datatable-helpers.md).
 * The namespace of `IObjectContainer` has been changed from `BoDi` to `Reqnroll.BoDi`. If you have used special customizations that required to access the dependency injection container directly, you might need to update the namespace usings.
-* The [Reqnroll Visual Studio extension](../installation/setup-ide.md#setup-visual-studio-2022) has been reworked in a way that it can handle both SpecFlow and Reqnroll projects (also for .NET 8.0).
+* The [Reqnroll Visual Studio extension](../installation/setup-ide.md#setup-visual-studio) has been reworked in a way that it can handle both SpecFlow and Reqnroll projects (also for .NET 8.0).
 * The integration plugins that have been managed by SpecFlow have been also ported to work with Reqnroll (e.g. `Reqnroll.Autofac`). See [](../integrations/available-plugins.md).
 * The "SpecFlow.Actions" plugins that provide a ready-to-use support for different automation technologies (e.g. Selenium) are ported as `Reqnroll.SpecFlowCompatibility.Actions.*` packages (e.g. `Reqnroll.SpecFlowCompatibility.Actions.Selenium`). 
 
