@@ -64,7 +64,7 @@
   </Folder>
   <Folder Name="/Solution Items/GitHubWorkflows/">
     <File Path=".github/workflows/ci.yml" />
-    <File Path=".github/workflows/lock.yml" />
+    <File Path=".github/workflows/publish_packages.ps1" />
   </Folder>
   <Folder Name="/Solution Items/Resources/">
     <File Path="reqnroll-config.json" />
