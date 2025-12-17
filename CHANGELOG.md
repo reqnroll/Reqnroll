@@ -2,8 +2,8 @@
 
 ## Improvements:
 
-* Updated NUnit3TestAdapter to v5.2.0 and NUnit to v4.4.0 in templates and tests to fix spurious warnings during test runs (#846)
-* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
+* NUnit dependencies are updated to v4.4.0 in templates. This does not impact Reqnroll compatibility. (#846)
+* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. See https://docs.reqnroll.net/latest/installation/formatter-configuration.html#available-substitution-variables for details. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
 * Support for storing the code-behind files in the intermediate output folder (obj folder) by setting the `ReqnrollUseIntermediateOutputPathForCodeBehind` MSBuild property to `true`. (#947)
@@ -11,7 +11,7 @@
 * Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
 * Updated Cucumber.HtmlFormatter to version 22 to support HTML reports on non-https URLs (#962)
 * Updated Cucumber.Messages to version 30 (#962)
-* NotImplementedException no longer maps to ScenarioExecutionStatus.StepDefinitionPending (#954)
+* NotImplementedException thrown by the tests is no longer treated as a "pending" outcome (reverting to v2 behavior). (#954)
 
 ## Bug fixes:
 
