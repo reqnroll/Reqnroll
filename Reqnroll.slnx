@@ -89,10 +89,6 @@
     <Project Path="Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj" />
     <Project Path="Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj" />
   </Folder>
-  <Folder Name="/Tests/UnitTests/TestFrameworkAdapters/">
-    <Project Path="Tests/TestFrameworkAdapters/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/Reqnroll.xUnit3.Generator.ReqnrollPluginTests.csproj" />
-    <Project Path="Tests/TestFrameworkAdapters/TestFrameworkAdapter.Tests.Shared/TestFrameworkPlugin.Tests.Shared.shproj" Id="0b20c67c-d5ef-4afe-a914-29b7e106fe7e" />
-  </Folder>
   <Project Path="Reqnroll.Generator/Reqnroll.Generator.csproj" />
   <Project Path="Reqnroll.Parser/Reqnroll.Parser.csproj" />
   <Project Path="Reqnroll.Tools.MsBuild.Generation/Reqnroll.Tools.MsBuild.Generation.csproj" />

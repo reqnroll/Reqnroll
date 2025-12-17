@@ -1,12 +1,16 @@
-﻿using FluentAssertions;
+﻿#nullable enable
+using System.CodeDom;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using FluentAssertions;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
 using Reqnroll.xUnit3.Generator.ReqnrollPlugin;
-using System.CodeDom;
-using System.Globalization;
+using Xunit;
 
-namespace Reqnroll.xUnit3.Generator.ReqnrollPluginTests;
+namespace Reqnroll.GeneratorTests.UnitTestProvider;
 
 public class XUnit3TestGeneratorProviderTests
 {
@@ -175,7 +179,7 @@ public class XUnit3TestGeneratorProviderTests
     {
         // Arrange
         var provider = CreateSutXUnit3GeneratorProvider();
-        var context = new Reqnroll.Generator.TestClassGenerationContext(
+        var context = new Generator.TestClassGenerationContext(
             unitTestGeneratorProvider: null,
             document: new ReqnrollDocument(
                 feature: new ReqnrollFeature(
@@ -215,7 +219,7 @@ public class XUnit3TestGeneratorProviderTests
         modifiedAttribute.Should().NotBeNull();
 
 
-        var attribute = modifiedAttribute.Arguments
+        var attribute = modifiedAttribute!.Arguments
                                          .OfType<CodeAttributeArgument>()
                                          .FirstOrDefault(a => a.Name == "DisplayName");
 
@@ -227,10 +231,10 @@ public class XUnit3TestGeneratorProviderTests
         {
             attribute.Should().NotBeNull();
 
-            var primitiveExpression = attribute.Value as CodePrimitiveExpression;
+            var primitiveExpression = attribute!.Value as CodePrimitiveExpression;
 
             primitiveExpression.Should().NotBeNull();
-            primitiveExpression.Value.Should().Be("Foo");
+            primitiveExpression!.Value.Should().Be("Foo");
         }
     }
 
@@ -256,17 +260,17 @@ public class XUnit3TestGeneratorProviderTests
         modifiedAttribute.Should().NotBeNull();
 
 
-        var attribute = modifiedAttribute.Arguments
+        var attribute = modifiedAttribute!.Arguments
                                          .OfType<CodeAttributeArgument>()
                                          .FirstOrDefault(a => a.Name == XUnit3TestGeneratorProvider.SKIP_PROPERTY_NAME);
 
         attribute.Should().NotBeNull();
 
 
-        var primitiveExpression = attribute.Value as CodePrimitiveExpression;
+        var primitiveExpression = attribute!.Value as CodePrimitiveExpression;
 
         primitiveExpression.Should().NotBeNull();
-        primitiveExpression.Value.Should().Be(XUnit3TestGeneratorProvider.IGNORED_REASON);
+        primitiveExpression!.Value.Should().Be(XUnit3TestGeneratorProvider.IGNORED_REASON);
     }
 
 
@@ -282,7 +286,7 @@ public class XUnit3TestGeneratorProviderTests
     {
         // Arrange
         var provider = CreateSutXUnit3GeneratorProvider();
-        var context = new Reqnroll.Generator.TestClassGenerationContext(
+        var context = new Generator.TestClassGenerationContext(
             unitTestGeneratorProvider: null,
             document: new ReqnrollDocument(
                 feature: new ReqnrollFeature(
@@ -321,7 +325,7 @@ public class XUnit3TestGeneratorProviderTests
 
         modifiedAttribute.Should().NotBeNull();
 
-        var attribute = modifiedAttribute.Arguments
+        var attribute = modifiedAttribute!.Arguments
                                          .OfType<CodeAttributeArgument>()
                                          .FirstOrDefault(a => a.Name == "DisplayName");
 
@@ -333,10 +337,10 @@ public class XUnit3TestGeneratorProviderTests
         {
             attribute.Should().NotBeNull();
 
-            var primitiveExpression = attribute.Value as CodePrimitiveExpression;
+            var primitiveExpression = attribute!.Value as CodePrimitiveExpression;
 
             primitiveExpression.Should().NotBeNull();
-            primitiveExpression.Value.Should().Be("Foo");
+            primitiveExpression!.Value.Should().Be("Foo");
         }
     }
 
