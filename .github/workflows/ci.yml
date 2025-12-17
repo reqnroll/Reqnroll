@@ -218,7 +218,7 @@ jobs:
       with:
         name: PluginTestsXUnit3
         if-no-files-found: error
-        path: Tests/TestFrameworkPlugins/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/bin/
+        path: Tests/TestFrameworkAdapters/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/bin/
     - name: Upload TestProjectGenerator
       uses: actions/upload-artifact@v4
       with:
@@ -339,7 +339,7 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: PluginTestsXUnit3
-        path: Tests/TestFrameworkPlugins/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/bin/
+        path: Tests/TestFrameworkAdapters/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/bin/
     - name: Download TestProjectGenerator
       uses: actions/download-artifact@v4
       with:
@@ -356,7 +356,7 @@ jobs:
       run: dotnet test ./Tests/Reqnroll.PluginTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.PluginTests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/plugintests-results.trx" ${{ needs.build.outputs.test_params }}    
     - name: Plugin xUnit3 Generator Tests
       shell: pwsh
-      run: dotnet test ./Tests/TestFrameworkPlugins/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.xUnit3.Generator.ReqnrollPluginTests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/xunit3-generator-plugintests-results.trx" ${{ needs.build.outputs.test_params }}
+      run: dotnet test ./Tests/TestFrameworkAdapters/Reqnroll.xUnit3.Generator.ReqnrollPluginTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.xUnit3.Generator.ReqnrollPluginTests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/xunit3-generator-plugintests-results.trx" ${{ needs.build.outputs.test_params }}
     - name: TestProjectGenerator Tests
       shell: pwsh
       run: dotnet test ./Tests/TestProjectGenerator/Reqnroll.TestProjectGenerator.Tests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.TestProjectGenerator.Tests.dll --filter "Category!=quarantaine{{ needs.build.outputs.specs_filter }}" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/testprjgentests-results.trx" ${{ needs.build.outputs.test_params }}    
