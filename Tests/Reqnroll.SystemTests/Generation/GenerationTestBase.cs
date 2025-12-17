@@ -847,7 +847,7 @@ public abstract class GenerationTestBase : SystemTestBase
         parallelTrueLogs.Should().BeEmpty("the scenarios should not have run parallel");
         var scenarioParallelTrueLogs = _bindingDriver.GetActualLogLines("scenario-parallel: true").ToList();
         scenarioParallelTrueLogs.Should().BeEmpty("the scenarios should have not run parallel using scenario-level parallelization");
-        // Check that the tests run synchron
+        // Check that the tests run synchronously
         var parallelFalseLogs = _bindingDriver.GetActualLogLines("parallel: false").ToList();
         parallelFalseLogs.Should().NotBeEmpty("the scenarios should have run synchron");
         var scenarioParallelFalseLogs = _bindingDriver.GetActualLogLines("scenario-parallel: false").ToList();
