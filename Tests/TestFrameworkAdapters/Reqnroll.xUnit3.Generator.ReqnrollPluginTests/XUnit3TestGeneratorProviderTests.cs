@@ -364,7 +364,7 @@ public class XUnit3TestGeneratorProviderTests
         var classConstructor = code.Class().Members().Single(m => m.Name == ".ctor");
         classConstructor.Should().NotBeNull();
         classConstructor.Parameters.Count.Should().Be(2);
-        classConstructor.Parameters[1].Type.BaseType.Should().Be("Xunit.Abstractions.ITestOutputHelper");
+        classConstructor.Parameters[1].Type.BaseType.Should().Be(XUnit3TestGeneratorProvider.OUTPUT_INTERFACE);
         classConstructor.Parameters[1].Name.Should().Be("testOutputHelper");
 
         var initOutputHelper = classConstructor.Statements.OfType<CodeAssignStatement>().First();
@@ -387,7 +387,7 @@ public class XUnit3TestGeneratorProviderTests
         // ASSERT
         code.Should().NotBeNull();
         var loggerInstance = code.Class().Members.OfType<CodeMemberField>().First(m => m.Name == @"_testOutputHelper");
-        loggerInstance.Type.BaseType.Should().Be("Xunit.Abstractions.ITestOutputHelper");
+        loggerInstance.Type.BaseType.Should().Be(XUnit3TestGeneratorProvider.OUTPUT_INTERFACE);
         loggerInstance.Attributes.Should().Be(MemberAttributes.Private | MemberAttributes.Final);
     }
 
@@ -418,7 +418,7 @@ public class XUnit3TestGeneratorProviderTests
         method.MethodName.Should().Be("RegisterInstanceAs");
         method.TypeArguments.Should().NotBeNull();
         method.TypeArguments.Count.Should().BeGreaterThan(0);
-        method.TypeArguments[0].BaseType.Should().Be("Xunit.Abstractions.ITestOutputHelper");
+        method.TypeArguments[0].BaseType.Should().Be(XUnit3TestGeneratorProvider.OUTPUT_INTERFACE);
     }
 
     [Fact]
