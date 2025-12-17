@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <PackageType>Template</PackageType>
@@ -43,6 +43,18 @@
     <ItemGroup>
       <Content Include="$(OutDir)\templates\**\*" PackagePath="content" />
     </ItemGroup>
+  </Target>
+
+  <!-- 
+    Temporary workawound: Recently (since .NET 10 SDK?) the Symbols Package .snupkg is generated, 
+    even though we set 'IncludeSymbols' to false. As this package is content-only, the generated 
+    symbols package will be empty that causes an error when the release script tries to upload it 
+    to nuget.org. We delete the symbols package immediately after creation as a workaround.  -->
+  <Target Name="DeleteSymbolPackage" AfterTargets="Pack" BeforeTargets="CopyPackageToPackagesOutputPath">
+    <ItemGroup>
+      <_TemplatesSymbolPackage Include="$(PackageOutputAbsolutePath)\$(PackageId)*.snupkg" />
+    </ItemGroup>
+    <Delete Files="@(_TemplatesSymbolPackage)" />
   </Target>
   
 </Project> 
