@@ -2,9 +2,9 @@
 hide-toc: true
 ---
 
-# Reqnroll for Visual Studio 2022
+# Reqnroll for Visual Studio
 
-This documentation covers the Visual Studio 2022 extension for Reqnroll.
+This documentation covers the Visual Studio extension for Reqnroll. The extension supports Visual Studio 2022 and Visual Studio 2026.
 
 * [Feature Overview](feature-overview.md) - Overview of the Visual Studio extension features
 * [Installation](../../installation/setup-ide.md#setup-visual-studio-2022) - How to install the Reqnroll Visual Studio extension
