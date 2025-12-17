@@ -319,8 +319,7 @@ public class TestRunnerManager : ITestRunnerManager
                 if (contextManager.FeatureContext != null)
                 {
                     var testRunner = testWorkerContainer.Resolve<ITestRunner>();
-                    var errorText = $"Closing the feature (\"{testRunner.FeatureContext?.FeatureInfo?.Title}\") on shutdown for the test runner with ID \"{testRunner.TestWorkerId}\". It should normally be closed by FeatureTearDownAsync, for example.";
-                    _testTracer.TraceWarning(errorText);
+                    // Closing the feature on shutdown for the test runner. It should normally be closed by FeatureTearDownAsync, for example.";
                     await testRunner.OnFeatureEndAsync();
                 }
             }
