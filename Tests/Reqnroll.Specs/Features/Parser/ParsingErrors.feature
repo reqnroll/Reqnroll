@@ -175,4 +175,7 @@ Scenario: Table without trailing delimiter on any row
 	"""
 	When the file is parsed
 	Then no parsing error is reported
+	And the parsed table has only the following columns
+		| column        |
+		| EffectiveDate |
 

@@ -115,6 +115,31 @@ namespace Reqnroll.Specs.Drivers.Parser
             }
         }
 
+        public void AssertTableHasColumns(params string[] expectedColumns)
+        {
+            ParsedDocument.Should().NotBeNull("The parsing was not successful");
+            
+            var scenario = ParsedDocument.ReqnrollFeature.Children.FirstOrDefault() as Scenario;
+            scenario.Should().NotBeNull("No scenario found in the parsed document");
+            
+            var step = scenario.Steps.FirstOrDefault();
+            step.Should().NotBeNull("No step found in the scenario");
+            
+            var table = step.Argument as Gherkin.Ast.DataTable;
+            table.Should().NotBeNull("No table argument found in the step");
+            
+            var headerRow = table.Rows.FirstOrDefault();
+            headerRow.Should().NotBeNull("Table has no rows");
+            
+            var actualColumns = headerRow.Cells.Select(c => c.Value).ToList();
+            
+            Console.WriteLine($"-> Expected columns: [{string.Join(", ", expectedColumns)}]");
+            Console.WriteLine($"-> Actual columns: [{string.Join(", ", actualColumns)}]");
+            
+            actualColumns.Should().BeEquivalentTo(expectedColumns, 
+                "the parsed table should have the expected columns");
+        }
+
         public void SaveSerializedFeatureTo(string fileName)
         {
             ParsedDocument.Should().NotBeNull("The parsing was not successful");
