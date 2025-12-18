@@ -14,7 +14,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" Pack="true" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -96,21 +96,44 @@
     </ItemGroup>
   </Target>
 
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>
+      $(TargetsForTfmSpecificContentInPackage);
+      CollectProjectReferenceOutputsForPack
+    </TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
   <!-- Include referenced project assembly as part of this package directly. -->
-  <Target Name="MarkProjectReferenceOutputsForPack" AfterTargets="ResolveReferences">
-
+  <Target Name="CollectProjectReferenceOutputsForPack" DependsOnTargets="ResolveReferences">
     <ItemGroup>
-      <ProjectReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference'" />
+      <TfmSpecificPackageFile
+        Include="@(ReferenceCopyLocalPaths)"
+        PackagePath="lib/$(TargetFramework)/"
+        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(Pack)' == 'true'"/>
+    </ItemGroup>
+  </Target>
 
-      <ProjectReferenceSymbols Include="@(ProjectReferenceCopyLocalPaths)" Condition="'%(Extension)' == '.pdb'" />
+  <PropertyGroup>
+    <TargetsForTfmSpecificDebugSymbolsInPackage>
+      $(TargetsForTfmSpecificDebugSymbolsInPackage);
+      CollectProjectReferenceSymbolsForPack
+    </TargetsForTfmSpecificDebugSymbolsInPackage>
+  </PropertyGroup>
+
+  <!-- Included referenced project PDBs as part of the symbols package. -->
+  <Target Name="CollectProjectReferenceSymbolsForPack" DependsOnTargets="ResolveReferences">
+    <ItemGroup>
+      <TfmSpecificAssembly
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(Pack)' == 'true'"/>
     </ItemGroup>
 
     <ItemGroup>
-      <!-- DLLs and other runtime assets go into the main package. -->
-      <None Include="@(ProjectReferenceCopyLocalPaths)" Pack="true" PackagePath="lib/$(TargetFramework)/" />
-
-      <!-- Debugging symbols go into the symbol package. -->
-      <None Update="@(ProjectReferenceSymbols)" PackFolder="Symbols" />
+      <TfmSpecificDebugSymbolsPdb Include="@(TfmSpecificAssembly->'%(RootDir)%(Directory)%(Filename).pdb')" />
+      <TfmSpecificDebugSymbolsFile
+        Include="@(TfmSpecificDebugSymbolsPdb)"
+        TargetFramework="$(TargetFramework)"
+        Condition="Exists('%(FullPath)')" />
     </ItemGroup>
   </Target>
 </Project>
