@@ -1,0 +1,1018 @@
+Reqnroll 3.3.1 Package Analysis
+================================
+
+Generated: Thu Dec 18 11:27:45 UTC 2025
+
+
+========================================
+Package: Reqnroll.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./CHANGELOG.md
+./Cucumber.CucumberExpressions-LICENSE-MIT.txt
+./Cucumber.HtmlFormatter-LICENSE-MIT.txt
+./Cucumber.Messages-LICENSE-MIT.txt
+./Cucumber.React-Components-LICENSE-MIT.txt
+./Gherkin-LICENSE-MIT.txt
+./README.md
+./Reqnroll.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.targets
+./lib/netstandard2.0/Reqnroll.ExternalAnnotations.xml
+./lib/netstandard2.0/Reqnroll.Utils.dll
+./lib/netstandard2.0/Reqnroll.Utils.pdb
+./lib/netstandard2.0/Reqnroll.dll
+./lib/netstandard2.0/Reqnroll.xml
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Reqnroll aims at bridging the communication gap between domain experts and developers by binding business readable behavior specifications to the underlying implementation. Our mission is to provide a pragmatic and frictionless approach to Acceptance Test Driven Development and Behavior Driven Development for .NET projects today."</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll bdd gherkin cucumber</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Cucumber.CucumberExpressions" version="17.1.0" exclude="Build,Analyzers" />
+        <dependency id="Cucumber.HtmlFormatter" version="22.2.0" exclude="Build,Analyzers" />
+        <dependency id="Cucumber.Messages" version="30.1.0" exclude="Build,Analyzers" />
+        <dependency id="Gherkin" version="35.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Bcl.AsyncInterfaces" version="9.0.6" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyModel" version="8.0.2" exclude="Build,Analyzers" />
+        <dependency id="System.Text.Json" version="8.0.5" exclude="Build,Analyzers" />
+        <dependency id="System.Threading.Channels" version="9.0.6" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 2 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.targets
+
+
+========================================
+Package: Reqnroll.Assist.Dynamic.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.Assist.Dynamic.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./lib/netstandard2.0/Reqnroll.Assist.Dynamic.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Assist.Dynamic</id>
+    <version>3.3.1</version>
+    <authors>Oleg Koshmeliuk,Marcus Hammarberg, Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Adds support for dynamic instances and sets from Reqnroll tables.
+
+    See documentation at https://github.com/reqnroll/Reqnroll/tree/main/Plugins/Reqnroll.Assist.Dynamic</description>
+    <copyright>Copyright © Oleg Koshmeliuk, Marcus Hammarberg, Reqnroll</copyright>
+    <tags>reqnroll dynamic</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Dynamitey" version="3.0.3" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✗ No build/ folder
+
+
+========================================
+Package: Reqnroll.Autofac.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.Autofac.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.Autofac.props
+./build/Reqnroll.Autofac.targets
+./lib/netstandard2.0/Reqnroll.Autofac.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Autofac</id>
+    <version>3.3.1</version>
+    <title>Reqnroll Autofac integration plugin</title>
+    <authors>Copyright © Gaspar Nagy, Spec Solutions, Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Reqnroll plugin that enables to use Autofac for resolving test dependencies.</description>
+    <copyright>Copyright © Gaspar Nagy, Spec Solutions, Reqnroll</copyright>
+    <tags>reqnroll autofac di dependency injection</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Autofac" version="4.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.Autofac.props
+    ./Reqnroll.Autofac.targets
+
+
+========================================
+Package: Reqnroll.CustomPlugin.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.CustomPlugin.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/netstandard2.0/Reqnroll.CustomPlugin.deps.json
+./build/netstandard2.0/Reqnroll.CustomPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.CustomPlugin</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package for writing custom generator extensions for Reqnroll.</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll bdd gherkin cucumber generator</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✗ No lib/ folder
+✓ Has build/ folder
+  Contents:
+    ./netstandard2.0/Reqnroll.CustomPlugin.deps.json
+    ./netstandard2.0/Reqnroll.CustomPlugin.dll
+
+
+========================================
+Package: Reqnroll.ExternalData.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.ExternalData.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.ExternalData.props
+./build/Reqnroll.ExternalData.targets
+./build/netstandard2.0/CsvHelper.dll
+./build/netstandard2.0/ExcelDataReader.DataSet.dll
+./build/netstandard2.0/ExcelDataReader.dll
+./build/netstandard2.0/Microsoft.Bcl.HashCode.dll
+./build/netstandard2.0/Microsoft.CSharp.dll
+./build/netstandard2.0/Newtonsoft.Json.dll
+./build/netstandard2.0/Reqnroll.ExternalData.ReqnrollPlugin.deps.json
+./build/netstandard2.0/Reqnroll.ExternalData.ReqnrollPlugin.dll
+./build/netstandard2.0/System.Reflection.Emit.Lightweight.dll
+./build/netstandard2.0/Utf8Json.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.ExternalData</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to use external data in Gherkin scenarios</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll externaldata json</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✗ No lib/ folder
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.ExternalData.props
+    ./Reqnroll.ExternalData.targets
+    ./netstandard2.0/CsvHelper.dll
+    ./netstandard2.0/ExcelDataReader.DataSet.dll
+    ./netstandard2.0/ExcelDataReader.dll
+    ./netstandard2.0/Microsoft.Bcl.HashCode.dll
+    ./netstandard2.0/Microsoft.CSharp.dll
+    ./netstandard2.0/Newtonsoft.Json.dll
+    ./netstandard2.0/Reqnroll.ExternalData.ReqnrollPlugin.deps.json
+    ./netstandard2.0/Reqnroll.ExternalData.ReqnrollPlugin.dll
+    ./netstandard2.0/System.Reflection.Emit.Lightweight.dll
+    ./netstandard2.0/Utf8Json.dll
+
+
+========================================
+Package: Reqnroll.MSTest.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.MSTest.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/MSTest.AssemblyHooks.cs
+./build/MSTest.AssemblyHooks.vb
+./build/Reqnroll.MsTest.props
+./build/Reqnroll.MsTest.targets
+./build/Reqnroll.TestFrameworkAdapter.props
+./build/Reqnroll.TestFrameworkAdapter.targets
+./build/netstandard2.0/Reqnroll.MSTest.Generator.ReqnrollPlugin.dll
+./lib/netstandard2.0/Reqnroll.MSTest.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.MSTest</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to use Reqnroll for use with MsTest v2.</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll mstest</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="3.3.1" include="All" />
+        <dependency id="Reqnroll" version="3.3.1" exclude="Build,Analyzers" />
+        <dependency id="MSTest.TestFramework" version="2.2.8" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✓ Has build/ folder
+  Contents:
+    ./MSTest.AssemblyHooks.cs
+    ./MSTest.AssemblyHooks.vb
+    ./Reqnroll.MsTest.props
+    ./Reqnroll.MsTest.targets
+    ./Reqnroll.TestFrameworkAdapter.props
+    ./Reqnroll.TestFrameworkAdapter.targets
+    ./netstandard2.0/Reqnroll.MSTest.Generator.ReqnrollPlugin.dll
+
+
+========================================
+Package: Reqnroll.Microsoft.Extensions.DependencyInjection.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.Microsoft.Extensions.DependencyInjection.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.Microsoft.Extensions.DependencyInjection.props
+./build/Reqnroll.Microsoft.Extensions.DependencyInjection.targets
+./lib/netstandard2.0/Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Microsoft.Extensions.DependencyInjection</id>
+    <version>3.3.1</version>
+    <title>Reqnroll Microsoft.Extensions.DependencyInjection integration plugin</title>
+    <authors>Mark Hoek, Solid Token, Stef Heyenrath, Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Reqnroll plugin that enables to use Microsoft.Extensions.DependencyInjection for resolving test dependencies.</description>
+    <copyright>Copyright © Mark Hoek, Solid Token, Stef Heyenrath, Reqnroll</copyright>
+    <tags>reqnroll verify xunit</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.DependencyInjection" version="6.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Abstractions" version="6.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.Microsoft.Extensions.DependencyInjection.props
+    ./Reqnroll.Microsoft.Extensions.DependencyInjection.targets
+
+
+========================================
+Package: Reqnroll.NUnit.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.NUnit.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/NUnit.AssemblyHooks.cs
+./build/NUnit.AssemblyHooks.vb
+./build/Reqnroll.NUnit.props
+./build/Reqnroll.NUnit.targets
+./build/Reqnroll.TestFrameworkAdapter.props
+./build/Reqnroll.TestFrameworkAdapter.targets
+./build/netstandard2.0/Reqnroll.NUnit.Generator.ReqnrollPlugin.dll
+./lib/netstandard2.0/Reqnroll.NUnit.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.NUnit</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to use Reqnroll with NUnit 3.13 and later.</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll nunit</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="3.3.1" include="All" />
+        <dependency id="Reqnroll" version="3.3.1" exclude="Build,Analyzers" />
+        <dependency id="NUnit" version="3.13.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✓ Has build/ folder
+  Contents:
+    ./NUnit.AssemblyHooks.cs
+    ./NUnit.AssemblyHooks.vb
+    ./Reqnroll.NUnit.props
+    ./Reqnroll.NUnit.targets
+    ./Reqnroll.TestFrameworkAdapter.props
+    ./Reqnroll.TestFrameworkAdapter.targets
+    ./netstandard2.0/Reqnroll.NUnit.Generator.ReqnrollPlugin.dll
+
+
+========================================
+Package: Reqnroll.SpecFlowCompatibility.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.SpecFlowCompatibility.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.SpecFlowCompatibility.props
+./build/Reqnroll.SpecFlowCompatibility.targets
+./lib/net462/Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll
+./lib/netstandard2.0/Reqnroll.SpecFlowCompatibility.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.SpecFlowCompatibility</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Enables SpecFlow compatibility mode for Reqnroll</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll specflow</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 2 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.SpecFlowCompatibility.props
+    ./Reqnroll.SpecFlowCompatibility.targets
+
+
+========================================
+Package: Reqnroll.TUnit.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./README.md
+./Reqnroll.TUnit.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.TUnit.props
+./build/Reqnroll.TUnit.targets
+./build/Reqnroll.TestFrameworkAdapter.props
+./build/Reqnroll.TestFrameworkAdapter.targets
+./build/TUnit.AssemblyHooks.cs
+./build/TUnit.AssemblyHooks.vb
+./build/netstandard2.0/Reqnroll.TUnit.Generator.ReqnrollPlugin.dll
+./build/netstandard2.0/Reqnroll.TUnit.Generator.ReqnrollPlugin.pdb
+./lib/netstandard2.0/Reqnroll.TUnit.ReqnrollPlugin.dll
+./lib/netstandard2.0/Reqnroll.TUnit.ReqnrollPlugin.xml
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.TUnit</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <readme>README.md</readme>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to use Reqnroll with TUnit 1.3.25 and later.</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll TUnit</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="3.3.1" include="All" />
+        <dependency id="Reqnroll" version="3.3.1" exclude="Build,Analyzers" />
+        <dependency id="TUnit.Core" version="1.3.25" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.TUnit.props
+    ./Reqnroll.TUnit.targets
+    ./Reqnroll.TestFrameworkAdapter.props
+    ./Reqnroll.TestFrameworkAdapter.targets
+    ./TUnit.AssemblyHooks.cs
+    ./TUnit.AssemblyHooks.vb
+    ./netstandard2.0/Reqnroll.TUnit.Generator.ReqnrollPlugin.dll
+    ./netstandard2.0/Reqnroll.TUnit.Generator.ReqnrollPlugin.pdb
+
+
+========================================
+Package: Reqnroll.Templates.DotNet.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.Templates.DotNet.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./content/reqnroll-config/.template.config/template.json
+./content/reqnroll-config/reqnroll.json
+./content/reqnroll-feature/.template.config/template.json
+./content/reqnroll-feature/Template.feature
+./content/reqnroll-project/.gitignore
+./content/reqnroll-project/.template.config/dotnetcli.host.json
+./content/reqnroll-project/.template.config/template.json
+./content/reqnroll-project/Features/Calculator.feature
+./content/reqnroll-project/StepDefinitions/CalculatorStepDefinitions.cs
+./content/reqnroll-project/Template.csproj
+./images/reqnroll-icon.png
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Templates.DotNet</id>
+    <version>3.3.1</version>
+    <title>Reqnroll Templates for dotnet new</title>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Templates for projects using different test execution frameworks and templates for Reqnroll files.</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll bdd gherkin cucumber dotnet-new templates</tags>
+    <packageTypes>
+      <packageType name="Template" />
+    </packageTypes>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="MSBuild.AdditionalTasks" version="0.1.36" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✗ No lib/ folder
+✗ No build/ folder
+
+
+========================================
+Package: Reqnroll.Tools.MsBuild.Generation.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.Tools.MsBuild.Generation.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/CPS/Buildsystem/CpsExtension.DesignTime.targets
+./build/CPS/Buildsystem/Rules/FeatureFileType.xaml
+./build/CPS/Buildsystem/Rules/ProjectItemsSchema.xaml
+./build/Reqnroll.Tools.MsBuild.Generation.props
+./build/Reqnroll.Tools.MsBuild.Generation.targets
+./build/net462/Cucumber.HtmlFormatter.dll
+./build/net462/Cucumber.Messages.dll
+./build/net462/CucumberExpressions.dll
+./build/net462/Gherkin.dll
+./build/net462/Microsoft.Bcl.AsyncInterfaces.dll
+./build/net462/Microsoft.Extensions.DependencyModel.dll
+./build/net462/Microsoft.NET.StringTools.dll
+./build/net462/Microsoft.Win32.Primitives.dll
+./build/net462/Microsoft.Win32.Registry.dll
+./build/net462/Reqnroll.Generator.dll
+./build/net462/Reqnroll.Parser.dll
+./build/net462/Reqnroll.Tools.MsBuild.Generation.dll
+./build/net462/Reqnroll.Utils.dll
+./build/net462/Reqnroll.dll
+./build/net462/Reqnroll.xml
+./build/net462/System.Buffers.dll
+./build/net462/System.CodeDom.dll
+./build/net462/System.Collections.Immutable.dll
+./build/net462/System.Composition.AttributedModel.dll
+./build/net462/System.Composition.Convention.dll
+./build/net462/System.Composition.Hosting.dll
+./build/net462/System.Composition.Runtime.dll
+./build/net462/System.Composition.TypedParts.dll
+./build/net462/System.Configuration.ConfigurationManager.dll
+./build/net462/System.Memory.dll
+./build/net462/System.Numerics.Vectors.dll
+./build/net462/System.Reflection.Metadata.dll
+./build/net462/System.Runtime.CompilerServices.Unsafe.dll
+./build/net462/System.Security.AccessControl.dll
+./build/net462/System.Security.Principal.Windows.dll
+./build/net462/System.Text.Encoding.CodePages.dll
+./build/net462/System.Text.Encodings.Web.dll
+./build/net462/System.Text.Json.dll
+./build/net462/System.Threading.Channels.dll
+./build/net462/System.Threading.Tasks.Dataflow.dll
+./build/net462/System.Threading.Tasks.Extensions.dll
+./build/net462/System.ValueTuple.dll
+./build/netstandard2.0/Cucumber.HtmlFormatter.dll
+./build/netstandard2.0/Cucumber.Messages.dll
+./build/netstandard2.0/CucumberExpressions.dll
+./build/netstandard2.0/Gherkin.dll
+./build/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll
+./build/netstandard2.0/Microsoft.Extensions.DependencyModel.dll
+./build/netstandard2.0/Microsoft.NET.StringTools.dll
+./build/netstandard2.0/Microsoft.Win32.Registry.dll
+./build/netstandard2.0/Reqnroll.Generator.dll
+./build/netstandard2.0/Reqnroll.Parser.dll
+./build/netstandard2.0/Reqnroll.Tools.MsBuild.Generation.deps.json
+./build/netstandard2.0/Reqnroll.Tools.MsBuild.Generation.dll
+./build/netstandard2.0/Reqnroll.Utils.dll
+./build/netstandard2.0/Reqnroll.dll
+./build/netstandard2.0/Reqnroll.xml
+./build/netstandard2.0/System.Buffers.dll
+./build/netstandard2.0/System.CodeDom.dll
+./build/netstandard2.0/System.Collections.Immutable.dll
+./build/netstandard2.0/System.ComponentModel.Composition.dll
+./build/netstandard2.0/System.Composition.AttributedModel.dll
+./build/netstandard2.0/System.Composition.Convention.dll
+./build/netstandard2.0/System.Composition.Hosting.dll
+./build/netstandard2.0/System.Composition.Runtime.dll
+./build/netstandard2.0/System.Composition.TypedParts.dll
+./build/netstandard2.0/System.Configuration.ConfigurationManager.dll
+./build/netstandard2.0/System.Memory.dll
+./build/netstandard2.0/System.Numerics.Vectors.dll
+./build/netstandard2.0/System.Reflection.Emit.ILGeneration.dll
+./build/netstandard2.0/System.Reflection.Emit.dll
+./build/netstandard2.0/System.Reflection.Metadata.dll
+./build/netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll
+./build/netstandard2.0/System.Security.AccessControl.dll
+./build/netstandard2.0/System.Security.Cryptography.ProtectedData.dll
+./build/netstandard2.0/System.Security.Principal.Windows.dll
+./build/netstandard2.0/System.Text.Encoding.CodePages.dll
+./build/netstandard2.0/System.Text.Encodings.Web.dll
+./build/netstandard2.0/System.Text.Json.dll
+./build/netstandard2.0/System.Threading.Channels.dll
+./build/netstandard2.0/System.Threading.Tasks.Dataflow.dll
+./build/netstandard2.0/System.Threading.Tasks.Extensions.dll
+./buildMultiTargeting/Reqnroll.Tools.MsBuild.Generation.props
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Tools.MsBuild.Generation</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to enable the code-behind file generation during build time https://go.reqnroll.net/doc-config-build</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll bdd gherkin cucumber</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+  </metadata>
+</package>
+✗ No lib/ folder
+✓ Has build/ folder
+  Contents:
+    ./CPS/Buildsystem/CpsExtension.DesignTime.targets
+    ./CPS/Buildsystem/Rules/FeatureFileType.xaml
+    ./CPS/Buildsystem/Rules/ProjectItemsSchema.xaml
+    ./Reqnroll.Tools.MsBuild.Generation.props
+    ./Reqnroll.Tools.MsBuild.Generation.targets
+    ./net462/Cucumber.HtmlFormatter.dll
+    ./net462/Cucumber.Messages.dll
+    ./net462/CucumberExpressions.dll
+    ./net462/Gherkin.dll
+    ./net462/Microsoft.Bcl.AsyncInterfaces.dll
+    ./net462/Microsoft.Extensions.DependencyModel.dll
+    ./net462/Microsoft.NET.StringTools.dll
+    ./net462/Microsoft.Win32.Primitives.dll
+    ./net462/Microsoft.Win32.Registry.dll
+    ./net462/Reqnroll.Generator.dll
+    ./net462/Reqnroll.Parser.dll
+    ./net462/Reqnroll.Tools.MsBuild.Generation.dll
+    ./net462/Reqnroll.Utils.dll
+    ./net462/Reqnroll.dll
+    ./net462/Reqnroll.xml
+    ./net462/System.Buffers.dll
+    ./net462/System.CodeDom.dll
+    ./net462/System.Collections.Immutable.dll
+    ./net462/System.Composition.AttributedModel.dll
+    ./net462/System.Composition.Convention.dll
+    ./net462/System.Composition.Hosting.dll
+    ./net462/System.Composition.Runtime.dll
+    ./net462/System.Composition.TypedParts.dll
+    ./net462/System.Configuration.ConfigurationManager.dll
+    ./net462/System.Memory.dll
+    ./net462/System.Numerics.Vectors.dll
+    ./net462/System.Reflection.Metadata.dll
+    ./net462/System.Runtime.CompilerServices.Unsafe.dll
+    ./net462/System.Security.AccessControl.dll
+    ./net462/System.Security.Principal.Windows.dll
+    ./net462/System.Text.Encoding.CodePages.dll
+    ./net462/System.Text.Encodings.Web.dll
+    ./net462/System.Text.Json.dll
+    ./net462/System.Threading.Channels.dll
+    ./net462/System.Threading.Tasks.Dataflow.dll
+    ./net462/System.Threading.Tasks.Extensions.dll
+    ./net462/System.ValueTuple.dll
+    ./netstandard2.0/Cucumber.HtmlFormatter.dll
+    ./netstandard2.0/Cucumber.Messages.dll
+    ./netstandard2.0/CucumberExpressions.dll
+    ./netstandard2.0/Gherkin.dll
+    ./netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll
+    ./netstandard2.0/Microsoft.Extensions.DependencyModel.dll
+    ./netstandard2.0/Microsoft.NET.StringTools.dll
+    ./netstandard2.0/Microsoft.Win32.Registry.dll
+    ./netstandard2.0/Reqnroll.Generator.dll
+    ./netstandard2.0/Reqnroll.Parser.dll
+    ./netstandard2.0/Reqnroll.Tools.MsBuild.Generation.deps.json
+    ./netstandard2.0/Reqnroll.Tools.MsBuild.Generation.dll
+    ./netstandard2.0/Reqnroll.Utils.dll
+    ./netstandard2.0/Reqnroll.dll
+    ./netstandard2.0/Reqnroll.xml
+    ./netstandard2.0/System.Buffers.dll
+    ./netstandard2.0/System.CodeDom.dll
+    ./netstandard2.0/System.Collections.Immutable.dll
+    ./netstandard2.0/System.ComponentModel.Composition.dll
+    ./netstandard2.0/System.Composition.AttributedModel.dll
+    ./netstandard2.0/System.Composition.Convention.dll
+    ./netstandard2.0/System.Composition.Hosting.dll
+    ./netstandard2.0/System.Composition.Runtime.dll
+    ./netstandard2.0/System.Composition.TypedParts.dll
+    ./netstandard2.0/System.Configuration.ConfigurationManager.dll
+    ./netstandard2.0/System.Memory.dll
+    ./netstandard2.0/System.Numerics.Vectors.dll
+    ./netstandard2.0/System.Reflection.Emit.ILGeneration.dll
+    ./netstandard2.0/System.Reflection.Emit.dll
+    ./netstandard2.0/System.Reflection.Metadata.dll
+    ./netstandard2.0/System.Runtime.CompilerServices.Unsafe.dll
+    ./netstandard2.0/System.Security.AccessControl.dll
+    ./netstandard2.0/System.Security.Cryptography.ProtectedData.dll
+    ./netstandard2.0/System.Security.Principal.Windows.dll
+    ./netstandard2.0/System.Text.Encoding.CodePages.dll
+    ./netstandard2.0/System.Text.Encodings.Web.dll
+    ./netstandard2.0/System.Text.Json.dll
+    ./netstandard2.0/System.Threading.Channels.dll
+    ./netstandard2.0/System.Threading.Tasks.Dataflow.dll
+    ./netstandard2.0/System.Threading.Tasks.Extensions.dll
+
+
+========================================
+Package: Reqnroll.Verify.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.Verify.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.Verify.props
+./build/Reqnroll.Verify.targets
+./lib/net472/Reqnroll.Verify.ReqnrollPlugin.dll
+./lib/net8.0/Reqnroll.Verify.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Verify</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to use Verify.Xunit with Reqnroll</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll verify xunit</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.7.2">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Verify.Xunit" version="29.0.0" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework="net8.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Verify.Xunit" version="29.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+    <frameworkAssemblies>
+      <frameworkAssembly assemblyName="System.Runtime.InteropServices.RuntimeInformation" targetFramework=".NETFramework4.7.2" />
+    </frameworkAssemblies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 2 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.Verify.props
+    ./Reqnroll.Verify.targets
+
+
+========================================
+Package: Reqnroll.Windsor.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.Windsor.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.Windsor.props
+./build/Reqnroll.Windsor.targets
+./lib/netstandard2.0/Reqnroll.Windsor.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.Windsor</id>
+    <version>3.3.1</version>
+    <title>Reqnroll Windsor integration plugin</title>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Reqnroll plugin that enables to use Windsor for resolving test dependencies.</description>
+    <copyright>Copyright © Gaspar Nagy, Spec Solutions, Reqnroll</copyright>
+    <tags>reqnroll castle windsor di dependency injection</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll" version="[3.3.1, 4.0.0)" exclude="Build,Analyzers" />
+        <dependency id="Castle.Windsor" version="6.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.Windsor.props
+    ./Reqnroll.Windsor.targets
+
+
+========================================
+Package: Reqnroll.xUnit.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.xUnit.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.TestFrameworkAdapter.props
+./build/Reqnroll.TestFrameworkAdapter.targets
+./build/Reqnroll.xUnit.props
+./build/Reqnroll.xUnit.targets
+./build/net462/Reqnroll.xUnit.Generator.ReqnrollPlugin.dll
+./build/net462/Reqnroll.xUnit.Generator.ReqnrollPlugin.pdb
+./build/netstandard2.0/Reqnroll.xUnit.Generator.ReqnrollPlugin.dll
+./build/netstandard2.0/Reqnroll.xUnit.Generator.ReqnrollPlugin.pdb
+./build/xUnit.AssemblyHooks.cs
+./build/xUnit.AssemblyHooks.vb
+./lib/net462/Reqnroll.xUnit.ReqnrollPlugin.dll
+./lib/netstandard2.0/Reqnroll.xUnit.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.xUnit</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to use Reqnroll with xUnit 2.x. Use Reqnroll.xunit.v3 for xUnit 3.x.</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll xUnit</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETFramework4.6.2">
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="3.3.1" include="All" />
+        <dependency id="Reqnroll" version="3.3.1" exclude="Build,Analyzers" />
+        <dependency id="Xunit.SkippableFact" version="1.4.13" exclude="Build,Analyzers" />
+        <dependency id="xunit.core" version="2.8.1" exclude="Build,Analyzers" />
+      </group>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="3.3.1" include="All" />
+        <dependency id="Reqnroll" version="3.3.1" exclude="Build,Analyzers" />
+        <dependency id="Xunit.SkippableFact" version="1.4.13" exclude="Build,Analyzers" />
+        <dependency id="xunit.core" version="2.8.1" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 2 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.TestFrameworkAdapter.props
+    ./Reqnroll.TestFrameworkAdapter.targets
+    ./Reqnroll.xUnit.props
+    ./Reqnroll.xUnit.targets
+    ./net462/Reqnroll.xUnit.Generator.ReqnrollPlugin.dll
+    ./net462/Reqnroll.xUnit.Generator.ReqnrollPlugin.pdb
+    ./netstandard2.0/Reqnroll.xUnit.Generator.ReqnrollPlugin.dll
+    ./netstandard2.0/Reqnroll.xUnit.Generator.ReqnrollPlugin.pdb
+    ./xUnit.AssemblyHooks.cs
+    ./xUnit.AssemblyHooks.vb
+
+
+========================================
+Package: Reqnroll.xunit.v3.3.3.1
+========================================
+
+Directory Structure:
+-------------------
+./Reqnroll.xunit.v3.nuspec
+./[Content_Types].xml
+./_rels/.rels
+./assets/icon.png
+./build/Reqnroll.TestFrameworkAdapter.props
+./build/Reqnroll.TestFrameworkAdapter.targets
+./build/Reqnroll.xunit.v3.props
+./build/Reqnroll.xunit.v3.targets
+./build/netstandard2.0/Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll
+./build/xUnit3.AssemblyHooks.cs
+./build/xUnit3.AssemblyHooks.vb
+./lib/netstandard2.0/Reqnroll.xUnit3.ReqnrollPlugin.dll
+
+NuSpec Content:
+--------------
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2013/05/nuspec.xsd">
+  <metadata>
+    <id>Reqnroll.xunit.v3</id>
+    <version>3.3.1</version>
+    <authors>Reqnroll</authors>
+    <license type="expression">BSD-3-Clause</license>
+    <licenseUrl>https://licenses.nuget.org/BSD-3-Clause</licenseUrl>
+    <icon>assets/icon.png</icon>
+    <projectUrl>https://reqnroll.net/</projectUrl>
+    <description>Package to use Reqnroll with xUnit.v3 2.0 and later.</description>
+    <copyright>Copyright © Reqnroll</copyright>
+    <tags>reqnroll bdd gherkin cucumber</tags>
+    <repository type="git" url="https://github.com/reqnroll/Reqnroll" commit="076536456f658b35c475d3768c4a73f4461c95e6" />
+    <dependencies>
+      <group targetFramework=".NETStandard2.0">
+        <dependency id="Reqnroll.Tools.MsBuild.Generation" version="3.3.1" include="All" />
+        <dependency id="Reqnroll" version="3.3.1" exclude="Build,Analyzers" />
+        <dependency id="xunit.v3.assert" version="2.0.0" exclude="Build,Analyzers" />
+        <dependency id="xunit.v3.extensibility.core" version="2.0.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+✓ Has lib/ folder
+  Contents: 1 DLL files
+✓ Has build/ folder
+  Contents:
+    ./Reqnroll.TestFrameworkAdapter.props
+    ./Reqnroll.TestFrameworkAdapter.targets
+    ./Reqnroll.xunit.v3.props
+    ./Reqnroll.xunit.v3.targets
+    ./netstandard2.0/Reqnroll.xUnit3.Generator.ReqnrollPlugin.dll
+    ./xUnit3.AssemblyHooks.cs
+    ./xUnit3.AssemblyHooks.vb
+
