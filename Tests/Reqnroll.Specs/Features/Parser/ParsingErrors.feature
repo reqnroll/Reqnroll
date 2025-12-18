@@ -159,3 +159,18 @@ Scenario: Duplicated background
 		| line | error             |
 		| 6    | got 'Background:' |
 
+Scenario: Table header without trailing delimiter
+	Given there is a Gherkin file as
+	"""
+		Feature: Table without trailing delimiter
+
+		Scenario: Table without trailing delimiter
+			Given a table
+				| EffectiveDate | InterestRate
+				| 1999-01-01    | 10.00        |
+	"""
+	When the file is parsed
+	Then the following errors are provided
+		| line | error                                    |
+		| 6    | inconsistent cell count within the table |
+
