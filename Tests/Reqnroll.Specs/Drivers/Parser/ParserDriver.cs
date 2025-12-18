@@ -119,7 +119,7 @@ namespace Reqnroll.Specs.Drivers.Parser
         {
             ParsedDocument.Should().NotBeNull("The parsing was not successful");
             
-            var scenario = ParsedDocument.ReqnrollFeature.Children.FirstOrDefault() as Scenario;
+            var scenario = ParsedDocument.ReqnrollFeature.Children.OfType<Scenario>().FirstOrDefault();
             scenario.Should().NotBeNull("No scenario found in the parsed document");
             
             var step = scenario.Steps.FirstOrDefault();
@@ -132,9 +132,6 @@ namespace Reqnroll.Specs.Drivers.Parser
             headerRow.Should().NotBeNull("Table has no rows");
             
             var actualColumns = headerRow.Cells.Select(c => c.Value).ToList();
-            
-            Console.WriteLine($"-> Expected columns: [{string.Join(", ", expectedColumns)}]");
-            Console.WriteLine($"-> Actual columns: [{string.Join(", ", actualColumns)}]");
             
             actualColumns.Should().BeEquivalentTo(expectedColumns, 
                 "the parsed table should have the expected columns");
