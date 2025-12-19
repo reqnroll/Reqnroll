@@ -1,10 +1,11 @@
 # [vNext]
 
 ## Improvements:
+* Elimination of the PickleIndex argument from the row test method signature and row test attributes. This restores the method signature to what is was in V2.x. (#938)
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.0 - 2025-12-17
 

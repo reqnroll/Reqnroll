@@ -1,8 +1,8 @@
+using Reqnroll.Formatters.RuntimeSupport;
+using Reqnroll.Tracing;
 using System;
 using System.Diagnostics;
 using System.Globalization;
-using Reqnroll.Formatters.RuntimeSupport;
-using Reqnroll.Tracing;
 
 namespace Reqnroll
 {
