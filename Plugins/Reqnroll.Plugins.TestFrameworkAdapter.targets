@@ -135,9 +135,15 @@
     DependsOnTargets="$(ResolveReqnrollGeneratorPluginFilesDependsOn)">
 
     <ItemGroup>
+      <_GeneratorPluginProjectReference 
+        Include="@(ProjectReference)" 
+        Condition="'%(ProjectReference.PackAsReqnrollGeneratorPlugin)' == 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ReqnrollGeneratorPluginFile
         Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true'" />
+        Condition="'%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true' OR ('@(_GeneratorPluginProjectReference)' != '' AND '%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference')" />
     </ItemGroup>
 
     <ItemGroup>
