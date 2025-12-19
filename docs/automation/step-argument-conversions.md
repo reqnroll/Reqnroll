@@ -102,6 +102,9 @@ public record Rating(int Value)
 }
 ```
 
+Specifying the `Name` property in the `StepArgumentTransformation` attribute allows for [Parameters](cucumber_expressions#parameters) to be specified with that name.
+This `Name` property does not enforce strict scoping to Cucumber expression parameters with that name, but is instead intended for clarity.
+
 ## Standard Conversion
 
 A standard conversion is performed by Reqnroll in the following cases:
