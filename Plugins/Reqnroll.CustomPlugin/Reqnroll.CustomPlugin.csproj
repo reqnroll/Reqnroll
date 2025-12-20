@@ -3,12 +3,56 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
+    <IsPackable>true</IsPackable>
     
     <!-- NuGet configuration -->
     <PackageId>Reqnroll.CustomPlugin</PackageId>
     <Description>Package for writing custom generator extensions for Reqnroll.</Description>
     <PackageTags>reqnroll bdd gherkin cucumber generator</PackageTags>
+    
+    <!-- Don't include the project's own DLL/PDB in the package -->
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    
+    <!-- Ensure PDBs go to symbol package -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CodeDom" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Reqnroll.Generator\Reqnroll.Generator.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\Reqnroll.Parser\Reqnroll.Parser.csproj" PrivateAssets="all" />
+    <ProjectReference Include="..\..\Reqnroll.Utils\Reqnroll.Utils.csproj" PrivateAssets="all" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_AddReferencedDllsToPackage</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <!-- Include only the 3 DLLs from referenced projects in main package -->
+  <Target Name="_AddReferencedDllsToPackage">
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="$(OutputPath)Reqnroll.Generator.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)Reqnroll.Parser.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)Reqnroll.Utils.dll" PackagePath="lib/$(TargetFramework)/" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Add PDBs to symbol package after main pack is complete -->
+  <Target Name="_AddPdbsToSymbolPackage" AfterTargets="Pack" Condition="'$(IncludeSymbols)' == 'true' AND Exists('$(PackageOutputPath)$(PackageId).$(PackageVersion).snupkg')">
+    <PropertyGroup>
+      <_SymbolPackageFile>$(MSBuildProjectDirectory)\$(PackageOutputPath)$(PackageId).$(PackageVersion).snupkg</_SymbolPackageFile>
+      <_PdbDir>$(MSBuildProjectDirectory)\bin\$(Configuration)\netstandard2.0</_PdbDir>
+      <_PdbPath1>$(_PdbDir)\Reqnroll.Generator.pdb</_PdbPath1>
+      <_PdbPath2>$(_PdbDir)\Reqnroll.Parser.pdb</_PdbPath2>
+      <_PdbPath3>$(_PdbDir)\Reqnroll.Utils.pdb</_PdbPath3>
+    </PropertyGroup>
+
+    <!-- Use ZipFileExtensions to add PDB files to the symbol package -->
+    <Exec Command="powershell -NoProfile -ExecutionPolicy Bypass -Command &quot;Add-Type -A 'System.IO.Compression.FileSystem'; $zip = [IO.Compression.ZipFile]::Open('$(_SymbolPackageFile)', 'Update'); $pdbFiles = @('$(_PdbPath1)', '$(_PdbPath2)', '$(_PdbPath3)'); foreach($f in $pdbFiles) { if(Test-Path $f) { [IO.Compression.ZipFileExtensions]::CreateEntryFromFile($zip, $f, 'lib/netstandard2.0/' + [IO.Path]::GetFileName($f), 'Optimal') | Out-Null } }; $zip.Dispose()&quot;" />
+  </Target>
 
 </Project>

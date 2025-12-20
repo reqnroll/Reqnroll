@@ -4,7 +4,10 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix Reqnroll.CustomPlugin package (#978)
+* Fix Reqnroll.SpecFlowCompatibility package (#978)
+
+*Contributors of this release (in alphabetical order):* @304NotModified
 
 # v3.3.0 - 2025-12-17
 
