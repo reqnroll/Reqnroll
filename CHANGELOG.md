@@ -4,7 +4,9 @@
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+* Fix authors of Reqnroll.Autofac package (#979)
+
+*Contributors of this release (in alphabetical order):* @304NotModified
 
 # v3.3.0 - 2025-12-17
 
