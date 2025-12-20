@@ -17,20 +17,17 @@ namespace Reqnroll.RuntimeTests.Formatters;
 
 public class FormatterBaseTests
 {
-    private class TestFormatter : FormatterBase
+    private class TestFormatter(IFormattersConfigurationProvider config, IFormatterLog logger, string name) : FormatterBase(config, logger, name)
     {
         public bool LaunchInnerCalled = false;
         public IDictionary<string, object> LaunchInnerConfig = null!;
         public Action<bool> LaunchInnerCallback = null!;
         public bool ConsumeAndFormatMessagesCalled = false;
         public CancellationToken? ConsumedToken;
-        public List<Envelope> ConsumedMessages = new();
+        public List<Envelope> ConsumedMessages = [];
         public bool ReportInitializedCalled = false;
         public bool CloseAsyncCalled = false;
         public bool CompleteWriterOnLaunchInner = false;
-
-        public TestFormatter(IFormattersConfigurationProvider config, IFormatterLog logger, string name)
-            : base(config, logger, name) { }
 
         public override void LaunchInner(IDictionary<string, object> formatterConfig, Action<bool> onAfterInitialization)
         {
