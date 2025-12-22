@@ -14,7 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" Pack="true" PrivateAssets="all" />
+    <ProjectReference
+      Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj"
+      PackAsComponent="true"
+      PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -93,47 +96,6 @@
 
       <!-- Track the file was created during the build so it will be cleaned automatically. -->
       <FileWrites Include="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" />
-    </ItemGroup>
-  </Target>
-
-  <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>
-      $(TargetsForTfmSpecificContentInPackage);
-      CollectProjectReferenceOutputsForPack
-    </TargetsForTfmSpecificContentInPackage>
-  </PropertyGroup>
-
-  <!-- Include referenced project assembly as part of this package directly. -->
-  <Target Name="CollectProjectReferenceOutputsForPack" DependsOnTargets="ResolveReferences">
-    <ItemGroup>
-      <TfmSpecificPackageFile
-        Include="@(ReferenceCopyLocalPaths)"
-        PackagePath="lib/$(TargetFramework)/"
-        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(Pack)' == 'true'"/>
-    </ItemGroup>
-  </Target>
-
-  <PropertyGroup>
-    <TargetsForTfmSpecificDebugSymbolsInPackage>
-      $(TargetsForTfmSpecificDebugSymbolsInPackage);
-      CollectProjectReferenceSymbolsForPack
-    </TargetsForTfmSpecificDebugSymbolsInPackage>
-  </PropertyGroup>
-
-  <!-- Included referenced project PDBs as part of the symbols package. -->
-  <Target Name="CollectProjectReferenceSymbolsForPack" DependsOnTargets="ResolveReferences">
-    <ItemGroup>
-      <TfmSpecificAssembly
-        Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(Pack)' == 'true'"/>
-    </ItemGroup>
-
-    <ItemGroup>
-      <TfmSpecificDebugSymbolsPdb Include="@(TfmSpecificAssembly->'%(RootDir)%(Directory)%(Filename).pdb')" />
-      <TfmSpecificDebugSymbolsFile
-        Include="@(TfmSpecificDebugSymbolsPdb)"
-        TargetFramework="$(TargetFramework)"
-        Condition="Exists('%(FullPath)')" />
     </ItemGroup>
   </Target>
 </Project>

@@ -3,6 +3,9 @@
     <TargetFrameworks>netstandard2.0;net462</TargetFrameworks>
     <IsReqnrollRuntimePlugin>true</IsReqnrollRuntimePlugin>
 
+    <!-- This is required to ensure dependencies are made available for packing -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.SpecFlowCompatibility</PackageId>
     <Description>Enables SpecFlow compatibility mode for Reqnroll</Description>
@@ -16,7 +19,49 @@
       PackAsReqnrollGeneratorPlugin="true" />
     <ProjectReference
       Include="..\Reqnroll.SpecFlowCompatibility\Reqnroll.SpecFlowCompatibility.csproj"
-      PrivateAssets="all" />
+      PrivateAssets="all"
+      PackAsComponent="true" />
   </ItemGroup>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);CollectPackedReferences</TargetsForTfmSpecificContentInPackage>
+  </PropertyGroup>
+
+  <!-- Collects the project references to be included directly in the package. -->
+  <Target
+    Name="CollectPackedReferences"
+    DependsOnTargets="ResolveReferences">
+    
+    <ItemGroup>
+      <ReferencesToPack
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.Pack)' == 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <TfmSpecificPackageFile
+        Include="@(ReferencesToPack)"
+        PackagePath="lib/$(TargetFramework)/"
+        Condition="'%(Extension)' != '.pdb'" />
+    </ItemGroup>
+    
+  </Target>
+
+  <!-- Resolves the generator plugin assemblies that needs to be included with this package. -->
+  <Target
+    Name="ResolveReqnrollGeneratorPluginFiles"
+    DependsOnTargets="$(ResolveReqnrollGeneratorPluginFilesDependsOn)">
+
+    <ItemGroup>
+      <ReqnrollGeneratorPluginFile
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <TfmSpecificPackageFile Include="@(ReqnrollGeneratorPluginFile)" PackagePath="build/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Update="@(ReqnrollGeneratorPluginFile)" PackFolder="Symbols" Condition="'%(Extension)' == '.pdb'" />
+    </ItemGroup>
+  </Target>
 
 </Project>
