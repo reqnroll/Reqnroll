@@ -35,4 +35,48 @@
         ProjectVersion="[%(_ProjectReferencesWithVersions.BaseVersion),$(CompatibilityVersionUpperRange))"/>
     </ItemGroup>
   </Target>
+
+  <!-- Get the list of project reference outputs that should be packed as a generator plugin. -->
+  <Target
+    Name="_GetProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin"
+    DependsOnTargets="ResolveReferences"
+    Returns="_ProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin">
+
+    <ItemGroup>
+      <_ReferenceCopyLocalProjects
+        Include="@(ReferenceCopyLocalPaths -> '%(ProjectReferenceOriginalItemSpec)')"
+        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true'">
+        <Asset>%(Identity)</Asset>
+      </_ReferenceCopyLocalProjects>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin
+        Include="@(_ReferenceCopyLocalProjects->'%(Asset)')"
+        Condition="'%(ProjectReference.PackAsReqnrollGeneratorPlugin)' == 'true'"/>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>
+      $(TargetsForTfmSpecificContentInPackage);
+      CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPlugin
+    </TargetsForTfmSpecificContentInPackage>
+
+    <CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPluginDependsOn>
+      $(CollectProjectReferenceOutputsForPackDependsOnAsReqnrollGeneratorPlugin);
+      _GetProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin
+    </CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPluginDependsOn>
+  </PropertyGroup>
+
+  <!-- Include referenced project assembly as part of this package directly. -->
+  <Target 
+    Name="CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPlugin"
+    DependsOnTargets="$(CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPluginDependsOn)">
+    <ItemGroup>
+      <TfmSpecificPackageFile
+        Include="@(_ProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin)"
+        PackagePath="build/$(TargetFramework)/" />
+    </ItemGroup>
+  </Target>
 </Project>
