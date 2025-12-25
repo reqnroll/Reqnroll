@@ -58,97 +58,178 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);ResolveRedistributableAssemblies</TargetsForTfmSpecificBuildOutput>
-    <ResolveRedistributableAssembliesDependsOn>ResolveAssemblyReferences</ResolveRedistributableAssembliesDependsOn>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);ResolveRedistributableReqnrollGeneratorPluginAssemblies</TargetsForTfmSpecificBuildOutput>
+    <ResolveRedistributableReqnrollGeneratorPluginAssembliesDependsOn>ResolveAssemblyReferences</ResolveRedistributableReqnrollGeneratorPluginAssembliesDependsOn>
   </PropertyGroup>
 
-  <!-- Resolves the additional assemblies that will be provided to the runtime through this package. -->
+  <!--
+  ============================================================
+  
+      ResolveRedistributableReqnrollGeneratorPluginAssemblies
+      
+      Resolves the additional assemblies that will be provided to the runtime through this package.
+  
+  ============================================================
+  -->
   <Target
-    Name="ResolveRedistributableAssemblies"
-    Returns="RedistributableAssembly"
-    DependsOnTargets="$(ResolveRedistributableAssembliesDependsOn)">
+    Name="ResolveRedistributableReqnrollGeneratorPluginAssemblies"
+    Returns="@(ReqnrollGeneratorPluginRedistributableAssembly)"
+    DependsOnTargets="$(ResolveRedistributableReqnrollGeneratorPluginAssembliesDependsOn)">
 
     <ItemGroup>
-      <RedistributableAssembly Include="@(ReferenceCopyLocalPaths)" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Include="@(ReferenceCopyLocalPaths)" />
       
       <!-- Remove system assemblies. -->
-      <RedistributableAssembly
-        Remove="@(RedistributableAssembly)"
-        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(RedistributableAssembly.NuGetPackageId)' == ''" />
+      <ReqnrollGeneratorPluginRedistributableAssembly
+        Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)"
+        Condition="$([System.String]::Intern('%(Filename)').StartsWith('System.')) And '%(ReqnrollGeneratorPluginRedistributableAssembly.NuGetPackageId)' == ''" />
 
       <!-- Remove Visual Studio assemblies. -->
-      <RedistributableAssembly
-        Remove="@(RedistributableAssembly)"
+      <ReqnrollGeneratorPluginRedistributableAssembly
+        Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)"
         Condition="$([System.String]::Intern('%(Filename)').StartsWith('Microsoft.VisualStudio'))" />
 
       <!-- Remove netstandard -->
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'netstandard'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'netstandard'" />
 
       <!-- Remove libraries provided via the Reqnroll MSBuild Generator. -->
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Cucumber.HtmlFormatter'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Cucumber.Messages'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'CucumberExpressions'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Gherkin'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Cucumber.HtmlFormatter'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Cucumber.Messages'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'CucumberExpressions'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Gherkin'" />
                                        
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Bcl.AsyncInterfaces'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Extensions.DependencyModel'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.NET.StringTools'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Win32.Primitives'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Win32.Registry'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Bcl.AsyncInterfaces'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Extensions.DependencyModel'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.NET.StringTools'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Win32.Primitives'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Microsoft.Win32.Registry'" />
       
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Generator'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Parser'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Tools.MsBuild.Generation'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Utils'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Generator'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Parser'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Tools.MsBuild.Generation'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'Reqnroll.Utils'" />
       
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Buffers'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.CodeDom'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Collections.Immutable'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.AttributedModel'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Convention'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Hosting'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Runtime'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.TypedParts'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Configuration.ConfigurationManager'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Memory'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Numerics.Vectors'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Emit'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Emit.ILGeneration'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Metadata'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Runtime.CompilerServices.Unsafe'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.AccessControl'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.Cryptography.ProtectedData'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.Principal.Windows'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Encoding.CodePages'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Encodings.Web'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Json'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Channels'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Tasks.Dataflow'" />
-      <RedistributableAssembly Remove="@(RedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Tasks.Extensions'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Buffers'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.CodeDom'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Collections.Immutable'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.AttributedModel'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Convention'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Hosting'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.Runtime'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Compositions.TypedParts'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Configuration.ConfigurationManager'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Memory'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Numerics.Vectors'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Emit'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Emit.ILGeneration'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Reflection.Metadata'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Runtime.CompilerServices.Unsafe'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.AccessControl'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.Cryptography.ProtectedData'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Security.Principal.Windows'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Encoding.CodePages'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Encodings.Web'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Text.Json'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Channels'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Tasks.Dataflow'" />
+      <ReqnrollGeneratorPluginRedistributableAssembly Remove="@(ReqnrollGeneratorPluginRedistributableAssembly)" Condition="'%(Filename)' == 'System.Threading.Tasks.Extensions'" />
     </ItemGroup>
 
   </Target>
 
   <PropertyGroup>
-    <CollectRedistributableAssembliesDependsOn>ResolveRedistributableAssemblies</CollectRedistributableAssembliesDependsOn>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);CollectRedistributableAssemblies</TargetsForTfmSpecificBuildOutput>
+    <CollectRedistributableAssembliesDependsOn>_GetReqnrollGeneratorPluginAssets</CollectRedistributableAssembliesDependsOn>
   </PropertyGroup>
 
-  <!-- Include redistributable assemblies in the package. -->
+  <!--
+  ============================================================
+  
+      CollectReqnrollGeneratorPluginAssets
+      
+      Adds the redistributed assets of the generator plugin to the package output.
+  
+  ============================================================
+  -->
   <Target
     Name="CollectRedistributableAssemblies"
-    AfterTargets="CoreCompile"
     DependsOnTargets="$(CollectRedistributableAssembliesDependsOn)">
 
     <ItemGroup>
-      <BuildOutputInPackage
-        Include="@(RedistributableAssembly)"
-        TargetPath="%(RedistributableAssembly.DestinationSubPath)"/>
+      <BuildOutputInPackage Include="@(_ReqnrollGeneratorPluginAssets)"/>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <GetReqnrollGeneratorPluginAssetsDependsOn Condition="'$(TargetFramework)' != ''">$(GetReqnrollGeneratorPluginAssetsDependsOn);_GetReqnrollGeneratorPluginAssets</GetReqnrollGeneratorPluginAssetsDependsOn>
+    <GetReqnrollGeneratorPluginAssetsDependsOn Condition="'$(TargetFramework)' == ''">$(GetReqnrollGeneratorPluginAssetsDependsOn);_WalkTfmsForReqnrollGeneratorPluginAssets</GetReqnrollGeneratorPluginAssetsDependsOn>
+  </PropertyGroup>
+
+  <!--
+  ============================================================
+  
+      GetReqnrollGeneratorPluginAssets
+      
+      Gets the list of redistributable assets a project publishes as a Reqnroll Generator Plugin.
+      
+      This target is intended to be invoked by consuming projects which want to pack the generator as part
+      of their own package.
+  
+  ============================================================
+  -->
+  <Target
+    Name="GetReqnrollGeneratorPluginAssets"
+    DependsOnTargets="$(GetReqnrollGeneratorPluginAssetsDependsOn)"
+    Returns="@(ReqnrollGeneratorPluginAssets)">
+    <ItemGroup>
+      <ReqnrollGeneratorPluginAssets Include="@(_ReqnrollGeneratorPluginAssets)" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Walks all target frameworks to get the assets for each framework -->
+  <Target
+    Name="_WalkTfmsForReqnrollGeneratorPluginAssets"
+    DependsOnTargets="_PrepareInnerReqnrollGeneratorProjects">
+    <MSBuild
+      Projects="@(_InnerReqnrollGeneratorProjects)"
+      Targets="_GetReqnrollGeneratorPluginAssets">
+      <Output TaskParameter="TargetOutputs" ItemName="_ReqnrollGeneratorPluginAssets" />
+    </MSBuild>
+  </Target>
+
+  <Target Name="_PrepareInnerReqnrollGeneratorProjects">
+    <ItemGroup>
+      <_ReqnrollGeneratorTargetFramework Include="$(TargetFrameworks)" />
+      <_ReqnrollGeneratorTargetFramework Include="$(TargetFramework)" Condition="'@(_ReqnrollGeneratorTargetFramework)' == ''" />
+      <!-- Make normalization explicit: Trim; Deduplicate by keeping first occurrence, case insensitive -->
+      <_ReqnrollGeneratorTargetFrameworkNormalized Include="@(_ReqnrollGeneratorTargetFramework->Trim()->Distinct())" />
+      <_InnerReqnrollGeneratorProjects Include="$(MSBuildProjectFile)">
+        <AdditionalProperties>TargetFramework=%(_ReqnrollGeneratorTargetFrameworkNormalized.Identity)</AdditionalProperties>
+      </_InnerReqnrollGeneratorProjects>
+    </ItemGroup>
+  </Target>
+
+  <Target
+    Name="_GetReqnrollGeneratorPluginAssets"
+    DependsOnTargets="ResolveRedistributableReqnrollGeneratorPluginAssemblies"
+    Returns="@(_ReqnrollGeneratorPluginAssets)">
+    <ItemGroup>
+
+      <!-- Include the main plugin assembly -->
+      <_ReqnrollGeneratorPluginAssets
+        Include="$(OutputPath)$(AssemblyName).dll"
+        PackagePath="build/$(TargetFramework)/"/>
+
+      <!-- Include all redistributable assemblies needed by the generator plugin -->
+      <_ReqnrollGeneratorPluginAssets
+        Include="@(ReqnrollGeneratorPluginRedistributableAssembly)"
+        PackagePath="build/$(TargetFramework)/"/>
 
       <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
-      <BuildOutputInPackage
+      <_ReqnrollGeneratorPluginAssets
         Include="$(ProjectDepsFilePath)"
-        TargetPath="$(ProjectDepsFileName)"
+        PackagePath="build/$(TargetFramework)/"
         Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'"/>
     </ItemGroup>
   </Target>

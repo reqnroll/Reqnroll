@@ -57,26 +57,38 @@
     </ItemGroup>
   </Target>
 
-  <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>
-      $(TargetsForTfmSpecificContentInPackage);
-      CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPlugin
-    </TargetsForTfmSpecificContentInPackage>
-
-    <CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPluginDependsOn>
-      $(CollectProjectReferenceOutputsForPackDependsOnAsReqnrollGeneratorPlugin);
-      _GetProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin
-    </CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPluginDependsOn>
-  </PropertyGroup>
-
-  <!-- Include referenced project assembly as part of this package directly. -->
+  <!--
+  ============================================================
+  
+      GetReqnrollGeneratorPluginProjectReferenceAssets
+      
+      Gets the list of redistributable assets a project publishes as a Reqnroll Generator Plugin and includes them
+      in the package content.
+  
+  ============================================================
+  -->
   <Target 
-    Name="CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPlugin"
-    DependsOnTargets="$(CollectProjectReferenceOutputsForPackAsReqnrollGeneratorPluginDependsOn)">
+    Name="GetReqnrollGeneratorPluginProjectReferenceAssets"
+    BeforeTargets="_GetPackageFiles"
+    DependsOnTargets="$(GetReqnrollGeneratorPluginProjectReferenceAssetsDependsOn)">
+
     <ItemGroup>
-      <TfmSpecificPackageFile
-        Include="@(_ProjectReferenceCopyLocalPathsForPackAsReqnrollGeneratorPlugin)"
-        PackagePath="build/$(TargetFramework)/" />
+      <_ReqnrollGeneratorPluginProjectReference
+        Include="@(ProjectReference)"
+        Condition="'%(ProjectReference.PackAsReqnrollGeneratorPlugin)' == 'true'"/>
+    </ItemGroup>
+    
+    <MSBuild 
+      Projects="@(_ReqnrollGeneratorPluginProjectReference)"
+      Targets="GetReqnrollGeneratorPluginAssets">
+      <Output TaskParameter="TargetOutputs" ItemName="_ReqnrollGeneratorPluginProjectReferenceAssets" />
+    </MSBuild>
+    
+    <ItemGroup>
+      <None
+        Include="@(_ReqnrollGeneratorPluginProjectReferenceAssets)"
+        Pack="true"
+        PackagePath="%(_ReqnrollGeneratorPluginProjectReferenceAssets.PackagePath)"/>
     </ItemGroup>
   </Target>
 </Project>
