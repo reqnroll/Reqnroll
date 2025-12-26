@@ -60,17 +60,24 @@
   <!--
   ============================================================
   
-      GetReqnrollGeneratorPluginProjectReferenceAssets
+      GetReqnrollGeneratorPluginProjectReferencePackageFiles
       
       Gets the list of redistributable assets a project publishes as a Reqnroll Generator Plugin and includes them
       in the package content.
+      
+      [IN]
+      @(ProjectReference) - The list of project references to be processed. Only ones marked as 
+                            PackAsReqnrollGeneratorPlugin="true" are processed by this target.
+                            
+      [OUT]
+      @(None) - Items are added which are the package files for each generator plugin.
   
   ============================================================
   -->
   <Target 
-    Name="GetReqnrollGeneratorPluginProjectReferenceAssets"
+    Name="GetReqnrollGeneratorPluginProjectReferencePackageFiles"
     BeforeTargets="_GetPackageFiles"
-    DependsOnTargets="$(GetReqnrollGeneratorPluginProjectReferenceAssetsDependsOn)">
+    DependsOnTargets="$(GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn)">
 
     <ItemGroup>
       <_ReqnrollGeneratorPluginProjectReference
@@ -80,15 +87,12 @@
     
     <MSBuild 
       Projects="@(_ReqnrollGeneratorPluginProjectReference)"
-      Targets="GetReqnrollGeneratorPluginAssets">
-      <Output TaskParameter="TargetOutputs" ItemName="_ReqnrollGeneratorPluginProjectReferenceAssets" />
+      Targets="GetReqnrollGeneratorPluginPackageFiles">
+      <Output TaskParameter="TargetOutputs" ItemName="_ReqnrollGeneratorPluginProjectReferencePackageFiles" />
     </MSBuild>
     
     <ItemGroup>
-      <None
-        Include="@(_ReqnrollGeneratorPluginProjectReferenceAssets)"
-        Pack="true"
-        PackagePath="%(_ReqnrollGeneratorPluginProjectReferenceAssets.PackagePath)"/>
+      <None Include="@(_ReqnrollGeneratorPluginProjectReferencePackageFiles)" Pack="true" />
     </ItemGroup>
   </Target>
 </Project>

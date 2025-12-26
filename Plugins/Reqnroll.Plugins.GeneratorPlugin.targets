@@ -175,40 +175,40 @@
   <!--
   ============================================================
   
-      GetReqnrollGeneratorPluginAssets
+      GetReqnrollGeneratorPluginPackageFiles
       
       Gets the list of redistributable assets a project publishes as a Reqnroll Generator Plugin.
       
       This target is intended to be invoked by consuming projects which want to pack the generator as part
       of their own package. Depending on whether the project is multi-targeting or not, it either invokes 
-      _GetReqnrollGeneratorPluginAssets to get the assets for the single target framework, or invokes 
-      _WalkTfmsForReqnrollGeneratorPluginAssets to get the assets for all target frameworks.
+      _GetReqnrollGeneratorPluginPackageFiles to get the assets for the single target framework, or invokes 
+      _WalkTfmsForReqnrollGeneratorPluginPackageFiles to get the assets for all target frameworks.
       
       [IN]
       @(_ReqnrollGeneratorPluginPackageFiles) - The list of files collected from all target frameworks.
       
       [OUT]
-      @(ReqnrollGeneratorPluginAssets) - The list of files to include in the package.
+      @(ReqnrollGeneratorPluginPackageFiles) - The list of files to include in the package.
   
   ============================================================
   -->
   <PropertyGroup>
-    <GetReqnrollGeneratorPluginAssetsDependsOn Condition="'$(TargetFramework)' != ''">$(GetReqnrollGeneratorPluginAssetsDependsOn);_GetReqnrollGeneratorPluginAssets</GetReqnrollGeneratorPluginAssetsDependsOn>
-    <GetReqnrollGeneratorPluginAssetsDependsOn Condition="'$(TargetFramework)' == ''">$(GetReqnrollGeneratorPluginAssetsDependsOn);_WalkTfmsForReqnrollGeneratorPluginAssets</GetReqnrollGeneratorPluginAssetsDependsOn>
+    <GetReqnrollGeneratorPluginPackageFilesDependsOn Condition="'$(TargetFramework)' != ''">$(GetReqnrollGeneratorPluginPackageFilesDependsOn);_GetReqnrollGeneratorPluginPackageFiles</GetReqnrollGeneratorPluginPackageFilesDependsOn>
+    <GetReqnrollGeneratorPluginPackageFilesDependsOn Condition="'$(TargetFramework)' == ''">$(GetReqnrollGeneratorPluginPackageFilesDependsOn);_WalkTfmsForReqnrollGeneratorPluginPackageFiles</GetReqnrollGeneratorPluginPackageFilesDependsOn>
   </PropertyGroup>
   
   <Target
-    Name="GetReqnrollGeneratorPluginAssets"
-    DependsOnTargets="$(GetReqnrollGeneratorPluginAssetsDependsOn)"
-    Returns="@(ReqnrollGeneratorPluginAssets)">
+    Name="GetReqnrollGeneratorPluginPackageFiles"
+    DependsOnTargets="$(GetReqnrollGeneratorPluginPackageFilesDependsOn)"
+    Returns="@(ReqnrollGeneratorPluginPackageFiles)">
     <ItemGroup>
-      <ReqnrollGeneratorPluginAssets Include="@(_ReqnrollGeneratorPluginPackageFiles)" />
+      <ReqnrollGeneratorPluginPackageFiles Include="@(_ReqnrollGeneratorPluginPackageFiles)" />
     </ItemGroup>
   </Target>
 
   <!-- Walks all target frameworks to get the assets for each framework -->
   <Target
-    Name="_WalkTfmsForReqnrollGeneratorPluginAssets"
+    Name="_WalkTfmsForReqnrollGeneratorPluginPackageFiles"
     DependsOnTargets="_PrepareInnerReqnrollGeneratorProjects">
     <MSBuild
       Projects="@(_InnerReqnrollGeneratorProjects)"
