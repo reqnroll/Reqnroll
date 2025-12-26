@@ -11,7 +11,7 @@
     <Description>Enables SpecFlow compatibility mode for Reqnroll</Description>
     <PackageTags>reqnroll specflow</PackageTags>
 
-    <!-- Suppress packing warnings: we intentionall add assemblies to /build and have repeated copies of assemblies. -->
+    <!-- Suppress packing warnings: we intentionally add assemblies to /build and have repeated copies of assemblies. -->
     <NoWarn>$(NoWarn);NU5100;NU5118</NoWarn>
   </PropertyGroup>
 
