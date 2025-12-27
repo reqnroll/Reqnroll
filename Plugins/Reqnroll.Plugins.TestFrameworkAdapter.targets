@@ -123,27 +123,5 @@
     </ItemGroup>
 
   </Target>
-
-  <PropertyGroup>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);ResolveReqnrollGeneratorPluginFiles</TargetsForTfmSpecificContentInPackage>
-    <ResolveReqnrollGeneratorPluginFilesDependsOn>ResolveAssemblyReferences</ResolveReqnrollGeneratorPluginFilesDependsOn>
-  </PropertyGroup>
-
-  <!-- Resolves the generator plugin assemblies that needs to be included with this package. -->
-  <Target
-    Name="ResolveReqnrollGeneratorPluginFiles"
-    DependsOnTargets="$(ResolveReqnrollGeneratorPluginFilesDependsOn)">
-
-    <ItemGroup>
-      <ReqnrollGeneratorPluginFile
-        Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.PackAsReqnrollGeneratorPlugin)' == 'true'" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <TfmSpecificPackageFile Include="@(ReqnrollGeneratorPluginFile)" PackagePath="build/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Update="@(ReqnrollGeneratorPluginFile)" PackFolder="Symbols" Condition="'%(Extension)' == '.pdb'" />
-    </ItemGroup>
-  </Target>
   
 </Project>
