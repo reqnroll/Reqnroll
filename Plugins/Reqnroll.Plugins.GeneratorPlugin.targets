@@ -60,34 +60,31 @@
   <!--
   ============================================================
   
-      _GetReqnrollGeneratorPrivatePackageFile
+      _GetReqnrollGeneratorPluginAdditionalPackageFiles
       
-      Gets the private files that should be packed into the generator plugin package alongside the primary assembly.
+      Gets the additional files that should be packed into the generator plugin package alongside the primary assembly.
       This target is hooked into the TFM-specific packaging process to add the extra files needed by the generator plugin.
       
       [IN]
-      @(_ReqnrollGeneratorPluginPrivateAssembly) - The list of assemblies to redistribute with the plugin assembly.
+      @(_ReqnrollGeneratorPluginPackageFiles) - The private package files to include.
       
       [OUT]
-      @(_ReqnrollGeneratorPluginPrivateAssembly) - The list of assemblies to redistribute with the plugin assembly.
+      @(TfmSpecificPackageFile) - The list of files to include in the package for the target framework.
   
   ============================================================
   -->
   
   <PropertyGroup>
-    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);_GetReqnrollGeneratorPrivatePackageFile</TargetsForTfmSpecificBuildOutput>
+    <TargetsForTfmSpecificBuildOutput>$(TargetsForTfmSpecificBuildOutput);_GetReqnrollGeneratorPluginAdditionalPackageFiles</TargetsForTfmSpecificBuildOutput>
   </PropertyGroup>
 
   <Target
-    Name="_GetReqnrollGeneratorPrivatePackageFile"
-    DependsOnTargets="_GetReqnrollGeneratorPluginPrivateAssemblies">
+    Name="_GetReqnrollGeneratorPluginAdditionalPackageFiles"
+    DependsOnTargets="_GetReqnrollGeneratorPluginPrivatePackageFiles">
 
     <ItemGroup>
-      <TfmSpecificPackageFile
-        Include="@(_ReqnrollGeneratorPluginPrivateAssembly)"
-        PackagePath="build/$(TargetFramework)/"/>
-    </ItemGroup>
-    
+      <TfmSpecificPackageFile Include="@(_ReqnrollGeneratorPluginPackageFiles)" />
+    </ItemGroup>    
   </Target>
 
   <!--
@@ -239,12 +236,13 @@
       <_ReqnrollGeneratorPluginPackageFiles
         Include="@(_ReqnrollGeneratorPluginPrivateAssembly)"
         PackagePath="build/$(TargetFramework)/"/>
-
+    </ItemGroup>
+    
+    <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'">
       <!-- Include the project dependencies file (it helps with MSBuild's loading dependencies in modern SDKs) -->
       <_ReqnrollGeneratorPluginPackageFiles
         Include="$(ProjectDepsFilePath)"
-        PackagePath="build/$(TargetFramework)/"
-        Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp' or '$(TargetFrameworkIdentifier)' == '.NETStandard'"/>
+        PackagePath="build/$(TargetFramework)/" />
     </ItemGroup>
   </Target>
 

@@ -74,25 +74,34 @@
   
   ============================================================
   -->
+  <PropertyGroup>
+    <GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn>$(GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn);_GetReqnrollGeneratorPluginProjectReferences</GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn>
+  </PropertyGroup>
+  
   <Target 
     Name="GetReqnrollGeneratorPluginProjectReferencePackageFiles"
     BeforeTargets="_GetPackageFiles"
     DependsOnTargets="$(GetReqnrollGeneratorPluginProjectReferencePackageFilesDependsOn)">
-
-    <ItemGroup>
-      <_ReqnrollGeneratorPluginProjectReference
-        Include="@(ProjectReference)"
-        Condition="'%(ProjectReference.PackAsReqnrollGeneratorPlugin)' == 'true'"/>
-    </ItemGroup>
     
     <MSBuild 
       Projects="@(_ReqnrollGeneratorPluginProjectReference)"
-      Targets="GetReqnrollGeneratorPluginPackageFiles">
+      Targets="GetReqnrollGeneratorPluginPackageFiles"
+      Properties="IsReqnrollGeneratorPlugin=true"
+      Condition="'@(_ReqnrollGeneratorPluginProjectReference)' != ''">
       <Output TaskParameter="TargetOutputs" ItemName="_ReqnrollGeneratorPluginProjectReferencePackageFiles" />
     </MSBuild>
     
     <ItemGroup>
       <None Include="@(_ReqnrollGeneratorPluginProjectReferencePackageFiles)" Pack="true" />
+    </ItemGroup>
+  </Target>
+  
+  <!-- Gets the project refrences to be packed as Reqnroll Generator Plugins -->
+  <Target Name="_GetReqnrollGeneratorPluginProjectReferences">
+    <ItemGroup>
+      <_ReqnrollGeneratorPluginProjectReference
+        Include="@(ProjectReference)"
+        Condition="'%(ProjectReference.PackAsReqnrollGeneratorPlugin)' == 'true'"/>
     </ItemGroup>
   </Target>
 </Project>
