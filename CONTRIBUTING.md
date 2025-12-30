@@ -18,7 +18,7 @@ In order to run all system tests, you will need to have the following SDKs insta
 - .NET 8.0 SDK
 - .NET 9.0 SDK
 
-and of course **C# knowledge** if you are looking to contribute by coding.
+Additionally, of course, **C# knowledge** if you are looking to contribute by coding.
 
 ## Types of contributions 
 
@@ -64,7 +64,7 @@ Please adhere to the coding conventions in the project (indentation, accurate co
 
 ### Pull requests
 
-in order to craft an excellent pull request:
+In order to craft an excellent pull request:
 
 1. [Fork](https://docs.github.com/articles/fork-a-repo) the project, clone your fork, and configure the remotes. If you are already in the [contributors team](https://github.com/orgs/reqnroll/teams/contributors), you can just clone the project.
 
@@ -145,7 +145,7 @@ We have three type of tests:
 
 ### Requirements tests using BDD
 
-There tests should contain illustrative scenarios that describe the behavior of the system. They are not suitable to provide full coverage for all cases (use unit tests for that).
+These tests should contain illustrative scenarios that describe the behavior of the system. They are not suitable to provide full coverage for all cases (use unit tests for that).
 
 Currently we have the following projects in this category:
 * Reqnroll.Specs - BDD tests for Reqnroll, currently under review and restructuring. Please ask for guidance before working on this project.
