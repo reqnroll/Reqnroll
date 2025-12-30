@@ -27,14 +27,11 @@
     <None Include="../../Licenses/*" Pack="true" PackagePath="Licenses/" />
   </ItemGroup>
 
-  <PropertyGroup>
-    <GenerateNuspecDependsOn>$(GenerateNuspecDependsOn);RemoveBuildOutputFromPackageContent</GenerateNuspecDependsOn>
-  </PropertyGroup>
-
-  <Target Name="RemoveBuildOutputFromPackageContent">
-    <PropertyGroup>
-      <IncludeBuildOutput>false</IncludeBuildOutput>
-    </PropertyGroup>
+  <!-- Trims the empty primary assembly from the NuGet package. -->
+  <Target Name="RemoveBuildOutputFromPackageContent" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_BuildOutputInPackage Remove="@(_BuildOutputInPackage)" />
+    </ItemGroup>
   </Target>
 
 </Project>
