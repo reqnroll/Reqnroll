@@ -39,7 +39,7 @@ A tag expression is an infix boolean expression. Below are some examples:
 |@gui or @database|	Scenarios tagged with either @gui or @database|
 
 ```{note}
-The '@' prefix is optional within a tag expression.
+The '@' prefix is required within a tag expression, except for single-term expressions (such as "foo").
 ```
 For even more advanced tag expressions you can use parenthesis for clarity, or to change operator precedence:
 
