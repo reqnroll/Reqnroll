@@ -10,13 +10,13 @@ namespace Reqnroll.Bindings.Discovery
     public abstract class BindingSourceProcessor : IBindingSourceProcessor
     {
         private readonly IBindingFactory _bindingFactory;
-        private readonly ITagExpressionParser _tagExpressionParser;
+        private readonly IReqnrollTagExpressionParser _tagExpressionParser;
 
         private BindingSourceType _currentBindingSourceType = null;
         private BindingScope[] _typeScopes = null;
         private readonly List<IStepDefinitionBindingBuilder> _stepDefinitionBindingBuilders = new();
 
-        protected BindingSourceProcessor(IBindingFactory bindingFactory, ITagExpressionParser tagExpressionParser)
+        protected BindingSourceProcessor(IBindingFactory bindingFactory, IReqnrollTagExpressionParser tagExpressionParser)
         {
             _bindingFactory = bindingFactory;
             _tagExpressionParser = tagExpressionParser;

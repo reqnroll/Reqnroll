@@ -135,8 +135,7 @@ namespace Reqnroll.Infrastructure
             container.RegisterTypeAs<TestCaseExecutionTrackerFactory, ITestCaseExecutionTrackerFactory>();
             container.RegisterFactoryAs<IMessagePublisher>(() => container.Resolve<ICucumberMessageBroker>());
             container.RegisterTypeAs<StepTrackerFactory, IStepTrackerFactory>();
-
-            var _ = container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser(new TagExpressionParser())).InstancePerDependency;
+            container.RegisterTypeAs<ReqnrollTagExpressionParser, IReqnrollTagExpressionParser>();
         }
 
         public virtual void RegisterTestThreadContainerDefaults(ObjectContainer testThreadContainer)

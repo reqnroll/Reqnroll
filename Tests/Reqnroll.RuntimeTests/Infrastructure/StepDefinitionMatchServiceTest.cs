@@ -64,7 +64,7 @@ public class StepDefinitionMatchServiceTest
 
     private BindingScope CreateBindingScope(string tag, string featureTitle, string scenarioTitle)
     {
-        var tagExpressionParser = new ReqnrollTagExpressionParser(new Cucumber.TagExpressions.TagExpressionParser());
+        var tagExpressionParser = new ReqnrollTagExpressionParser();
         return new BindingScope(tagExpressionParser.Parse(tag), featureTitle, scenarioTitle);
     }
 

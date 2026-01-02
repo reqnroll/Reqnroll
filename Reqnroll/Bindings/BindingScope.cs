@@ -16,7 +16,7 @@ namespace Reqnroll.Bindings
         {
             scopeMatches = 0;
 
-            if (Tag != null)
+            if (tagExpression is not NullExpression)
             {
                 var tags = stepContext.Tags.Select(t => "@" + t).ToList();
 

@@ -18,7 +18,7 @@ namespace Reqnroll.RuntimeTests
 
         public IEnumerable<string> ValidationErrors => GeneralErrorMessages.Concat(BindingSpecificErrorMessages);
 
-        public BindingSourceProcessorStub() : base(new BindingFactory(new StepDefinitionRegexCalculator(ConfigurationLoader.GetDefault()), new CucumberExpressionStepDefinitionBindingBuilderFactory(new CucumberExpressionParameterTypeRegistry(new BindingRegistry())), new CucumberExpressionDetector()), new ReqnrollTagExpressionParser(new TagExpressionParser()))
+        public BindingSourceProcessorStub() : base(new BindingFactory(new StepDefinitionRegexCalculator(ConfigurationLoader.GetDefault()), new CucumberExpressionStepDefinitionBindingBuilderFactory(new CucumberExpressionParameterTypeRegistry(new BindingRegistry())), new CucumberExpressionDetector()), new ReqnrollTagExpressionParser())
         {
         }
 

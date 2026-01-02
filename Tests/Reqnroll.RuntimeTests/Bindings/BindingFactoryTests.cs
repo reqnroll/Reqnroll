@@ -24,7 +24,7 @@ public class BindingFactoryTests
         var cucumberExpressionStepDefinitionBindingBuilderFactory = new CucumberExpressionStepDefinitionBindingBuilderFactory(new CucumberExpressionParameterTypeRegistry(Mock.Of<IBindingRegistry>()));
         var cucumberExpressionDetector = new CucumberExpressionDetector();
         var sut = new BindingFactory(stepDefinitionRegexCalculator.Object, cucumberExpressionStepDefinitionBindingBuilderFactory, cucumberExpressionDetector);
-        var tagExpressionParser = new ReqnrollTagExpressionParser(new Cucumber.TagExpressions.TagExpressionParser());
+        var tagExpressionParser = new ReqnrollTagExpressionParser();
         var stepDefinitionType = StepDefinitionType.Given;
         var bindingMethod = new Mock<IBindingMethod>().Object;
         var bindingScope = new BindingScope(tagExpressionParser.Parse("tag1"), "feature1", "scenario1");

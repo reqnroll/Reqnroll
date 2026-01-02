@@ -153,7 +153,7 @@ public class CucumberExpressionIntegrationTests
             base.RegisterGlobalContainerDefaults(container);
             var stubUintTestProvider = new Mock<IUnitTestRuntimeProvider>();
             container.RegisterInstanceAs(stubUintTestProvider.Object, "nunit");
-            container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser(new TagExpressionParser()));
+            container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser());
         }
     }
 

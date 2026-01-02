@@ -186,7 +186,6 @@ public class BindingProviderService(
             base.RegisterGlobalContainerDefaults(container);
             container.RegisterTypeAs<DryRunBindingInvoker, IAsyncBindingInvoker>();
             container.RegisterTypeAs<Formatters.Configuration.FormattersForcedDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
-            var _ = container.RegisterFactoryAs<ITagExpressionParser>(() => new ReqnrollTagExpressionParser(new TagExpressionParser())).InstancePerDependency;
         }
     }
 

@@ -13,7 +13,7 @@ namespace Reqnroll.Bindings.Discovery
         private readonly IBindingRegistry _bindingRegistry;
         private readonly ITestTracer _testTracer;
 
-        public RuntimeBindingSourceProcessor(IBindingFactory bindingFactory, IBindingRegistry bindingRegistry, ITestTracer testTracer, ITagExpressionParser tagExpressionParser) : base(bindingFactory, tagExpressionParser)
+        public RuntimeBindingSourceProcessor(IBindingFactory bindingFactory, IBindingRegistry bindingRegistry, ITestTracer testTracer, IReqnrollTagExpressionParser tagExpressionParser) : base(bindingFactory, tagExpressionParser)
         {
             _bindingRegistry = bindingRegistry;
             _testTracer = testTracer;
