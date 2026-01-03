@@ -1,12 +1,13 @@
 # [vNext]
 
 ## Improvements:
+* Updated Cucumber Dependencies to: Gherkin 37.0.1, Messages 31.1.0 and HtmlFormatter 22.3.0. 
 
 ## Bug fixes:
 
 * Fix authors of Reqnroll.Autofac package (#979)
 
-*Contributors of this release (in alphabetical order):* @304NotModified
+*Contributors of this release (in alphabetical order):* @304NotModified, @clrudolphi
 
 # v3.3.0 - 2025-12-17
 
