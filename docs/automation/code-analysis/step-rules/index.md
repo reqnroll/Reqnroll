@@ -11,4 +11,4 @@ This section provides a reference to all the rules associated with step definiti
 
 ## Step method rules
 - [Step methods should not return values (RR1021)](./rr1021.md)
-- [Asynchronous step methods must return a Task, Task<TResult>, ValueTask or ValueTask<TResult> (RR1022)](./rr1022.md)
+- [Asynchronous step methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt; (RR1022)](./rr1022.md)

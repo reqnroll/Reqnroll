@@ -16,4 +16,4 @@ The following rules are provided.
 | [RR1002](./step-rules/rr1002.md) | Step text cannot be empty or whitespace |
 | [RR1003](./step-rules/rr1003.md) | Step text cannot have leading or trailing whitespace |
 | [RR1021](./step-rules/rr1021.md) | Step methods should not return values |
-| [RR1022](./step-rules/rr1022.md) | Asynchronous step methods must return a Task, Task<TResult>, ValueTask or ValueTask<TResult> |
+| [RR1022](./step-rules/rr1022.md) | Asynchronous step methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt; |
