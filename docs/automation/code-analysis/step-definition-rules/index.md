@@ -1,8 +1,18 @@
-# Step Rules Reference
+# Step Definition rules
 This section provides a reference to all the rules associated with step definitions.
 
 - [Step text rules](#step-text-rules)
 - [Step method rules](#step-method-rules)
+
+```{toctree}
+:hidden:
+
+rr1001
+rr1002
+rr1003
+rr1021
+rr1022
+```
 
 ## Step text rules
 - [Step text cannot be null (RR1001)](./rr1001.md)
