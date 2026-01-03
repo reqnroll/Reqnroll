@@ -64,7 +64,7 @@ public class FeatureExecutionTrackerTests
         var featureLevelCucumberMessagesMock = new Mock<IFeatureLevelCucumberMessages>();
         featureLevelCucumberMessagesMock.SetupGet(m => m.Source).Returns(new Source("c:\\file", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN));
         featureLevelCucumberMessagesMock.SetupGet(m => m.GherkinDocument).Returns(new GherkinDocument("", new Feature(new Location(0, 0), [], "en", "Feature", "Dummy Feature", "", new List<FeatureChild>()), []));
-        featureLevelCucumberMessagesMock.SetupGet(m => m.Pickles).Returns( new List<Pickle>([new Pickle("0", "", "", "en", [new PickleStep(null, [], "step1", PickleStepType.ACTION, "I eat a cuke")], [], [])]));
+        featureLevelCucumberMessagesMock.SetupGet(m => m.Pickles).Returns( new List<Pickle>([new Pickle("0", "", new Location(0,0), "", "en", [new PickleStep(null, [], "step1", PickleStepType.ACTION, "I eat a cuke")], [], [])]));
         featureLevelCucumberMessagesMock.SetupGet(m => m.HasMessages).Returns(true);
 
         _featureInfoDummy = new FeatureInfo(CultureInfo.InvariantCulture, null, "Test Feature", null, ProgrammingLanguage.CSharp, null, featureLevelCucumberMessagesMock.Object);
@@ -270,7 +270,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
 
         var scenarioInfoDummy = new ScenarioInfo("dummy SI", "", null, null, null, "0");
@@ -292,7 +292,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -315,7 +315,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
 
@@ -343,7 +343,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -371,7 +371,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -397,7 +397,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -424,7 +424,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");
@@ -449,7 +449,7 @@ public class FeatureExecutionTrackerTests
         // Arrange
         var sut = InitializeFeatureTrackerSut();
         // set up the PickleJar and PickleIds for the Scenario in this test
-        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
+        sut.SetPickleJar(new PickleJar(new List<Pickle> { new("0", "", new Location(0, 0), "dummyPickle Name", "en-US", new List<PickleStep>(), new List<PickleTag>(), [""]) }));
         sut.PickleIds.Add("0", "0");
         // Ensure that the PickleExecutionTracker is created for the Scenario
         sut.GetOrAddPickleExecutionTracker("0");

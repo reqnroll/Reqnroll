@@ -1,8 +1,4 @@
-import { Before, Given } from '@cucumber/fake-cucumber'
-
-Before({tags: '@skip'}, function () {
-  return 'skipped'
-})
+import { Given } from '@cucumber/fake-cucumber'
 
 Given('a step that does not skip', function () {
   // no-op
