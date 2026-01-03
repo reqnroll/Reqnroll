@@ -57,9 +57,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReferenceCopyLocalPaths
-        Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == '@(PackageReferenceToPack -> '%(Identity)')'" />
+      <PackageReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == '@(PackageReferenceToPack -> '%(Identity)')'" />
     </ItemGroup>
 
     <ItemGroup>

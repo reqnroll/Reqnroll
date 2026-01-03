@@ -104,13 +104,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        if (char.IsWhiteSpace(stepText[0]))
-        {
-            context.ReportDiagnostic(
-                Diagnostic.Create(StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule, stepTextArgument.GetLocation()));
-        }
-
-        if (char.IsWhiteSpace(stepText[stepText.Length - 1]))
+        if (char.IsWhiteSpace(stepText[0]) || char.IsWhiteSpace(stepText[stepText.Length - 1]))
         {
             context.ReportDiagnostic(
                 Diagnostic.Create(StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule, stepTextArgument.GetLocation()));

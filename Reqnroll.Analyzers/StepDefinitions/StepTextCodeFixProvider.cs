@@ -36,11 +36,38 @@ public class StepTextCodeFixProvider : CodeFixProvider
         {
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: "Remove step text argument",
+                    title: CodeFixResources.RemoveStepTextArgumentTitle,
                     createChangedDocument: _ => RemoveStepTextArgumentAsync(context.Document, root, argument),
                     equivalenceKey: "RemoveStepTextArgument"),
                 diagnostic);
         }
+
+        if (diagnostic.Descriptor == StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+        {
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: CodeFixResources.TrimStepTextArgumentTitle,
+                    createChangedDocument: _ => TrimStepTextArgumentAsync(context.Document, root, argument),
+                    equivalenceKey: "TrimStepTextArgument"),
+                diagnostic);
+        }
+    }
+
+    private async Task<Document> TrimStepTextArgumentAsync(
+        Document document,
+        SyntaxNode root,
+        AttributeArgumentSyntax argument)
+    {
+        // Create a new argument with trimmed text.
+        var literalExpression = (LiteralExpressionSyntax)argument.Expression;
+        var originalText = (string)literalExpression.Token.Value!;
+        var trimmedText = originalText.Trim();
+        var newLiteralExpression = literalExpression.WithToken(SyntaxFactory.Literal(trimmedText));
+
+        // Replace the argument expression.
+        var newRoot = root.ReplaceNode(literalExpression, newLiteralExpression);
+
+        return document.WithSyntaxRoot(newRoot);
     }
 
     private async Task<Document> RemoveStepTextArgumentAsync(
