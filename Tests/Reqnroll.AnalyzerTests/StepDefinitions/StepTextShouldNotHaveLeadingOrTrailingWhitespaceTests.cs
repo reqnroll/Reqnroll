@@ -30,7 +30,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingWhitespaceRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();

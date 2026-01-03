@@ -27,7 +27,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -68,7 +68,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -97,7 +97,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -111,7 +111,9 @@ public class StepTextCannotBeNullOrEmptyTests
             TestCode =
                 """"
                 using Reqnroll;
+
                 namespace Sample.Tests;
+
                 [Binding]
                 public class GameSteps
                 {
@@ -125,7 +127,9 @@ public class StepTextCannotBeNullOrEmptyTests
             FixedCode =
                 """"
                 using Reqnroll;
+
                 namespace Sample.Tests;
+
                 [Binding]
                 public class GameSteps
                 {
@@ -138,7 +142,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -167,7 +171,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -181,7 +185,9 @@ public class StepTextCannotBeNullOrEmptyTests
             TestCode =
                 """"
                 using Reqnroll;
+
                 namespace Sample.Tests;
+
                 [Binding]
                 public class GameSteps
                 {
@@ -195,7 +201,9 @@ public class StepTextCannotBeNullOrEmptyTests
             FixedCode =
                 """"
                 using Reqnroll;
+
                 namespace Sample.Tests;
+
                 [Binding]
                 public class GameSteps
                 {
@@ -208,7 +216,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -240,7 +248,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();

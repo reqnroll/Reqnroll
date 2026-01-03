@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Composition;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
-using System.Collections.Immutable;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CSharp;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System.Collections.Immutable;
+using System.Composition;
 
 namespace Reqnroll.Analyzers.StepDefinitions;
 
@@ -15,9 +11,9 @@ namespace Reqnroll.Analyzers.StepDefinitions;
 public class StepTextCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-        StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule.Id,
-        StepTextAnalyzer.StepTextShouldNotHaveLeadingWhitespaceRule.Id,
-        StepTextAnalyzer.StepTextShouldNotHaveTrailingWhitespaceRule.Id);
+        StepTextAnalyzer.StepTextCannotBeNullRule.Id,
+        StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule.Id,
+        StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule.Id);
 
     public override FixAllProvider? GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -35,7 +31,8 @@ public class StepTextCodeFixProvider : CodeFixProvider
         var argument = root.FindToken(diagnostic.Location.SourceSpan.Start).Parent!
             .AncestorsAndSelf().OfType<AttributeArgumentSyntax>().First();
 
-        if (diagnostic.Descriptor == StepTextAnalyzer.StepTextCannotBeNullOrEmptyRule)
+        if (diagnostic.Descriptor == StepTextAnalyzer.StepTextCannotBeNullRule || 
+            diagnostic.Descriptor == StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
         {
             context.RegisterCodeFix(
                 CodeAction.Create(
