@@ -4,9 +4,11 @@
 
 ## Bug fixes:
 
-* Fix authors of Reqnroll.Autofac package (#979)
+* Fix: Upgrading to 3.3.0 causes build error with SpecFlowCompatibility (NuGet package Reqnroll.SpecFlowCompatibility issue) (#970)
+* Fix: IGeneratorPlugin interface could not be found after upgrading to the Reqnroll 3.3.0 (NuGet package Reqnroll.CustomPlugin issue) (#972)
+* Fix: Authors field of Reqnroll.Autofac package is incorrect (#979)
 
-*Contributors of this release (in alphabetical order):* @304NotModified
+*Contributors of this release (in alphabetical order):* @304NotModified, @Code-Grump
 
 # v3.3.0 - 2025-12-17
 
