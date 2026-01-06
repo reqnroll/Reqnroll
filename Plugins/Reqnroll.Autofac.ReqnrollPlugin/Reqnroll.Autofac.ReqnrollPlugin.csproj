@@ -10,7 +10,7 @@
     <PackageTags>reqnroll autofac di dependency injection</PackageTags>
     <Title>Reqnroll Autofac integration plugin</Title>
     <Description>Reqnroll plugin that enables to use Autofac for resolving test dependencies.</Description>
-    <Authors>Copyright © Gaspar Nagy, Spec Solutions, $(ReqnrollAuthors)</Authors>
+    <Authors>Gaspar Nagy, Spec Solutions, $(ReqnrollAuthors)</Authors>
     <Copyright>Copyright © Gaspar Nagy, Spec Solutions, $(ReqnrollAuthors)</Copyright>
   </PropertyGroup>
 
