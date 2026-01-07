@@ -22,11 +22,6 @@
     <ProjectReference Include="../../Reqnroll.Parser/Reqnroll.Parser.csproj" PrivateAssets="all" PackAsComponent="true" />
   </ItemGroup>
 
-  <ItemGroup>
-    <!-- Include the third-party license files. -->
-    <None Include="../../Licenses/*" Pack="true" PackagePath="Licenses/" />
-  </ItemGroup>
-
   <!-- Trims the empty primary assembly from the NuGet package. -->
   <Target Name="RemoveBuildOutputFromPackageContent" BeforeTargets="GenerateNuspec">
     <ItemGroup>
