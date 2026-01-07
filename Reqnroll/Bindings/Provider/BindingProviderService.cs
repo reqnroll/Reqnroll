@@ -136,9 +136,10 @@ public class BindingProviderService(
             if (!scopedBinding.IsScoped)
                 return null;
 
+            string tagScope = scopedBinding.BindingScope.Tag;
             return new BindingScopeData
             {
-                Tag = scopedBinding.BindingScope.Tag,
+                Tag = string.IsNullOrEmpty(tagScope) ? null : tagScope,
                 FeatureTitle = scopedBinding.BindingScope.FeatureTitle,
                 ScenarioTitle = scopedBinding.BindingScope.ScenarioTitle
             };
