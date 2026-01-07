@@ -1,6 +1,11 @@
 # [vNext]
 
 ## Improvements:
+* Update packages to be able to run under .Net 10:
+  * Microsoft.Extensions.DependencyInjection to 10.0.1
+  * Scrutor to 7.0.0
+  * Microsoft.Extensions.Logging.Abstractions to 10.0.1
+  * System.Text.Json to 10.0.1
 
 ## Bug fixes:
 
@@ -8,7 +13,7 @@
 * Fix: IGeneratorPlugin interface could not be found after upgrading to the Reqnroll 3.3.0 (NuGet package Reqnroll.CustomPlugin issue) (#972)
 * Fix: Authors field of Reqnroll.Autofac package is incorrect (#979)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @Code-Grump
+*Contributors of this release (in alphabetical order):* @304NotModified, @Code-Grump, @Obelixx
 
 # v3.3.0 - 2025-12-17
 
