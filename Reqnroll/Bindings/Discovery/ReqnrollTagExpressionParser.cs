@@ -1,10 +1,9 @@
 using Cucumber.TagExpressions;
 using System;
-using System.Xml.Linq;
 
 namespace Reqnroll.Bindings.Discovery;
 
-public class ReqnrollTagExpressionParser() : IReqnrollTagExpressionParser
+public class ReqnrollTagExpressionParser : IReqnrollTagExpressionParser
 {
     public ITagExpression Parse(string tagExpression)
     {
@@ -28,14 +27,14 @@ public class ReqnrollTagExpressionParser() : IReqnrollTagExpressionParser
     {
         switch (expression)
         {
-            case NullExpression nullNode:
+            case NullExpression:
                 return true;
             case BinaryOpNode binaryNode:
                 return ConfirmExpressionHasAtPrefixes(binaryNode.Left) && ConfirmExpressionHasAtPrefixes(binaryNode.Right);
             case NotNode notNode:
                 return ConfirmExpressionHasAtPrefixes(notNode.Operand);
             case LiteralNode literalNode:
-                return (literalNode.Name.StartsWith("@"));
+                return literalNode.Name.StartsWith("@");
             default:
                 throw new InvalidOperationException($"Unknown tag expression node type: {expression.GetType().FullName}");
         }

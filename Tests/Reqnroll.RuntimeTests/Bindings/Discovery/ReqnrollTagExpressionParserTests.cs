@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using Xunit;
 using FluentAssertions;
 using Reqnroll.Bindings.Discovery;
@@ -29,8 +27,8 @@ public class ReqnrollTagExpressionParserTests
         
         // Assert
         expression.Should().NotBeNull();
-        expression.Evaluate(new[] { "@" + tagName }).Should().BeTrue("tag with @ prefix should match");
-        expression.Evaluate(new[] { tagName }).Should().BeFalse("tag without @ prefix should not match");
+        expression.Evaluate(["@" + tagName]).Should().BeTrue("tag with @ prefix should match");
+        expression.Evaluate([tagName]).Should().BeFalse("tag without @ prefix should not match");
     }
 
     [Theory]
@@ -47,7 +45,7 @@ public class ReqnrollTagExpressionParserTests
         
         // Assert
         expression.Should().NotBeNull();
-        expression.Evaluate(new[] { tagName }).Should().BeTrue("tag with @ prefix should match");
+        expression.Evaluate([tagName]).Should().BeTrue("tag with @ prefix should match");
     }
 
 
@@ -103,7 +101,7 @@ public class ReqnrollTagExpressionParserTests
         
         // Assert
         expression.Should().NotBeNull();
-        expression.Evaluate(new[] { "@tag1" }).Should().BeTrue();
+        expression.Evaluate(["@tag1"]).Should().BeTrue();
         expression.Evaluate(Array.Empty<string>()).Should().BeTrue();
     }
 

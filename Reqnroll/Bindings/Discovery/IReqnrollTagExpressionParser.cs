@@ -5,7 +5,6 @@ namespace Reqnroll.Bindings.Discovery;
 /// <summary>
 /// Defines a parser for tag expressions.
 /// </summary>
-
 public interface IReqnrollTagExpressionParser
 {
     /// <summary>
