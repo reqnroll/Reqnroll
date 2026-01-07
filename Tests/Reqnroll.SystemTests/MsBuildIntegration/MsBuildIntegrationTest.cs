@@ -242,7 +242,6 @@ public class MsBuildIntegrationTest : SystemTestBase
     [TestMethod]
     public void Should_copy_config_file_to_output_folder()
     {
-        _solutionDriver.DefaultProject.ForceAddingExplicitReferenceToReqnrollPackage = true;
         AddSimpleScenario();
         _projectsDriver.AddPassingStepBinding();
 
