@@ -22,11 +22,14 @@ public class SmokeTest : SystemTestBase
     public void Can_load_step_definitions_from_external_assembly()
     {
         _solutionDriver.EnsureDefaultProject();
-        var externalLibraryName = "ExternalStepsLibrary";
-        var externalLib = _projectsDriver.CreateProject(externalLibraryName, "C#", ProjectType.Library)!;
-        externalLib.IsReqnrollFeatureProject = false;
 
+        var externalLib = _projectsDriver.CreateProject("ExternalStepsLibrary", "C#", ProjectType.Library)!;
+        externalLib.IsReqnrollFeatureProject = false;
         externalLib.AddStepBinding("When", "something happens in external lib", "//pass", null);
+
+        _projectsDriver.AddProjectReference(externalLib.ProjectName);
+        _solutionDriver.DefaultProject.Configuration.BindingAssemblies.Add(new BindingAssembly(externalLib.ProjectName));
+
         AddScenario(
             """
             Scenario: Sample Scenario
