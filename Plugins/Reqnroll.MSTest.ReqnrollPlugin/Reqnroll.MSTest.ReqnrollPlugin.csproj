@@ -11,7 +11,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" />
+    <!-- PrivateAssets="none" ensures that MSTest build assets are included even if the user does not explicitly add a reference to the 'MSTest.TestFramework' package -->
+    <!-- We can consider removing PrivateAssets="none" in v4 and declaring that the users must add reference to 'MSTest.TestFramework' explicitly. -->
+    <PackageReference Include="MSTest.TestFramework" Version="2.2.8" PrivateAssets="none" />
   </ItemGroup>
 
   <ItemGroup>
