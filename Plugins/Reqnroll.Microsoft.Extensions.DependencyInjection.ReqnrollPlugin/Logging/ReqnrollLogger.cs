@@ -41,7 +41,7 @@ public class ReqnrollLogger : ILogger
 
     public bool IsEnabled(LogLevel logLevel) => logLevel != LogLevel.None;
 
-#if NET8_0
+#if NETSTANDARD2_0_OR_GREATER
     public IDisposable? BeginScope<TState>(TState state) where TState : notnull => _scopeProvider.Push(state);
 #else
     public IDisposable BeginScope<TState>(TState state) => _scopeProvider.Push(state);

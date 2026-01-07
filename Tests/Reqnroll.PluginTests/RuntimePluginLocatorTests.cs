@@ -59,6 +59,8 @@ namespace Reqnroll.PluginTests
                 "Reqnroll.NUnit.ReqnrollPlugin.dll",
                 "Reqnroll.xUnit.ReqnrollPlugin.dll",
                 "Reqnroll.xUnit.Generator.ReqnrollPlugin.dll",
+                "Reqnroll.NUnit.Generator.ReqnrollPlugin.dll",
+                "Reqnroll.MSTest.Generator.ReqnrollPlugin.dll",
             ]);
         }
 
