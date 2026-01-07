@@ -34,7 +34,8 @@ namespace Reqnroll.TestProjectGenerator.Factories.ConfigurationGenerator
                     jsonWriter.WriteEndObject();
                     jsonWriter.Flush();
 
-                    return new ProjectFile("reqnroll.json", "None", stringWriter.ToString(), CopyToOutputDirectory.CopyIfNewer);
+                    // We do not specify explicitly that the config should be copied to the output directory, because Reqnroll should handle that itself.
+                    return new ProjectFile("reqnroll.json", "None", stringWriter.ToString());
                 }
             }
         }

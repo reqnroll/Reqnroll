@@ -238,4 +238,17 @@ public class MsBuildIntegrationTest : SystemTestBase
                       .BeEquivalentTo($"-> resource: {linkTargetFolder}/{featureFile}.ndjson:StepBinding");
 
     }
+
+    [TestMethod]
+    public void Should_copy_config_file_to_output_folder()
+    {
+        _solutionDriver.DefaultProject.ForceAddingExplicitReferenceToReqnrollPackage = true;
+        AddSimpleScenario();
+        _projectsDriver.AddPassingStepBinding();
+
+        _compilationDriver.CompileSolution(logLevel: "n");
+
+        string expectedConfigFilePath = Path.Combine(_testProjectFolders.PathToSolutionDirectory, _solutionDriver.DefaultProject.ProjectName, "bin", "Debug", _solutionDriver.DefaultProject.TargetFrameworkMoniker, "reqnroll.json");
+        File.Exists(expectedConfigFilePath).Should().BeTrue($"the config file should be copied to the output folder '{expectedConfigFilePath}'");
+    }
 }
