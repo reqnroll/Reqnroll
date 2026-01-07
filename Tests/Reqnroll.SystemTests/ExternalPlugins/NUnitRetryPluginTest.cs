@@ -13,6 +13,7 @@ public class NUnitRetryPluginTest : ExternalPluginsTestBase
     {
         base.TestInitialize();
         _testRunConfiguration.UnitTestProvider = UnitTestProvider.NUnit4;
+        _solutionDriver.DefaultProject.ForceAddingExplicitReferenceToReqnrollPackage = true;
         _projectsDriver.AddNuGetPackage("NUnitRetry.ReqnrollPlugin", "1.0.100");
     }
 
