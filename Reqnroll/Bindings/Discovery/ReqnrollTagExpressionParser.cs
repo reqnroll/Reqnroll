@@ -8,7 +8,19 @@ public class ReqnrollTagExpressionParser : IReqnrollTagExpressionParser
     public ITagExpression Parse(string tagExpression)
     {
         var tagExpressionParser = new TagExpressionParser();
-        return Rewrite(tagExpressionParser.Parse(tagExpression));
+        try { 
+            var parsedExpression = tagExpressionParser.Parse(tagExpression);
+            return Rewrite(parsedExpression);
+        }
+        catch (TagExpressionException ex)
+        {
+            var msg = ex.Message;
+            if (ex.TagToken != null)
+            {
+                msg += $" (at offset {ex.TagToken.Position})";
+            }
+            return new InvalidTagExpression(tagExpression, msg);
+        }
     }
 
     // iff the expression is a literal node, prefix it with '@' if not already present

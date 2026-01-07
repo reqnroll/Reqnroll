@@ -7,6 +7,7 @@ namespace Reqnroll.Bindings
     public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle)
     {
         public string Tag => tagExpression.ToString();
+        public ITagExpression TagExpression => tagExpression;
 
         public string FeatureTitle { get; } = featureTitle;
 

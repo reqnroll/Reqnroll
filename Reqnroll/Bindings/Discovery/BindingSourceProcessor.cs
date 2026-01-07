@@ -182,6 +182,8 @@ namespace Reqnroll.Bindings.Discovery
             int order = GetHookOrder(hookAttribute);
 
             var validationResult = ValidateHook(bindingSourceMethod, hookAttribute, hookType);
+            validationResult += ValidateBindingScope(scope);
+
             if (!validationResult.IsValid)
             {
                 OnValidationError(validationResult, true);
@@ -253,6 +255,8 @@ namespace Reqnroll.Bindings.Discovery
             var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>(nameof(StepDefinitionBaseAttribute.ExpressionType));
 
             var validationResult = ValidateStepDefinition(bindingSourceMethod, stepDefinitionAttribute);
+            validationResult += ValidateBindingScope(scope);
+
             if (!validationResult.IsValid)
             {
                 OnValidationError(validationResult, false);
@@ -352,6 +356,17 @@ namespace Reqnroll.Bindings.Discovery
             if (!IsScenarioSpecificHook(hookType) && !bindingSourceMethod.IsStatic)
                 result += BindingValidationResult.Error($"The binding methods for before/after feature and before/after test run events must be static: {bindingSourceMethod}");
 
+            return result;
+        }
+
+        protected virtual BindingValidationResult ValidateBindingScope(BindingScope bindingScope) 
+        { 
+            var result = BindingValidationResult.Valid;
+
+            if (bindingScope != null && bindingScope.TagExpression is InvalidTagExpression invalidTagExpression)
+            {
+                result += BindingValidationResult.Error(invalidTagExpression.Message);
+            }
             return result;
         }
 
