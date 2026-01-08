@@ -1,7 +1,5 @@
 # [vNext]
 
-## Improvements:
-
 ## Bug fixes:
 
 * Fix: Upgrading to 3.3.0 causes build error with SpecFlowCompatibility (NuGet package Reqnroll.SpecFlowCompatibility issue) (#970)
