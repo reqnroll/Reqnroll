@@ -52,7 +52,12 @@
     <ProjectReference
       Include="$(MSBuildThisFileDirectory)..\Reqnroll.Tools.MsBuild.Generation\Reqnroll.Tools.MsBuild.Generation.csproj"
       PrivateAssets="none" />
-    <ProjectReference Include="$(MSBuildThisFileDirectory)..\Reqnroll\Reqnroll.csproj"  />
+    <!-- PrivateAssets="none" ensures that the consumers of this package get everything from Reqnroll package, 
+         like they would have referenced the Reqnroll package directly. This is necessary to ensure that build and later analyzer assets are also used.
+         This is important here, because these are the "entry" packages that users reference directly. -->
+    <ProjectReference 
+      Include="$(MSBuildThisFileDirectory)..\Reqnroll\Reqnroll.csproj"
+      PrivateAssets="none" />
   </ItemGroup>
 
   <!-- Assembly hooks templates are not compiled and instead are used to produce source for the package. -->
