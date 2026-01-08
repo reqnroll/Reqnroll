@@ -2,8 +2,27 @@
 
 ## Improvements:
 
-* Updated NUnit3TestAdapter to v5.2.0 and NUnit to v4.4.0 in templates and tests to fix spurious warnings during test runs (#846)
-* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. (#930)
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.3.1 - 2026-01-08
+
+## Bug fixes:
+
+* Fix: Upgrading to 3.3.0 causes build error with SpecFlowCompatibility (NuGet package Reqnroll.SpecFlowCompatibility issue) (#970)
+* Fix: IGeneratorPlugin interface could not be found after upgrading to the Reqnroll 3.3.0 (NuGet package Reqnroll.CustomPlugin issue) (#972)
+* Fix: Authors field of Reqnroll.Autofac package is incorrect (#979)
+* Fix: Referencing step definitions from other assembly/project not working because `reqnroll.json` config file is not copied to the output folder (#985)
+
+*Contributors of this release (in alphabetical order):* @304NotModified, @Code-Grump, @gasparnagy
+
+# v3.3.0 - 2025-12-17
+
+## Improvements:
+
+* NUnit dependencies are updated to v4.4.0 in templates. This does not impact Reqnroll compatibility. (#846)
+* Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. See https://docs.reqnroll.net/latest/installation/formatter-configuration.html#available-substitution-variables for details. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
 * Tag Expressions: step definition scopes and hooks may now use tag expressions (such as `@db and not @slow`) (#911)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
@@ -12,14 +31,15 @@
 * Updated TUnit integration to support TUnit v1.3.25 and .NET 10 SDK compatibility (#918)
 * Updated Cucumber.HtmlFormatter to version 22 to support HTML reports on non-https URLs (#962)
 * Updated Cucumber.Messages to version 30 (#962)
-* NotImplementedException no longer maps to ScenarioExecutionStatus.StepDefinitionPending (#954)
+* NotImplementedException thrown by the tests is no longer treated as a "pending" outcome (reverting to v2 behavior). (#954)
 
 ## Bug fixes:
 
 * Fix: Error during build "System.TypeLoadException: Method 'DisposeAsync' in type 'System.Text.Json.Utf8JsonWriter" (partial fix for some occurrences) (#921, #914)
 * Fix: The configuration setting `generator/addNonParallelizableMarkerForTags` does not work for xUnit 3 (#917)
+* Fix: Improve error handling in OnTestRunEnd when test runners are still executing (#957)
 
-*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @copilot, @gasparnagy, @markk-df
+*Contributors of this release (in alphabetical order):* @304NotModified, @AdaskoTheBeAsT, @clrudolphi, @Code-Grump, @copilot, @gasparnagy, @markk-df, @obligaron
 
 # v3.2.1 - 2025-11-07
 

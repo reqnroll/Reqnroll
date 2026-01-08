@@ -5,6 +5,9 @@
 
   Changelog:
 
+  3.2
+  - Added 'AsyncCucumberExpressionAttribute' and 'AsyncRegexAttribute' to the trace/stepDefinitionSkeletonStyle values.
+
   3.1
   - Added generator/disableFriendlyTestNames
 
@@ -101,7 +104,7 @@
         "stepDefinitionSkeletonStyle": {
           "description": "Specifies the default step definition style.",
           "type": "string",
-          "default": "AsyncCucumberExpressionAttribute",
+          "default": "CucumberExpressionAttribute",
           "enum": [ "AsyncCucumberExpressionAttribute", "AsyncRegexAttribute", "CucumberExpressionAttribute", "RegexAttribute", "MethodNameUnderscores", "MethodNamePascalCase", "MethodNameRegex" ]
         },
         "coloredOutput": {

@@ -15,5 +15,10 @@ namespace Reqnroll.TestProjectGenerator
         public ConfigurationFormat ConfigurationFormat { get; set; }
 
         public string ReqnrollAllowedNuGetVersion { get; set; }
+
+        /// <summary>
+        /// Whether to add an explicit reference to `Reqnroll` package in addition to the unit test specific packages, like `Reqnroll.MsTest`.
+        /// </summary>
+        public bool ForceAddingExplicitReferenceToReqnrollPackage { get; set; } = false;
     }
 }

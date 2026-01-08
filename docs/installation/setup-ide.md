@@ -14,24 +14,24 @@ Setting up the Integrated Development Environment (IDE) integration for Reqnroll
 
 This guide describes the setup steps for the following IDEs:
 
-* [](#setup-visual-studio-2022)
+* [](#setup-visual-studio)
 * [](#setup-vscode)
 * [](#setup-rider)
 
 (setup-vs)=
-## Setup Visual Studio 2022
+## Setup Visual Studio
 
-In order to use Reqnroll with Visual Studio 2022, you need to install the [Reqnroll for Visual Studio 2022](https://go.reqnroll.net/vs2022-extension) extension.
+In order to use Reqnroll with Visual Studio 2022 or Visual Studio 2026, you need to install the [Reqnroll for Visual Studio](https://go.reqnroll.net/vs2022-extension) extension.
 
 ```{warning}
-The *Reqnroll with Visual Studio 2022* extension cannot work together with the *SpecFlow for Visual Studio 2022* extension, as they both process feature files. As the Reqnroll extension also supports SpecFlow projects, you can remove the SpecFlow extension if you install the Reqnroll extension. Alternatively, you can disable the SpecFlow extension for the time you work with Reqnroll. 
+The *Reqnroll with Visual Studio* extension cannot work together with the *SpecFlow for Visual Studio 2022* extension, as they both process feature files. As the Reqnroll extension also supports SpecFlow projects, you can remove the SpecFlow extension if you install the Reqnroll extension. Alternatively, you can disable the SpecFlow extension for the time you work with Reqnroll. 
 ```
 
-1. Open Visual Studio 2022
+1. Open Visual Studio
 2. From the *Extensions* menu, choose the *Manage Extensions...* command.
 3. On the dialog, make sure that *Online* is selected from the list on the left and type `Reqnroll` to the *Search* text box on the right top corner.
-4. Choose the *Reqnroll for Visual Studio 2022* from the list and click on the *Download* button.
-5. Restart Visual Studio 2022.
+4. Choose the *Reqnroll for Visual Studio* from the list and click on the *Download* button.
+5. Restart Visual Studio.
 
 For more details about the Reqnroll with Visual Studio extension, please check the [](../ide-integrations/visual-studio/index) page.
 

@@ -308,22 +308,30 @@ public class TestRunnerManager : ITestRunnerManager
     private async Task<ExceptionDispatchInfo[]> FireRemainingAfterFeatureHooks()
     {
         var onFeatureEndErrors = new List<ExceptionDispatchInfo>();
-        var testWorkerContainers = _availableTestWorkerContainers.Keys.Concat(_usedTestWorkerContainers.Keys).ToArray();
+        var testWorkerContainers = _availableTestWorkerContainers.Keys.ToArray(); // _usedTestWorkerContainers is ignored, because it should be normal empty at this point and it's not safe to change a running/used testrunner
         foreach (var testWorkerContainer in testWorkerContainers)
         {
-            var contextManager = testWorkerContainer.Resolve<IContextManager>();
-            if (contextManager.FeatureContext != null)
+            if (!_availableTestWorkerContainers.TryRemove(testWorkerContainer, out _))
+                continue; // Container was already taken by another thread
+            try
             {
-                var testRunner = testWorkerContainer.Resolve<ITestRunner>();
-                try
+                var contextManager = testWorkerContainer.Resolve<IContextManager>();
+                if (contextManager.FeatureContext != null)
                 {
+                    var testRunner = testWorkerContainer.Resolve<ITestRunner>();
+                    // Closing the feature on shutdown for the test runner. It should normally be closed by FeatureTearDownAsync, for example.";
                     await testRunner.OnFeatureEndAsync();
                 }
-                catch (Exception ex)
-                {
-                    _testTracer.TraceWarning("[AfterFeature] error: " + ex);
-                    onFeatureEndErrors.Add(ExceptionDispatchInfo.Capture(ex));
-                }
+            }
+            catch (Exception ex)
+            {
+                _testTracer.TraceWarning("[AfterFeature] error: " + ex);
+                onFeatureEndErrors.Add(ExceptionDispatchInfo.Capture(ex));
+            }
+            finally
+            {
+                var containerHint = new TestWorkerContainerHint(null, Thread.CurrentThread.ManagedThreadId);
+                _availableTestWorkerContainers.TryAdd(testWorkerContainer, containerHint);
             }
         }
         return onFeatureEndErrors.ToArray();
@@ -355,8 +363,15 @@ public class TestRunnerManager : ITestRunnerManager
             {
                 foreach (var item in testWorkerContainers)
                 {
+                    if (!_availableTestWorkerContainers.TryRemove(item.Key, out _))
+                        continue; // Container was already taken by another thread
+                    var testRunner = item.Key.Resolve<ITestRunner>();
+                    if (testRunner.FeatureContext is not null)
+                    {
+                        var errorText = $"A test runner with the ID {testRunner.TestWorkerId} was found that has an unclosed feature. The feature's name is {testRunner.FeatureContext.FeatureInfo?.Title}. The feature will not be closed (it should normally be closed by FeatureTearDownAsync, for example).";
+                        _testTracer.TraceWarning(errorText);
+                    }
                     item.Key.Dispose();
-                    _availableTestWorkerContainers.TryRemove(item.Key, out _);
                 }
                 testWorkerContainers = _availableTestWorkerContainers.ToArray();
             }
@@ -365,7 +380,7 @@ public class TestRunnerManager : ITestRunnerManager
             if (notReleasedTestWorkerContainers.Length > 0)
             {
                 var errorText = $"Found {notReleasedTestWorkerContainers.Length} not released TestRunners (ids: {string.Join(",", notReleasedTestWorkerContainers.Select(x => TestThreadContainerInfo.GetId(x.Key)))})";
-                _globalContainer.Resolve<ITestTracer>().TraceWarning(errorText);
+                _testTracer.TraceWarning(errorText);
             }
 
             // this call dispose on this object, but _wasDisposed will avoid double execution

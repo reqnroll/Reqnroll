@@ -81,4 +81,79 @@ if (Directory.Exists(TmpDirectory))
     <!--Implementation based on https://www.nyckel.com/blog/nuget-packages/.-->
     <ReqnrollClearNuGetCache NuGetCacheDirectory="$(NugetPackageRoot)/$(PackageId.ToLower())/$(VersionPrefix)-$(VersionSuffix)" EnsureNugetCacheCleared="$(REQNROLL_ENSURE_NUGET_CACHE_CLEARED)"/>
   </Target>
+
+  <!-- Get the list of project reference outputs that should be packed as part of this package. -->
+  <Target
+    Name="_GetProjectReferenceCopyLocalPathsForPackAsComponent"
+    DependsOnTargets="ResolveReferences"
+    Returns="_ProjectReferenceCopyLocalPathsForPackAsComponent">
+
+    <ItemGroup>
+      <_ReferenceCopyLocalProjects
+        Include="@(ReferenceCopyLocalPaths -> '%(ProjectReferenceOriginalItemSpec)')"
+        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference' AND '%(ReferenceCopyLocalPaths.PackAsComponent)' == 'true'">
+        <Asset>%(Identity)</Asset>
+      </_ReferenceCopyLocalProjects>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ProjectReferenceCopyLocalPathsForPackAsComponent
+        Include="@(_ReferenceCopyLocalProjects->'%(Asset)')"
+        Condition="'%(ProjectReference.PackAsComponent)' == 'true'"/>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificContentInPackage>
+      $(TargetsForTfmSpecificContentInPackage);
+      CollectProjectReferenceOutputsForPack
+    </TargetsForTfmSpecificContentInPackage>
+    
+    <CollectProjectReferenceOutputsForPackDependsOn>
+      $(CollectProjectReferenceOutputsForPackDependsOn);
+      _GetProjectReferenceCopyLocalPathsForPackAsComponent
+    </CollectProjectReferenceOutputsForPackDependsOn>
+  </PropertyGroup>
+
+  <!-- Include referenced project assembly as part of this package directly. -->
+  <Target Name="CollectProjectReferenceOutputsForPack" DependsOnTargets="$(CollectProjectReferenceOutputsForPackDependsOn)">
+    <ItemGroup>
+      <TfmSpecificPackageFile
+        Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent)"
+        PackagePath="lib/$(TargetFramework)/"
+        Condition="'%(Extension)' != '.pdb'"/>
+    </ItemGroup>
+  </Target>
+
+  <PropertyGroup>
+    <TargetsForTfmSpecificDebugSymbolsInPackage>
+      $(TargetsForTfmSpecificDebugSymbolsInPackage);
+      CollectProjectReferenceDebugSymbolsForPack
+    </TargetsForTfmSpecificDebugSymbolsInPackage>
+
+    <CollectProjectReferenceDebugSymbolsForPackDependsOn>
+      $(CollectProjectReferenceDebugSymbolsForPackDependsOn);
+      _GetProjectReferenceCopyLocalPathsForPackAsComponent
+    </CollectProjectReferenceDebugSymbolsForPackDependsOn>
+  </PropertyGroup>
+
+  <!-- Included referenced project PDBs as part of the symbols package. -->
+  <Target Name="CollectProjectReferenceDebugSymbolsForPack" DependsOnTargets="$(CollectProjectReferenceDebugSymbolsForPackDependsOn)">
+    <ItemGroup>
+      <TfmSpecificDebugSymbolsFile
+        Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent)"
+        Condition="'%(Extension)' == '.pdb'"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_TfmSpecificDebugSymbolsCandidate
+        Include="@(_ProjectReferenceCopyLocalPathsForPackAsComponent->'%(RootDir)%(Directory)%(Filename).pdb')"
+        Condition="'%(Extension)' != '.pdb'"/>
+      <TfmSpecificDebugSymbolsFile
+        Include="@(_TfmSpecificDebugSymbolsCandidate)"
+        TargetFramework="$(TargetFramework)"
+        Condition="Exists('%(FullPath)')" />
+    </ItemGroup>
+  </Target>
+  
 </Project>

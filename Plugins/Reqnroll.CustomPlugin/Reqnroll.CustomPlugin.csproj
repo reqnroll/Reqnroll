@@ -1,14 +1,32 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <IsReqnrollGeneratorPlugin>true</IsReqnrollGeneratorPlugin>
-    
+    <IncludeMainProjectInDepsFile>false</IncludeMainProjectInDepsFile>
+
     <!-- NuGet configuration -->
     <PackageId>Reqnroll.CustomPlugin</PackageId>
     <Description>Package for writing custom generator extensions for Reqnroll.</Description>
     <PackageTags>reqnroll bdd gherkin cucumber generator</PackageTags>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.CodeDom" Version="8.0.0" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <ProjectReference Include="../../Reqnroll/Reqnroll.csproj" />
+    <ProjectReference Include="../../Reqnroll.Generator/Reqnroll.Generator.csproj" PrivateAssets="all" PackAsComponent="true" />
+    <ProjectReference Include="../../Reqnroll.Utils/Reqnroll.Utils.csproj" PrivateAssets="all" PackAsComponent="true" />
+    <ProjectReference Include="../../Reqnroll.Parser/Reqnroll.Parser.csproj" PrivateAssets="all" PackAsComponent="true" />
+  </ItemGroup>
+
+  <!-- Trims the empty primary assembly from the NuGet package. -->
+  <Target Name="RemoveBuildOutputFromPackageContent" BeforeTargets="GenerateNuspec">
+    <ItemGroup>
+      <_BuildOutputInPackage Remove="@(_BuildOutputInPackage)" />
+    </ItemGroup>
+  </Target>
 
 </Project>
