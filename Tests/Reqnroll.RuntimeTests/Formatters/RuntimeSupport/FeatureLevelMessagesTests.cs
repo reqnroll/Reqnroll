@@ -113,7 +113,7 @@ public class FeatureLevelMessagesTests
         using var stream = new MemoryStream(Encoding.UTF8.GetBytes(ndjsonContent));
 
         // Act
-        var sut = new FeatureLevelCucumberMessages(stream, "test", 2);
+        var sut = new FeatureLevelCucumberMessages(stream, 2);
 
         // Assert
         sut.Should().NotBeNull();
@@ -357,4 +357,139 @@ public class FeatureLevelMessagesTests
     private GherkinDocument GherkinDocument1 => new("URI1", new Feature(new Location(0,0), new List<Tag>(), "en", "Feature", "gherkin doc", "", new List<FeatureChild>()), new List<Comment>());
     private Pickle Pickle1 => new("pickleId1", "URI1", "pickle 1", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
     private Pickle Pickle2 => new("pickleId2", "URI2", "pickle 2", "en", new List<PickleStep>(), new List<PickleTag>(), new List<string>());
+
+    #region GetPickleIndexFromTestRow Tests
+    [Fact]
+    public void GetPickleIndexFromTestRow_ReturnsCorrectIndex()
+    {
+        // Arrange: create pickles with row-hash tags
+        var pickle1 = new Pickle(
+            id: "id1",
+            name: "name1",
+            steps: new List<PickleStep>(),
+            tags: new List<PickleTag>(),
+            astNodeIds: new List<string>(),
+            uri: "",
+            language: ""
+        );
+        var pickle2 = new Pickle(
+            id: "id2",
+            name: "name2",
+            steps: new List<PickleStep>(),
+            tags: new List<PickleTag>(),
+            astNodeIds: new List<string>(),
+            uri: "",
+            language: ""
+        );
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle2, "Feature", "Scenario", ["tag1"], ["val1"]);
+
+        var envelopes = new List<Envelope>
+            {
+                Envelope.Create(pickle1),
+                Envelope.Create(pickle2)
+            };
+
+        var featureMessages = new FeatureLevelCucumberMessages(envelopes, 2);
+
+        // Act
+        var index = featureMessages.GetPickleIndexFromTestRow("Feature", "Scenario", ["tag1"], new[] { "val1" });
+
+        // Assert
+        Assert.Equal("1", index);
+    }
+    [Fact]
+    public void GetPickleIndexFromTestRow_ReturnsNullIfNoMatch()
+    {
+        var pickle1 = new Pickle(
+            id: "id1",
+            name: "name1",
+            steps: new List<PickleStep>(),
+            tags: new List<PickleTag>(),
+            astNodeIds: new List<string>(),
+            uri: "",
+            language: ""
+        );
+        var pickle2 = new Pickle(
+            id: "id2",
+            name: "name2",
+            steps: new List<PickleStep>(),
+            tags: new List<PickleTag>(),
+            astNodeIds: new List<string>(),
+            uri: "",
+            language: ""
+        );
+
+        var envelopes = new List<Envelope>
+            {
+                Envelope.Create(pickle1),
+                Envelope.Create(pickle2)
+            };
+
+        var featureMessages = new FeatureLevelCucumberMessages(envelopes, 2);
+
+        var index = featureMessages.GetPickleIndexFromTestRow("Feature", "Scenario", ["tag1"], new[] { "val1" });
+
+        Assert.Null(index);
+    }
+    [Fact]
+    public void GetPickleIndexFromTestRow_CyclesThroughIndicesWithSharedHash()
+    {
+        // Arrange: create three pickles with the same row hash
+        var pickle1 = new Pickle(
+            id: "id1",
+            name: "name1",
+            steps: new List<PickleStep>(),
+            tags: new List<PickleTag>(),
+            astNodeIds: new List<string>(),
+            uri: "",
+            language: ""
+        );
+        var pickle2 = new Pickle(
+            id: "id2",
+            name: "name2",
+            steps: new List<PickleStep>(),
+            tags: new List<PickleTag>(),
+            astNodeIds: new List<string>(),
+            uri: "",
+            language: ""
+        );
+        var pickle3 = new Pickle(
+            id: "id3",
+            name: "name3",
+            steps: new List<PickleStep>(),
+            tags: new List<PickleTag>(),
+            astNodeIds: new List<string>(),
+            uri: "",
+            language: ""
+        );
+
+        // All pickles get the same row-hash tag
+        var feature = "Feature";
+        var scenario = "Scenario";
+        var tags = new[] { "tag1" };
+        var rowValues = new[] { "val1" };
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle1, feature, scenario, tags, rowValues);
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle2, feature, scenario, tags, rowValues);
+        TestRowPickleMapper.MarkPickleWithRowHash(pickle3, feature, scenario, tags, rowValues);
+
+        var envelopes = new List<Envelope>
+        {
+            Envelope.Create(pickle1),
+            Envelope.Create(pickle2),
+            Envelope.Create(pickle3)
+        };
+
+        var featureMessages = new FeatureLevelCucumberMessages(envelopes, 3);
+
+        // Act & Assert: Should cycle through indices 0, 1, 2, then repeat
+        var indices = new List<string>();
+        for (int i = 0; i < 6; i++)
+        {
+            var idx = featureMessages.GetPickleIndexFromTestRow(feature, scenario, tags, rowValues);
+            indices.Add(idx);
+        }
+
+        Assert.Equal(new[] { "0", "1", "2", "0", "1", "2" }, indices);
+    }
+    #endregion
 }

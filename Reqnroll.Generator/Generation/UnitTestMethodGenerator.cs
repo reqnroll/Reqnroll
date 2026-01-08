@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using Gherkin.Ast;
 using Reqnroll.Configuration;
+using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Generator.CodeDom;
 using Reqnroll.Generator.UnitTestConverter;
 using Reqnroll.Generator.UnitTestProvider;
@@ -211,7 +212,7 @@ namespace Reqnroll.Generator.Generation
             // Cucumber Messages support uses a new variables: pickleIndex
             // The pickleIndex tells the runtime which Pickle this test corresponds to. 
             // When Backgrounds and Rule Backgrounds are used, we don't know ahead of time how many Steps there are in the Pickle.
-            AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, pickleIndex);
+            AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, pickleIndex, feature.Name, scenarioDefinition.Name, additionalTagsExpression, new CodeVariableReferenceExpression(GeneratorConstants.SCENARIO_ARGUMENTS_VARIABLE_NAME));
 
             testMethod.Statements.Add(
                 new CodeVariableDeclarationStatement(new CodeTypeReference(typeof(ScenarioInfo), CodeTypeReferenceOptions.GlobalReference), "scenarioInfo",
@@ -242,9 +243,39 @@ namespace Reqnroll.Generator.Generation
             GenerateScenarioCleanupMethodCall(generationContext, testMethod);
         }
 
-        internal void AddVariableForPickleIndex(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, int? pickleIndex)
+        internal void AddVariableForPickleIndex(CodeMemberMethod testMethod, bool pickleIdIncludedInParameters, int? pickleIndex, string featureName, string scenarioName, CodeExpression exampleTags, CodeVariableReferenceExpression arguments)
         {
-            _scenarioPartHelper.AddVariableForPickleIndex(testMethod, pickleIdIncludedInParameters, pickleIndex);
+            if (!pickleIdIncludedInParameters && pickleIndex == null)
+                throw new ArgumentNullException(nameof(pickleIndex));
+
+            // if simple scenario, just assign the pickle index value directly
+            // string pickleIndex = "<pickleIndex>";
+
+            // if scenario outline with row tests, we generate code that invokes the TestRowPickleMapper to get the pickle index from the row hash.
+
+            CodeExpression valueExpression;
+            if (!pickleIdIncludedInParameters)
+            {
+                valueExpression = new CodePrimitiveExpression(pickleIndex.Value.ToString());
+            }
+            else
+            {
+                // string pickleIndex = global::TestRowPickleMapper.GetPickleIndexFromTestRow(featureInfo, featureName, scenarioName, exampleTags, arguments.Values);
+                var testRowPickleMapperTypeRef = new CodeTypeReferenceExpression(new CodeTypeReference(typeof(TestRowPickleMapper), CodeTypeReferenceOptions.GlobalReference));
+                valueExpression = new CodeMethodInvokeExpression(
+                    testRowPickleMapperTypeRef,
+                    nameof(TestRowPickleMapper.GetPickleIndexFromTestRow),
+                    new CodeVariableReferenceExpression(GeneratorConstants.FEATUREINFO_FIELD),
+                    new CodePrimitiveExpression(featureName),
+                    new CodePrimitiveExpression(scenarioName),
+                    exampleTags,
+                    new CodePropertyReferenceExpression(arguments, "Values"));
+            }
+
+            var pickleIdVariable = new CodeVariableDeclarationStatement(typeof(string), GeneratorConstants.PICKLEINDEX_VARIABLE_NAME,
+                    valueExpression);
+
+            testMethod.Statements.Add(pickleIdVariable);
         }
 
         private void AddVariableForTags(CodeMemberMethod testMethod, CodeExpression tagsExpression)
@@ -383,7 +414,7 @@ namespace Reqnroll.Generator.Generation
         private void GenerateScenarioOutlineExamplesAsIndividualMethods(
             TestClassGenerationContext generationContext,
             ScenarioDefinitionInFeatureFile scenarioDefinitionInFeature,
-            CodeMemberMethod scenarioOutlineTestMethod, 
+            CodeMemberMethod scenarioOutlineTestMethod,
             ParameterSubstitution paramToIdentifier,
             ref int pickleIndex)
         {
@@ -432,9 +463,19 @@ namespace Reqnroll.Generator.Generation
             {
                 foreach (var row in examples.TableBody)
                 {
-                    var arguments = row.Cells.Select(c => c.Value).Concat([pickleIndex.ToString()]);
-
+                    var arguments = row.Cells.Select(c => c.Value).ToArray();
                     _unitTestGeneratorProvider.SetRow(generationContext, scenarioOutlineTestMethod, arguments, GetNonIgnoreTags(examples.Tags), HasIgnoreTag(examples.Tags));
+
+                    // hash the feature name, scenario outline name, example set tags and row values to create a unique id for the row.
+                    // Look up the pickle in the generation context Feature Envelopes using the pickleIndex, and add the hash to the Pickle's list of tags.
+                    var featureName = generationContext.Feature.Name;
+                    var scenarioOutlineName = scenarioOutline.Name;
+                    var pickle = generationContext.FeatureEnvelopes
+                                .Where(e => e.Pickle != null)
+                                .Select(e => e.Pickle)
+                                .ElementAt(pickleIndex);
+
+                    TestRowPickleMapper.MarkPickleWithRowHash(pickle, featureName, scenarioOutlineName, examples.Tags.Select(t => t.Name), arguments);
 
                     pickleIndex++;
                 }
@@ -497,7 +538,6 @@ namespace Reqnroll.Generator.Generation
             {
                 testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), pair.Value));
             }
-            testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string), GeneratorConstants.PICKLEINDEX_PARAMETER_NAME));
             testMethod.Parameters.Add(new CodeParameterDeclarationExpression(typeof(string[]), GeneratorConstants.SCENARIO_OUTLINE_EXAMPLE_TAGS_PARAMETER));
             return testMethod;
         }
@@ -519,7 +559,6 @@ namespace Reqnroll.Generator.Generation
 
             //call test implementation with the params
             var argumentExpressions = row.Cells.Select(paramCell => new CodePrimitiveExpression(paramCell.Value)).Cast<CodeExpression>().ToList();
-            argumentExpressions.Add(new CodePrimitiveExpression(pickleIndex.ToString()));
             argumentExpressions.Add(_scenarioPartHelper.GetStringArrayExpression(exampleSetTags));
 
             var statements = new List<CodeStatement>();
