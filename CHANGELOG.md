@@ -1,10 +1,12 @@
 # [vNext]
 
 ## Improvements:
+* Tag Expressions: step definition scopes and hooks may now use tag expressions (such as `@db and not @slow`) (#911)
 
 ## Bug fixes:
 
 *Contributors of this release (in alphabetical order):* 
+@clrudolphi
 
 # v3.3.1 - 2026-01-08
 
@@ -24,7 +26,6 @@
 * NUnit dependencies are updated to v4.4.0 in templates. This does not impact Reqnroll compatibility. (#846)
 * Formatters: configured OutputFilePath may now contain variable substitution parameters for build metadata, timestamp, and environment variables. See https://docs.reqnroll.net/latest/installation/formatter-configuration.html#available-substitution-variables for details. (#930)
 * Improved packaging of Reqnroll NuGet packages (#914)
-* Tag Expressions: step definition scopes and hooks may now use tag expressions (such as `@db and not @slow`) (#911)
 * Improved up-to-date checking for feature files that results in faster builds. As part of this the code-behind files are deleted on clean or rebuild. (#941)
 * Support for storing the code-behind files in the intermediate output folder (obj folder) by setting the `ReqnrollUseIntermediateOutputPathForCodeBehind` MSBuild property to `true`. (#947)
 * Support for linked feature files (files used from outside of the project folder). To use this feature, the `ReqnrollUseIntermediateOutputPathForCodeBehind` flag must be enabled (see above). (#948)

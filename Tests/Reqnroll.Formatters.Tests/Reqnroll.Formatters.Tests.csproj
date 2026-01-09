@@ -33,6 +33,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="Samples\Resources\tag-expressions\tag_expressions.ndjson" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="GitHubActionsTestLogger" Version="2.4.1" Condition="'$(REQNROLL_TEST_PIPELINEMODE)' == 'true'">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -45,8 +49,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
+    <ProjectReference Include="..\..\Plugins\Reqnroll.ExternalData\Reqnroll.ExternalData.ReqnrollPlugin\Reqnroll.ExternalData.ReqnrollPlugin.csproj">
       <PrivateAssets>all</PrivateAssets>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

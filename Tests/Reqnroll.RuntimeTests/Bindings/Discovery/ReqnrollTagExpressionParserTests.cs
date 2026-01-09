@@ -55,16 +55,16 @@ public class ReqnrollTagExpressionParserTests
     [InlineData("not tag1")]
     [InlineData("tag1 and @tag2")]
     [InlineData("@tag1 or tag2")]
-    public void Multi_term_expressions_without_at_prefix_throw_exception(string expression)
+    public void Multi_term_expressions_without_at_prefix_returns_InvalidTagExpression(string expression)
     {
         // Arrange
         var parser = CreateParser();
 
         // Act
-        Action act = () => parser.Parse(expression);
+        var result = parser.Parse(expression);
 
         // Assert
-        act.Should().Throw<TagExpressionException>();
+        result.Should().BeOfType<InvalidTagExpression>();
     }
 
 
