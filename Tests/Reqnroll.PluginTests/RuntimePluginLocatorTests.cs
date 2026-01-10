@@ -48,15 +48,17 @@ namespace Reqnroll.PluginTests
             var allProjectReferenceFoundByPluginLocator = projectReferences.All(pr => plugins.Any(plugin => plugin.Contains(pr)));
             allProjectReferenceFoundByPluginLocator.Should().BeTrue();
 
-            var foundPlugins = plugins.Select(Path.GetFileName);
+            var foundPlugins = plugins.Select(Path.GetFileName).OrderBy(p => p);
             foundPlugins.Should().BeEquivalentTo([
-                "Reqnroll.PluginTests.dll", // This test assembly
-                "Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll",
                 "Reqnroll.Autofac.ReqnrollPlugin.dll", 
                 "Reqnroll.ExternalData.ReqnrollPlugin.dll",
+                "Reqnroll.Microsoft.Extensions.DependencyInjection.ReqnrollPlugin.dll",
+                "Reqnroll.MSTest.Generator.ReqnrollPlugin.dll", 
+                "Reqnroll.MSTest.ReqnrollPlugin.dll", 
+                "Reqnroll.NUnit.Generator.ReqnrollPlugin.dll", 
+                "Reqnroll.NUnit.ReqnrollPlugin.dll",                 
+                "Reqnroll.PluginTests.dll", // This test assembly
                 "Reqnroll.Windsor.ReqnrollPlugin.dll",
-                "Reqnroll.MSTest.ReqnrollPlugin.dll",
-                "Reqnroll.NUnit.ReqnrollPlugin.dll",
                 "Reqnroll.xUnit.ReqnrollPlugin.dll",
                 "Reqnroll.xUnit.Generator.ReqnrollPlugin.dll",
             ]);
