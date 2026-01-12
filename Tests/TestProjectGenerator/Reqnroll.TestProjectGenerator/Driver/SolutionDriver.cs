@@ -60,13 +60,18 @@ namespace Reqnroll.TestProjectGenerator.Driver
         {
             get
             {
-                if (_defaultProject == null)
-                {
-                    _defaultProject = _projectBuilderFactory.CreateProject(DefaultProjectName, _testRunConfiguration.ProgrammingLanguage);
-                    _projects.Add(_defaultProject.ProjectName, _defaultProject);
-                }
+                EnsureDefaultProject();
 
                 return _defaultProject;
+            }
+        }
+
+        public void EnsureDefaultProject()
+        {
+            if (_defaultProject == null)
+            {
+                _defaultProject = _projectBuilderFactory.CreateProject(DefaultProjectName, _testRunConfiguration.ProgrammingLanguage);
+                _projects.Add(_defaultProject.ProjectName, _defaultProject);
             }
         }
 

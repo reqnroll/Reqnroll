@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using FluentAssertions;
-using Moq;
 using Reqnroll.EnvironmentAccess;
 using Xunit;
 
@@ -115,7 +114,7 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
                     metadata.Remote.Should().Be("url/repo.git");
                     metadata.Revision.Should().Be("rev");
                     metadata.Branch.Should().Be("branchname"); // GitHub uses GITHUB_REF_NAME when REF_TYPE is branch
-                    metadata.Tag.Should().BeNull(); // No tag since REF_TYPE is branch
+                    metadata.Tag.Should().Be("UNKNOWN"); // No tag since REF_TYPE is branch
                     break;
             }
         }
@@ -172,7 +171,7 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
             var metadata = provider.GetBuildMetadata();
             
             metadata.Should().NotBeNull();
-            metadata.Tag.Should().BeNull();
+            metadata.Tag.Should().Be("UNKNOWN");
         }
 
         [Fact]
@@ -197,7 +196,7 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
             metadata.BuildNumber.Should().Be("67");
             metadata.Remote.Should().Be("https://github.com/owner/repo.git");
             metadata.Revision.Should().Be("abc123");
-            metadata.Branch.Should().BeNull(); // No branch since REF_TYPE is tag
+            metadata.Branch.Should().Be("UNKNOWN"); // No branch since REF_TYPE is tag
             metadata.Tag.Should().Be("v1.0.0");
         }
 
@@ -213,12 +212,12 @@ namespace Reqnroll.RuntimeTests.EnvironmentAccess
             
             metadata.Should().NotBeNull();
             metadata.ProductName.Should().Be("TeamCity");
-            metadata.BuildUrl.Should().BeNull();
-            metadata.BuildNumber.Should().BeNull();
-            metadata.Remote.Should().BeNull();
-            metadata.Revision.Should().BeNull();
-            metadata.Branch.Should().BeNull();
-            metadata.Tag.Should().BeNull();
+            metadata.BuildUrl.Should().Be("UNKNOWN");
+            metadata.BuildNumber.Should().Be("UNKNOWN");
+            metadata.Remote.Should().Be("UNKNOWN");
+            metadata.Revision.Should().Be("UNKNOWN");
+            metadata.Branch.Should().Be("UNKNOWN");
+            metadata.Tag.Should().Be("UNKNOWN");
         }
     }
 }

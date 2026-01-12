@@ -14,7 +14,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" PrivateAssets="all" />
+    <ProjectReference
+      Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj"
+      PackAsComponent="true"
+      PrivateAssets="all" />
     <ProjectReference
       Include="..\Reqnroll.Analyzers\Reqnroll.Analyzers.csproj"
       ReferenceOutputAssembly="false"/>
@@ -99,27 +102,4 @@
       <FileWrites Include="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" />
     </ItemGroup>
   </Target>
-
-  <!-- Include referenced project assembly as part of this package directly. -->
-  <Target Name="MarkProjectReferenceOutputsForPack" AfterTargets="ResolveReferences">
-
-    <ItemGroup>
-      <ProjectReferenceCopyLocalPaths
-        Include="@(ReferenceCopyLocalPaths)"
-        Condition="'%(ReferenceCopyLocalPaths.ReferenceSourceTarget)' == 'ProjectReference'" />
-
-      <ProjectReferenceSymbols
-        Include="@(ProjectReferenceCopyLocalPaths)"
-        Condition="'%(Extension)' == '.pdb'" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <!-- DLLs and other runtime assets go into the main package. -->
-      <None Include="@(ProjectReferenceCopyLocalPaths)" Pack="true" PackagePath="lib/$(TargetFramework)/" />
-
-      <!-- Debugging symbols go into the symbol package. -->
-      <None Update="@(ProjectReferenceSymbols)" PackFolder="Symbols" />
-    </ItemGroup>
-  </Target>
-
 </Project>

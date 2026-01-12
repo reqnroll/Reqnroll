@@ -4,9 +4,20 @@
 
 ## Bug fixes:
 
-* Fix authors of Reqnroll.Autofac package (#979)
+* Fix: Partially defined CI Environment variables (missing relevant environment variables) cause missing Meta envelope in Cucumber Messages report and Javascript errors in HTML report. (#990)
 
-*Contributors of this release (in alphabetical order):* @304NotModified
+*Contributors of this release (in alphabetical order):* @clrudolphi
+
+# v3.3.1 - 2026-01-08
+
+## Bug fixes:
+
+* Fix: Upgrading to 3.3.0 causes build error with SpecFlowCompatibility (NuGet package Reqnroll.SpecFlowCompatibility issue) (#970)
+* Fix: IGeneratorPlugin interface could not be found after upgrading to the Reqnroll 3.3.0 (NuGet package Reqnroll.CustomPlugin issue) (#972)
+* Fix: Authors field of Reqnroll.Autofac package is incorrect (#979)
+* Fix: Referencing step definitions from other assembly/project not working because `reqnroll.json` config file is not copied to the output folder (#985)
+
+*Contributors of this release (in alphabetical order):* @304NotModified, @Code-Grump, @gasparnagy
 
 # v3.3.0 - 2025-12-17
 

@@ -91,6 +91,7 @@ namespace Reqnroll.TestProjectGenerator.Factories
             project.Format = _testRunConfiguration.ProjectFormat;
             project.ConfigurationFormat = _testRunConfiguration.ConfigurationFormat;
             project.Language = language;
+            project.ForceAddingExplicitReferenceToReqnrollPackage = _testRunConfiguration.ForceAddingExplicitReferenceToReqnrollPackage;
 
             project.Configuration.UnitTestProvider = _testRunConfiguration.UnitTestProvider;
 
