@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using FluentAssertions;
-using Moq;
 using Reqnroll.EnvironmentAccess;
 using Xunit;
 

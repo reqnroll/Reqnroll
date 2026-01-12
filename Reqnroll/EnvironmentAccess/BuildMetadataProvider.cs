@@ -14,12 +14,12 @@ namespace Reqnroll.EnvironmentAccess
         /// </summary>
         /// <param name="variable">The name of the environment variable to retrieve.</param>
         /// <returns>The value of the environment variable if it exists and can be accessed; otherwise, <c>null</c>.</returns>
-        internal string GetVariableOrUnknown(string variable)
+        private string GetVariableOrUnknown(string variable)
         { 
             var value = GetVariable(variable);
             return string.IsNullOrEmpty(value) ? UNKNOWN : value;
         }
-        internal string GetVariable(string variable)
+        private string GetVariable(string variable)
         {
             var varValue = environment.GetEnvironmentVariable(variable);
             if (varValue is ISuccess<string> success)
