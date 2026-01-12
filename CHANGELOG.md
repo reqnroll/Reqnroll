@@ -3,10 +3,10 @@
 ## Improvements:
 
 ## Bug fixes:
-* Fix: Partially defined CI Environments (missing relevant environment variables) cause Formatters to be missing messages. (#990)
 
-*Contributors of this release (in alphabetical order):* 
-@clrudolphi
+* Fix: Partially defined CI Environment variables (missing relevant environment variables) cause missing Meta envelope in Cucumber Messages report and Javascript errors in HTML report. (#990)
+
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.1 - 2026-01-08
 
