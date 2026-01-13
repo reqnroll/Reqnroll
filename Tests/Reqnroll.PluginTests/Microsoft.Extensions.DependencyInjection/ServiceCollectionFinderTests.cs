@@ -5,6 +5,8 @@ using System.Reflection;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Reqnroll.Bindings.Discovery;
+using Reqnroll.Infrastructure;
 using Reqnroll.Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -12,12 +14,16 @@ namespace Reqnroll.PluginTests.Microsoft.Extensions.DependencyInjection;
 
 public class ServiceCollectionFinderTests
 {
+    private readonly Mock<ITestRunnerManager> _testRunnerManagerMock = new();
+    private readonly Mock<IRuntimeBindingRegistryBuilder> _bindingRegistryBuilderMock = new();
+    private readonly Mock<ITestAssemblyProvider> _testAssemblyProviderMock = new();
+    private readonly Mock<IBindingAssemblyLoader> _bindingAssemblyLoaderMock = new();
+
     [Fact]
     public void GetServiceCollection_HappyPath_ResolvesCorrectServiceCollection()
     {
         // Arrange
-        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ValidStartWithAutoRegister));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithAutoRegister));
 
         // Act
         var (serviceCollection, _) = sut.GetServiceCollection();
@@ -33,14 +39,14 @@ public class ServiceCollectionFinderTests
     public void GetServiceCollection_MethodIsVoid_ThrowsInvalidScenarioDependenciesException()
     {
         // Arrange
-        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(InvalidStartVoid));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(InvalidStartVoid));
 
         // Act
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<InvalidScenarioDependenciesException>()
+        act.Should()
+           .Throw<InvalidScenarioDependenciesException>()
            .WithMessage("[ScenarioDependencies] should return IServiceCollection but the method doesn't return a value.");
     }
 
@@ -48,30 +54,29 @@ public class ServiceCollectionFinderTests
     public void GetServiceCollection_MethodReturnsNull_ThrowsInvalidScenarioDependenciesException()
     {
         // Arrange
-        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(InvalidStartNull));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(InvalidStartNull));
 
         // Act
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<InvalidScenarioDependenciesException>()
+        act.Should()
+           .Throw<InvalidScenarioDependenciesException>()
            .WithMessage("[ScenarioDependencies] should return IServiceCollection but returned null.");
     }
-
 
     [Fact]
     public void GetServiceCollection_MethodReturnsInvalidType_ThrowsInvalidScenarioDependenciesException()
     {
         // Arrange
-        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(InvalidStartWrongType));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(InvalidStartWrongType));
 
         // Act
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<InvalidScenarioDependenciesException>()
+        act.Should()
+           .Throw<InvalidScenarioDependenciesException>()
            .WithMessage("[ScenarioDependencies] should return IServiceCollection but returned System.Collections.Generic.List`1[System.String].");
     }
 
@@ -79,14 +84,14 @@ public class ServiceCollectionFinderTests
     public void GetServiceCollection_NotFound_ThrowsMissingScenarioDependenciesException()
     {
         // Arrange
-        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ServiceCollectionFinderTests));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ServiceCollectionFinderTests));
 
         // Act
         var act = () => sut.GetServiceCollection();
 
         // Assert
-        act.Should().Throw<MissingScenarioDependenciesException>()
+        act.Should()
+           .Throw<MissingScenarioDependenciesException>()
            .WithMessage("No method marked with [ScenarioDependencies] attribute found. It should be a (public or non-public) static method. Scanned assemblies: Reqnroll.PluginTests.");
     }
 
@@ -94,8 +99,7 @@ public class ServiceCollectionFinderTests
     public void GetServiceCollection_AutoRegisterBindingsTrue_RegisterBindingsAsScoped()
     {
         // Arrange
-        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ValidStartWithAutoRegister), typeof(Binding1));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithAutoRegister), typeof(Binding1));
 
         // Act
         var (serviceCollection, _) = sut.GetServiceCollection();
@@ -109,8 +113,7 @@ public class ServiceCollectionFinderTests
     public void GetServiceCollection_AutoRegisterBindingsFalse_DoNotRegisterBindings()
     {
         // Arrange
-        var testRunnerManagerMock = CreateTestRunnerManagerMock(typeof(ValidStartWithoutAutoRegister), typeof(Binding1));
-        var sut = new ServiceCollectionFinder(testRunnerManagerMock.Object);
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithoutAutoRegister), typeof(Binding1));
 
         // Act
         var (serviceCollection, _) = sut.GetServiceCollection();
@@ -120,7 +123,57 @@ public class ServiceCollectionFinderTests
         serviceCollection.Should().NotContain(d => d.ImplementationType == typeof(Binding1));
     }
 
-    private static Mock<ITestRunnerManager> CreateTestRunnerManagerMock(params Type[] types)
+    [Fact]
+    public void GetServiceCollection_CustomLifetime_ReturnsCorrectLifetime()
+    {
+        // Arrange
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithFeatureLifetime));
+
+        // Act
+        var (_, lifetime) = sut.GetServiceCollection();
+
+        // Assert
+        lifetime.Should().Be(ScopeLevelType.Feature);
+    }
+
+    [Fact]
+    public void GetServiceCollection_BindingAssembliesNull_FallbacksToBindingRegistryBuilder()
+    {
+        // Arrange
+        var types = new[] { typeof(ValidStartWithAutoRegister) };
+        var assemblyMock = new Mock<Assembly>();
+        assemblyMock.Setup(m => m.GetTypes()).Returns(types.ToArray());
+        var assembly = types[0].Assembly;
+        assemblyMock.Setup(m => m.GetName()).Returns(assembly.GetName());
+
+        _testRunnerManagerMock.Setup(m => m.BindingAssemblies).Returns((Assembly[])null);
+        _testAssemblyProviderMock.Setup(m => m.TestAssembly).Returns(assemblyMock.Object);
+        _bindingRegistryBuilderMock.Setup(m => m.GetBindingAssemblies(assemblyMock.Object)).Returns([assemblyMock.Object]);
+
+        var sut = new ServiceCollectionFinder(_testRunnerManagerMock.Object, _bindingRegistryBuilderMock.Object, _testAssemblyProviderMock.Object, _bindingAssemblyLoaderMock.Object);
+
+        // Act
+        var (serviceCollection, _) = sut.GetServiceCollection();
+
+        // Assert
+        serviceCollection.Should().NotBeNull();
+        _bindingRegistryBuilderMock.Verify(m => m.GetBindingAssemblies(assemblyMock.Object), Times.Once);
+    }
+
+    [Fact]
+    public void GetServiceProviderLifetime_ReturnsCorrectLifetime()
+    {
+        // Arrange
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithFeatureLifetime));
+
+        // Act
+        var lifetime = sut.GetServiceProviderLifetime();
+
+        // Assert
+        lifetime.Should().Be(ServiceProviderLifetimeType.Feature);
+    }
+
+    private ServiceCollectionFinder CreateServiceCollectionFinderWithMocks(params Type[] types)
     {
         var assemblyMock = new Mock<Assembly>();
         assemblyMock.Setup(m => m.GetTypes()).Returns(types.ToArray());
@@ -130,9 +183,20 @@ public class ServiceCollectionFinderTests
             assemblyMock.Setup(m => m.GetName()).Returns(assembly.GetName());
         }
 
-        var testRunnerManagerMock = new Mock<ITestRunnerManager>();
-        testRunnerManagerMock.Setup(m => m.BindingAssemblies).Returns([assemblyMock.Object]);
-        return testRunnerManagerMock;
+        _testRunnerManagerMock.Setup(m => m.BindingAssemblies).Returns([assemblyMock.Object]);
+        _testAssemblyProviderMock.Setup(m => m.TestAssembly).Returns(assemblyMock.Object);
+        _bindingRegistryBuilderMock.Setup(m => m.GetBindingAssemblies(It.IsAny<Assembly>())).Returns([assemblyMock.Object]);
+
+        return new ServiceCollectionFinder(_testRunnerManagerMock.Object, _bindingRegistryBuilderMock.Object, _testAssemblyProviderMock.Object, _bindingAssemblyLoaderMock.Object);
+    }
+
+    private class ValidStartWithFeatureLifetime
+    {
+        [ScenarioDependencies(ScopeLevel = ScopeLevelType.Feature, ServiceProviderLifetime = ServiceProviderLifetimeType.Feature)]
+        public static IServiceCollection GetServices()
+        {
+            return new ServiceCollection();
+        }
     }
 
     private interface ITestInterface
@@ -152,6 +216,7 @@ public class ServiceCollectionFinderTests
             return serviceCollection;
         }
     }
+
     private class ValidStartWithoutAutoRegister
     {
         [ScenarioDependencies(AutoRegisterBindings = false)]
@@ -161,6 +226,7 @@ public class ServiceCollectionFinderTests
             return serviceCollection;
         }
     }
+
     private class InvalidStartVoid
     {
         [ScenarioDependencies]
@@ -188,6 +254,7 @@ public class ServiceCollectionFinderTests
             return new List<string>();
         }
     }
+
     [Binding]
     private class Binding1;
 }

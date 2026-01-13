@@ -14,6 +14,26 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
         Feature
     }
 
+    public enum ServiceProviderLifetimeType
+    {
+        /// <summary>
+        /// Global lifetime. The container is created once for the entire test run.
+        /// </summary>
+        Global,
+        /// <summary>
+        /// Test thread lifetime. The container is created once for each test thread.
+        /// </summary>
+        TestThread,
+        /// <summary>
+        /// Feature lifetime. The container is created once for each feature.
+        /// </summary>
+        Feature,
+        /// <summary>
+        /// Scenario lifetime. The container is created once for each scenario.
+        /// </summary>
+        Scenario
+    }
+
     [AttributeUsage(AttributeTargets.Method)]
     public class ScenarioDependenciesAttribute : Attribute
     {
@@ -26,5 +46,10 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
         /// Define when to create and destroy scope. 
         /// </summary>
         public ScopeLevelType ScopeLevel { get; set; } = ScopeLevelType.Scenario;
+
+        /// <summary>
+        /// Define the lifetime of the Service Provider instance.
+        /// </summary>
+        public ServiceProviderLifetimeType ServiceProviderLifetime { get; set; } = ServiceProviderLifetimeType.Global;
     }
 }

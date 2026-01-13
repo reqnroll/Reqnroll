@@ -3,32 +3,58 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.DependencyInjection;
+using Reqnroll.Bindings.Discovery;
+using Reqnroll.Infrastructure;
 
 namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 {
     public class ServiceCollectionFinder : IServiceCollectionFinder
     {
-        private readonly ITestRunnerManager testRunnerManager;
-        private (IServiceCollection, ScopeLevelType) _cache;
+        private readonly ITestRunnerManager _testRunnerManager;
+        private readonly IRuntimeBindingRegistryBuilder _bindingRegistryBuilder;
+        private readonly ITestAssemblyProvider _testAssemblyProvider;
+        private (IServiceCollection ServiceCollection, ScenarioDependenciesAttribute Attribute) _cache;
 
-        public ServiceCollectionFinder(ITestRunnerManager testRunnerManager)
+        public ServiceCollectionFinder(ITestRunnerManager testRunnerManager, IRuntimeBindingRegistryBuilder bindingRegistryBuilder, ITestAssemblyProvider testAssemblyProvider, IBindingAssemblyLoader bindingAssemblyLoader)
         {
-            this.testRunnerManager = testRunnerManager;
+            _testRunnerManager = testRunnerManager;
+            _bindingRegistryBuilder = bindingRegistryBuilder;
+            _testAssemblyProvider = testAssemblyProvider;
+        }
+
+        public ServiceProviderLifetimeType GetServiceProviderLifetime()
+        {
+            if (_cache == default)
+            {
+                PopulateCache();
+            }
+
+            return _cache.Attribute.ServiceProviderLifetime;
         }
 
         public (IServiceCollection, ScopeLevelType) GetServiceCollection()
         {
-            if (_cache != default)
+            if (_cache == default)
             {
-                return _cache;
+                PopulateCache();
             }
 
-            var assemblies = testRunnerManager.BindingAssemblies;
+            return (_cache.ServiceCollection, _cache.Attribute.ScopeLevel);
+        }
+
+        private void PopulateCache()
+        {
+            if (_cache != default)
+            {
+                return;
+            }
+
+            var assemblies = _testRunnerManager.BindingAssemblies ?? _bindingRegistryBuilder.GetBindingAssemblies(_testAssemblyProvider.TestAssembly);
             foreach (var assembly in assemblies)
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    foreach (MethodInfo methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
+                    foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
                     {
                         var scenarioDependenciesAttribute = (ScenarioDependenciesAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(ScenarioDependenciesAttribute));
 
@@ -39,7 +65,8 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                             {
                                 AddBindingAttributes(assemblies, serviceCollection);
                             }
-                            return _cache = (serviceCollection, scenarioDependenciesAttribute.ScopeLevel);
+                            _cache = (serviceCollection, scenarioDependenciesAttribute);
+                            return;
                         }
                     }
                 }
@@ -50,11 +77,12 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
 
         private static IServiceCollection GetServiceCollection(MethodInfo methodInfo)
         {
-            var serviceCollection = methodInfo.Invoke(null, null);
-            if(methodInfo.ReturnType == typeof(void))
+            if (methodInfo.ReturnType == typeof(void))
             {
                 throw new InvalidScenarioDependenciesException("the method doesn't return a value.");
             }
+
+            var serviceCollection = methodInfo.Invoke(null, null);
 
             if (serviceCollection == null)
             {
