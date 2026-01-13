@@ -44,5 +44,12 @@ namespace Reqnroll.Specs.StepDefinitions
         {
             _parserDriver.AssertErrors(expectedErrors);
         }
+
+        [Then(@"the parsed table has only the following columns")]
+        public void ThenTheParsedTableHasOnlyTheFollowingColumns(Table table)
+        {
+            var expectedColumns = table.Rows.Select(r => r["column"]).ToArray();
+            _parserDriver.AssertTableHasColumns(expectedColumns);
+        }
     }
 }
