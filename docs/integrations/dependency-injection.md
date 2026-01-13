@@ -7,19 +7,19 @@ Reqnroll plugin for using Microsoft.Extensions.DependencyInjection as a dependen
 Currently supports Microsoft.Extensions.DependencyInjection v6.0.0 or above
 ```
 
-## Step by step walkthrough of using Reqnroll.Microsoft.Extensions.DependencyInjection
+## Install the plugin from NuGet into your Reqnroll project
 
+Install the `Reqnroll.Microsoft.Extensions.DependencyInjection` NuGet package directly into your test project.
 
-### 1.  Install plugin from NuGet into your Reqnroll project.
-
-```csharp
-PM> Install-Package Reqnroll.Microsoft.Extensions.DependencyInjection
+```powershell
+Install-Package Reqnroll.Microsoft.Extensions.DependencyInjection
 ```
-### 2. Create static methods somewhere in the Reqnroll project
 
-Create a static method in your SpecFlow project that returns a Microsoft.Extensions.DependencyInjection.IServiceCollection and tag it with the [ScenarioDependencies] attribute. Configure your test dependencies for the scenario execution within this method. Step definition classes (i.e. classes with the SpecFlow [Binding] attribute) are automatically added to the service collection.
-  
-### 3. A typical dependency builder method looks like this:
+## Using the plugin
+
+Create a static, parameterless method in your Reqnroll project that returns an instance of `Microsoft.Extensions.DependencyInjection.IServiceCollection` and tag it with the `[ScenarioDependencies]` attribute. Configure your test dependencies for the scenario execution within this method. Step definition classes (i.e. classes with the Reqnroll `[Binding]` attribute) are automatically added to the service collection.
+
+A typical dependency builder method looks like this:
 
 ```csharp
 public class SetupTestDependencies
@@ -35,4 +35,24 @@ public class SetupTestDependencies
     return services;
   }
 }
+```
+
+### Configuring the scope and lifetime of the service provider
+
+For services registered with a scoped lifetime (as opposed to singleton), it might make sense to have a new scope for each scenario rather than each feature (the default). If this is the case, this can be adjusted with the `ScopeLevel` property on the `[ScenarioDependencies]` attribute. For example
+
+```csharp
+[ScenarioDependencies(ScopeLevel = ScopeLevelType.Scenario)]
+public static IServiceCollection CreateServices()
+```
+
+It's also possible to change the lifetime of the entire service provider, rather than just its scope. This is particularly useful when you want a new instance of a singleton service for each feature or each scenario.
+
+```csharp
+[ScenarioDependencies(ServiceProviderLifetime = ServiceProviderLifetimeType.Feature)]
+public static IServiceCollection CreateServices()
+```
+
+```{note}
+If the `ServiceProviderLifetime` is set to `Scenario` then the `ScopeLevel` is implicitly `Scenario` as well.
 ```

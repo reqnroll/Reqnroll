@@ -2,11 +2,14 @@
 
 ## Improvements:
 
+* Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Added support for configurable service provider lifetimes to control at which scope the services are registered (#998)
+  * Options are Global (default, previous behavior), Test Thread, Feature, Scenario
+
 ## Bug fixes:
 
 * Fix: Partially defined CI Environment variables (missing relevant environment variables) cause missing Meta envelope in Cucumber Messages report and Javascript errors in HTML report. (#990)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+*Contributors of this release (in alphabetical order):* @AidenFuller, @clrudolphi
 
 # v3.3.1 - 2026-01-08
 
