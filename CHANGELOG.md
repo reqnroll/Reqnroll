@@ -5,8 +5,10 @@
 ## Bug fixes:
 
 * Fix: Partially defined CI Environment variables (missing relevant environment variables) cause missing Meta envelope in Cucumber Messages report and Javascript errors in HTML report. (#990)
+* Fix: Visual Studio Test Explorer does not navigate to the correct source line for MsTest v4 tests when 'ReqnrollUseIntermediateOutputPathForCodeBehind' is enabled. (#997)
+* Fix: Visual Studio Test Explorer does not navigate to the correct source line for TUnit tests. (#997)
 
-*Contributors of this release (in alphabetical order):* @clrudolphi
+*Contributors of this release (in alphabetical order):* @clrudolphi, @gasparnagy
 
 # v3.3.1 - 2026-01-08
 

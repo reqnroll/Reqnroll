@@ -1,5 +1,6 @@
 using System.CodeDom;
 using System.Collections.Generic;
+using Reqnroll.Generator.Generation;
 using Reqnroll.Generator.Interfaces;
 using Reqnroll.Generator.UnitTestProvider;
 using Reqnroll.Parser;
@@ -38,6 +39,11 @@ namespace Reqnroll.Generator
         internal string FeatureMessages { get; set; }
 
         public FeatureFileInput FeatureFileInput { get; set; }
+
+        /// <summary>
+        /// Contains the scenario definition being currently processed
+        /// </summary>
+        public ScenarioDefinitionInFeatureFile CurrentScenarioDefinition { get; set; }
 
         public TestClassGenerationContext(
             IUnitTestGeneratorProvider unitTestGeneratorProvider,
