@@ -99,12 +99,12 @@ namespace Reqnroll.Bindings.Discovery
 
         private bool IsHookAttribute(BindingSourceAttribute attribute)
         {
-// ReSharper disable AssignNullToNotNullAttribute
+            // ReSharper disable AssignNullToNotNullAttribute
             return (attribute.AttributeType.FullName.StartsWith(typeof(BeforeScenarioAttribute).Namespace) ||
                     attribute.AttributeType.Name.StartsWith("Before", StringComparison.InvariantCulture) ||
                     attribute.AttributeType.Name.StartsWith("After", StringComparison.InvariantCulture)) &&
                 TryGetHookType(attribute) != null;
-// ReSharper restore AssignNullToNotNullAttribute
+            // ReSharper restore AssignNullToNotNullAttribute
         }
 
         private bool IsStepArgumentTransformationAttribute(BindingSourceAttribute attribute)
@@ -245,7 +245,7 @@ namespace Reqnroll.Bindings.Discovery
         private void ProcessStepDefinitionAttribute(BindingSourceMethod bindingSourceMethod, BindingSourceAttribute stepDefinitionAttribute, BindingScope scope)
         {
             var stepDefinitionTypes = GetStepDefinitionTypes(stepDefinitionAttribute);
-            
+
             var expressionString = GetExpressionString(stepDefinitionAttribute);
             var expressionType = stepDefinitionAttribute.TryGetAttributeValue<ExpressionType>(nameof(StepDefinitionBaseAttribute.ExpressionType));
 
@@ -280,7 +280,7 @@ namespace Reqnroll.Bindings.Discovery
         protected readonly struct BindingValidationResult
         {
             public static BindingValidationResult Valid = new();
-            public static BindingValidationResult Error(string errorMessage) => new (errorMessage);
+            public static BindingValidationResult Error(string errorMessage) => new(errorMessage);
 
             public List<string> ErrorMessages { get; }
 
@@ -315,11 +315,33 @@ namespace Reqnroll.Bindings.Discovery
 
         protected virtual BindingValidationResult ValidateType(BindingSourceType bindingSourceType)
         {
+            bool BindingClassInheritsFromBindingClass(BindingSourceType bindingSourceType)
+            {
+                if (bindingSourceType.BindingType == null)
+                    return false;
+                if (string.IsNullOrEmpty(bindingSourceType.BindingType.FullName) || string.IsNullOrEmpty(bindingSourceType.BindingType.AssemblyName))
+                    return false;
+                var type = GetTypeFromFullNameAndAssembly(bindingSourceType.BindingType?.FullName, bindingSourceType.BindingType?.AssemblyName);
+                int count = 0;
+                while (type != null && type != typeof(object))
+                {
+                    if (type.IsDefined(typeof(BindingAttribute), false))
+                    {
+                        count++;
+                        if (count > 1)
+                            return true;
+                    }
+                    type = type.BaseType;
+                }
+                return false;
+            }
             var result = BindingValidationResult.Valid;
             if (!bindingSourceType.IsClass)
                 result += BindingValidationResult.Error($"Binding types must be classes: {bindingSourceType}");
             if (bindingSourceType.IsGenericTypeDefinition)
                 result += BindingValidationResult.Error($"Binding types cannot be generic: {bindingSourceType}");
+            if (BindingClassInheritsFromBindingClass(bindingSourceType))
+                result += BindingValidationResult.Error($"Binding types cannot inherit from other binding types: {bindingSourceType}");
             return result;
         }
 
@@ -404,6 +426,20 @@ namespace Reqnroll.Bindings.Discovery
             {
                 action(null);
             }
+        }
+
+        private Type GetTypeFromFullNameAndAssembly(string fullName, string assemblyName)
+        {
+            // Construct the assembly-qualified name
+            string assemblyQualifiedName = $"{fullName}, {assemblyName}";
+            // Try to get the Type
+            var type = Type.GetType(assemblyQualifiedName);
+            if (type == null)
+            {
+                // Optionally, handle the error or throw
+                throw new InvalidOperationException($"Type '{assemblyQualifiedName}' could not be found.");
+            }
+            return type;
         }
     }
 }
