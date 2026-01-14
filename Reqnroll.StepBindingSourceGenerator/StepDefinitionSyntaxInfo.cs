@@ -3,7 +3,7 @@
 namespace Reqnroll.StepBindingSourceGenerator;
 
 /// <summary>
-/// Represents the pipline-relevant information about the declaration of a step definition.
+/// Represents the pipeline-relevant information about the declaration of a step definition.
 /// </summary>
 /// <param name="MethodDeclarationSyntax">The method declaration syntax which has been identified to be a step 
 /// definition.</param>

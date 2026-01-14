@@ -35,7 +35,7 @@ public readonly struct StepTextPattern
     public static StepTextPattern None { get; } = default;
 
     /// <summary>
-    /// Gets the language of the syntax used by the step text pattern to define matchning semantics and parameters.
+    /// Gets the language of the syntax used by the step text pattern to define matching semantics and parameters.
     /// </summary>
     public StepTextPatternSyntaxLanguage SyntaxLanguage { get; }
 
