@@ -1,5 +1,13 @@
 # [vNext]
 
+## Improvements:
+
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.3.2 - 2026-01-14
+
 ## Bug fixes:
 
 * Fix: Partially defined CI Environment variables (missing relevant environment variables) cause missing Meta envelope in Cucumber Messages report and Javascript errors in HTML report. (#990)
