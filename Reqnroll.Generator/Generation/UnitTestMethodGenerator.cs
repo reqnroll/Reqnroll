@@ -67,6 +67,8 @@ namespace Reqnroll.Generator.Generation
                 throw new TestGeneratorException("The scenario must have a title specified.");
             }
 
+            generationContext.CurrentScenarioDefinition = scenarioDefinitionInFeatureFile;
+
             if (scenarioDefinitionInFeatureFile.IsScenarioOutline)
             {
                 GenerateScenarioOutlineTest(generationContext, scenarioDefinitionInFeatureFile, ref pickleIndex);
