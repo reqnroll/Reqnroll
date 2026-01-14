@@ -2,8 +2,7 @@
 
 ## Improvements:
 
-* Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Added support for configurable service provider lifetimes to control at which scope the services are registered (#998)
-  * Options are Global (default, previous behavior), Test Thread, Feature, Scenario
+* Microsoft.Extensions.DependencyInjection.ReqnrollPlugin: Added support for configurable service provider lifetimes to control which level the services are registered. Options are Global (default, previous behavior), Test Thread, Feature, Scenario. (#998)
 
 ## Bug fixes:
 

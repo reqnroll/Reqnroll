@@ -39,10 +39,10 @@ public class SetupTestDependencies
 
 ### Configuring the scope and lifetime of the service provider
 
-For services registered with a scoped lifetime (as opposed to singleton), it might make sense to have a new scope for each scenario rather than each feature (the default). If this is the case, this can be adjusted with the `ScopeLevel` property on the `[ScenarioDependencies]` attribute. For example
+For services registered with a scoped lifetime (as opposed to singleton), it might make sense to have a new scope for each feature instead of the default per-scenario scope. If this is the case, this can be adjusted with the `ScopeLevel` property on the `[ScenarioDependencies]` attribute. For example
 
 ```csharp
-[ScenarioDependencies(ScopeLevel = ScopeLevelType.Scenario)]
+[ScenarioDependencies(ScopeLevel = ScopeLevelType.Feature)]
 public static IServiceCollection CreateServices()
 ```
 
@@ -54,5 +54,5 @@ public static IServiceCollection CreateServices()
 ```
 
 ```{note}
-If the `ServiceProviderLifetime` is set to `Scenario` then the `ScopeLevel` is implicitly `Scenario` as well.
+`ServiceProviderLifetime` and `ScopeLevel` are configured independently. If the `ServiceProviderLifetime` is set to `Scenario` then the `ScopeLevel` is implicitly `Scenario` as well.
 ```

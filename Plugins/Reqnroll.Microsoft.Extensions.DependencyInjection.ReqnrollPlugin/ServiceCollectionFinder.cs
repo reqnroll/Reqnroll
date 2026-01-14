@@ -15,7 +15,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
         private readonly ITestAssemblyProvider _testAssemblyProvider;
         private (IServiceCollection ServiceCollection, ScenarioDependenciesAttribute Attribute) _cache;
 
-        public ServiceCollectionFinder(ITestRunnerManager testRunnerManager, IRuntimeBindingRegistryBuilder bindingRegistryBuilder, ITestAssemblyProvider testAssemblyProvider, IBindingAssemblyLoader bindingAssemblyLoader)
+        public ServiceCollectionFinder(ITestRunnerManager testRunnerManager, IRuntimeBindingRegistryBuilder bindingRegistryBuilder, ITestAssemblyProvider testAssemblyProvider)
         {
             _testRunnerManager = testRunnerManager;
             _bindingRegistryBuilder = bindingRegistryBuilder;
@@ -65,6 +65,13 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                             {
                                 AddBindingAttributes(assemblies, serviceCollection);
                             }
+
+                            // If the ServiceProviderLifetime is Scenario, set the ScopeLevel to Scenario to match.
+                            if (scenarioDependenciesAttribute.ServiceProviderLifetime == ServiceProviderLifetimeType.Scenario)
+                            {
+                                scenarioDependenciesAttribute.ScopeLevel = ScopeLevelType.Scenario;
+                            }
+
                             _cache = (serviceCollection, scenarioDependenciesAttribute);
                             return;
                         }

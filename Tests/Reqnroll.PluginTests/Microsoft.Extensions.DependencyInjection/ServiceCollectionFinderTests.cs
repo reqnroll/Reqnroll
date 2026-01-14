@@ -17,7 +17,6 @@ public class ServiceCollectionFinderTests
     private readonly Mock<ITestRunnerManager> _testRunnerManagerMock = new();
     private readonly Mock<IRuntimeBindingRegistryBuilder> _bindingRegistryBuilderMock = new();
     private readonly Mock<ITestAssemblyProvider> _testAssemblyProviderMock = new();
-    private readonly Mock<IBindingAssemblyLoader> _bindingAssemblyLoaderMock = new();
 
     [Fact]
     public void GetServiceCollection_HappyPath_ResolvesCorrectServiceCollection()
@@ -150,7 +149,7 @@ public class ServiceCollectionFinderTests
         _testAssemblyProviderMock.Setup(m => m.TestAssembly).Returns(assemblyMock.Object);
         _bindingRegistryBuilderMock.Setup(m => m.GetBindingAssemblies(assemblyMock.Object)).Returns([assemblyMock.Object]);
 
-        var sut = new ServiceCollectionFinder(_testRunnerManagerMock.Object, _bindingRegistryBuilderMock.Object, _testAssemblyProviderMock.Object, _bindingAssemblyLoaderMock.Object);
+        var sut = new ServiceCollectionFinder(_testRunnerManagerMock.Object, _bindingRegistryBuilderMock.Object, _testAssemblyProviderMock.Object);
 
         // Act
         var (serviceCollection, _) = sut.GetServiceCollection();
@@ -161,7 +160,33 @@ public class ServiceCollectionFinderTests
     }
 
     [Fact]
-    public void GetServiceProviderLifetime_ReturnsCorrectLifetime()
+    public void GetServiceProviderLifetime_GlobalLifetime_ReturnsCorrectLifetime()
+    {
+        // Arrange
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithGlobalLifetime));
+
+        // Act
+        var lifetime = sut.GetServiceProviderLifetime();
+
+        // Assert
+        lifetime.Should().Be(ServiceProviderLifetimeType.Global);
+    }
+
+    [Fact]
+    public void GetServiceProviderLifetime_TestThreadLifetime_ReturnsCorrectLifetime()
+    {
+        // Arrange
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithTestThreadLifetime));
+
+        // Act
+        var lifetime = sut.GetServiceProviderLifetime();
+
+        // Assert
+        lifetime.Should().Be(ServiceProviderLifetimeType.TestThread);
+    }
+
+    [Fact]
+    public void GetServiceProviderLifetime_FeatureLifetime_ReturnsCorrectLifetime()
     {
         // Arrange
         var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithFeatureLifetime));
@@ -171,6 +196,21 @@ public class ServiceCollectionFinderTests
 
         // Assert
         lifetime.Should().Be(ServiceProviderLifetimeType.Feature);
+    }
+
+    [Fact]
+    public void GetServiceProviderLifetime_ScenarioLifetime_ReturnsCorrectLifetime()
+    {
+        // Arrange
+        var sut = CreateServiceCollectionFinderWithMocks(typeof(ValidStartWithScenarioLifetime));
+
+        // Act
+        var lifetime = sut.GetServiceProviderLifetime();
+        var (_, scope) = sut.GetServiceCollection();
+
+        // Assert
+        lifetime.Should().Be(ServiceProviderLifetimeType.Scenario);
+        scope.Should().Be(ScopeLevelType.Scenario, "because the ServiceProviderLifetime is Scenario.");
     }
 
     private ServiceCollectionFinder CreateServiceCollectionFinderWithMocks(params Type[] types)
@@ -187,16 +227,7 @@ public class ServiceCollectionFinderTests
         _testAssemblyProviderMock.Setup(m => m.TestAssembly).Returns(assemblyMock.Object);
         _bindingRegistryBuilderMock.Setup(m => m.GetBindingAssemblies(It.IsAny<Assembly>())).Returns([assemblyMock.Object]);
 
-        return new ServiceCollectionFinder(_testRunnerManagerMock.Object, _bindingRegistryBuilderMock.Object, _testAssemblyProviderMock.Object, _bindingAssemblyLoaderMock.Object);
-    }
-
-    private class ValidStartWithFeatureLifetime
-    {
-        [ScenarioDependencies(ScopeLevel = ScopeLevelType.Feature, ServiceProviderLifetime = ServiceProviderLifetimeType.Feature)]
-        public static IServiceCollection GetServices()
-        {
-            return new ServiceCollection();
-        }
+        return new ServiceCollectionFinder(_testRunnerManagerMock.Object, _bindingRegistryBuilderMock.Object, _testAssemblyProviderMock.Object);
     }
 
     private interface ITestInterface
@@ -252,6 +283,42 @@ public class ServiceCollectionFinderTests
         public static object GetServices()
         {
             return new List<string>();
+        }
+    }
+
+    private class ValidStartWithGlobalLifetime
+    {
+        [ScenarioDependencies(ScopeLevel = ScopeLevelType.Feature, ServiceProviderLifetime = ServiceProviderLifetimeType.Global)]
+        public static IServiceCollection GetServices()
+        {
+            return new ServiceCollection();
+        }
+    }
+
+    private class ValidStartWithTestThreadLifetime
+    {
+        [ScenarioDependencies(ScopeLevel = ScopeLevelType.Feature, ServiceProviderLifetime = ServiceProviderLifetimeType.TestThread)]
+        public static IServiceCollection GetServices()
+        {
+            return new ServiceCollection();
+        }
+    }
+
+    private class ValidStartWithFeatureLifetime
+    {
+        [ScenarioDependencies(ScopeLevel = ScopeLevelType.Feature, ServiceProviderLifetime = ServiceProviderLifetimeType.Feature)]
+        public static IServiceCollection GetServices()
+        {
+            return new ServiceCollection();
+        }
+    }
+
+    private class ValidStartWithScenarioLifetime
+    {
+        [ScenarioDependencies(ScopeLevel = ScopeLevelType.Feature, ServiceProviderLifetime = ServiceProviderLifetimeType.Scenario)]
+        public static IServiceCollection GetServices()
+        {
+            return new ServiceCollection();
         }
     }
 
