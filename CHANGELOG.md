@@ -1,7 +1,5 @@
 # [vNext]
 
-## Improvements:
-
 ## Bug fixes:
 
 * Fix: Partially defined CI Environment variables (missing relevant environment variables) cause missing Meta envelope in Cucumber Messages report and Javascript errors in HTML report. (#990)
