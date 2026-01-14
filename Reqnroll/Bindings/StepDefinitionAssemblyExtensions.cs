@@ -41,7 +41,7 @@ public static class StepDefinitionAssemblyExtensions
             return false;
         }
 
-        if (typeof(IStepDefinitionDescriptorsProvider).IsAssignableFrom(registryAttribute.RegistryType))
+        if (!typeof(IStepDefinitionDescriptorsProvider).IsAssignableFrom(registryAttribute.RegistryType))
         {
             error = new InvalidOperationException(
                 $"Assembly '{assembly.FullName}' speciifes its registry type is " +
