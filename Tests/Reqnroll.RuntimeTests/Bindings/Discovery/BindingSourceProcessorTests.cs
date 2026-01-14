@@ -94,6 +94,13 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             return new BindingMethod(bindingType, "MyMethod", Array.Empty<IBindingParameter>(), RuntimeBindingType.Void);
         }
 
+        private BindingSourceAttribute CreateSyntheticScopeBindingSourceAttributeWithTagExpression(string tagExpression)
+        {
+            var bsAttribute = CreateBindingSourceAttribute("ScopeAttribute", "Reqnroll.ScopeAttribute");
+            bsAttribute.NamedAttributeValues.Add("Tag", new BindingSourceAttributeValueProvider(tagExpression)); 
+            return bsAttribute;
+        }
+
         [Binding]
         class StepDefClassWithAsyncVoid
         {
@@ -173,6 +180,21 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             sut.BuildingCompleted();
 
             sut.ValidationErrors.Should().Contain(m => m.Contains("The binding methods for before/after feature and before/after test run events must be static"));
+        }
+
+        [Fact]
+        public void InvalidScopeTagExpressionsOnBindingMethodErrors_should_be_captured()
+        {
+            var sut = CreateBindingSourceProcessor();
+            var bindingSourceType = CreateSyntheticBindingSourceType();
+            var bindingSourceMethod = CreateSyntheticStepDefBindingSourceMethod();
+            // add invalid tag expression
+            var scopeAttribute = CreateSyntheticScopeBindingSourceAttributeWithTagExpression("@foo not (");
+            bindingSourceMethod.Attributes = bindingSourceMethod.Attributes.Append(scopeAttribute).ToArray();
+            sut.ProcessType(bindingSourceType).Should().BeTrue();
+            sut.ProcessMethod(bindingSourceMethod);
+            sut.BuildingCompleted();
+            sut.ValidationErrors.Should().Contain(m => m.Contains("could not be parsed because of syntax error"));
         }
 
         private static BindingSourceMethod CreateBindingSourceMethod(Type bindingType, string methodName, params BindingSourceAttribute[] attributes)

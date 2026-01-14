@@ -182,15 +182,15 @@ namespace Reqnroll.Bindings.Discovery
             int order = GetHookOrder(hookAttribute);
 
             var validationResult = ValidateHook(bindingSourceMethod, hookAttribute, hookType);
-            validationResult += ValidateBindingScope(scope);
+            var scopeValidationResult = ValidateBindingScope(scope);
 
             if (!validationResult.IsValid)
             {
-                OnValidationError(validationResult, true);
+                OnValidationError(validationResult + scopeValidationResult, true);
                 return;
             }
 
-            var hookBinding = _bindingFactory.CreateHookBinding(bindingSourceMethod.BindingMethod, hookType, scope, order);
+            var hookBinding = _bindingFactory.CreateHookBinding(bindingSourceMethod.BindingMethod, hookType, scope, order, scopeValidationResult.IsValid ? null : scopeValidationResult.ErrorMessages[0]);
 
             ProcessHookBinding(hookBinding);
         }

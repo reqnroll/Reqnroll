@@ -4,7 +4,7 @@ using Cucumber.TagExpressions;
 
 namespace Reqnroll.Bindings
 {
-    public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle)
+    public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle, string errorMessage = null)
     {
         public string Tag => tagExpression.ToString();
         public ITagExpression TagExpression => tagExpression;
@@ -12,6 +12,8 @@ namespace Reqnroll.Bindings
         public string FeatureTitle { get; } = featureTitle;
 
         public string ScenarioTitle { get; } = scenarioTitle;
+        public bool IsValid => ErrorMessage == null;
+        public string ErrorMessage => errorMessage;
 
         public bool Match(StepContext stepContext, out int scopeMatches)
         {
@@ -46,7 +48,7 @@ namespace Reqnroll.Bindings
 
         protected bool Equals(BindingScope other)
         {
-            return string.Equals(Tag, other.Tag) && string.Equals(FeatureTitle, other.FeatureTitle) && string.Equals(ScenarioTitle, other.ScenarioTitle);
+            return string.Equals(Tag, other.Tag) && string.Equals(FeatureTitle, other.FeatureTitle) && string.Equals(ScenarioTitle, other.ScenarioTitle) && string.Equals(ErrorMessage, other.ErrorMessage);
         }
 
         public override bool Equals(object obj)
@@ -64,6 +66,7 @@ namespace Reqnroll.Bindings
                 var hashCode = (Tag != null ? Tag.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (FeatureTitle != null ? FeatureTitle.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (ScenarioTitle != null ? ScenarioTitle.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (ErrorMessage != null ? ErrorMessage.GetHashCode() : 0);
                 return hashCode;
             }
         }

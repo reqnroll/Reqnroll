@@ -108,6 +108,7 @@ public class BindingProviderService(
                 Type = hookBinding.HookType.ToString(),
                 HookOrder = hookBinding.HookOrder,
                 Scope = GetScope(hookBinding),
+                Error = hookBinding.ErrorMessage
             };
 
             return hook;
@@ -141,7 +142,8 @@ public class BindingProviderService(
             {
                 Tag = string.IsNullOrEmpty(tagScope) ? null : tagScope,
                 FeatureTitle = scopedBinding.BindingScope.FeatureTitle,
-                ScenarioTitle = scopedBinding.BindingScope.ScenarioTitle
+                ScenarioTitle = scopedBinding.BindingScope.ScenarioTitle,
+                Error = scopedBinding.BindingScope.ErrorMessage
             };
         }
 
