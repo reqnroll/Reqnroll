@@ -183,11 +183,11 @@ namespace Reqnroll.Bindings.Discovery
 
             var validationResult = ValidateHook(bindingSourceMethod, hookAttribute, hookType);
             var scopeValidationResult = ValidateBindingScope(scope);
-
+            validationResult += scopeValidationResult;
             if (!validationResult.IsValid)
             {
-                OnValidationError(validationResult + scopeValidationResult, true);
-                return;
+                OnValidationError(validationResult, true);
+               
             }
 
             var hookBinding = _bindingFactory.CreateHookBinding(bindingSourceMethod.BindingMethod, hookType, scope, order, scopeValidationResult.IsValid ? null : scopeValidationResult.ErrorMessages[0]);

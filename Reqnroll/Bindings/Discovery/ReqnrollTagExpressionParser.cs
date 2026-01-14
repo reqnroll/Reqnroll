@@ -8,9 +8,11 @@ public class ReqnrollTagExpressionParser : IReqnrollTagExpressionParser
     public ITagExpression Parse(string tagExpression)
     {
         var tagExpressionParser = new TagExpressionParser();
+        ITagExpression result = null;
         try { 
-            var parsedExpression = tagExpressionParser.Parse(tagExpression);
-            return Rewrite(parsedExpression);
+            result = tagExpressionParser.Parse(tagExpression);
+            result =  Rewrite(result);
+            return new ReqnrollTagExpression(result, tagExpression);
         }
         catch (TagExpressionException ex)
         {
@@ -19,7 +21,7 @@ public class ReqnrollTagExpressionParser : IReqnrollTagExpressionParser
             {
                 msg += $" (at offset {ex.TagToken.Position})";
             }
-            return new InvalidTagExpression(tagExpression, msg);
+            return new InvalidTagExpression(null, tagExpression, msg);
         }
     }
 

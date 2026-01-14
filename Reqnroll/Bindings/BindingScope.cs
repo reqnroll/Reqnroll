@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
 using Cucumber.TagExpressions;
+using Reqnroll.Bindings.Discovery;
 
 namespace Reqnroll.Bindings
 {
-    public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle, string errorMessage = null)
+    public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle)
     {
         public string Tag => tagExpression.ToString();
         public ITagExpression TagExpression => tagExpression;
@@ -13,7 +14,7 @@ namespace Reqnroll.Bindings
 
         public string ScenarioTitle { get; } = scenarioTitle;
         public bool IsValid => ErrorMessage == null;
-        public string ErrorMessage => errorMessage;
+        public string ErrorMessage => tagExpression is InvalidTagExpression ? tagExpression.ToString() : null;
 
         public bool Match(StepContext stepContext, out int scopeMatches)
         {

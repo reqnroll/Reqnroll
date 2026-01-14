@@ -2,17 +2,14 @@ using Cucumber.TagExpressions;
 using System;
 
 namespace Reqnroll.Bindings.Discovery;
-
-public class InvalidTagExpression : ITagExpression
+public class InvalidTagExpression : ReqnrollTagExpression, ITagExpression
 {
     public string Message { get; }
-    public string OriginalTagExpression { get; }
-    public InvalidTagExpression(string originalTagExpression, string message)
+    public InvalidTagExpression(ITagExpression expression, string originalTagExpression, string message) : base(expression, originalTagExpression)
     {
-        OriginalTagExpression = originalTagExpression;
         Message = message;
     }
-    public bool Evaluate(System.Collections.Generic.IEnumerable<string> tags)
+    public override bool Evaluate(System.Collections.Generic.IEnumerable<string> tags)
     {
         throw new InvalidOperationException("Cannot evaluate an invalid tag expression: " + Message);
     }

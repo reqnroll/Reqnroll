@@ -197,6 +197,21 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             sut.ValidationErrors.Should().Contain(m => m.Contains("could not be parsed because of syntax error"));
         }
 
+        [Fact]
+        public void InvalidScopeTagExpressionsOnHookBindingMethodErrors_should_be_captured()
+        {
+            var sut = CreateBindingSourceProcessor();
+            var bindingSourceType = CreateSyntheticBindingSourceType();
+            var bindingSourceMethod = CreateSyntheticHookBindingSourceMethod(HookType.BeforeScenario);
+            // add invalid tag expression
+            var scopeAttribute = CreateSyntheticScopeBindingSourceAttributeWithTagExpression("@foo and or");
+            bindingSourceMethod.Attributes = bindingSourceMethod.Attributes.Append(scopeAttribute).ToArray();
+            sut.ProcessType(bindingSourceType).Should().BeTrue();
+            sut.ProcessMethod(bindingSourceMethod);
+            sut.BuildingCompleted();
+            sut.ValidationErrors.Should().Contain(m => m.Contains("could not be parsed because of syntax error"));
+        }
+
         private static BindingSourceMethod CreateBindingSourceMethod(Type bindingType, string methodName, params BindingSourceAttribute[] attributes)
         {
             var methodInfo = bindingType.GetMethod(methodName);
