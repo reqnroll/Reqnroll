@@ -14,6 +14,7 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
         private readonly IRuntimeBindingRegistryBuilder _bindingRegistryBuilder;
         private readonly ITestAssemblyProvider _testAssemblyProvider;
         private (IServiceCollection ServiceCollection, ScenarioDependenciesAttribute Attribute) _cache;
+        private readonly object _cacheLock = new();
 
         public ServiceCollectionFinder(ITestRunnerManager testRunnerManager, IRuntimeBindingRegistryBuilder bindingRegistryBuilder, ITestAssemblyProvider testAssemblyProvider)
         {
@@ -49,37 +50,45 @@ namespace Reqnroll.Microsoft.Extensions.DependencyInjection
                 return;
             }
 
-            var assemblies = _testRunnerManager.BindingAssemblies ?? _bindingRegistryBuilder.GetBindingAssemblies(_testAssemblyProvider.TestAssembly);
-            foreach (var assembly in assemblies)
+            lock (_cacheLock)
             {
-                foreach (var type in assembly.GetTypes())
+                if (_cache != default)
                 {
-                    foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
+                    return;
+                }
+
+                var assemblies = _testRunnerManager.BindingAssemblies ?? _bindingRegistryBuilder.GetBindingAssemblies(_testAssemblyProvider.TestAssembly);
+                foreach (var assembly in assemblies)
+                {
+                    foreach (var type in assembly.GetTypes())
                     {
-                        var scenarioDependenciesAttribute = (ScenarioDependenciesAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(ScenarioDependenciesAttribute));
-
-                        if (scenarioDependenciesAttribute != null)
+                        foreach (var methodInfo in type.GetMethods(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public))
                         {
-                            var serviceCollection = GetServiceCollection(methodInfo);
-                            if (scenarioDependenciesAttribute.AutoRegisterBindings)
-                            {
-                                AddBindingAttributes(assemblies, serviceCollection);
-                            }
+                            var scenarioDependenciesAttribute = (ScenarioDependenciesAttribute)Attribute.GetCustomAttribute(methodInfo, typeof(ScenarioDependenciesAttribute));
 
-                            // If the ServiceProviderLifetime is Scenario, set the ScopeLevel to Scenario to match.
-                            if (scenarioDependenciesAttribute.ServiceProviderLifetime == ServiceProviderLifetimeType.Scenario)
+                            if (scenarioDependenciesAttribute != null)
                             {
-                                scenarioDependenciesAttribute.ScopeLevel = ScopeLevelType.Scenario;
-                            }
+                                var serviceCollection = GetServiceCollection(methodInfo);
+                                if (scenarioDependenciesAttribute.AutoRegisterBindings)
+                                {
+                                    AddBindingAttributes(assemblies, serviceCollection);
+                                }
 
-                            _cache = (serviceCollection, scenarioDependenciesAttribute);
-                            return;
+                                // If the ServiceProviderLifetime is Scenario, set the ScopeLevel to Scenario to match.
+                                if (scenarioDependenciesAttribute.ServiceProviderLifetime == ServiceProviderLifetimeType.Scenario)
+                                {
+                                    scenarioDependenciesAttribute.ScopeLevel = ScopeLevelType.Scenario;
+                                }
+
+                                _cache = (serviceCollection, scenarioDependenciesAttribute);
+                                return;
+                            }
                         }
                     }
                 }
+                var assemblyNames = assemblies.Select(a => a.GetName().Name).ToList();
+                throw new MissingScenarioDependenciesException(assemblyNames);
             }
-            var assemblyNames = assemblies.Select(a => a.GetName().Name).ToList();
-            throw new MissingScenarioDependenciesException(assemblyNames);
         }
 
         private static IServiceCollection GetServiceCollection(MethodInfo methodInfo)
