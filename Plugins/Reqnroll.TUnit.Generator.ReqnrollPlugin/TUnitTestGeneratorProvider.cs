@@ -148,7 +148,11 @@ public class TUnitTestGeneratorProvider : IUnitTestGeneratorProvider
     public void SetTestMethod(TestClassGenerationContext generationContext, CodeMemberMethod testMethod, string friendlyTestName)
     {
         // Mark the method as a test and add a friendly name.
-        CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+        var testAttribute = CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+        // we only support line number in C#
+        if (CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.CSharp) 
+            testAttribute.Arguments.Add(new CodeAttributeArgument(new CodeSnippetExpression($"line: {generationContext.CurrentScenarioDefinition.ScenarioDefinition.Location.Line}")));
+
         CodeDomHelper.AddAttribute(testMethod, DISPLAYNAME_ATTR, friendlyTestName);
     }
 

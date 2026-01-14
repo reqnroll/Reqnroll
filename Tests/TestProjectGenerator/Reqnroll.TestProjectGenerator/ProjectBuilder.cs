@@ -67,6 +67,10 @@ namespace Reqnroll.TestProjectGenerator
         public ConfigurationFormat ConfigurationFormat { get; set; } = ConfigurationFormat.Json;
 
         public bool IsReqnrollFeatureProject { get; set; } = true;
+        /// <summary>
+        /// Whether to add an explicit reference to `Reqnroll` package in addition to the unit test specific packages, like `Reqnroll.MsTest`.
+        /// </summary>
+        public bool ForceAddingExplicitReferenceToReqnrollPackage { get; set; } = false;
 
         public bool? IsTreatWarningsAsErrors { get; set; }
 
@@ -235,7 +239,8 @@ namespace Reqnroll.TestProjectGenerator
                     _project.AddNuGetPackage("System.Runtime.CompilerServices.Unsafe", "6.0.0", new NuGetPackageAssembly("System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a", "netstandard2.0\\System.Runtime.CompilerServices.Unsafe.dll"));
                 }
 
-                _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
+                if (!IsReqnrollFeatureProject || ForceAddingExplicitReferenceToReqnrollPackage)
+                    _project.AddNuGetPackage("Reqnroll", _currentVersionDriver.ReqnrollNuGetVersion, new NuGetPackageAssembly("Reqnroll", "net462\\Reqnroll.dll"));
 
                 var generator = _bindingsGeneratorFactory.FromLanguage(_project.ProgrammingLanguage);
                 _project.AddFile(generator.GenerateLoggerClass(_testProjectFolders.LogFilePath));

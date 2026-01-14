@@ -117,6 +117,9 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     // These tests attempt to execute the Retry scenario from the CCK using the known open-source plugins for Reqnroll that integrate Retry functionality into Reqnroll.
     public void CCKRetryScenario(string pluginName, string testNameRoot)
     {
+        // for the retry plugins we need to explicitly add a reference to the Reqnroll package
+        _testRunConfiguration.ForceAddingExplicitReferenceToReqnrollPackage = true;
+
         var (plugin, version, unitTestProvider) = pluginName switch
         {
             "NUnitRetry" => ("NUnitRetry.ReqnrollPlugin", "1.0.100", TestProjectGenerator.UnitTestProvider.NUnit4),

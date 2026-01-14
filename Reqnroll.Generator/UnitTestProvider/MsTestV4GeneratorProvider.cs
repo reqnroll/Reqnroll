@@ -19,13 +19,18 @@ public class MsTestV4GeneratorProvider(CodeDomHelper codeDomHelper) : MsTestV2Ge
     {
         // V4 - the DisplayName property must be explicitly set
 
+        CodeAttributeDeclaration testAttribute;
         if (generationContext.DisableFriendlyTestNames)
         {
-            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+            testAttribute = CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
         }
         else
         {
-            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
+            testAttribute = CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
         }
+
+        // we only support line number in C#
+        if (CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.CSharp)
+            testAttribute.Arguments.Insert(0, new CodeAttributeArgument(new CodeSnippetExpression($"callerLineNumber: {generationContext.CurrentScenarioDefinition.ScenarioDefinition.Location.Line}")));
     }
 }
