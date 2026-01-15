@@ -17,7 +17,7 @@ public class ContextManagerTests : StepExecutionTestsBase
 
     private static void InitializeFeatureContext(ContextManager sut)
     {
-        sut.InitializeFeatureContext(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+        sut.InitializeFeatureContext(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "f.feature", "F", null));
     }
 
     private void InitializeScenarioContext(ContextManager sut)

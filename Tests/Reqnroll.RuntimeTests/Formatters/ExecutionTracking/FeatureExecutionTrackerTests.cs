@@ -67,7 +67,7 @@ public class FeatureExecutionTrackerTests
         featureLevelCucumberMessagesMock.SetupGet(m => m.Pickles).Returns( new List<Pickle>([new Pickle("0", "", "", "en", [new PickleStep(null, [], "step1", PickleStepType.ACTION, "I eat a cuke")], [], [])]));
         featureLevelCucumberMessagesMock.SetupGet(m => m.HasMessages).Returns(true);
 
-        _featureInfoDummy = new FeatureInfo(CultureInfo.InvariantCulture, null, "Test Feature", null, ProgrammingLanguage.CSharp, null, featureLevelCucumberMessagesMock.Object);
+        _featureInfoDummy = new FeatureInfo(CultureInfo.InvariantCulture, null, "test.feature", "Test Feature", null, ProgrammingLanguage.CSharp, null, featureLevelCucumberMessagesMock.Object);
         mockFeatureContext.Setup(m => m.FeatureInfo).Returns(_featureInfoDummy);
         mockFeatureContext.Setup(m => m.FeatureContainer).Returns(_featureContainer.Object);
 

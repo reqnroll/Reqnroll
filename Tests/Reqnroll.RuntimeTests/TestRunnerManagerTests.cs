@@ -96,8 +96,8 @@ public class TestRunnerManagerTests : IAsyncLifetime
             return result;
         }
 
-        var ourFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "F1", null);
-        var otherFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "F2", null);
+        var ourFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "f1.feature", "F1", null);
+        var otherFeatureInfo = new FeatureInfo(new CultureInfo("en-US"), null, "f2.feature", "F2", null);
 
         const int otherRunnerCount = 10;
         var otherRunners1 = await GetBoundTestRunners(otherFeatureInfo, otherRunnerCount / 2);
@@ -176,7 +176,7 @@ public class TestRunnerManagerTests : IAsyncLifetime
 
         FeatureHookTracker.Reset();
         AfterTestRunTestBinding.Reset();
-        await testRunnerWithFeatureContext.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+        await testRunnerWithFeatureContext.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "f.feature", "F", null));
         var disposableClass1 = new DisposableClass();
         testRunnerWithFeatureContext.FeatureContext.FeatureContainer.RegisterInstanceAs(disposableClass1, dispose: true);
 
@@ -199,7 +199,7 @@ public class TestRunnerManagerTests : IAsyncLifetime
 
         FeatureHookTracker.Reset(shouldThrow: true);
         AfterTestRunTestBinding.Reset();
-        await testRunnerWithFeatureContext.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+        await testRunnerWithFeatureContext.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "f.feature", "F", null));
         var disposableClass1 = new DisposableClass();
         testRunnerWithFeatureContext.FeatureContext.FeatureContainer.RegisterInstanceAs(disposableClass1, dispose: true);
 
@@ -290,13 +290,13 @@ public class TestRunnerManagerTests : IAsyncLifetime
     public async Task Should_resolve_a_test_runner_specific_test_tracer()
     {
         var testRunner1 = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder());
-        await testRunner1.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
+        await testRunner1.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds.feature", "sds", "sss"));
         testRunner1.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null), null);
         await testRunner1.OnScenarioStartAsync();
         var tracer1 = testRunner1.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
 
         var testRunner2 = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder());
-        await testRunner2.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds", "sss"));
+        await testRunner2.OnFeatureStartAsync(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "sds.feature", "sds", "sss"));
         testRunner2.OnScenarioInitialize(new ScenarioInfo("foo", "foo_desc", null, null), null);
         await testRunner1.OnScenarioStartAsync();
         var tracer2 = testRunner2.ScenarioContext.ScenarioContainer.Resolve<ITestTracer>();
@@ -310,8 +310,8 @@ public class TestRunnerManagerTests : IAsyncLifetime
     [Fact]
     public async Task Should_support_out_of_order_feature_execution()
     {
-        var feature1 = new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "feat1", "some text");
-        var feature2 = new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "feat2", "other text");
+        var feature1 = new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "feat1.feature", "feat1", "some text");
+        var feature2 = new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "feat2.feature", "feat2", "other text");
 
         // Feature 1 started
         var testRunnerFeature1Scenario = TestRunnerManager.GetTestRunnerForAssembly(_anAssembly, new RuntimeTestsContainerBuilder(), featureHint: feature1);

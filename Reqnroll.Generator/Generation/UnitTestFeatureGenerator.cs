@@ -194,6 +194,7 @@ public class UnitTestFeatureGenerator : IFeatureGenerator
                                                                          new CodeObjectCreateExpression(new CodeTypeReference(typeof(CultureInfo), CodeTypeReferenceOptions.GlobalReference),
                                                                                                         new CodePrimitiveExpression(generationContext.Feature.Language)),
                                                                          new CodePrimitiveExpression(generationContext.Document.DocumentLocation?.FeatureFolderPath),
+                                                                         new CodePrimitiveExpression(Path.GetFileName(generationContext.Document.DocumentLocation?.SourceFilePath)),
                                                                          new CodePrimitiveExpression(generationContext.Feature.Name),
                                                                          new CodePrimitiveExpression(generationContext.Feature.Description),
                                                                          new CodeFieldReferenceExpression(

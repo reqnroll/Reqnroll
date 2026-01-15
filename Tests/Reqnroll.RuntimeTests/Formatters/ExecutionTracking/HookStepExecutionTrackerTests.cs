@@ -40,7 +40,7 @@ public class HookStepExecutionTrackerTests
     {
         var testObjResolverMock = new Mock<ITestObjectResolver>();
 
-        _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "Test Feature", "");
+        _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "test.feature", "Test Feature", "");
         _featureContextStub = new FeatureContext(_objectContainerStub, _featureInfoStub, ConfigurationLoader.GetDefault());
 
         _scenarioInfoStub = new ScenarioInfo("Test Scenario", "", [], null);

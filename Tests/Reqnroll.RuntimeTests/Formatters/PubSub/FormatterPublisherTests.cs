@@ -179,8 +179,8 @@ public class FormatterPublisherTests
         feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
         feature2TrackerMock.Setup(f => f.Enabled).Returns(true);
 
-        var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
-        var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2", "");
+        var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1.feature", "feature1", "");
+        var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2.feature", "feature2", "");
         var f1Context = new Mock<IFeatureContext>();
         f1Context.Setup(x => x.FeatureInfo).Returns(f1);
         var f2Context = new Mock<IFeatureContext>();
@@ -209,8 +209,8 @@ public class FormatterPublisherTests
         feature2TrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(false);
         feature2TrackerMock.Setup(f => f.Enabled).Returns(true);
 
-        var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
-        var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2", "");
+        var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1.feature", "feature1", "");
+        var f2 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature2.feature", "feature2", "");
         var f1Context = new Mock<IFeatureContext>();
         f1Context.Setup(x => x.FeatureInfo).Returns(f1);
         var f2Context = new Mock<IFeatureContext>();
@@ -236,7 +236,7 @@ public class FormatterPublisherTests
         featureTrackerMock.Setup(f => f.FeatureExecutionSuccess).Returns(true);
         featureTrackerMock.Setup(f => f.Enabled).Returns(true);
 
-        var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1", "");
+        var f1 = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "feature1.feature", "feature1", "");
         var f1Context = new Mock<IFeatureContext>();
         f1Context.Setup(x => x.FeatureInfo).Returns(f1);
 
@@ -272,7 +272,7 @@ public class FormatterPublisherTests
     {
         // Arrange
         var featureContextMock = new Mock<IFeatureContext>();
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", null);
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", null);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
 
         var existingFeatureTrackerMock = new Mock<IFeatureExecutionTracker>();
@@ -295,7 +295,7 @@ public class FormatterPublisherTests
     {
         // Arrange
         var featureContextMock = new Mock<IFeatureContext>();
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", null);
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", null);
 
         var featureLevelCucumberMessagesMock = new Mock<IFeatureLevelCucumberMessages>();
         featureLevelCucumberMessagesMock.Setup(m => m.Source).Returns(new Source("uri", "Feature test", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN));
@@ -328,7 +328,7 @@ public class FormatterPublisherTests
         // Arrange
         var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
         var featureContextMock = new Mock<IFeatureContext>();
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", "desc");
 
         featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
@@ -358,7 +358,7 @@ public class FormatterPublisherTests
         // Arrange
         var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
         var featureContextMock = new Mock<IFeatureContext>();
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", "desc");
 
         featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
@@ -442,7 +442,7 @@ public class FormatterPublisherTests
 
         var hookBindingMock = new Mock<IHookBinding>();
         hookBindingMock.Setup(hb => hb.HookType).Returns(hookType);
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", "desc");
 
         _bindingRegistryMock.Setup(br => br.GetStepDefinitions()).Returns(new List<IStepDefinitionBinding>());
         _bindingRegistryMock.Setup(br => br.GetStepTransformations()).Returns(new List<IStepArgumentTransformationBinding>());
@@ -483,7 +483,7 @@ public class FormatterPublisherTests
 
         var hookBindingMock = new Mock<IHookBinding>();
         hookBindingMock.Setup(hb => hb.HookType).Returns(hookType);
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", "desc");
 
         _sut.Enabled = true;
         _sut.MessageFactory = messageFactory;
@@ -530,7 +530,7 @@ public class FormatterPublisherTests
         // Arrange
         var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
         var featureContextMock = new Mock<IFeatureContext>();
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", "desc");
 
         featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
@@ -578,7 +578,7 @@ public class FormatterPublisherTests
         // Arrange
         var featureTrackerMock = new Mock<IFeatureExecutionTracker>();
         var featureContextMock = new Mock<IFeatureContext>();
-        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "My Feature", "desc");
+        var featureInfoStub = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "My Feature", "desc");
         featureTrackerMock.Setup(ft => ft.Enabled).Returns(true);
         featureContextMock.Setup(fc => fc.FeatureInfo).Returns(featureInfoStub);
         var scenarioInfoStub = new ScenarioInfo("My Scenario", "", [], new OrderedDictionary());

@@ -125,7 +125,7 @@ namespace Reqnroll.PluginTests.Windsor
             var scenarioContainer1 = new ObjectContainer(featureContainer);
             var scenarioContainer2 = new ObjectContainer(featureContainer);
 
-            var context = new FeatureContext(featureContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", ""), ConfigurationLoader.GetDefault());
+            var context = new FeatureContext(featureContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", "", ""), ConfigurationLoader.GetDefault());
 
             globalContainer.RegisterInstanceAs<IContainerFinder>(new SpecificContainerFinder(() => new WindsorContainer()));
             featureContainer.RegisterInstanceAs(context);

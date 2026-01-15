@@ -202,7 +202,7 @@ public class CucumberExpressionIntegrationTests
         bindingSourceProcessor.BuildingCompleted();
 
         await engine.OnTestRunStartAsync();
-        await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo(culture), ".", "Sample feature", null, ProgrammingLanguage.CSharp));
+        await engine.OnFeatureStartAsync(new FeatureInfo(CultureInfo.GetCultureInfo(culture), ".", "sample.feature", "Sample feature", null, ProgrammingLanguage.CSharp));
         await engine.OnScenarioStartAsync();
         engine.OnScenarioInitialize(new ScenarioInfo("Sample scenario", null, null, null), null);
         await engine.StepAsync(StepDefinitionKeyword.Given, "Given ", stepText, null, null);

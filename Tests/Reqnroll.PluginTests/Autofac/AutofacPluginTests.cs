@@ -245,7 +245,7 @@ public class AutofacPluginTests
         var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
         var scenarioContext = new ScenarioContext(scenarioContainer, new ScenarioInfo("", "", Array.Empty<string>(), new OrderedDictionary()), null, resolver);
         scenarioContainer.RegisterInstanceAs(scenarioContext);
-        var featureContext = new FeatureContext(scenarioContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", ""), ConfigurationLoader.GetDefault());
+        var featureContext = new FeatureContext(scenarioContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", "", ""), ConfigurationLoader.GetDefault());
         _featureContainer.RegisterInstanceAs(featureContext);
         var testThreadContext = new TestThreadContext(_testThreadContainer);
         _testThreadContainer.RegisterInstanceAs(testThreadContext);
@@ -275,7 +275,7 @@ public class AutofacPluginTests
         // Act
         InitializeToScenarioContainer(sut);
         var resolver = _testRunContainer.Resolve<ITestObjectResolver>();
-        var featureContext = new FeatureContext(_featureContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", ""), ConfigurationLoader.GetDefault());
+        var featureContext = new FeatureContext(_featureContainer, new FeatureInfo(CultureInfo.CurrentCulture, "", "", "", ""), ConfigurationLoader.GetDefault());
         _featureContainer.RegisterInstanceAs(featureContext);
         var testThreadContext = new TestThreadContext(_testThreadContainer);
         _testThreadContainer.RegisterInstanceAs(testThreadContext);

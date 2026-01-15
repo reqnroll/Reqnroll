@@ -59,7 +59,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var containerBuilder = new RuntimeTestsContainerBuilder();
             var testThreadContainer = containerBuilder.CreateTestThreadContainer(containerBuilder.CreateGlobalContainer(typeof(TestThreadContextTests).Assembly));
             var contextManager = CreateContextManager(testThreadContainer);
-            contextManager.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, "", "test feature", null));
+            contextManager.InitializeFeatureContext(new FeatureInfo(FeatureLanguage, "", "test.feature", "test feature", null));
             contextManager.InitializeScenarioContext(new ScenarioInfo("test scenario", "test_description", null, null), null);
 
             contextManager.TestThreadContext.Should().NotBeNull();

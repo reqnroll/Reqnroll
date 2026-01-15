@@ -40,7 +40,7 @@ namespace Reqnroll.RuntimeTests.Infrastructure
             var traceListenerMock = new Mock<ITraceListener>();
             var attachmentHandlerMock = new Mock<IReqnrollAttachmentHandler>();
             var contextManager = new Mock<IContextManager>();
-            var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "test feature", null);
+            var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "test.feature", "test feature", null);
             var config = new ReqnrollConfiguration(ConfigSource.Json, null, null, null, null, false, MissingOrPendingStepsOutcome.Error, false, false, TimeSpan.FromSeconds(10), Reqnroll.BindingSkeletons.StepDefinitionSkeletonStyle.CucumberExpressionAttribute, null, false, false, new string[] { }, true, ObsoleteBehavior.Error, false);
             var featureContext = new FeatureContext(null, featureInfo, config);
             contextManager.SetupGet(c => c.FeatureContext).Returns(featureContext);

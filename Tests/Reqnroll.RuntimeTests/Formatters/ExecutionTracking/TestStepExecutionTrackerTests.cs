@@ -181,7 +181,7 @@ public class TestStepExecutionTrackerTests
         var scenarioContextDummy = new ScenarioContext(null, null, null, testResolverMock.Object);
         scenarioContextDummy.MissingSteps.Add(stepInfoDummy.StepInstance, "skeleton");
         var featureContextMock = new Mock<IFeatureContext>();
-        var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "title", "");
+        var featureInfo = new FeatureInfo(new System.Globalization.CultureInfo("en-US"), "", "myfeature.feature", "title", "");
         featureContextMock.SetupGet(fc => fc.FeatureInfo).Returns(featureInfo);
 
         var stepFinishedEvent = new StepFinishedEvent(featureContextMock.Object, scenarioContextDummy, stepContextMock.Object);

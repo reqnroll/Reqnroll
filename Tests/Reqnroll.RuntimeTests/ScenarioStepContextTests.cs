@@ -282,7 +282,7 @@ namespace Reqnroll.RuntimeTests
         {
             var mockTracer = new Mock<ITestTracer>();
             var contextManager = ResolveContextManager(mockTracer.Object);
-            contextManager.InitializeFeatureContext(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "F", null));
+            contextManager.InitializeFeatureContext(new FeatureInfo(new CultureInfo("en-US", false), string.Empty, "f.feature", "F", null));
 
             contextManager.InitializeStepContext(CreateStepInfo("I have called initialize once"));
             //// Do not call CleanupStepContext, in order to simulate an inconsistent state

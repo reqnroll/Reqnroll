@@ -99,7 +99,7 @@ public class PickleExecutionTrackerTests
     {
         var testOjbResolverMock = new Mock<ITestObjectResolver>();
 
-        _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "Test Feature", "");
+        _featureInfoStub = new FeatureInfo(CultureInfo.CurrentCulture, "", "test.feature", "Test Feature", "");
         _featureContextStub = new FeatureContext(_objectContainerStub, _featureInfoStub, ConfigurationLoader.GetDefault());
 
         _scenarioInfoStub = new ScenarioInfo("Test Scenario", "", [], null);
@@ -330,7 +330,7 @@ public class PickleExecutionTrackerTests
         var stepStartedEvent = new StepStartedEvent(_featureContextStub, _scenarioContextSub, _mockStepContext.Object);
 
         var outputEvent = new OutputAddedEvent("test output",
-                                               new FeatureInfo(CultureInfo.CurrentCulture, "", "Test Feature", ""),
+                                               new FeatureInfo(CultureInfo.CurrentCulture, "", "test.feature", "Test Feature", ""),
                                                new ScenarioInfo("Test Scenario", "", [], null)
         );
 

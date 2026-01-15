@@ -35,7 +35,7 @@ namespace Reqnroll.RuntimeTests
             var testThreadContainer = CreateDefaultTestThreadContainer(configurationHolder, null, null, instance);
 
             CultureInfo cultureInfo = new CultureInfo("en-US", false);
-            return instance.CreateFeatureContainer(testThreadContainer, new FeatureInfo(cultureInfo, "test feature path", "test feature info", "", ProgrammingLanguage.CSharp));
+            return instance.CreateFeatureContainer(testThreadContainer, new FeatureInfo(cultureInfo, "test feature path", "test.feature", "test feature info", "", ProgrammingLanguage.CSharp));
         }
 
         private static IObjectContainer CreateDefaultGlobalContainer(IRuntimeConfigurationProvider configurationProvider, Action<IObjectContainer> registerGlobalMocks, ContainerBuilder instance)

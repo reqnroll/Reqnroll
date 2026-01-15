@@ -50,7 +50,7 @@ namespace Reqnroll.RuntimeTests.Bindings
         private static FeatureContext GetFeatureContext(CultureInfo cultureInfo)
         {
             return new FeatureContext(default,
-                                      new FeatureInfo(cultureInfo, default, default, default),
+                                      new FeatureInfo(cultureInfo, default, default, default, default),
                                       new ReqnrollConfiguration(default, default, default, default, cultureInfo, default, default, default, default, default, default, default, default, default, default, default, default, default));
         }
     }

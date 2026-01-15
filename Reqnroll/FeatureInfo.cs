@@ -13,6 +13,7 @@ namespace Reqnroll
         public ProgrammingLanguage GenerationTargetLanguage { get; private set; }
 
         public string FolderPath { get; private set; }
+        public string FileName { get; private set; }
 
         public string Title { get; private set; }
         public string Description { get; private set; }
@@ -24,12 +25,12 @@ namespace Reqnroll
         /// </summary>
         internal IFeatureLevelCucumberMessages FeatureCucumberMessages { get; set; }
 
-        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, params string[] tags)
-            : this(language, folderPath, title, description, ProgrammingLanguage.CSharp, tags)
+        public FeatureInfo(CultureInfo language, string folderPath, string fileName, string title, string description, params string[] tags)
+            : this(language, folderPath, fileName, title, description, ProgrammingLanguage.CSharp, tags)
         {
         }
 
-        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, params string[] tags)
+        public FeatureInfo(CultureInfo language, string folderPath, string fileName, string title, string description, ProgrammingLanguage programmingLanguage, params string[] tags)
         {
             if (language.IsNeutralCulture)
             {
@@ -40,14 +41,15 @@ namespace Reqnroll
 
             Language = language;
             FolderPath = folderPath;
+            FileName = fileName;
             Title = title;
             Description = description;
             GenerationTargetLanguage = programmingLanguage;
             Tags = tags ?? Array.Empty<string>();
         }
 
-        public FeatureInfo(CultureInfo language, string folderPath, string title, string description, ProgrammingLanguage programmingLanguage, string[] tags, IFeatureLevelCucumberMessages featureLevelCucumberMessages = null)
-            : this(language, folderPath, title, description, programmingLanguage, tags)
+        public FeatureInfo(CultureInfo language, string folderPath, string fileName, string title, string description, ProgrammingLanguage programmingLanguage, string[] tags, IFeatureLevelCucumberMessages featureLevelCucumberMessages = null)
+            : this(language, folderPath, fileName, title, description, programmingLanguage, tags)
         {
             FeatureCucumberMessages = featureLevelCucumberMessages;
         }

@@ -118,7 +118,7 @@ public partial class TestExecutionEngineTests
         _scenarioContext = new ScenarioContext(_scenarioContainer, _scenarioInfo, _ruleInfo, _testObjectResolverMock.Object);
         _scenarioContainer.RegisterInstanceAs(_scenarioContext);
         _contextManagerStub.Setup(cm => cm.ScenarioContext).Returns(_scenarioContext);
-        _featureInfo = new FeatureInfo(culture, "feature path", "feature_title", "", ProgrammingLanguage.CSharp);
+        _featureInfo = new FeatureInfo(culture, "feature path", "test.feature", "feature_title", "", ProgrammingLanguage.CSharp);
         var featureContext = new FeatureContext(_featureContainer, _featureInfo, _reqnrollConfiguration);
         _featureContainer.RegisterInstanceAs(featureContext);
         _contextManagerStub.Setup(cm => cm.FeatureContext).Returns(featureContext);

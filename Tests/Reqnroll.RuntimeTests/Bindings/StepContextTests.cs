@@ -41,5 +41,5 @@ public class StepContextTests
         => new("Sample scenario", null, directScenarioTags ?? Array.Empty<string>(), new OrderedDictionary(), inheritedScenarioTags ?? Array.Empty<string>());
 
     private FeatureInfo CreateFeatureInfo(string[] featureTags = null) => 
-        new(new CultureInfo("en-US"), @"C:\MyProject", "Sample feature", null, ProgrammingLanguage.CSharp, featureTags ?? Array.Empty<string>());
+        new(new CultureInfo("en-US"), @"C:\MyProject", "sample.feature", "Sample feature", null, ProgrammingLanguage.CSharp, featureTags ?? Array.Empty<string>());
 }
