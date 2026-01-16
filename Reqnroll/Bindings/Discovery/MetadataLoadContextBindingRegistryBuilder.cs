@@ -201,8 +201,15 @@ namespace Reqnroll.Bindings.Discovery
             {
                 System.Diagnostics.Debug.WriteLine($"[MLC]   Processing method: {methodInfo.Name}");
                 var bindingMethod = CreateBindingSourceMethod(methodInfo);
-                System.Diagnostics.Debug.WriteLine($"[MLC]     Method has {bindingMethod.Attributes.Length} attributes");
-                _bindingSourceProcessor.ProcessMethod(bindingMethod);
+                if (bindingMethod != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"[MLC]     Method has {bindingMethod.Attributes.Length} attributes");
+                    _bindingSourceProcessor.ProcessMethod(bindingMethod);
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"[MLC]     Method has no binding attributes - skipped");
+                }
             }
 
             _bindingSourceProcessor.ProcessTypeDone();
@@ -215,12 +222,21 @@ namespace Reqnroll.Bindings.Discovery
                 .Where(attrData => _bindingSourceProcessor.CanProcessTypeAttribute(attrData.AttributeType.FullName))
                 .ToList();
 
+            // Filter to only Reqnroll binding method attributes (or those that derive from them)
+            var bindingMethodAttributes = customAttributesData
+                .Where(attrData => IsBindingMethodAttribute(attrData.AttributeType))
+                .ToList();
+
+            // If no binding method attributes found, skip this method
+            if (bindingMethodAttributes.Count == 0)
+                return null;
+
             return new BindingSourceMethod
             {
                 BindingMethod = new RuntimeBindingMethod(methodDefinition),
                 IsPublic = methodDefinition.IsPublic,
                 IsStatic = methodDefinition.IsStatic,
-                Attributes = GetAttributes(customAttributesData)
+                Attributes = GetAttributes(bindingMethodAttributes)
             };
         }
 
@@ -416,6 +432,78 @@ namespace Reqnroll.Bindings.Discovery
         }
 
         /// <summary>
+        /// Determines if an attribute type is a Reqnroll binding method attribute,
+        /// or derives from one (e.g., custom step definition attributes that inherit from StepDefinitionBaseAttribute).
+        /// </summary>
+        private bool IsBindingMethodAttribute(Type attributeType)
+        {
+            if (attributeType == null)
+                return false;
+
+            var fullName = attributeType.FullName;
+            if (fullName == null)
+                return false;
+
+            // Check known Reqnroll method attribute types
+            // Step definition attributes
+            if (fullName == "Reqnroll.GivenAttribute" ||
+                fullName == "Reqnroll.WhenAttribute" ||
+                fullName == "Reqnroll.ThenAttribute" ||
+                fullName == "Reqnroll.StepDefinitionAttribute" ||
+                fullName == "Reqnroll.StepDefinitionBaseAttribute")
+                return true;
+
+            // Step argument transformation
+            if (fullName == "Reqnroll.StepArgumentTransformationAttribute")
+                return true;
+
+            // Hook attributes
+            if (fullName == "Reqnroll.BeforeScenarioAttribute" ||
+                fullName == "Reqnroll.AfterScenarioAttribute" ||
+                fullName == "Reqnroll.BeforeFeatureAttribute" ||
+                fullName == "Reqnroll.AfterFeatureAttribute" ||
+                fullName == "Reqnroll.BeforeStepAttribute" ||
+                fullName == "Reqnroll.AfterStepAttribute" ||
+                fullName == "Reqnroll.BeforeTestRunAttribute" ||
+                fullName == "Reqnroll.AfterTestRunAttribute" ||
+                fullName == "Reqnroll.BeforeScenarioBlockAttribute" ||
+                fullName == "Reqnroll.AfterScenarioBlockAttribute")
+                return true;
+
+            // Check for SpecFlow compatibility (backward compatibility)
+            if (fullName.StartsWith("TechTalk.SpecFlow."))
+            {
+                var specFlowName = fullName.Substring("TechTalk.SpecFlow.".Length);
+                if (specFlowName == "GivenAttribute" ||
+                    specFlowName == "WhenAttribute" ||
+                    specFlowName == "ThenAttribute" ||
+                    specFlowName == "StepDefinitionAttribute" ||
+                    specFlowName == "BeforeScenarioAttribute" ||
+                    specFlowName == "AfterScenarioAttribute" ||
+                    specFlowName == "BeforeFeatureAttribute" ||
+                    specFlowName == "AfterFeatureAttribute" ||
+                    specFlowName == "BeforeStepAttribute" ||
+                    specFlowName == "AfterStepAttribute" ||
+                    specFlowName == "BeforeTestRunAttribute" ||
+                    specFlowName == "AfterTestRunAttribute" ||
+                    specFlowName == "StepArgumentTransformationAttribute")
+                    return true;
+            }
+
+            // Check if it inherits from a known base attribute (for custom attributes like GivenAndWhenAttribute)
+            // Walk up the inheritance chain using MLC type's BaseType
+            var baseType = attributeType.BaseType;
+            while (baseType != null && baseType.FullName != "System.Attribute" && baseType.FullName != "System.Object")
+            {
+                if (IsBindingMethodAttribute(baseType))
+                    return true;
+                baseType = baseType.BaseType;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Determines if an attribute type is a Reqnroll attribute.
         /// This is a simplified version that checks namespace.
         /// A full implementation would coordinate with IReqnrollAttributesFilter.
@@ -431,8 +519,8 @@ namespace Reqnroll.Bindings.Discovery
 
             // Check if it's in a Reqnroll namespace
             return fullName.StartsWith("Reqnroll.") ||
-                   fullName.StartsWith("TechTalk.SpecFlow.") || // For backwards compatibility
-                   attributeType.Name.EndsWith("Attribute");
+                   fullName.StartsWith("TechTalk.SpecFlow.") // For backwards compatibility
+                   || attributeType.Name.EndsWith("Attribute");
         }
 
         public void Dispose()
