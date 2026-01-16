@@ -183,7 +183,7 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
         }
 
         [Fact]
-        public void InvalidScopeTagExpressionsOnBindingMethodErrors_should_be_captured()
+        public void InvalidScopeTagExpressionsOnStepDefBindingMethodErrors_should_be_captured()
         {
             var sut = CreateBindingSourceProcessor();
             var bindingSourceType = CreateSyntheticBindingSourceType();
@@ -194,7 +194,7 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             sut.ProcessType(bindingSourceType).Should().BeTrue();
             sut.ProcessMethod(bindingSourceMethod);
             sut.BuildingCompleted();
-            sut.ValidationErrors.Should().Contain(m => m.Contains("could not be parsed because of syntax error"));
+            sut.ValidationErrors.Should().Contain(m => m.Contains("Invalid scope") && m.Contains("could not be parsed because of syntax error"));
         }
 
         [Fact]
@@ -209,7 +209,7 @@ namespace Reqnroll.RuntimeTests.Bindings.Discovery
             sut.ProcessType(bindingSourceType).Should().BeTrue();
             sut.ProcessMethod(bindingSourceMethod);
             sut.BuildingCompleted();
-            sut.ValidationErrors.Should().Contain(m => m.Contains("could not be parsed because of syntax error"));
+            sut.ValidationErrors.Should().Contain(m => m.Contains("Invalid scope") && m.Contains("could not be parsed because of syntax error"));
         }
 
         private static BindingSourceMethod CreateBindingSourceMethod(Type bindingType, string methodName, params BindingSourceAttribute[] attributes)

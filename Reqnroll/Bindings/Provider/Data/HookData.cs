@@ -7,5 +7,4 @@ public class HookData
     public string Type { get; set; }
     public int HookOrder { get; set; }
     public string Error { get; set; }
-
 }

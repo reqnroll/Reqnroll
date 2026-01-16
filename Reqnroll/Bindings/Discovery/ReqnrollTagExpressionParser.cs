@@ -8,10 +8,10 @@ public class ReqnrollTagExpressionParser : IReqnrollTagExpressionParser
     public ITagExpression Parse(string tagExpression)
     {
         var tagExpressionParser = new TagExpressionParser();
-        ITagExpression result = null;
-        try { 
-            result = tagExpressionParser.Parse(tagExpression);
-            result =  Rewrite(result);
+        try 
+        { 
+            var result = tagExpressionParser.Parse(tagExpression);
+            result = Rewrite(result);
             return new ReqnrollTagExpression(result, tagExpression);
         }
         catch (TagExpressionException ex)

@@ -187,10 +187,10 @@ namespace Reqnroll.Bindings.Discovery
             if (!validationResult.IsValid)
             {
                 OnValidationError(validationResult, true);
-               
             }
 
-            var hookBinding = _bindingFactory.CreateHookBinding(bindingSourceMethod.BindingMethod, hookType, scope, order, scopeValidationResult.IsValid ? null : scopeValidationResult.ErrorMessages[0]);
+            var hookBinding = _bindingFactory.CreateHookBinding(bindingSourceMethod.BindingMethod, hookType, scope, order, 
+                scopeValidationResult.IsValid ? null : scopeValidationResult.CombinedErrorMessages);
 
             ProcessHookBinding(hookBinding);
         }
@@ -363,9 +363,9 @@ namespace Reqnroll.Bindings.Discovery
         { 
             var result = BindingValidationResult.Valid;
 
-            if (bindingScope != null && bindingScope.TagExpression is InvalidTagExpression invalidTagExpression)
+            if (bindingScope is { TagExpression: InvalidTagExpression invalidTagExpression })
             {
-                result += BindingValidationResult.Error(invalidTagExpression.Message);
+                result += BindingValidationResult.Error($"Invalid scope: {invalidTagExpression}");
             }
             return result;
         }

@@ -3,24 +3,17 @@ using System.Collections.Generic;
 
 namespace Reqnroll.Bindings.Discovery;
 
-public class ReqnrollTagExpression : ITagExpression
+public class ReqnrollTagExpression(ITagExpression inner, string tagExpressionText) : ITagExpression
 {
-    public string TagExpressionText { get; }
-    private ITagExpression _inner;
-
-    public ReqnrollTagExpression(ITagExpression inner, string tagExpressionText)
-    {
-        TagExpressionText = tagExpressionText;
-        _inner = inner;
-    }
+    public string TagExpressionText { get; } = tagExpressionText;
 
     public override string ToString()
     {
-        return _inner.ToString();
+        return inner.ToString();
     }
 
     public virtual bool Evaluate(IEnumerable<string> inputs)
     {
-        return _inner.Evaluate(inputs);
+        return inner.Evaluate(inputs);
     }
 }

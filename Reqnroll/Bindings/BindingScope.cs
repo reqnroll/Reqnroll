@@ -7,7 +7,7 @@ namespace Reqnroll.Bindings
 {
     public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle)
     {
-        public string Tag => tagExpression.ToString();
+        public string Tag => tagExpression is ReqnrollTagExpression reqnrollTagExpression ? reqnrollTagExpression.TagExpressionText : tagExpression.ToString();
         public ITagExpression TagExpression => tagExpression;
 
         public string FeatureTitle { get; } = featureTitle;
