@@ -1,6 +1,5 @@
 # [vNext]
 
-
 ## Improvements:
 
 ## Bug fixes:
