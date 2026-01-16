@@ -15,6 +15,7 @@ namespace Reqnroll.Bindings.Discovery
     /// <summary>
     /// Implementation of IRuntimeBindingRegistryBuilder that uses MetadataLoadContext
     /// for assembly inspection without loading assemblies into the runtime context.
+    /// (except for the assemblies that contain Reqnroll attributes and attributes derived from them)
     /// </summary>
     public class MetadataLoadContextBindingRegistryBuilder : IRuntimeBindingRegistryBuilder, IDisposable
     {
@@ -160,55 +161,33 @@ namespace Reqnroll.Bindings.Discovery
             // Get custom attribute data (metadata) instead of materialized attributes
             var customAttributesData = type.GetCustomAttributesData();
             
-            // DIAGNOSTIC: Log what we're finding
-            System.Diagnostics.Debug.WriteLine($"[MLC] Processing type: {type.FullName}");
-            System.Diagnostics.Debug.WriteLine($"[MLC] Found {customAttributesData.Count} total attributes");
-            foreach (var attr in customAttributesData)
-            {
-                System.Diagnostics.Debug.WriteLine($"[MLC]   - {attr.AttributeType.FullName}");
-            }
-            
             var filteredAttributeData = customAttributesData
                 .Where(attrData => _bindingSourceProcessor.CanProcessTypeAttribute(attrData.AttributeType.FullName))
                 .ToList();
 
-            System.Diagnostics.Debug.WriteLine($"[MLC] After CanProcessTypeAttribute filter: {filteredAttributeData.Count} attributes");
             
             var fullNames = filteredAttributeData.Select(ad => ad.AttributeType.FullName).ToList();
-            System.Diagnostics.Debug.WriteLine($"[MLC] Full names: {string.Join(", ", fullNames)}");
             
             if (!_bindingSourceProcessor.PreFilterType(fullNames))
             {
-                System.Diagnostics.Debug.WriteLine($"[MLC] PreFilterType returned FALSE - type rejected");
                 return false;
             }
 
-            System.Diagnostics.Debug.WriteLine($"[MLC] PreFilterType returned TRUE - processing type");
-            
             var bindingSourceType = CreateBindingSourceType(type, filteredAttributeData);
-            System.Diagnostics.Debug.WriteLine($"[MLC] Created BindingSourceType, calling ProcessType");
 
             bool processTypeResult = _bindingSourceProcessor.ProcessType(bindingSourceType);
-            System.Diagnostics.Debug.WriteLine($"[MLC] ProcessType returned: {processTypeResult}");
             
             if (!processTypeResult)
                 return false;
 
             var methods = type.GetMethods(BindingFlags.Static | BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            System.Diagnostics.Debug.WriteLine($"[MLC] Found {methods.Length} methods on type");
             
             foreach (var methodInfo in methods)
             {
-                System.Diagnostics.Debug.WriteLine($"[MLC]   Processing method: {methodInfo.Name}");
                 var bindingMethod = CreateBindingSourceMethod(methodInfo);
                 if (bindingMethod != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"[MLC]     Method has {bindingMethod.Attributes.Length} attributes");
                     _bindingSourceProcessor.ProcessMethod(bindingMethod);
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"[MLC]     Method has no binding attributes - skipped");
                 }
             }
 
@@ -248,7 +227,6 @@ namespace Reqnroll.Bindings.Discovery
         private BindingSourceType CreateBindingSourceType(Type type, IEnumerable<CustomAttributeData> filteredAttributeData)
         {
             var attributes = GetAttributes(filteredAttributeData);
-            System.Diagnostics.Debug.WriteLine($"[MLC] CreateBindingSourceType: created {attributes.Length} BindingSourceAttribute objects");
             
             return new BindingSourceType
             {
@@ -633,19 +611,6 @@ namespace Reqnroll.Bindings.Discovery
 
             // Primitive types and strings
             return argument.Value;
-        }
-
-        /// <summary>
-        /// Converts a constructor parameter name to a likely property name.
-        /// Example: "pattern" -> "Pattern"
-        /// </summary>
-        private string GetPropertyNameFromParameter(string parameterName)
-        {
-            if (string.IsNullOrEmpty(parameterName))
-                return string.Empty;
-
-            // Capitalize first letter
-            return char.ToUpper(parameterName[0]) + parameterName.Substring(1);
         }
 
         private BindingSourceAttribute[] GetAttributes(IEnumerable<CustomAttributeData> customAttributesData)
