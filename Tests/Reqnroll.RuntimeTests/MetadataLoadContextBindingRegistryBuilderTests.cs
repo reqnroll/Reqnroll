@@ -12,18 +12,20 @@ using Reqnroll.Infrastructure;
 namespace Reqnroll.RuntimeTests
 {
     
-    public class RuntimeBindingRegistryBuilderTests
+    public class MetadataLoadContextBindingRegistryBuilderTests : IDisposable
     {
         private BindingSourceProcessorStub bindingSourceProcessorStub;
+        private MetadataLoadContextBindingRegistryBuilder lastBuilder;
 
-        public RuntimeBindingRegistryBuilderTests()
+        public MetadataLoadContextBindingRegistryBuilderTests()
         {
             bindingSourceProcessorStub = new BindingSourceProcessorStub();
         }
 
-        private RuntimeBindingRegistryBuilder CreateSut()
+        private MetadataLoadContextBindingRegistryBuilder CreateSut()
         {
-            return new RuntimeBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter(), new Mock<IBindingAssemblyLoader>().Object, ConfigurationLoader.GetDefault(), new Mock<IBindingProviderService>().Object);
+            lastBuilder = new MetadataLoadContextBindingRegistryBuilder(bindingSourceProcessorStub, new ReqnrollAttributesFilter(), new Mock<IBindingAssemblyLoader>().Object, ConfigurationLoader.GetDefault(), new Mock<IBindingProviderService>().Object);
+            return lastBuilder;
         }
 
         [Fact]
@@ -130,6 +132,18 @@ namespace Reqnroll.RuntimeTests
         }
 
         [Fact]
+        public void ShouldFindExampleConverter_FromType()
+        {
+            var builder = CreateSut();
+            BuildCompleteBindingFromType(builder, typeof(BindingRegistryBuilderTestFixtures.StepTransformationExample));
+            Assert.Equal(1,
+                bindingSourceProcessorStub.StepArgumentTransformationBindings.Count(
+                    s =>
+                        s.Regex != null && s.Regex.Match("BindingRegistryTests").Success &&
+                        s.Regex.Match("").Success == false));
+        }
+
+        [Fact]
         public void ShouldFindExampleConverter()
         {
             var builder = CreateSut();
@@ -142,13 +156,13 @@ namespace Reqnroll.RuntimeTests
                         s.Regex.Match("").Success == false));
         }
 
-        private static void BuildCompleteBindingFromAssembly(RuntimeBindingRegistryBuilder builder)
+        private static void BuildCompleteBindingFromAssembly(MetadataLoadContextBindingRegistryBuilder builder)
         {
             builder.BuildBindingsFromAssembly(Assembly.GetExecutingAssembly());
             builder.BuildingCompleted();
         }
 
-        private static void BuildCompleteBindingFromType(RuntimeBindingRegistryBuilder builder, Type type)
+        private static void BuildCompleteBindingFromType(MetadataLoadContextBindingRegistryBuilder builder, Type type)
         {
             builder.BuildBindingsFromType(type);
             builder.BuildingCompleted();
@@ -243,6 +257,11 @@ namespace Reqnroll.RuntimeTests
             Assert.Equal(1, bindingSourceProcessorStub.StepDefinitionBindings.Count(b => b.StepDefinitionType == StepDefinitionType.Given));
             Assert.Equal(1, bindingSourceProcessorStub.StepDefinitionBindings.Count(b => b.StepDefinitionType == StepDefinitionType.When));
             Assert.Equal(0, bindingSourceProcessorStub.StepDefinitionBindings.Count(b => b.StepDefinitionType == StepDefinitionType.Then));
+        }
+
+        public void Dispose()
+        {
+            lastBuilder?.Dispose();
         }
     }
 }

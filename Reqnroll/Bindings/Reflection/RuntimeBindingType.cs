@@ -47,7 +47,9 @@ namespace Reqnroll.Bindings.Reflection
 
         protected bool Equals(RuntimeBindingType other)
         {
-            return Type == other.Type;
+            // When comparing types from different type systems (e.g., MetadataLoadContext vs Runtime),
+            // reference equality won't work. Compare by FullName instead.
+            return FullName == other.FullName && AssemblyName == other.AssemblyName;
         }
 
         public override bool Equals(object obj)
@@ -60,7 +62,11 @@ namespace Reqnroll.Bindings.Reflection
 
         public override int GetHashCode()
         {
-            return (Type != null ? Type.GetHashCode() : 0);
+            // Use FullName and AssemblyName for hash code to match Equals implementation
+            unchecked
+            {
+                return ((FullName != null ? FullName.GetHashCode() : 0) * 397) ^ (AssemblyName != null ? AssemblyName.GetHashCode() : 0);
+            }
         }
 
         public static readonly RuntimeBindingType Void = new(typeof(void));
