@@ -187,6 +187,7 @@ public class BindingProviderService(
         {
             base.RegisterGlobalContainerDefaults(container);
             container.RegisterTypeAs<DryRunBindingInvoker, IAsyncBindingInvoker>();
+            container.RegisterTypeAs<MetadataLoadContextBindingRegistryBuilder, IRuntimeBindingRegistryBuilder>();
             container.RegisterTypeAs<Formatters.Configuration.FormattersForcedDisabledOverrideProvider, IFormattersConfigurationDisableOverrideProvider>();
         }
     }

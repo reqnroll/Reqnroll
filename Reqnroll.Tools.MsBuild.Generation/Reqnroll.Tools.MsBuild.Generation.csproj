@@ -79,7 +79,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Composition" Version="17.11.13" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Only" Version="17.13.61" PrivateAssets="all" />
     <PackageReference Include="Microsoft.VisualStudio.Threading.Analyzers" Version="17.13.61" PrivateAssets="all" />
-    <PackageReference Include="System.Collections.Immutable" Version="8.0.0" PrivateAssets="all" />
+    <PackageReference Include="System.Collections.Immutable" Version="10.0.2" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
