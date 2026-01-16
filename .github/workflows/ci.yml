@@ -443,8 +443,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSIONS }}
     - name: .NET Information
       run: |
-        dotnet --list-sdks
-        dotnet --list-runtimes
+        dotnet --info
     - name: System Tests
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-windows-results.trx" ${{ needs.build.outputs.test_params }}
@@ -504,8 +503,7 @@ jobs:
         dotnet-version: ${{ env.DOTNET_VERSIONS }}
     - name: .NET Information
       run: |
-        dotnet --list-sdks
-        dotnet --list-runtimes
+        dotnet --info
     - name: System Tests
       shell: pwsh
       run: dotnet test ./Tests/Reqnroll.SystemTests/bin/${{ needs.build.outputs.product_configuration }}/*/Reqnroll.SystemTests.dll --filter "TestCategory!=MsBuild&TestCategory!=NetFramework" --logger "trx;LogFileName=${{ github.workspace }}/TestResults/systemtests-linux-results.trx" ${{ needs.build.outputs.test_params }}
