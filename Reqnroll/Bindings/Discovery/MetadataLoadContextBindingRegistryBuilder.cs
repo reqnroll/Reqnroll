@@ -222,21 +222,21 @@ namespace Reqnroll.Bindings.Discovery
                 .Where(attrData => _bindingSourceProcessor.CanProcessTypeAttribute(attrData.AttributeType.FullName))
                 .ToList();
 
-            // Filter to only Reqnroll binding method attributes (or those that derive from them)
-            var bindingMethodAttributes = customAttributesData
-                .Where(attrData => IsBindingMethodAttribute(attrData.AttributeType))
-                .ToList();
+            // Check if method has at least one binding method attribute (Given, When, Then, Hook, etc.)
+            var hasBindingMethodAttribute = customAttributesData
+                .Any(attrData => IsBindingMethodAttribute(attrData.AttributeType));
 
             // If no binding method attributes found, skip this method
-            if (bindingMethodAttributes.Count == 0)
+            if (!hasBindingMethodAttribute)
                 return null;
 
+            // Include ALL Reqnroll attributes (binding method attributes + modifiers like [Scope])
             return new BindingSourceMethod
             {
                 BindingMethod = new RuntimeBindingMethod(methodDefinition),
                 IsPublic = methodDefinition.IsPublic,
                 IsStatic = methodDefinition.IsStatic,
-                Attributes = GetAttributes(bindingMethodAttributes)
+                Attributes = GetAttributes(customAttributesData)
             };
         }
 
@@ -264,10 +264,242 @@ namespace Reqnroll.Bindings.Discovery
 
         /// <summary>
         /// Creates a BindingSourceAttribute from CustomAttributeData.
-        /// This extracts attribute metadata without materializing the attribute instance.
-        /// Mimics the RuntimeBindingRegistryBuilder approach of reading fields/properties and matching constructor parameters.
+        /// This uses a hybrid approach: MLC for discovery, runtime instantiation for property access.
         /// </summary>
         private BindingSourceAttribute CreateAttribute(CustomAttributeData attributeData)
+        {
+            // Try to instantiate the attribute as a runtime type
+            // This works for Reqnroll attributes since they're already in our runtime
+            var instantiatedAttribute = TryInstantiateAttribute(attributeData);
+            
+            if (instantiatedAttribute != null)
+            {
+                // Use the runtime approach - can read all properties including those set by base constructors
+                return CreateAttributeFromInstance(instantiatedAttribute);
+            }
+            
+            // Fallback to metadata-only approach for attributes we can't instantiate
+            return CreateAttributeFromMetadata(attributeData);
+        }
+
+        /// <summary>
+        /// Attempts to instantiate an attribute from CustomAttributeData.
+        /// This works for Reqnroll attributes that exist in the current runtime.
+        /// </summary>
+        private Attribute TryInstantiateAttribute(CustomAttributeData attributeData)
+        {
+            try
+            {
+                // Get the runtime type from the MLC type's full name
+                // We can't use AssemblyQualifiedName from MLC type directly, so construct it
+                var mlcType = attributeData.AttributeType;
+                var assemblyName = mlcType.Assembly.GetName().Name;
+                var typeFullName = mlcType.FullName;
+                
+                // Try to get the runtime type
+                // For Reqnroll attributes, this will find the type in the Reqnroll assembly already loaded
+                Type runtimeType = Type.GetType($"{typeFullName}, {assemblyName}");
+                
+                if (runtimeType == null)
+                {
+                    // Try without assembly name for types in mscorlib/System.Runtime
+                    runtimeType = Type.GetType(typeFullName);
+                }
+                
+                if (runtimeType == null || !typeof(Attribute).IsAssignableFrom(runtimeType))
+                    return null;
+                
+                // Extract and convert constructor arguments
+                var ctorArgs = attributeData.ConstructorArguments
+                    .Select(arg => ConvertMlcValueToRuntime(arg))
+                    .ToArray();
+                
+                // Instantiate the attribute using the constructor
+                var instance = Activator.CreateInstance(runtimeType, ctorArgs) as Attribute;
+                
+                if (instance == null)
+                    return null;
+                
+                // Apply named arguments (property/field setters from attribute declaration)
+                foreach (var namedArg in attributeData.NamedArguments)
+                {
+                    var value = ConvertMlcValueToRuntime(namedArg.TypedValue);
+                    
+                    if (namedArg.IsField)
+                    {
+                        var field = runtimeType.GetField(namedArg.MemberName, 
+                            BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                        field?.SetValue(instance, value);
+                    }
+                    else
+                    {
+                        var property = runtimeType.GetProperty(namedArg.MemberName, 
+                            BindingFlags.Instance | BindingFlags.Public);
+                        if (property != null && property.CanWrite)
+                        {
+                            property.SetValue(instance, value);
+                        }
+                    }
+                }
+                
+                return instance;
+            }
+            catch (Exception ex)
+            {
+                // If we can't instantiate, fall back to metadata-only approach
+                System.Diagnostics.Debug.WriteLine($"[MLC] Failed to instantiate attribute {attributeData.AttributeType.FullName}: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Converts a value from MLC type system to runtime type system.
+        /// Handles Type references, enums, arrays, and primitives.
+        /// </summary>
+        private object ConvertMlcValueToRuntime(CustomAttributeTypedArgument argument)
+        {
+            if (argument.Value == null)
+                return null;
+
+            // Handle arrays
+            if (argument.Value is IReadOnlyCollection<CustomAttributeTypedArgument> arrayValues)
+            {
+                var elementType = argument.ArgumentType.GetElementType();
+                if (elementType != null)
+                {
+                    // For enum arrays, we need to convert to the runtime enum type
+                    if (elementType.IsEnum)
+                    {
+                        var runtimeElementType = Type.GetType($"{elementType.FullName}, {elementType.Assembly.GetName().Name}");
+                        if (runtimeElementType != null && runtimeElementType.IsEnum)
+                        {
+                            var convertedValues = arrayValues
+                                .Select(av => ConvertMlcValueToRuntime(av))
+                                .ToArray();
+                            var typedArray = Array.CreateInstance(runtimeElementType, convertedValues.Length);
+                            for (int i = 0; i < convertedValues.Length; i++)
+                            {
+                                typedArray.SetValue(convertedValues[i], i);
+                            }
+                            return typedArray;
+                        }
+                    }
+                    
+                    // For other arrays, extract values
+                    var extractedValues = arrayValues.Select(ConvertMlcValueToRuntime).ToArray();
+                    var array = Array.CreateInstance(
+                        Type.GetType($"{elementType.FullName}, {elementType.Assembly.GetName().Name}") ?? typeof(object),
+                        extractedValues.Length);
+                    for (int i = 0; i < extractedValues.Length; i++)
+                    {
+                        array.SetValue(extractedValues[i], i);
+                    }
+                    return array;
+                }
+                
+                return arrayValues.Select(ConvertMlcValueToRuntime).ToArray();
+            }
+
+            // Handle Type references - convert MLC Type to runtime Type
+            if (argument.ArgumentType.FullName == "System.Type" || argument.ArgumentType.Name == "Type")
+            {
+                var mlcType = argument.Value as Type;
+                if (mlcType != null)
+                {
+                    var runtimeType = Type.GetType($"{mlcType.FullName}, {mlcType.Assembly.GetName().Name}");
+                    return runtimeType ?? argument.Value;
+                }
+                return argument.Value;
+            }
+
+            // Handle enums - convert MLC enum to runtime enum
+            if (argument.ArgumentType.IsEnum)
+            {
+                var runtimeEnumType = Type.GetType($"{argument.ArgumentType.FullName}, {argument.ArgumentType.Assembly.GetName().Name}");
+                if (runtimeEnumType != null && runtimeEnumType.IsEnum)
+                {
+                    // argument.Value is the underlying integer value
+                    return Enum.ToObject(runtimeEnumType, argument.Value);
+                }
+                return argument.Value;
+            }
+
+            // Primitives and strings
+            return argument.Value;
+        }
+
+        /// <summary>
+        /// Creates BindingSourceAttribute from an instantiated attribute instance.
+        /// This approach can read all properties and fields, including those set by base constructors.
+        /// </summary>
+        private BindingSourceAttribute CreateAttributeFromInstance(Attribute attribute)
+        {
+            var attributeType = attribute.GetType();
+            
+            // Read all fields and properties into the named values dictionary
+            var namedAttributeValues = new Dictionary<string, IBindingSourceAttributeValueProvider>();
+            
+            // Read fields
+            foreach (var fieldInfo in attributeType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic))
+            {
+                try
+                {
+                    var value = fieldInfo.GetValue(attribute);
+                    namedAttributeValues[fieldInfo.Name] = new BindingSourceAttributeValueProvider(value);
+                }
+                catch
+                {
+                    // Skip fields we can't read
+                }
+            }
+            
+            // Read properties (override fields if same name)
+            foreach (var propertyInfo in attributeType.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+            {
+                if (propertyInfo.CanRead)
+                {
+                    try
+                    {
+                        var value = propertyInfo.GetValue(attribute);
+                        namedAttributeValues[propertyInfo.Name] = new BindingSourceAttributeValueProvider(value);
+                    }
+                    catch
+                    {
+                        // Skip properties we can't read
+                    }
+                }
+            }
+            
+            // Build AttributeValues array for the most complex constructor
+            var mostComplexCtor = attributeType.GetConstructors(BindingFlags.Instance | BindingFlags.Public)
+                .OrderByDescending(ctor => ctor.GetParameters().Length)
+                .FirstOrDefault();
+            
+            IBindingSourceAttributeValueProvider[] attributeValues;
+            if (mostComplexCtor == null)
+            {
+                attributeValues = Array.Empty<IBindingSourceAttributeValueProvider>();
+            }
+            else
+            {
+                attributeValues = mostComplexCtor.GetParameters()
+                    .Select(p => FindAttributeConstructorArg(p, namedAttributeValues))
+                    .ToArray();
+            }
+            
+            return new BindingSourceAttribute
+            {
+                AttributeType = new RuntimeBindingType(attributeType),
+                AttributeValues = attributeValues,
+                NamedAttributeValues = namedAttributeValues
+            };
+        }
+
+        /// <summary>
+        /// Creates BindingSourceAttribute from CustomAttributeData without instantiation.
+        /// Fallback for attributes that can't be instantiated in the runtime.
+        /// </summary>
+        private BindingSourceAttribute CreateAttributeFromMetadata(CustomAttributeData attributeData)
         {
             var attributeType = attributeData.AttributeType;
 
