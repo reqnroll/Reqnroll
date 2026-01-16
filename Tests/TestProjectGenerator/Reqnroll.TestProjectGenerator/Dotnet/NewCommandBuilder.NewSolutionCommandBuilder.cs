@@ -29,6 +29,7 @@ namespace Reqnroll.TestProjectGenerator.Dotnet
                 string arguments = $"new sln";
                 arguments = AddArgument(arguments, "-n", _name);
                 arguments = AddArgument(arguments, "-o", "\"" + _rootPath + "\"");
+                arguments = AddArgument(arguments, "-f", "sln"); // force sln format (the default has changed to slnx)
 
                 return arguments;
             }
