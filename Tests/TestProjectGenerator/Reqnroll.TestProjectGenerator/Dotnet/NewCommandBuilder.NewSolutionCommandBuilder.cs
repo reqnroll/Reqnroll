@@ -32,7 +32,7 @@ public partial class NewCommandBuilder
             string arguments = "new sln";
             arguments = AddArgument(arguments, "-n", _name);
             arguments = AddArgument(arguments, "-o", "\"" + _rootPath + "\"");
-            if (_sdk != null && _sdk.GetParsedVersion().Major >= 10)
+            if (_sdk == null ¦¦ _sdk.GetParsedVersion().Major >= 10)
                 arguments = AddArgument(arguments, "-f", "sln"); // force sln format (the default has changed to slnx)
             return arguments;
         }
