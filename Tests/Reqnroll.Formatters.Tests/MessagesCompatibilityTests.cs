@@ -95,9 +95,11 @@ public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
     [DataRow("global-hooks-beforeall-error")] // Cucumber expects execution to continue after a hook failure
     [DataRow("global-hooks-afterall-error")] // Cucumber expects execution to continue after a hook failure
     [DataRow("global-hooks-attachments")] // Fails b/c we cannot obtain Reqnroll OutputHandler in global hooks
+    [DataRow("hooks-skipped")] // Reqnroll terminates execution on first hook failure; Cucumber expects execution of other hooks continue after a hook failure
     [DataRow("unknown-parameter-type")] // Reqnroll does not provide skeletons for missing Parameter Types
     [DataRow("regular-expression")] // Reqnroll does not support optional binding method arguments
     [DataRow("multiple-features-reversed")] // Reqnroll does not have the concept of specifying execution order via run-time parameter
+    [DataRow("test-run-exception")] // Reqnroll does not support a means of simulating a start-up failure
     // These scenarios are from the CCK, but Reqnroll cannot provide a compliant implementation. This is usually the result of differences in behavior or support of Gherkin features.
     // When these scenarios are run, expect them to fail.
     public void NonCompliantCCKScenarios(string testName)
