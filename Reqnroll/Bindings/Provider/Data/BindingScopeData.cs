@@ -6,4 +6,5 @@ public class BindingScopeData
     public string Tag { get; set; }
     public string FeatureTitle { get; set; }
     public string ScenarioTitle { get; set; }
+    public string Error { get; set; }
 }

@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Cucumber.TagExpressions" Version="8.1.0" />
     <PackageReference Include="Gherkin" Version="35.0.0" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
     <PackageReference Include="Cucumber.Messages" Version="30.1.0" />

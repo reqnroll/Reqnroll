@@ -1,8 +1,8 @@
-﻿using Reqnroll.Bindings.Discovery;
+using Cucumber.TagExpressions;
+using Reqnroll.Bindings.Discovery;
 using Reqnroll.Bindings.Provider.Data;
 using Reqnroll.Bindings.Reflection;
 using Reqnroll.BoDi;
-using Reqnroll.CommonModels;
 using Reqnroll.Configuration;
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
@@ -108,6 +108,7 @@ public class BindingProviderService(
                 Type = hookBinding.HookType.ToString(),
                 HookOrder = hookBinding.HookOrder,
                 Scope = GetScope(hookBinding),
+                Error = hookBinding.ErrorMessage
             };
 
             return hook;
@@ -136,13 +137,13 @@ public class BindingProviderService(
             if (!scopedBinding.IsScoped)
                 return null;
 
+            string tagScope = scopedBinding.BindingScope.Tag;
             return new BindingScopeData
             {
-                Tag = scopedBinding.BindingScope.Tag == null
-                    ? null
-                    : "@" + scopedBinding.BindingScope.Tag,
+                Tag = string.IsNullOrEmpty(tagScope) ? null : tagScope,
                 FeatureTitle = scopedBinding.BindingScope.FeatureTitle,
-                ScenarioTitle = scopedBinding.BindingScope.ScenarioTitle
+                ScenarioTitle = scopedBinding.BindingScope.ScenarioTitle,
+                Error = scopedBinding.BindingScope.ErrorMessage
             };
         }
 
