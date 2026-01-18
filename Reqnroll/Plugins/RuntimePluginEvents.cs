@@ -11,6 +11,18 @@ namespace Reqnroll.Plugins
         public event EventHandler<ConfigurationDefaultsEventArgs> ConfigurationDefaults;
         public event EventHandler<CustomizeTestThreadDependenciesEventArgs> CustomizeTestThreadDependencies;
         public event EventHandler<CustomizeFeatureDependenciesEventArgs> CustomizeFeatureDependencies;
+
+        /// <summary>
+        /// Use this event to customise the object container which will subsequently be provided to each Scenario.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// Note that you may not resolve the <see cref="ScenarioContext"/> from the container exposed by this event, attempts
+        /// to do so will raise <see cref="Reqnroll.BoDi.ObjectContainerException"/>.  
+        /// This event is invoked before the scenario context is ready to be resolved.
+        /// If you would like information about the Scenario, please resolve <see cref="ScenarioInfo"/> instead.
+        /// </para>
+        /// <remarks>
         public event EventHandler<CustomizeScenarioDependenciesEventArgs> CustomizeScenarioDependencies;
 
         public void RaiseRegisterGlobalDependencies(ObjectContainer objectContainer)
