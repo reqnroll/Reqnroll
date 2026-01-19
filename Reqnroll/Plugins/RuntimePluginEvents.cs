@@ -13,7 +13,7 @@ namespace Reqnroll.Plugins
         public event EventHandler<CustomizeFeatureDependenciesEventArgs> CustomizeFeatureDependencies;
 
         /// <summary>
-        /// Use this event to customise the object container which will subsequently be provided to each Scenario.
+        /// Use this event to customize the object container which will subsequently be provided to each Scenario.
         /// </summary>
         /// <remarks>
         /// <para>
