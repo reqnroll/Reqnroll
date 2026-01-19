@@ -18,7 +18,7 @@ namespace Reqnroll.Plugins
         /// <remarks>
         /// <para>
         /// Note that you may not resolve the <see cref="ScenarioContext"/> from the container exposed by this event, attempts
-        /// to do so will raise <see cref="Reqnroll.BoDi.ObjectContainerException"/>.  
+        /// to do so will raise <see cref="Reqnroll.BoDi.ObjectContainerException"/>. 
         /// This event is invoked before the scenario context is ready to be resolved.
         /// If you would like information about the Scenario, please resolve <see cref="ScenarioInfo"/> instead.
         /// </para>
