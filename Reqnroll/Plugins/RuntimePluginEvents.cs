@@ -22,7 +22,7 @@ namespace Reqnroll.Plugins
         /// This event is invoked before the scenario context is ready to be resolved.
         /// If you would like information about the Scenario, please resolve <see cref="ScenarioInfo"/> instead.
         /// </para>
-        /// <remarks>
+        /// </remarks>
         public event EventHandler<CustomizeScenarioDependenciesEventArgs> CustomizeScenarioDependencies;
 
         public void RaiseRegisterGlobalDependencies(ObjectContainer objectContainer)
