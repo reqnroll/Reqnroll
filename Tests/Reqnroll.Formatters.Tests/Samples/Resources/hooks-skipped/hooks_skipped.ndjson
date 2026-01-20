@@ -4,11 +4,11 @@
 {"pickle":{"id":"9","uri":"samples/hooks-skipped/hooks-skipped.feature","location":{"line":5,"column":3},"astNodeIds":["1"],"tags":[],"name":"Skip from a step","language":"en","steps":[{"id":"8","text":"a step that skips","type":"Context","astNodeIds":["0"]}]}}
 {"pickle":{"id":"11","uri":"samples/hooks-skipped/hooks-skipped.feature","location":{"line":13,"column":3},"astNodeIds":["4"],"tags":[{"name":"@skip-before","astNodeId":"3"}],"name":"Skip from a Before hook","language":"en","steps":[{"id":"10","text":"a normal step","type":"Context","astNodeIds":["2"]}]}}
 {"pickle":{"id":"13","uri":"samples/hooks-skipped/hooks-skipped.feature","location":{"line":21,"column":3},"astNodeIds":["7"],"tags":[{"name":"@skip-after","astNodeId":"6"}],"name":"Skip from an After hook","language":"en","steps":[{"id":"12","text":"a normal step","type":"Context","astNodeIds":["5"]}]}}
-{"stepDefinition":{"id":"17","pattern":{"type":"CUCUMBER_EXPRESSION","source":"a normal step"},"sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":15}}}}
-{"stepDefinition":{"id":"18","pattern":{"type":"CUCUMBER_EXPRESSION","source":"a step that skips"},"sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":19}}}}
 {"hook":{"id":"14","type":"BEFORE_TEST_CASE","sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":3}}}}
 {"hook":{"id":"15","type":"BEFORE_TEST_CASE","tagExpression":"@skip-before","sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":7}}}}
 {"hook":{"id":"16","type":"BEFORE_TEST_CASE","sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":11}}}}
+{"stepDefinition":{"id":"17","pattern":{"type":"CUCUMBER_EXPRESSION","source":"a normal step"},"sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":15}}}}
+{"stepDefinition":{"id":"18","pattern":{"type":"CUCUMBER_EXPRESSION","source":"a step that skips"},"sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":19}}}}
 {"hook":{"id":"19","type":"AFTER_TEST_CASE","sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":23}}}}
 {"hook":{"id":"20","type":"AFTER_TEST_CASE","tagExpression":"@skip-after","sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":27}}}}
 {"hook":{"id":"21","type":"AFTER_TEST_CASE","sourceReference":{"uri":"samples/hooks-skipped/hooks-skipped.ts","location":{"line":31}}}}

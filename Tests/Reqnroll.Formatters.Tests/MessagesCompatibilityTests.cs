@@ -7,6 +7,7 @@ namespace Reqnroll.Formatters.Tests;
 public class MessagesCompatibilityTests : MessagesCompatibilityTestBase
 {
     [TestMethod]
+    [DataRow("all-statuses")]
     [DataRow("ambiguous")]
     [DataRow("backgrounds")]
     [DataRow("cdata")]

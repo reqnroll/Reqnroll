@@ -1,4 +1,4 @@
-import { After, Before, When } from '@cucumber/fake-cucumber'
+import { After, Before, Given } from '@cucumber/fake-cucumber'
 
 Before({}, function () {
   // no-op
@@ -12,11 +12,11 @@ Before({}, function () {
   // no-op
 })
 
-When('a normal step', function () {
+Given('a normal step', function () {
   // no-op
 })
 
-When('a step that skips', function () {
+Given('a step that skips', function () {
   return 'skipped'
 })
 
