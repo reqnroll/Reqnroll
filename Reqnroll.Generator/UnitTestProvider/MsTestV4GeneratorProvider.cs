@@ -1,6 +1,7 @@
 using Reqnroll.Generator.CodeDom;
 using System.CodeDom;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Reqnroll.Generator.UnitTestProvider;
 
@@ -33,4 +34,24 @@ public class MsTestV4GeneratorProvider(CodeDomHelper codeDomHelper) : MsTestV2Ge
         if (CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.CSharp)
             testAttribute.Arguments.Insert(0, new CodeAttributeArgument(new CodeSnippetExpression($"callerLineNumber: {generationContext.CurrentScenarioDefinition.ScenarioDefinition.Location.Line}")));
     }
+
+    protected override string FindDisplayNameFromTestMethodAttribute(CodeAttributeDeclaration testMethodAttr)
+    {
+        // Find the DisplayName argument value
+        string testMethodDisplayName = null;
+        if (testMethodAttr != null && testMethodAttr.Arguments.Count >= 1)
+        {
+            var displayNameArg = testMethodAttr.Arguments
+                .OfType<CodeAttributeArgument>()
+                .Where(arg => arg.Name == "DisplayName")
+                .FirstOrDefault();
+            if (displayNameArg != null && displayNameArg.Value is CodePrimitiveExpression expr && expr.Value is string str)
+            {
+                testMethodDisplayName = str;
+            }
+        }
+
+        return testMethodDisplayName;
+    }
+
 }

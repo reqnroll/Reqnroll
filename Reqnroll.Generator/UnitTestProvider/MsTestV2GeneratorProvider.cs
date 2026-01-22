@@ -77,19 +77,7 @@ namespace Reqnroll.Generator.UnitTestProvider
                     .OfType<CodeAttributeDeclaration>()
                     .FirstOrDefault(attr => attr.AttributeType.BaseType == TEST_ATTR);
 
-                // Find the DisplayName argument value
-                string testMethodDisplayName = null;
-                if (testMethodAttr != null && testMethodAttr.Arguments.Count >= 1)
-                {
-                    var displayNameArg = testMethodAttr.Arguments
-                        .OfType<CodeAttributeArgument>()
-                        .Where(attrArg => attrArg.Name == "DisplayName")
-                        .FirstOrDefault();
-                    if (displayNameArg != null && displayNameArg.Value is CodePrimitiveExpression expr && expr.Value is string str)
-                    {
-                        testMethodDisplayName = str;
-                    }
-                }
+                string testMethodDisplayName = FindDisplayNameFromTestMethodAttribute(testMethodAttr);
                 if (string.IsNullOrEmpty(testMethodDisplayName))
                 {
                     testMethodDisplayName = testMethod.Name;
@@ -99,6 +87,24 @@ namespace Reqnroll.Generator.UnitTestProvider
                 args.Add(displayNameProp);
             }
             CodeDomHelper.AddAttribute(testMethod, ROW_ATTR, args.ToArray());
+        }
+
+        protected virtual string FindDisplayNameFromTestMethodAttribute(CodeAttributeDeclaration testMethodAttr)
+        {
+            // Find the DisplayName argument value
+            string testMethodDisplayName = null;
+            if (testMethodAttr != null && testMethodAttr.Arguments.Count >= 1)
+            {
+                var displayNameArg = testMethodAttr.Arguments
+                    .OfType<CodeAttributeArgument>()
+                    .FirstOrDefault();
+                if (displayNameArg != null && displayNameArg.Value is CodePrimitiveExpression expr && expr.Value is string str)
+                {
+                    testMethodDisplayName = str;
+                }
+            }
+
+            return testMethodDisplayName;
         }
 
         public override void SetTestClass(TestClassGenerationContext generationContext, string featureTitle, string featureDescription)
