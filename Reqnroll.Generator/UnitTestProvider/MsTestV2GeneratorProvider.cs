@@ -77,11 +77,13 @@ namespace Reqnroll.Generator.UnitTestProvider
                     .OfType<CodeAttributeDeclaration>()
                     .FirstOrDefault(attr => attr.AttributeType.BaseType == TEST_ATTR);
 
+                // Find the DisplayName argument value
                 string testMethodDisplayName = null;
                 if (testMethodAttr != null && testMethodAttr.Arguments.Count >= 1)
                 {
                     var displayNameArg = testMethodAttr.Arguments
                         .OfType<CodeAttributeArgument>()
+                        .Where(attrArg => attrArg.Name == "DisplayName")
                         .FirstOrDefault();
                     if (displayNameArg != null && displayNameArg.Value is CodePrimitiveExpression expr && expr.Value is string str)
                     {

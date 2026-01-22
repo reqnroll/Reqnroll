@@ -3,8 +3,9 @@
 ## Improvements:
 
 ## Bug fixes:
+* Fix: disableFriendlyTestNames doesn't work in Reqnroll 3.3.2 (#1013)
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.2 - 2026-01-14
 

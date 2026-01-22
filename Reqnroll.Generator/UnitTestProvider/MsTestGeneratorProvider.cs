@@ -154,7 +154,7 @@ namespace Reqnroll.Generator.UnitTestProvider
             }
             else
             {
-                CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, friendlyTestName);
+                CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
             }
         }
 
