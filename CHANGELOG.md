@@ -3,6 +3,7 @@
 ## Improvements:
 
 ## Bug fixes:
+* Fix: xUnit VB.NET generates code with async warning (#1009)
 * Fix: disableFriendlyTestNames doesn't work in Reqnroll 3.3.2 (#1013)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi
