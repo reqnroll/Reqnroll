@@ -7,6 +7,7 @@ using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using Xunit;
 
 namespace Reqnroll.RuntimeTests.Formatters.Configuration;
@@ -159,4 +160,41 @@ public class FileBasedConfigurationResolverTests
         result.Should().HaveCount(1);
         result["emptyFormatter"].Should().BeEmpty();
     }
+    [Fact]
+    public void Resolve_Should_Return_Formatter_Of_Multiple_Levels_Of_Settings()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""formatter1"": {
+                        ""config1"": ""setting1"",
+                        ""nestedConfig"": {
+                            ""subConfig1"": ""subSetting1""
+                        }
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result["formatter1"]["config1"].Should().Be("setting1");
+        
+        var nestedConfig = result["formatter1"]["nestedConfig"];
+        nestedConfig.Should().NotBeNull();
+        nestedConfig.Should().BeOfType<Dictionary<string, object>>();
+        var nestedConfigDict = (IDictionary<string, object>)nestedConfig;
+        var subConfig1 = nestedConfigDict["subConfig1"];
+        subConfig1.Should().Be("subSetting1");
+    }
+
+
 }
