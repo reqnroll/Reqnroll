@@ -7,6 +7,7 @@ using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using System.Text.Json;
 using Xunit;
 
@@ -196,5 +197,232 @@ public class FileBasedConfigurationResolverTests
         subConfig1.Should().Be("subSetting1");
     }
 
+
+    [Fact]
+    public void Resolve_Should_Parse_AttachmentHandling_As_Enum_Embed()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""cucumberMessages"": {
+                        ""attachmentHandling"": ""Embed""
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.Embed);
+    }
+
+    [Fact]
+    public void Resolve_Should_Parse_AttachmentHandling_As_Enum_External()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""cucumberMessages"": {
+                        ""attachmentHandling"": ""External""
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.External);
+    }
+
+    [Fact]
+    public void Resolve_Should_Parse_AttachmentHandling_As_Enum_None()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""cucumberMessages"": {
+                        ""attachmentHandling"": ""None""
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.None);
+    }
+
+    [Fact(Skip = "Skip while deciding on proper behavior for invalid configurations")]
+    public void Resolve_Should_Parse_AttachmentHandling_CaseInsensitive()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""cucumberMessages"": {
+                        ""attachmentHandling"": ""embed""
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.Embed);
+    }
+
+    [Fact]
+    public void Resolve_Should_Keep_String_When_AttachmentHandling_Value_Is_Invalid()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""cucumberMessages"": {
+                        ""attachmentHandling"": ""INVALID_VALUE""
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result["cucumberMessages"]["attachmentHandling"].Should().Be("INVALID_VALUE");
+    }
+
+    [Fact]
+    public void Resolve_Should_Parse_AttachmentHandling_In_Nested_Configuration()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""cucumberMessages"": {
+                        ""outputPath"": ""output/results.ndjson"",
+                        ""attachmentHandling"": ""External"",
+                        ""otherSettings"": {
+                            ""enabled"": true
+                        }
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(1);
+        result["cucumberMessages"]["outputPath"].Should().Be("output/results.ndjson");
+        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.External);
+        
+        var otherSettings = result["cucumberMessages"]["otherSettings"];
+        otherSettings.Should().BeOfType<Dictionary<string, object>>();
+        var otherSettingsDict = (IDictionary<string, object>)otherSettings;
+        otherSettingsDict["enabled"].Should().Be(true);
+    }
+
+    [Fact]
+    public void Resolve_Should_Parse_Multiple_Formatters_With_Different_AttachmentHandling()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""formatter1"": {
+                        ""attachmentHandling"": ""Embed""
+                    },
+                    ""formatter2"": {
+                        ""attachmentHandling"": ""External""
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result.Should().HaveCount(2);
+        result["formatter1"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.Embed);
+        result["formatter2"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.External);
+    }
+
+    [Fact]
+    public void Resolve_Should_Parse_Formatter_With_AttachmentOptions()
+    {
+        // Arrange
+        var filePath = "config.json";
+        var fileContent = @"
+            {
+                ""formatters"": {
+                    ""formatter1"": {
+                        ""attachmentHandlingOptions"": {
+                            ""attachmentHandling"": ""External"",
+                            ""externalAttachmentsStoragePath"": ""/path/to/attachments""
+                        }
+                    }
+                }
+            }";
+
+        _jsonLocatorMock.Setup(locator => locator.GetReqnrollJsonFilePath()).Returns(filePath);
+        _fileSystemMock.Setup(fs => fs.FileExists(filePath)).Returns(true);
+        _fileServiceMock.Setup(fs => fs.ReadAllText(filePath)).Returns(fileContent);
+
+        // Act
+        var result = _sut.Resolve();
+
+        // Assert
+        result["formatter1"]["attachmentHandlingOptions"].Should().BeOfType<AttachmentHandlingOptions>();
+        var attachmentOptions = (AttachmentHandlingOptions)result["formatter1"]["attachmentHandlingOptions"];
+        attachmentOptions.AttachmentHandlingOption.Should().Be(AttachmentHandlingOption.External);
+        attachmentOptions.ExternalAttachmentsStoragePath.Should().Be("/path/to/attachments");
+    }
 
 }
