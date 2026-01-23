@@ -3,6 +3,7 @@ using Gherkin.CucumberMessages;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Bindings;
 using Reqnroll.EnvironmentAccess;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
 using System;
 using System.Collections.Generic;
@@ -283,6 +284,37 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             tracker.TestRunStartedId,
             tracker.TestRunHookStartedId,
             Converters.ToTimestamp(tracker.Timestamp));
+    }
+
+    public virtual ExternalAttachment ToExternalAttachment(AttachmentTracker tracker)
+    {
+        var filePath = tracker.FilePath;
+        return new ExternalAttachment(
+            Path.GetFullPath(filePath),
+            FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
+            tracker.TestCaseStepId,
+            tracker.TestCaseStartedId,
+            tracker.TestRunHookStartedId,
+            Converters.ToTimestamp(tracker.Timestamp));
+    }
+
+    public virtual Envelope CreateAttachmentEnvelope(AttachmentTracker tracker, AttachmentHandlingOption attachmentHandlingOption)
+    {
+        Attachment attachment = null;
+        ExternalAttachment externalAttachment = null;
+
+        if (AttachmentHandlingOption.Embed == (attachmentHandlingOption & AttachmentHandlingOption.Embed)) 
+        {
+            attachment = ToAttachment(tracker);
+        }
+        
+        if (AttachmentHandlingOption.External == (attachmentHandlingOption & AttachmentHandlingOption.External))
+        {
+            externalAttachment = ToExternalAttachment(tracker);
+        }
+        
+        var envelope = new Envelope(attachment, externalAttachment, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        return envelope;
     }
 
     public virtual Attachment ToAttachment(OutputMessageTracker tracker)

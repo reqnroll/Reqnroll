@@ -14,16 +14,13 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference
-      Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj"
-      PackAsComponent="true"
-      PrivateAssets="all" />
+    <ProjectReference Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj" PackAsComponent="true" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Gherkin" Version="37.0.1" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
-    <PackageReference Include="Cucumber.Messages" Version="31.1.0" />
+    <PackageReference Include="Cucumber.Messages" Version="32.0.0" />
     <PackageReference Include="Cucumber.HtmlFormatter" Version="22.3.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
@@ -41,9 +38,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <EmbeddedResource
-      Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate"
-      Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
+    <EmbeddedResource Include=".\BindingSkeletons\DefaultSkeletonTemplates.sftemplate" Exclude="bin\**;obj\**;**\*.xproj;packages\**;@(EmbeddedResource)" />
   </ItemGroup>
 
   <!-- Ensure the instrumentation key template isn't included as source. -->
@@ -72,11 +67,7 @@
   </ItemGroup>
 
   <!-- Embeds the Application Insights instrumentation key  -->
-  <Target
-    Name="EmbedAppInsightsInstrumentationKey"
-    Inputs="@(AppInsightsInstrumentationKeyFile)"
-    Outputs="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
-    BeforeTargets="CoreCompile">
+  <Target Name="EmbedAppInsightsInstrumentationKey" Inputs="@(AppInsightsInstrumentationKeyFile)" Outputs="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" BeforeTargets="CoreCompile">
 
     <!-- Read the lines from the template. -->
     <ReadLinesFromFile File="%(AppInsightsInstrumentationKeyFile.Identity)">
@@ -84,11 +75,7 @@
     </ReadLinesFromFile>
 
     <!-- Produce the output file with the key token replaced. -->
-    <WriteLinesToFile
-      File="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)"
-      Lines="@(_AppInsightsInstrumentationKeyFileTemplateLine -> Replace('_InstrumentationKey_', '$(AppInsightsInstrumentationKey)'))"
-      Overwrite="true"
-      Encoding="UTF-8" />
+    <WriteLinesToFile File="$(IntermediateOutputPath)%(AppInsightsInstrumentationKeyFile.Filename).$(AppInsightsInstrumentationKey)%(AppInsightsInstrumentationKeyFile.Extension)" Lines="@(_AppInsightsInstrumentationKeyFileTemplateLine -&gt; Replace('_InstrumentationKey_', '$(AppInsightsInstrumentationKey)'))" Overwrite="true" Encoding="UTF-8" />
 
     <ItemGroup>
       <!-- Include the file in the final build package -->

@@ -1,0 +1,15 @@
+﻿{
+  "$schema": "https://schemas.reqnroll.net/reqnroll-config-latest.json",
+
+  "bindingAssemblies": [
+  ],
+  "formatters": {
+    "message": {
+      "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_externalAttachments_report.ndjson",
+      "attachmentHandlingOptions": {
+        "attachmentHandling": "External",
+        "externalAttachmentStoragePath": "path/to/CucumberMessages/Attachments"
+      }
+    }
+  }
+}

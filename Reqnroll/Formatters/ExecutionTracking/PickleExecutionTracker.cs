@@ -8,6 +8,7 @@ using System.Linq;
 using Reqnroll.Bindings;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.Formatters.ExecutionTracking;
 
@@ -78,6 +79,8 @@ public class PickleExecutionTracker : IPickleExecutionTracker
                 await _publisher.PublishAsync(message);
             }
         }
+
+        public AttachmentHandlingOption AggregateAttachmentHandlingOption => _publisher.AggregateAttachmentHandlingOption;
 
         private async Task FlushBuffer()
         {

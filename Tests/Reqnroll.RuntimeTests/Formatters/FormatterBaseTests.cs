@@ -21,7 +21,7 @@ public class FormatterBaseTests
     {
         public bool LaunchInnerCalled = false;
         public IDictionary<string, object> LaunchInnerConfig = null!;
-        public Action<bool> LaunchInnerCallback = null!;
+        public Action<bool, AttachmentHandlingOption> LaunchInnerCallback = null!;
         public bool ConsumeAndFormatMessagesCalled = false;
         public CancellationToken? ConsumedToken;
         public List<Envelope> ConsumedMessages = new();
@@ -32,14 +32,14 @@ public class FormatterBaseTests
         public TestFormatter(IFormattersConfigurationProvider config, IFormatterLog logger, string name)
             : base(config, logger, name) { }
 
-        public override void LaunchInner(IDictionary<string, object> formatterConfig, Action<bool> onAfterInitialization)
+        public override void LaunchInner(IDictionary<string, object> formatterConfig, Action<bool, AttachmentHandlingOption> onAfterInitialization)
         {
             LaunchInnerCalled = true;
             LaunchInnerConfig = formatterConfig;
             LaunchInnerCallback = onAfterInitialization;
             if (CompleteWriterOnLaunchInner)
                 PostedMessages.Writer.Complete();
-            onAfterInitialization(true);
+            onAfterInitialization(true, AttachmentHandlingOption.Embed);
         }
 
         protected override async Task ConsumeAndFormatMessagesBackgroundTask(CancellationToken cancellationToken)
@@ -75,7 +75,7 @@ public class FormatterBaseTests
         _configMock.Setup(c => c.Enabled).Returns(false);
         _sut.LaunchFormatter(_brokerMock.Object);
         _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains("disabled via configuration"))), Times.Once);
-        _brokerMock.Verify(b => b.FormatterInitialized(_sut, false), Times.Once);
+        _brokerMock.Verify(b => b.FormatterInitialized(_sut, false, AttachmentHandlingOption.Embed), Times.Once);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class FormatterBaseTests
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns((IDictionary<string, object>)null!);
         _sut.LaunchFormatter(_brokerMock.Object);
         _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains("disabled via configuration"))), Times.Once);
-        _brokerMock.Verify(b => b.FormatterInitialized(_sut, false), Times.Once);
+        _brokerMock.Verify(b => b.FormatterInitialized(_sut, false, AttachmentHandlingOption.Embed), Times.Once);
     }
 
     [Fact]
@@ -150,7 +150,7 @@ public class FormatterBaseTests
         _sut.LaunchInnerConfig.Should().NotBeNull();
         _sut.LaunchInnerConfig.Should().BeEmpty();
         _sut.LaunchInnerCallback.Should().NotBeNull();
-        _brokerMock.Verify(b => b.FormatterInitialized(_sut, true), Times.Once);
+        _brokerMock.Verify(b => b.FormatterInitialized(_sut, true, AttachmentHandlingOption.Embed), Times.Once);
 
     }
 }

@@ -1,6 +1,8 @@
 ﻿using Io.Cucumber.Messages.Types;
 using Reqnroll.Analytics;
+using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
@@ -27,7 +29,8 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
     private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeFormatters = new();
-
+    private List<AttachmentHandlingOption> _activeFormattersAttachmentHandlingOptions = new();
+    private AttachmentHandlingOption _aggregatedAttachmentHandlingOptions;
 
     public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters, IAnalyticsRuntimeTelemetryService telemetryService)
     {
@@ -45,10 +48,13 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     }
 
     // This method is called by the sinks during formatter LaunchFormatter().
-    public void FormatterInitialized(ICucumberMessageFormatter formatter, bool enabled)
+    public void FormatterInitialized(ICucumberMessageFormatter formatter, bool enabled, AttachmentHandlingOption attachmentHandlingOption)
     {
         if (enabled)
+        {
             _activeFormatters.TryAdd(formatter.Name, formatter);
+            _activeFormattersAttachmentHandlingOptions.Add(attachmentHandlingOption);
+        }
 
         Interlocked.Increment(ref _numberOfFormattersInitialized);
         CheckInitializationStatus();
@@ -56,12 +62,34 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     public bool IsEnabled => HaveAllFormattersRegisteredAndInitialized() && _activeFormatters.Count > 0;
 
+    public AttachmentHandlingOption AggregateAttachmentHandlingOption => _aggregatedAttachmentHandlingOptions;
+    public AttachmentHandlingOption AggregateAttachmentHandlingOptions()
+    {
+        AttachmentHandlingOption aggregateOption;
+        if (_activeFormattersAttachmentHandlingOptions.Count > 0)
+        {
+            aggregateOption = _activeFormattersAttachmentHandlingOptions[0];
+            for (int i = 1; i < _activeFormattersAttachmentHandlingOptions.Count; i++)
+            {
+                aggregateOption |= _activeFormattersAttachmentHandlingOptions[i];
+            }
+        }
+        else
+        {
+            aggregateOption = AttachmentHandlingOption.Embed;
+        }
+
+        _logger.WriteMessage($"DEBUG: Formatters - Broker: Aggregated AttachmentHandlingOption is: {aggregateOption}");
+        return aggregateOption;
+    }
+
     private void CheckInitializationStatus()
     {
         // If all known formatters have registered 
         // The system is enabled if we have at least one registered formatter that is IsEnabled
         if (HaveAllFormattersRegisteredAndInitialized())
         {
+            _aggregatedAttachmentHandlingOptions = AggregateAttachmentHandlingOptions();
             SendTelemetryEvents();
             _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
         }

@@ -19,6 +19,7 @@ using Xunit;
 using HookType = Reqnroll.Bindings.HookType;
 using Reqnroll.Formatters.PubSub;
 using System.Threading.Tasks;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.RuntimeTests.Formatters.ExecutionTracking;
 
@@ -44,6 +45,7 @@ public class PickleExecutionTrackerTests
         _mockIdGenerator = new Mock<IIdGenerator>();
         _mockIdGenerator.Setup(x => x.GetNewId()).Returns("test-id");
         _mockPublisher = new Mock<IMessagePublisher>();
+        _mockPublisher.Setup(x => x.AggregateAttachmentHandlingOption).Returns(AttachmentHandlingOption.Embed);
         _mockMessageFactory = new Mock<ICucumberMessageFactory>();
 
         IStepTrackerFactory stepTrackerFactory = new StepTrackerFactory(_mockMessageFactory.Object, _mockPublisher.Object, _mockIdGenerator.Object);
@@ -91,6 +93,10 @@ public class PickleExecutionTrackerTests
         _mockMessageFactory
             .Setup(m => m.ToAttachment(It.IsAny<OutputMessageTracker>()))
             .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1)));
+
+        _mockMessageFactory
+            .Setup(m => m.CreateAttachmentEnvelope(It.IsAny<AttachmentTracker>(), It.IsAny<AttachmentHandlingOption>()))
+            .Returns(Envelope.Create(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1))));
 
         _stepDefinitionsByMethodSignature.TryAdd(_mockHookBinding.Object, "hook-id");
     }
@@ -318,7 +324,7 @@ public class PickleExecutionTrackerTests
         // Act
         await tracker.ProcessEvent(attachmentEvent);
         // Assert
-        _mockMessageFactory.Verify(m => m.ToAttachment(It.IsAny<AttachmentTracker>()), Times.Once);
+        _mockMessageFactory.Verify(m => m.CreateAttachmentEnvelope(It.IsAny<AttachmentTracker>(), It.IsAny<AttachmentHandlingOption>()), Times.Once);
     }
 
     [Fact]

@@ -6,6 +6,7 @@ using Xunit;
 using Io.Cucumber.Messages.Types;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Formatters;
+using Reqnroll.Formatters.Configuration;
 
 namespace Reqnroll.RuntimeTests.Formatters.PubSub;
 
@@ -33,11 +34,11 @@ public class CucumberMessageBrokerTests
     {
         // Arrange
         _sut.Initialize();
-        _sut.FormatterInitialized(_formatterMock1.Object, true);
+        _sut.FormatterInitialized(_formatterMock1.Object, true, AttachmentHandlingOption.Embed);
 
         Assert.False(_sut.IsEnabled); // should not be enabled until after both formatters are registered
 
-        _sut.FormatterInitialized(_formatterMock2.Object, true);
+        _sut.FormatterInitialized(_formatterMock2.Object, true, AttachmentHandlingOption.Embed);
 
         // Act
         var result = _sut.IsEnabled;
@@ -64,8 +65,8 @@ public class CucumberMessageBrokerTests
     public async Task PublishAsync_Should_Invoke_PublishAsync_On_All_Formatters()
     {
         // Arrange
-        _sut.FormatterInitialized(_formatterMock1.Object, true);
-        _sut.FormatterInitialized(_formatterMock2.Object, true);
+        _sut.FormatterInitialized(_formatterMock1.Object, true, AttachmentHandlingOption.Embed);
+        _sut.FormatterInitialized(_formatterMock2.Object, true, AttachmentHandlingOption.Embed);
 
         var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
@@ -81,8 +82,8 @@ public class CucumberMessageBrokerTests
     public async Task PublishAsync_Should_Swallow_Exceptions_From_Formatters()
     {
         // Arrange
-        _sut.FormatterInitialized(_formatterMock1.Object, true);
-        _sut.FormatterInitialized(_formatterMock2.Object, true);
+        _sut.FormatterInitialized(_formatterMock1.Object, true, AttachmentHandlingOption.Embed);
+        _sut.FormatterInitialized(_formatterMock2.Object, true, AttachmentHandlingOption.Embed);
 
         var message = Envelope.Create(new TestRunStarted(new Timestamp(1, 0), "testStart"));
 
