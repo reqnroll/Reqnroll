@@ -140,6 +140,9 @@
             "outputFilePath": {
               "type": "string",
               "description": "File path where the HTML report will be output."
+            },
+            "attachmentHandlingOptions": {
+              "$ref": "#/definitions/FormatterAttachmentHandlingOptions"
             }
           },
           "additionalProperties": true
@@ -151,6 +154,9 @@
             "outputFilePath": {
               "type": "string",
               "description": "File path where the message ndjson output will be saved."
+            },
+            "attachmentHandlingOptions": {
+              "$ref": "#/definitions/FormatterAttachmentHandlingOptions"
             }
           },
           "additionalProperties": true
@@ -318,6 +324,24 @@
       "properties": {
         "connectorPath": {
           "description": "A file path for a custom binding connector. The setting might contain environment variable references in %ENV_VAR% format. If a relative path is specified, the default connector folder will be used as a base folder.",
+          "type": "string"
+        }
+      }
+    },
+
+    "FormatterAttachmentHandlingOptions": {
+      "description": "Settings for attachment handling in formatters.",
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "attachmentHandling": {
+          "description": "Specifies how attachments will be reported.",
+          "type": "string",
+          "default": "Embed",
+          "enum": [ "None", "Embed", "External" ]
+        },
+        "externalAttachmentsStoragePath": {
+          "description": "The file system path where external attachments will be stored by the executing test framework. This setting is required if 'attachmentHandling' is set to 'External'.",
           "type": "string"
         }
       }
