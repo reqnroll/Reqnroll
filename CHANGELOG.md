@@ -2,6 +2,7 @@
 
 ## Improvements:
 * Updated Cucumber dependencies to: Gherkin v37.0.1, Cucumber.Messages v31.1.0 and Cucumber.HtmlFormatter v22.3.0. (#984)
+* Updated Cucumber dependency to Cucumber.Messages v32.0.0. This introduces the 'ExternalAttachment' message type (along with configuration options in reqnroll.json) that can be used to include references to external files (e.g. screenshots) in the report. 
 
 ## Bug fixes:
 
