@@ -341,7 +341,7 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
         ResetCucumberMessages("reqnroll_externalAttachments_report");
         EnableCucumberMessages();
         CucumberMessagesAddConfigurationFile("reqnroll_withExternalAttachments.json");
-        SetCucumberMessagesOutputFileName("reqnroll_externalAttachments_report");
+        //SetCucumberMessagesOutputFileName("reqnroll_externalAttachments_report");
         AddFeatureFile("""
                        Feature: Cucumber Messages Smoke External Attachment Test
                          Scenario: Attach External File

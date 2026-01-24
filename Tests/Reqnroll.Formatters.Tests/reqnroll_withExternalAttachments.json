@@ -8,7 +8,7 @@
       "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_externalAttachments_report.ndjson",
       "attachmentHandlingOptions": {
         "attachmentHandling": "External",
-        "externalAttachmentStoragePath": "path/to/CucumberMessages/Attachments"
+        "externalAttachmentsStoragePath": "path/to/CucumberMessages/Attachments"
       }
     }
   }

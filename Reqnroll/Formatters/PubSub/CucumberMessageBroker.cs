@@ -29,8 +29,12 @@ public class CucumberMessageBroker : ICucumberMessageBroker
     // This holds the list of registered and enabled sinks to which messages will be routed.
     // Using a concurrent collection as the sinks may be registering in parallel threads
     private readonly ConcurrentDictionary<string, ICucumberMessageFormatter> _activeFormatters = new();
+
+    // This holds the AttachmentHandlingOptions of the active formatters for aggregation; as the formatters register, their options are added to this list
     private List<AttachmentHandlingOption> _activeFormattersAttachmentHandlingOptions = new();
-    private AttachmentHandlingOption _aggregatedAttachmentHandlingOptions;
+
+    // This holds the aggregated AttachmentHandlingOption for all active formatters
+    private AttachmentHandlingOption _aggregated_AttachmentHandlingOptions = AttachmentHandlingOption.Embed; // Default value when no formatters are active
 
     public CucumberMessageBroker(IFormatterLog formatterLog, IDictionary<string, ICucumberMessageFormatter> containerRegisteredFormatters, IAnalyticsRuntimeTelemetryService telemetryService)
     {
@@ -62,7 +66,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
 
     public bool IsEnabled => HaveAllFormattersRegisteredAndInitialized() && _activeFormatters.Count > 0;
 
-    public AttachmentHandlingOption AggregateAttachmentHandlingOption => _aggregatedAttachmentHandlingOptions;
+    public AttachmentHandlingOption AggregateAttachmentHandlingOption => _aggregated_AttachmentHandlingOptions;
     public AttachmentHandlingOption AggregateAttachmentHandlingOptions()
     {
         AttachmentHandlingOption aggregateOption;
@@ -89,7 +93,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
         // The system is enabled if we have at least one registered formatter that is IsEnabled
         if (HaveAllFormattersRegisteredAndInitialized())
         {
-            _aggregatedAttachmentHandlingOptions = AggregateAttachmentHandlingOptions();
+            _aggregated_AttachmentHandlingOptions = AggregateAttachmentHandlingOptions();
             SendTelemetryEvents();
             _logger.WriteMessage($"DEBUG: Formatters - Broker: Initialization complete. Enabled status is: {IsEnabled}");
         }
@@ -127,7 +131,7 @@ public class CucumberMessageBroker : ICucumberMessageBroker
             }
             catch (System.Exception e)
             {
-                _logger.WriteMessage($"Formatters Broker: Exception thrown by Formatter Plugin {formatter.Name}: {e.Message}");
+                _logger.WriteMessage($"Formatters Broker: Exception thrown by Formatter Plugin {formatter.Name}: {e.Message} {Environment.NewLine}{e.StackTrace}");
             }
         }
     }

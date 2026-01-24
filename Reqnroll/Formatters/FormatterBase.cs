@@ -37,7 +37,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
     public string Name => _pluginName;
     protected AttachmentHandlingOption _attachmentHandlingOption;
     public AttachmentHandlingOption AttachmentHandlingOption => _attachmentHandlingOption;
-    protected string ExternalAttachmentsStoragePath { get; set; } = string.Empty; 
+    public string ExternalAttachmentsStoragePath { get; set; } = string.Empty; 
 
     protected FormatterBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName)
     {
@@ -72,6 +72,8 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
         var options = GetAttachmentHandlingOptionValues(formatterConfiguration);
         _attachmentHandlingOption = options.AttachmentHandlingOption;
         ExternalAttachmentsStoragePath = _configurationProvider.ResolveTemplatePlaceholders(options.ExternalAttachmentsStoragePath);
+        _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} resolved ExternalAttachmentsStoragePath from: '{options.ExternalAttachmentsStoragePath}' to '{ExternalAttachmentsStoragePath}'.");
+        _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} configured with AttachmentHandlingOption: {_attachmentHandlingOption.ToString()} and ExternalAttachmentsStoragePath: '{ExternalAttachmentsStoragePath}'.");
 
         LaunchInner(formatterConfiguration, ReportInitialized);
         _formatterTask = Task.Run(() => ConsumeAndFormatMessagesBackgroundTask(_cancellationTokenSource.Token));
@@ -136,10 +138,12 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
             var path = attachment.Url;
             if (Path.IsPathRooted(path))
             {
+                _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} transforming (rooted) absolute path '{path}' to external attachment storage path.");
                 path = Path.Combine(ExternalAttachmentsStoragePath, Path.GetFileName(path));
             }
             else
             {
+                _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} transforming (relative) path '{path}' to external attachment storage path.");
                 path = Path.Combine(ExternalAttachmentsStoragePath, path);
             }
             var newExternalAttachment = new ExternalAttachment(
