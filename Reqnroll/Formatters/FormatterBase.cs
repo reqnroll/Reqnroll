@@ -81,7 +81,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
 
     public virtual AttachmentHandlingOptions GetAttachmentHandlingOptionValues(IDictionary<string, object> formatterConfiguration)
     {
-        if (formatterConfiguration.TryGetValue("attachmentHandlingOptions", out var options)
+        if (formatterConfiguration.TryGetValue(FormattersConfigurationResolverBase.ATTACHMENT_HANDLING_SECTION, out var options)
             && options is AttachmentHandlingOptions attachmentHandlingOptions)
         {
             _logger.WriteMessage($"DEBUG: Formatters: Formatter plugin: {Name} setting AttachmentHandlingOption to {attachmentHandlingOptions.AttachmentHandlingOption.ToString()} from configuration.");

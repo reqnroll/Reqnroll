@@ -6,9 +6,9 @@
   "formatters": {
     "message": {
       "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_externalAttachments_report.ndjson",
-      "attachmentHandlingOptions": {
-        "attachmentHandling": "External",
-        "externalAttachmentsStoragePath": "path/to/CucumberMessages/Attachments"
+      "attachmentHandling": {
+        "mode": "External",
+        "attachmentsStoragePath": "path/to/CucumberMessages/Attachments"
       }
     }
   }

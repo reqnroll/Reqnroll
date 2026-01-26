@@ -141,7 +141,7 @@
               "type": "string",
               "description": "File path where the HTML report will be output."
             },
-            "attachmentHandlingOptions": {
+            "attachmentHandling": {
               "$ref": "#/definitions/FormatterAttachmentHandlingOptions"
             }
           },
@@ -155,7 +155,7 @@
               "type": "string",
               "description": "File path where the message ndjson output will be saved."
             },
-            "attachmentHandlingOptions": {
+            "attachmentHandling": {
               "$ref": "#/definitions/FormatterAttachmentHandlingOptions"
             }
           },
@@ -334,13 +334,13 @@
       "type": "object",
       "additionalProperties": true,
       "properties": {
-        "attachmentHandling": {
+        "mode": {
           "description": "Specifies how attachments will be reported.",
           "type": "string",
           "default": "Embed",
           "enum": [ "None", "Embed", "External" ]
         },
-        "externalAttachmentsStoragePath": {
+        "attachmentsStoragePath": {
           "description": "The file system path where external attachments will be stored by the executing test framework. This setting is required if 'attachmentHandling' is set to 'External'.",
           "type": "string"
         }

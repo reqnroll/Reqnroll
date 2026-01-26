@@ -8,6 +8,9 @@ namespace Reqnroll.Formatters.Configuration;
 public abstract class FormattersConfigurationResolverBase : IFormattersConfigurationResolverBase
 {
     protected const string FORMATTERS_KEY = "formatters";
+    public const string ATTACHMENT_HANDLING_SECTION = "attachmentHandling";
+    public const string ATTACHMENT_HANDLING_MODE = "mode";
+    public const string ATTACHMENT_EXTERNAL_STORAGE_PATH = "attachmentsStoragePath";
 
     public IDictionary<string, IDictionary<string, object>> Resolve()
     {
@@ -45,7 +48,7 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
     private object GetConfigValue(JsonElement element, string propertyName = null)
     {
         // Check if this property is the AttachmentHandlingOptions section
-        if (propertyName != null && propertyName.Equals("attachmentHandlingOptions", StringComparison.OrdinalIgnoreCase) &&
+        if (propertyName != null && propertyName.Equals(ATTACHMENT_HANDLING_SECTION, StringComparison.OrdinalIgnoreCase) &&
             element.ValueKind == JsonValueKind.Object)
         {
             var dict = GetConfigValue(element) as IDictionary<string, object>;
@@ -53,11 +56,11 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
             {
                 AttachmentHandlingOption attachmentHandlingOption = AttachmentHandlingOption.None;
                 string externalPath = null;
-                if (dict.TryGetValue("attachmentHandling", out var handlingObj) && handlingObj is AttachmentHandlingOption)
+                if (dict.TryGetValue(ATTACHMENT_HANDLING_MODE, out var handlingObj) && handlingObj is AttachmentHandlingOption)
                 {
                     attachmentHandlingOption = (AttachmentHandlingOption)handlingObj;
                 }
-                if (dict.TryGetValue("externalAttachmentsStoragePath", out var pathObj) && pathObj is string pathStr)
+                if (dict.TryGetValue(ATTACHMENT_EXTERNAL_STORAGE_PATH, out var pathObj) && pathObj is string pathStr)
                 {
                     externalPath = pathStr;
                 }
@@ -89,7 +92,7 @@ public abstract class FormattersConfigurationResolverBase : IFormattersConfigura
     {
         enumValue = null;
 
-        if (propertyName.Equals("attachmentHandling", StringComparison.OrdinalIgnoreCase) &&
+        if (propertyName.Equals(ATTACHMENT_HANDLING_MODE, StringComparison.OrdinalIgnoreCase) &&
             element.ValueKind == JsonValueKind.String)
         {
             var stringValue = element.GetString();

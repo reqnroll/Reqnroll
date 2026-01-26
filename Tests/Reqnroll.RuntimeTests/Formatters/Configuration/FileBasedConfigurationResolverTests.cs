@@ -199,7 +199,7 @@ public class FileBasedConfigurationResolverTests
 
 
     [Fact]
-    public void Resolve_Should_Parse_AttachmentHandling_As_Enum_Embed()
+    public void Resolve_Should_Parse_AttachmentHandling_Mode_As_Enum_Embed()
     {
         // Arrange
         var filePath = "config.json";
@@ -207,7 +207,7 @@ public class FileBasedConfigurationResolverTests
             {
                 ""formatters"": {
                     ""cucumberMessages"": {
-                        ""attachmentHandling"": ""Embed""
+                        ""mode"": ""Embed""
                     }
                 }
             }";
@@ -221,11 +221,11 @@ public class FileBasedConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(1);
-        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.Embed);
+        result["cucumberMessages"]["mode"].Should().Be(AttachmentHandlingOption.Embed);
     }
 
     [Fact]
-    public void Resolve_Should_Parse_AttachmentHandling_As_Enum_External()
+    public void Resolve_Should_Parse_AttachmentHandling_Mode_As_Enum_External()
     {
         // Arrange
         var filePath = "config.json";
@@ -233,7 +233,7 @@ public class FileBasedConfigurationResolverTests
             {
                 ""formatters"": {
                     ""cucumberMessages"": {
-                        ""attachmentHandling"": ""External""
+                        ""mode"": ""External""
                     }
                 }
             }";
@@ -247,11 +247,11 @@ public class FileBasedConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(1);
-        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.External);
+        result["cucumberMessages"]["mode"].Should().Be(AttachmentHandlingOption.External);
     }
 
     [Fact]
-    public void Resolve_Should_Parse_AttachmentHandling_As_Enum_None()
+    public void Resolve_Should_Parse_AttachmentHandling_Mode_As_Enum_None()
     {
         // Arrange
         var filePath = "config.json";
@@ -259,7 +259,7 @@ public class FileBasedConfigurationResolverTests
             {
                 ""formatters"": {
                     ""cucumberMessages"": {
-                        ""attachmentHandling"": ""None""
+                        ""mode"": ""None""
                     }
                 }
             }";
@@ -273,11 +273,11 @@ public class FileBasedConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(1);
-        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.None);
+        result["cucumberMessages"]["mode"].Should().Be(AttachmentHandlingOption.None);
     }
 
     [Fact(Skip = "Skip while deciding on proper behavior for invalid configurations")]
-    public void Resolve_Should_Parse_AttachmentHandling_CaseInsensitive()
+    public void Resolve_Should_Parse_AttachmentHandling_Mode_CaseInsensitive()
     {
         // Arrange
         var filePath = "config.json";
@@ -285,7 +285,7 @@ public class FileBasedConfigurationResolverTests
             {
                 ""formatters"": {
                     ""cucumberMessages"": {
-                        ""attachmentHandling"": ""embed""
+                        ""mode"": ""embed""
                     }
                 }
             }";
@@ -299,11 +299,11 @@ public class FileBasedConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(1);
-        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.Embed);
+        result["cucumberMessages"]["mode"].Should().Be(AttachmentHandlingOption.Embed);
     }
 
     [Fact]
-    public void Resolve_Should_Keep_String_When_AttachmentHandling_Value_Is_Invalid()
+    public void Resolve_Should_Keep_String_When_AttachmentHandling_Mode_Value_Is_Invalid()
     {
         // Arrange
         var filePath = "config.json";
@@ -311,7 +311,7 @@ public class FileBasedConfigurationResolverTests
             {
                 ""formatters"": {
                     ""cucumberMessages"": {
-                        ""attachmentHandling"": ""INVALID_VALUE""
+                        ""mode"": ""INVALID_VALUE""
                     }
                 }
             }";
@@ -325,11 +325,11 @@ public class FileBasedConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(1);
-        result["cucumberMessages"]["attachmentHandling"].Should().Be("INVALID_VALUE");
+        result["cucumberMessages"]["mode"].Should().Be("INVALID_VALUE");
     }
 
     [Fact]
-    public void Resolve_Should_Parse_AttachmentHandling_In_Nested_Configuration()
+    public void Resolve_Should_Parse_AttachmentHandling_Mode_In_Nested_Configuration()
     {
         // Arrange
         var filePath = "config.json";
@@ -338,7 +338,7 @@ public class FileBasedConfigurationResolverTests
                 ""formatters"": {
                     ""cucumberMessages"": {
                         ""outputPath"": ""output/results.ndjson"",
-                        ""attachmentHandling"": ""External"",
+                        ""mode"": ""External"",
                         ""otherSettings"": {
                             ""enabled"": true
                         }
@@ -356,7 +356,7 @@ public class FileBasedConfigurationResolverTests
         // Assert
         result.Should().HaveCount(1);
         result["cucumberMessages"]["outputPath"].Should().Be("output/results.ndjson");
-        result["cucumberMessages"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.External);
+        result["cucumberMessages"]["mode"].Should().Be(AttachmentHandlingOption.External);
         
         var otherSettings = result["cucumberMessages"]["otherSettings"];
         otherSettings.Should().BeOfType<Dictionary<string, object>>();
@@ -373,10 +373,10 @@ public class FileBasedConfigurationResolverTests
             {
                 ""formatters"": {
                     ""formatter1"": {
-                        ""attachmentHandling"": ""Embed""
+                        ""mode"": ""Embed""
                     },
                     ""formatter2"": {
-                        ""attachmentHandling"": ""External""
+                        ""mode"": ""External""
                     }
                 }
             }";
@@ -390,8 +390,8 @@ public class FileBasedConfigurationResolverTests
 
         // Assert
         result.Should().HaveCount(2);
-        result["formatter1"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.Embed);
-        result["formatter2"]["attachmentHandling"].Should().Be(AttachmentHandlingOption.External);
+        result["formatter1"]["mode"].Should().Be(AttachmentHandlingOption.Embed);
+        result["formatter2"]["mode"].Should().Be(AttachmentHandlingOption.External);
     }
 
     [Fact]
@@ -403,9 +403,9 @@ public class FileBasedConfigurationResolverTests
             {
                 ""formatters"": {
                     ""formatter1"": {
-                        ""attachmentHandlingOptions"": {
-                            ""attachmentHandling"": ""External"",
-                            ""externalAttachmentsStoragePath"": ""/path/to/attachments""
+                        ""attachmentHandling"": {
+                            ""mode"": ""External"",
+                            ""attachmentsStoragePath"": ""/path/to/attachments""
                         }
                     }
                 }
@@ -419,8 +419,8 @@ public class FileBasedConfigurationResolverTests
         var result = _sut.Resolve();
 
         // Assert
-        result["formatter1"]["attachmentHandlingOptions"].Should().BeOfType<AttachmentHandlingOptions>();
-        var attachmentOptions = (AttachmentHandlingOptions)result["formatter1"]["attachmentHandlingOptions"];
+        result["formatter1"]["attachmentHandling"].Should().BeOfType<AttachmentHandlingOptions>();
+        var attachmentOptions = (AttachmentHandlingOptions)result["formatter1"]["attachmentHandling"];
         attachmentOptions.AttachmentHandlingOption.Should().Be(AttachmentHandlingOption.External);
         attachmentOptions.ExternalAttachmentsStoragePath.Should().Be("/path/to/attachments");
     }
