@@ -179,7 +179,7 @@ public class FormatterBaseTests
     {
         // Arrange
         var attachmentHandlingOptions = new AttachmentHandlingOptions(AttachmentHandlingOption.External, "/path/to/attachments");
-        var config = new Dictionary<string, object> { { "attachmentHandlingOptions", attachmentHandlingOptions } };
+        var config = new Dictionary<string, object> { { "attachmentHandling", attachmentHandlingOptions } };
 
         // Act
         var result = _sut.GetAttachmentHandlingOptionValues(config);
@@ -194,7 +194,7 @@ public class FormatterBaseTests
     {
         // Arrange
         var attachmentHandlingOptions = new AttachmentHandlingOptions(AttachmentHandlingOption.External, "/output/attachments");
-        var config = new Dictionary<string, object> { { "attachmentHandlingOptions", attachmentHandlingOptions } };
+        var config = new Dictionary<string, object> { { "attachmentHandling", attachmentHandlingOptions } };
         _configMock.Setup(c => c.Enabled).Returns(true);
         _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(config);
         _configMock.Setup(c => c.ResolveTemplatePlaceholders("/output/attachments")).Returns("/resolved/path");
