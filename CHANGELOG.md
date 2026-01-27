@@ -2,6 +2,14 @@
 
 ## Improvements:
 
+## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.3.3 - 2026-01-27
+
+## Improvements:
+
 * Improve binding discovery so that the discovery can continue even if the attributes of a type fail to load (#1006)
 
 ## Bug fixes:
