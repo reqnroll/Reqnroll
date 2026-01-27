@@ -83,6 +83,7 @@ namespace Reqnroll.Bindings.Discovery
             catch (Exception ex)
             {
                 _bindingSourceProcessor.RegisterTypeLoadError($"Could not load attributes for type '{type.FullName}': {ex}");
+                // When the type attributes cannot be loaded, the type cannot be processed anyway so we can return with false here to avoid reporting further errors.
                 return false;
             }
             var filteredAttributes = reflectedAttributes.Where(attr => _bindingSourceProcessor.CanProcessTypeAttribute(attr.GetType().FullName));
