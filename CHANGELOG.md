@@ -2,9 +2,11 @@
 
 ## Improvements:
 
+* Improve binding discovery so that the discovery can continue even if the attributes of a type fail to load (#1006)
+
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.2 - 2026-01-14
 
