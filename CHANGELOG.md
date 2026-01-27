@@ -5,6 +5,8 @@
 * Improve binding discovery so that the discovery can continue even if the attributes of a type fail to load (#1006)
 
 ## Bug fixes:
+* Fix: xUnit VB.NET generates code with async warning (#1009)
+* Fix: disableFriendlyTestNames doesn't work in Reqnroll 3.3.2 (#1013)
 
 *Contributors of this release (in alphabetical order):* @clrudolphi
 
