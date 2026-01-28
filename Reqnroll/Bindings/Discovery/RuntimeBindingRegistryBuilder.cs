@@ -72,8 +72,21 @@ namespace Reqnroll.Bindings.Discovery
         //internal - for testing
         internal bool BuildBindingsFromType(Type type)
         {
-// ReSharper disable PossibleMultipleEnumeration
-            var filteredAttributes = type.GetCustomAttributes(typeof(Attribute), true).Cast<Attribute>().Where(attr => _bindingSourceProcessor.CanProcessTypeAttribute(attr.GetType().FullName));
+            // ReSharper disable PossibleMultipleEnumeration
+            // catch type attribute loading errors and continue;
+            // if we cannot load an attribute, it must be because it comes from an assembly that is not relevant for Reqnroll bindings
+            var reflectedAttributes = new List<Attribute>();
+            try 
+            { 
+                reflectedAttributes.AddRange(type.GetCustomAttributes(true).Cast<Attribute>());
+            }
+            catch (Exception ex)
+            {
+                _bindingSourceProcessor.RegisterTypeLoadError($"Could not load attributes for type '{type.FullName}': {ex}");
+                // When the type attributes cannot be loaded, the type cannot be processed anyway so we can return with false here to avoid reporting further errors.
+                return false;
+            }
+            var filteredAttributes = reflectedAttributes.Where(attr => _bindingSourceProcessor.CanProcessTypeAttribute(attr.GetType().FullName));
             if (!_bindingSourceProcessor.PreFilterType(filteredAttributes.Select(attr => attr.GetType().FullName)))
                 return false;
 
@@ -94,12 +107,22 @@ namespace Reqnroll.Bindings.Discovery
 
         private BindingSourceMethod CreateBindingSourceMethod(MethodInfo methodDefinition)
         {
+            // catch method attribute loading errors and continue;
+            var reflectedAttributes = new List<Attribute>();
+            try
+            {
+                reflectedAttributes.AddRange(methodDefinition.GetCustomAttributes(true).Cast<Attribute>());
+            }
+            catch (Exception ex)
+            {
+                _bindingSourceProcessor.RegisterTypeLoadError($"Could not load attributes for method '{methodDefinition.DeclaringType?.FullName}.{methodDefinition.Name}': {ex}");
+            }
             return new BindingSourceMethod
                        {
                            BindingMethod = new RuntimeBindingMethod(methodDefinition),
                            IsPublic = methodDefinition.IsPublic,
                            IsStatic = methodDefinition.IsStatic,
-                           Attributes = GetAttributes(methodDefinition.GetCustomAttributes(true).Cast<Attribute>().Where(attr => _bindingSourceProcessor.CanProcessTypeAttribute(attr.GetType().FullName)))
+                           Attributes = GetAttributes(reflectedAttributes.Where(attr => _bindingSourceProcessor.CanProcessTypeAttribute(attr.GetType().FullName)))
                        };
         }
 

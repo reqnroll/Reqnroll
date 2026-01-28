@@ -1,6 +1,7 @@
 using Reqnroll.Generator.CodeDom;
 using System.CodeDom;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace Reqnroll.Generator.UnitTestProvider;
 
@@ -19,13 +20,38 @@ public class MsTestV4GeneratorProvider(CodeDomHelper codeDomHelper) : MsTestV2Ge
     {
         // V4 - the DisplayName property must be explicitly set
 
+        CodeAttributeDeclaration testAttribute;
         if (generationContext.DisableFriendlyTestNames)
         {
-            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
+            testAttribute = CodeDomHelper.AddAttribute(testMethod, TEST_ATTR);
         }
         else
         {
-            CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
+            testAttribute = CodeDomHelper.AddAttribute(testMethod, TEST_ATTR, new CodeAttributeArgument("DisplayName", new CodePrimitiveExpression(friendlyTestName)));
         }
+
+        // we only support line number in C#
+        if (CodeDomHelper.TargetLanguage == CodeDomProviderLanguage.CSharp)
+            testAttribute.Arguments.Insert(0, new CodeAttributeArgument(new CodeSnippetExpression($"callerLineNumber: {generationContext.CurrentScenarioDefinition.ScenarioDefinition.Location.Line}")));
     }
+
+    protected override string FindDisplayNameFromTestMethodAttribute(CodeAttributeDeclaration testMethodAttr)
+    {
+        // Find the DisplayName argument value
+        string testMethodDisplayName = null;
+        if (testMethodAttr != null && testMethodAttr.Arguments.Count >= 1)
+        {
+            var displayNameArg = testMethodAttr.Arguments
+                .OfType<CodeAttributeArgument>()
+                .Where(arg => arg.Name == "DisplayName")
+                .FirstOrDefault();
+            if (displayNameArg != null && displayNameArg.Value is CodePrimitiveExpression expr && expr.Value is string str)
+            {
+                testMethodDisplayName = str;
+            }
+        }
+
+        return testMethodDisplayName;
+    }
+
 }
