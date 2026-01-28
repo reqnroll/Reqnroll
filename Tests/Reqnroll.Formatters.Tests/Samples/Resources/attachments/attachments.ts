@@ -1,9 +1,12 @@
 import { When } from '@cucumber/fake-cucumber'
 import fs from 'node:fs'
 
-When('the string {string} is attached as {string}', async function (text: string, mediaType: string) {
-  await this.attach(text, mediaType)
-})
+When(
+  'the string {string} is attached as {string}',
+  async function (text: string, mediaType: string) {
+    await this.attach(text, mediaType)
+  }
+)
 
 When('the string {string} is logged', async function (text: string) {
   await this.log(text)
@@ -15,13 +18,16 @@ When('text with ANSI escapes is logged', async function () {
   )
 })
 
-When('the following string is attached as {string}:', async function (mediaType: string, text: string) {
-  await this.attach(text, mediaType)
-})
+When(
+  'the following string is attached as {string}:',
+  async function (mediaType: string, text: string) {
+    await this.attach(text, mediaType)
+  }
+)
 
 When(
   'an array with {int} bytes is attached as {string}',
-    async function (size: number, mediaType: string) {
+  async function (size: number, mediaType: string) {
     const data = [...Array(size).keys()]
     const buffer = Buffer.from(data)
     await this.attach(buffer, mediaType)
@@ -29,12 +35,23 @@ When(
 )
 
 When('a PDF document is attached and renamed', async function () {
-  await this.attach(fs.createReadStream(__dirname + '/document.pdf'), {
+  await this.attach(
+    fs.createReadStream(import.meta.dirname + '/document.pdf'),
+    {
       mediaType: 'application/pdf',
-      fileName: 'renamed.pdf'
-  })
+      fileName: 'renamed.pdf',
+    }
+  )
 })
 
 When('a link to {string} is attached', async function (uri: string) {
-    await this.link(uri)
+  await this.link(uri)
 })
+
+When(
+  'the string {string} is attached as {string} before a failure',
+  async function (text: string, mediaType: string) {
+    await this.attach(text, mediaType)
+    throw new Error('whoops')
+  }
+)

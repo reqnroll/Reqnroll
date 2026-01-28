@@ -39,6 +39,6 @@ public class AttachmentTracker
     {
         FilePath = attachmentAddedEvent.FilePath;
         Timestamp = attachmentAddedEvent.Timestamp;
-        await _publisher.PublishAsync(Envelope.Create(_messageFactory.ToAttachment(this)));
+        await _publisher.PublishAsync(_messageFactory.CreateAttachmentEnvelope(this, _publisher.AggregateAttachmentHandlingOption));
     }
 }
