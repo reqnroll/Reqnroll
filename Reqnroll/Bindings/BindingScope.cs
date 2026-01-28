@@ -1,38 +1,30 @@
 using System;
 using System.Linq;
+using Cucumber.TagExpressions;
+using Reqnroll.Bindings.Discovery;
 
 namespace Reqnroll.Bindings
 {
-    public class BindingScope
+    public class BindingScope(ITagExpression tagExpression, string featureTitle, string scenarioTitle)
     {
-        public string Tag { get; private set; }
-        public string FeatureTitle { get; private set; }
-        public string ScenarioTitle { get; private set; }
+        public string Tag => tagExpression is ReqnrollTagExpression reqnrollTagExpression ? reqnrollTagExpression.TagExpressionText : tagExpression.ToString();
+        public ITagExpression TagExpression => tagExpression;
 
-        public BindingScope(string tag, string featureTitle, string scenarioTitle)
-        {
-            Tag = RemoveLeadingAt(tag);
-            FeatureTitle = featureTitle;
-            ScenarioTitle = scenarioTitle;
-        }
+        public string FeatureTitle { get; } = featureTitle;
 
-        private string RemoveLeadingAt(string tag)
-        {
-            if (tag == null || !tag.StartsWith("@"))
-                return tag;
-
-            return tag.Substring(1); // remove leading "@"
-        }
+        public string ScenarioTitle { get; } = scenarioTitle;
+        public bool IsValid => ErrorMessage == null;
+        public string ErrorMessage => tagExpression is InvalidTagExpression ? tagExpression.ToString() : null;
 
         public bool Match(StepContext stepContext, out int scopeMatches)
         {
             scopeMatches = 0;
 
-            var tags = stepContext.Tags;
-
-            if (Tag != null)
+            if (tagExpression is not NullExpression)
             {
-                if (!tags.Contains(Tag))
+                var tags = stepContext.Tags.Select(t => "@" + t).ToList();
+
+                if (!tagExpression.Evaluate(tags))    
                     return false;
 
                 scopeMatches++;
@@ -57,14 +49,14 @@ namespace Reqnroll.Bindings
 
         protected bool Equals(BindingScope other)
         {
-            return string.Equals(Tag, other.Tag) && string.Equals(FeatureTitle, other.FeatureTitle) && string.Equals(ScenarioTitle, other.ScenarioTitle);
+            return string.Equals(Tag, other.Tag) && string.Equals(FeatureTitle, other.FeatureTitle) && string.Equals(ScenarioTitle, other.ScenarioTitle) && string.Equals(ErrorMessage, other.ErrorMessage);
         }
 
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != this.GetType()) return false;
+            if (obj.GetType() != GetType()) return false;
             return Equals((BindingScope) obj);
         }
 
@@ -75,6 +67,7 @@ namespace Reqnroll.Bindings
                 var hashCode = (Tag != null ? Tag.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (FeatureTitle != null ? FeatureTitle.GetHashCode() : 0);
                 hashCode = (hashCode*397) ^ (ScenarioTitle != null ? ScenarioTitle.GetHashCode() : 0);
+                hashCode = (hashCode*397) ^ (ErrorMessage != null ? ErrorMessage.GetHashCode() : 0);
                 return hashCode;
             }
         }

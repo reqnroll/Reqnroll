@@ -9,16 +9,20 @@ namespace Reqnroll.Bindings
         public BindingScope BindingScope { get; private set; }
         public bool IsScoped { get { return BindingScope != null; } }
 
-        public HookBinding(IBindingMethod bindingMethod, HookType hookType, BindingScope bindingScope, int hookOrder) : base(bindingMethod)
+        public bool IsValid => ErrorMessage == null;
+        public string ErrorMessage { get; }
+
+        public HookBinding(IBindingMethod bindingMethod, HookType hookType, BindingScope bindingScope, int hookOrder, string errorMessage = null) : base(bindingMethod)
         {
             HookOrder = hookOrder;
             HookType = hookType;
             BindingScope = bindingScope;
+            ErrorMessage = errorMessage;
         }
 
         protected bool Equals(HookBinding other)
         {
-            return HookType == other.HookType && HookOrder == other.HookOrder && Equals(BindingScope, other.BindingScope) && base.Equals(other);
+            return HookType == other.HookType && HookOrder == other.HookOrder && Equals(BindingScope, other.BindingScope) && string.Equals(ErrorMessage, other.ErrorMessage) && base.Equals(other);
         }
 
         public override bool Equals(object obj)
@@ -36,6 +40,7 @@ namespace Reqnroll.Bindings
                 var hashCode = (int) HookType;
                 hashCode = (hashCode*397) ^ HookOrder;
                 hashCode = (hashCode*397) ^ (BindingScope != null ? BindingScope.GetHashCode() : 0);
+                hashCode = (hashCode * 397) ^ (ErrorMessage != null ? ErrorMessage.GetHashCode() : 0);
                 return hashCode;
             }
         }

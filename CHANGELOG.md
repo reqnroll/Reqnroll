@@ -1,10 +1,12 @@
 # [vNext]
 
 ## Improvements:
+* Tag Expressions: step definition scopes and hooks may now use tag expressions (such as `@db and not @slow`) (#911)
 
 ## Bug fixes:
 
 *Contributors of this release (in alphabetical order):* 
+@clrudolphi
 
 # v3.3.3 - 2026-01-27
 
