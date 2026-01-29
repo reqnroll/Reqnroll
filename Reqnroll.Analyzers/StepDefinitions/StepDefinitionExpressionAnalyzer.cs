@@ -8,41 +8,41 @@ namespace Reqnroll.Analyzers.StepDefinitions;
 using static DiagnosticResources;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public sealed class StepTextAnalyzer : DiagnosticAnalyzer
+public sealed class StepDefinitionExpressionAnalyzer : DiagnosticAnalyzer
 {
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
-    internal static readonly DiagnosticDescriptor StepTextCannotBeNullRule = 
+    internal static readonly DiagnosticDescriptor StepDefinitionExpressionCannotBeNullRule = 
         new DiagnosticDescriptor(
             "Reqnroll1001",
-            CreateResourceString(nameof(StepTextCannotBeNullTitle)),
-            CreateResourceString(nameof(StepTextCannotBeNullMessage)),
+            CreateResourceString(nameof(StepDefinitionExpressionCannotBeNullTitle)),
+            CreateResourceString(nameof(StepDefinitionExpressionCannotBeNullMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
             true);
 
-    internal static readonly DiagnosticDescriptor StepTextCannotBeEmptyOrWhitespaceRule =
+    internal static readonly DiagnosticDescriptor StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule =
         new DiagnosticDescriptor(
             "Reqnroll1002",
-            CreateResourceString(nameof(StepTextCannotBeEmptyOrWhitespaceTitle)),
-            CreateResourceString(nameof(StepTextCannotBeEmptyOrWhitespaceMessage)),
+            CreateResourceString(nameof(StepDefinitionExpressionCannotBeEmptyOrWhitespaceTitle)),
+            CreateResourceString(nameof(StepDefinitionExpressionCannotBeEmptyOrWhitespaceMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
             true);
 
-    internal static readonly DiagnosticDescriptor StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule = 
+    internal static readonly DiagnosticDescriptor StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule = 
         new DiagnosticDescriptor(
             "Reqnroll1003",
-            CreateResourceString(nameof(StepTextShouldNotHaveLeadingOrTrailingWhitespaceTitle)),
-            CreateResourceString(nameof(StepTextShouldNotHaveLeadingOrTrailingWhitespaceMessage)),
+            CreateResourceString(nameof(StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceTitle)),
+            CreateResourceString(nameof(StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
             true);
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
-            StepTextCannotBeNullRule,
-            StepTextCannotBeEmptyOrWhitespaceRule,
-            StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule);
+            StepDefinitionExpressionCannotBeNullRule,
+            StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule,
+            StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule);
 
     public override void Initialize(AnalysisContext context)
     {
@@ -72,7 +72,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
 
         if (!constantValue.HasValue || constantValue.Value == null)
         {
-            context.ReportDiagnostic(Diagnostic.Create(StepTextCannotBeNullRule, firstArgument.GetLocation()));
+            context.ReportDiagnostic(Diagnostic.Create(StepDefinitionExpressionCannotBeNullRule, firstArgument.GetLocation()));
         }
 
         if (constantValue.Value is not string stepText)
@@ -91,7 +91,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
         if (stepText == null)
         {
             context.ReportDiagnostic(
-                Diagnostic.Create(StepTextCannotBeNullRule, stepTextArgument.GetLocation()));
+                Diagnostic.Create(StepDefinitionExpressionCannotBeNullRule, stepTextArgument.GetLocation()));
 
             return;
         }
@@ -99,7 +99,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
         if (string.IsNullOrWhiteSpace(stepText))
         {
             context.ReportDiagnostic(
-                Diagnostic.Create(StepTextCannotBeEmptyOrWhitespaceRule, stepTextArgument.GetLocation()));
+                Diagnostic.Create(StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule, stepTextArgument.GetLocation()));
 
             return;
         }
@@ -107,7 +107,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
         if (char.IsWhiteSpace(stepText[0]) || char.IsWhiteSpace(stepText[stepText.Length - 1]))
         {
             context.ReportDiagnostic(
-                Diagnostic.Create(StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule, stepTextArgument.GetLocation()));
+                Diagnostic.Create(StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule, stepTextArgument.GetLocation()));
         }
     }
 }

@@ -10,7 +10,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
     [InlineData("    ")]
     public async Task StepBindingWithLeadingWhitespaceTextRaisesDiagnostic(string whitespace)
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepTextAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionExpressionAnalyzer>
         {
             TestCode =
                 $$""""
@@ -30,7 +30,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -42,7 +42,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
     [InlineData("    ")]
     public async Task FixingStepBindingWithLeadingWhitespaceTrimsStepText(string whitespace)
     {
-        var test = new ReqnrollCSharpCodeFixTest<StepTextAnalyzer, StepTextCodeFixProvider>
+        var test = new ReqnrollCSharpCodeFixTest<StepDefinitionExpressionAnalyzer, StepDefinitionExpressionCodeFixProvider>
         {
             TestCode =
                 $$""""
@@ -78,7 +78,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -90,7 +90,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
     [InlineData("    ")]
     public async Task StepBindingWithTrailingWhitespaceTextRaisesDiagnostic(string whitespace)
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepTextAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionExpressionAnalyzer>
         {
             TestCode =
                 $$""""
@@ -110,7 +110,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -122,7 +122,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
     [InlineData("    ")]
     public async Task FixingStepBindingWithTrailingWhitespaceTrimsStepText(string whitespace)
     {
-        var test = new ReqnrollCSharpCodeFixTest<StepTextAnalyzer, StepTextCodeFixProvider>
+        var test = new ReqnrollCSharpCodeFixTest<StepDefinitionExpressionAnalyzer, StepDefinitionExpressionCodeFixProvider>
         {
             TestCode =
                 $$""""
@@ -158,7 +158,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -170,7 +170,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
     [InlineData("    ")]
     public async Task StepBindingWithLeadingAndTrailingWhitespaceTextRaisesSingleDiagnostic(string whitespace)
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepTextAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionExpressionAnalyzer>
         {
             TestCode =
                 $$""""
@@ -190,7 +190,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -202,7 +202,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
     [InlineData("    ")]
     public async Task FixingStepBindingWithLeadingAndTrailingWhitespaceTrimsStepText(string whitespace)
     {
-        var test = new ReqnrollCSharpCodeFixTest<StepTextAnalyzer, StepTextCodeFixProvider>
+        var test = new ReqnrollCSharpCodeFixTest<StepDefinitionExpressionAnalyzer, StepDefinitionExpressionCodeFixProvider>
         {
             TestCode =
                 $$""""
@@ -238,7 +238,7 @@ public class StepTextShouldNotHaveLeadingOrTrailingWhitespaceTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();

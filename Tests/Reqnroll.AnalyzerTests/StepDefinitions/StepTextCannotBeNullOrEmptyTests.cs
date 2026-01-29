@@ -7,7 +7,7 @@ public class StepTextCannotBeNullOrEmptyTests
     [Fact]
     public async Task StepBindingWithNullTextRaisesDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepTextAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionExpressionAnalyzer>
         {
             TestCode =
                 """"
@@ -27,7 +27,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -36,7 +36,7 @@ public class StepTextCannotBeNullOrEmptyTests
     [Fact]
     public async Task FixingStepBindingWithNullTextRemovesTextArgument()
     {
-        var test = new ReqnrollCSharpCodeFixTest<StepTextAnalyzer, StepTextCodeFixProvider>
+        var test = new ReqnrollCSharpCodeFixTest<StepDefinitionExpressionAnalyzer, StepDefinitionExpressionCodeFixProvider>
         {
             TestCode =
                 """"
@@ -68,7 +68,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -77,7 +77,7 @@ public class StepTextCannotBeNullOrEmptyTests
     [Fact]
     public async Task StepBindingWithDefaultTextRaisesDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepTextAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionExpressionAnalyzer>
         {
             TestCode =
                 """"
@@ -97,7 +97,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -106,7 +106,7 @@ public class StepTextCannotBeNullOrEmptyTests
     [Fact]
     public async Task FixingStepBindingWithDefaultTextRemovesTextArgument()
     {
-        var test = new ReqnrollCSharpCodeFixTest<StepTextAnalyzer, StepTextCodeFixProvider>
+        var test = new ReqnrollCSharpCodeFixTest<StepDefinitionExpressionAnalyzer, StepDefinitionExpressionCodeFixProvider>
         {
             TestCode =
                 """"
@@ -142,7 +142,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeNullRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -151,7 +151,7 @@ public class StepTextCannotBeNullOrEmptyTests
     [Fact]
     public async Task StepBindingWithEmptyTextRaisesDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepTextAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionExpressionAnalyzer>
         {
             TestCode =
                 """"
@@ -171,7 +171,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -180,7 +180,7 @@ public class StepTextCannotBeNullOrEmptyTests
     [Fact]
     public async Task FixingStepBindingWithEmptyTextRemovesTextArgument()
     {
-        var test = new ReqnrollCSharpCodeFixTest<StepTextAnalyzer, StepTextCodeFixProvider>
+        var test = new ReqnrollCSharpCodeFixTest<StepDefinitionExpressionAnalyzer, StepDefinitionExpressionCodeFixProvider>
         {
             TestCode =
                 """"
@@ -216,7 +216,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();
@@ -228,7 +228,7 @@ public class StepTextCannotBeNullOrEmptyTests
     [InlineData("    ")]
     public async Task StepBindingWithWhitespaceTextRaisesDiagnostic(string whitespace)
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepTextAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionExpressionAnalyzer>
         {
             TestCode =
                 $$""""
@@ -248,7 +248,7 @@ public class StepTextCannotBeNullOrEmptyTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
+            new DiagnosticResult(StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule)
                 .WithLocation(0));
 
         await test.RunAsync();

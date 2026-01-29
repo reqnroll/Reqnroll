@@ -7,13 +7,13 @@ namespace Reqnroll.Analyzers.StepDefinitions;
 using static DiagnosticResources;
 
 [DiagnosticAnalyzer(LanguageNames.CSharp)]
-public class StepMethodReturnTypeAnalyzer : StepMethodAnalyzer
+public class StepDefinitionMethodReturnTypeAnalyzer : StepDefinitionMethodAnalyzer
 {
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
     internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
         "Reqnroll1021",
-        CreateResourceString(nameof(StepMethodShouldReturnVoidOrTaskOrValueTaskTitle)),
-        CreateResourceString(nameof(StepMethodShouldReturnVoidOrTaskOrValueTaskMessage)),
+        CreateResourceString(nameof(StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskTitle)),
+        CreateResourceString(nameof(StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskMessage)),
         DiagnosticCategory.Usage,
         DiagnosticSeverity.Warning,
         true);
@@ -21,7 +21,7 @@ public class StepMethodReturnTypeAnalyzer : StepMethodAnalyzer
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
         ImmutableArray.Create(Rule);
 
-    protected override void AnalyzeStepMethod(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol)
+    protected override void AnalyzeStepDefinitionMethod(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol)
     {
         var methodSyntax = (MethodDeclarationSyntax)context.Node;
 

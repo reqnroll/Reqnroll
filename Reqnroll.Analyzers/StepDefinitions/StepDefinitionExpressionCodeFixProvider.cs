@@ -7,13 +7,13 @@ using System.Composition;
 
 namespace Reqnroll.Analyzers.StepDefinitions;
 
-[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StepTextCodeFixProvider)), Shared]
-public class StepTextCodeFixProvider : CodeFixProvider
+[ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StepDefinitionExpressionCodeFixProvider)), Shared]
+public class StepDefinitionExpressionCodeFixProvider : CodeFixProvider
 {
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-        StepTextAnalyzer.StepTextCannotBeNullRule.Id,
-        StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule.Id,
-        StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule.Id);
+        StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule.Id,
+        StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule.Id,
+        StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule.Id);
 
     public override FixAllProvider? GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -31,8 +31,8 @@ public class StepTextCodeFixProvider : CodeFixProvider
         var argument = root.FindToken(diagnostic.Location.SourceSpan.Start).Parent!
             .AncestorsAndSelf().OfType<AttributeArgumentSyntax>().First();
 
-        if (diagnostic.Descriptor == StepTextAnalyzer.StepTextCannotBeNullRule || 
-            diagnostic.Descriptor == StepTextAnalyzer.StepTextCannotBeEmptyOrWhitespaceRule)
+        if (diagnostic.Descriptor == StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule || 
+            diagnostic.Descriptor == StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule)
         {
             context.RegisterCodeFix(
                 CodeAction.Create(
@@ -42,7 +42,7 @@ public class StepTextCodeFixProvider : CodeFixProvider
                 diagnostic);
         }
 
-        if (diagnostic.Descriptor == StepTextAnalyzer.StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule)
+        if (diagnostic.Descriptor == StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
         {
             context.RegisterCodeFix(
                 CodeAction.Create(

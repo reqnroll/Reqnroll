@@ -7,7 +7,7 @@ public class AsyncStepMethodReturnTypeTests
     [Fact]
     public async Task AsyncStepMethodReturningTaskDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -34,7 +34,7 @@ public class AsyncStepMethodReturnTypeTests
     [Fact]
     public async Task AsyncStepMethodReturningTaskOfTDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -61,7 +61,7 @@ public class AsyncStepMethodReturnTypeTests
     [Fact]
     public async Task AsyncStepMethodReturningValueTaskDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -88,7 +88,7 @@ public class AsyncStepMethodReturnTypeTests
     [Fact]
     public async Task AsyncStepMethodReturningValueTaskOfTDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -115,7 +115,7 @@ public class AsyncStepMethodReturnTypeTests
     [Fact]
     public async Task AsyncStepMethodReturningVoidRaisesDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<AsyncStepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -137,7 +137,7 @@ public class AsyncStepMethodReturnTypeTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(AsyncStepMethodReturnTypeAnalyzer.Rule)
+            new DiagnosticResult(AsyncStepDefinitionMethodReturnTypeAnalyzer.Rule)
                 .WithLocation(0)
                 .WithArguments("GameSteps.WhenMakerStartsAGame", "async"));
 

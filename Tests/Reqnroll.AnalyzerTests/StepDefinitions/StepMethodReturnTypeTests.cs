@@ -7,7 +7,7 @@ public class StepMethodReturnTypeTests
     [Fact]
     public async Task StepMethodReturningVoidDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -32,7 +32,7 @@ public class StepMethodReturnTypeTests
     [Fact]
     public async Task StepMethodReturningTaskDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -59,7 +59,7 @@ public class StepMethodReturnTypeTests
     [Fact]
     public async Task StepMethodReturningValueTaskDoesNotRaiseDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -86,7 +86,7 @@ public class StepMethodReturnTypeTests
     [Fact]
     public async Task StepMethodReturningValueRaisesDiagnostic()
     {
-        var test = new ReqnrollCSharpAnalyzerTest<StepMethodReturnTypeAnalyzer>
+        var test = new ReqnrollCSharpAnalyzerTest<StepDefinitionMethodReturnTypeAnalyzer>
         {
             TestCode =
                 """"
@@ -107,7 +107,7 @@ public class StepMethodReturnTypeTests
         };
 
         test.ExpectedDiagnostics.Add(
-            new DiagnosticResult(StepMethodReturnTypeAnalyzer.Rule)
+            new DiagnosticResult(StepDefinitionMethodReturnTypeAnalyzer.Rule)
                 .WithLocation(0)
                 .WithArguments("GameSteps.WhenMakerStartsAGame", "void"));
 

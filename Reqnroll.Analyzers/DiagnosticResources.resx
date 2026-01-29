@@ -117,34 +117,34 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="AsyncStepMethodMustReturnTaskMessage" xml:space="preserve">
-    <value>'{0}': step method is marked as {1} and must return a Task. Remove the {1} keyword or change the return type to Task.</value>
+  <data name="AsyncStepDefinitionMethodMustReturnTaskMessage" xml:space="preserve">
+    <value>'{0}': step definition method is marked as {1} and must return a Task. Remove the {1} keyword or change the return type to Task.</value>
   </data>
-  <data name="AsyncStepMethodMustReturnTaskTitle" xml:space="preserve">
-    <value>Asynchronous step methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt;</value>
+  <data name="AsyncStepDefinitionMethodMustReturnTaskTitle" xml:space="preserve">
+    <value>Asynchronous step definition methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt;</value>
   </data>
-  <data name="StepMethodShouldReturnVoidOrTaskOrValueTaskMessage" xml:space="preserve">
-    <value>'{0}': method is marked as a step and any values returned by the method will be ignored. Step methods should either have {0} return type, or return a Task or ValueTask.</value>
+  <data name="StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskMessage" xml:space="preserve">
+    <value>'{0}': method is marked as a step definition and any values returned by the method will be ignored. Step definition methods should either have {0} return type, or return a Task or ValueTask.</value>
   </data>
-  <data name="StepMethodShouldReturnVoidOrTaskOrValueTaskTitle" xml:space="preserve">
-    <value>Step methods should not return values</value>
+  <data name="StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskTitle" xml:space="preserve">
+    <value>Step definition methods should not return values</value>
   </data>
-  <data name="StepTextCannotBeNullTitle" xml:space="preserve">
-    <value>Step text cannot be empty</value>
+  <data name="StepDefinitionExpressionCannotBeNullTitle" xml:space="preserve">
+    <value>Step definition expression cannot be empty</value>
   </data>
-  <data name="StepTextCannotBeNullMessage" xml:space="preserve">
-    <value>The text of a step binding cannot be null. Replace it with text or remove the text argument to bind to the method name.</value>
+  <data name="StepDefinitionExpressionCannotBeNullMessage" xml:space="preserve">
+    <value>A step definition expression cannot be null. Replace it with text or remove the text argument to bind to the method name.</value>
   </data>
-  <data name="StepTextShouldNotHaveLeadingOrTrailingWhitespaceMessage" xml:space="preserve">
-    <value>Step text has leading or trailing whitespace</value>
+  <data name="StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceMessage" xml:space="preserve">
+    <value>Step definition expression has leading or trailing whitespace</value>
   </data>
-  <data name="StepTextShouldNotHaveLeadingOrTrailingWhitespaceTitle" xml:space="preserve">
-    <value>The text of this step binding includes some leading and/or trailing whitespace.</value>
+  <data name="StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceTitle" xml:space="preserve">
+    <value>The step definition expression includes some leading and/or trailing whitespace.</value>
   </data>
-  <data name="StepTextCannotBeEmptyOrWhitespaceTitle" xml:space="preserve">
-    <value>Step text cannot be empty or whitespace</value>
+  <data name="StepDefinitionExpressionCannotBeEmptyOrWhitespaceTitle" xml:space="preserve">
+    <value>Step definition expression cannot be empty or whitespace</value>
   </data>
-  <data name="StepTextCannotBeEmptyOrWhitespaceMessage" xml:space="preserve">
-    <value>The text of a step binding cannot be an empty string, or only contain whitespace characters. Add step text or remove the text argument to bind to the method name.</value>
+  <data name="StepDefinitionExpressionCannotBeEmptyOrWhitespaceMessage" xml:space="preserve">
+    <value>A step definition expression cannot be an empty string, or only contain whitespace characters. Add text or remove the text argument to bind to the method name.</value>
   </data>
 </root>

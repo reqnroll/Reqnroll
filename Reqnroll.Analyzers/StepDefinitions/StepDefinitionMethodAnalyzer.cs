@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 
 namespace Reqnroll.Analyzers.StepDefinitions;
 
-public abstract class StepMethodAnalyzer : DiagnosticAnalyzer
+public abstract class StepDefinitionMethodAnalyzer : DiagnosticAnalyzer
 {
     public override void Initialize(AnalysisContext context)
     {
@@ -28,8 +28,8 @@ public abstract class StepMethodAnalyzer : DiagnosticAnalyzer
             return;
         }
 
-        AnalyzeStepMethod(context, methodSymbol);
+        AnalyzeStepDefinitionMethod(context, methodSymbol);
     }
 
-    protected abstract void AnalyzeStepMethod(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol);
+    protected abstract void AnalyzeStepDefinitionMethod(SyntaxNodeAnalysisContext context, IMethodSymbol methodSymbol);
 }
