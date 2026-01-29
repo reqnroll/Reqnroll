@@ -16,7 +16,8 @@ public class AsyncStepDefinitionMethodReturnTypeAnalyzer : StepDefinitionMethodA
         CreateResourceString(nameof(AsyncStepDefinitionMethodMustReturnTaskMessage)),
         DiagnosticCategory.Usage,
         DiagnosticSeverity.Error,
-        true);
+        true,
+        helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1022"));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => ImmutableArray.Create(Rule);
 

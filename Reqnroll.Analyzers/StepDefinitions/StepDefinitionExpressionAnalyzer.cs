@@ -18,7 +18,8 @@ public sealed class StepDefinitionExpressionAnalyzer : DiagnosticAnalyzer
             CreateResourceString(nameof(StepDefinitionExpressionCannotBeNullMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1001"));
 
     internal static readonly DiagnosticDescriptor StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule =
         new DiagnosticDescriptor(
@@ -27,7 +28,8 @@ public sealed class StepDefinitionExpressionAnalyzer : DiagnosticAnalyzer
             CreateResourceString(nameof(StepDefinitionExpressionCannotBeEmptyOrWhitespaceMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1002"));
 
     internal static readonly DiagnosticDescriptor StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule = 
         new DiagnosticDescriptor(
@@ -36,7 +38,8 @@ public sealed class StepDefinitionExpressionAnalyzer : DiagnosticAnalyzer
             CreateResourceString(nameof(StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
-            true);
+            true,
+            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1003"));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(

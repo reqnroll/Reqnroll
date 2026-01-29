@@ -16,7 +16,8 @@ public class StepDefinitionMethodReturnTypeAnalyzer : StepDefinitionMethodAnalyz
         CreateResourceString(nameof(StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskMessage)),
         DiagnosticCategory.Usage,
         DiagnosticSeverity.Warning,
-        true);
+        true,
+        helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1021"));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
         ImmutableArray.Create(Rule);
