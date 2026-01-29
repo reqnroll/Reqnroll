@@ -13,7 +13,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
     internal static readonly DiagnosticDescriptor StepTextCannotBeNullRule = 
         new DiagnosticDescriptor(
-            "RR1001",
+            "Reqnroll1001",
             CreateResourceString(nameof(StepTextCannotBeNullTitle)),
             CreateResourceString(nameof(StepTextCannotBeNullMessage)),
             DiagnosticCategory.Usage,
@@ -22,7 +22,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
 
     internal static readonly DiagnosticDescriptor StepTextCannotBeEmptyOrWhitespaceRule =
         new DiagnosticDescriptor(
-            "RR1002",
+            "Reqnroll1002",
             CreateResourceString(nameof(StepTextCannotBeEmptyOrWhitespaceTitle)),
             CreateResourceString(nameof(StepTextCannotBeEmptyOrWhitespaceMessage)),
             DiagnosticCategory.Usage,
@@ -31,7 +31,7 @@ public sealed class StepTextAnalyzer : DiagnosticAnalyzer
 
     internal static readonly DiagnosticDescriptor StepTextShouldNotHaveLeadingOrTrailingWhitespaceRule = 
         new DiagnosticDescriptor(
-            "RR1003",
+            "Reqnroll1003",
             CreateResourceString(nameof(StepTextShouldNotHaveLeadingOrTrailingWhitespaceTitle)),
             CreateResourceString(nameof(StepTextShouldNotHaveLeadingOrTrailingWhitespaceMessage)),
             DiagnosticCategory.Usage,
