@@ -1,10 +1,10 @@
-# RR1021: Step methods should not return values
+# Reqnroll1021: Step definition methods should not return values
 
 ## Cause
 A method is decorated with one of the Reqnroll step binding attributes and returns a value other than `System.Task` or `System.ValueTask`.
 
 ## Description
-When a synchronous step method is invoked by Reqnroll, it is not expected to return information to the Reqnroll runtime.
+When a synchronous step definition method is invoked by Reqnroll, it is not expected to return information to the Reqnroll runtime.
 
 In the following example, the method returns a string:
 
@@ -16,11 +16,11 @@ public string WhenMakerStartsAGame()
 }
 ```
 
-Reqnroll will invoke the step, however the return value is discarded.
+Reqnroll will invoke the method, however the return value is discarded.
 
 In the case of asynchronous methods, a `System.Task` or `System.ValueTask` should be returned to represent the asynchronous operation. The runtime will observe the value and wait for the operation to complete before continuing execution.
 
-Additional `System.Task<TResult>` or `System.ValueTask<TResult>` can be returned by a step:
+`System.Task<TResult>` or `System.ValueTask<TResult>` can be returned by a step:
 
 ```CSharp
 [When("maker starts a game ")]

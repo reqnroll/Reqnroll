@@ -1,10 +1,10 @@
-# RR1022: Asynchronous step methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt;
+# Reqnroll1022: Asynchronous step definition methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt;
 
 ## Cause
-A method is decorated with one of the Reqnroll step binding attributes, is marked with the `async` keyword, and has a return type other than `System.Task`, `System.Task<TResult>`, `System.ValueTask` or `System.ValueTask<TResult>`.
+A method is decorated with one of the Reqnroll step definition attributes, is marked with the `async` keyword, and has a return type other than `System.Task`, `System.Task<TResult>`, `System.ValueTask` or `System.ValueTask<TResult>`.
 
 ## Description
-Reqnroll intends step methods to be invoked sequentially: steps are invoked in the order in which they are written in a feature. In the case of asynchronous methods, Reqnroll waits for the asynchronous operation to complete before continuing.
+Reqnroll intends step definition methods to be invoked sequentially: steps are invoked in the order in which they are written in a feature. In the case of asynchronous methods, Reqnroll waits for the asynchronous operation to complete before continuing.
 
 However, it is possible to write asynchronous methods which do not return an awaitable value:
 

@@ -1,5 +1,5 @@
 # Code Analysis
-Reqnroll includes a Rolsyn code analyser that inspects your C# or Visual Basic code to identify potential problems at design and build-time. The analyser checks code against a set of rules and reports any violations as issues. Reqnroll issues are prefixed with "RR" to separate them from issues produced by other code analysis or the compiler.
+Reqnroll includes a Rolsyn code analyser that inspects your C# or Visual Basic code to identify potential problems at design and build-time. The analyser checks code against a set of rules and reports any violations as issues. Reqnroll issues are prefixed with "Reqnroll" to separate them from issues produced by other code analysis or the compiler.
 
 ```{toctree}
 :hidden:
@@ -18,8 +18,8 @@ The following rules are provided.
 
 | Rule ID | Title |
 | --- | --- |
-| [RR1001](./step-definition-rules/rr1001.md) | Step text cannot be null |
-| [RR1002](./step-definition-rules/rr1002.md) | Step text cannot be empty or whitespace |
-| [RR1003](./step-definition-rules/rr1003.md) | Step text cannot have leading or trailing whitespace |
-| [RR1021](./step-definition-rules/rr1021.md) | Step methods should not return values |
-| [RR1022](./step-definition-rules/rr1022.md) | Asynchronous step methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt; |
+| [Reqnroll1001](./step-definition-rules/rr1001.md) | Step definition expression cannot be null |
+| [Reqnroll1002](./step-definition-rules/rr1002.md) | Step definition expression cannot be empty or whitespace |
+| [Reqnroll1003](./step-definition-rules/rr1003.md) | Step definition expression cannot have leading or trailing whitespace |
+| [Reqnroll1021](./step-definition-rules/rr1021.md) | Step definition methods should not return values |
+| [Reqnroll1022](./step-definition-rules/rr1022.md) | Asynchronous step definition methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt; |
