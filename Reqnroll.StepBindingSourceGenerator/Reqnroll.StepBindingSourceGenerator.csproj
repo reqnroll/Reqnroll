@@ -5,6 +5,21 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
+    <IsRoslynComponent>true</IsRoslynComponent>
+    <IsPackable>true</IsPackable>
+    <DevelopmentDependency>true</DevelopmentDependency>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <IncludeSymbols>false</IncludeSymbols>
+    <IncludeSource>false</IncludeSource>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NoWarn>NU5128</NoWarn>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+
+    <!-- NuGet package metadata -->
+    <PackageId>Reqnroll.Prototype.StepBindingSourceGenerator</PackageId>
+    <Description>Provides analyzers and code fixes for projects using Reqnroll.</Description>
+    <PackageTags>reqnroll analyzer</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +29,34 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Include="README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
     <InternalsVisibleTo Include="Reqnroll.StepBindingSourceGeneratorTests" />
   </ItemGroup>
+
+  <!-- Include the analyzer in the package. -->
+  <Target Name="AddAnalyzerToPackage" AfterTargets="Build">
+    <ItemGroup>
+      <None Include="$(OutputPath)$(AssemblyName).dll" Pack="true" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Include specified package referenced assemblies as part of this package directly. -->
+  <Target Name="MarkPackageReferencesForPack" AfterTargets="ResolveReferences" DependsOnTargets="ResolveAssemblyReferences">
+
+    <ItemGroup>
+      <PackageReferenceToPack Include="@(PackageReference)" Condition="'%(PackageReference.Pack)' == 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == '@(PackageReferenceToPack -> '%(Identity)')'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="@(PackageReferenceCopyLocalPaths)" Pack="true" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
 
 </Project>
