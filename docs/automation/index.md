@@ -22,5 +22,6 @@ sharing-data-between-bindings
 context-injection
 scenario-context
 feature-context
+code-analysis/index
 ```
 
