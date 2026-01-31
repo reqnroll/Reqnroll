@@ -120,9 +120,6 @@
   <data name="AsyncStepDefinitionMethodMustReturnTaskMessage" xml:space="preserve">
     <value>'{0}': step definition method is marked as {1} and must return a Task. Remove the {1} keyword or change the return type to Task.</value>
   </data>
-  <data name="AsyncStepDefinitionMethodMustReturnTaskTitle" xml:space="preserve">
-    <value>Asynchronous step definition methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt;</value>
-  </data>
   <data name="StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskMessage" xml:space="preserve">
     <value>'{0}': method is marked as a step definition and any values returned by the method will be ignored. Step definition methods should either have {0} return type, or return a Task or ValueTask.</value>
   </data>
@@ -136,15 +133,18 @@
     <value>A step definition expression cannot be null. Replace it with text or remove the text argument to bind to the method name.</value>
   </data>
   <data name="StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceMessage" xml:space="preserve">
-    <value>Step definition expression has leading or trailing whitespace</value>
+    <value>A step definition expression must not include leading or trailing whitespace.</value>
   </data>
   <data name="StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceTitle" xml:space="preserve">
-    <value>The step definition expression includes some leading and/or trailing whitespace.</value>
+    <value>Step definition expression has leading or trailing whitespace</value>
   </data>
   <data name="StepDefinitionExpressionCannotBeEmptyOrWhitespaceTitle" xml:space="preserve">
     <value>Step definition expression cannot be empty or whitespace</value>
   </data>
   <data name="StepDefinitionExpressionCannotBeEmptyOrWhitespaceMessage" xml:space="preserve">
     <value>A step definition expression cannot be an empty string, or only contain whitespace characters. Add text or remove the text argument to bind to the method name.</value>
+  </data>
+  <data name="AsyncStepDefinitionMethodMustReturnTaskTitle" xml:space="preserve">
+    <value>Asynchronous step definition methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt;</value>
   </data>
 </root>
