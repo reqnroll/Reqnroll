@@ -91,6 +91,7 @@
     <Project Path="Tests/Reqnroll.PluginTests/Reqnroll.PluginTests.csproj" />
     <Project Path="Tests/Reqnroll.RuntimeTests/Reqnroll.RuntimeTests.csproj" />
   </Folder>
+  <Project Path="Reqnroll.Analyzers.CodeFixes/Reqnroll.Analyzers.CodeFixes.csproj" Id="4d3b47c9-7522-44cb-9849-03aca23e4c0c" />
   <Project Path="Reqnroll.Analyzers/Reqnroll.Analyzers.csproj" />
   <Project Path="Reqnroll.Generator/Reqnroll.Generator.csproj" />
   <Project Path="Reqnroll.Parser/Reqnroll.Parser.csproj" />

@@ -24,8 +24,7 @@
   <ItemGroup>
     <PackageReference Include="Cucumber.CucumberExpressions" Version="18.0.1" PrivateAssets="all" Pack="true" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.3.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Workspaces" Version="4.3.1" PrivateAssets="all" />
-    <PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="3.12.0-beta1.25076.4" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.CodeAnalysis.ResxSourceGenerator" Version="5.0.0-1.25277.114" PrivateAssets="all" />
   </ItemGroup>
 
   <ItemGroup>
@@ -40,6 +39,14 @@
 
   <ItemGroup>
     <InternalsVisibleTo Include="Reqnroll.AnalyzerTests" />
+    <InternalsVisibleTo Include="Reqnroll.Analyzers.CodeFixTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference
+      Include="..\Reqnroll.Analyzers.CodeFixes\Reqnroll.Analyzers.CodeFixes.csproj"
+      PrivateAssets="all"
+      PackAsRoslynComponent="true" />
   </ItemGroup>
 
   <!-- Include the analyzer in the package. -->
@@ -57,11 +64,33 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReferenceCopyLocalPaths Include="@(ReferenceCopyLocalPaths)" Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == '@(PackageReferenceToPack -> '%(Identity)')'" />
+      <PackageReferenceCopyLocalPaths
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.NuGetPackageId)' == '@(PackageReferenceToPack -> '%(Identity)')'" />
     </ItemGroup>
 
     <ItemGroup>
       <None Include="@(PackageReferenceCopyLocalPaths)" Pack="true" PackagePath="analyzers/dotnet/cs" />
+    </ItemGroup>
+  </Target>
+
+  <!-- Include specified project referenced assemblies as part of this package directly. -->
+  <Target Name="MarkRoslynProjectReferencesForPack" AfterTargets="ResolveReferences" DependsOnTargets="ResolveAssemblyReferences">
+
+    <ItemGroup>
+      <ProjectReferenceToPackAsRoslynComponent
+        Include="@(ProjectReference)"
+        Condition="'%(ProjectReference.PackAsRoslynComponent)' == 'true'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReferenceCopyLocalPaths
+        Include="@(ReferenceCopyLocalPaths)"
+        Condition="'%(ReferenceCopyLocalPaths.ProjectReferenceOriginalItemSpec)' == '@(ProjectReferenceToPackAsRoslynComponent -> '%(Identity)')'" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="@(ProjectReferenceCopyLocalPaths)" Pack="true" PackagePath="analyzers/dotnet/cs" />
     </ItemGroup>
   </Target>
   

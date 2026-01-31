@@ -1,4 +1,5 @@
 ﻿using Microsoft.CodeAnalysis.Testing;
+using Reqnroll.Analyzers.CodeFixes.StepDefinitions;
 
 namespace Reqnroll.Analyzers.StepDefinitions;
 

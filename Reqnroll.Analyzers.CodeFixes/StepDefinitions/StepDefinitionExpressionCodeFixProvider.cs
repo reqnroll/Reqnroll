@@ -1,19 +1,25 @@
-﻿using Microsoft.CodeAnalysis.CodeActions;
+﻿using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Immutable;
 using System.Composition;
 
-namespace Reqnroll.Analyzers.StepDefinitions;
+namespace Reqnroll.Analyzers.CodeFixes.StepDefinitions;
 
 [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StepDefinitionExpressionCodeFixProvider)), Shared]
 public class StepDefinitionExpressionCodeFixProvider : CodeFixProvider
 {
+    public StepDefinitionExpressionCodeFixProvider()
+    {
+        System.Diagnostics.Debug.WriteLine(">>> CodeFixProvider instantiated");
+    }
+
     public override ImmutableArray<string> FixableDiagnosticIds { get; } = ImmutableArray.Create(
-        StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule.Id,
-        StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule.Id,
-        StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule.Id);
+        DiagnosticIds.StepDefinitionExpressionCannotBeNull,
+        DiagnosticIds.StepDefinitionExpressionCannotBeEmptyOrWhitespace,
+        DiagnosticIds.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespace);
 
     public override FixAllProvider? GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -31,8 +37,8 @@ public class StepDefinitionExpressionCodeFixProvider : CodeFixProvider
         var argument = root.FindToken(diagnostic.Location.SourceSpan.Start).Parent!
             .AncestorsAndSelf().OfType<AttributeArgumentSyntax>().First();
 
-        if (diagnostic.Descriptor == StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeNullRule || 
-            diagnostic.Descriptor == StepDefinitionExpressionAnalyzer.StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule)
+        if (diagnostic.Descriptor.Id == DiagnosticIds.StepDefinitionExpressionCannotBeNull || 
+            diagnostic.Descriptor.Id == DiagnosticIds.StepDefinitionExpressionCannotBeEmptyOrWhitespace)
         {
             context.RegisterCodeFix(
                 CodeAction.Create(
@@ -42,7 +48,7 @@ public class StepDefinitionExpressionCodeFixProvider : CodeFixProvider
                 diagnostic);
         }
 
-        if (diagnostic.Descriptor == StepDefinitionExpressionAnalyzer.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule)
+        if (diagnostic.Descriptor.Id == DiagnosticIds.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespace)
         {
             context.RegisterCodeFix(
                 CodeAction.Create(

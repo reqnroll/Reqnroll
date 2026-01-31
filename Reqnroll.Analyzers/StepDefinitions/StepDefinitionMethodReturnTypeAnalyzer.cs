@@ -11,13 +11,14 @@ public class StepDefinitionMethodReturnTypeAnalyzer : StepDefinitionMethodAnalyz
 {
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
     internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-        "Reqnroll1021",
+        DiagnosticIds.StepDefinitionMethodShouldReturnVoidOrTaskOrValueTask,
         CreateResourceString(nameof(StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskTitle)),
         CreateResourceString(nameof(StepDefinitionMethodShouldReturnVoidOrTaskOrValueTaskMessage)),
         DiagnosticCategory.Usage,
         DiagnosticSeverity.Warning,
         true,
-        helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1021"));
+        helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl(
+            DiagnosticIds.StepDefinitionMethodShouldReturnVoidOrTaskOrValueTask));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics => 
         ImmutableArray.Create(Rule);

@@ -13,33 +13,36 @@ public sealed class StepDefinitionExpressionAnalyzer : DiagnosticAnalyzer
     #pragma warning disable IDE0090 // Use 'new(...)' - full constructor syntax enables analyzer release tracking.
     internal static readonly DiagnosticDescriptor StepDefinitionExpressionCannotBeNullRule = 
         new DiagnosticDescriptor(
-            "Reqnroll1001",
+            DiagnosticIds.StepDefinitionExpressionCannotBeNull,
             CreateResourceString(nameof(StepDefinitionExpressionCannotBeNullTitle)),
             CreateResourceString(nameof(StepDefinitionExpressionCannotBeNullMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
             true,
-            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1001"));
+            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl(
+                DiagnosticIds.StepDefinitionExpressionCannotBeNull));
 
     internal static readonly DiagnosticDescriptor StepDefinitionExpressionCannotBeEmptyOrWhitespaceRule =
         new DiagnosticDescriptor(
-            "Reqnroll1002",
+            DiagnosticIds.StepDefinitionExpressionCannotBeEmptyOrWhitespace,
             CreateResourceString(nameof(StepDefinitionExpressionCannotBeEmptyOrWhitespaceTitle)),
             CreateResourceString(nameof(StepDefinitionExpressionCannotBeEmptyOrWhitespaceMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
             true,
-            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1002"));
+            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl(
+                DiagnosticIds.StepDefinitionExpressionCannotBeEmptyOrWhitespace));
 
     internal static readonly DiagnosticDescriptor StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceRule = 
         new DiagnosticDescriptor(
-            "Reqnroll1003",
+            DiagnosticIds.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespace,
             CreateResourceString(nameof(StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceTitle)),
             CreateResourceString(nameof(StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespaceMessage)),
             DiagnosticCategory.Usage,
             DiagnosticSeverity.Error,
             true,
-            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl("Reqnroll1003"));
+            helpLinkUri: DocumentationHelper.GetRuleDocumentationUrl(
+                DiagnosticIds.StepDefinitionExpressionShouldNotHaveLeadingOrTrailingWhitespace));
 
     public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
         ImmutableArray.Create(
