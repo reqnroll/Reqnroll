@@ -18,8 +18,8 @@ The following rules are provided.
 
 | Rule ID | Title |
 | --- | --- |
-| [Reqnroll1001](./step-definition-rules/rr1001.md) | Step definition expression cannot be null |
-| [Reqnroll1002](./step-definition-rules/rr1002.md) | Step definition expression cannot be empty or whitespace |
-| [Reqnroll1003](./step-definition-rules/rr1003.md) | Step definition expression cannot have leading or trailing whitespace |
-| [Reqnroll1021](./step-definition-rules/rr1021.md) | Step definition methods should not return values |
-| [Reqnroll1022](./step-definition-rules/rr1022.md) | Asynchronous step definition methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt; |
+| [Reqnroll1001](./step-definition-rules/reqnroll1001.md) | Step definition expression cannot be null |
+| [Reqnroll1002](./step-definition-rules/reqnroll1002.md) | Step definition expression cannot be empty or whitespace |
+| [Reqnroll1003](./step-definition-rules/reqnroll1003.md) | Step definition expression cannot have leading or trailing whitespace |
+| [Reqnroll1021](./step-definition-rules/reqnroll1021.md) | Step definition methods should not return values |
+| [Reqnroll1022](./step-definition-rules/reqnroll1022.md) | Asynchronous step definition methods must return a Task, Task&lt;TResult&gt;, ValueTask or ValueTask&lt;TResult&gt; |
