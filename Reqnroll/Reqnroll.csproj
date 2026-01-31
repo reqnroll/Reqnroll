@@ -18,9 +18,6 @@
       Include="..\Reqnroll.Utils\Reqnroll.Utils.csproj"
       PackAsComponent="true"
       PrivateAssets="all" />
-    <ProjectReference
-      Include="..\Reqnroll.Analyzers\Reqnroll.Analyzers.csproj"
-      ReferenceOutputAssembly="false"/>
   </ItemGroup>
 
   <ItemGroup>
