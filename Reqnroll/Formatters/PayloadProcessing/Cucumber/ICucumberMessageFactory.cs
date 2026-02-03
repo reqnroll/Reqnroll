@@ -5,6 +5,7 @@ using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.Configuration;
 using Reqnroll.Formatters.ExecutionTracking;
 using System;
+using System.Collections.Generic;
 
 namespace Reqnroll.Formatters.PayloadProcessing.Cucumber;
 
@@ -44,7 +45,7 @@ public interface ICucumberMessageFactory
     ExternalAttachment ToExternalAttachment(AttachmentTracker tracker);
     Attachment ToAttachment(OutputMessageTracker tracker);
     
-    Envelope CreateAttachmentEnvelope(AttachmentTracker tracker, AttachmentHandlingOption attachmentHandlingOption);
+    IEnumerable<Envelope> CreateAttachmentEnvelopes(AttachmentTracker tracker, AttachmentHandlingOption attachmentHandlingOption);
 
     // Metadata methods
     Meta ToMeta(string reqnrollVersion, string netCoreVersion, string osPlatform, BuildMetadata buildMetaData);

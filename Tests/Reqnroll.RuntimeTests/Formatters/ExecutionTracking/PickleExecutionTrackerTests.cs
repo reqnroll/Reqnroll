@@ -95,8 +95,8 @@ public class PickleExecutionTrackerTests
             .Returns(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1)));
 
         _mockMessageFactory
-            .Setup(m => m.CreateAttachmentEnvelope(It.IsAny<AttachmentTracker>(), It.IsAny<AttachmentHandlingOption>()))
-            .Returns(Envelope.Create(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1))));
+            .Setup(m => m.CreateAttachmentEnvelopes(It.IsAny<AttachmentTracker>(), It.IsAny<AttachmentHandlingOption>()))
+            .Returns([Envelope.Create(new Attachment("attachmentbody", AttachmentContentEncoding.BASE64, "filename", "mediatype", new Source("uri", "data", SourceMediaType.TEXT_X_CUCUMBER_GHERKIN_PLAIN), "test-case-started-id", "test-step-Id", "url", "test-run-started-id", "test-run-hook-started-id", new Timestamp(0, 1)))]);
 
         _stepDefinitionsByMethodSignature.TryAdd(_mockHookBinding.Object, "hook-id");
     }
@@ -324,7 +324,7 @@ public class PickleExecutionTrackerTests
         // Act
         await tracker.ProcessEvent(attachmentEvent);
         // Assert
-        _mockMessageFactory.Verify(m => m.CreateAttachmentEnvelope(It.IsAny<AttachmentTracker>(), It.IsAny<AttachmentHandlingOption>()), Times.Once);
+        _mockMessageFactory.Verify(m => m.CreateAttachmentEnvelopes(It.IsAny<AttachmentTracker>(), It.IsAny<AttachmentHandlingOption>()), Times.Once);
     }
 
     [Fact]

@@ -298,23 +298,17 @@ public class CucumberMessageFactory : ICucumberMessageFactory
             Converters.ToTimestamp(tracker.Timestamp));
     }
 
-    public virtual Envelope CreateAttachmentEnvelope(AttachmentTracker tracker, AttachmentHandlingOption attachmentHandlingOption)
+    public virtual IEnumerable<Envelope> CreateAttachmentEnvelopes(AttachmentTracker tracker, AttachmentHandlingOption attachmentHandlingOption)
     {
-        Attachment attachment = null;
-        ExternalAttachment externalAttachment = null;
-
         if (AttachmentHandlingOption.Embed == (attachmentHandlingOption & AttachmentHandlingOption.Embed)) 
         {
-            attachment = ToAttachment(tracker);
+            yield return Envelope.Create(ToAttachment(tracker));
         }
         
         if (AttachmentHandlingOption.External == (attachmentHandlingOption & AttachmentHandlingOption.External))
         {
-            externalAttachment = ToExternalAttachment(tracker);
+            yield return Envelope.Create(ToExternalAttachment(tracker));
         }
-        
-        var envelope = new Envelope(attachment, externalAttachment, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        return envelope;
     }
 
     public virtual Attachment ToAttachment(OutputMessageTracker tracker)
