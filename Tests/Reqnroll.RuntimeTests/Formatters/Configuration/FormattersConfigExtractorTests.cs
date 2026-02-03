@@ -70,7 +70,7 @@ public class FormattersConfigExtractorTests
 
         // Assert
         result.Should().ContainKey("html");
-        result["html"]["outputFilePath"].Should().Be("report.html");
+        result["html"].OutputFilePath.Should().Be("report.html");
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class FormattersConfigExtractorTests
 
         // Assert
         result.Should().ContainKey("message");
-        result["message"]["outputFilePath"].Should().Be("messages.ndjson");
+        result["message"].OutputFilePath.Should().Be("messages.ndjson");
     }
 
     [Fact]
@@ -106,8 +106,8 @@ public class FormattersConfigExtractorTests
 
         // Assert
         result.Should().ContainKey("customFormatter");
-        result["customFormatter"]["setting1"].Should().Be("value1");
-        result["customFormatter"]["setting2"].Should().Be("value2");
+        result["customFormatter"].AdditionalSettings["setting1"].Should().Be("value1");
+        result["customFormatter"].AdditionalSettings["setting2"].Should().Be("value2");
     }
 
     [Fact]
@@ -147,8 +147,8 @@ public class FormattersConfigExtractorTests
         var result = FormattersConfigExtractor.ExtractFormatters(json);
 
         // Assert
-        result["html"]["outputFilePath"].Should().Be("report.html");
-        result["html"]["customOption"].Should().Be("customValue");
+        result["html"].OutputFilePath.Should().Be("report.html");
+        result["html"].AdditionalSettings["customOption"].Should().Be("customValue");
     }
 
     [Fact]
@@ -165,8 +165,8 @@ public class FormattersConfigExtractorTests
         var result = FormattersConfigExtractor.ExtractFormatters(json);
 
         // Assert
-        result["custom"]["enabled"].Should().Be(true);
-        result["custom"]["debug"].Should().Be(false);
+        result["custom"].AdditionalSettings["enabled"].Should().Be(true);
+        result["custom"].AdditionalSettings["debug"].Should().Be(false);
     }
 
     [Fact]
@@ -183,8 +183,8 @@ public class FormattersConfigExtractorTests
         var result = FormattersConfigExtractor.ExtractFormatters(json);
 
         // Assert
-        result["custom"]["timeout"].Should().Be(30.5);
-        result["custom"]["retries"].Should().Be(3.0); // Numbers are parsed as double
+        result["custom"].AdditionalSettings["timeout"].Should().Be(30.5);
+        result["custom"].AdditionalSettings["retries"].Should().Be(3.0); // Numbers are parsed as double
     }
 
     [Fact]
@@ -224,7 +224,8 @@ public class FormattersConfigExtractorTests
 
         // Assert
         result.Should().ContainKey("html");
-        result["html"].Should().BeEmpty();
+        result["html"].OutputFilePath.Should().BeNull();
+        result["html"].AdditionalSettings.Should().BeEmpty();
     }
 
     [Fact]
@@ -242,7 +243,7 @@ public class FormattersConfigExtractorTests
 
         // Assert
         // The key should be accessible case-insensitively due to StringComparer.OrdinalIgnoreCase
-        result["html"]["outputFilePath"].Should().Be("report.html");
-        result["HTML"]["outputFilePath"].Should().Be("report.html");
+        result["html"].OutputFilePath.Should().Be("report.html");
+        result["HTML"].OutputFilePath.Should().Be("report.html");
     }
 }

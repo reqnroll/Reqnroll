@@ -12,14 +12,14 @@ namespace Reqnroll.Formatters.Configuration;
 public static class FormattersConfigExtractor
 {
     /// <summary>
-    /// Deserializes JSON content and extracts the formatters configuration as a dictionary.
+    /// Deserializes JSON content and extracts the formatters configuration as typed FormatterConfiguration objects.
     /// </summary>
     /// <param name="jsonContent">The JSON content to parse.</param>
     /// <returns>A dictionary of formatter configurations, or an empty dictionary if parsing fails or no formatters are defined.</returns>
-    public static IDictionary<string, IDictionary<string, object>> ExtractFormatters(string jsonContent)
+    public static IDictionary<string, FormatterConfiguration> ExtractFormatters(string jsonContent)
     {
         if (string.IsNullOrWhiteSpace(jsonContent))
-            return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+            return new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
@@ -28,18 +28,18 @@ public static class FormattersConfigExtractor
         }
         catch (JsonException)
         {
-            return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+            return new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
         }
     }
 
     /// <summary>
-    /// Converts a FormattersElement to the dictionary format used by the formatters configuration system.
+    /// Converts a FormattersElement to typed FormatterConfiguration objects.
     /// </summary>
     /// <param name="formatters">The FormattersElement to convert.</param>
     /// <returns>A dictionary of formatter configurations.</returns>
-    public static IDictionary<string, IDictionary<string, object>> ConvertFormattersElement(FormattersElement formatters)
+    public static IDictionary<string, FormatterConfiguration> ConvertFormattersElement(FormattersElement formatters)
     {
-        var result = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+        var result = new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
 
         if (formatters == null)
             return result;
@@ -62,17 +62,12 @@ public static class FormattersConfigExtractor
             {
                 if (kvp.Value.ValueKind == JsonValueKind.Object)
                 {
-                    var configValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var property in kvp.Value.EnumerateObject())
-                    {
-                        configValues[property.Name] = GetConfigValue(property.Value);
-                    }
-                    result[kvp.Key] = configValues;
+                    result[kvp.Key] = ConvertJsonElementToFormatterConfiguration(kvp.Value);
                 }
                 else
                 {
-                    // Non-object values get an empty config dictionary
-                    result[kvp.Key] = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+                    // Non-object values get an empty config
+                    result[kvp.Key] = new FormatterConfiguration();
                 }
             }
         }
@@ -80,25 +75,50 @@ public static class FormattersConfigExtractor
         return result;
     }
 
-    private static IDictionary<string, object> ConvertFormatterOptions(FormatterOptionsElement options)
+    private static FormatterConfiguration ConvertFormatterOptions(FormatterOptionsElement options)
     {
-        var configValues = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
-
-        if (options.OutputFilePath != null)
+        var config = new FormatterConfiguration
         {
-            configValues["outputFilePath"] = options.OutputFilePath;
-        }
+            OutputFilePath = options.OutputFilePath
+        };
 
         // Process additional options captured by JsonExtensionData
         if (options.AdditionalOptions != null)
         {
             foreach (var kvp in options.AdditionalOptions)
             {
-                configValues[kvp.Key] = GetConfigValue(kvp.Value);
+                var value = GetConfigValue(kvp.Value);
+                if (value != null)
+                {
+                    config.AdditionalSettings[kvp.Key] = value;
+                }
             }
         }
 
-        return configValues;
+        return config;
+    }
+
+    private static FormatterConfiguration ConvertJsonElementToFormatterConfiguration(JsonElement element)
+    {
+        var config = new FormatterConfiguration();
+
+        foreach (var property in element.EnumerateObject())
+        {
+            if (string.Equals(property.Name, "outputFilePath", StringComparison.OrdinalIgnoreCase))
+            {
+                config.OutputFilePath = property.Value.GetString();
+            }
+            else
+            {
+                var value = GetConfigValue(property.Value);
+                if (value != null)
+                {
+                    config.AdditionalSettings[property.Name] = value;
+                }
+            }
+        }
+
+        return config;
     }
 
     private static object GetConfigValue(JsonElement valueElement)

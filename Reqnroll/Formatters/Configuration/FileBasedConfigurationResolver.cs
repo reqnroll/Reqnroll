@@ -27,11 +27,16 @@ public class FileBasedConfigurationResolver : IFileBasedConfigurationResolver
         _log = log;
     }
 
-    public IDictionary<string, IDictionary<string, object>> Resolve()
+    /// <summary>
+    /// File-based configuration replaces entirely (does not merge with previous settings).
+    /// </summary>
+    public bool ShouldMergeSettings => false;
+
+    public IDictionary<string, FormatterConfiguration> Resolve()
     {
         var jsonContent = GetJsonContent();
         if (jsonContent == null)
-            return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+            return new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
 
         try
         {
@@ -40,7 +45,7 @@ public class FileBasedConfigurationResolver : IFileBasedConfigurationResolver
         catch (JsonException ex)
         {
             _log?.WriteMessage($"Failed to parse formatters configuration: {ex.Message}");
-            return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+            return new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
         }
     }
 

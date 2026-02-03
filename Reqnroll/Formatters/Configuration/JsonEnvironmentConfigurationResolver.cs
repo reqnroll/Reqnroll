@@ -20,7 +20,12 @@ public class JsonEnvironmentConfigurationResolver : IJsonEnvironmentConfiguratio
         _log = log;
     }
 
-    public IDictionary<string, IDictionary<string, object>> Resolve()
+    /// <summary>
+    /// JSON-based configuration replaces entirely (does not merge with previous settings).
+    /// </summary>
+    public bool ShouldMergeSettings => false;
+
+    public IDictionary<string, FormatterConfiguration> Resolve()
     {
         try
         {
@@ -48,6 +53,6 @@ public class JsonEnvironmentConfigurationResolver : IJsonEnvironmentConfiguratio
             _log?.WriteMessage($"Unexpected error retrieving environment configuration: {ex.Message}");
         }
 
-        return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+        return new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
     }
 }
