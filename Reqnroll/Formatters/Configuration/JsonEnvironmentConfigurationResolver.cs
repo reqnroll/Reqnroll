@@ -2,11 +2,12 @@
 using Reqnroll.EnvironmentAccess;
 using Reqnroll.Formatters.RuntimeSupport;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Reqnroll.Formatters.Configuration;
 
-public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResolverBase, IJsonEnvironmentConfigurationResolver
+public class JsonEnvironmentConfigurationResolver : IJsonEnvironmentConfigurationResolver
 {
     private readonly IEnvironmentOptions _environmentOptions;
     private readonly IFormatterLog _log;
@@ -19,7 +20,7 @@ public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResol
         _log = log;
     }
 
-    protected override JsonDocument GetJsonDocument()
+    public IDictionary<string, IDictionary<string, object>> Resolve()
     {
         try
         {
@@ -29,11 +30,7 @@ public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResol
             {
                 try
                 {
-                    return JsonDocument.Parse(formattersJson, new JsonDocumentOptions
-                    {
-                        CommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true // More lenient parsing
-                    });
+                    return FormattersConfigExtractor.ExtractFormatters(formattersJson);
                 }
                 catch (JsonException ex)
                 {
@@ -51,6 +48,6 @@ public class JsonEnvironmentConfigurationResolver : FormattersConfigurationResol
             _log?.WriteMessage($"Unexpected error retrieving environment configuration: {ex.Message}");
         }
 
-        return null;
+        return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
     }
 }

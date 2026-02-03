@@ -3,11 +3,12 @@ using Reqnroll.Configuration;
 using Reqnroll.Formatters.RuntimeSupport;
 using Reqnroll.Utils;
 using System;
+using System.Collections.Generic;
 using System.Text.Json;
 
 namespace Reqnroll.Formatters.Configuration;
 
-public class FileBasedConfigurationResolver : FormattersConfigurationResolverBase, IFileBasedConfigurationResolver
+public class FileBasedConfigurationResolver : IFileBasedConfigurationResolver
 {
     private readonly IReqnrollJsonLocator _configFileLocator;
     private readonly IFileSystem _fileSystem;
@@ -26,7 +27,24 @@ public class FileBasedConfigurationResolver : FormattersConfigurationResolverBas
         _log = log;
     }
 
-    protected override JsonDocument GetJsonDocument()
+    public IDictionary<string, IDictionary<string, object>> Resolve()
+    {
+        var jsonContent = GetJsonContent();
+        if (jsonContent == null)
+            return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+
+        try
+        {
+            return FormattersConfigExtractor.ExtractFormatters(jsonContent);
+        }
+        catch (JsonException ex)
+        {
+            _log?.WriteMessage($"Failed to parse formatters configuration: {ex.Message}");
+            return new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    private string GetJsonContent()
     {
         try
         {
@@ -71,19 +89,7 @@ public class FileBasedConfigurationResolver : FormattersConfigurationResolverBas
                 return null;
             }
 
-            try
-            {
-                return JsonDocument.Parse(jsonFileContent, new JsonDocumentOptions
-                {
-                    CommentHandling = JsonCommentHandling.Skip,
-                    AllowTrailingCommas = true // More lenient parsing
-                });
-            }
-            catch (JsonException ex)
-            {
-                _log?.WriteMessage($"Failed to parse JSON from file '{fileName}': {ex.Message}");
-                return null;
-            }
+            return jsonFileContent;
         }
         catch (Exception ex)
         {
