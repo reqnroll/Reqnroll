@@ -27,5 +27,8 @@ namespace Reqnroll.Configuration.JsonConfig
 
         [JsonPropertyName("bindingAssemblies")]
         public List<StepAssemblyElement> BindingAssemblies { get; set; }
+
+        [JsonPropertyName("formatters")]
+        public FormattersElement Formatters { get; set; }
     }
 }

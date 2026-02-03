@@ -31,7 +31,8 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
         _variableSubstitutionService = variableSubstitutionService;
     }
 
-    public IDictionary<string, object> GetFormatterConfigurationByName(string formatterName)
+    /// <inheritdoc />
+    public FormatterConfiguration GetFormatterConfiguration(string formatterName)
     {
         var config = _resolvedConfiguration.Value;
         if (config.Formatters.TryGetValue(formatterName, out var formatterConfig))
@@ -39,18 +40,37 @@ public class FormattersConfigurationProvider : IFormattersConfigurationProvider
         return null;
     }
 
+    /// <inheritdoc />
+    [Obsolete("Use GetFormatterConfiguration instead for type-safe access to configuration values.")]
+    public IDictionary<string, object> GetFormatterConfigurationByName(string formatterName)
+    {
+        var config = GetFormatterConfiguration(formatterName);
+        return config?.ToDictionary();
+    }
+
     private FormattersConfiguration ResolveConfiguration()
     {
-        var combinedConfig = new Dictionary<string, IDictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+        var combinedConfig = new Dictionary<string, FormatterConfiguration>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var resolver in _resolvers)
         {
             foreach (var entry in resolver.Resolve())
             {
-                if (entry.Value == null) 
+                if (entry.Value == null)
+                {
+                    // null means "disable this formatter"
                     combinedConfig.Remove(entry.Key);
-                else 
+                }
+                else if (resolver.ShouldMergeSettings && combinedConfig.TryGetValue(entry.Key, out var existing))
+                {
+                    // Merge: only override settings that are explicitly set in the new config
+                    existing.MergeFrom(entry.Value);
+                }
+                else
+                {
+                    // Replace: set the entire configuration
                     combinedConfig[entry.Key] = entry.Value;
+                }
             }
         }
         bool enabled = combinedConfig.Count > 0 && !_envVariableDisableFlagProvider.Disabled();

@@ -78,11 +78,11 @@ public class FileWritingFormatterBaseTests
             if (ThrowOnCreateTargetFileStream) throw new System.Exception("fail");
             return new MemoryStream();
         }
-        protected override void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+        protected override void FinalizeInitialization(string outputPath, FormatterConfiguration configuration, Action<bool> onInitialized)
         {
             FinalizeInitializationCalled = true;
             if (ThrowOnFinalizeInitialization) throw new System.Exception("fail");
-            base.FinalizeInitialization(outputPath, formatterConfiguration, onInitialized);
+            base.FinalizeInitialization(outputPath, configuration, onInitialized);
             LastOutputPath = outputPath;
         }
         public async Task PostEnvelopeAsync(Envelope envelope)
@@ -90,9 +90,9 @@ public class FileWritingFormatterBaseTests
             await PostedMessages.Writer.WriteAsync(envelope);
         }
 
-        public string TestConfiguredOutputFilePath(IDictionary<string, object> formatterConfiguration)
+        public string TestGetOutputFilePath(FormatterConfiguration configuration)
         {
-            return ConfiguredOutputFilePath(formatterConfiguration);
+            return GetOutputFilePath(configuration);
         }
     }
 
@@ -112,7 +112,7 @@ public class FileWritingFormatterBaseTests
     public void LaunchInner_InvalidPathCharacters_HandlesGracefully()
     {
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
-        var config = new Dictionary<string, object> { { "outputFilePath", "invalid\0path.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "invalid\0path.txt" };
         _sut.LaunchInner(config, enabled => enabled.Should().BeFalse());
         _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains( "is invalid or missing."))), Times.Once);
     }
@@ -121,7 +121,7 @@ public class FileWritingFormatterBaseTests
     public void LaunchInner_EmptyFileName_UsesDefaultFileName()
     {
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
-        var config = new Dictionary<string, object> { { "outputFilePath", "somedir/" } };
+        var config = new FormatterConfiguration { OutputFilePath = "somedir/" };
         _sut.LaunchInner(config, enabled => enabled.Should().BeTrue());
         _sut.LastOutputPath.Should().EndWith("default.txt");
     }
@@ -137,7 +137,7 @@ public class FileWritingFormatterBaseTests
 
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
         _configMock.Setup(c => c.Enabled).Returns(true);
-        var config = new Dictionary<string, object> { { "outputFilePath", "invalid|file.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "invalid|file.txt" };
         _sut.LaunchInner(config, enabled => enabled.Should().BeFalse());
         _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains("invalid or missing"))), Times.Once);
     }
@@ -147,7 +147,7 @@ public class FileWritingFormatterBaseTests
     {
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(false);
         _configMock.Setup(c => c.Enabled).Returns(true);
-        var config = new Dictionary<string, object> { { "outputFilePath", "dir/file.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "dir/file.txt" };
         _sut.LaunchInner(config, _ => { });
         _fileSystemMock.Verify(f => f.CreateDirectory(It.IsAny<string>()), Times.Once);
     }
@@ -157,7 +157,7 @@ public class FileWritingFormatterBaseTests
     {
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(false);
         _fileSystemMock.Setup(f => f.CreateDirectory(It.IsAny<string>())).Throws(new System.Exception("fail"));
-        var config = new Dictionary<string, object> { { "outputFilePath", "dir/file.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "dir/file.txt" };
         _sut.LaunchInner(config, enabled => enabled.Should().BeFalse());
         _loggerMock.Verify(l => l.WriteMessage(It.Is<string>(s => s.Contains("occurred creating the destination directory"))), Times.Once);
     }
@@ -166,7 +166,7 @@ public class FileWritingFormatterBaseTests
     public void LaunchInner_ValidConfig_InitializesFileStream()
     {
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
-        var config = new Dictionary<string, object> { { "outputFilePath", "file.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "file.txt" };
         _sut.LaunchInner(config, enabled => enabled.Should().BeTrue());
         _sut.OnTargetFileStreamInitializedCalled.Should().BeTrue();
         _sut.LastOutputPath.Should().NotBeNull();
@@ -178,7 +178,7 @@ public class FileWritingFormatterBaseTests
         // Arrange: set a flag so that the SUT sets TargetFileStream to null during initialization
         _sut.ThrowOnCreateTargetFileStream = true; // Use this flag to simulate failure and set TargetFileStream to null
 
-        var config = new Dictionary<string, object> { { "outputFilePath", "file.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "file.txt" };
         _sut.LaunchInner(config, _ => { });
 
         // Act: invoke the background task
@@ -201,7 +201,7 @@ public class FileWritingFormatterBaseTests
     {
         // Arrange: set up a valid file stream and post a message
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
-        var config = new Dictionary<string, object> { { "outputFilePath", "file.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "file.txt" };
         _sut.LaunchInner(config, _ => { });
         var envelope = Envelope.Create(new TestRunStarted(new Io.Cucumber.Messages.Types.Timestamp(0, 0), ""));
         await _sut.PostEnvelopeAsync(envelope);
@@ -229,7 +229,7 @@ public class FileWritingFormatterBaseTests
     public void Dispose_CallsDisposeFileStreamAndBaseDispose()
     {
         _fileSystemMock.Setup(f => f.DirectoryExists(It.IsAny<string>())).Returns(true);
-        var config = new Dictionary<string, object> { { "outputFilePath", "file.txt" } };
+        var config = new FormatterConfiguration { OutputFilePath = "file.txt" };
         _sut.LaunchInner(config, _ => { });
         _sut.Dispose();
         _sut.OnTargetFileStreamDisposingCalled.Should().BeTrue();
@@ -240,7 +240,7 @@ public class FileWritingFormatterBaseTests
     {
         var sp = Path.DirectorySeparatorChar;
         _configMock.Setup(c => c.Enabled).Returns(true);
-        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "aFileName.txt" } });
+        _configMock.Setup(c => c.GetFormatterConfiguration("testPlugin")).Returns(new FormatterConfiguration { OutputFilePath = "aFileName.txt" });
         _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
         _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
@@ -255,7 +255,7 @@ public class FileWritingFormatterBaseTests
     {
         var sp = Path.DirectorySeparatorChar;
         _configMock.Setup(c => c.Enabled).Returns(true);
-        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "myoutput" } });
+        _configMock.Setup(c => c.GetFormatterConfiguration("testPlugin")).Returns(new FormatterConfiguration { OutputFilePath = "myoutput" });
         _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
         _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
@@ -270,7 +270,7 @@ public class FileWritingFormatterBaseTests
     {
         var sp = Path.DirectorySeparatorChar;
         _configMock.Setup(c => c.Enabled).Returns(true);
-        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin")).Returns(new Dictionary<string, object> { { "outputFilePath", "myoutput.log" } });
+        _configMock.Setup(c => c.GetFormatterConfiguration("testPlugin")).Returns(new FormatterConfiguration { OutputFilePath = "myoutput.log" });
         _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
         _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
@@ -284,8 +284,8 @@ public class FileWritingFormatterBaseTests
     public async Task PublishAsync_Should_Write_Envelopes()
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
-        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                          .Returns(new Dictionary<string, object> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+        _configMock.Setup(c => c.GetFormatterConfiguration("testPlugin"))
+                          .Returns(new FormatterConfiguration { OutputFilePath = @"C:\/valid\/path/output.txt" });
         _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
         var message = Envelope.Create(new TestRunStarted(new Io.Cucumber.Messages.Types.Timestamp(1, 0), "started"));
@@ -301,8 +301,8 @@ public class FileWritingFormatterBaseTests
     public void LaunchFormatter_Should_Create_Directory_If_Not_Exists()
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
-        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                          .Returns(new Dictionary<string, object> { { "outputFilePath", "outputFilePath" } });
+        _configMock.Setup(c => c.GetFormatterConfiguration("testPlugin"))
+                          .Returns(new FormatterConfiguration { OutputFilePath = "outputFilePath" });
         _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(false);
 
         _sut.LaunchFormatter(new Mock<ICucumberMessageBroker>().Object);
@@ -315,8 +315,8 @@ public class FileWritingFormatterBaseTests
     public async Task Publish_FollowedBy_Dispose_Should_Cause_CancelToken_to_Fire()
     {
         _configMock.Setup(c => c.Enabled).Returns(true);
-        _configMock.Setup(c => c.GetFormatterConfigurationByName("testPlugin"))
-                          .Returns(new Dictionary<string, object> { { "outputFilePath", @"C:\/valid\/path/output.txt" } });
+        _configMock.Setup(c => c.GetFormatterConfiguration("testPlugin"))
+                          .Returns(new FormatterConfiguration { OutputFilePath = @"C:\/valid\/path/output.txt" });
         _fileSystemMock.Setup(fs => fs.DirectoryExists(It.IsAny<string>())).Returns(true);
 
         var message = Envelope.Create(new TestRunStarted(new Io.Cucumber.Messages.Types.Timestamp(1, 0), "started"));
@@ -330,18 +330,25 @@ public class FileWritingFormatterBaseTests
     }
 
     [Fact]
-    public void ConfiguredOutputFilePath_MissingKey_ReturnsEmptyString()
+    public void GetOutputFilePath_NullConfiguration_ReturnsEmptyString()
     {
-        var config = new Dictionary<string, object>();
-        var result = _sut.TestConfiguredOutputFilePath(config);
+        var result = _sut.TestGetOutputFilePath(null!);
         result.Should().BeEmpty();
     }
 
     [Fact]
-    public void ConfiguredOutputFilePath_NullValue_ReturnsEmptyString()
+    public void GetOutputFilePath_NullOutputFilePath_ReturnsEmptyString()
     {
-        var config = new Dictionary<string, object> { { "outputFilePath", null! } };
-        var result = _sut.TestConfiguredOutputFilePath(config);
+        var config = new FormatterConfiguration { OutputFilePath = null };
+        var result = _sut.TestGetOutputFilePath(config);
         result.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void GetOutputFilePath_ValidOutputFilePath_ReturnsPath()
+    {
+        var config = new FormatterConfiguration { OutputFilePath = "test/path.txt" };
+        var result = _sut.TestGetOutputFilePath(config);
+        result.Should().Be("test/path.txt");
     }
 }

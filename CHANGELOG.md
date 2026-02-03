@@ -1,10 +1,10 @@
 # [vNext]
 
 ## Improvements:
-
+* Refactored Formatters Configuration deserialization to align with Reqnroll JsonConfig. Created typed configuration settings object. Breaking change for custom Formatter implementers.
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.3 - 2026-01-27
 

@@ -172,7 +172,8 @@ public class MessagesCompatibilityTestBase : SystemTestBase
         var jsonEnvConfigResolver = new JsonEnvironmentConfigurationResolver(envOptions);
 
         var keyValueEnvironmentConfigurationResolverMock = new Mock<IKeyValueEnvironmentConfigurationResolver>();
-        keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, IDictionary<string, object>>());
+        keyValueEnvironmentConfigurationResolverMock.Setup(r => r.Resolve()).Returns(new Dictionary<string, FormatterConfiguration>());
+        keyValueEnvironmentConfigurationResolverMock.Setup(r => r.ShouldMergeSettings).Returns(true);
 
         FormattersConfigurationProvider configurationProvider = new FormattersConfigurationProvider(
             configFileResolver,
@@ -181,9 +182,9 @@ public class MessagesCompatibilityTestBase : SystemTestBase
                                                                         new FormattersDisabledOverrideProvider(envOptions),
                                                                         substitutionServiceMock.Object);
 
-        configurationProvider.GetFormatterConfigurationByName("message").TryGetValue("outputFilePath", out var outputFilePathElement);
+        var messageConfig = configurationProvider.GetFormatterConfiguration("message");
+        var outputFilePath = messageConfig?.OutputFilePath ?? "";
 
-        var outputFilePath = outputFilePathElement!.ToString();
         if (string.IsNullOrEmpty(outputFilePath))
             outputFilePath = "[BASEDIRECTORY]\\CucumberMessages\\reqnroll_report.ndson";
 

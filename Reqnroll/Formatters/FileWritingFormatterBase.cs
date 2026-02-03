@@ -41,10 +41,15 @@ public abstract class FileWritingFormatterBase : FormatterBase
 
     protected const int TUNING_PARAM_FILE_WRITE_BUFFER_SIZE = 65536;
 
-    public override void LaunchInner(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    /// <summary>
+    /// Initializes the file-writing formatter with the typed configuration.
+    /// </summary>
+    /// <param name="configuration">The typed formatter configuration.</param>
+    /// <param name="onInitialized">Callback to report initialization success or failure.</param>
+    public override void LaunchInner(FormatterConfiguration configuration, Action<bool> onInitialized)
     {
         var defaultBaseDirectory = ".";
-        var configuredPath = ConfiguredOutputFilePath(formatterConfiguration)?.Trim();
+        var configuredPath = GetOutputFilePath(configuration)?.Trim();
         configuredPath = ResolveOutputFilePathVariables(configuredPath);
         string outputPath;
         string baseDirectory;
@@ -106,8 +111,19 @@ public abstract class FileWritingFormatterBase : FormatterBase
             }
         }
 
-        FinalizeInitialization(outputPath, formatterConfiguration, onInitialized);
+        FinalizeInitialization(outputPath, configuration, onInitialized);
         Logger.WriteMessage($"Formatter {Name} initialized to write to: {outputPath}.");
+    }
+
+    /// <summary>
+    /// Legacy method - calls the new typed version.
+    /// </summary>
+    [Obsolete("Override LaunchInner(FormatterConfiguration, Action<bool>) instead.")]
+    public override void LaunchInner(IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    {
+        // Convert and call the typed version
+        var config = FormatterConfiguration.FromDictionary(formatterConfiguration) ?? new FormatterConfiguration();
+        LaunchInner(config, onInitialized);
     }
 
     public virtual string? ResolveOutputFilePathVariables(string? configuredFilePath)
@@ -162,7 +178,13 @@ public abstract class FileWritingFormatterBase : FormatterBase
         }
     }
 
-    protected virtual void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    /// <summary>
+    /// Finalizes the initialization of the formatter by creating the target file stream.
+    /// </summary>
+    /// <param name="outputPath">The resolved output file path.</param>
+    /// <param name="configuration">The typed formatter configuration.</param>
+    /// <param name="onInitialized">Callback to report initialization success or failure.</param>
+    protected virtual void FinalizeInitialization(string outputPath, FormatterConfiguration configuration, Action<bool> onInitialized)
     {
         try
         {
@@ -181,6 +203,16 @@ public abstract class FileWritingFormatterBase : FormatterBase
         }
     }
 
+    /// <summary>
+    /// Legacy method for backward compatibility.
+    /// </summary>
+    [Obsolete("Override FinalizeInitialization(string, FormatterConfiguration, Action<bool>) instead.")]
+    protected virtual void FinalizeInitialization(string outputPath, IDictionary<string, object> formatterConfiguration, Action<bool> onInitialized)
+    {
+        var config = FormatterConfiguration.FromDictionary(formatterConfiguration) ?? new FormatterConfiguration();
+        FinalizeInitialization(outputPath, config, onInitialized);
+    }
+
     protected virtual Stream CreateTargetFileStream(string outputPath) =>
         File.Create(outputPath, TUNING_PARAM_FILE_WRITE_BUFFER_SIZE);
 
@@ -188,12 +220,26 @@ public abstract class FileWritingFormatterBase : FormatterBase
     protected abstract void OnTargetFileStreamDisposing();
     protected abstract Task WriteToFile(Envelope envelope, CancellationToken cancellationToken);
 
+    /// <summary>
+    /// Gets the configured output file path from the typed configuration.
+    /// </summary>
+    /// <param name="configuration">The typed formatter configuration.</param>
+    /// <returns>The configured output file path, or empty string if not configured.</returns>
+    protected virtual string GetOutputFilePath(FormatterConfiguration configuration)
+    {
+        return configuration?.OutputFilePath ?? string.Empty;
+    }
+
+    /// <summary>
+    /// Legacy method for getting the output file path from a dictionary configuration.
+    /// </summary>
+    [Obsolete("Override GetOutputFilePath(FormatterConfiguration) instead.")]
     protected virtual string ConfiguredOutputFilePath(IDictionary<string, object> formatterConfiguration)
     {
         string outputFilePath = string.Empty;
         if (formatterConfiguration.TryGetValue("outputFilePath", out var outputPathElement))
         {
-            outputFilePath = outputPathElement?.ToString() ?? string.Empty; // Ensure null-coalescing to handle possible null values.
+            outputFilePath = outputPathElement?.ToString() ?? string.Empty;
         }
         return outputFilePath;
     }
