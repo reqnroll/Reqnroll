@@ -7,6 +7,8 @@ using System.Text;
 using Reqnroll.BindingSkeletons;
 using Reqnroll.Bindings;
 using Reqnroll.Bindings.Reflection;
+using Reqnroll.Configuration;
+using Reqnroll.EnvironmentAccess;
 
 namespace Reqnroll.Tracing
 {
@@ -32,11 +34,12 @@ namespace Reqnroll.Tracing
         private readonly ITraceListener traceListener;
         private readonly IStepFormatter stepFormatter;
         private readonly IStepDefinitionSkeletonProvider stepDefinitionSkeletonProvider;
-        private readonly Configuration.ReqnrollConfiguration reqnrollConfiguration;
+        private readonly ReqnrollConfiguration reqnrollConfiguration;
         private readonly IColorOutputTheme colorOutputTheme;
         private readonly IColorOutputHelper colorOutputHelper;
+        private readonly TraceLevel effectiveTraceLevel;
 
-        public TestTracer(ITraceListener traceListener, IStepFormatter stepFormatter, IStepDefinitionSkeletonProvider stepDefinitionSkeletonProvider, Configuration.ReqnrollConfiguration reqnrollConfiguration, IColorOutputTheme colorOutputTheme, IColorOutputHelper colorOutputHelper)
+        public TestTracer(ITraceListener traceListener, IStepFormatter stepFormatter, IStepDefinitionSkeletonProvider stepDefinitionSkeletonProvider, ReqnrollConfiguration reqnrollConfiguration, IColorOutputTheme colorOutputTheme, IColorOutputHelper colorOutputHelper, IEnvironmentOptions environmentOptions)
         {
             this.traceListener = traceListener;
             this.stepFormatter = stepFormatter;
@@ -44,21 +47,33 @@ namespace Reqnroll.Tracing
             this.reqnrollConfiguration = reqnrollConfiguration;
             this.colorOutputTheme = colorOutputTheme;
             this.colorOutputHelper = colorOutputHelper;
+            this.effectiveTraceLevel = environmentOptions.TraceLevel ?? reqnrollConfiguration.TraceLevel;
         }
+
+        private bool IsLevelEnabled(TraceLevel requiredLevel) => effectiveTraceLevel >= requiredLevel;
 
         public void TraceStep(StepInstance stepInstance, bool showAdditionalArguments)
         {
+            if (!IsLevelEnabled(TraceLevel.Normal))
+                return;
+
             string stepText = stepFormatter.GetStepText(stepInstance);
             traceListener.WriteTestOutput(stepText.TrimEnd());
         }
 
         public void TraceWarning(string text)
         {
+            if (!IsLevelEnabled(TraceLevel.Minimal))
+                return;
+
             traceListener.WriteToolOutput("{0}: {1}", colorOutputHelper.Colorize("warning", colorOutputTheme.Warning), text);
         }
 
         public void TraceStepDone(BindingMatch match, object[] arguments, TimeSpan duration)
         {
+            if (!IsLevelEnabled(TraceLevel.Detailed))
+                return;
+
             traceListener.WriteToolOutput(
                 "{0}: {1} ({2:F1}s)",
                 colorOutputHelper.Colorize("done", colorOutputTheme.Done),
@@ -69,6 +84,9 @@ namespace Reqnroll.Tracing
 
         public void TraceStepSkipped(Exception exception)
         {
+            if (!IsLevelEnabled(TraceLevel.Normal))
+                return;
+
             traceListener.WriteToolOutput("{0}: {1}",
                 colorOutputHelper.Colorize("skipped", colorOutputTheme.Warning),
                 string.IsNullOrEmpty(exception?.Message) ? "Step skipped." : exception.Message);
@@ -76,11 +94,17 @@ namespace Reqnroll.Tracing
 
         public void TraceStepSkippedBecauseOfPreviousErrors()
         {
+            if (!IsLevelEnabled(TraceLevel.Normal))
+                return;
+
             traceListener.WriteToolOutput("skipped because of previous errors");
         }
 
         public void TraceStepPending(BindingMatch match, object[] arguments, Exception exception)
         {
+            if (!IsLevelEnabled(TraceLevel.Minimal))
+                return;
+
             traceListener.WriteToolOutput("{0}: {1}: {2}",
                 colorOutputHelper.Colorize("pending", colorOutputTheme.Warning),
                 stepFormatter.GetMatchText(match, arguments),
@@ -89,11 +113,17 @@ namespace Reqnroll.Tracing
 
         public void TraceBindingError(Exception ex)
         {
+            if (!IsLevelEnabled(TraceLevel.Minimal))
+                return;
+
             traceListener.WriteToolOutput("{0}: {1}", colorOutputHelper.Colorize("binding error", colorOutputTheme.Error), ex.Message);
         }
 
         public void TraceError(Exception ex, TimeSpan duration)
         {
+            if (!IsLevelEnabled(TraceLevel.Minimal))
+                return;
+
             WriteErrorMessage(ex.Message, duration);
             WriteLoaderExceptionsIfAny(ex, duration);
         }
@@ -136,6 +166,9 @@ namespace Reqnroll.Tracing
 
         public void TraceNoMatchingStepDefinition(StepInstance stepInstance, ProgrammingLanguage targetLanguage, CultureInfo bindingCulture, List<BindingMatch> matchesWithoutScopeCheck)
         {
+            if (!IsLevelEnabled(TraceLevel.Minimal))
+                return;
+
             StringBuilder message = new StringBuilder();
             if (matchesWithoutScopeCheck == null || matchesWithoutScopeCheck.Count == 0)
                 message.AppendLine("No matching step definition found for the step. Use the following code to create one:");
@@ -157,6 +190,9 @@ namespace Reqnroll.Tracing
 
         public void TraceDuration(TimeSpan elapsed, IBindingMethod method, object[] arguments)
         {
+            if (!IsLevelEnabled(TraceLevel.Diagnostic))
+                return;
+
             string matchText = stepFormatter.GetMatchText(method, arguments);
             if (elapsed > MillisecondsThreshold)
             {
@@ -170,6 +206,9 @@ namespace Reqnroll.Tracing
 
         public void TraceDuration(TimeSpan elapsed, string text)
         {
+            if (!IsLevelEnabled(TraceLevel.Diagnostic))
+                return;
+
             if (elapsed > MillisecondsThreshold)
             {
                 traceListener.WriteToolOutput($"duration: {text}: {elapsed.TotalSeconds:F1}s");

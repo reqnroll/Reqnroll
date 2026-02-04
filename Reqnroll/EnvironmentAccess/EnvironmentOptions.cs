@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Reqnroll.CommonModels;
+using Reqnroll.Configuration;
 
 namespace Reqnroll.EnvironmentAccess;
 
@@ -13,6 +14,7 @@ public class EnvironmentOptions(IEnvironmentWrapper environment) : IEnvironmentO
     public const string REQNROLL_DRY_RUN_ENVIRONMENT_VARIABLE = "REQNROLL_DRY_RUN";
     public const string REQNROLL_BINDING_OUTPUT_ENVIRONMENT_VARIABLE = "REQNROLL_BINDING_OUTPUT";
     public const string DOTNET_RUNNING_IN_CONTAINER_ENVIRONMENT_VARIABLE = "DOTNET_RUNNING_IN_CONTAINER";
+    public const string REQNROLL_TRACE_LEVEL_ENVIRONMENT_VARIABLE = "REQNROLL_TRACE_LEVEL";
 
     private readonly Lazy<bool> _isDryRunLazy = new Lazy<bool>(() =>
         environment.GetEnvironmentVariable(REQNROLL_DRY_RUN_ENVIRONMENT_VARIABLE) is ISuccess<string> dryRunVar
@@ -40,4 +42,10 @@ public class EnvironmentOptions(IEnvironmentWrapper environment) : IEnvironmentO
 
     public IDictionary<string, string> FormatterSettings =>
         environment.GetEnvironmentVariables(REQNROLL_FORMATTERS_ENVIRONMENT_VARIABLE_PREFIX, trimPrefix: true);
+
+    public TraceLevel? TraceLevel =>
+        environment.GetEnvironmentVariable(REQNROLL_TRACE_LEVEL_ENVIRONMENT_VARIABLE) is ISuccess<string> traceLevelVar
+            && Enum.TryParse<TraceLevel>(traceLevelVar.Result, ignoreCase: true, out var level)
+            ? level
+            : null;
 }

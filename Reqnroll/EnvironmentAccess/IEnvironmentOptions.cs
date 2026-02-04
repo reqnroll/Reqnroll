@@ -1,5 +1,6 @@
 ﻿#nullable enable
 using System.Collections.Generic;
+using Reqnroll.Configuration;
 
 namespace Reqnroll.EnvironmentAccess;
 
@@ -19,4 +20,10 @@ public interface IEnvironmentOptions
     string? FormattersJson { get; }
 
     IDictionary<string, string> FormatterSettings { get; }
+
+    /// <summary>
+    /// Override for the trace level, set via the REQNROLL_TRACE_LEVEL environment variable.
+    /// Returns null if the environment variable is not set or has an invalid value.
+    /// </summary>
+    TraceLevel? TraceLevel { get; }
 }

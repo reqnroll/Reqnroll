@@ -50,6 +50,8 @@ namespace Reqnroll.Configuration
 
         public static bool DefaultColoredOutput => ConfigDefaults.ColoredOutput;
 
+        public static TraceLevel DefaultTraceLevel => ConfigDefaults.TraceLevel;
+
         public bool HasJsonConfig
         {
             get
@@ -132,7 +134,8 @@ namespace Reqnroll.Configuration
                 DefaultAddNonParallelizableMarkerForTags,
                 DefaultDisableFriendlyTestNames,
                 DefaultObsoleteBehavior,
-                DefaultColoredOutput
+                DefaultColoredOutput,
+                DefaultTraceLevel
                 );
         }
 

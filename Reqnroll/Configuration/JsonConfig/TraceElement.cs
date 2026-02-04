@@ -20,6 +20,9 @@ namespace Reqnroll.Configuration.JsonConfig
         [JsonPropertyName("ColoredOutput")]
         public bool ColoredOutput { get; set; } = ConfigDefaults.ColoredOutput;
 
+        [JsonPropertyName("traceLevel")]
+        public TraceLevel TraceLevel { get; set; } = ConfigDefaults.TraceLevel;
+
         // legacy config
         [JsonPropertyName("traceSuccessfulSteps")]
         public bool TraceSuccessfulSteps { get; set; } = ConfigDefaults.TraceSuccessfulSteps;

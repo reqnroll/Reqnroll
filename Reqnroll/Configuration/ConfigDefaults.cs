@@ -23,6 +23,7 @@ namespace Reqnroll.Configuration
 
         public const ObsoleteBehavior ObsoleteBehavior = Configuration.ObsoleteBehavior.Warn;
         public const bool ColoredOutput = false;
+        public const TraceLevel TraceLevel = Configuration.TraceLevel.Normal;
 
         public const bool AllowDebugGeneratedFiles = false;
         public const bool AllowRowTests = true;

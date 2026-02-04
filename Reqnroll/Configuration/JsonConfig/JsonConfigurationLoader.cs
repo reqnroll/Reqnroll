@@ -25,6 +25,7 @@ namespace Reqnroll.Configuration.JsonConfig
             bool traceTimings = reqnrollConfiguration.TraceTimings;
             var minTracedDuration = reqnrollConfiguration.MinTracedDuration;
             bool coloredOutput = reqnrollConfiguration.ColoredOutput;
+            var traceLevel = reqnrollConfiguration.TraceLevel;
             var stepDefinitionSkeletonStyle = reqnrollConfiguration.StepDefinitionSkeletonStyle;
             var additionalStepAssemblies = reqnrollConfiguration.AdditionalStepAssemblies;
             bool allowRowTests = reqnrollConfiguration.AllowRowTests;
@@ -87,6 +88,7 @@ namespace Reqnroll.Configuration.JsonConfig
                 minTracedDuration = jsonConfig.Trace.MinTracedDuration;
                 stepDefinitionSkeletonStyle = jsonConfig.Trace.StepDefinitionSkeletonStyle;
                 coloredOutput = jsonConfig.Trace.ColoredOutput;
+                traceLevel = jsonConfig.Trace.TraceLevel;
             }
 
             // legacy config
@@ -124,7 +126,8 @@ namespace Reqnroll.Configuration.JsonConfig
                 addNonParallelizableMarkerForTags,
                 disableFriendlyTestNames,
                 obsoleteBehavior,
-                coloredOutput
+                coloredOutput,
+                traceLevel
             )
             {
                 ConfigSourceText = jsonContent
