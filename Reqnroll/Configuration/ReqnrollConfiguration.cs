@@ -33,7 +33,8 @@ namespace Reqnroll.Configuration
             string[] addNonParallelizableMarkerForTags,
             bool disableFriendlyTestNames,
             ObsoleteBehavior obsoleteBehavior,
-            bool coloredOutput
+            bool coloredOutput,
+            TraceLevel traceLevel = ConfigDefaults.TraceLevel
         )
         {
             ConfigSource = configSource;
@@ -54,6 +55,7 @@ namespace Reqnroll.Configuration
             DisableFriendlyTestNames = disableFriendlyTestNames;
             ObsoleteBehavior = obsoleteBehavior;
             ColoredOutput = coloredOutput;
+            TraceLevel = traceLevel;
         }
 
         public ConfigSource ConfigSource { get; set; }
@@ -83,6 +85,7 @@ namespace Reqnroll.Configuration
         public bool TraceTimings { get; set; }
         public TimeSpan MinTracedDuration { get; set; }
         public StepDefinitionSkeletonStyle StepDefinitionSkeletonStyle { get; set; }
+        public TraceLevel TraceLevel { get; set; }
 
         public List<string> AdditionalStepAssemblies { get; set; }
 
@@ -102,7 +105,8 @@ namespace Reqnroll.Configuration
                                                               && StepDefinitionSkeletonStyle == other.StepDefinitionSkeletonStyle
                                                               && AdditionalStepAssemblies.SequenceEqual(other.AdditionalStepAssemblies)
                                                               && AddNonParallelizableMarkerForTags.SequenceEqual(other.AddNonParallelizableMarkerForTags)
-                                                              && DisableFriendlyTestNames == other.DisableFriendlyTestNames;
+                                                              && DisableFriendlyTestNames == other.DisableFriendlyTestNames
+                                                              && TraceLevel == other.TraceLevel;
 
         public override bool Equals(object obj)
         {
@@ -145,6 +149,7 @@ namespace Reqnroll.Configuration
                 hashCode = (hashCode * 397) ^ (AdditionalStepAssemblies != null ? AdditionalStepAssemblies.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ (AddNonParallelizableMarkerForTags != null ? AddNonParallelizableMarkerForTags.GetHashCode() : 0);
                 hashCode = (hashCode * 397) ^ DisableFriendlyTestNames.GetHashCode();
+                hashCode = (hashCode * 397) ^ (int)TraceLevel;
                 return hashCode;
             }
         }

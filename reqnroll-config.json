@@ -5,6 +5,9 @@
 
   Changelog:
 
+  3.3
+  - Added trace/traceLevel for configurable log level filtering.
+
   3.2
   - Added 'AsyncCucumberExpressionAttribute' and 'AsyncRegexAttribute' to the trace/stepDefinitionSkeletonStyle values.
 
@@ -111,6 +114,12 @@
           "description": "Determine whether Reqnroll should color the test result output.",
           "type": "boolean",
           "default": false
+        },
+        "traceLevel": {
+          "description": "Controls the verbosity of trace output. None: no output. Minimal: errors, warnings, and pending steps only. Normal (default): standard step execution output. Detailed: includes step completion confirmations. Diagnostic: includes duration timings.",
+          "type": "string",
+          "default": "Normal",
+          "enum": [ "None", "Minimal", "Normal", "Detailed", "Diagnostic" ]
         }
       }
     },

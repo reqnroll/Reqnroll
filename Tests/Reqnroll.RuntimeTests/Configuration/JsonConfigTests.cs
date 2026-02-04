@@ -318,6 +318,33 @@ namespace Reqnroll.RuntimeTests.Configuration
             runtimeConfig.ColoredOutput.Should().Be(true);
         }
 
+        [Theory]
+        [InlineData("None", TraceLevel.None)]
+        [InlineData("Minimal", TraceLevel.Minimal)]
+        [InlineData("Normal", TraceLevel.Normal)]
+        [InlineData("Detailed", TraceLevel.Detailed)]
+        [InlineData("Diagnostic", TraceLevel.Diagnostic)]
+        public void Check_Trace_TraceLevel(string configValue, TraceLevel expected)
+        {
+            string config = @$"{{
+                                ""trace"": {{ ""traceLevel"": ""{configValue}"" }}
+                            }}";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.TraceLevel.Should().Be(expected);
+        }
+
+        [Fact]
+        public void Check_Trace_TraceLevel_Default()
+        {
+            string config = "{}";
+
+            var runtimeConfig = new JsonConfigurationLoader().LoadJson(ConfigurationLoader.GetDefault(), config);
+
+            runtimeConfig.TraceLevel.Should().Be(TraceLevel.Normal);
+        }
+
         [Fact]
         public void Check_StepAssemblies_IsEmpty()
         {
@@ -499,6 +526,7 @@ namespace Reqnroll.RuntimeTests.Configuration
             config.StepDefinitionSkeletonStyle.Should().Be(ConfigDefaults.StepDefinitionSkeletonStyle);
             config.TraceSuccessfulSteps.Should().Be(ConfigDefaults.TraceSuccessfulSteps);
             config.ColoredOutput.Should().Be(ConfigDefaults.ColoredOutput);
+            config.TraceLevel.Should().Be(ConfigDefaults.TraceLevel);
 
             config.AdditionalStepAssemblies.Should().NotBeNull();
             config.AdditionalStepAssemblies.Should().BeEmpty();
