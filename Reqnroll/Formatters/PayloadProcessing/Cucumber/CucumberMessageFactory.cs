@@ -290,12 +290,12 @@ public class CucumberMessageFactory : ICucumberMessageFactory
     {
         var filePath = tracker.FilePath;
         return new ExternalAttachment(
-            Path.GetFullPath(filePath),
-            FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
-            tracker.TestCaseStepId,
-            tracker.TestCaseStartedId,
-            tracker.TestRunHookStartedId,
-            Converters.ToTimestamp(tracker.Timestamp));
+                url: Path.GetFullPath(filePath),
+                mediaType: FileExtensionToMimeTypeMap.GetMimeType(Path.GetExtension(filePath)),
+                testCaseStartedId: tracker.TestCaseStartedId,
+                testStepId: tracker.TestCaseStepId,
+                testRunHookStartedId: tracker.TestRunHookStartedId,
+                timestamp: Converters.ToTimestamp(tracker.Timestamp));
     }
 
     public virtual IEnumerable<Envelope> CreateAttachmentEnvelopes(AttachmentTracker tracker, AttachmentHandlingOption attachmentHandlingOption)

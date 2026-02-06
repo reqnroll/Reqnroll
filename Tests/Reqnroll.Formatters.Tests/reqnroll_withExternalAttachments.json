@@ -5,7 +5,7 @@
   ],
   "formatters": {
     "message": {
-      "outputFilePath": "[BaseDirectory]/CucumberMessages/reqnroll_externalAttachments_report.ndjson",
+      "outputFilePath": "[BaseDirectory]/CucumberMessages/Smoke reqnroll_externalAttachments_report.ndjson",
       "attachmentHandling": {
         "mode": "External",
         "attachmentsStoragePath": "path/to/CucumberMessages/Attachments"

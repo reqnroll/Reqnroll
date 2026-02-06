@@ -338,7 +338,7 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
     [TestMethod]
     public void SmokeEmitsExternalAttachmentMessagesWhenConfigured()
     {
-        ResetCucumberMessages("reqnroll_externalAttachments_report");
+        ResetCucumberMessages("Smoke reqnroll_externalAttachments_report");
         EnableCucumberMessages();
         CucumberMessagesAddConfigurationFile("reqnroll_withExternalAttachments.json");
         //SetCucumberMessagesOutputFileName("reqnroll_externalAttachments_report");
@@ -359,6 +359,12 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
                                 [When("I attach an external file")]
                                 public void WhenIAttachAnExternalFile()
                                 {
+                                    var assembly = typeof(Io.Cucumber.Messages.Types.ExternalAttachment).Assembly;
+                                    var version = assembly.GetName().Version;
+                                    var fileVersion = System.Diagnostics.FileVersionInfo.GetVersionInfo(assembly.Location);
+                                    Console.WriteLine($"Cucumber.Messages runtime version: {version}");
+                                    Console.WriteLine($"File version: {fileVersion.FileVersion}");
+                                    Console.WriteLine($"Location: {assembly.Location}");
                                     outputHelper.AddAttachment("Smoke.png");
                                 }
                             }
@@ -366,7 +372,7 @@ public class CucumberMessagesBasicTests : MessagesCompatibilityTestBase
                         """);
         ExecuteTests();
         ShouldAllScenariosPass();
-        var actualResults = GetActualResults("reqnroll_externalAttachments_report").ToList();
+        var actualResults = GetActualResults("Smoke reqnroll_externalAttachments_report").ToList();
         var exA = actualResults.Where(e => e.ExternalAttachment != null).FirstOrDefault();
         exA.Should().NotBeNull("Expected actual results to contain an ExternalAttachment Message");
     }

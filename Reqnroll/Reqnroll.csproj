@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Gherkin" Version="37.0.1" />
     <PackageReference Include="Cucumber.CucumberExpressions" Version="17.1.0" />
-    <PackageReference Include="Cucumber.Messages" Version="32.0.0" />
+    <PackageReference Include="Cucumber.Messages" Version="32.0.1" />
     <PackageReference Include="Cucumber.HtmlFormatter" Version="22.3.0" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.6" />
     <PackageReference Include="Microsoft.Extensions.DependencyModel" Version="8.0.2" />
