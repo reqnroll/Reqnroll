@@ -33,7 +33,7 @@ All contributors are welcome! For more information see the [Contribution guideli
 
 * [Spec Solutions](https://www.specsolutions.eu/)
 * [Info Support](https://www.infosupport.com/)
-* [LambdaTest](https://www.lambdatest.com/)
+* [TestMu AI (formerly LambdaTest)](https://www.testmuai.com/)
 
 See all sponsors and information about sponsorship on the [Sponsorship page](https://reqnroll.net/sponsorship) of our website.
 
@@ -41,6 +41,6 @@ See all sponsors and information about sponsorship on the [Sponsorship page](htt
 
 Reqnroll for VisualStudio is licensed under the [BSD 3-Clause License](LICENSE).
 
-Copyright (c) 2024-2025 Reqnroll
+Copyright (c) 2024-2026 Reqnroll
 
 This project is based on the SpecFlow framework.

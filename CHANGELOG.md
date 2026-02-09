@@ -4,6 +4,16 @@
 * Updated Cucumber dependencies to: Gherkin v37.0.1, Cucumber.Messages v31.1.0 and Cucumber.HtmlFormatter v22.3.0. (#984)
 
 ## Bug fixes:
+
+*Contributors of this release (in alphabetical order):* 
+
+# v3.3.3 - 2026-01-27
+
+## Improvements:
+
+* Improve binding discovery so that the discovery can continue even if the attributes of a type fail to load (#1006)
+
+## Bug fixes:
 * Fix: xUnit VB.NET generates code with async warning (#1009)
 * Fix: disableFriendlyTestNames doesn't work in Reqnroll 3.3.2 (#1013)
 
