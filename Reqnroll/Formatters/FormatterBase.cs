@@ -35,6 +35,16 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
 
     public string Name => _pluginName;
 
+    /// <summary>
+    /// Gets the timeout duration to wait for formatter task completion during disposal.
+    /// </summary>
+    protected virtual TimeSpan DisposeTimeout => TimeSpan.FromSeconds(15);
+
+    /// <summary>
+    /// Gets the timeout duration to wait after cancellation during disposal.
+    /// </summary>
+    protected virtual TimeSpan DisposeCancellationTimeout => TimeSpan.FromSeconds(15);
+
     protected FormatterBase(IFormattersConfigurationProvider configurationProvider, IFormatterLog logger, string pluginName)
     {
         _configurationProvider = configurationProvider;
@@ -134,7 +144,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                         Logger.WriteMessage($"DEBUG: Formatters: Dispose is waiting on the formatter task {Name}.");
                         // In this situation, the TestEngine is shutting down and has called Dispose on the global container.
                         // Forcing the Dispose to wait until the formatter has had a chance to complete.
-                        var timeoutTask = Task.Delay(TimeSpan.FromSeconds(15));
+                        var timeoutTask = Task.Delay(DisposeTimeout);
                         var finishedTask = Task.WhenAny(timeoutTask, _formatterTask).GetAwaiter().GetResult();
                         if (finishedTask == timeoutTask)
                         {
@@ -151,7 +161,7 @@ public abstract class FormatterBase : ICucumberMessageFormatter, IDisposable
                                 _logger.WriteMessage($"DEBUG: Formatters:PluginBase.Dispose - cancellation message can't be sent as the collection is closed.");
                             }
                             _logger.WriteMessage($"DEBUG: Formatters.PluginBase.Dispose - waiting again after cancellation.");
-                            timeoutTask = Task.Delay(TimeSpan.FromSeconds(15));
+                            timeoutTask = Task.Delay(DisposeCancellationTimeout);
                             finishedTask = Task.WhenAny(timeoutTask, _formatterTask).GetAwaiter().GetResult();
                             if (finishedTask == timeoutTask)
                             {

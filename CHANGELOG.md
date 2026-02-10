@@ -1,10 +1,11 @@
 # [vNext]
 
 ## Improvements:
+* Refactor: Introduce virtual timeout properties FormattersBase class to allow individual formatters to override the defaults
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.3 - 2026-01-27
 

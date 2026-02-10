@@ -28,6 +28,8 @@ public class FormatterBaseTests
         public bool ReportInitializedCalled = false;
         public bool CloseAsyncCalled = false;
         public bool CompleteWriterOnLaunchInner = false;
+        protected override TimeSpan DisposeTimeout => TimeSpan.FromMilliseconds(100);
+        protected override TimeSpan DisposeCancellationTimeout => TimeSpan.FromMilliseconds(100);
 
         public TestFormatter(IFormattersConfigurationProvider config, IFormatterLog logger, string name)
             : base(config, logger, name) { }

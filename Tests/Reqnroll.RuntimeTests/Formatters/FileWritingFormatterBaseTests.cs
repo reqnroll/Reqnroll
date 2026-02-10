@@ -39,6 +39,9 @@ public class FileWritingFormatterBaseTests
         public bool FinalizeInitializationCalled = false;
         public Stream? LastStream;
 
+        protected override TimeSpan DisposeTimeout => TimeSpan.FromMilliseconds(100);
+        protected override TimeSpan DisposeCancellationTimeout => TimeSpan.FromMilliseconds(100);
+
         public TestFileWritingFormatter(IFormattersConfigurationProvider config, IFormatterLog logger, IFileSystem fileSystem)
             : base(config, logger, fileSystem, "testPlugin", ".txt", "default.txt") { }
 
