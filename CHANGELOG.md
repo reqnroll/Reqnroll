@@ -1,10 +1,11 @@
 # [vNext]
 
 ## Improvements:
+* Formatters: Improve the robustness of Formatter shutdown and handling of cancellation.
 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.3 - 2026-01-27
 
