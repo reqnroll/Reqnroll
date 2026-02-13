@@ -9,4 +9,5 @@ public interface ICucumberMessageFormatter
     void LaunchFormatter(ICucumberMessageBroker broker);
     string Name { get; }
     Task PublishAsync(Envelope message);
+    Task CloseAsync();
 }

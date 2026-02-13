@@ -1,10 +1,11 @@
 # [vNext]
 
 ## Improvements:
-
+* Formatters: Made shutdown an explicit part of the interfaces for the Broker and Formatters. 
+* 
 ## Bug fixes:
 
-*Contributors of this release (in alphabetical order):* 
+*Contributors of this release (in alphabetical order):* @clrudolphi
 
 # v3.3.3 - 2026-01-27
 

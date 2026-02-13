@@ -194,6 +194,9 @@ public class CucumberMessagePublisher : IAsyncExecutionEventListener, ICucumberM
 
         await _broker.PublishAsync(Envelope.Create(MessageFactory.ToTestRunFinished(TestRunPassed, _clock.GetNowDateAndTime(), _testRunStartedId)));
         _logger.WriteMessage("DEBUG: Formatter:Publisher.TestRunComplete: TestRunFinished Message written");
+
+        await _broker.CompleteAsync();
+        _logger.WriteMessage("DEBUG: Formatter:Publisher.TestRunComplete: Broker CompleteAsync finished");
     }
 
     #region TestThreadExecutionEventPublisher Event Handling Methods
