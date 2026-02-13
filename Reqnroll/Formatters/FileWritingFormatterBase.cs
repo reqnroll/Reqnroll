@@ -126,11 +126,6 @@ public abstract class FileWritingFormatterBase : FormatterBase
         {
             await foreach (var message in PostedMessages.Reader.ReadAllAsync(cancellationToken))
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    Logger.WriteMessage($"Formatter {Name} has been cancelled.");
-                    break;
-                }
                 await WriteToFile(message, cancellationToken);
             }
         }
