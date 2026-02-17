@@ -10,7 +10,7 @@
 
     <!-- NuGet package metadata -->
     <PackageId>Reqnroll.Microsoft.Extensions.DependencyInjection</PackageId>
-    <PackageTags>reqnroll verify xunit</PackageTags>
+    <PackageTags>reqnroll microsoft extensions di dependency injection</PackageTags>
     <Title>Reqnroll Microsoft.Extensions.DependencyInjection integration plugin</Title>
     <Description>Reqnroll plugin that enables to use Microsoft.Extensions.DependencyInjection for resolving test dependencies.</Description>
     <Authors>Mark Hoek, Solid Token, Stef Heyenrath, $(ReqnrollAuthors)</Authors>
