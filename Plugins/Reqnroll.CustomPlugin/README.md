@@ -1,6 +1,10 @@
-﻿Reqnroll.CustomPlugin provides a sample custom plugin for Reqnroll.
+﻿Reqnroll.CustomPlugin provides the required dependencies for writing custom Reqnroll generator extensions.
 
 This package serves as a template and example for creating custom plugins that extend Reqnroll functionality. It demonstrates how to create custom generators, transformations, and other extensions.
+
+## Documentation
+
+For more information about creating custom generator plugins, see [Generator Plugins - Reqnroll documentation](https://docs.reqnroll.net/latest/extend/plugins.html#generator-plugins).
 
 ## Support
 
